@@ -2421,7 +2421,7 @@ retry:
 				if (fence) {
 					r = dma_fence_wait(fence, false);
 					if (r) {
-						WARN(r, "recovery from shadow isn't comleted\n");
+						WARN(r, "recovery from shadow isn't completed\n");
 						break;
 					}
 				}
@@ -2433,7 +2433,7 @@ retry:
 			if (fence) {
 				r = dma_fence_wait(fence, false);
 				if (r)
-					WARN(r, "recovery from shadow isn't comleted\n");
+					WARN(r, "recovery from shadow isn't completed\n");
 			}
 			dma_fence_put(fence);
 		}
