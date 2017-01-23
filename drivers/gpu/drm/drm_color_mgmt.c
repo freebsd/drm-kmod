@@ -88,7 +88,7 @@
  */
 
 /**
- * drm_color_lut_extract - clamp and round LUT entries
+ * drm_color_lut_extract - clamp&round LUT entries
  * @user_input: input value
  * @bit_precision: number of bits the hw LUT supports
  *
