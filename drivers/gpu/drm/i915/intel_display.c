@@ -7174,7 +7174,7 @@ static bool pipe_config_supports_ips(struct drm_i915_private *dev_priv,
 	 *
 	 * Should measure whether using a lower cdclk w/o IPS
 	 */
-	return ilk_pipe_pixel_rate(pipe_config) <=
+	return pipe_config->pixel_rate <=
 		dev_priv->max_cdclk_freq * 95 / 100;
 }
 
@@ -7196,6 +7196,19 @@ static bool intel_crtc_supports_double_wide(const struct intel_crtc *crtc)
 	/* GDG double wide on either pipe, otherwise pipe A only */
 	return INTEL_INFO(dev_priv)->gen < 4 &&
 		(crtc->pipe == PIPE_A || IS_I915G(dev_priv));
+}
+
+static void intel_crtc_compute_pixel_rate(struct intel_crtc_state *crtc_state)
+{
+	struct drm_i915_private *dev_priv = to_i915(crtc_state->base.crtc->dev);
+
+	if (HAS_GMCH_DISPLAY(dev_priv))
+		/* FIXME calculate proper pipe pixel rate for GMCH pfit */
+		crtc_state->pixel_rate =
+			crtc_state->base.adjusted_mode.crtc_clock;
+	else
+		crtc_state->pixel_rate =
+			ilk_pipe_pixel_rate(crtc_state);
 }
 
 static int intel_crtc_compute_config(struct intel_crtc *crtc,
@@ -7243,6 +7256,8 @@ static int intel_crtc_compute_config(struct intel_crtc *crtc,
 	if ((INTEL_GEN(dev_priv) > 4 || IS_G4X(dev_priv)) &&
 		adjusted_mode->crtc_hsync_start == adjusted_mode->crtc_hdisplay)
 		return -EINVAL;
+
+	intel_crtc_compute_pixel_rate(pipe_config);
 
 	if (HAS_IPS(dev_priv))
 		hsw_compute_ips_config(crtc, pipe_config);
@@ -10312,7 +10327,7 @@ static int ilk_max_pixel_rate(struct drm_atomic_state *state)
 			continue;
 		}
 
-		pixel_rate = ilk_pipe_pixel_rate(crtc_state);
+		pixel_rate = crtc_state->pixel_rate;
 
 		if (IS_BROADWELL(dev_priv) || IS_GEN9(dev_priv))
 			pixel_rate = bdw_adjust_min_pipe_pixel_rate(crtc_state,
@@ -12824,9 +12839,10 @@ static void intel_dump_pipe_config(struct intel_crtc *crtc,
 	DRM_DEBUG_KMS("adjusted mode:\n");
 	drm_mode_debug_printmodeline(&pipe_config->base.adjusted_mode);
 	intel_dump_crtc_timings(&pipe_config->base.adjusted_mode);
-	DRM_DEBUG_KMS("port clock: %d, pipe src size: %dx%d\n",
+	DRM_DEBUG_KMS("port clock: %d, pipe src size: %dx%d, pixel rate %d\n",
 		      pipe_config->port_clock,
-		      pipe_config->pipe_src_w, pipe_config->pipe_src_h);
+		      pipe_config->pipe_src_w, pipe_config->pipe_src_h,
+		      pipe_config->pixel_rate);
 
 	if (INTEL_GEN(dev_priv) >= 9)
 		DRM_DEBUG_KMS("num_scalers: %d, scaler_users: 0x%x, scaler_id: %d\n",
@@ -13404,6 +13420,7 @@ intel_pipe_config_compare(struct drm_i915_private *dev_priv,
 		}
 
 		PIPE_CONF_CHECK_I(scaler_state.scaler_id);
+		PIPE_CONF_CHECK_CLOCK_FUZZY(pixel_rate);
 	}
 
 	/* BDW+ don't expose a synchronous way to read the state */
@@ -13694,6 +13711,8 @@ verify_crtc_state(struct drm_crtc *crtc,
 			encoder->get_config(encoder, pipe_config);
 		}
 	}
+
+	intel_crtc_compute_pixel_rate(pipe_config);
 
 	if (!new_crtc_state->active)
 		return;
@@ -17172,10 +17191,11 @@ static void intel_modeset_readout_hw_state(struct drm_device *dev)
 			 */
 			crtc_state->base.mode.private_flags = I915_MODE_FLAG_INHERITED;
 
-			if (INTEL_GEN(dev_priv) >= 9 || IS_BROADWELL(dev_priv))
-				pixclk = ilk_pipe_pixel_rate(crtc_state);
-			else if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
-				pixclk = crtc_state->base.adjusted_mode.crtc_clock;
+			intel_crtc_compute_pixel_rate(crtc_state);
+
+			if (INTEL_GEN(dev_priv) >= 9 || IS_BROADWELL(dev_priv) ||
+			    IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
+				pixclk = crtc_state->pixel_rate;
 			else
 				WARN_ON(dev_priv->display.modeset_calc_cdclk);
 
