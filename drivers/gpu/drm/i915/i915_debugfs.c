@@ -39,49 +39,6 @@ static inline struct drm_i915_private *node_to_i915(struct drm_info_node *node)
 	return to_i915(node->minor->dev);
 }
 
-/* As the drm_debugfs_init() routines are called before dev->dev_private is
- * allocated we need to hook into the minor for release. */
-static int
-drm_add_fake_info_node(struct drm_minor *minor,
-		       struct dentry *ent,
-		       const void *key)
-{
-	struct drm_info_node *node;
-
-	node = kmalloc(sizeof(*node), GFP_KERNEL);
-	if (node == NULL) {
-		debugfs_remove(ent);
-		return -ENOMEM;
-	}
-
-	node->minor = minor;
-	node->dent = ent;
-	node->info_ent = (void *)key;
-
-	mutex_lock(&minor->debugfs_lock);
-	list_add(&node->list, &minor->debugfs_list);
-	mutex_unlock(&minor->debugfs_lock);
-
-	return 0;
-}
-
-static __always_inline void seq_print_param(struct seq_file *m,
-					    const char *name,
-					    const char *type,
-					    const void *x)
-{
-	if (!__builtin_strcmp(type, "bool"))
-		seq_printf(m, "i915.%s=%s\n", name, yesno(*(const bool *)x));
-	else if (!__builtin_strcmp(type, "int"))
-		seq_printf(m, "i915.%s=%d\n", name, *(const int *)x);
-	else if (!__builtin_strcmp(type, "unsigned int"))
-		seq_printf(m, "i915.%s=%u\n", name, *(const unsigned int *)x);
-	else if (!__builtin_strcmp(type, "char *"))
-		seq_printf(m, "i915.%s=%s\n", name, *(const char **)x);
-	else
-		BUILD_BUG();
-}
-
 static int i915_capabilities(struct seq_file *m, void *data)
 {
 	struct drm_i915_private *dev_priv = node_to_i915(m->private);
@@ -4665,112 +4622,6 @@ static const struct file_operations i915_forcewake_fops = {
 	.release = i915_forcewake_release,
 };
 
-static int i915_forcewake_create(struct dentry *root, struct drm_minor *minor)
-{
-	struct dentry *ent;
-
-	ent = debugfs_create_file("i915_forcewake_user",
-				  S_IRUSR,
-				  root, to_i915(minor->dev),
-				  &i915_forcewake_fops);
-	if (!ent)
-		return -ENOMEM;
-
-	return drm_add_fake_info_node(minor, ent, &i915_forcewake_fops);
-}
-
-static int i915_hpd_storm_ctl_show(struct seq_file *m, void *data)
-{
-	struct drm_i915_private *dev_priv = m->private;
-	struct i915_hotplug *hotplug = &dev_priv->hotplug;
-
-	seq_printf(m, "Threshold: %d\n", hotplug->hpd_storm_threshold);
-	seq_printf(m, "Detected: %s\n",
-		   yesno(delayed_work_pending(&hotplug->reenable_work)));
-
-	return 0;
-}
-
-static ssize_t i915_hpd_storm_ctl_write(struct file *file,
-					const char __user *ubuf, size_t len,
-					loff_t *offp)
-{
-	struct seq_file *m = file->private_data;
-	struct drm_i915_private *dev_priv = m->private;
-	struct i915_hotplug *hotplug = &dev_priv->hotplug;
-	unsigned int new_threshold;
-	int i;
-	char *newline;
-	char tmp[16];
-
-	if (len >= sizeof(tmp))
-		return -EINVAL;
-
-	if (copy_from_user(tmp, ubuf, len))
-		return -EFAULT;
-
-	tmp[len] = '\0';
-
-	/* Strip newline, if any */
-	newline = strchr(tmp, '\n');
-	if (newline)
-		*newline = '\0';
-
-	if (strcmp(tmp, "reset") == 0)
-		new_threshold = HPD_STORM_DEFAULT_THRESHOLD;
-	else if (kstrtouint(tmp, 10, &new_threshold) != 0)
-		return -EINVAL;
-
-	if (new_threshold > 0)
-		DRM_DEBUG_KMS("Setting HPD storm detection threshold to %d\n",
-			      new_threshold);
-	else
-		DRM_DEBUG_KMS("Disabling HPD storm detection\n");
-
-	spin_lock_irq(&dev_priv->irq_lock);
-	hotplug->hpd_storm_threshold = new_threshold;
-	/* Reset the HPD storm stats so we don't accidentally trigger a storm */
-	for_each_hpd_pin(i)
-		hotplug->stats[i].count = 0;
-	spin_unlock_irq(&dev_priv->irq_lock);
-
-	/* Re-enable hpd immediately if we were in an irq storm */
-	flush_delayed_work(&dev_priv->hotplug.reenable_work);
-
-	return len;
-}
-
-static int i915_hpd_storm_ctl_open(struct inode *inode, struct file *file)
-{
-	return single_open(file, i915_hpd_storm_ctl_show, inode->i_private);
-}
-
-static const struct file_operations i915_hpd_storm_ctl_fops = {
-	.owner = THIS_MODULE,
-	.open = i915_hpd_storm_ctl_open,
-	.read = seq_read,
-	.llseek = seq_lseek,
-	.release = single_release,
-	.write = i915_hpd_storm_ctl_write
-};
-
-static int i915_debugfs_create(struct dentry *root,
-			       struct drm_minor *minor,
-			       const char *name,
-			       const struct file_operations *fops)
-{
-	struct dentry *ent;
-
-	ent = debugfs_create_file(name,
-				  S_IRUGO | S_IWUSR,
-				  root, to_i915(minor->dev),
-				  fops);
-	if (!ent)
-		return -ENOMEM;
-
-	return drm_add_fake_info_node(minor, ent, fops);
-}
-
 static const struct drm_info_list i915_debugfs_list[] = {
 	{"i915_capabilities", i915_capabilities, 0},
 	{"i915_gem_objects", i915_gem_object_info, 0},
@@ -4855,48 +4706,32 @@ static const struct i915_debugfs_files {
 int i915_debugfs_register(struct drm_i915_private *dev_priv)
 {
 	struct drm_minor *minor = dev_priv->drm.primary;
+	struct dentry *ent;
 	int ret, i;
 
-	ret = i915_forcewake_create(minor->debugfs_root, minor);
-	if (ret)
-		return ret;
+	ent = debugfs_create_file("i915_forcewake_user", S_IRUSR,
+				  minor->debugfs_root, to_i915(minor->dev),
+				  &i915_forcewake_fops);
+	if (!ent)
+		return -ENOMEM;
 
 	ret = intel_pipe_crc_create(minor);
 	if (ret)
 		return ret;
 
 	for (i = 0; i < ARRAY_SIZE(i915_debugfs_files); i++) {
-		ret = i915_debugfs_create(minor->debugfs_root, minor,
-					  i915_debugfs_files[i].name,
+		ent = debugfs_create_file(i915_debugfs_files[i].name,
+					  S_IRUGO | S_IWUSR,
+					  minor->debugfs_root,
+					  to_i915(minor->dev),
 					  i915_debugfs_files[i].fops);
-		if (ret)
-			return ret;
+		if (!ent)
+			return -ENOMEM;
 	}
 
 	return drm_debugfs_create_files(i915_debugfs_list,
 					I915_DEBUGFS_ENTRIES,
 					minor->debugfs_root, minor);
-}
-
-void i915_debugfs_unregister(struct drm_i915_private *dev_priv)
-{
-	struct drm_minor *minor = dev_priv->drm.primary;
-	int i;
-
-	drm_debugfs_remove_files(i915_debugfs_list,
-				 I915_DEBUGFS_ENTRIES, minor);
-
-	drm_debugfs_remove_files((struct drm_info_list *)&i915_forcewake_fops,
-				 1, minor);
-
-	intel_pipe_crc_cleanup(minor);
-
-	for (i = 0; i < ARRAY_SIZE(i915_debugfs_files); i++) {
-		struct drm_info_list *info_list =
-			(struct drm_info_list *)i915_debugfs_files[i].fops;
-
-		drm_debugfs_remove_files(info_list, 1, minor);
-	}
 }
 
 struct dpcd_block {
