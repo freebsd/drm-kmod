@@ -388,6 +388,15 @@ static void error_print_request(struct drm_i915_error_state_buf *m,
 		   erq->head, erq->tail);
 }
 
+static void error_print_context(struct drm_i915_error_state_buf *m,
+				const char *header,
+				struct drm_i915_error_context *ctx)
+{
+	err_printf(m, "%s%s[%d] user_handle %d hw_id %d, ban score %d guilty %d active %d\n",
+		   header, ctx->comm, ctx->pid, ctx->handle, ctx->hw_id,
+		   ctx->ban_score, ctx->guilty, ctx->active);
+}
+
 static void error_print_engine(struct drm_i915_error_state_buf *m,
 			       struct drm_i915_error_engine *ee)
 {
@@ -461,6 +470,7 @@ static void error_print_engine(struct drm_i915_error_state_buf *m,
 
 	error_print_request(m, "  ELSP[0]: ", &ee->execlist[0]);
 	error_print_request(m, "  ELSP[1]: ", &ee->execlist[1]);
+	error_print_context(m, "  Active context: ", &ee->context);
 }
 
 void i915_error_printf(struct drm_i915_error_state_buf *e, const char *f, ...)
@@ -566,12 +576,12 @@ int i915_error_state_to_str(struct drm_i915_error_state_buf *m,
 
 	for (i = 0; i < ARRAY_SIZE(error->engine); i++) {
 		if (error->engine[i].hangcheck_stalled &&
-		    error->engine[i].pid != -1) {
-			err_printf(m, "Active process (on ring %s): %s [%d], context bans %d\n",
+		    error->engine[i].context.pid) {
+			err_printf(m, "Active process (on ring %s): %s [%d], score %d\n",
 				   engine_str(i),
-				   error->engine[i].comm,
-				   error->engine[i].pid,
-				   error->engine[i].context_bans);
+				   error->engine[i].context.comm,
+				   error->engine[i].context.pid,
+				   error->engine[i].context.ban_score);
 		}
 	}
 	err_printf(m, "Reset count: %u\n", error->reset_count);
@@ -662,11 +672,13 @@ int i915_error_state_to_str(struct drm_i915_error_state_buf *m,
 		obj = ee->batchbuffer;
 		if (obj) {
 			err_puts(m, dev_priv->engine[i]->name);
-			if (ee->pid != -1)
-				err_printf(m, " (submitted by %s [%d], bans %d)",
-					   ee->comm,
-					   ee->pid,
-					   ee->context_bans);
+			if (ee->context.pid)
+				err_printf(m, " (submitted by %s [%d], ctx %d [%d], score %d)",
+					   ee->context.comm,
+					   ee->context.pid,
+					   ee->context.handle,
+					   ee->context.hw_id,
+					   ee->context.ban_score);
 			err_printf(m, " --- gtt_offset = 0x%08x %08x\n",
 				   upper_32_bits(obj->gtt_offset),
 				   lower_32_bits(obj->gtt_offset));
@@ -1271,6 +1283,28 @@ static void error_record_engine_execlists(struct intel_engine_cs *engine,
 				       &ee->execlist[n]);
 }
 
+static void record_context(struct drm_i915_error_context *e,
+			   struct i915_gem_context *ctx)
+{
+	if (ctx->pid) {
+		struct task_struct *task;
+
+		rcu_read_lock();
+		task = pid_task(ctx->pid, PIDTYPE_PID);
+		if (task) {
+			strcpy(e->comm, task->comm);
+			e->pid = task->pid;
+		}
+		rcu_read_unlock();
+	}
+
+	e->handle = ctx->user_handle;
+	e->hw_id = ctx->hw_id;
+	e->ban_score = ctx->ban_score;
+	e->guilty = ctx->guilty_count;
+	e->active = ctx->active_count;
+}
+
 static void i915_gem_record_rings(struct drm_i915_private *dev_priv,
 				  struct drm_i915_error_state *error)
 {
@@ -1285,7 +1319,6 @@ static void i915_gem_record_rings(struct drm_i915_private *dev_priv,
 		struct drm_i915_error_engine *ee = &error->engine[i];
 		struct drm_i915_gem_request *request;
 
-		ee->pid = -1;
 		ee->engine_id = -1;
 
 		if (!engine)
@@ -1300,14 +1333,11 @@ static void i915_gem_record_rings(struct drm_i915_private *dev_priv,
 		request = i915_gem_find_active_request(engine);
 		if (request) {
 			struct intel_ring *ring;
-#ifdef __linux__
-			struct pid *pid;
-#else
-			pid_t pid;
-#endif
 
 			ee->vm = request->ctx->ppgtt ?
 				&request->ctx->ppgtt->base : &ggtt->base;
+
+			record_context(&ee->context, request->ctx);
 
 			/* We need to copy these to an anonymous buffer
 			 * as the simplest method to avoid being overwritten
@@ -1325,27 +1355,6 @@ static void i915_gem_record_rings(struct drm_i915_private *dev_priv,
 			ee->ctx =
 				i915_error_object_create(dev_priv,
 							 request->ctx->engine[i].state);
-
-			pid = request->ctx->pid;
-			if (pid) {
-#ifdef __linux__
-				struct task_struct *task;
-				rcu_read_lock();
-				task = pid_task(pid, PIDTYPE_PID);
-				if (task) {
-					strcpy(ee->comm, task->comm);
-					ee->pid = task->pid;
-				}
-				rcu_read_unlock();
-#else
-				struct thread *td = tdfind(pid, -1);
-				if (td) {
-					strcpy(ee->comm, td->td_proc->p_comm);
-					ee->pid = td->td_proc->p_pid;
-					PROC_UNLOCK(td->td_proc);
-				}
-#endif
-			}
 
 			error->simulated |=
 				i915_gem_context_no_error_capture(request->ctx);
@@ -1550,12 +1559,12 @@ static void i915_error_capture_msg(struct drm_i915_private *dev_priv,
 			"GPU HANG: ecode %d:%d:0x%08x",
 			INTEL_GEN(dev_priv), engine_id, ecode);
 
-	if (engine_id != -1 && error->engine[engine_id].pid != -1)
+	if (engine_id != -1 && error->engine[engine_id].context.pid)
 		len += scnprintf(error->error_msg + len,
 				 sizeof(error->error_msg) - len,
 				 ", in %s [%d]",
-				 error->engine[engine_id].comm,
-				 error->engine[engine_id].pid);
+				 error->engine[engine_id].context.comm,
+				 error->engine[engine_id].context.pid);
 
 	scnprintf(error->error_msg + len, sizeof(error->error_msg) - len,
 		  ", reason: %s, action: %s",
