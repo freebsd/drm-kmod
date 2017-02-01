@@ -1320,7 +1320,6 @@ static int gen9_init_render_ring(struct intel_engine_cs *engine)
 static void reset_common_ring(struct intel_engine_cs *engine,
 			      struct drm_i915_gem_request *request)
 {
-	struct drm_i915_private *dev_priv = engine->i915;
 	struct execlist_port *port = engine->execlist_port;
 	struct intel_context *ce;
 
@@ -1361,7 +1360,6 @@ static void reset_common_ring(struct intel_engine_cs *engine,
 		return;
 
 	/* Catch up with any missed context-switch interrupts */
-	I915_WRITE(RING_CONTEXT_STATUS_PTR(engine), _MASKED_FIELD(0xffff, 0));
 	if (request->ctx != port[0].request->ctx) {
 		i915_gem_request_put(port[0].request);
 		port[0] = port[1];
