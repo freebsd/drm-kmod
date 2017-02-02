@@ -16631,7 +16631,6 @@ fail:
 	drm_modeset_acquire_fini(&ctx);
 }
 
-
 int intel_modeset_init(struct drm_device *dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
