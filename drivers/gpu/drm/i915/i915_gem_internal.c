@@ -89,6 +89,27 @@ create_st:
 	sg = st->sgl;
 	st->nents = 0;
 
+	max_order = MAX_ORDER;
+#ifdef CONFIG_SWIOTLB
+	if (swiotlb_nr_tbl()) {
+		unsigned int max_segment;
+
+		max_segment = swiotlb_max_segment();
+		if (max_segment) {
+			max_segment = max_t(unsigned int, max_segment,
+					    PAGE_SIZE) >> PAGE_SHIFT;
+			max_order = min(max_order, ilog2(max_segment));
+		}
+	}
+#endif
+
+	gfp = GFP_KERNEL | __GFP_HIGHMEM | __GFP_RECLAIMABLE;
+	if (IS_I965GM(i915) || IS_I965G(i915)) {
+		/* 965gm cannot relocate objects above 4GiB. */
+		gfp &= ~__GFP_HIGHMEM;
+		gfp |= __GFP_DMA32;
+	}
+
 	do {
 		int order = min(fls(npages) - 1, max_order);
 		struct page *page;
