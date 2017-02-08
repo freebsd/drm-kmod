@@ -368,7 +368,7 @@ static bool intel_fb_initial_config(struct drm_fb_helper *fb_helper,
 		return false;
 
 	memcpy(save_enabled, enabled, count);
-	mask = BIT(count) - 1;
+	mask = GENMASK(count - 1, 0);
 	conn_configured = 0;
 retry:
 	conn_seq = conn_configured;
