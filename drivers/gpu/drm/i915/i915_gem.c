@@ -3005,13 +3005,7 @@ void i915_gem_reset(struct drm_i915_private *dev_priv)
 
 void i915_gem_reset_finish(struct drm_i915_private *dev_priv)
 {
-	struct intel_engine_cs *engine;
-	enum intel_engine_id id;
-
 	lockdep_assert_held(&dev_priv->drm.struct_mutex);
-
-	for_each_engine(engine, dev_priv, id)
-		tasklet_enable(&engine->irq_tasklet);
 }
 
 static void nop_submit_request(struct drm_i915_gem_request *request)
