@@ -499,7 +499,7 @@ struct i915_hotplug {
 
 #define for_each_power_domain(domain, mask)				\
 	for ((domain) = 0; (domain) < POWER_DOMAIN_NUM; (domain)++)	\
-		for_each_if ((1 << (domain)) & (mask))
+		for_each_if (BIT_ULL(domain) & (mask))
 
 struct drm_i915_private;
 struct i915_mm_struct;
@@ -1414,7 +1414,7 @@ struct i915_power_well {
 	int count;
 	/* cached hw enabled state */
 	bool hw_enabled;
-	unsigned long domains;
+	u64 domains;
 	/* unique identifier for this power well */
 	unsigned long id;
 	/*
