@@ -2502,11 +2502,7 @@ struct drm_i915_private {
 	/* Used to save the pipe-to-encoder mapping for audio */
 	struct intel_encoder *av_enc_map[I915_MAX_PIPES];
 
-	/* necessary resource sharing with HDMI LPE audio driver. */
-	struct {
-		struct platform_device *platdev;
-		int	irq;
-	} lpe_audio;
+	I915_SELFTEST_DECLARE(struct fault_attr vm_fault);
 
 	/*
 	 * NOTE: This is the dri1/ums dungeon, don't add stuff here. Your patch
