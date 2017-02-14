@@ -603,7 +603,7 @@ mi_set_context(struct drm_i915_gem_request *req, u32 hw_flags)
 		i915.semaphores ?
 		INTEL_INFO(dev_priv)->num_rings - 1 :
 		0;
-	int len, ret;
+	int len;
 
 	/* w/a: If Flush TLB Invalidation Mode is enabled, driver must do a TLB
 	 * invalidation prior to MI_SET_CONTEXT. On GEN6 we don't set the value
@@ -611,7 +611,7 @@ mi_set_context(struct drm_i915_gem_request *req, u32 hw_flags)
 	 * itlb_before_ctx_switch.
 	 */
 	if (IS_GEN6(dev_priv)) {
-		ret = engine->emit_flush(req, EMIT_INVALIDATE);
+		int ret = engine->emit_flush(req, EMIT_INVALIDATE);
 		if (ret)
 			return ret;
 	}
@@ -686,7 +686,7 @@ mi_set_context(struct drm_i915_gem_request *req, u32 hw_flags)
 
 	intel_ring_advance(req, cs);
 
-	return ret;
+	return 0;
 }
 
 static int remap_l3(struct drm_i915_gem_request *req, int slice)
