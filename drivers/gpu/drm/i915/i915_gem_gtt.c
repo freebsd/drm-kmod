@@ -2186,7 +2186,6 @@ static void gen8_ggtt_clear_range(struct i915_address_space *vm,
 
 	for (i = 0; i < num_entries; i++)
 		gen8_set_pte(&gtt_base[i], scratch_pte);
-	readl(gtt_base);
 }
 
 static void gen6_ggtt_clear_range(struct i915_address_space *vm,
@@ -2211,7 +2210,6 @@ static void gen6_ggtt_clear_range(struct i915_address_space *vm,
 
 	for (i = 0; i < num_entries; i++)
 		iowrite32(scratch_pte, &gtt_base[i]);
-	readl(gtt_base);
 }
 
 static void i915_ggtt_insert_page(struct i915_address_space *vm,
@@ -2234,8 +2232,11 @@ static void i915_ggtt_insert_entries(struct i915_address_space *vm,
 	unsigned int flags = (cache_level == I915_CACHE_NONE) ?
 		AGP_USER_MEMORY : AGP_USER_CACHED_MEMORY;
 
+#ifdef __linux__
+	intel_gtt_insert_sg_entries(pages, start >> PAGE_SHIFT, flags);
+#else
 	linux_intel_gtt_insert_sg_entries(pages, start >> PAGE_SHIFT, flags);
-
+#endif
 }
 
 static void i915_ggtt_clear_range(struct i915_address_space *vm,
