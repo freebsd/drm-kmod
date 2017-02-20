@@ -14967,10 +14967,6 @@ int intel_modeset_init(struct drm_device *dev)
 		}
 	}
 
-	intel_update_czclk(dev_priv);
-	intel_update_cdclk(dev_priv);
-	dev_priv->cdclk.logical = dev_priv->cdclk.actual = dev_priv->cdclk.hw;
-
 	intel_shared_dpll_init(dev);
 
 	intel_update_czclk(dev_priv);
