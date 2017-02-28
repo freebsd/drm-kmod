@@ -232,7 +232,7 @@ static int compat_drm_addmap(struct file *file, unsigned int cmd,
 	m32.mtrr = map.mtrr;
 	m32.handle = ptr_to_compat(map.handle);
 	if (map.handle != compat_ptr(m32.handle))
-		printk_ratelimited("compat_drm_addmap truncated handle %p for type %d offset %x\n",
+		pr_err_ratelimited("compat_drm_addmap truncated handle %p for type %d offset %x\n",
 				   map.handle, m32.type, m32.offset);
 
 	if (copy_to_user(argp, &m32, sizeof(m32)))
