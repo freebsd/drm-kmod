@@ -4452,8 +4452,9 @@ intel_trans_dp_port_sel(struct intel_crtc *crtc)
  *   - DP transcoding bits
  *   - transcoder
  */
-static void ironlake_pch_enable(struct intel_crtc *crtc)
+static void ironlake_pch_enable(const struct intel_crtc_state *crtc_state)
 {
+	struct intel_crtc *crtc = to_intel_crtc(crtc_state->base.crtc);
 	struct drm_device *dev = crtc->base.dev;
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	int pipe = crtc->pipe;
@@ -4480,7 +4481,7 @@ static void ironlake_pch_enable(struct intel_crtc *crtc)
 		temp = I915_READ(PCH_DPLL_SEL);
 		temp |= TRANS_DPLL_ENABLE(pipe);
 		sel = TRANS_DPLLB_SEL(pipe);
-		if (crtc->config->shared_dpll ==
+		if (crtc_state->shared_dpll ==
 		    intel_get_shared_dpll_by_id(dev_priv, DPLL_ID_PCH_PLL_B))
 			temp |= sel;
 		else
@@ -4505,9 +4506,9 @@ static void ironlake_pch_enable(struct intel_crtc *crtc)
 
 	/* For PCH DP, enable TRANS_DP_CTL */
 	if (HAS_PCH_CPT(dev_priv) &&
-	    intel_crtc_has_dp_encoder(crtc->config)) {
+	    intel_crtc_has_dp_encoder(crtc_state)) {
 		const struct drm_display_mode *adjusted_mode =
-			&crtc->config->base.adjusted_mode;
+			&crtc_state->base.adjusted_mode;
 		u32 bpc = (I915_READ(PIPECONF(pipe)) & PIPECONF_BPC_MASK) >> 5;
 		i915_reg_t reg = TRANS_DP_CTL(pipe);
 		temp = I915_READ(reg);
@@ -4542,10 +4543,11 @@ static void ironlake_pch_enable(struct intel_crtc *crtc)
 	ironlake_enable_pch_transcoder(dev_priv, pipe);
 }
 
-static void lpt_pch_enable(struct intel_crtc *crtc)
+static void lpt_pch_enable(const struct intel_crtc_state *crtc_state)
 {
+	struct intel_crtc *crtc = to_intel_crtc(crtc_state->base.crtc);
 	struct drm_i915_private *dev_priv = to_i915(crtc->base.dev);
-	enum transcoder cpu_transcoder = crtc->config->cpu_transcoder;
+	enum transcoder cpu_transcoder = crtc_state->cpu_transcoder;
 
 	assert_pch_transcoder_disabled(dev_priv, TRANSCODER_A);
 
@@ -5273,7 +5275,7 @@ static void ironlake_crtc_enable(struct intel_crtc_state *pipe_config,
 	intel_enable_pipe(intel_crtc);
 
 	if (intel_crtc->config->has_pch_encoder)
-		ironlake_pch_enable(intel_crtc);
+		ironlake_pch_enable(pipe_config);
 
 	assert_vblank_disabled(crtc);
 	drm_crtc_vblank_on(crtc);
@@ -5383,7 +5385,7 @@ static void haswell_crtc_enable(struct intel_crtc_state *pipe_config,
 		intel_enable_pipe(intel_crtc);
 
 	if (intel_crtc->config->has_pch_encoder)
-		lpt_pch_enable(intel_crtc);
+		lpt_pch_enable(pipe_config);
 
 	if (intel_crtc_has_type(intel_crtc->config, INTEL_OUTPUT_DP_MST))
 		intel_ddi_set_vc_payload_alloc(crtc, true);
