@@ -185,7 +185,7 @@ i915_hotplug_interrupt_update_locked(struct drm_i915_private *dev_priv,
 {
 	uint32_t val;
 
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 	WARN_ON(bits & ~mask);
 
 	val = I915_READ(PORT_HOTPLUG_EN);
@@ -227,7 +227,7 @@ void ilk_update_display_irq(struct drm_i915_private *dev_priv,
 {
 	uint32_t new_val;
 
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	WARN_ON(enabled_irq_mask & ~interrupt_mask);
 
@@ -255,7 +255,7 @@ static void ilk_update_gt_irq(struct drm_i915_private *dev_priv,
 			      uint32_t interrupt_mask,
 			      uint32_t enabled_irq_mask)
 {
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	WARN_ON(enabled_irq_mask & ~interrupt_mask);
 
@@ -307,7 +307,7 @@ static void snb_update_pm_irq(struct drm_i915_private *dev_priv,
 
 	WARN_ON(enabled_irq_mask & ~interrupt_mask);
 
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	new_val = dev_priv->pm_imr;
 	new_val &= ~interrupt_mask;
@@ -345,7 +345,7 @@ void gen6_reset_pm_iir(struct drm_i915_private *dev_priv, u32 reset_mask)
 {
 	i915_reg_t reg = gen6_pm_iir(dev_priv);
 
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	I915_WRITE(reg, reset_mask);
 	I915_WRITE(reg, reset_mask);
@@ -354,7 +354,7 @@ void gen6_reset_pm_iir(struct drm_i915_private *dev_priv, u32 reset_mask)
 
 void gen6_enable_pm_irq(struct drm_i915_private *dev_priv, u32 enable_mask)
 {
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	dev_priv->pm_ier |= enable_mask;
 	I915_WRITE(gen6_pm_ier(dev_priv), dev_priv->pm_ier);
@@ -364,7 +364,7 @@ void gen6_enable_pm_irq(struct drm_i915_private *dev_priv, u32 enable_mask)
 
 void gen6_disable_pm_irq(struct drm_i915_private *dev_priv, u32 disable_mask)
 {
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	dev_priv->pm_ier &= ~disable_mask;
 	__gen6_mask_pm_irq(dev_priv, disable_mask);
@@ -468,7 +468,7 @@ static void bdw_update_port_irq(struct drm_i915_private *dev_priv,
 	uint32_t new_val;
 	uint32_t old_val;
 
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	WARN_ON(enabled_irq_mask & ~interrupt_mask);
 
@@ -501,7 +501,7 @@ void bdw_update_pipe_irq(struct drm_i915_private *dev_priv,
 {
 	uint32_t new_val;
 
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	WARN_ON(enabled_irq_mask & ~interrupt_mask);
 
@@ -535,7 +535,7 @@ void ibx_display_interrupt_update(struct drm_i915_private *dev_priv,
 
 	WARN_ON(enabled_irq_mask & ~interrupt_mask);
 
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	if (WARN_ON(!intel_irqs_enabled(dev_priv)))
 		return;
@@ -551,7 +551,7 @@ __i915_enable_pipestat(struct drm_i915_private *dev_priv, enum pipe pipe,
 	i915_reg_t reg = PIPESTAT(pipe);
 	u32 pipestat = I915_READ(reg) & PIPESTAT_INT_ENABLE_MASK;
 
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 	WARN_ON(!intel_irqs_enabled(dev_priv));
 
 	if (WARN_ONCE(enable_mask & ~PIPESTAT_INT_ENABLE_MASK ||
@@ -578,7 +578,7 @@ __i915_disable_pipestat(struct drm_i915_private *dev_priv, enum pipe pipe,
 	i915_reg_t reg = PIPESTAT(pipe);
 	u32 pipestat = I915_READ(reg) & PIPESTAT_INT_ENABLE_MASK;
 
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 	WARN_ON(!intel_irqs_enabled(dev_priv));
 
 	if (WARN_ONCE(enable_mask & ~PIPESTAT_INT_ENABLE_MASK ||
@@ -3418,7 +3418,7 @@ static int ironlake_irq_postinstall(struct drm_device *dev)
 
 void valleyview_enable_display_irqs(struct drm_i915_private *dev_priv)
 {
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	if (dev_priv->display_irqs_enabled)
 		return;
@@ -3433,7 +3433,7 @@ void valleyview_enable_display_irqs(struct drm_i915_private *dev_priv)
 
 void valleyview_disable_display_irqs(struct drm_i915_private *dev_priv)
 {
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	if (!dev_priv->display_irqs_enabled)
 		return;
@@ -4109,7 +4109,7 @@ static void i915_hpd_irq_setup(struct drm_i915_private *dev_priv)
 {
 	u32 hotplug_en;
 
-	assert_spin_locked(&dev_priv->irq_lock);
+	lockdep_assert_held(&dev_priv->irq_lock);
 
 	/* Note HDMI and DP share hotplug bits */
 	/* enable bits are the same for all generations */
