@@ -3479,7 +3479,8 @@ __intel_display_resume(struct drm_device *dev,
 	}
 
 	/* ignore any reset values/BIOS leftovers in the WM registers */
-	to_intel_atomic_state(state)->skip_intermediate_wm = true;
+	if (!HAS_GMCH_DISPLAY(to_i915(dev)))
+		to_intel_atomic_state(state)->skip_intermediate_wm = true;
 
 	ret = drm_atomic_helper_commit_duplicated_state(state, ctx);
 
@@ -14874,7 +14875,8 @@ retry:
 	 * intermediate watermarks (since we don't trust the current
 	 * watermarks).
 	 */
-	intel_state->skip_intermediate_wm = true;
+	if (!HAS_GMCH_DISPLAY(dev_priv))
+		intel_state->skip_intermediate_wm = true;
 
 	ret = intel_atomic_check(dev, state);
 	if (ret) {
@@ -15037,7 +15039,8 @@ int intel_modeset_init(struct drm_device *dev)
 	 * Note that we need to do this after reconstructing the BIOS fb's
 	 * since the watermark calculation done here will use pstate->fb.
 	 */
-	sanitize_watermarks(dev);
+	if (!HAS_GMCH_DISPLAY(dev_priv))
+		sanitize_watermarks(dev);
 
 	return 0;
 }
@@ -15508,12 +15511,14 @@ intel_modeset_setup_hw_state(struct drm_device *dev)
 		pll->on = false;
 	}
 
-	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
+	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv)) {
 		vlv_wm_get_hw_state(dev);
-	else if (IS_GEN9(dev_priv))
+		vlv_wm_sanitize(dev_priv);
+	} else if (IS_GEN9(dev_priv)) {
 		skl_wm_get_hw_state(dev);
-	else if (HAS_PCH_SPLIT(dev_priv))
+	} else if (HAS_PCH_SPLIT(dev_priv)) {
 		ilk_wm_get_hw_state(dev);
+	}
 
 	for_each_intel_crtc(dev, crtc) {
 		u64 put_domains;
