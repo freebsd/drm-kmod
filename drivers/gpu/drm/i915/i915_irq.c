@@ -1047,8 +1047,6 @@ static void notify_ring(struct intel_engine_cs *engine)
 	atomic_inc(&engine->irq_count);
 	set_bit(ENGINE_IRQ_BREADCRUMB, &engine->irq_posted);
 
-	rcu_read_lock();
-
 	spin_lock(&engine->breadcrumbs.lock);
 	wait = engine->breadcrumbs.first_wait;
 	if (wait) {
@@ -1065,7 +1063,7 @@ static void notify_ring(struct intel_engine_cs *engine)
 		 */
 		if (i915_seqno_passed(intel_engine_get_seqno(engine),
 				      wait->seqno))
-			rq = wait->request;
+			rq = i915_gem_request_get(wait->request);
 
 		wake_up_process(wait->tsk);
 	} else {
@@ -1073,10 +1071,10 @@ static void notify_ring(struct intel_engine_cs *engine)
 	}
 	spin_unlock(&engine->breadcrumbs.lock);
 
-	if (rq)
+	if (rq) {
 		dma_fence_signal(&rq->fence);
-
-	rcu_read_unlock();
+		i915_gem_request_put(rq);
+	}
 
 	trace_intel_engine_notify(engine, wait);
 }
