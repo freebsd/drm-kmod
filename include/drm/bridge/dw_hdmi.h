@@ -117,17 +117,12 @@ struct dw_hdmi_phy_ops {
 		    struct drm_display_mode *mode);
 	void (*disable)(struct dw_hdmi *hdmi, void *data);
 	enum drm_connector_status (*read_hpd)(struct dw_hdmi *hdmi, void *data);
-	void (*update_hpd)(struct dw_hdmi *hdmi, void *data,
-			   bool force, bool disabled, bool rxsense);
-	void (*setup_hpd)(struct dw_hdmi *hdmi, void *data);
 };
 
 struct dw_hdmi_plat_data {
-	struct regmap *regm;
+	enum dw_hdmi_devtype dev_type;
 	enum drm_mode_status (*mode_valid)(struct drm_connector *connector,
 					   struct drm_display_mode *mode);
-	unsigned long input_bus_format;
-	unsigned long input_bus_encoding;
 
 	/* Vendor PHY support */
 	const struct dw_hdmi_phy_ops *phy_ops;
@@ -138,9 +133,6 @@ struct dw_hdmi_plat_data {
 	const struct dw_hdmi_mpll_config *mpll_cfg;
 	const struct dw_hdmi_curr_ctrl *cur_ctr;
 	const struct dw_hdmi_phy_config *phy_config;
-	int (*configure_phy)(struct dw_hdmi *hdmi,
-			     const struct dw_hdmi_plat_data *pdata,
-			     unsigned long mpixelclock);
 };
 
 int dw_hdmi_probe(struct platform_device *pdev,
