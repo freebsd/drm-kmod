@@ -91,7 +91,6 @@
 #include <sys/bus.h>
 
 #include <linux/io.h>
-#include <linux/pci.h>
 #include <linux/platform_device.h>
 #include <linux/idr.h>
 #include <linux/string.h>
@@ -151,6 +150,7 @@
 #define smp_wmb() wmb()
 #include <drm/drm_drv.h>
 #include <drm/drm_prime.h>
+#include <drm/drm_pci.h>
 
 #include "opt_compat.h"
 #include "opt_drm.h"
@@ -175,7 +175,6 @@ struct drm_device;
 struct drm_agp_head;
 struct drm_local_map;
 struct drm_device_dma;
-struct drm_dma_handle;
 struct drm_gem_object;
 struct drm_master;
 struct drm_vblank_crtc;
@@ -186,6 +185,9 @@ struct videomode;
 struct reservation_object;
 struct seq_file;
 struct dma_buf_attachment;
+
+struct pci_dev;
+struct pci_controller;
 
 /*
  * The following categories are defined:
@@ -806,50 +808,11 @@ static inline int drm_debugfs_remove_files(const struct drm_info_list *files,
 }
 #endif
 
-
-
-extern unsigned int drm_timestamp_monotonic;
-
-extern struct class *drm_class;
-
-extern struct drm_dma_handle *drm_pci_alloc(struct drm_device *dev, size_t size,
-					    size_t align);
-extern void drm_pci_free(struct drm_device *dev, struct drm_dma_handle * dmah);
-
-			       /* sysfs support (drm_sysfs.c) */
+/* sysfs support (drm_sysfs.c) */
 extern void drm_sysfs_hotplug_event(struct drm_device *dev);
 
 
 /*@}*/
-
-extern int drm_pci_init(struct drm_driver *driver, struct pci_driver *pdriver);
-extern void drm_pci_exit(struct drm_driver *driver, struct pci_driver *pdriver);
-#ifdef CONFIG_PCI
-extern int drm_get_pci_dev(struct pci_dev *pdev,
-			   const struct pci_device_id *ent,
-			   struct drm_driver *driver);
-extern int drm_pci_set_busid(struct drm_device *dev, struct drm_master *master);
-#else
-static inline int drm_get_pci_dev(struct pci_dev *pdev,
-				  const struct pci_device_id *ent,
-				  struct drm_driver *driver)
-{
-	return -ENOSYS;
-}
-
-static inline int drm_pci_set_busid(struct drm_device *dev,
-				    struct drm_master *master)
-{
-	return -ENOSYS;
-}
-#endif
-
-#define DRM_PCIE_SPEED_25 1
-#define DRM_PCIE_SPEED_50 2
-#define DRM_PCIE_SPEED_80 4
-
-extern int drm_pcie_get_speed_cap_mask(struct drm_device *dev, u32 *speed_mask);
-extern int drm_pcie_get_max_link_width(struct drm_device *dev, u32 *mlw);
 
 /* returns true if currently okay to sleep */
 static __inline__ bool drm_can_sleep(void)
