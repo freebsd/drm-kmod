@@ -4124,7 +4124,7 @@ pipes_modified(struct drm_atomic_state *state)
 	struct drm_crtc_state *cstate;
 	uint32_t i, ret = 0;
 
-	for_each_crtc_in_state(state, crtc, cstate, i)
+	for_each_new_crtc_in_state(state, crtc, cstate, i)
 		ret |= drm_crtc_mask(crtc);
 
 	return ret;
@@ -4267,7 +4267,7 @@ skl_print_wm_changes(const struct drm_atomic_state *state)
 	const struct skl_ddb_allocation *new_ddb = &intel_state->wm_results.ddb;
 	int i;
 
-	for_each_crtc_in_state(state, crtc, cstate, i) {
+	for_each_new_crtc_in_state(state, crtc, cstate, i) {
 		const struct intel_crtc *intel_crtc = to_intel_crtc(crtc);
 		enum pipe pipe = intel_crtc->pipe;
 
@@ -4309,7 +4309,7 @@ skl_compute_wm(struct drm_atomic_state *state)
 	 * since any racing commits that want to update them would need to
 	 * hold _all_ CRTC state mutexes.
 	 */
-	for_each_crtc_in_state(state, crtc, cstate, i)
+	for_each_new_crtc_in_state(state, crtc, cstate, i)
 		changed = true;
 	if (!changed)
 		return 0;
@@ -4331,7 +4331,7 @@ skl_compute_wm(struct drm_atomic_state *state)
 	 * should allow skl_update_pipe_wm() to return failure in cases where
 	 * no suitable watermark values can be found.
 	 */
-	for_each_crtc_in_state(state, crtc, cstate, i) {
+	for_each_new_crtc_in_state(state, crtc, cstate, i) {
 		struct intel_crtc_state *intel_cstate =
 			to_intel_crtc_state(cstate);
 		const struct skl_pipe_wm *old_pipe_wm =
