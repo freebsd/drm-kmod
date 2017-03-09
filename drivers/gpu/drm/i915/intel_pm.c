@@ -5282,7 +5282,7 @@ void gen6_rps_busy(struct drm_i915_private *dev_priv)
 	if (dev_priv->rps.enabled) {
 		u8 freq;
 
-		if (dev_priv->pm_rps_events & (GEN6_PM_RP_DOWN_EI_EXPIRED | GEN6_PM_RP_UP_EI_EXPIRED))
+		if (dev_priv->pm_rps_events & GEN6_PM_RP_UP_EI_EXPIRED)
 			gen6_rps_reset_ei(dev_priv);
 		I915_WRITE(GEN6_PMINTRMSK,
 			   gen6_rps_pm_mask(dev_priv, dev_priv->rps.cur_freq));
