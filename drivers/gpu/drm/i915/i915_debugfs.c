@@ -4291,6 +4291,7 @@ i915_drop_caches_set(void *data, u64 val)
 	if (val & (DROP_RETIRE | DROP_ACTIVE))
 		i915_gem_retire_requests(dev_priv);
 
+	lockdep_set_current_reclaim_state(GFP_KERNEL);
 	if (val & DROP_BOUND)
 		i915_gem_shrink(dev_priv, LONG_MAX, I915_SHRINK_BOUND);
 
@@ -4299,6 +4300,7 @@ i915_drop_caches_set(void *data, u64 val)
 
 	if (val & DROP_SHRINK_ALL)
 		i915_gem_shrink_all(dev_priv);
+	lockdep_clear_current_reclaim_state();
 
 unlock:
 	mutex_unlock(&dev->struct_mutex);
