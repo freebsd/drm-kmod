@@ -1331,7 +1331,7 @@ struct vlv_s0ix_state {
 };
 
 struct intel_rps_ei {
-	u32 cz_clock;
+	ktime_t ktime;
 	u32 render_c0;
 	u32 media_c0;
 };
