@@ -3,40 +3,9 @@
 SYSDIR?=${SRCTOP}/sys
 .include "${SYSDIR}/conf/kern.opts.mk"
 
-.if ${MACHINE_CPUARCH} == "amd64"
-_i915kms=	i915
-_radeonkms=	radeonkms
-. if ${MK_SOURCELESS_UCODE} != "no"
-_amdgpukmsfw=	amdgpukmsfw
-_radeonkmsfw=	radeonkmsfw
-. endif
-.endif
-
-.if ${MACHINE_CPUARCH} == "i386"
-. if ${MACHINE} != "pc98"
-_i915kms=	i915
-_radeonkms=	radeonkms
-.  if ${MK_SOURCELESS_UCODE} != "no"
-_amdgpukmsfw=	amdgpukmsfw
-_radeonkmsfw=	radeonkmsfw
-.  endif
-. endif
-.endif
-
-.if ${MACHINE_CPUARCH} == "powerpc"
-_radeonkms=	radeonkms
-. if ${MK_SOURCELESS_UCODE} != "no"
-_radeonkmsfw=	radeonkmsfw
-. endif
-.endif
-
 SUBDIR = \
-	drm \
 	amd \
-	${_i915kms} \
-	${_amdgpukmsfw} \
-	${_radeonkmsfw} \
-	${_radeonkms}
+	i915
 
 # Special target that causes drm2 code to printf error returns.  Useful for
 # determining the root cause of errors.  Depends on drmP.h macro DRM_ERR_RET.
