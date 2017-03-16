@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 #.PATH:	${SRCTOP}/sys/dev/drm/i915
-KMOD	= drm3_i915kms
+KMOD	= i915kms
 SRCS	= \
 	dvo_ch7017.c \
 	dvo_ch7xxx.c \
