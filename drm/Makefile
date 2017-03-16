@@ -1,6 +1,6 @@
 # $FreeBSD$
 
-.PATH:	. ./ttm
+.PATH:	../drm ../drm/ttm
 KMOD	= drm
 SRCS	= \
 	ati_pcigart.c \

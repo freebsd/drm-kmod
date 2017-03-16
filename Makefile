@@ -4,6 +4,7 @@ SYSDIR?=${SRCTOP}/sys
 .include "${SYSDIR}/conf/kern.opts.mk"
 
 SUBDIR = \
+	drm \
 	amd \
 	i915
 
