@@ -228,6 +228,7 @@ struct pci_controller;
 #define DRM_UT_ATOMIC		0x10
 #define DRM_UT_VBL		0x20
 #define DRM_UT_STATE		0x40
+#define DRM_UT_LEASE		0x80
 
 /***********************************************************************/
 /** \name DRM template customization defaults */
@@ -330,6 +331,9 @@ struct pci_controller;
 		       ##args)
 #define DRM_DEBUG_VBL(fmt, args...)					\
 	drm_printk(KERN_DEBUG, DRM_UT_VBL, __func__, "", fmt, ##args)
+
+#define DRM_DEBUG_LEASE(fmt, ...)					\
+	drm_printk(KERN_DEBUG, DRM_UT_LEASE, fmt, ##__VA_ARGS__)
 
 #define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, level, fmt, args...)	\
 ({									\
