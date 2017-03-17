@@ -249,10 +249,7 @@ out:
 		workload->status = ret;
 
 	if (!IS_ERR_OR_NULL(rq))
-		i915_add_request_no_flush(rq);
-	else
-		engine->context_unpin(engine, shadow_ctx);
-
+		i915_add_request(rq);
 	mutex_unlock(&dev_priv->drm.struct_mutex);
 	return ret;
 }
