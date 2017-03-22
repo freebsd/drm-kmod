@@ -522,18 +522,19 @@ struct drm_driver {
 	int dev_priv_size;
 };
 
-extern __printf(6, 7)
+__printf(6, 7)
 void drm_dev_printk(const struct device *dev, const char *level,
 		    unsigned int category, const char *function_name,
 		    const char *prefix, const char *format, ...);
 
 #ifndef __linux__
-extern __printf(5, 6)
+__printf(5, 6)
 	void drm_printk(const char *level, unsigned int category,
 					const char *function_name, const char *prefix,
 					const char *format, ...);
 #else
-extern __printf(3, 4)
+__printf(3, 4)
+
 void drm_printk(const char *level, unsigned int category,
 		const char *format, ...);
 #endif
