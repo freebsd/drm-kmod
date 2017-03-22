@@ -62,6 +62,13 @@
  * ELSP context descriptor dword into Work Item.
  * See guc_wq_item_append()
  *
+ * ADS:
+ * The Additional Data Struct (ADS) has pointers for different buffers used by
+ * the GuC. One single gem object contains the ADS struct itself (guc_ads), the
+ * scheduling policies (guc_policies), a structure describing a collection of
+ * register sets (guc_mmio_reg_state) and some extra pages for the GuC to save
+ * its internal state for sleep.
+ *
  */
 
 static inline bool is_high_priority(struct i915_guc_client* client)
@@ -941,7 +948,7 @@ static void guc_policies_init(struct guc_policies *policies)
 	policies->is_valid = 1;
 }
 
-static int guc_addon_create(struct intel_guc *guc)
+static int guc_ads_create(struct intel_guc *guc)
 {
 	struct drm_i915_private *dev_priv = guc_to_i915(guc);
 	struct i915_vma *vma;
@@ -1004,7 +1011,7 @@ static int guc_addon_create(struct intel_guc *guc)
 	return 0;
 }
 
-static void guc_addon_destroy(struct intel_guc *guc)
+static void guc_ads_destroy(struct intel_guc *guc)
 {
 	i915_vma_unpin_and_release(&guc->ads_vma);
 }
@@ -1054,7 +1061,7 @@ int i915_guc_submission_init(struct drm_i915_private *dev_priv)
 	if (ret < 0)
 		goto err_vaddr;
 
-	ret = guc_addon_create(guc);
+	ret = guc_ads_create(guc);
 	if (ret < 0)
 		goto err_log;
 
@@ -1073,7 +1080,7 @@ int i915_guc_submission_init(struct drm_i915_private *dev_priv)
 	return 0;
 
 err_ads:
-	guc_addon_destroy(guc);
+	guc_ads_destroy(guc);
 err_log:
 	intel_guc_log_destroy(guc);
 err_vaddr:
@@ -1093,7 +1100,7 @@ void i915_guc_submission_fini(struct drm_i915_private *dev_priv)
 	guc_client_free(guc->execbuf_client);
 	guc->execbuf_client = NULL;
 	ida_destroy(&guc->ctx_ids);
-	guc_addon_destroy(guc);
+	guc_ads_destroy(guc);
 	intel_guc_log_destroy(guc);
 	i915_gem_object_unpin_map(guc->ctx_pool->obj);
 	i915_vma_unpin_and_release(&guc->ctx_pool);
