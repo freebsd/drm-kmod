@@ -90,11 +90,11 @@ SRCS	= \
 
 #	drm_fb_cma_helper.c \
 
-CFLAGS+= -I${SRCTOP}/sys/compat/linuxkpi/common/include
-CFLAGS+= -I${SRCTOP}/sys/compat/linuxkpi/common/include/drm
-CFLAGS+= -I${SRCTOP}/sys/compat/linuxkpi/common/include/uapi
+CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include
+CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/drm
+CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -include ${SRCTOP}/sys/dev/drm/drm_os_config.h
+CFLAGS+= -include ./drm_os_config.h
 
 # until stable
 #CFLAGS += -O0

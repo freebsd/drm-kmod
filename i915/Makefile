@@ -94,10 +94,10 @@ SRCS	= \
 #
 
 CLEANFILES += ${KMOD}.ko.full ${KMOD}.ko.debug
-CFLAGS+= -I${SRCTOP}/sys/compat/linuxkpi/common/include
-CFLAGS+= -I${SRCTOP}/sys/compat/linuxkpi/common/include/uapi
+CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include
+CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -include ${SRCTOP}/sys/dev/drm/drm_os_config.h
+CFLAGS+= -include ../drm/drm_os_config.h
 #CFLAGS += -DPRINT_UNIMPLEMENTED
 
 .if ${MACHINE_CPUARCH} == "amd64"

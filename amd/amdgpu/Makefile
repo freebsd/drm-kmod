@@ -142,21 +142,21 @@ SRCS	= \
 
 
 
-CFLAGS+=	-I${SRCTOP}/sys/compat/linuxkpi/common/include
-CFLAGS+=	-I${SRCTOP}/sys/compat/linuxkpi/common/include/drm
-CFLAGS+=	-I${SRCTOP}/sys/compat/linuxkpi/common/include/uapi
-CFLAGS+=	-I${SRCTOP}/sys/dev/drm/amd/amdgpu
-CFLAGS+=	-I${SRCTOP}/sys/dev/drm/amd/include
-CFLAGS+=	-I${SRCTOP}/sys/dev/drm/amd/acp/include
-CFLAGS+=	-I${SRCTOP}/sys/dev/drm/amd/powerplay/eventmgr
-CFLAGS+=	-I${SRCTOP}/sys/dev/drm/amd/powerplay/hwmgr
-CFLAGS+=	-I${SRCTOP}/sys/dev/drm/amd/powerplay/inc
-CFLAGS+=	-I${SRCTOP}/sys/dev/drm/amd/powerplay/smumgr
-CFLAGS+=	-I${SRCTOP}/sys/dev/drm/amd/scheduler
-CFLAGS+=	-I${SRCTOP}/sys/dev/drm/amd/include/asic_reg
+CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include
+CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include/drm
+CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
+CFLAGS+=	-I./amdgpu
+CFLAGS+=	-I../include
+CFLAGS+=	-I../acp/include
+CFLAGS+=	-I../powerplay/eventmgr
+CFLAGS+=	-I../powerplay/hwmgr
+CFLAGS+=	-I../powerplay/inc
+CFLAGS+=	-I../powerplay/smumgr
+CFLAGS+=	-I../scheduler
+CFLAGS+=	-I../include/asic_reg
 CFLAGS+=	'-DKBUILD_MODNAME="${KMOD}"'
 #CFLAGS+=	-O0
-CFLAGS+=	-include ${SRCTOP}/sys/dev/drm/drm_os_config.h
+CFLAGS+=	-include ../../drm/drm_os_config.h
 
 
 SRCS	+=device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \

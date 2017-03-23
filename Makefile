@@ -1,6 +1,6 @@
 # $FreeBSD$
 
-SYSDIR?=${SRCTOP}/sys
+SYSDIR?=${SRC_BASE}/sys
 .include "${SYSDIR}/conf/kern.opts.mk"
 
 SUBDIR = \
