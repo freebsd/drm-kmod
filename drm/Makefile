@@ -1,6 +1,6 @@
 # $FreeBSD$
 
-.PATH:	../drm ../drm/ttm
+.PATH:	. ./ttm
 KMOD	= drm
 SRCS	= \
 	ati_pcigart.c \
@@ -93,6 +93,10 @@ SRCS	= \
 CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include
 CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/drm
 CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
+CFLAGS+= -I.
+CFLAGS+= -I./ttm
+CFLAGS+= -I..
+CFLAGS+= -I${SRC_BASE}/include
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= -include ./drm_os_config.h
 
