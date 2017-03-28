@@ -53,7 +53,7 @@
 #include <sys/tree.h>
 #endif
 
-#define TTM_MAX_BO_PRIORITY	16U
+#define TTM_MAX_BO_PRIORITY	4U
 
 struct ttm_backend_func {
 	/**
