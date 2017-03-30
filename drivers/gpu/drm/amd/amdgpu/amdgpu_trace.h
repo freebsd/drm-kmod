@@ -227,8 +227,8 @@ TRACE_EVENT(amdgpu_vm_bo_map,
 
 	    TP_fast_assign(
 			   __entry->bo = bo_va ? bo_va->bo : NULL;
-			   __entry->start = mapping->it.start;
-			   __entry->last = mapping->it.last;
+			   __entry->start = mapping->start;
+			   __entry->last = mapping->last;
 			   __entry->offset = mapping->offset;
 			   __entry->flags = mapping->flags;
 			   ),
@@ -251,8 +251,8 @@ TRACE_EVENT(amdgpu_vm_bo_unmap,
 
 	    TP_fast_assign(
 			   __entry->bo = bo_va->bo;
-			   __entry->start = mapping->it.start;
-			   __entry->last = mapping->it.last;
+			   __entry->start = mapping->start;
+			   __entry->last = mapping->last;
 			   __entry->offset = mapping->offset;
 			   __entry->flags = mapping->flags;
 			   ),
@@ -271,8 +271,8 @@ DECLARE_EVENT_CLASS(amdgpu_vm_mapping,
 			     ),
 
 	    TP_fast_assign(
-			   __entry->soffset = mapping->it.start;
-			   __entry->eoffset = mapping->it.last + 1;
+			   __entry->soffset = mapping->start;
+			   __entry->eoffset = mapping->last + 1;
 			   __entry->flags = mapping->flags;
 			   ),
 	    TP_printk("soffs=%010llx, eoffs=%010llx, flags=%08x",
