@@ -3845,19 +3845,25 @@ skl_plane_downscale_amount(const struct intel_crtc_state *cstate,
 
 	/* n.b., src is 16.16 fixed point, dst is whole integer */
 	if (plane->id == PLANE_CURSOR) {
+		/*
+		 * Cursors only support 0/180 degree rotation,
+		 * hence no need to account for rotation here.
+		 */
 		src_w = pstate->base.src_w >> 16;
 		src_h = pstate->base.src_h >> 16;
 		dst_w = pstate->base.crtc_w;
 		dst_h = pstate->base.crtc_h;
 	} else {
+		/*
+		 * Src coordinates are already rotated by 270 degrees for
+		 * the 90/270 degree plane rotation cases (to match the
+		 * GTT mapping), hence no need to account for rotation here.
+		 */
 		src_w = drm_rect_width(&pstate->base.src) >> 16;
 		src_h = drm_rect_height(&pstate->base.src) >> 16;
 		dst_w = drm_rect_width(&pstate->base.dst);
 		dst_h = drm_rect_height(&pstate->base.dst);
 	}
-
-	if (drm_rotation_90_or_270(pstate->base.rotation))
-		swap(dst_w, dst_h);
 
 	fp_w_ratio = fixed_16_16_div(src_w, dst_w);
 	fp_h_ratio = fixed_16_16_div(src_h, dst_h);
