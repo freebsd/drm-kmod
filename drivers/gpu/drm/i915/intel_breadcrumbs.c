@@ -633,6 +633,9 @@ static int intel_breadcrumbs_signaler(void *arg)
 		} else {
 			DEFINE_WAIT(exec);
 
+			if (kthread_should_park())
+				kthread_parkme();
+
 			if (kthread_should_stop()) {
 				GEM_BUG_ON(request);
 				break;
@@ -645,9 +648,6 @@ static int intel_breadcrumbs_signaler(void *arg)
 
 			if (request)
 				remove_wait_queue(&request->execute, &exec);
-
-			if (kthread_should_park())
-				kthread_parkme();
 		}
 		i915_gem_request_put(request);
 	} while (1);
