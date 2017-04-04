@@ -142,10 +142,10 @@ SRCS	= \
 
 
 
+CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/gplv2/include
 CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include
 CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include/drm
 CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
-CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/gplv2/include
 CFLAGS+=	-I./amdgpu
 CFLAGS+=	-I../include
 CFLAGS+=	-I../acp/include
