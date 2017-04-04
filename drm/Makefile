@@ -90,10 +90,10 @@ SRCS	= \
 
 #	drm_fb_cma_helper.c \
 
+CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/gplv2/include
 CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include
 CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/drm
 CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
-CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/gplv2/include
 CFLAGS+= -I.
 CFLAGS+= -I./ttm
 CFLAGS+= -I..
