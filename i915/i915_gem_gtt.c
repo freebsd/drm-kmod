@@ -2546,20 +2546,14 @@ static void i915_ggtt_insert_page(struct i915_address_space *vm,
 				  u32 unused)
 {
 	struct drm_i915_private *dev_priv = to_i915(vm->dev);
-#ifdef __notyet__
 	unsigned int flags = (cache_level == I915_CACHE_NONE) ?
 		AGP_USER_MEMORY : AGP_USER_CACHED_MEMORY;
-#endif
 	int rpm_atomic_seq;
 
 	rpm_atomic_seq = assert_rpm_atomic_begin(dev_priv);
 
-#ifdef __notyet__
 	intel_gtt_insert_page(addr, offset >> PAGE_SHIFT, flags);
-#else
-	panic("AGP needs intel_gtt_insert page - see d6473f5 upstream in torvalds' tree");
-#endif	
-	
+
 	assert_rpm_atomic_end(dev_priv, rpm_atomic_seq);
 }
 

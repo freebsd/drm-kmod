@@ -163,6 +163,14 @@ intel_gmch_remove(void)
 }
 
 void
+intel_gtt_insert_page(dma_addr_t addr, unsigned int pg, unsigned int flags)
+{
+
+	_intel_gtt_install_pte(pg, addr, flags);
+	intel_gtt_chipset_flush();
+}
+
+void
 intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
     unsigned int flags)
 {
@@ -174,7 +182,6 @@ intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
 	for_each_sg_page(st->sgl, &sg_iter, st->nents, 0) {
 		addr = sg_page_iter_dma_address(&sg_iter);
 		_intel_gtt_install_pte(pg_start + i, addr, flags);
-
 		++i;
 	}
 
@@ -282,5 +289,6 @@ retry:
 MODULE_DEPEND(i915kms, drmn, 1, 1, 1);
 MODULE_DEPEND(i915kms, agp, 1, 1, 1);
 MODULE_DEPEND(i915kms, linuxkpi, 1, 1, 1);
+MODULE_DEPEND(i915kms, linuxkpi_gplv2, 1, 1, 1);
 MODULE_DEPEND(i915kms, firmware, 1, 1, 1);
 MODULE_DEPEND(i915kms, debugfs, 1, 1, 1);
