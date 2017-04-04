@@ -154,6 +154,7 @@
 #include <drm/drm_file.h>
 #include <drm/drm_debugfs.h>
 #include <drm/drm_ioctl.h>
+#include <drm/drm_sysfs.h>
 
 #include "opt_compat.h"
 #include "opt_drm.h"
@@ -616,10 +617,6 @@ static inline int drm_device_is_unplugged(struct drm_device *dev)
  * These are exported to drivers so that they can implement fencing using
  * DMA quiscent + idle. DMA quiescent usually requires the hardware lock.
  */
-
-			       /* sysfs support (drm_sysfs.c) */
-extern void drm_sysfs_hotplug_event(struct drm_device *dev);
-
 
 /*@}*/
 
