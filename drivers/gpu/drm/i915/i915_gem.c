@@ -2478,7 +2478,9 @@ rebuild_st:
 				/* reclaim and warn, but no oom */
 #ifdef __linux__
 				gfp = mapping_gfp_mask(mapping);
+				reclaim = mapping_gfp_mask(mapping);
 #endif
+				reclaim |= __GFP_NORETRY; /* reclaim, but no oom */
 
 				/* Our bo are always dirty and so we require
 				 * kswapd to reclaim our pages (direct reclaim
