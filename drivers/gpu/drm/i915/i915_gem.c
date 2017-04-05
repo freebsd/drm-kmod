@@ -2467,7 +2467,7 @@ rebuild_st:
 			 * to userspace.
 			 */
 #ifdef __linux__
-			reclaim = mapping_gfp_constraint(mapping, 0);
+			reclaim = mapping_gfp_mask(mapping);
 #else
 			reclaim = 0;
 #endif
