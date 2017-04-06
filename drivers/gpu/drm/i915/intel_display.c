@@ -9492,10 +9492,10 @@ static int intel_modeset_setup_plane_state(struct drm_atomic_state *state,
 	return 0;
 }
 
-bool intel_get_load_detect_pipe(struct drm_connector *connector,
-				struct drm_display_mode *mode,
-				struct intel_load_detect_pipe *old,
-				struct drm_modeset_acquire_ctx *ctx)
+int intel_get_load_detect_pipe(struct drm_connector *connector,
+			       struct drm_display_mode *mode,
+			       struct intel_load_detect_pipe *old,
+			       struct drm_modeset_acquire_ctx *ctx)
 {
 	struct intel_crtc *intel_crtc;
 	struct intel_encoder *intel_encoder =
@@ -9518,10 +9518,7 @@ bool intel_get_load_detect_pipe(struct drm_connector *connector,
 
 	old->restore_state = NULL;
 
-retry:
-	ret = drm_modeset_lock(&config->connection_mutex, ctx);
-	if (ret)
-		goto fail;
+	WARN_ON(!drm_modeset_is_locked(&config->connection_mutex));
 
 	/*
 	 * Algorithm gets a little messy:
@@ -9671,10 +9668,8 @@ fail:
 		restore_state = NULL;
 	}
 
-	if (ret == -EDEADLK) {
-		drm_modeset_backoff(ctx);
-		goto retry;
-	}
+	if (ret == -EDEADLK)
+		return ret;
 
 	return false;
 }
@@ -15057,6 +15052,7 @@ static void intel_enable_pipe_a(struct drm_device *dev)
 	struct drm_connector *crt = NULL;
 	struct intel_load_detect_pipe load_detect_temp;
 	struct drm_modeset_acquire_ctx *ctx = dev->mode_config.acquire_ctx;
+	int ret;
 
 	/* We can't just switch on the pipe A, we need to set things up with a
 	 * proper mode and output configuration. As a gross hack, enable pipe A
@@ -15073,7 +15069,10 @@ static void intel_enable_pipe_a(struct drm_device *dev)
 	if (!crt)
 		return;
 
-	if (intel_get_load_detect_pipe(crt, NULL, &load_detect_temp, ctx))
+	ret = intel_get_load_detect_pipe(crt, NULL, &load_detect_temp, ctx);
+	WARN(ret < 0, "All modeset mutexes are locked, but intel_get_load_detect_pipe failed\n");
+
+	if (ret > 0)
 		intel_release_load_detect_pipe(crt, &load_detect_temp, ctx);
 }
 
