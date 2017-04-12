@@ -138,7 +138,10 @@ static int wc_set(struct drm_i915_gem_object *obj,
 	typeof(v) *map;
 	int err;
 
-	err = i915_gem_object_set_to_wc_domain(obj, true);
+	/* XXX GTT write followed by WC write go missing */
+	flush_write_domain(obj, ~0);
+
+	err = i915_gem_object_set_to_gtt_domain(obj, true);
 	if (err)
 		return err;
 
@@ -159,7 +162,10 @@ static int wc_get(struct drm_i915_gem_object *obj,
 	typeof(v) map;
 	int err;
 
-	err = i915_gem_object_set_to_wc_domain(obj, false);
+	/* XXX WC write followed by GTT write go missing */
+	flush_write_domain(obj, ~0);
+
+	err = i915_gem_object_set_to_gtt_domain(obj, false);
 	if (err)
 		return err;
 
