@@ -1299,7 +1299,6 @@ struct amdgpu_smumgr {
  */
 struct amdgpu_allowed_register_entry {
 	uint32_t reg_offset;
-	bool untouched;
 	bool grbm_indexed;
 };
 
