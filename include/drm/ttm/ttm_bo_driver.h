@@ -36,10 +36,6 @@
 #ifndef __linux__
 #include <drm/drmP.h>
 #endif
-#include <ttm/ttm_bo_api.h>
-#include <ttm/ttm_memory.h>
-#include <ttm/ttm_module.h>
-#include <ttm/ttm_placement.h>
 #include <drm/drm_mm.h>
 #include <drm/drm_global.h>
 #include <drm/drm_vma_manager.h>
@@ -52,6 +48,10 @@
 #include <sys/rwlock.h>
 #include <sys/tree.h>
 #endif
+#include "ttm_bo_api.h"
+#include "ttm_memory.h"
+#include "ttm_module.h"
+#include "ttm_placement.h"
 
 #define TTM_MAX_BO_PRIORITY	4U
 
