@@ -53,7 +53,6 @@
 #include "bif/bif_4_1_d.h"
 #include <linux/pci.h>
 #include <linux/firmware.h>
-#include "amdgpu_pm.h"
 
 #define pci_save_state linux_pci_save_state
 #define pci_restore_state linux_pci_restore_state
@@ -1589,9 +1588,6 @@ static int amdgpu_late_init(struct amdgpu_device *adev)
 			}
 		}
 	}
-
-	amdgpu_dpm_enable_uvd(adev, false);
-	amdgpu_dpm_enable_vce(adev, false);
 
 	return 0;
 }
