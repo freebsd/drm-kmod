@@ -49,12 +49,7 @@ static int __intel_ring_space(int head, int tail, int size)
 
 unsigned int intel_ring_update_space(struct intel_ring *ring)
 {
-	unsigned int space;
-
-	space = __intel_ring_space(ring->head, ring->emit, ring->size);
-
-	ring->space = space;
-	return space;
+	ring->space = __intel_ring_space(ring->head, ring->emit, ring->size);
 }
 
 static int

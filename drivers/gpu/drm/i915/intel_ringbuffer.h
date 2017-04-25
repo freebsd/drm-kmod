@@ -496,7 +496,7 @@ int intel_ring_pin(struct intel_ring *ring,
 		   struct drm_i915_private *i915,
 		   unsigned int offset_bias);
 void intel_ring_reset(struct intel_ring *ring, u32 tail);
-unsigned int intel_ring_update_space(struct intel_ring *ring);
+void intel_ring_update_space(struct intel_ring *ring);
 void intel_ring_unpin(struct intel_ring *ring);
 void intel_ring_free(struct intel_ring *ring);
 
