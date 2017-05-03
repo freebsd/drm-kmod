@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 Intel Corporation
+ * Copyright © 2017 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,33 +22,17 @@
  *
  */
 
-#ifndef __I915_GEM_H__
-#define __I915_GEM_H__
+#ifndef __I915_SYNCMAP_H__
+#define __I915_SYNCMAP_H__
 
-#include <linux/bug.h>
+#include <linux/types.h>
 
-#ifdef CONFIG_DRM_I915_DEBUG_GEM
-#define GEM_BUG_ON(expr) BUG_ON(expr)
-#define GEM_WARN_ON(expr) WARN_ON(expr)
+struct i915_syncmap;
+#define KSYNCMAP 16 /* radix of the tree, how many slots in each layer */
 
-#define GEM_DEBUG_DECL(var) var
-#define GEM_DEBUG_EXEC(expr) expr
-#define GEM_DEBUG_BUG_ON(expr) GEM_BUG_ON(expr)
+void i915_syncmap_init(struct i915_syncmap **root);
+int i915_syncmap_set(struct i915_syncmap **root, u64 id, u32 seqno);
+bool i915_syncmap_is_later(struct i915_syncmap **root, u64 id, u32 seqno);
+void i915_syncmap_free(struct i915_syncmap **root);
 
-#else
-
-#define GEM_BUG_ON(expr) BUILD_BUG_ON_INVALID(expr)
-#ifdef __linux__
-#define GEM_WARN_ON(expr) (BUILD_BUG_ON_INVALID(expr),0)
-#else
-#define GEM_WARN_ON(expr) ({ BUILD_BUG_ON_INVALID(expr); 0; })
-#endif
-
-#define GEM_DEBUG_DECL(var)
-#define GEM_DEBUG_EXEC(expr) do { } while (0)
-#define GEM_DEBUG_BUG_ON(expr)
-#endif
-
-#define I915_NUM_ENGINES 5
-
-#endif /* __I915_GEM_H__ */
+#endif /* __I915_SYNCMAP_H__ */
