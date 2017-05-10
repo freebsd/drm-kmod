@@ -59,9 +59,6 @@ static void shrinker_unlock(struct drm_i915_private *dev_priv, bool unlock)
 		return;
 
 	mutex_unlock(&dev_priv->drm.struct_mutex);
-
-	/* expedite the RCU grace period to free some request slabs */
-	synchronize_rcu_expedited();
 }
 
 static bool any_vma_pinned(struct drm_i915_gem_object *obj)
