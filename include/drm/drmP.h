@@ -138,7 +138,7 @@
 #include <drm/drm_crtc.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_global.h>
-#include <drm/drm_mem_util.h>
+#include <drm/drm_hashtab.h>
 #include <drm/drm_mm.h>
 #include <drm/drm_os_freebsd.h>
 #include <drm/drm_ioctl.h>
