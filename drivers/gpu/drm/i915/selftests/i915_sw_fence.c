@@ -123,14 +123,6 @@ static int test_dag(void *arg)
 	}
 
 	C = alloc_fence();
-<<<<<<< HEAD
-	if (!C) {
-		ret = -ENOMEM;
-		goto err_B;
-	}
-
-=======
->>>>>>> drm/i915: Import the kfence selftests for i915_sw_fence
 	if (i915_sw_fence_await_sw_fence_gfp(B, C, GFP_KERNEL) == -EINVAL) {
 		pr_err("invalid cycle detected\n");
 		goto err_C;
@@ -319,11 +311,7 @@ static int test_AB_C(void *arg)
 	}
 
 	C = alloc_fence();
-<<<<<<< HEAD
 	if (!C) {
-=======
-	if (!B) {
->>>>>>> drm/i915: Import the kfence selftests for i915_sw_fence
 		ret = -ENOMEM;
 		goto err_B;
 	}
@@ -400,11 +388,7 @@ static int test_C_AB(void *arg)
 	}
 
 	C = alloc_fence();
-<<<<<<< HEAD
 	if (!C) {
-=======
-	if (!B) {
->>>>>>> drm/i915: Import the kfence selftests for i915_sw_fence
 		ret = -ENOMEM;
 		goto err_B;
 	}
