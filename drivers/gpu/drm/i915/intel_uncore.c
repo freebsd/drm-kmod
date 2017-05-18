@@ -1445,9 +1445,10 @@ out:
 	return ret;
 }
 
-static int i915_reset_complete(struct pci_dev *pdev)
+static bool i915_reset_complete(struct pci_dev *pdev)
 {
 	u8 gdrst;
+
 	pci_read_config_byte(pdev, I915_GDRST, &gdrst);
 	return (gdrst & GRDOM_RESET_STATUS) == 0;
 }
@@ -1458,15 +1459,16 @@ static int i915_do_reset(struct drm_i915_private *dev_priv, unsigned engine_mask
 
 	/* assert reset for at least 20 usec */
 	pci_write_config_byte(pdev, I915_GDRST, GRDOM_RESET_ENABLE);
-	udelay(20);
+	usleep_range(50, 200);
 	pci_write_config_byte(pdev, I915_GDRST, 0);
 
 	return wait_for(i915_reset_complete(pdev), 500);
 }
 
-static int g4x_reset_complete(struct pci_dev *pdev)
+static bool g4x_reset_complete(struct pci_dev *pdev)
 {
 	u8 gdrst;
+
 	pci_read_config_byte(pdev, I915_GDRST, &gdrst);
 	return (gdrst & GRDOM_RESET_ENABLE) == 0;
 }
@@ -1474,6 +1476,7 @@ static int g4x_reset_complete(struct pci_dev *pdev)
 static int g33_do_reset(struct drm_i915_private *dev_priv, unsigned engine_mask)
 {
 	struct pci_dev *pdev = dev_priv->drm.pdev;
+
 	pci_write_config_byte(pdev, I915_GDRST, GRDOM_RESET_ENABLE);
 	return wait_for(g4x_reset_complete(pdev), 500);
 }
@@ -1486,8 +1489,10 @@ static int g4x_do_reset(struct drm_i915_private *dev_priv, unsigned engine_mask)
 	pci_write_config_byte(pdev, I915_GDRST,
 			      GRDOM_RENDER | GRDOM_RESET_ENABLE);
 	ret =  wait_for(g4x_reset_complete(pdev), 500);
-	if (ret)
-		return ret;
+	if (ret) {
+		DRM_DEBUG_DRIVER("Wait for render reset failed\n");
+		goto out;
+	}
 
 	/* WaVcpClkGateDisableForMediaReset:ctg,elk */
 	I915_WRITE(VDECCLK_GATE_D, I915_READ(VDECCLK_GATE_D) | VCP_UNIT_CLOCK_GATE_DISABLE);
@@ -1496,16 +1501,17 @@ static int g4x_do_reset(struct drm_i915_private *dev_priv, unsigned engine_mask)
 	pci_write_config_byte(pdev, I915_GDRST,
 			      GRDOM_MEDIA | GRDOM_RESET_ENABLE);
 	ret =  wait_for(g4x_reset_complete(pdev), 500);
-	if (ret)
-		return ret;
+	if (ret) {
+		DRM_DEBUG_DRIVER("Wait for media reset failed\n");
+	}
 
 	/* WaVcpClkGateDisableForMediaReset:ctg,elk */
 	I915_WRITE(VDECCLK_GATE_D, I915_READ(VDECCLK_GATE_D) & ~VCP_UNIT_CLOCK_GATE_DISABLE);
 	POSTING_READ(VDECCLK_GATE_D);
 
+out:
 	pci_write_config_byte(pdev, I915_GDRST, 0);
-
-	return 0;
+	return ret;
 }
 
 static int ironlake_do_reset(struct drm_i915_private *dev_priv,
@@ -1513,31 +1519,36 @@ static int ironlake_do_reset(struct drm_i915_private *dev_priv,
 {
 	int ret;
 
-	I915_WRITE(ILK_GDSR,
-		   ILK_GRDOM_RENDER | ILK_GRDOM_RESET_ENABLE);
+	I915_WRITE(ILK_GDSR, ILK_GRDOM_RENDER | ILK_GRDOM_RESET_ENABLE);
 	ret = intel_wait_for_register(dev_priv,
 				      ILK_GDSR, ILK_GRDOM_RESET_ENABLE, 0,
 				      500);
-	if (ret)
-		return ret;
+	if (ret) {
+		DRM_DEBUG_DRIVER("Wait for render reset failed\n");
+		goto out;
+	}
 
-	I915_WRITE(ILK_GDSR,
-		   ILK_GRDOM_MEDIA | ILK_GRDOM_RESET_ENABLE);
+	I915_WRITE(ILK_GDSR, ILK_GRDOM_MEDIA | ILK_GRDOM_RESET_ENABLE);
 	ret = intel_wait_for_register(dev_priv,
 				      ILK_GDSR, ILK_GRDOM_RESET_ENABLE, 0,
 				      500);
-	if (ret)
-		return ret;
+	if (ret) {
+		DRM_DEBUG_DRIVER("Wait for media reset failed\n");
+		goto out;
+	}
 
+out:
 	I915_WRITE(ILK_GDSR, 0);
-
-	return 0;
+	POSTING_READ(ILK_GDSR);
+	return ret;
 }
 
 /* Reset the hardware domains (GENX_GRDOM_*) specified by mask */
 static int gen6_hw_domain_reset(struct drm_i915_private *dev_priv,
 				u32 hw_domain_mask)
 {
+	int err;
+
 	/* GEN6_GDRST is not in the gt power well, no need to check
 	 * for fifo space for the write or forcewake the chip for
 	 * the read
@@ -1545,9 +1556,14 @@ static int gen6_hw_domain_reset(struct drm_i915_private *dev_priv,
 	__raw_i915_write32(dev_priv, GEN6_GDRST, hw_domain_mask);
 
 	/* Wait for the device to ack the reset requests */
-	return intel_wait_for_register_fw(dev_priv,
+	err = intel_wait_for_register_fw(dev_priv,
 					  GEN6_GDRST, hw_domain_mask, 0,
 					  500);
+	if (err)
+		DRM_DEBUG_DRIVER("Wait for 0x%08x engines reset failed\n",
+				 hw_domain_mask);
+
+	return err;
 }
 
 /**
@@ -1766,7 +1782,10 @@ static reset_func intel_get_gpu_reset(struct drm_i915_private *dev_priv)
 int intel_gpu_reset(struct drm_i915_private *dev_priv, unsigned engine_mask)
 {
 	reset_func reset;
+	int retry;
 	int ret;
+
+	might_sleep();
 
 	reset = intel_get_gpu_reset(dev_priv);
 	if (reset == NULL)
@@ -1776,7 +1795,13 @@ int intel_gpu_reset(struct drm_i915_private *dev_priv, unsigned engine_mask)
 	 * request may be dropped and never completes (causing -EIO).
 	 */
 	intel_uncore_forcewake_get(dev_priv, FORCEWAKE_ALL);
-	ret = reset(dev_priv, engine_mask);
+	for (retry = 0; retry < 3; retry++) {
+		ret = reset(dev_priv, engine_mask);
+		if (ret != -ETIMEDOUT)
+			break;
+
+		cond_resched();
+	}
 	intel_uncore_forcewake_put(dev_priv, FORCEWAKE_ALL);
 
 	return ret;
