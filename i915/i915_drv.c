@@ -669,8 +669,13 @@ static int i915_kick_out_firmware_fb(struct drm_i915_private *dev_priv)
 	ap->ranges[0].base = ggtt->mappable_base;
 	ap->ranges[0].size = ggtt->mappable_end;
 
+#ifdef __FreeBSD__
+	(void)pdev;
+	primary = false;
+#else
 	primary =
 		pdev->resource[PCI_ROM_RESOURCE].flags & IORESOURCE_ROM_SHADOW;
+#endif
 
 	ret = drm_fb_helper_remove_conflicting_framebuffers(ap, "inteldrmfb", primary);
 

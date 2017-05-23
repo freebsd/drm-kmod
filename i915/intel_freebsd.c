@@ -12,7 +12,6 @@ __FBSDID("$FreeBSD$");
 #include <asm/pgtable.h>
 
 #include "i915_drv.h"
-#include <linux/apple-gmux.h>
 #include <linux/console.h>
 #include <linux/module.h>
 #include <linux/pm_runtime.h>

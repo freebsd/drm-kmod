@@ -90,23 +90,23 @@ static void intel_dsm_platform_mux_info(void)
 		return;
 	}
 
-	connector_count = &pkg->package.elements[0];
+	connector_count = &pkg->Package.Elements[0];
 	DRM_DEBUG_DRIVER("MUX info connectors: %lld\n",
-		  (unsigned long long)connector_count->integer.value);
-	for (i = 1; i < pkg->package.count; i++) {
-		union acpi_object *obj = &pkg->package.elements[i];
-		union acpi_object *connector_id = &obj->package.elements[0];
-		union acpi_object *info = &obj->package.elements[1];
+		  (unsigned long long)connector_count->Integer.Value);
+	for (i = 1; i < pkg->Package.Count; i++) {
+		union acpi_object *obj = &pkg->Package.Elements[i];
+		union acpi_object *connector_id = &obj->Package.Elements[0];
+		union acpi_object *info = &obj->Package.Elements[1];
 		DRM_DEBUG_DRIVER("Connector id: 0x%016llx\n",
-			  (unsigned long long)connector_id->integer.value);
+			  (unsigned long long)connector_id->Integer.Value);
 		DRM_DEBUG_DRIVER("  port id: %s\n",
-		       intel_dsm_port_name(info->buffer.pointer[0]));
+		       intel_dsm_port_name(info->Buffer.Pointer[0]));
 		DRM_DEBUG_DRIVER("  display mux info: %s\n",
-		       intel_dsm_mux_type(info->buffer.pointer[1]));
+		       intel_dsm_mux_type(info->Buffer.Pointer[1]));
 		DRM_DEBUG_DRIVER("  aux/dc mux info: %s\n",
-		       intel_dsm_mux_type(info->buffer.pointer[2]));
+		       intel_dsm_mux_type(info->Buffer.Pointer[2]));
 		DRM_DEBUG_DRIVER("  hpd mux info: %s\n",
-		       intel_dsm_mux_type(info->buffer.pointer[3]));
+		       intel_dsm_mux_type(info->Buffer.Pointer[3]));
 	}
 
 	ACPI_FREE(pkg);

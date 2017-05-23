@@ -683,7 +683,7 @@ static int i915_gem_request_info(struct seq_file *m, void *data)
 			rcu_read_unlock();
 #else
 			pid_t pid = req->ctx->pid;
-			struct thread *td = pid ? tdfind(pid, -1) : NULL;
+			struct thread *td = tdfind(pid, -1);
 			seq_printf(m, "    %x @ %d: %s [%d]\n",
 				   req->fence.seqno,
 				   (int) (jiffies - req->emitted_jiffies),
@@ -1942,7 +1942,7 @@ static int i915_context_status(struct seq_file *m, void *unused)
 #else
 			pid_t pid = ctx->pid;
 			struct thread *td = tdfind(pid, -1);
-			if (td) {
+			if (td != NULL) {
 				seq_printf(m, "(%s [%d]) ",
 				    td->td_name, td->td_proc->p_pid);
 				PROC_UNLOCK(td->td_proc);
