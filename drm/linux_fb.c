@@ -371,9 +371,11 @@ is_primary(struct linux_fb_info *info)
 	if (device &&  (pci_dev = to_pci_dev(device)) == NULL)
 		return (0);
 
+#ifndef __FreeBSD__
 	res = &pci_dev->resource[PCI_ROM_RESOURCE];
 	if (res && res->flags & IORESOURCE_ROM_SHADOW)
 		return (1);
+#endif
 
 	return (0);
 }
