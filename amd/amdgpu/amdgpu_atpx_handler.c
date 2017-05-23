@@ -98,20 +98,20 @@ static union acpi_object *amdgpu_atpx_call(acpi_handle handle, int function,
 	struct acpi_object_list atpx_arg;
 	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
 
-	atpx_arg.count = 2;
-	atpx_arg.pointer = &atpx_arg_elements[0];
+	atpx_arg.Count = 2;
+	atpx_arg.Pointer = &atpx_arg_elements[0];
 
-	atpx_arg_elements[0].type = ACPI_TYPE_INTEGER;
-	atpx_arg_elements[0].integer.value = function;
+	atpx_arg_elements[0].Type = ACPI_TYPE_INTEGER;
+	atpx_arg_elements[0].Integer.Value = function;
 
 	if (params) {
-		atpx_arg_elements[1].type = ACPI_TYPE_BUFFER;
-		atpx_arg_elements[1].buffer.length = params->length;
-		atpx_arg_elements[1].buffer.pointer = params->pointer;
+		atpx_arg_elements[1].Type = ACPI_TYPE_BUFFER;
+		atpx_arg_elements[1].Buffer.Length = params->Length;
+		atpx_arg_elements[1].Buffer.Pointer = params->Pointer;
 	} else {
 		/* We need a second fake parameter */
-		atpx_arg_elements[1].type = ACPI_TYPE_INTEGER;
-		atpx_arg_elements[1].integer.value = 0;
+		atpx_arg_elements[1].Type = ACPI_TYPE_INTEGER;
+		atpx_arg_elements[1].Integer.Value = 0;
 	}
 
 	status = acpi_evaluate_object(handle, NULL, &atpx_arg, &buffer);
@@ -120,11 +120,11 @@ static union acpi_object *amdgpu_atpx_call(acpi_handle handle, int function,
 	if (ACPI_FAILURE(status) && status != AE_NOT_FOUND) {
 		printk("failed to evaluate ATPX got %s\n",
 		       acpi_format_exception(status));
-		kfree(buffer.pointer);
+		kfree(buffer.Pointer);
 		return NULL;
 	}
 
-	return buffer.pointer;
+	return buffer.Pointer;
 }
 
 /**
@@ -172,7 +172,7 @@ static int amdgpu_atpx_validate(struct amdgpu_atpx *atpx)
 
 		memset(&output, 0, sizeof(output));
 
-		size = *(u16 *) info->buffer.pointer;
+		size = *(u16 *) info->Buffer.Pointer;
 		if (size < 10) {
 			printk("ATPX buffer is too small: %zu\n", size);
 			kfree(info);
@@ -180,7 +180,7 @@ static int amdgpu_atpx_validate(struct amdgpu_atpx *atpx)
 		}
 		size = min(sizeof(output), size);
 
-		memcpy(&output, info->buffer.pointer, size);
+		memcpy(&output, info->Buffer.Pointer, size);
 
 		valid_bits = output.flags & output.valid_flags;
 
@@ -245,7 +245,7 @@ static int amdgpu_atpx_verify_interface(struct amdgpu_atpx *atpx)
 
 	memset(&output, 0, sizeof(output));
 
-	size = *(u16 *) info->buffer.pointer;
+	size = *(u16 *) info->Buffer.Pointer;
 	if (size < 8) {
 		printk("ATPX buffer is too small: %zu\n", size);
 		err = -EINVAL;
@@ -253,7 +253,7 @@ static int amdgpu_atpx_verify_interface(struct amdgpu_atpx *atpx)
 	}
 	size = min(sizeof(output), size);
 
-	memcpy(&output, info->buffer.pointer, size);
+	memcpy(&output, info->Buffer.Pointer, size);
 
 	/* TODO: check version? */
 	printk("ATPX version %u, functions 0x%08x\n",
@@ -285,8 +285,8 @@ static int amdgpu_atpx_set_discrete_state(struct amdgpu_atpx *atpx, u8 state)
 	if (atpx->functions.power_cntl) {
 		input.size = 3;
 		input.dgpu_state = state;
-		params.length = input.size;
-		params.pointer = &input;
+		params.Length = input.size;
+		params.Pointer = &input;
 		info = amdgpu_atpx_call(atpx->handle,
 					ATPX_FUNCTION_POWER_CONTROL,
 					&params);
@@ -321,8 +321,8 @@ static int amdgpu_atpx_switch_disp_mux(struct amdgpu_atpx *atpx, u16 mux_id)
 	if (atpx->functions.disp_mux_cntl) {
 		input.size = 4;
 		input.mux = mux_id;
-		params.length = input.size;
-		params.pointer = &input;
+		params.Length = input.size;
+		params.Pointer = &input;
 		info = amdgpu_atpx_call(atpx->handle,
 					ATPX_FUNCTION_DISPLAY_MUX_CONTROL,
 					&params);
@@ -353,8 +353,8 @@ static int amdgpu_atpx_switch_i2c_mux(struct amdgpu_atpx *atpx, u16 mux_id)
 	if (atpx->functions.i2c_mux_cntl) {
 		input.size = 4;
 		input.mux = mux_id;
-		params.length = input.size;
-		params.pointer = &input;
+		params.Length = input.size;
+		params.Pointer = &input;
 		info = amdgpu_atpx_call(atpx->handle,
 					ATPX_FUNCTION_I2C_MUX_CONTROL,
 					&params);
@@ -385,8 +385,8 @@ static int amdgpu_atpx_switch_start(struct amdgpu_atpx *atpx, u16 mux_id)
 	if (atpx->functions.switch_start) {
 		input.size = 4;
 		input.mux = mux_id;
-		params.length = input.size;
-		params.pointer = &input;
+		params.Length = input.size;
+		params.Pointer = &input;
 		info = amdgpu_atpx_call(atpx->handle,
 					ATPX_FUNCTION_GRAPHICS_DEVICE_SWITCH_START_NOTIFICATION,
 					&params);
@@ -417,8 +417,8 @@ static int amdgpu_atpx_switch_end(struct amdgpu_atpx *atpx, u16 mux_id)
 	if (atpx->functions.switch_end) {
 		input.size = 4;
 		input.mux = mux_id;
-		params.length = input.size;
-		params.pointer = &input;
+		params.Length = input.size;
+		params.Pointer = &input;
 		info = amdgpu_atpx_call(atpx->handle,
 					ATPX_FUNCTION_GRAPHICS_DEVICE_SWITCH_END_NOTIFICATION,
 					&params);

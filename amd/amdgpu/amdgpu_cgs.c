@@ -998,7 +998,7 @@ static int amdgpu_cgs_acpi_eval_object(struct cgs_device *cgs_device,
 	if (info->size != sizeof(struct cgs_acpi_method_info))
 		return -EINVAL;
 
-	input.count = info->input_count;
+	input.Count = info->input_count;
 	if (info->input_count > 0) {
 		if (info->pinput_argument == NULL)
 			return -EINVAL;
@@ -1032,27 +1032,27 @@ static int amdgpu_cgs_acpi_eval_object(struct cgs_device *cgs_device,
 	}
 
 	/* parse input parameters */
-	if (input.count > 0) {
-		input.pointer = params =
-				kzalloc(sizeof(union acpi_object) * input.count, GFP_KERNEL);
+	if (input.Count > 0) {
+		input.Pointer = params =
+				kzalloc(sizeof(union acpi_object) * input.Count, GFP_KERNEL);
 		if (params == NULL)
 			return -EINVAL;
 
 		argument = info->pinput_argument;
 
-		for (i = 0; i < input.count; i++) {
-			params->type = argument->type;
-			switch (params->type) {
+		for (i = 0; i < input.Count; i++) {
+			params->Type = argument->type;
+			switch (params->Type) {
 			case ACPI_TYPE_INTEGER:
-				params->integer.value = argument->value;
+				params->Integer.Value = argument->value;
 				break;
 			case ACPI_TYPE_STRING:
-				params->string.length = argument->data_length;
-				params->string.pointer = argument->pointer;
+				params->String.Length = argument->data_length;
+				params->String.Pointer = argument->pointer;
 				break;
 			case ACPI_TYPE_BUFFER:
-				params->buffer.length = argument->data_length;
-				params->buffer.pointer = argument->pointer;
+				params->Buffer.Length = argument->data_length;
+				params->Buffer.Pointer = argument->pointer;
 				break;
 			default:
 				break;
@@ -1075,15 +1075,15 @@ static int amdgpu_cgs_acpi_eval_object(struct cgs_device *cgs_device,
 	}
 
 	/* return the output info */
-	obj = output.pointer;
+	obj = output.Pointer;
 
 	if (count > 1) {
-		if ((obj->type != ACPI_TYPE_PACKAGE) ||
-			(obj->package.count != count)) {
+		if ((obj->Type != ACPI_TYPE_PACKAGE) ||
+			(obj->Package.Count != count)) {
 			result = -EIO;
 			goto free_obj;
 		}
-		params = obj->package.elements;
+		params = obj->Package.Elements;
 	} else
 		params = obj;
 
@@ -1093,31 +1093,31 @@ static int amdgpu_cgs_acpi_eval_object(struct cgs_device *cgs_device,
 	}
 
 	for (i = 0; i < count; i++) {
-		if (argument->type != params->type) {
+		if (argument->type != params->Type) {
 			result = -EIO;
 			goto free_obj;
 		}
-		switch (params->type) {
+		switch (params->Type) {
 		case ACPI_TYPE_INTEGER:
-			argument->value = params->integer.value;
+			argument->value = params->Integer.Value;
 			break;
 		case ACPI_TYPE_STRING:
-			if ((params->string.length != argument->data_length) ||
-				(params->string.pointer == NULL)) {
+			if ((params->String.Length != argument->data_length) ||
+				(params->String.Pointer == NULL)) {
 				result = -EIO;
 				goto free_obj;
 			}
 			strncpy(argument->pointer,
-				params->string.pointer,
-				params->string.length);
+				params->String.Pointer,
+				params->String.Length);
 			break;
 		case ACPI_TYPE_BUFFER:
-			if (params->buffer.pointer == NULL) {
+			if (params->Buffer.Pointer == NULL) {
 				result = -EIO;
 				goto free_obj;
 			}
 			memcpy(argument->pointer,
-				params->buffer.pointer,
+				params->Buffer.Pointer,
 				argument->data_length);
 			break;
 		default:
@@ -1131,7 +1131,7 @@ static int amdgpu_cgs_acpi_eval_object(struct cgs_device *cgs_device,
 free_obj:
 	kfree(obj);
 free_input:
-	kfree((void *)input.pointer);
+	kfree((void *)input.Pointer);
 	return result;
 }
 #else

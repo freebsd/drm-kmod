@@ -54,20 +54,20 @@ static union acpi_object *amdgpu_atif_call(acpi_handle handle, int function,
 	struct acpi_object_list atif_arg;
 	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
 
-	atif_arg.count = 2;
-	atif_arg.pointer = &atif_arg_elements[0];
+	atif_arg.Count = 2;
+	atif_arg.Pointer = &atif_arg_elements[0];
 
-	atif_arg_elements[0].type = ACPI_TYPE_INTEGER;
-	atif_arg_elements[0].integer.value = function;
+	atif_arg_elements[0].Type = ACPI_TYPE_INTEGER;
+	atif_arg_elements[0].Integer.Value = function;
 
 	if (params) {
-		atif_arg_elements[1].type = ACPI_TYPE_BUFFER;
-		atif_arg_elements[1].buffer.length = params->length;
-		atif_arg_elements[1].buffer.pointer = params->pointer;
+		atif_arg_elements[1].Type = ACPI_TYPE_BUFFER;
+		atif_arg_elements[1].Buffer.Length = params->Length;
+		atif_arg_elements[1].Buffer.Pointer = params->Pointer;
 	} else {
 		/* We need a second fake parameter */
-		atif_arg_elements[1].type = ACPI_TYPE_INTEGER;
-		atif_arg_elements[1].integer.value = 0;
+		atif_arg_elements[1].Type = ACPI_TYPE_INTEGER;
+		atif_arg_elements[1].Integer.Value = 0;
 	}
 
 	status = acpi_evaluate_object(handle, "ATIF", &atif_arg, &buffer);
@@ -76,11 +76,11 @@ static union acpi_object *amdgpu_atif_call(acpi_handle handle, int function,
 	if (ACPI_FAILURE(status) && status != AE_NOT_FOUND) {
 		DRM_DEBUG_DRIVER("failed to evaluate ATIF got %s\n",
 				 acpi_format_exception(status));
-		kfree(buffer.pointer);
+		kfree(buffer.Pointer);
 		return NULL;
 	}
 
-	return buffer.pointer;
+	return buffer.Pointer;
 }
 
 /**
@@ -155,7 +155,7 @@ static int amdgpu_atif_verify_interface(acpi_handle handle,
 
 	memset(&output, 0, sizeof(output));
 
-	size = *(u16 *) info->buffer.pointer;
+	size = *(u16 *) info->Buffer.Pointer;
 	if (size < 12) {
 		DRM_INFO("ATIF buffer is too small: %zu\n", size);
 		err = -EINVAL;
@@ -163,7 +163,7 @@ static int amdgpu_atif_verify_interface(acpi_handle handle,
 	}
 	size = min(sizeof(output), size);
 
-	memcpy(&output, info->buffer.pointer, size);
+	memcpy(&output, info->Buffer.Pointer, size);
 
 	/* TODO: check version? */
 	DRM_DEBUG_DRIVER("ATIF version %u\n", output.version);
@@ -202,7 +202,7 @@ static int amdgpu_atif_get_notification_params(acpi_handle handle,
 		goto out;
 	}
 
-	size = *(u16 *) info->buffer.pointer;
+	size = *(u16 *) info->Buffer.Pointer;
 	if (size < 10) {
 		err = -EINVAL;
 		goto out;
@@ -210,7 +210,7 @@ static int amdgpu_atif_get_notification_params(acpi_handle handle,
 
 	memset(&params, 0, sizeof(params));
 	size = min(sizeof(params), size);
-	memcpy(&params, info->buffer.pointer, size);
+	memcpy(&params, info->Buffer.Pointer, size);
 
 	DRM_DEBUG_DRIVER("SYSTEM_PARAMS: mask = %#x, flags = %#x\n",
 			params.flags, params.valid_mask);
@@ -261,7 +261,7 @@ static int amdgpu_atif_get_sbios_requests(acpi_handle handle,
 	if (!info)
 		return -EIO;
 
-	size = *(u16 *)info->buffer.pointer;
+	size = *(u16 *)info->Buffer.Pointer;
 	if (size < 0xd) {
 		count = -EINVAL;
 		goto out;
@@ -269,7 +269,7 @@ static int amdgpu_atif_get_sbios_requests(acpi_handle handle,
 	memset(req, 0, sizeof(*req));
 
 	size = min(sizeof(*req), size);
-	memcpy(req, info->buffer.pointer, size);
+	memcpy(req, info->Buffer.Pointer, size);
 	DRM_DEBUG_DRIVER("SBIOS pending requests: %#x\n", req->pending);
 
 	count = hweight32(req->pending);
@@ -374,20 +374,20 @@ static union acpi_object *amdgpu_atcs_call(acpi_handle handle, int function,
 	struct acpi_object_list atcs_arg;
 	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
 
-	atcs_arg.count = 2;
-	atcs_arg.pointer = &atcs_arg_elements[0];
+	atcs_arg.Count = 2;
+	atcs_arg.Pointer = &atcs_arg_elements[0];
 
-	atcs_arg_elements[0].type = ACPI_TYPE_INTEGER;
-	atcs_arg_elements[0].integer.value = function;
+	atcs_arg_elements[0].Type = ACPI_TYPE_INTEGER;
+	atcs_arg_elements[0].Integer.Value = function;
 
 	if (params) {
-		atcs_arg_elements[1].type = ACPI_TYPE_BUFFER;
-		atcs_arg_elements[1].buffer.length = params->length;
-		atcs_arg_elements[1].buffer.pointer = params->pointer;
+		atcs_arg_elements[1].Type = ACPI_TYPE_BUFFER;
+		atcs_arg_elements[1].Buffer.Length = params->Length;
+		atcs_arg_elements[1].Buffer.Pointer = params->Pointer;
 	} else {
 		/* We need a second fake parameter */
-		atcs_arg_elements[1].type = ACPI_TYPE_INTEGER;
-		atcs_arg_elements[1].integer.value = 0;
+		atcs_arg_elements[1].Type = ACPI_TYPE_INTEGER;
+		atcs_arg_elements[1].Integer.Value = 0;
 	}
 
 	status = acpi_evaluate_object(handle, "ATCS", &atcs_arg, &buffer);
@@ -396,11 +396,11 @@ static union acpi_object *amdgpu_atcs_call(acpi_handle handle, int function,
 	if (ACPI_FAILURE(status) && status != AE_NOT_FOUND) {
 		DRM_DEBUG_DRIVER("failed to evaluate ATCS got %s\n",
 				 acpi_format_exception(status));
-		kfree(buffer.pointer);
+		kfree(buffer.Pointer);
 		return NULL;
 	}
 
-	return buffer.pointer;
+	return buffer.Pointer;
 }
 
 /**
@@ -446,7 +446,7 @@ static int amdgpu_atcs_verify_interface(acpi_handle handle,
 
 	memset(&output, 0, sizeof(output));
 
-	size = *(u16 *) info->buffer.pointer;
+	size = *(u16 *) info->Buffer.Pointer;
 	if (size < 8) {
 		DRM_INFO("ATCS buffer is too small: %zu\n", size);
 		err = -EINVAL;
@@ -454,7 +454,7 @@ static int amdgpu_atcs_verify_interface(acpi_handle handle,
 	}
 	size = min(sizeof(output), size);
 
-	memcpy(&output, info->buffer.pointer, size);
+	memcpy(&output, info->Buffer.Pointer, size);
 
 	/* TODO: check version? */
 	DRM_DEBUG_DRIVER("ATCS version %u\n", output.version);
@@ -558,8 +558,8 @@ int amdgpu_acpi_pcie_performance_request(struct amdgpu_device *adev,
 	atcs_input.req_type = ATCS_PCIE_LINK_SPEED;
 	atcs_input.perf_req = perf_req;
 
-	params.length = sizeof(struct atcs_pref_req_input);
-	params.pointer = &atcs_input;
+	params.Length = sizeof(struct atcs_pref_req_input);
+	params.Pointer = &atcs_input;
 
 	while (retry--) {
 		info = amdgpu_atcs_call(handle, ATCS_FUNCTION_PCIE_PERFORMANCE_REQUEST, &params);
@@ -568,7 +568,7 @@ int amdgpu_acpi_pcie_performance_request(struct amdgpu_device *adev,
 
 		memset(&atcs_output, 0, sizeof(atcs_output));
 
-		size = *(u16 *) info->buffer.pointer;
+		size = *(u16 *) info->Buffer.Pointer;
 		if (size < 3) {
 			DRM_INFO("ATCS buffer is too small: %zu\n", size);
 			kfree(info);
@@ -576,7 +576,7 @@ int amdgpu_acpi_pcie_performance_request(struct amdgpu_device *adev,
 		}
 		size = min(sizeof(atcs_output), size);
 
-		memcpy(&atcs_output, info->buffer.pointer, size);
+		memcpy(&atcs_output, info->Buffer.Pointer, size);
 
 		kfree(info);
 
