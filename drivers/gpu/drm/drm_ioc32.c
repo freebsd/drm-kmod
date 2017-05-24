@@ -367,7 +367,7 @@ static int compat_drm_markbufs(struct file *file, unsigned int cmd,
 {
 	drm_buf_desc32_t b32;
 	drm_buf_desc32_t __user *argp = (void __user *)arg;
-	struct drm_buf_desc buf;
+	struct drm_buf_desc __user buf;
 
 	if (copy_from_user(&b32, argp, sizeof(b32)))
 		return -EFAULT;
@@ -957,7 +957,7 @@ static struct {
 	DRM_IOCTL32_DEF(DRM_IOCTL_SET_UNIQUE, compat_drm_setunique),
 	DRM_IOCTL32_DEF(DRM_IOCTL_ADD_MAP, compat_drm_addmap),
 	DRM_IOCTL32_DEF(DRM_IOCTL_ADD_BUFS, compat_drm_addbufs),
-	[DRM_IOCTL_NR(DRM_IOCTL_MARK_BUFS32)].fn = compat_drm_markbufs,
+	DRM_IOCTL32_DEF(DRM_IOCTL_MARK_BUFS, compat_drm_markbufs),
 	DRM_IOCTL32_DEF(DRM_IOCTL_INFO_BUFS, compat_drm_infobufs),
 	[DRM_IOCTL_NR(DRM_IOCTL_MAP_BUFS32)].fn = compat_drm_mapbufs,
 	[DRM_IOCTL_NR(DRM_IOCTL_FREE_BUFS32)].fn = compat_drm_freebufs,
