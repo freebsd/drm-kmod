@@ -33,21 +33,25 @@
 
 #include <drm/drmP.h>
 #include "drm_legacy.h"
-#include "drm_internal.h"
-#include "drm_crtc_internal.h"
+// before patch: >>>>>>> switch compat_drm_addbufs() to drm_ioctl_kernel()
+/* <<<<<<< HEAD */
+/* #include "drm_internal.h" */
+/* #include "drm_crtc_internal.h" */
 
-#ifdef CONFIG_COMPAT
-#define compat_ptr(x)	((void *)(unsigned long)x)
-#define ptr_to_compat(x)	((unsigned long)x)
+/* #ifdef CONFIG_COMPAT */
+/* #define compat_ptr(x)	((void *)(unsigned long)x) */
+/* #define ptr_to_compat(x)	((unsigned long)x) */
 
-extern int drm_version(struct drm_device *dev, void *data,
-			struct drm_file *file_priv);
+/* extern int drm_version(struct drm_device *dev, void *data, */
+/* 			struct drm_file *file_priv); */
 
-extern int drm_getunique(struct drm_device *dev, void *data,
-			struct drm_file *file_priv);
+/* extern int drm_getunique(struct drm_device *dev, void *data, */
+/* 			struct drm_file *file_priv); */
 
-extern int drm_getclient(struct drm_device *dev, void *data,
-			struct drm_file *file_priv);
+/* extern int drm_getclient(struct drm_device *dev, void *data, */
+/* 			struct drm_file *file_priv); */
+/* ======= */
+/* >>>>>>> switch compat_drm_addbufs() to drm_ioctl_kernel() */
 
 #define DRM_IOCTL_VERSION32		DRM_IOWR(0x00, drm_version32_t)
 #define DRM_IOCTL_GET_UNIQUE32		DRM_IOWR(0x01, drm_unique32_t)
@@ -933,6 +937,7 @@ static struct {
 /* 	DRM_IOCTL32_DEF(DRM_IOCTL_WAIT_VBLANK, compat_drm_wait_vblank), */
 /* #if defined(CONFIG_X86) || defined(CONFIG_IA64) */
 /* 	DRM_IOCTL32_DEF(DRM_IOCTL_MODE_ADDFB2, compat_drm_mode_addfb2), */
+#define DRM_IOCTL32_DEF(n, f) [DRM_IOCTL_NR(n##32)] = {.fn = f, .name = #n}
 	[DRM_IOCTL_NR(DRM_IOCTL_VERSION32)].fn = compat_drm_version,
 	[DRM_IOCTL_NR(DRM_IOCTL_GET_UNIQUE32)].fn = compat_drm_getunique,
 	[DRM_IOCTL_NR(DRM_IOCTL_GET_MAP32)].fn = compat_drm_getmap,
@@ -940,7 +945,7 @@ static struct {
 	[DRM_IOCTL_NR(DRM_IOCTL_GET_STATS32)].fn = compat_drm_getstats,
 	[DRM_IOCTL_NR(DRM_IOCTL_SET_UNIQUE32)].fn = compat_drm_setunique,
 	[DRM_IOCTL_NR(DRM_IOCTL_ADD_MAP32)].fn = compat_drm_addmap,
-	[DRM_IOCTL_NR(DRM_IOCTL_ADD_BUFS32)].fn = compat_drm_addbufs,
+	DRM_IOCTL32_DEF(DRM_IOCTL_ADD_BUFS, compat_drm_addbufs),
 	[DRM_IOCTL_NR(DRM_IOCTL_MARK_BUFS32)].fn = compat_drm_markbufs,
 	[DRM_IOCTL_NR(DRM_IOCTL_INFO_BUFS32)].fn = compat_drm_infobufs,
 	[DRM_IOCTL_NR(DRM_IOCTL_MAP_BUFS32)].fn = compat_drm_mapbufs,
