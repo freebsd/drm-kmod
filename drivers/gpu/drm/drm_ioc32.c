@@ -943,7 +943,7 @@ static struct {
 /* 	DRM_IOCTL32_DEF(DRM_IOCTL_MODE_ADDFB2, compat_drm_mode_addfb2), */
 #define DRM_IOCTL32_DEF(n, f) [DRM_IOCTL_NR(n##32)] = {.fn = f, .name = #n}
 	DRM_IOCTL32_DEF(DRM_IOCTL_VERSION, compat_drm_version),
-	[DRM_IOCTL_NR(DRM_IOCTL_GET_UNIQUE32)].fn = compat_drm_getunique,
+	DRM_IOCTL32_DEF(DRM_IOCTL_GET_UNIQUE, compat_drm_getunique),
 	[DRM_IOCTL_NR(DRM_IOCTL_GET_MAP32)].fn = compat_drm_getmap,
 	[DRM_IOCTL_NR(DRM_IOCTL_GET_CLIENT32)].fn = compat_drm_getclient,
 	[DRM_IOCTL_NR(DRM_IOCTL_GET_STATS32)].fn = compat_drm_getstats,
