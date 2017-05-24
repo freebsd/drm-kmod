@@ -33,6 +33,7 @@
 
 #include <drm/drmP.h>
 #include "drm_legacy.h"
+#include "drm_internal.h"
 // before patch: >>>>>>> switch compat_drm_addbufs() to drm_ioctl_kernel()
 /* <<<<<<< HEAD */
 /* #include "drm_internal.h" */
@@ -129,9 +130,12 @@ static int compat_drm_version(struct file *file, unsigned int cmd,
 	v32.version_major = v.version_major;
 	v32.version_minor = v.version_minor;
 	v32.version_patchlevel = v.version_patchlevel;
-	v32.name_len = v.name_len;
-	v32.date_len = v.date_len;
-	v32.desc_len = v.desc_len;
+/* <<<<<<< HEAD */
+/* 	v32.name_len = v.name_len; */
+/* 	v32.date_len = v.date_len; */
+/* 	v32.desc_len = v.desc_len; */
+/* ======= */
+/* >>>>>>> switch compat_drm_version() to drm_ioctl_kernel() */
 	if (copy_to_user((void __user *)arg, &v32, sizeof(v32)))
 		return -EFAULT;
 	return 0;
@@ -938,7 +942,7 @@ static struct {
 /* #if defined(CONFIG_X86) || defined(CONFIG_IA64) */
 /* 	DRM_IOCTL32_DEF(DRM_IOCTL_MODE_ADDFB2, compat_drm_mode_addfb2), */
 #define DRM_IOCTL32_DEF(n, f) [DRM_IOCTL_NR(n##32)] = {.fn = f, .name = #n}
-	[DRM_IOCTL_NR(DRM_IOCTL_VERSION32)].fn = compat_drm_version,
+	DRM_IOCTL32_DEF(DRM_IOCTL_VERSION, compat_drm_version),
 	[DRM_IOCTL_NR(DRM_IOCTL_GET_UNIQUE32)].fn = compat_drm_getunique,
 	[DRM_IOCTL_NR(DRM_IOCTL_GET_MAP32)].fn = compat_drm_getmap,
 	[DRM_IOCTL_NR(DRM_IOCTL_GET_CLIENT32)].fn = compat_drm_getclient,
