@@ -396,6 +396,13 @@ static int copy_one_buf32(void *data, int count, struct drm_buf_entry *from)
 	return copy_to_user(to + count, &v, offsetof(drm_buf_desc32_t, flags));
 }
 
+static int drm_legacy_infobufs32(struct drm_device *dev, void *data,
+			struct drm_file *file_priv)
+{
+	drm_buf_info32_t *request = data;
+	return __drm_legacy_infobufs(dev, data, &request->count, copy_one_buf32);
+}
+
 static int compat_drm_infobufs(struct file *file, unsigned int cmd,
 			       unsigned long arg)
 {
@@ -409,7 +416,7 @@ static int compat_drm_infobufs(struct file *file, unsigned int cmd,
 	if (req32.count < 0)
 		req32.count = 0;
 
-	err = drm_ioctl_kernel(file, drm_legacy_infobufs, &req32, DRM_AUTH);
+	err = drm_ioctl_kernel(file, drm_legacy_infobufs32, &req32, DRM_AUTH);
 	if (err)
 		return err;
 
@@ -951,7 +958,7 @@ static struct {
 	[DRM_IOCTL_NR(DRM_IOCTL_ADD_MAP32)].fn = compat_drm_addmap,
 	DRM_IOCTL32_DEF(DRM_IOCTL_ADD_BUFS, compat_drm_addbufs),
 	[DRM_IOCTL_NR(DRM_IOCTL_MARK_BUFS32)].fn = compat_drm_markbufs,
-	[DRM_IOCTL_NR(DRM_IOCTL_INFO_BUFS32)].fn = compat_drm_infobufs,
+	DRM_IOCTL32_DEF(DRM_IOCTL_INFO_BUFS, compat_drm_infobufs),
 	[DRM_IOCTL_NR(DRM_IOCTL_MAP_BUFS32)].fn = compat_drm_mapbufs,
 	[DRM_IOCTL_NR(DRM_IOCTL_FREE_BUFS32)].fn = compat_drm_freebufs,
 	[DRM_IOCTL_NR(DRM_IOCTL_RM_MAP32)].fn = compat_drm_rmmap,
