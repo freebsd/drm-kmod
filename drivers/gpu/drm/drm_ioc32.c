@@ -961,12 +961,12 @@ static struct {
 	DRM_IOCTL32_DEF(DRM_IOCTL_RES_CTX, compat_drm_resctx),
 	DRM_IOCTL32_DEF(DRM_IOCTL_DMA, compat_drm_dma),
 #if IS_ENABLED(CONFIG_AGP)
-	[DRM_IOCTL_NR(DRM_IOCTL_AGP_ENABLE32)].fn = compat_drm_agp_enable,
-	[DRM_IOCTL_NR(DRM_IOCTL_AGP_INFO32)].fn = compat_drm_agp_info,
-	[DRM_IOCTL_NR(DRM_IOCTL_AGP_ALLOC32)].fn = compat_drm_agp_alloc,
-	[DRM_IOCTL_NR(DRM_IOCTL_AGP_FREE32)].fn = compat_drm_agp_free,
-	[DRM_IOCTL_NR(DRM_IOCTL_AGP_BIND32)].fn = compat_drm_agp_bind,
-	[DRM_IOCTL_NR(DRM_IOCTL_AGP_UNBIND32)].fn = compat_drm_agp_unbind,
+	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_ENABLE, compat_drm_agp_enable),
+	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_INFO, compat_drm_agp_info),
+	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_ALLOC, compat_drm_agp_alloc),
+	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_FREE, compat_drm_agp_free),
+	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_BIND, compat_drm_agp_bind),
+	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_UNBIND, compat_drm_agp_unbind),
 #endif
 	[DRM_IOCTL_NR(DRM_IOCTL_SG_ALLOC32)].fn = compat_drm_sg_alloc,
 	[DRM_IOCTL_NR(DRM_IOCTL_SG_FREE32)].fn = compat_drm_sg_free,
