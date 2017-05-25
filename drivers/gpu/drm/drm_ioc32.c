@@ -762,7 +762,6 @@ static int compat_drm_sg_alloc(struct file *file, unsigned int cmd,
 	drm_scatter_gather32_t __user *argp = (void __user *)arg;
 	struct drm_scatter_gather request;
 	int err;
-	unsigned long handle;
 
 	if (get_user(request.size, &argp->size))
 		return -EFAULT;
@@ -773,8 +772,7 @@ static int compat_drm_sg_alloc(struct file *file, unsigned int cmd,
 		return err;
 
 	/* XXX not sure about the handle conversion here... */
-	handle = request.handle >> PAGE_SHIFT;
-	if (put_user(handle, &argp->handle))
+	if (put_user(request.handle >> PAGE_SHIFT, &argp->handle))
 		return -EFAULT;
 
 	return 0;
@@ -968,8 +966,8 @@ static struct {
 	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_BIND, compat_drm_agp_bind),
 	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_UNBIND, compat_drm_agp_unbind),
 #endif
-	[DRM_IOCTL_NR(DRM_IOCTL_SG_ALLOC32)].fn = compat_drm_sg_alloc,
-	[DRM_IOCTL_NR(DRM_IOCTL_SG_FREE32)].fn = compat_drm_sg_free,
+	DRM_IOCTL32_DEF(DRM_IOCTL_SG_ALLOC, compat_drm_sg_alloc),
+	DRM_IOCTL32_DEF(DRM_IOCTL_SG_FREE, compat_drm_sg_free),
 #if defined(CONFIG_X86) || defined(CONFIG_IA64)
 	[DRM_IOCTL_NR(DRM_IOCTL_UPDATE_DRAW32)].fn = compat_drm_update_draw,
 #endif
