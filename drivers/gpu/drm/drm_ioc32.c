@@ -449,6 +449,18 @@ static int map_one_buf32(void *data, int idx, unsigned long virtual,
 	return 0;
 }
 
+static int drm_legacy_mapbufs32(struct drm_device *dev, void *data,
+		       struct drm_file *file_priv)
+{
+	drm_buf_map32_t *request = data;
+	void __user *v;
+	int err = __drm_legacy_mapbufs(dev, data, &request->count,
+				    &v, map_one_buf32,
+				    file_priv);
+	request->virtual = ptr_to_compat(v);
+	return err;
+}
+
 static int compat_drm_mapbufs(struct file *file, unsigned int cmd,
 			      unsigned long arg)
 {
@@ -461,7 +473,7 @@ static int compat_drm_mapbufs(struct file *file, unsigned int cmd,
 	if (req32.count < 0)
 		return -EINVAL;
 
-	err = drm_ioctl_kernel(file, drm_legacy_mapbufs, &req32, DRM_AUTH);
+	err = drm_ioctl_kernel(file, drm_legacy_mapbufs32, &req32, DRM_AUTH);
 	if (err)
 		return err;
 
@@ -950,7 +962,7 @@ static struct {
 	DRM_IOCTL32_DEF(DRM_IOCTL_ADD_BUFS, compat_drm_addbufs),
 	DRM_IOCTL32_DEF(DRM_IOCTL_MARK_BUFS, compat_drm_markbufs),
 	DRM_IOCTL32_DEF(DRM_IOCTL_INFO_BUFS, compat_drm_infobufs),
-	[DRM_IOCTL_NR(DRM_IOCTL_MAP_BUFS32)].fn = compat_drm_mapbufs,
+	DRM_IOCTL32_DEF(DRM_IOCTL_MAP_BUFS, compat_drm_mapbufs),
 	DRM_IOCTL32_DEF(DRM_IOCTL_FREE_BUFS, compat_drm_freebufs),
 	DRM_IOCTL32_DEF(DRM_IOCTL_RM_MAP, compat_drm_rmmap),
 	DRM_IOCTL32_DEF(DRM_IOCTL_SET_SAREA_CTX, compat_drm_setsareactx),
