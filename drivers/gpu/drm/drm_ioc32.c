@@ -964,7 +964,7 @@ static struct {
 	[DRM_IOCTL_NR(DRM_IOCTL_RM_MAP32)].fn = compat_drm_rmmap,
 	DRM_IOCTL32_DEF(DRM_IOCTL_SET_SAREA_CTX, compat_drm_setsareactx),
 	DRM_IOCTL32_DEF(DRM_IOCTL_GET_SAREA_CTX, compat_drm_getsareactx),
-	[DRM_IOCTL_NR(DRM_IOCTL_RES_CTX32)].fn = compat_drm_resctx,
+	DRM_IOCTL32_DEF(DRM_IOCTL_RES_CTX, compat_drm_resctx),
 	[DRM_IOCTL_NR(DRM_IOCTL_DMA32)].fn = compat_drm_dma,
 #if IS_ENABLED(CONFIG_AGP)
 	[DRM_IOCTL_NR(DRM_IOCTL_AGP_ENABLE32)].fn = compat_drm_agp_enable,
