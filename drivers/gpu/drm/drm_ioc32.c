@@ -971,7 +971,7 @@ static struct {
 #if defined(CONFIG_X86) || defined(CONFIG_IA64)
 	DRM_IOCTL32_DEF(DRM_IOCTL_UPDATE_DRAW, compat_drm_update_draw),
 #endif
-	[DRM_IOCTL_NR(DRM_IOCTL_WAIT_VBLANK32)].fn = compat_drm_wait_vblank,
+	DRM_IOCTL32_DEF(DRM_IOCTL_WAIT_VBLANK, compat_drm_wait_vblank),
 #if defined(CONFIG_X86) || defined(CONFIG_IA64)
 	[DRM_IOCTL_NR(DRM_IOCTL_MODE_ADDFB232)].fn = compat_drm_mode_addfb2,
 #endif
