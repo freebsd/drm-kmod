@@ -876,7 +876,7 @@ static int compat_drm_mode_addfb2(struct file *file, unsigned int cmd,
 				  unsigned long arg)
 {
 	struct drm_mode_fb_cmd232 __user *argp = (void __user *)arg;
-	struct drm_mode_fb_cmd2 req64;
+	struct drm_mode_fb_cmd2 __user req64;
 	int err;
 	u32 fb_id;
 
@@ -893,8 +893,7 @@ static int compat_drm_mode_addfb2(struct file *file, unsigned int cmd,
 	if (err)
 		return err;
 
-	fb_id = argp->fb_id;
-	if (put_user(req64.fb_id, &fb_id))
+	if (put_user(req64.fb_id, &argp->fb_id))
 		return -EFAULT;
 
 	return 0;
@@ -973,7 +972,7 @@ static struct {
 #endif
 	DRM_IOCTL32_DEF(DRM_IOCTL_WAIT_VBLANK, compat_drm_wait_vblank),
 #if defined(CONFIG_X86) || defined(CONFIG_IA64)
-	[DRM_IOCTL_NR(DRM_IOCTL_MODE_ADDFB232)].fn = compat_drm_mode_addfb2,
+	DRM_IOCTL32_DEF(DRM_IOCTL_MODE_ADDFB2, compat_drm_mode_addfb2),
 #endif
 };
 
