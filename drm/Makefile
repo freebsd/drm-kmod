@@ -70,6 +70,7 @@ SRCS=	ati_pcigart.c \
 	drm_scdc_helper.c \
 	drm_sysctl_freebsd.c \
 	drm_sysfs.c \
+	drm_vblank.c \
 	drm_vm.c \
 	drm_vma_manager.c \
 	linux_fb.c \

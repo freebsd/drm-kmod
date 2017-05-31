@@ -155,6 +155,9 @@
 #include <drm/drm_debugfs.h>
 #include <drm/drm_ioctl.h>
 #include <drm/drm_sysfs.h>
+#include <drm/drm_vblank.h>
+#include <drm/drm_irq.h>
+
 
 #include "opt_compat.h"
 #include "opt_drm.h"
@@ -551,9 +554,6 @@ static inline bool drm_drv_uses_atomic_modeset(struct drm_device *dev)
 {
  	return dev->mode_config.funcs->atomic_commit != NULL;
 }
-
-
-#include <drm/drm_irq.h>
 
 #define DRM_SWITCH_POWER_ON 0
 #define DRM_SWITCH_POWER_OFF 1
