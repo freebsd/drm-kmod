@@ -34,9 +34,6 @@ struct vt_kms_softc {
 	struct task              fb_mode_task;
 };
 
-void drm_kqregister(struct linux_file *filp);
-
-
 #define	DRM_IRQ_ARGS		int irq, void *arg
 
 #define	KHZ2PICOS(a)	(1000000000UL/(a))
@@ -214,9 +211,6 @@ void cancel_reset_debug_log(void);
 #define	PM_EVENT_QUIESCE	0x0008
 #define	PM_EVENT_PRETHAW	PM_EVENT_QUIESCE
 
-
-void	hex_dump_to_buffer(const void *buf, size_t len, int rowsize,
-	    int groupsize, char *linebuf, size_t linebuflen, bool ascii);
 
 #define drm_proc_cleanup(a, b)
 

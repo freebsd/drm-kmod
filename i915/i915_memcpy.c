@@ -26,7 +26,9 @@
 
 #include "i915_drv.h"
 
+#ifndef __FreeBSD__
 static DEFINE_STATIC_KEY_FALSE(has_movntdqa);
+#endif
 
 #ifdef CONFIG_AS_MOVNTDQA
 static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len)
@@ -95,6 +97,8 @@ bool i915_memcpy_from_wc(void *dst, const void *src, unsigned long len)
 
 void i915_memcpy_init_early(struct drm_i915_private *dev_priv)
 {
+#ifndef __FreeBSD__
 	if (static_cpu_has(X86_FEATURE_XMM4_1))
 		static_branch_enable(&has_movntdqa);
+#endif
 }

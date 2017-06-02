@@ -552,6 +552,9 @@ EXPORT_SYMBOL(ttm_object_device_release);
  */
 static bool __must_check get_dma_buf_unless_doomed(struct dma_buf *dmabuf)
 {
+#ifdef __FreeBSD__
+	CTASSERT(sizeof(((struct dma_buf *)0)->file->f_count) == sizeof(atomic_t));
+#endif
 	return atomic_inc_not_zero((atomic_t *)&dmabuf->file->f_count) != 0L;
 }
 

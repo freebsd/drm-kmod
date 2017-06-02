@@ -69,8 +69,10 @@ static int mipi_dsi_uevent(struct device *dev, struct kobj_uevent_env *env)
 	if (err != -ENODEV)
 		return err;
 
+#ifndef __FreeBSD__
 	add_uevent_var(env, "MODALIAS=%s%s", MIPI_DSI_MODULE_PREFIX,
 		       dsi->name);
+#endif
 
 	return 0;
 }

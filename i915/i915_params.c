@@ -22,6 +22,10 @@
  * IN THE SOFTWARE.
  */
 
+#ifdef __FreeBSD__
+#include <linux/types.h>
+#endif
+
 #include "i915_params.h"
 #include "i915_drv.h"
 

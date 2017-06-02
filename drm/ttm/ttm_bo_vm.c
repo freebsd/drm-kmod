@@ -323,9 +323,7 @@ static void ttm_bo_vm_open(struct vm_area_struct *vma)
 
 	WARN_ON(bo->bdev->dev_mapping != vma->vm_file->f_mapping);
 
-#ifndef __FreeBSD__
 	(void)ttm_bo_reference(bo);
-#endif
 }
 
 static void ttm_bo_vm_close(struct vm_area_struct *vma)

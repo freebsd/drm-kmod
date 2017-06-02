@@ -4253,7 +4253,11 @@ static bool discard_backing_storage(struct drm_i915_gem_object *obj)
 	 * acquiring such a reference whilst we are in the middle of
 	 * freeing the object.
 	 */
+#ifdef __FreeBSD__
+	return file_count(obj->base.filp) == 1;
+#else
 	return atomic_long_read(&obj->base.filp->f_count) == 1;
+#endif
 }
 
 void i915_gem_free_object(struct drm_gem_object *gem_obj)

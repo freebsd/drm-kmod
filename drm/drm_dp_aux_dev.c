@@ -280,11 +280,13 @@ static struct drm_dp_aux_dev *drm_dp_aux_dev_get_by_aux(struct drm_dp_aux *aux)
 	return aux_dev;
 }
 
+#ifndef __FreeBSD__
 static int auxdev_wait_atomic_t(atomic_t *p)
 {
 	schedule();
 	return 0;
 }
+#endif
 
 void drm_dp_aux_unregister_devnode(struct drm_dp_aux *aux)
 {
@@ -300,8 +302,12 @@ void drm_dp_aux_unregister_devnode(struct drm_dp_aux *aux)
 	mutex_unlock(&aux_idr_mutex);
 
 	atomic_dec(&aux_dev->usecount);
+#ifdef __FreeBSD__
+	wait_on_atomic_t(&aux_dev->usecount, TASK_UNINTERRUPTIBLE);
+#else
 	wait_on_atomic_t(&aux_dev->usecount, auxdev_wait_atomic_t,
 			 TASK_UNINTERRUPTIBLE);
+#endif
 
 	minor = aux_dev->index;
 	if (aux_dev->dev)
@@ -351,7 +357,8 @@ int drm_dp_aux_dev_init(void)
 #ifdef __linux__
 	res = register_chrdev(0, "aux", &auxdev_fops);
 #else
-	res = register_chrdev_p(DRM_MAJOR+1, "aux", &auxdev_fops, DRM_DEV_UID, DRM_DEV_GID, DRM_DEV_MODE);
+	res = register_chrdev_p(DRM_MAJOR+1, "aux", &auxdev_fops,
+	    DRM_DEV_UID, DRM_DEV_GID, DRM_DEV_MODE);
 	if (res == 0)
 		res = DRM_MAJOR+1;
 #endif	

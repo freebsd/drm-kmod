@@ -63,6 +63,12 @@ static inline bool i915_mmio_reg_valid(i915_reg_t reg)
 			       (port) == PORT_B ? (b) : (c))
 #define _MMIO_PORT3(pipe, a, b, c) _MMIO(_PORT3(pipe, a, b, c))
 
+#ifdef __FreeBSD__
+/* clang's _Static_assert barfs on these. */
+#undef BUILD_BUG_ON_MSG
+#define	BUILD_BUG_ON_MSG(x, msg)
+#endif
+
 #define _MASKED_FIELD(mask, value) ({					   \
 	if (__builtin_constant_p(mask))					   \
 		BUILD_BUG_ON_MSG(((mask) & 0xffff0000), "Incorrect mask"); \

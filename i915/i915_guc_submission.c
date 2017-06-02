@@ -495,7 +495,12 @@ static void guc_wq_item_append(struct i915_guc_client *gc,
 	 * XXX: if not the case, we need save data to a temp wqi and copy it to
 	 * workqueue buffer dw by dw.
 	 */
+#ifdef __FreeBSD__
+	/* _Static_assert is broken. */
+	MPASS(wqi_size == 16);
+#else
 	BUILD_BUG_ON(wqi_size != 16);
+#endif
 	GEM_BUG_ON(gc->wq_rsvd < wqi_size);
 
 	/* postincrement WQ tail for next time */

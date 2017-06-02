@@ -319,12 +319,14 @@ void drm_sysfs_connector_remove(struct drm_connector *connector)
  */
 void drm_sysfs_hotplug_event(struct drm_device *dev)
 {
+#ifndef __FreeBSD__
 	char *event_string = "HOTPLUG=1";
 	char *envp[] = { event_string, NULL };
 
 	DRM_DEBUG("generating hotplug event\n");
 
 	kobject_uevent_env(&dev->primary->kdev->kobj, KOBJ_CHANGE, envp);
+#endif
 }
 EXPORT_SYMBOL(drm_sysfs_hotplug_event);
 
