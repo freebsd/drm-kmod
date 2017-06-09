@@ -246,7 +246,9 @@ static unsigned long i915_stolen_to_physical(struct drm_device *dev)
 		}
 	}
 
-
+#ifdef __FreeBSD__
+	(void)r;
+#else
 	/* Verify that nothing else uses this physical address. Stolen
 	 * memory should be reserved by the BIOS and hidden from the
 	 * kernel. So if the region is already marked as busy, something
@@ -276,6 +278,7 @@ static unsigned long i915_stolen_to_physical(struct drm_device *dev)
 			base = 0;
 		}
 	}
+#endif
 
 	return base;
 }
