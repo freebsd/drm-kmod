@@ -2494,8 +2494,8 @@ rebuild_st:
 	mapping = obj->base.filp->f_mapping;
 	noreclaim = mapping_gfp_constraint(mapping,
 					   ~(__GFP_IO | __GFP_RECLAIM));
-#endif
 	noreclaim |= __GFP_NORETRY | __GFP_NOWARN;
+
 	sg = st->sgl;
 	st->nents = 0;
 	for (i = 0; i < page_count; i++) {
@@ -2530,23 +2530,8 @@ rebuild_st:
 				/* reclaim and warn, but no oom */
 #ifdef __linux__
 				gfp = mapping_gfp_mask(mapping);
-				noreclaim = mapping_gfp_mask(mapping);
 #endif
-				noreclaim |= __GFP_NORETRY; /* reclaim, but no oom */
-
-				/* Our bo are always dirty and so we require
-				 * kswapd to reclaim our pages (direct reclaim
-				 * does not effectively begin pageout of our
-				 * buffers on its own). However, direct reclaim
-				 * only waits for kswapd when under allocation
-				 * congestion. So as a result __GFP_RECLAIM is
-				 * unreliable and fails to actually reclaim our
-				 * dirty pages -- unless you try over and over
-				 * again with !__GFP_NORETRY. However, we still
-				 * want to fail this allocation rather than
-				 * trigger the out-of-memory killer and for
-				 * this we want the future __GFP_MAYFAIL.
-				 */
+				gfp |= __GFP_NORETRY;
 			}
 		} while (1);
 
