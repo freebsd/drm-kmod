@@ -2430,6 +2430,7 @@ struct drm_i915_private {
 
 			bool periodic;
 			int period_exponent;
+			int timestamp_frequency;
 
 			int metrics_set;
 
