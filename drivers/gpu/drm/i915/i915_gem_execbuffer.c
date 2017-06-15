@@ -113,13 +113,40 @@ static int eb_create(struct i915_execbuffer *eb)
 		eb->and = -eb->args->buffer_count;
 	}
 
-	INIT_LIST_HEAD(&eb->vmas);
 	return 0;
+}
+
+static inline void
+__eb_unreserve_vma(struct i915_vma *vma,
+		   const struct drm_i915_gem_exec_object2 *entry)
+{
+	if (unlikely(entry->flags & __EXEC_OBJECT_HAS_FENCE))
+		i915_vma_unpin_fence(vma);
+
+	if (entry->flags & __EXEC_OBJECT_HAS_PIN)
+		__i915_vma_unpin(vma);
+}
+
+static void
+eb_unreserve_vma(struct i915_vma *vma)
+{
+	struct drm_i915_gem_exec_object2 *entry = vma->exec_entry;
+
+	__eb_unreserve_vma(vma, entry);
+	entry->flags &= ~(__EXEC_OBJECT_HAS_FENCE | __EXEC_OBJECT_HAS_PIN);
 }
 
 static void
 eb_reset(struct i915_execbuffer *eb)
 {
+	struct i915_vma *vma;
+
+	list_for_each_entry(vma, &eb->vmas, exec_list) {
+		eb_unreserve_vma(vma);
+		i915_vma_put(vma);
+		vma->exec_entry = NULL;
+	}
+
 	if (eb->and >= 0)
 		memset(eb->buckets, 0, (eb->and+1)*sizeof(struct hlist_head));
 }
@@ -150,6 +177,8 @@ eb_lookup_vmas(struct i915_execbuffer *eb)
 	struct drm_i915_gem_object *obj;
 	struct list_head objects;
 	int i, ret;
+
+	INIT_LIST_HEAD(&eb->vmas);
 
 	INIT_LIST_HEAD(&objects);
 	spin_lock(&eb->file->table_lock);
@@ -257,40 +286,23 @@ static struct i915_vma *eb_get_vma(struct i915_execbuffer *eb, unsigned long han
 	}
 }
 
-static void
-eb_unreserve_vma(struct i915_vma *vma)
-{
-	struct drm_i915_gem_exec_object2 *entry;
-
-	if (!drm_mm_node_allocated(&vma->node))
-		return;
-
-	entry = vma->exec_entry;
-
-	if (entry->flags & __EXEC_OBJECT_HAS_FENCE)
-		i915_vma_unpin_fence(vma);
-
-	if (entry->flags & __EXEC_OBJECT_HAS_PIN)
-		__i915_vma_unpin(vma);
-
-	entry->flags &= ~(__EXEC_OBJECT_HAS_FENCE | __EXEC_OBJECT_HAS_PIN);
-}
-
 static void eb_destroy(struct i915_execbuffer *eb)
 {
-	i915_gem_context_put(eb->ctx);
+	struct i915_vma *vma;
 
-	while (!list_empty(&eb->vmas)) {
-		struct i915_vma *vma;
+	list_for_each_entry(vma, &eb->vmas, exec_list) {
+		if (!vma->exec_entry)
+			continue;
 
-		vma = list_first_entry(&eb->vmas,
-				       struct i915_vma,
-				       exec_list);
-		list_del_init(&vma->exec_list);
-		eb_unreserve_vma(vma);
+		__eb_unreserve_vma(vma, vma->exec_entry);
 		vma->exec_entry = NULL;
 		i915_vma_put(vma);
 	}
+
+	i915_gem_context_put(eb->ctx);
+
+	if (eb->buckets)
+		kfree(eb->buckets);
 }
 
 static inline int use_cpu_reloc(struct drm_i915_gem_object *obj)
@@ -993,13 +1005,7 @@ eb_relocate_slow(struct i915_execbuffer *eb)
 	int i, total, ret;
 
 	/* We may process another execbuffer during the unlock... */
-	while (!list_empty(&eb->vmas)) {
-		vma = list_first_entry(&eb->vmas, struct i915_vma, exec_list);
-		list_del_init(&vma->exec_list);
-		eb_unreserve_vma(vma);
-		i915_vma_put(vma);
-	}
-
+	eb_reset(eb);
 	mutex_unlock(&dev->struct_mutex);
 
 	total = 0;
@@ -1060,7 +1066,6 @@ eb_relocate_slow(struct i915_execbuffer *eb)
 	}
 
 	/* reacquire the objects */
-	eb_reset(eb);
 	ret = eb_lookup_vmas(eb);
 	if (ret)
 		goto err;
