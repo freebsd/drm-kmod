@@ -818,7 +818,7 @@ EXPORT_SYMBOL(drm_fb_helper_alloc_fbi);
 void drm_fb_helper_unregister_fbi(struct drm_fb_helper *fb_helper)
 {
 	if (fb_helper && fb_helper->fbdev)
-		unregister_framebuffer(fb_helper->fbdev);
+		linux_unregister_framebuffer(fb_helper->fbdev);
 }
 EXPORT_SYMBOL(drm_fb_helper_unregister_fbi);
 
@@ -1593,7 +1593,7 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 	info->fbio.fb_bpp = preferred_bpp;
 	sc = (struct vt_kms_softc *)info->fbio.fb_priv;
 	sc->fb_helper = fb_helper;
-	if (register_framebuffer(info) < 0)
+	if (linux_register_framebuffer(info) < 0)
 		return -EINVAL;
 
 	dev_info(fb_helper->dev->dev, "fb%d: %s frame buffer device\n",

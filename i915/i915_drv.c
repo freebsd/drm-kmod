@@ -387,6 +387,28 @@ intel_alloc_mchbar_resource(struct drm_device *dev)
 #endif
 
 	/* Get some space for it */
+#ifdef __FreeBSD__
+#undef resource
+	device_t vga;
+	(void)ret;
+
+	vga = device_get_parent(dev->dev->bsddev);
+	dev_priv->mch_res_rid = 0x100;
+	dev_priv->mch_res = BUS_ALLOC_RESOURCE(device_get_parent(vga),
+	    dev->dev->bsddev, SYS_RES_MEMORY, &dev_priv->mch_res_rid, 0, ~0UL,
+	    MCHBAR_SIZE, RF_ACTIVE | RF_SHAREABLE);
+	if (dev_priv->mch_res == NULL) {
+		DRM_DEBUG_DRIVER("failed bus alloc\n");
+		return -ENOMEM;
+	}
+
+	if (INTEL_INFO(dev)->gen >= 4)
+		pci_write_config_dword(dev_priv->bridge_dev, reg + 4,
+		    upper_32_bits(rman_get_start(dev_priv->mch_res)));
+
+	pci_write_config_dword(dev_priv->bridge_dev, reg,
+	    lower_32_bits(rman_get_start(dev_priv->mch_res)));
+#else
 	dev_priv->mch_res.name = "i915 MCHBAR";
 	dev_priv->mch_res.flags = IORESOURCE_MEM;
 	ret = pci_bus_alloc_resource(dev_priv->bridge_dev->bus,
@@ -407,6 +429,7 @@ intel_alloc_mchbar_resource(struct drm_device *dev)
 
 	pci_write_config_dword(dev_priv->bridge_dev, reg,
 			       lower_32_bits(dev_priv->mch_res.start));
+#endif
 	return 0;
 }
 
@@ -477,8 +500,23 @@ intel_teardown_mchbar(struct drm_device *dev)
 		}
 	}
 
+#ifdef __FreeBSD__
+	if (dev_priv->mch_res != NULL) {
+		device_t vga;
+
+		vga = device_get_parent(dev->dev->bsddev);
+		BUS_DEACTIVATE_RESOURCE(device_get_parent(vga),
+		    dev->dev->bsddev, SYS_RES_MEMORY, dev_priv->mch_res_rid,
+		    dev_priv->mch_res);
+		BUS_RELEASE_RESOURCE(device_get_parent(vga),
+		    dev->dev->bsddev, SYS_RES_MEMORY, dev_priv->mch_res_rid,
+		    dev_priv->mch_res);
+		dev_priv->mch_res = NULL;
+	}
+#else
 	if (dev_priv->mch_res.start)
 		release_resource(&dev_priv->mch_res);
+#endif
 }
 
 /* true = enable decode, false = disable decoder */
@@ -890,7 +928,23 @@ static int i915_mmio_setup(struct drm_device *dev)
 		mmio_size = 512 * 1024;
 	else
 		mmio_size = 2 * 1024 * 1024;
+#ifdef __FreeBSD__
+	struct resource *res;
+	int rid, type;
+
+	rid = PCIR_BAR(mmio_bar);
+	type = pci_resource_type(pdev, mmio_bar);
+	res = bus_alloc_resource_any(pdev->dev.bsddev, type, &rid, RF_ACTIVE);
+
+	dev->drm_pcir[mmio_bar].res = res;
+	dev->drm_pcir[mmio_bar].rid = rid;
+
+	dev_priv->mmio_rid = rid;
+	dev_priv->mmio_restype = type;
+	dev_priv->regs = (void *)rman_get_bushandle(res);
+#else
 	dev_priv->regs = pci_iomap(pdev, mmio_bar, mmio_size);
+#endif
 	if (dev_priv->regs == NULL) {
 		DRM_ERROR("failed to map registers\n");
 
@@ -909,7 +963,15 @@ static void i915_mmio_cleanup(struct drm_device *dev)
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 
 	intel_teardown_mchbar(dev);
+#ifdef __FreeBSD__
+	int rid;
+
+	rid = dev_priv->mmio_rid;
+	bus_release_resource(pdev->dev.bsddev, dev_priv->mmio_restype,
+	    rid, dev->drm_pcir[rid].res);
+#else
 	pci_iounmap(pdev, dev_priv->regs);
+#endif
 }
 
 /**

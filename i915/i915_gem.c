@@ -171,7 +171,11 @@ i915_gem_get_aperture_ioctl(struct drm_device *dev, void *data,
 static int
 i915_gem_object_get_pages_phys(struct drm_i915_gem_object *obj)
 {
+#ifdef __FreeBSD__
+	vm_object_t mapping = obj->base.filp->_shmem;
+#else
 	struct address_space *mapping = obj->base.filp->f_mapping;
+#endif
 	char *vaddr = obj->phys_handle->vaddr;
 	struct sg_table *st;
 	struct scatterlist *sg;
@@ -238,7 +242,11 @@ i915_gem_object_put_pages_phys(struct drm_i915_gem_object *obj)
 		obj->dirty = 0;
 
 	if (obj->dirty) {
+#ifdef __FreeBSD__
+		vm_object_t mapping = obj->base.filp->_shmem;
+#else
 		struct address_space *mapping = obj->base.filp->f_mapping;
+#endif
 		char *vaddr = obj->phys_handle->vaddr;
 		int i;
 
@@ -1695,7 +1703,7 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 	}
 	PROC_UNLOCK(p);
 
-	vmobj = file_inode(obj->base.filp)->i_mapping;
+	vmobj = obj->base.filp->_shmem;
 	vm_object_reference(vmobj);
 	rv = vm_map_find(map, vmobj, args->offset, &addr, args->size, 0,
 	    VMFS_OPTIMAL_SPACE, VM_PROT_READ | VM_PROT_WRITE,
@@ -2178,7 +2186,11 @@ i915_gem_object_truncate(struct drm_i915_gem_object *obj)
 	 * To do this we must instruct the shmfs to drop all of its
 	 * backing pages, *now*.
 	 */
+#ifdef __FreeBSD__
+	shmem_truncate_range(obj->base.filp->_shmem, 0, (loff_t)-1);
+#else
 	shmem_truncate_range(file_inode(obj->base.filp), 0, (loff_t)-1);
+#endif
 	obj->madv = __I915_MADV_PURGED;
 }
 
@@ -2186,7 +2198,11 @@ i915_gem_object_truncate(struct drm_i915_gem_object *obj)
 static void
 i915_gem_object_invalidate(struct drm_i915_gem_object *obj)
 {
+#ifdef __FreeBSD__
+	vm_object_t mapping;
+#else
 	struct address_space *mapping;
+#endif
 
 	switch (obj->madv) {
 	case I915_MADV_DONTNEED:
@@ -2198,7 +2214,11 @@ i915_gem_object_invalidate(struct drm_i915_gem_object *obj)
 	if (obj->base.filp == NULL)
 		return;
 
+#ifdef __FreeBSD__
+	mapping = obj->base.filp->_shmem;
+#else
 	mapping = obj->base.filp->f_mapping,
+#endif
 	invalidate_mapping_pages(mapping, 0, (loff_t)-1);
 }
 
@@ -2286,7 +2306,11 @@ i915_gem_object_get_pages_gtt(struct drm_i915_gem_object *obj)
 {
 	struct drm_i915_private *dev_priv = to_i915(obj->base.dev);
 	int page_count, i;
+#ifdef __FreeBSD__
+	vm_object_t mapping;
+#else
 	struct address_space *mapping;
+#endif
 	struct sg_table *st;
 	struct scatterlist *sg;
 	struct sgt_iter sgt_iter;
@@ -2317,8 +2341,13 @@ i915_gem_object_get_pages_gtt(struct drm_i915_gem_object *obj)
 	 *
 	 * Fail silently without starting the shrinker
 	 */
+#ifdef __FreeBSD__
+	mapping = obj->base.filp->_shmem;
+	gfp = 0;
+#else
 	mapping = obj->base.filp->f_mapping;
 	gfp = mapping_gfp_constraint(mapping, ~(__GFP_IO | __GFP_RECLAIM));
+#endif
 	gfp |= __GFP_NORETRY | __GFP_NOWARN;
 	sg = st->sgl;
 	st->nents = 0;
@@ -4178,7 +4207,9 @@ struct drm_i915_gem_object *i915_gem_object_create(struct drm_device *dev,
 						  size_t size)
 {
 	struct drm_i915_gem_object *obj;
+#ifndef __FreeBSD__
 	struct address_space *mapping;
+#endif
 	gfp_t mask;
 	int ret;
 
@@ -4197,8 +4228,10 @@ struct drm_i915_gem_object *i915_gem_object_create(struct drm_device *dev,
 		mask |= __GFP_DMA32;
 	}
 
+#ifndef __FreeBSD__
 	mapping = obj->base.filp->f_mapping;
 	mapping_set_gfp_mask(mapping, mask);
+#endif
 
 	i915_gem_object_init(obj, &i915_gem_object_ops);
 

@@ -1089,7 +1089,11 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 	r = ttm_bo_device_init(&adev->mman.bdev,
 			       adev->mman.bo_global_ref.ref.object,
 			       &amdgpu_bo_driver,
+#ifdef __FreeBSD__
+			       NULL,
+#else
 			       adev->ddev->anon_mapping,
+#endif
 			       DRM_FILE_PAGE_OFFSET,
 			       adev->need_dma32);
 	if (r) {

@@ -137,8 +137,10 @@ int drm_open(struct inode *inode, struct file *filp)
 	if (!dev->open_count++)
 		need_setup = 1;
 
+#ifndef __FreeBSD__
 	/* share address_space across all char-devs of a single device */
 	filp->f_mapping = dev->anon_mapping;
+#endif
 
 	retcode = drm_open_helper(filp, minor);
 	if (retcode)

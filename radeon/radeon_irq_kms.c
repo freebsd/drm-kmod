@@ -219,7 +219,9 @@ static bool radeon_msi_ok(struct radeon_device *rdev)
 	 */
 	if (rdev->family < CHIP_BONAIRE) {
 		dev_info(rdev->dev, "radeon: MSI limited to 32-bit\n");
+#ifndef __FreeBSD__
 		rdev->pdev->no_64bit_msi = 1;
+#endif
 	}
 
 	/* force MSI on */

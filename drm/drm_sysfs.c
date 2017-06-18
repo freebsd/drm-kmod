@@ -242,7 +242,9 @@ static struct bin_attribute *connector_bin_attrs[] = {
 
 static const struct attribute_group connector_dev_group = {
 	.attrs = connector_dev_attrs,
+#ifndef __FreeBSD__
 	.bin_attrs = connector_bin_attrs,
+#endif
 };
 
 static const struct attribute_group *connector_dev_groups[] = {

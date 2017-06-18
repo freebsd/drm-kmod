@@ -1020,7 +1020,9 @@ int drm_dp_aux_register(struct drm_dp_aux *aux)
 	aux->ddc.class = I2C_CLASS_DDC;
 	aux->ddc.owner = THIS_MODULE;
 	aux->ddc.dev.parent = aux->dev;
+#ifndef __FreeBSD__
 	aux->ddc.dev.of_node = aux->dev->of_node;
+#endif
 
 	strlcpy(aux->ddc.name, aux->name ? aux->name : dev_name(aux->dev),
 		sizeof(aux->ddc.name));

@@ -366,7 +366,9 @@ is_primary(struct linux_fb_info *info)
 {
 	struct device *device = info->device;
 	struct pci_dev *pci_dev = NULL;
+#ifndef __FreeBSD__
 	struct linux_resource *res = NULL;
+#endif
 
 	if (device &&  (pci_dev = to_pci_dev(device)) == NULL)
 		return (0);
@@ -592,7 +594,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 }
 
 int
-register_framebuffer(struct linux_fb_info *fb_info)
+linux_register_framebuffer(struct linux_fb_info *fb_info)
 {
 	int rc;
 
@@ -671,7 +673,7 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 }
 
 int
-unregister_framebuffer(struct linux_fb_info *fb_info)
+linux_unregister_framebuffer(struct linux_fb_info *fb_info)
 {
 	int rc;
 

@@ -2715,9 +2715,13 @@ static int i915_runtime_pm_status(struct seq_file *m, void *unused)
 #else
 	seq_printf(m, "Device Power Management (CONFIG_PM) disabled\n");
 #endif
+#ifdef __FreeBSD__
+	(void)pdev;
+#else
 	seq_printf(m, "PCI device power state: %s [%d]\n",
 		   pci_power_name(pdev->current_state),
 		   pdev->current_state);
+#endif
 
 	return 0;
 }

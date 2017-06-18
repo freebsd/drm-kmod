@@ -95,6 +95,7 @@ static struct bus_type mipi_dsi_bus_type = {
 	.pm = &mipi_dsi_device_pm_ops,
 };
 
+#ifndef __FreeBSD__
 static int of_device_match(struct device *dev, void *data)
 {
 	return dev->of_node == data;
@@ -117,12 +118,15 @@ struct mipi_dsi_device *of_find_mipi_dsi_device_by_node(struct device_node *np)
 	return dev ? to_mipi_dsi_device(dev) : NULL;
 }
 EXPORT_SYMBOL(of_find_mipi_dsi_device_by_node);
+#endif
 
 static void mipi_dsi_dev_release(struct device *dev)
 {
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
 
+#ifndef __FreeBSD__
 	of_node_put(dev->of_node);
+#endif
 	kfree(dsi);
 }
 
@@ -228,7 +232,9 @@ mipi_dsi_device_register_full(struct mipi_dsi_host *host,
 		return dsi;
 	}
 
+#ifndef __FreeBSD__
 	dsi->dev.of_node = info->node;
+#endif
 	dsi->channel = info->channel;
 	strlcpy(dsi->name, info->type, sizeof(dsi->name));
 
@@ -256,6 +262,7 @@ EXPORT_SYMBOL(mipi_dsi_device_unregister);
 static DEFINE_MUTEX(host_lock);
 static LIST_HEAD(host_list);
 
+#ifndef __FreeBSD__
 /**
  * of_find_mipi_dsi_host_by_node() - find the MIPI DSI host matching a
  *				     device tree node
@@ -287,7 +294,7 @@ EXPORT_SYMBOL(of_find_mipi_dsi_host_by_node);
 int mipi_dsi_host_register(struct mipi_dsi_host *host)
 {
 	struct device_node *node;
-#ifdef notyet
+
 	for_each_available_child_of_node(host->dev->of_node, node) {
 		/* skip nodes without reg property */
 		if (!of_find_property(node, "reg", NULL))
@@ -298,10 +305,11 @@ int mipi_dsi_host_register(struct mipi_dsi_host *host)
 	mutex_lock(&host_lock);
 	list_add_tail(&host->list, &host_list);
 	mutex_unlock(&host_lock);
-#endif
+
 	return 0;
 }
 EXPORT_SYMBOL(mipi_dsi_host_register);
+#endif
 
 static int mipi_dsi_remove_device_fn(struct device *dev, void *priv)
 {

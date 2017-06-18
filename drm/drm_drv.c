@@ -415,7 +415,7 @@ void drm_unplug_dev(struct drm_device *dev)
 }
 EXPORT_SYMBOL(drm_unplug_dev);
 
-#ifdef __linux__
+#ifndef __FreeBSD__
 /*
  * DRM internal mount
  * We want to be able to allocate our own "struct address_space" to control
@@ -487,16 +487,6 @@ static void drm_fs_inode_free(struct inode *inode)
 		simple_release_fs(&drm_fs_mnt, &drm_fs_cnt);
 	}
 }
-#else
-static struct address_space *drm_fs_inode_new(void)
-{
-	return alloc_anon_mapping(128 * 1024 * 1024 /* XXX */);
-}
-
-static void drm_fs_inode_free(struct address_space *as)
-{
-	free_anon_mapping(as);
-}
 #endif
 
 /**
@@ -545,12 +535,14 @@ int drm_dev_init(struct drm_device *dev,
 	mutex_init(&dev->ctxlist_mutex);
 	mutex_init(&dev->master_mutex);
 
+#ifndef __FreeBSD__
 	dev->anon_mapping = drm_fs_inode_new();
 	if (IS_ERR(dev->anon_mapping)) {
 		ret = PTR_ERR(dev->anon_mapping);
 		DRM_ERROR("Cannot allocate anonymous mapping: %d\n", ret);
 		goto err_free;
 	}
+#endif
 
 	if (drm_core_check_feature(dev, DRIVER_MODESET)) {
 		ret = drm_minor_alloc(dev, DRM_MINOR_CONTROL);
@@ -600,7 +592,9 @@ err_minors:
 	drm_minor_free(dev, DRM_MINOR_PRIMARY);
 	drm_minor_free(dev, DRM_MINOR_RENDER);
 	drm_minor_free(dev, DRM_MINOR_CONTROL);
+#ifndef __FreeBSD__
 	drm_fs_inode_free(dev->anon_mapping);
+#endif
 err_free:
 	mutex_destroy(&dev->master_mutex);
 	spin_lock_destroy(&dev->buf_lock);
@@ -660,7 +654,9 @@ static void drm_dev_release(struct kref *ref)
 
 	drm_legacy_ctxbitmap_cleanup(dev);
 	drm_ht_remove(&dev->map_hash);
+#ifndef __FreeBSD__
 	drm_fs_inode_free(dev->anon_mapping);
+#endif
 
 	drm_minor_free(dev, DRM_MINOR_PRIMARY);
 	drm_minor_free(dev, DRM_MINOR_RENDER);

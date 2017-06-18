@@ -285,7 +285,11 @@ EXPORT_SYMBOL(ttm_tt_bind);
 
 int ttm_tt_swapin(struct ttm_tt *ttm)
 {
+#ifdef __FreeBSD__
+	vm_object_t swap_space;
+#else
 	struct address_space *swap_space;
+#endif
 	struct file *swap_storage;
 	struct page *from_page;
 	struct page *to_page;
@@ -295,7 +299,11 @@ int ttm_tt_swapin(struct ttm_tt *ttm)
 	swap_storage = ttm->swap_storage;
 	BUG_ON(swap_storage == NULL);
 
+#ifdef __FreeBSD__
+	swap_space = swap_storage->_shmem;
+#else
 	swap_space = swap_storage->f_mapping;
+#endif
 
 	for (i = 0; i < ttm->num_pages; ++i) {
 		from_page = shmem_read_mapping_page(swap_space, i);
@@ -323,7 +331,11 @@ out_err:
 
 int ttm_tt_swapout(struct ttm_tt *ttm, struct file *persistent_swap_storage)
 {
+#ifdef __FreeBSD__
+	vm_object_t swap_space;
+#else
 	struct address_space *swap_space;
+#endif
 	struct file *swap_storage;
 	struct page *from_page;
 	struct page *to_page;
@@ -344,7 +356,11 @@ int ttm_tt_swapout(struct ttm_tt *ttm, struct file *persistent_swap_storage)
 	} else
 		swap_storage = persistent_swap_storage;
 
+#ifdef __FreeBSD__
+	swap_space = swap_storage->_shmem;
+#else
 	swap_space = swap_storage->f_mapping;
+#endif
 
 	for (i = 0; i < ttm->num_pages; ++i) {
 		from_page = ttm->pages[i];
@@ -383,12 +399,12 @@ static void ttm_tt_clear_mapping(struct ttm_tt *ttm)
 	if (ttm->page_flags & TTM_PAGE_FLAG_SG)
 		return;
 
-#ifdef notyet	
+#ifndef __FreeBSD__
 	for (i = 0; i < ttm->num_pages; ++i) {
 		(*page)->mapping = NULL;
 		(*page++)->index = 0;
 	}
-#endif	
+#endif
 }
 
 void ttm_tt_unpopulate(struct ttm_tt *ttm)

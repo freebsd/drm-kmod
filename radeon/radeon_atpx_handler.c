@@ -562,7 +562,9 @@ static bool radeon_atpx_detect(void)
 		has_atpx |= (radeon_atpx_pci_probe_handle(pdev) == true);
 
 		parent_pdev = pci_upstream_bridge(pdev);
+#ifndef __FreeBSD__
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
+#endif
 	}
 
 	/* some newer PX laptops mark the dGPU as a non-VGA display device */
@@ -572,7 +574,9 @@ static bool radeon_atpx_detect(void)
 		has_atpx |= (radeon_atpx_pci_probe_handle(pdev) == true);
 
 		parent_pdev = pci_upstream_bridge(pdev);
+#ifndef __FreeBSD__
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
+#endif
 	}
 
 	if (has_atpx && vga_count == 2) {

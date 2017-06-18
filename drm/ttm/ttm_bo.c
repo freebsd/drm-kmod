@@ -1526,7 +1526,11 @@ EXPORT_SYMBOL(ttm_bo_device_release);
 int ttm_bo_device_init(struct ttm_bo_device *bdev,
 		       struct ttm_bo_global *glob,
 		       struct ttm_bo_driver *driver,
+#ifdef __FreeBSD__
+		       void *dummy,
+#else
 		       struct address_space *mapping,
+#endif
 		       uint64_t file_page_offset,
 		       bool need_dma32)
 {
@@ -1548,7 +1552,9 @@ int ttm_bo_device_init(struct ttm_bo_device *bdev,
 				    0x10000000);
 	INIT_DELAYED_WORK(&bdev->wq, ttm_bo_delayed_workqueue);
 	INIT_LIST_HEAD(&bdev->ddestroy);
+#ifndef __FreeBSD__
 	bdev->dev_mapping = mapping;
+#endif
 	bdev->glob = glob;
 	bdev->need_dma32 = need_dma32;
 	mutex_lock(&glob->device_list_mutex);

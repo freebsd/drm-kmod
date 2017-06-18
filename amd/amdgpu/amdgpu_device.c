@@ -1060,7 +1060,9 @@ static void amdgpu_switcheroo_set_state(struct pci_dev *pdev, enum vga_switchero
 		return;
 
 	if (state == VGA_SWITCHEROO_ON) {
+#ifndef __FreeBSD__
 		unsigned d3_delay = dev->pdev->d3_delay;
+#endif
 
 		printk(KERN_INFO "amdgpu: switched on\n");
 		/* don't suspend or resume card normally */
@@ -1068,7 +1070,9 @@ static void amdgpu_switcheroo_set_state(struct pci_dev *pdev, enum vga_switchero
 
 		amdgpu_device_resume(dev, true, true);
 
+#ifndef __FreeBSD__
 		dev->pdev->d3_delay = d3_delay;
+#endif
 
 		dev->switch_power_state = DRM_SWITCH_POWER_ON;
 		drm_kms_helper_poll_enable(dev);
@@ -1663,8 +1667,23 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_IO) {
+#ifdef __FreeBSD__
+			struct resource *res;
+			int rid;
+
+			rid = PCIR_BAR(i);
+			res = bus_alloc_resource_any(adev->pdev->dev.bsddev,
+			    SYS_RES_IOPORT, &rid, RF_ACTIVE);
+			ddev->drm_pcir[i].res = res;
+			ddev->drm_pcir[i].rid = rid;
+
+			adev->rio_mem = (void *)rman_get_bushandle(res);
+			adev->rio_mem_size = rman_get_size(res);
+			adev->rio_rid = rid;
+#else
 			adev->rio_mem_size = pci_resource_len(adev->pdev, i);
 			adev->rio_mem = pci_iomap(adev->pdev, i, adev->rio_mem_size);
+#endif
 			break;
 		}
 	}
@@ -1878,8 +1897,19 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	if (adev->flags & AMD_IS_PX)
 		vga_switcheroo_fini_domain_pm_ops(adev->dev);
 	vga_client_register(adev->pdev, NULL, NULL, NULL);
+#ifdef __FreeBSD__
+	if (adev->rio_mem) {
+		int rid;
+
+		rid = adev->rio_rid;
+		/* XXX check for error */
+		bus_release_resource(adev->pdev->dev.bsddev, SYS_RES_IOPORT,
+		    rid, adev->ddev->drm_pcir[rid].res);
+	}
+#else
 	if (adev->rio_mem)
 		pci_iounmap(adev->pdev, adev->rio_mem);
+#endif
 	adev->rio_mem = NULL;
 	iounmap(adev->rmmio);
 	adev->rmmio = NULL;

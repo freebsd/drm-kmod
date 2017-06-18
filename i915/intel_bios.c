@@ -1446,6 +1446,13 @@ static const struct vbt_header *find_vbt(void __iomem *bios, size_t size)
 	return NULL;
 }
 
+#ifdef __FreeBSD__
+#define	pci_map_rom(pdev, sizep)			\
+	vga_pci_map_bios(pdev->dev.bsddev, sizep)
+#define	pci_unmap_rom(pdev, bios)			\
+	vga_pci_unmap_bios(pdev->dev.bsddev, bios)
+#endif
+
 /**
  * intel_bios_init - find VBT and initialize settings from the BIOS
  * @dev_priv: i915 device instance
