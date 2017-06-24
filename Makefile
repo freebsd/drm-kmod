@@ -3,11 +3,11 @@
 SYSDIR?=${SRC_BASE}/sys
 .include "${SYSDIR}/conf/kern.opts.mk"
 
-SUBDIR = \
-	drm \
-	amd \
-	i915 \
-	radeon
+SUBDIR=	drm	\
+	amd	\
+	i915	\
+	radeon	\
+	linuxkpi
 
 # Special target that causes drm2 code to printf error returns.  Useful for
 # determining the root cause of errors.  Depends on drmP.h macro DRM_ERR_RET.
