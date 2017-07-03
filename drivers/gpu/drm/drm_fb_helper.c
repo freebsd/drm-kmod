@@ -302,20 +302,6 @@ int drm_fb_helper_debug_enter(struct fb_info *info)
 }
 EXPORT_SYMBOL(drm_fb_helper_debug_enter);
 
-/* Find the real fb for a given fb helper CRTC */
-static struct drm_framebuffer *drm_mode_config_fb(struct drm_crtc *crtc)
-{
-	struct drm_device *dev = crtc->dev;
-	struct drm_crtc *c;
-
-	drm_for_each_crtc(c, dev) {
-		if (crtc->base.id == c->base.id)
-			return c->primary->fb;
-	}
-
-	return NULL;
-}
-
 /**
  * drm_fb_helper_debug_leave - implementation for &fb_ops.fb_debug_leave
  * @info: fbdev registered by the helper
@@ -332,8 +318,11 @@ int drm_fb_helper_debug_leave(struct fb_info *info)
 		struct drm_mode_set *mode_set = &helper->crtc_info[i].mode_set;
 
 		crtc = mode_set->crtc;
+		if (drm_drv_uses_atomic_modeset(crtc->dev))
+			continue;
+
 		funcs = crtc->helper_private;
-		fb = drm_mode_config_fb(crtc);
+		fb = crtc->primary->fb;
 
 		if (!crtc->enabled)
 			continue;
@@ -344,9 +333,6 @@ int drm_fb_helper_debug_leave(struct fb_info *info)
 		}
 
 		if (funcs->mode_set_base_atomic == NULL)
-			continue;
-
-		if (drm_drv_uses_atomic_modeset(crtc->dev))
 			continue;
 
 		drm_fb_helper_restore_lut_atomic(mode_set->crtc);
