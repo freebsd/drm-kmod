@@ -97,7 +97,7 @@ static struct attribute *rc6_attrs[] = {
 	NULL
 };
 
-static struct attribute_group rc6_attr_group = {
+static const struct attribute_group rc6_attr_group = {
 	.name = power_group_name,
 	.attrs =  rc6_attrs
 };
@@ -108,7 +108,7 @@ static struct attribute *rc6p_attrs[] = {
 	NULL
 };
 
-static struct attribute_group rc6p_attr_group = {
+static const struct attribute_group rc6p_attr_group = {
 	.name = power_group_name,
 	.attrs =  rc6p_attrs
 };
@@ -118,7 +118,7 @@ static struct attribute *media_rc6_attrs[] = {
 	NULL
 };
 
-static struct attribute_group media_rc6_attr_group = {
+static const struct attribute_group media_rc6_attr_group = {
 	.name = power_group_name,
 	.attrs =  media_rc6_attrs
 };
