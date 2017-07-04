@@ -355,6 +355,7 @@ static void execlists_submit_ports(struct intel_engine_cs *engine)
 				execlists_context_status_change(rq, INTEL_CONTEXT_SCHEDULE_IN);
 			port_set(&port[n], port_pack(rq, count));
 			desc = execlists_update_context(rq);
+                       pr_err("%s: in (rq=%x) ctx=%d\n", engine->name, rq->global_seqno, upper_32_bits(desc));
 			GEM_DEBUG_EXEC(port[n].context_id = upper_32_bits(desc));
 		} else {
 			GEM_BUG_ON(!n);
@@ -594,9 +595,23 @@ static void intel_lrc_irq_handler(unsigned long data)
 			if (!(status & GEN8_CTX_STATUS_COMPLETED_MASK))
 				continue;
 
+                       pr_err("%s: out CSB (%x head=%d, tail=%d), ctx=%d, rq=%d\n",
+                                       engine->name,
+                                       readl(csb_mmio),
+                                       head, tail,
+                                       readl(buf+2*head+1),
+                                       port->context_id);
+
 			/* Check the context/desc id for this event matches */
-			GEM_DEBUG_BUG_ON(readl(buf + 2 * head + 1) !=
-					 port->context_id);
+                       if (readl(buf + 2 * head + 1) != port->context_id) {
+                               pr_err("%s: BUG CSB (%x head=%d, tail=%d), ctx=%d, rq=%d\n",
+                                               engine->name,
+                                               readl(csb_mmio),
+                                               head, tail,
+                                               readl(buf+2*head+1),
+                                               port->context_id);
+                               BUG();
+                       }
 
 			rq = port_unpack(port, &count);
 			GEM_BUG_ON(count == 0);

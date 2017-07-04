@@ -2057,6 +2057,7 @@ int i915_reset_engine(struct intel_engine_cs *engine)
 		goto out;
 	}
 
+       pr_err("Resetting %s\n", engine->name);
 	ret = intel_gpu_reset(engine->i915, intel_engine_flag(engine));
 	if (ret) {
 		/* If we fail here, we expect to fallback to a global reset */
