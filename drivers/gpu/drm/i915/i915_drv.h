@@ -1393,7 +1393,11 @@ struct i915_power_well {
 	 * Arbitraty data associated with this power well. Platform and power
 	 * well specific.
 	 */
-	unsigned long data;
+	union {
+		struct {
+			enum dpio_phy phy;
+		} bxt;
+	};
 	const struct i915_power_well_ops *ops;
 };
 
