@@ -505,6 +505,9 @@ int drm_fb_helper_restore_fbdev_mode_unlocked(struct drm_fb_helper *fb_helper)
 	if (!drm_fbdev_emulation)
 		return -ENODEV;
 
+	if (READ_ONCE(fb_helper->deferred_setup))
+		return 0;
+
 	mutex_lock(&fb_helper->lock);
 	ret = restore_fbdev_mode(fb_helper);
 
@@ -1716,8 +1719,7 @@ EXPORT_SYMBOL(drm_fb_helper_pan_display);
 
 /*
  * Allocates the backing storage and sets up the fbdev info structure through
- * the ->fb_probe callback and then registers the fbdev and sets up the panic
- * notifier.
+ * the ->fb_probe callback.
  */
 static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 					 int preferred_bpp)
@@ -1818,13 +1820,8 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 	}
 
 	if (crtc_count == 0 || sizes.fb_width == -1 || sizes.fb_height == -1) {
-		/*
-		 * hmm everyone went away - assume VGA cable just fell out
-		 * and will come back later.
-		 */
-		DRM_INFO("Cannot find any crtc or sizes - going 1024x768\n");
-		sizes.fb_width = sizes.surface_width = 1024;
-		sizes.fb_height = sizes.surface_height = 768;
+		DRM_INFO("Cannot find any crtc or sizes\n");
+		return -EAGAIN;
 	}
 
 	/* Handle our overallocation */
@@ -2464,6 +2461,68 @@ out:
 	kfree(enabled);
 }
 
+/* Note: Drops fb_helper->lock before returning. */
+static int
+__drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
+					  int bpp_sel)
+{
+	struct drm_device *dev = fb_helper->dev;
+	struct fb_info *info;
+	unsigned int width, height;
+	int ret;
+
+	width = dev->mode_config.max_width;
+	height = dev->mode_config.max_height;
+
+	drm_setup_crtcs(fb_helper, width, height);
+	ret = drm_fb_helper_single_fb_probe(fb_helper, bpp_sel);
+	if (ret < 0) {
+		if (ret == -EAGAIN) {
+			fb_helper->preferred_bpp = bpp_sel;
+			fb_helper->deferred_setup = true;
+			ret = 0;
+		}
+		mutex_unlock(&fb_helper->lock);
+
+		return ret;
+	}
+
+	fb_helper->deferred_setup = false;
+
+	info = fb_helper->fbdev;
+	info->var.pixclock = 0;
+
+#ifndef __linux__
+	info->fbio.fb_video_dev = device_get_parent(fb_helper->dev->dev->bsddev);
+	info->fbio.fb_bpp = bpp_sel;
+	info->fb_bsddev = fb_helper->dev->dev->bsddev;
+	struct vt_kms_softc *sc = (struct vt_kms_softc *)info->fbio.fb_priv;
+	if (sc)
+		sc->fb_helper = fb_helper;
+#endif
+
+	/* Need to drop locks to avoid recursive deadlock in
+	 * register_framebuffer. This is ok because the only thing left to do is
+	 * register the fbdev emulation instance in kernel_fb_helper_list. */
+	mutex_unlock(&fb_helper->lock);
+
+	ret = register_framebuffer(info);
+	if (ret < 0)
+		return ret;
+
+	dev_info(dev->dev, "fb%d: %s frame buffer device\n",
+		 info->node, info->fix.id);
+
+	mutex_lock(&kernel_fb_helper_lock);
+	if (list_empty(&kernel_fb_helper_list))
+		register_sysrq_key('v', &sysrq_drm_fb_helper_restore_op);
+
+	list_add(&fb_helper->kernel_fb_list, &kernel_fb_helper_list);
+	mutex_unlock(&kernel_fb_helper_lock);
+
+	return 0;
+}
+
 /**
  * drm_fb_helper_initial_config - setup a sane initial connector configuration
  * @fb_helper: fb_helper device struct
@@ -2508,49 +2567,15 @@ out:
  */
 int drm_fb_helper_initial_config(struct drm_fb_helper *fb_helper, int bpp_sel)
 {
-	struct drm_device *dev = fb_helper->dev;
-	struct fb_info *info;
 	int ret;
 
 	if (!drm_fbdev_emulation)
 		return 0;
 
 	mutex_lock(&fb_helper->lock);
-	drm_setup_crtcs(fb_helper,
-			dev->mode_config.max_width,
-			dev->mode_config.max_height);
-	ret = drm_fb_helper_single_fb_probe(fb_helper, bpp_sel);
-	mutex_unlock(&fb_helper->lock);
-	if (ret)
-		return ret;
+	ret = __drm_fb_helper_initial_config_and_unlock(fb_helper, bpp_sel);
 
-	info = fb_helper->fbdev;
-	info->var.pixclock = 0;
-
-#ifndef __linux__
-	info->fbio.fb_video_dev = device_get_parent(fb_helper->dev->dev->bsddev);
-	info->fbio.fb_bpp = bpp_sel;
-	info->fb_bsddev = fb_helper->dev->dev->bsddev;
-	struct vt_kms_softc *sc = (struct vt_kms_softc *)info->fbio.fb_priv;
-	if(sc)
-		sc->fb_helper = fb_helper;
-#endif
-
-	ret = register_framebuffer(info);
-	if (ret < 0)
-		return ret;
-
-	dev_info(dev->dev, "fb%d: %s frame buffer device\n",
-		 info->node, info->fix.id);
-
-	mutex_lock(&kernel_fb_helper_lock);
-	if (list_empty(&kernel_fb_helper_list))
-		register_sysrq_key('v', &sysrq_drm_fb_helper_restore_op);
-
-	list_add(&fb_helper->kernel_fb_list, &kernel_fb_helper_list);
-	mutex_unlock(&kernel_fb_helper_lock);
-
-	return 0;
+	return ret;
 }
 EXPORT_SYMBOL(drm_fb_helper_initial_config);
 
@@ -2583,6 +2608,12 @@ int drm_fb_helper_hotplug_event(struct drm_fb_helper *fb_helper)
 		return 0;
 
 	mutex_lock(&fb_helper->lock);
+	if (fb_helper->deferred_setup) {
+		err = __drm_fb_helper_initial_config_and_unlock(fb_helper,
+				fb_helper->preferred_bpp);
+		return err;
+	}
+
 	if (!fb_helper->fb || !drm_fb_helper_is_bound(fb_helper)) {
 		fb_helper->delayed_hotplug = true;
 		mutex_unlock(&fb_helper->lock);
