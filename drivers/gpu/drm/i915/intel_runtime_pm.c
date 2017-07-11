@@ -2083,6 +2083,7 @@ static struct i915_power_well hsw_power_wells[] = {
 		.name = "display",
 		.domains = HSW_DISPLAY_POWER_DOMAINS,
 		.ops = &hsw_power_well_ops,
+		.id = HSW_DISP_PW_GLOBAL,
 	},
 };
 
@@ -2098,6 +2099,7 @@ static struct i915_power_well bdw_power_wells[] = {
 		.name = "display",
 		.domains = BDW_DISPLAY_POWER_DOMAINS,
 		.ops = &hsw_power_well_ops,
+		.id = HSW_DISP_PW_GLOBAL,
 	},
 };
 
