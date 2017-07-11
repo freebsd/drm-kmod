@@ -1402,6 +1402,7 @@ struct i915_power_well {
 			u8 irq_pipe_mask;
 			/* The pw is backing the VGA functionality */
 			bool has_vga:1;
+			bool has_fuses:1;
 		} hsw;
 	};
 	const struct i915_power_well_ops *ops;
