@@ -1477,6 +1477,8 @@ void i915_driver_unload(struct drm_device *dev)
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 
+	i915_driver_unregister(dev_priv);
+
 	if (i915_gem_suspend(dev_priv))
 		DRM_ERROR("failed to idle hardware; continuing to unload!\n");
 
@@ -1486,7 +1488,7 @@ void i915_driver_unload(struct drm_device *dev)
 
 	intel_gvt_cleanup(dev_priv);
 
-	i915_driver_unregister(dev_priv);
+	drm_vblank_cleanup(dev);
 
 	intel_modeset_cleanup(dev);
 
