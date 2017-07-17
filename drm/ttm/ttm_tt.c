@@ -300,7 +300,7 @@ int ttm_tt_swapin(struct ttm_tt *ttm)
 	BUG_ON(swap_storage == NULL);
 
 #ifdef __FreeBSD__
-	swap_space = swap_storage->_shmem;
+	swap_space = swap_storage->f_shmem;
 #else
 	swap_space = swap_storage->f_mapping;
 #endif
@@ -357,7 +357,7 @@ int ttm_tt_swapout(struct ttm_tt *ttm, struct file *persistent_swap_storage)
 		swap_storage = persistent_swap_storage;
 
 #ifdef __FreeBSD__
-	swap_space = swap_storage->_shmem;
+	swap_space = swap_storage->f_shmem;
 #else
 	swap_space = swap_storage->f_mapping;
 #endif

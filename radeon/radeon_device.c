@@ -1476,7 +1476,7 @@ int radeon_device_init(struct radeon_device *rdev,
 
 			rdev->rio_mem = (void *)rman_get_bushandle(res);
 			rdev->rio_mem_size = rman_get_size(res);
-			rdev->rio_rid = rid;
+			rdev->rio_rid = i;
 #else
 			rdev->rio_mem_size = pci_resource_len(rdev->pdev, i);
 			rdev->rio_mem = pci_iomap(rdev->pdev, i, rdev->rio_mem_size);

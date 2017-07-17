@@ -42,7 +42,6 @@
 #include <drm/drm_atomic_helper.h>
 
 #define fb_info linux_fb_info
-#define lru plinks.lq
 #include "drm_crtc_helper_internal.h"
 
 static bool drm_fbdev_emulation = true;
@@ -895,6 +894,7 @@ static void drm_fb_helper_dirty(struct fb_info *info, u32 x, u32 y,
 	schedule_work(&helper->dirty_work);
 }
 
+#if defined(CONFIG_FB_DEFERRED_IO)
 /**
  * drm_fb_helper_deferred_io() - fbdev deferred_io callback function
  * @info: fb_info struct pointer
@@ -927,6 +927,7 @@ void drm_fb_helper_deferred_io(struct fb_info *info,
 	}
 }
 EXPORT_SYMBOL(drm_fb_helper_deferred_io);
+#endif
 
 /**
  * drm_fb_helper_sys_read - wrapper around fb_sys_read

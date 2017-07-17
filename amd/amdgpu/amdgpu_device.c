@@ -1679,7 +1679,7 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 
 			adev->rio_mem = (void *)rman_get_bushandle(res);
 			adev->rio_mem_size = rman_get_size(res);
-			adev->rio_rid = rid;
+			adev->rio_rid = i;
 #else
 			adev->rio_mem_size = pci_resource_len(adev->pdev, i);
 			adev->rio_mem = pci_iomap(adev->pdev, i, adev->rio_mem_size);

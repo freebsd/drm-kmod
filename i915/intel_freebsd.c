@@ -21,7 +21,7 @@ __FBSDID("$FreeBSD$");
 
 void *intel_gtt_get_registers(void);
 void _intel_gtt_get(size_t *gtt_total, size_t *stolen_size, unsigned long *mappable_end);
-void _intel_gtt_install_pte(unsigned int index, vm_paddr_t addr, unsigned int flags);
+void intel_gtt_install_pte(unsigned int index, vm_paddr_t addr, unsigned int flags);
 uint32_t intel_gtt_read_pte(unsigned int entry);
 
 #define AGP_I810_PGTBL_CTL	0x2020
@@ -165,7 +165,7 @@ void
 intel_gtt_insert_page(dma_addr_t addr, unsigned int pg, unsigned int flags)
 {
 
-	_intel_gtt_install_pte(pg, addr, flags);
+	intel_gtt_install_pte(pg, addr, flags);
 	intel_gtt_chipset_flush();
 }
 
@@ -180,7 +180,7 @@ intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
 	i = 0;
 	for_each_sg_page(st->sgl, &sg_iter, st->nents, 0) {
 		addr = sg_page_iter_dma_address(&sg_iter);
-		_intel_gtt_install_pte(pg_start + i, addr, flags);
+		intel_gtt_install_pte(pg_start + i, addr, flags);
 		++i;
 	}
 
@@ -223,7 +223,7 @@ remap_io_mapping(struct vm_area_struct *vma, unsigned long addr,
 	vm_pindex_t pidx, pidx_start;
 	int count, rc;
 
-	attr = pgprot2cachemode(iomap->prot);
+	attr = iomap->attr;
 	count = size >> PAGE_SHIFT;
 	pa = pfn << PAGE_SHIFT;
 	pidx_start = OFF_TO_IDX(addr);

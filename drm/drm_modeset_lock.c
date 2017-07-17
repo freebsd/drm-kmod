@@ -350,7 +350,9 @@ static inline int modeset_lock(struct drm_modeset_lock *lock,
 	WARN_ON(ctx->contended);
 
 	if (ctx->trylock_only) {
+#ifndef __FreeBSD__
 		lockdep_assert_held(&ctx->ww_ctx);
+#endif
 
 		if (!ww_mutex_trylock(&lock->mutex))
 			return -EBUSY;

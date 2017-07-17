@@ -58,8 +58,6 @@
 /* times are in msecs */
 #define PAGE_FREE_INTERVAL		1000
 
-#define lru plinks.lq
-
 /**
  * struct ttm_page_pool - Pool to reuse recently allocated uc/wc pages.
  *
@@ -74,7 +72,7 @@
 struct ttm_page_pool {
 	spinlock_t		lock;
 	bool			fill_lock;
-	struct list_head	list;
+	struct pglist		list;
 	gfp_t			gfp_flags;
 	unsigned		npages;
 	char			*name;
@@ -319,6 +317,7 @@ static int ttm_page_pool_free(struct ttm_page_pool *pool, unsigned nr_free,
 	struct page **pages_to_free;
 	unsigned freed_pages = 0,
 		 npages_to_free = nr_free;
+	int i;
 
 	if (NUM_PAGES_TO_ALLOC < nr_free)
 		npages_to_free = NUM_PAGES_TO_ALLOC;
@@ -336,7 +335,7 @@ static int ttm_page_pool_free(struct ttm_page_pool *pool, unsigned nr_free,
 restart:
 	spin_lock_irqsave(&pool->lock, irq_flags);
 
-	list_for_each_entry_reverse(p, &pool->list, lru) {
+	TAILQ_FOREACH_REVERSE(p, &pool->list, pglist, plinks.q) {
 		if (freed_pages >= npages_to_free)
 			break;
 
@@ -344,7 +343,9 @@ restart:
 		/* We can only remove NUM_PAGES_TO_ALLOC at a time. */
 		if (freed_pages >= NUM_PAGES_TO_ALLOC) {
 			/* remove range of pages from the pool */
-			__list_del(p->lru.prev, &pool->list);
+			for (i = 0; i < freed_pages; i++)
+				TAILQ_REMOVE(&pool->list, pages_to_free[i],
+				    plinks.q);
 
 			ttm_pool_update_free_locked(pool, freed_pages);
 			/**
@@ -379,7 +380,8 @@ restart:
 
 	/* remove range of pages from the pool */
 	if (freed_pages) {
-		__list_del(&p->lru, &pool->list);
+		for (i = 0; i < freed_pages; i++)
+			TAILQ_REMOVE(&pool->list, pages_to_free[i], plinks.q);
 
 		ttm_pool_update_free_locked(pool, freed_pages);
 		nr_free -= freed_pages;
@@ -483,14 +485,14 @@ static int ttm_set_pages_caching(struct page **pages,
  * any pages that have changed their caching state already put them to the
  * pool.
  */
-static void ttm_handle_caching_state_failure(struct list_head *pages,
+static void ttm_handle_caching_state_failure(struct pglist *pages,
 		int ttm_flags, enum ttm_caching_state cstate,
 		struct page **failed_pages, unsigned cpages)
 {
 	unsigned i;
 	/* Failed pages have to be freed */
 	for (i = 0; i < cpages; ++i) {
-		list_del(&failed_pages[i]->lru);
+		TAILQ_REMOVE(pages, failed_pages[i], plinks.q);
 #ifdef __FreeBSD__
 		vm_page_lock(failed_pages[i]);
 		vm_page_unwire(failed_pages[i], PQ_NONE);
@@ -506,7 +508,7 @@ static void ttm_handle_caching_state_failure(struct list_head *pages,
  * This function is reentrant if caller updates count depending on number of
  * pages returned in pages array.
  */
-static int ttm_alloc_new_pages(struct list_head *pages, gfp_t gfp_flags,
+static int ttm_alloc_new_pages(struct pglist *pages, gfp_t gfp_flags,
 		int ttm_flags, enum ttm_caching_state cstate, unsigned count)
 {
 	struct page **caching_array;
@@ -572,7 +574,7 @@ static int ttm_alloc_new_pages(struct list_head *pages, gfp_t gfp_flags,
 			}
 		}
 
-		list_add(&p->lru, pages);
+		TAILQ_INSERT_HEAD(pages, p, plinks.q);
 	}
 
 	if (cpages) {
@@ -613,7 +615,7 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool,
 	 * pages in a pool we fill the pool up first. */
 	if (count < _manager->options.small
 		&& count > pool->npages) {
-		struct list_head new_pages;
+		struct pglist new_pages;
 		unsigned alloc_size = _manager->options.alloc_size;
 
 		/**
@@ -622,22 +624,22 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool,
 		 */
 		spin_unlock_irqrestore(&pool->lock, *irq_flags);
 
-		INIT_LIST_HEAD(&new_pages);
+		TAILQ_INIT(&new_pages);
 		r = ttm_alloc_new_pages(&new_pages, pool->gfp_flags, ttm_flags,
 				cstate,	alloc_size);
 		spin_lock_irqsave(&pool->lock, *irq_flags);
 
 		if (!r) {
-			list_splice(&new_pages, &pool->list);
+			TAILQ_CONCAT(&pool->list, &new_pages, plinks.q);
 			++pool->nrefills;
 			pool->npages += alloc_size;
 		} else {
 			pr_err("Failed to fill pool (%p)\n", pool);
 			/* If we have any pages left put them to the pool. */
-			list_for_each_entry(p, &pool->list, lru) {
+			TAILQ_FOREACH(p, &pool->list, plinks.q) {
 				++cpages;
 			}
-			list_splice(&new_pages, &pool->list);
+			TAILQ_CONCAT(&pool->list, &new_pages, plinks.q);
 			pool->npages += cpages;
 		}
 
@@ -651,13 +653,13 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool,
  * @return count of pages still required to fulfill the request.
  */
 static unsigned ttm_page_pool_get_pages(struct ttm_page_pool *pool,
-					struct list_head *pages,
+					struct pglist *pages,
 					int ttm_flags,
 					enum ttm_caching_state cstate,
 					unsigned count)
 {
 	unsigned long irq_flags;
-	struct list_head *p;
+	struct page *p;
 	unsigned i;
 
 	spin_lock_irqsave(&pool->lock, irq_flags);
@@ -665,13 +667,20 @@ static unsigned ttm_page_pool_get_pages(struct ttm_page_pool *pool,
 
 	if (count >= pool->npages) {
 		/* take all pages from the pool */
-		list_splice_init(&pool->list, pages);
+		TAILQ_CONCAT(pages, &pool->list, plinks.q);
 		count -= pool->npages;
 		pool->npages = 0;
 		goto out;
 	}
 	/* find the last pages to include for requested number of pages. Split
 	 * pool to begin and halve it to reduce search space. */
+#ifdef __FreeBSD__
+	for (i = 0; i < count; i++) {
+		p = TAILQ_FIRST(&pool->list);
+		TAILQ_REMOVE(&pool->list, p, plinks.q);
+		TAILQ_INSERT_TAIL(pages, p, plinks.q);
+	}
+#else
 	if (count <= pool->npages/2) {
 		i = 0;
 		list_for_each(p, &pool->list) {
@@ -687,6 +696,7 @@ static unsigned ttm_page_pool_get_pages(struct ttm_page_pool *pool,
 	}
 	/* Cut 'count' number of pages from the pool */
 	list_cut_position(pages, &pool->list, p);
+#endif
 	pool->npages -= count;
 	count = 0;
 out:
@@ -725,7 +735,7 @@ static void ttm_put_pages(struct page **pages, unsigned npages, int flags,
 		if (pages[i]) {
 			if (page_count(pages[i]) != 1)
 				pr_err("Erroneous page count. Leaking pages.\n");
-			list_add_tail(&pages[i]->lru, &pool->list);
+			TAILQ_INSERT_TAIL(&pool->list, pages[i], plinks.q);
 			pages[i] = NULL;
 			pool->npages++;
 		}
@@ -752,7 +762,7 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 			 enum ttm_caching_state cstate)
 {
 	struct ttm_page_pool *pool = ttm_get_pool(flags, cstate);
-	struct list_head plist;
+	struct pglist plist;
 	struct page *p = NULL;
 	gfp_t gfp_flags = GFP_USER;
 	unsigned count;
@@ -792,16 +802,16 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 	gfp_flags |= pool->gfp_flags;
 
 	/* First we take pages from the pool */
-	INIT_LIST_HEAD(&plist);
+	TAILQ_INIT(&plist);
 	npages = ttm_page_pool_get_pages(pool, &plist, flags, cstate, npages);
 	count = 0;
-	list_for_each_entry(p, &plist, lru) {
+	TAILQ_FOREACH(p, &plist, plinks.q) {
 		pages[count++] = p;
 	}
 
 	/* clear the pages coming from the pool if requested */
 	if (flags & TTM_PAGE_FLAG_ZERO_ALLOC) {
-		list_for_each_entry(p, &plist, lru) {
+		TAILQ_FOREACH(p, &plist, plinks.q) {
 #ifdef __FreeBSD__
 			pmap_zero_page(p);
 #else
@@ -819,9 +829,9 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 		/* ttm_alloc_new_pages doesn't reference pool so we can run
 		 * multiple requests in parallel.
 		 **/
-		INIT_LIST_HEAD(&plist);
+		TAILQ_INIT(&plist);
 		r = ttm_alloc_new_pages(&plist, gfp_flags, flags, cstate, npages);
-		list_for_each_entry(p, &plist, lru) {
+		TAILQ_FOREACH(p, &plist, plinks.q) {
 			pages[count++] = p;
 		}
 		if (r) {
@@ -841,7 +851,7 @@ static void ttm_page_pool_init_locked(struct ttm_page_pool *pool, gfp_t flags,
 {
 	spin_lock_init(&pool->lock);
 	pool->fill_lock = false;
-	INIT_LIST_HEAD(&pool->list);
+	TAILQ_INIT(&pool->list);
 	pool->npages = pool->nfrees = 0;
 	pool->gfp_flags = flags;
 	pool->name = name;
