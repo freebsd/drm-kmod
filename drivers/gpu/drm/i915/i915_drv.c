@@ -2055,6 +2055,12 @@ int i915_reset_engine(struct intel_engine_cs *engine)
 	}
 
 	ret = intel_gpu_reset(engine->i915, intel_engine_flag(engine));
+	if (ret) {
+		/* If we fail here, we expect to fallback to a global reset */
+		DRM_DEBUG_DRIVER("Failed to reset %s, ret=%d\n",
+				 engine->name, ret);
+		goto out;
+	}
 
 	/*
 	 * The request that caused the hang is stuck on elsp, we know the
@@ -2062,15 +2068,6 @@ int i915_reset_engine(struct intel_engine_cs *engine)
 	 * request to resume executing remaining requests in the queue.
 	 */
 	i915_gem_reset_engine(engine, active_request);
-
-	i915_gem_reset_finish_engine(engine);
-
-	if (ret) {
-		/* If we fail here, we expect to fallback to a global reset */
-		DRM_DEBUG_DRIVER("Failed to reset %s, ret=%d\n",
-				 engine->name, ret);
-		goto out;
-	}
 
 	/*
 	 * The engine and its registers (and workarounds in case of render)
@@ -2083,6 +2080,7 @@ int i915_reset_engine(struct intel_engine_cs *engine)
 
 	error->reset_engine_count[engine->id]++;
 out:
+	i915_gem_reset_finish_engine(engine);
 	return ret;
 }
 
