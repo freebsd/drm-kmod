@@ -164,10 +164,12 @@ int radeon_kfd_init(void)
 
 void radeon_kfd_fini(void)
 {
+#ifndef __FreeBSD__
 	if (kgd2kfd) {
 		kgd2kfd->exit();
 		symbol_put(kgd2kfd_init);
 	}
+#endif
 }
 
 void radeon_kfd_device_probe(struct radeon_device *rdev)

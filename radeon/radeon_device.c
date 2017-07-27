@@ -1461,6 +1461,10 @@ int radeon_device_init(struct radeon_device *rdev,
 	if (rdev->family >= CHIP_BONAIRE)
 		radeon_doorbell_init(rdev);
 
+#ifdef __FreeBSD__
+#define	DEVICE_COUNT_RESOURCE	5
+#endif
+
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		if (pci_resource_flags(rdev->pdev, i) & IORESOURCE_IO) {
