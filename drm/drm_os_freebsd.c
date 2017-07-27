@@ -257,11 +257,6 @@ drm_clflush_virt_range(void *addr, unsigned long length)
 #define to_drm_minor(d) container_of(d, struct drm_minor, kdev)
 #define to_drm_connector(d) container_of(d, struct drm_connector, kdev)
 
-static struct device_type drm_sysfs_device_minor = {
-	.name = "drm_minor"
-};
-
-
 static char *drm_devnode(struct device *dev, umode_t *mode)
 {
 	return kasprintf(GFP_KERNEL, "dri/%s", dev_name(dev));

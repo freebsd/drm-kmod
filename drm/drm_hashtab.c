@@ -37,6 +37,9 @@
 #include <linux/hash.h>
 #include <linux/slab.h>
 #include <linux/export.h>
+#ifdef __FreeBSD__
+#include <linux/rculist.h>
+#endif
 
 int drm_ht_create(struct drm_open_hash *ht, unsigned int order)
 {

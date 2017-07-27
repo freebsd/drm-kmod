@@ -81,6 +81,7 @@ void drm_sysfs_destroy(void)
 	drm_class = NULL;
 }
 
+#ifndef __FreeBSD__
 /*
  * Connector properties
  */
@@ -138,6 +139,7 @@ static ssize_t status_show(struct device *device,
 	return snprintf(buf, PAGE_SIZE, "%s\n",
 			drm_get_connector_status_name(status));
 }
+#endif
 
 static ssize_t dpms_show(struct device *device,
 			   struct device_attribute *attr,
@@ -164,6 +166,7 @@ static ssize_t enabled_show(struct device *device,
 	return snprintf(buf, PAGE_SIZE, enabled ? "enabled\n" : "disabled\n");
 }
 
+#ifndef __FreeBSD__
 static ssize_t edid_show(struct file *filp, struct kobject *kobj,
 			 struct bin_attribute *attr, char *buf, loff_t off,
 			 size_t count)
@@ -196,6 +199,7 @@ unlock:
 
 	return ret;
 }
+#endif
 
 static ssize_t modes_show(struct device *device,
 			   struct device_attribute *attr,
@@ -215,19 +219,24 @@ static ssize_t modes_show(struct device *device,
 	return written;
 }
 
+#ifndef __FreeBSD__
 static DEVICE_ATTR_RW(status);
+#endif
 static DEVICE_ATTR_RO(enabled);
 static DEVICE_ATTR_RO(dpms);
 static DEVICE_ATTR_RO(modes);
 
 static struct attribute *connector_dev_attrs[] = {
+#ifndef __FreeBSD__
 	&dev_attr_status.attr,
+#endif
 	&dev_attr_enabled.attr,
 	&dev_attr_dpms.attr,
 	&dev_attr_modes.attr,
 	NULL
 };
 
+#ifndef __FreeBSD__
 static struct bin_attribute edid_attr = {
 	.attr.name = "edid",
 	.attr.mode = 0444,
@@ -239,6 +248,7 @@ static struct bin_attribute *connector_bin_attrs[] = {
 	&edid_attr,
 	NULL
 };
+#endif
 
 static const struct attribute_group connector_dev_group = {
 	.attrs = connector_dev_attrs,

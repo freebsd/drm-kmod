@@ -25,6 +25,10 @@
 #include "ppinterrupt.h"
 #include "hardwaremanager.h"
 
+#ifdef __FreeBSD__
+#include <linux/kernel.h>	/* for printk() */
+#endif
+
 void pem_init_feature_info(struct pp_eventmgr *eventmgr)
 {
 

@@ -26,6 +26,10 @@
 
 #include "i915_drv.h"
 
+#ifdef __FreeBSD__
+#define	prio	task_thread->td_priority
+#endif
+
 static void intel_breadcrumbs_hangcheck(unsigned long data)
 {
 	struct intel_engine_cs *engine = (struct intel_engine_cs *)data;

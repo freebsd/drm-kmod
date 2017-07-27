@@ -498,18 +498,21 @@ static int __init i915_init(void)
 		return 0;
 	}
 
-	/* FreeBSD specific hackery */
+#ifdef __FreeBSD__
 	i915_pci_driver.busname = "vgapci";
-	i915_pci_driver.bsdclass = &drm_devclass;
+	i915_pci_driver.bsdclass = drm_devclass;
 	i915_pci_driver.name = "drmn";
+#endif
 
 	return pci_register_driver(&i915_pci_driver);
 }
 
 static void __exit i915_exit(void)
 {
+#ifndef __FreeBSD__
 	if (!i915_pci_driver.driver.owner)
 		return;
+#endif
 
 	pci_unregister_driver(&i915_pci_driver);
 }

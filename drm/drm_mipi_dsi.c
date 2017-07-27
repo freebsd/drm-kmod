@@ -45,6 +45,7 @@
  * subset of the MIPI DCS command set.
  */
 
+#ifndef __FreeBSD__
 static int mipi_dsi_device_match(struct device *dev, struct device_driver *drv)
 {
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
@@ -69,10 +70,8 @@ static int mipi_dsi_uevent(struct device *dev, struct kobj_uevent_env *env)
 	if (err != -ENODEV)
 		return err;
 
-#ifndef __FreeBSD__
 	add_uevent_var(env, "MODALIAS=%s%s", MIPI_DSI_MODULE_PREFIX,
 		       dsi->name);
-#endif
 
 	return 0;
 }
@@ -95,7 +94,6 @@ static struct bus_type mipi_dsi_bus_type = {
 	.pm = &mipi_dsi_device_pm_ops,
 };
 
-#ifndef __FreeBSD__
 static int of_device_match(struct device *dev, void *data)
 {
 	return dev->of_node == data;
@@ -118,15 +116,12 @@ struct mipi_dsi_device *of_find_mipi_dsi_device_by_node(struct device_node *np)
 	return dev ? to_mipi_dsi_device(dev) : NULL;
 }
 EXPORT_SYMBOL(of_find_mipi_dsi_device_by_node);
-#endif
 
 static void mipi_dsi_dev_release(struct device *dev)
 {
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
 
-#ifndef __FreeBSD__
 	of_node_put(dev->of_node);
-#endif
 	kfree(dsi);
 }
 
@@ -232,9 +227,7 @@ mipi_dsi_device_register_full(struct mipi_dsi_host *host,
 		return dsi;
 	}
 
-#ifndef __FreeBSD__
 	dsi->dev.of_node = info->node;
-#endif
 	dsi->channel = info->channel;
 	strlcpy(dsi->name, info->type, sizeof(dsi->name));
 
@@ -262,7 +255,6 @@ EXPORT_SYMBOL(mipi_dsi_device_unregister);
 static DEFINE_MUTEX(host_lock);
 static LIST_HEAD(host_list);
 
-#ifndef __FreeBSD__
 /**
  * of_find_mipi_dsi_host_by_node() - find the MIPI DSI host matching a
  *				     device tree node
@@ -309,7 +301,6 @@ int mipi_dsi_host_register(struct mipi_dsi_host *host)
 	return 0;
 }
 EXPORT_SYMBOL(mipi_dsi_host_register);
-#endif
 
 static int mipi_dsi_remove_device_fn(struct device *dev, void *priv)
 {
@@ -329,6 +320,7 @@ void mipi_dsi_host_unregister(struct mipi_dsi_host *host)
 	mutex_unlock(&host_lock);
 }
 EXPORT_SYMBOL(mipi_dsi_host_unregister);
+#endif /* !__FreeBSD__ */
 
 /**
  * mipi_dsi_attach - attach a DSI device to its DSI host
@@ -1100,6 +1092,7 @@ int mipi_dsi_dcs_get_display_brightness(struct mipi_dsi_device *dsi,
 }
 EXPORT_SYMBOL(mipi_dsi_dcs_get_display_brightness);
 
+#ifndef __FreeBSD__
 static int mipi_dsi_drv_probe(struct device *dev)
 {
 	struct mipi_dsi_driver *drv = to_mipi_dsi_driver(dev->driver);
@@ -1165,6 +1158,7 @@ static int __init mipi_dsi_bus_init(void)
 	return bus_register(&mipi_dsi_bus_type);
 }
 postcore_initcall(mipi_dsi_bus_init);
+#endif
 
 MODULE_AUTHOR("Andrzej Hajda <a.hajda@samsung.com>");
 MODULE_DESCRIPTION("MIPI DSI Bus");

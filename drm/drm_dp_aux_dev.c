@@ -352,15 +352,19 @@ int drm_dp_aux_dev_init(void)
 	if (IS_ERR(drm_dp_aux_dev_class)) {
 		return PTR_ERR(drm_dp_aux_dev_class);
 	}
-	drm_dp_aux_dev_class->dev_groups = drm_dp_aux_groups;
-
-#ifdef __linux__
-	res = register_chrdev(0, "aux", &auxdev_fops);
+#ifdef __FreeBSD__
+	(void)drm_dp_aux_groups;
 #else
+	drm_dp_aux_dev_class->dev_groups = drm_dp_aux_groups;
+#endif
+
+#ifdef __FreeBSD__
 	res = register_chrdev_p(DRM_MAJOR+1, "aux", &auxdev_fops,
 	    DRM_DEV_UID, DRM_DEV_GID, DRM_DEV_MODE);
 	if (res == 0)
 		res = DRM_MAJOR+1;
+#else
+	res = register_chrdev(0, "aux", &auxdev_fops);
 #endif	
 	if (res < 0)
 		goto out;

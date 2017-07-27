@@ -322,17 +322,19 @@ int drm_pci_init(struct drm_driver *driver, struct pci_driver *pdriver)
 
 	DRM_DEBUG("\n");
 
-	/* FreeBSD specific hackery */
+#ifdef __FreeBSD__
 	pdriver->busname = "vgapci";
-	pdriver->bsdclass = &drm_devclass;
+	pdriver->bsdclass = drm_devclass;
 	pdriver->name = "drmn";
+#endif
 
 	if (!(driver->driver_features & DRIVER_LEGACY))
 		return pci_register_driver(pdriver);
 
 	DRM_ERROR("FreeBSD needs DRIVER_MODESET");
 	return (-ENOTSUP);
-#ifdef __linux__	
+
+#ifndef __FreeBSD__
 	/* If not using KMS, fall back to stealth mode manual scanning. */
 	INIT_LIST_HEAD(&driver->legacy_dev_list);
 	for (i = 0; pdriver->id_table[i].vendor != 0; i++) {
@@ -362,23 +364,27 @@ int drm_pci_init(struct drm_driver *driver, struct pci_driver *pdriver)
 
 int drm_pcie_get_speed_cap_mask(struct drm_device *dev, u32 *mask)
 {
-	struct pci_dev *root;
+	device_t root;
 	u32 lnkcap, lnkcap2;
+	int error, pos;
 
 	*mask = 0;
 	if (!dev->pdev)
 		return -EINVAL;
 
-	/* XXX need to initialize more of bus in linuxkpi - note to self */
-	root = dev->pdev->bus->self;
+	root = device_get_parent(device_get_parent(device_get_parent(
+	    dev->dev->bsddev)));
 
 	/* we've been informed via and serverworks don't make the cut */
-	if (root->vendor == PCI_VENDOR_ID_VIA ||
-	    root->vendor == PCI_VENDOR_ID_SERVERWORKS)
-		return -EINVAL;
+	if (pci_get_vendor(root) == PCI_VENDOR_ID_VIA ||
+	    pci_get_vendor(root) == PCI_VENDOR_ID_SERVERWORKS)
+		return (-EINVAL);
 
-	pcie_capability_read_dword(root, PCI_EXP_LNKCAP, &lnkcap);
-	pcie_capability_read_dword(root, PCI_EXP_LNKCAP2, &lnkcap2);
+	if ((error = pci_find_cap(root, PCIY_EXPRESS, &pos)) != 0)
+		return (-error);
+
+	lnkcap = pci_read_config(root, pos + PCIER_LINK_CAP, 4);
+	lnkcap2 = pci_read_config(root, pos + PCIER_LINK_CAP2, 4);
 
 	if (lnkcap2) {	/* PCIe r3.0-compliant */
 		if (lnkcap2 & PCI_EXP_LNKCAP2_SLS_2_5GB)
@@ -394,7 +400,8 @@ int drm_pcie_get_speed_cap_mask(struct drm_device *dev, u32 *mask)
 			*mask |= (DRM_PCIE_SPEED_25 | DRM_PCIE_SPEED_50);
 	}
 
-	DRM_INFO("probing gen 2 caps for device %x:%x = %x/%x\n", root->vendor, root->device, lnkcap, lnkcap2);
+	DRM_INFO("probing gen 2 caps for device %x:%x = %x/%x\n",
+	    pci_get_vendor(root), pci_get_device(root), lnkcap, lnkcap2);
 	return 0;
 }
 EXPORT_SYMBOL(drm_pcie_get_speed_cap_mask);

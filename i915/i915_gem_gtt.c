@@ -32,6 +32,10 @@
 #include "i915_trace.h"
 #include "intel_drv.h"
 
+#ifdef __FreeBSD__
+#include <dev/agp/agp_i810.h>
+#endif
+
 #define I915_GFP_DMA (GFP_KERNEL | __GFP_HIGHMEM)
 
 /**
@@ -3111,8 +3115,18 @@ static int i915_gmch_probe(struct i915_ggtt *ggtt)
 		return -EIO;
 	}
 
+#ifdef __FreeBSD__
+	struct intel_gtt *gtt;
+
+	gtt = intel_gtt_get();
+	ggtt->base.total = gtt->gtt_total_entries << PAGE_SHIFT;
+	ggtt->stolen_size = gtt->stolen_size;
+	ggtt->mappable_base = gtt->gma_bus_addr;
+	ggtt->mappable_end = gtt->gtt_mappable_entries << PAGE_SHIFT;
+#else
 	intel_gtt_get(&ggtt->base.total, &ggtt->stolen_size,
 		      &ggtt->mappable_base, &ggtt->mappable_end);
+#endif
 
 	ggtt->do_idle_maps = needs_idle_maps(dev_priv);
 	ggtt->base.insert_page = i915_ggtt_insert_page;

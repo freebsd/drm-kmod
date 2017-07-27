@@ -26,12 +26,13 @@ uint32_t intel_gtt_read_pte(unsigned int entry);
 
 #define AGP_I810_PGTBL_CTL	0x2020
 #define	AGP_I810_PGTBL_ENABLED	0x00000001
-#define INTEL_GTT_GEN	intel_private.gen
+#define INTEL_GTT_GEN		intel_private.gen
 #define GFX_FLSH_CNTL_BSD	0x2170 /* 915+ only */
 #define HAS_PGTBL_EN		1
-#define I915_GMADR_BAR	2
+#define I915_GMADR_BAR		2
 
 #define WARN_UN() log(LOG_WARNING, "%s unimplemented", __FUNCTION__)
+
 static struct _intel_private {
 	struct pci_dev *bridge_dev;
 	u8 __iomem *registers;
@@ -40,53 +41,10 @@ static struct _intel_private {
 	phys_addr_t gma_bus_addr;
 } intel_private;
 
-#ifdef __notyet__
-static struct _intel_private {
-	const struct intel_gtt_driver *driver;
-	struct pci_dev *pcidev;	/* device one */
-	struct pci_dev *bridge_dev;
-	u8 __iomem *registers;
-	phys_addr_t gtt_bus_addr;
-	u32 PGETBL_save;
-	u32 __iomem *gtt;		/* I915G */
-	bool clear_fake_agp; /* on first access via agp, fill with scratch */
-	int num_dcache_entries;
-	void __iomem *i9xx_flush_page;
-	char *i81x_gtt_table;
-	struct resource ifp_resource;
-	int resource_valid;
-	struct page *scratch_page;
-	phys_addr_t scratch_page_dma;
-	int refcount;
-	/* Whether i915 needs to use the dmar apis or not. */
-	unsigned int needs_dmar : 1;
-	phys_addr_t gma_bus_addr;
-	/*  Size of memory reserved for graphics by the BIOS */
-	unsigned int stolen_size;
-	/* Total number of gtt entries. */
-	unsigned int gtt_total_entries;
-	/* Part of the gtt that is mappable by the cpu, for those chips where
-	 * this is not the full gtt. */
-	unsigned int gtt_mappable_entries;
-} intel_private;
-#endif
-
-void
-intel_gtt_get(size_t *gtt_total, size_t *stolen_size,
-		  bus_addr_t *mappable_base, unsigned long *mappable_end)
-
-{
-	_intel_gtt_get(gtt_total, stolen_size, mappable_end);	
-	*mappable_base = intel_private.gma_bus_addr;
-	DRM_DEBUG("gtt_total %lx, stolen_size %lx, mappable_end %lx gma_bus_addr %lx\n",
-		  *gtt_total, *stolen_size, *mappable_end, *mappable_base);
-}
-
 bool
 intel_enable_gtt(void)
 {
 	u8 __iomem *reg;
-
 
 	DRM_DEBUG("entering %s\n", __func__);
 #ifdef __notyet__
@@ -111,13 +69,14 @@ intel_enable_gtt(void)
 	}
 #endif	
 
-	/* On the resume path we may be adjusting the PGTBL value, so
+	/*
+	 * On the resume path we may be adjusting the PGTBL value, so
 	 * be paranoid and flush all chipset write buffers...
 	 */
 	if (INTEL_GTT_GEN >= 3)
 		writel(0, intel_private.registers+ GFX_FLSH_CNTL_BSD);
 
-	reg = intel_private.registers+AGP_I810_PGTBL_CTL;
+	reg = intel_private.registers + AGP_I810_PGTBL_CTL;
 	writel(intel_private.PGTBL_save, reg);
 #ifdef __notyet	
 	if (HAS_PGTBL_EN && (readl(reg) & AGP_I810_PGTBL_ENABLED) == 0) {
@@ -129,7 +88,7 @@ intel_enable_gtt(void)
 #endif	
 
 	if (INTEL_GTT_GEN >= 3)
-		writel(0, intel_private.registers+ GFX_FLSH_CNTL_BSD);
+		writel(0, intel_private.registers + GFX_FLSH_CNTL_BSD);
 	DRM_DEBUG("exiting %s\n", __func__);
 	return (1);
 }
@@ -139,14 +98,14 @@ intel_gmch_probe(struct pci_dev *bridge_pdev, struct pci_dev *gpu_pdev,
 		 struct agp_bridge_data *bridge)
 {
 	DRM_DEBUG("entering %s\n", __func__);
-	intel_private.registers = intel_gtt_get_registers();
+	intel_private.registers = NULL; //intel_gtt_get_registers();
 	intel_private.gma_bus_addr = pci_bus_address(gpu_pdev, I915_GMADR_BAR);
 	DRM_DEBUG("bus_addr %lx\n", intel_private.gma_bus_addr);
 	INTEL_GTT_GEN = 4;
 	/* save the PGTBL reg for resume */
 	intel_private.PGTBL_save =
-		readl(intel_private.registers+AGP_I810_PGTBL_CTL)
-			& ~AGP_I810_PGTBL_ENABLED;
+	    readl(intel_private.registers + AGP_I810_PGTBL_CTL) &
+	    ~AGP_I810_PGTBL_ENABLED;
 	/* we only ever restore the register when enabling the PGTBL... */
 	if (HAS_PGTBL_EN)
 		intel_private.PGTBL_save |= AGP_I810_PGTBL_ENABLED;
@@ -158,7 +117,6 @@ intel_gmch_probe(struct pci_dev *bridge_pdev, struct pci_dev *gpu_pdev,
 void
 intel_gmch_remove(void)
 {
-
 }
 
 void
@@ -166,7 +124,7 @@ intel_gtt_insert_page(dma_addr_t addr, unsigned int pg, unsigned int flags)
 {
 
 	intel_gtt_install_pte(pg, addr, flags);
-	intel_gtt_chipset_flush();
+	(void)intel_gtt_chipset_flush();
 }
 
 void
@@ -190,6 +148,7 @@ intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
 void
 i915_locks_destroy(struct drm_i915_private *dev_priv)
 {
+
 	spin_lock_destroy(&dev_priv->irq_lock);
 	spin_lock_destroy(&dev_priv->gpu_error.lock);
 	mutex_destroy(&dev_priv->backlight_lock);
@@ -201,17 +160,6 @@ i915_locks_destroy(struct drm_i915_private *dev_priv)
 	mutex_destroy(&dev_priv->av_mutex);
 }
 
-
-/**
- * remap_io_mapping - remap an IO mapping to userspace
- * @vma: user vma to map to
- * @addr: target user address to start at
- * @pfn: physical address of kernel memory
- * @size: size of map area
- * @iomap: the source io_mapping
- *
- *  Note: this is only safe if the mm semaphore is held when called.
- */
 int
 remap_io_mapping(struct vm_area_struct *vma, unsigned long addr,
     unsigned long pfn, unsigned long size, struct io_mapping *iomap)
@@ -261,25 +209,6 @@ retry:
 		vm_page_xbusy(m);
 		pmap_page_set_memattr(m, attr);
 		vma->vm_pfn_count++;
-	}
-
-	/*
-	 * In order to adhere to the semantics expected by the latest i915_gem_fault
-	 * we make this an all or nothing. The implicit assumption here is that overlaps
-	 * in page faults will not be sufficiently common to impair performance.
-	 */
-	if (__predict_false(rc != 0)) {
-		count = pidx - pidx_start;
-		pa = pfn << PAGE_SHIFT;
-		for (pidx = pidx_start; pidx < pidx_start + count; pidx++, pa += PAGE_SIZE) {
-			m = PHYS_TO_VM_PAGE(pa);
-			if (vm_page_busied(m))
-				vm_page_xunbusy(m);
-			vm_page_lock(m);
-			vm_page_remove(m);
-			vm_page_unlock(m);
-		}
-		vma->vm_pfn_count = 0;
 	}
 	VM_OBJECT_WUNLOCK(vm_obj);
 	return (rc);

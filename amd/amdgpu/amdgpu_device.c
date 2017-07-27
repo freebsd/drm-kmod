@@ -1664,6 +1664,10 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 		/* doorbell bar mapping */
 		amdgpu_doorbell_init(adev);
 
+#ifdef __FreeBSD__
+#define	DEVICE_COUNT_RESOURCE	5
+#endif
+
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_IO) {
@@ -1878,7 +1882,8 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 
 	DRM_INFO("amdgpu: finishing device.\n");
 	adev->shutdown = true;
-	drm_crtc_force_disable_all(adev->ddev);
+	if (adev->mode_info.mode_config_initialized)
+		drm_crtc_force_disable_all(adev->ddev);
 	/* evict vram memory */
 	amdgpu_bo_evict_vram(adev);
 	amdgpu_ib_pool_fini(adev);
@@ -2114,11 +2119,15 @@ int amdgpu_device_resume(struct drm_device *dev, bool resume, bool fbcon)
 	 * temporarily disable the rpm helpers so this doesn't deadlock us.
 	 */
 #ifdef CONFIG_PM
+#ifndef __FreeBSD__
 	dev->dev->power.disable_depth++;
+#endif
 #endif
 	drm_helper_hpd_irq_event(dev);
 #ifdef CONFIG_PM
+#ifndef __FreeBSD__
 	dev->dev->power.disable_depth--;
+#endif
 #endif
 
 	if (fbcon) {

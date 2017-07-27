@@ -1211,8 +1211,10 @@ static void ivybridge_parity_work(struct work_struct *work)
 		parity_event[4] = kasprintf(GFP_KERNEL, "SLICE=%d", slice);
 		parity_event[5] = NULL;
 
+#ifndef __FreeBSD__
 		kobject_uevent_env(&dev_priv->drm.primary->kdev->kobj,
 				   KOBJ_CHANGE, parity_event);
+#endif
 
 		DRM_DEBUG("Parity error: Slice = %d, Row = %d, Bank = %d, Sub bank = %d.\n",
 			  slice, row, bank, subbank);
@@ -2500,6 +2502,7 @@ static void i915_error_wake_up(struct drm_i915_private *dev_priv)
  */
 static void i915_reset_and_wakeup(struct drm_i915_private *dev_priv)
 {
+#ifndef __FreeBSD__
 	struct kobject *kobj = &dev_priv->drm.primary->kdev->kobj;
 	char *error_event[] = { I915_ERROR_UEVENT "=1", NULL };
 	char *reset_event[] = { I915_RESET_UEVENT "=1", NULL };
@@ -2509,6 +2512,7 @@ static void i915_reset_and_wakeup(struct drm_i915_private *dev_priv)
 
 	DRM_DEBUG_DRIVER("resetting chip\n");
 	kobject_uevent_env(kobj, KOBJ_CHANGE, reset_event);
+#endif
 
 	/*
 	 * In most cases it's guaranteed that we get here with an RPM
@@ -2541,9 +2545,11 @@ static void i915_reset_and_wakeup(struct drm_i915_private *dev_priv)
 	intel_finish_reset(dev_priv);
 	intel_runtime_pm_put(dev_priv);
 
+#ifndef __FreeBSD__
 	if (!test_bit(I915_WEDGED, &dev_priv->gpu_error.flags))
 		kobject_uevent_env(kobj,
 				   KOBJ_CHANGE, reset_done_event);
+#endif
 
 	/*
 	 * Note: The wake_up also serves as a memory barrier so that

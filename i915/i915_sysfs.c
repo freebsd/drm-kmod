@@ -38,6 +38,7 @@ static inline struct drm_i915_private *kdev_minor_to_i915(struct device *kdev)
 	return to_i915(minor->dev);
 }
 
+#ifndef __FreeBSD__
 #ifdef CONFIG_PM
 static u32 calc_residency(struct drm_i915_private *dev_priv,
 			  i915_reg_t reg)
@@ -263,6 +264,7 @@ static struct bin_attribute dpf_attrs_1 = {
 	.mmap = NULL,
 	.private = (void *)1
 };
+#endif
 
 static ssize_t gt_act_freq_mhz_show(struct device *kdev,
 				    struct device_attribute *attr, char *buf)
@@ -458,6 +460,7 @@ static ssize_t gt_min_freq_mhz_store(struct device *kdev,
 
 }
 
+#ifndef __FreeBSD__
 static DEVICE_ATTR(gt_act_freq_mhz, S_IRUGO, gt_act_freq_mhz_show, NULL);
 static DEVICE_ATTR(gt_cur_freq_mhz, S_IRUGO, gt_cur_freq_mhz_show, NULL);
 static DEVICE_ATTR(gt_boost_freq_mhz, S_IRUGO, gt_boost_freq_mhz_show, gt_boost_freq_mhz_store);
@@ -570,9 +573,11 @@ static struct bin_attribute error_state_attr = {
 	.read = error_state_read,
 	.write = error_state_write,
 };
+#endif
 
 void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 {
+#ifndef __FreeBSD__
 	struct device *kdev = dev_priv->drm.primary->kdev;
 	int ret;
 
@@ -621,10 +626,12 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 				    &error_state_attr);
 	if (ret)
 		DRM_ERROR("error_state sysfs setup failed\n");
+#endif
 }
 
 void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
 {
+#ifndef __FreeBSD__
 	struct device *kdev = dev_priv->drm.primary->kdev;
 
 	sysfs_remove_bin_file(&kdev->kobj, &error_state_attr);
@@ -637,5 +644,6 @@ void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
 #ifdef CONFIG_PM
 	sysfs_unmerge_group(&kdev->kobj, &rc6_attr_group);
 	sysfs_unmerge_group(&kdev->kobj, &rc6p_attr_group);
+#endif
 #endif
 }
