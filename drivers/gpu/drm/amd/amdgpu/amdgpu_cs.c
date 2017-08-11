@@ -1380,6 +1380,7 @@ static int amdgpu_cs_wait_any_fence(struct amdgpu_device *adev,
 			array[i] = fence;
 		} else { /* NULL, the fence has been already signaled */
 			r = 1;
+			first = i;
 			goto out;
 		}
 	}
