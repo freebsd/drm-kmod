@@ -1910,6 +1910,7 @@ struct i915_workarounds {
 
 struct i915_virtual_gpu {
 	bool active;
+	u32 caps;
 };
 
 /* used in computing the new watermarks state */
