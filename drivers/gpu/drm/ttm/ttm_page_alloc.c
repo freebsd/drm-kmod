@@ -684,7 +684,7 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool,
 			pr_err("Failed to fill pool (%p)\n", pool);
 			/* If we have any pages left put them to the pool. */
 #ifdef __linux__
-			list_for_each_entry(p, &pool->list, lru) {
+			list_for_each_entry(p, &new_pages, lru) {
 #else
 			TAILQ_FOREACH(p, &pool->list, plinks.q) {
 #endif
