@@ -323,13 +323,12 @@ int drm_pci_init(struct drm_driver *driver, struct pci_driver *pdriver)
 	DRM_DEBUG("\n");
 
 #ifdef __FreeBSD__
-	pdriver->busname = "vgapci";
 	pdriver->bsdclass = drm_devclass;
 	pdriver->name = "drmn";
 #endif
 
 	if (!(driver->driver_features & DRIVER_LEGACY))
-		return pci_register_driver(pdriver);
+		return linux_pci_register_drm_driver(pdriver);
 
 	DRM_ERROR("FreeBSD needs DRIVER_MODESET");
 	return (-ENOTSUP);

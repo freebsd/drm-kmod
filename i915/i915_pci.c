@@ -499,12 +499,11 @@ static int __init i915_init(void)
 	}
 
 #ifdef __FreeBSD__
-	i915_pci_driver.busname = "vgapci";
 	i915_pci_driver.bsdclass = drm_devclass;
 	i915_pci_driver.name = "drmn";
 #endif
 
-	return pci_register_driver(&i915_pci_driver);
+	return linux_pci_register_drm_driver(&i915_pci_driver);
 }
 
 static void __exit i915_exit(void)
