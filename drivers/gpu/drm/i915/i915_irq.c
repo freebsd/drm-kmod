@@ -1758,8 +1758,8 @@ static void i9xx_pipestat_irq_reset(struct drm_i915_private *dev_priv)
 	}
 }
 
-static void valleyview_pipestat_irq_ack(struct drm_i915_private *dev_priv,
-					u32 iir, u32 pipe_stats[I915_MAX_PIPES])
+static void i9xx_pipestat_irq_ack(struct drm_i915_private *dev_priv,
+				  u32 iir, u32 pipe_stats[I915_MAX_PIPES])
 {
 	int pipe;
 
@@ -1814,6 +1814,74 @@ static void valleyview_pipestat_irq_ack(struct drm_i915_private *dev_priv,
 			I915_WRITE(reg, pipe_stats[pipe]);
 	}
 	spin_unlock(&dev_priv->irq_lock);
+}
+
+static void i8xx_pipestat_irq_handler(struct drm_i915_private *dev_priv,
+				      u16 iir, u32 pipe_stats[I915_MAX_PIPES])
+{
+	enum pipe pipe;
+
+	for_each_pipe(dev_priv, pipe) {
+		if (pipe_stats[pipe] & PIPE_VBLANK_INTERRUPT_STATUS)
+			drm_handle_vblank(&dev_priv->drm, pipe);
+
+		if (pipe_stats[pipe] & PIPE_CRC_DONE_INTERRUPT_STATUS)
+			i9xx_pipe_crc_irq_handler(dev_priv, pipe);
+
+		if (pipe_stats[pipe] & PIPE_FIFO_UNDERRUN_STATUS)
+			intel_cpu_fifo_underrun_irq_handler(dev_priv, pipe);
+	}
+}
+
+static void i915_pipestat_irq_handler(struct drm_i915_private *dev_priv,
+				      u32 iir, u32 pipe_stats[I915_MAX_PIPES])
+{
+	bool blc_event = false;
+	enum pipe pipe;
+
+	for_each_pipe(dev_priv, pipe) {
+		if (pipe_stats[pipe] & PIPE_VBLANK_INTERRUPT_STATUS)
+			drm_handle_vblank(&dev_priv->drm, pipe);
+
+		if (pipe_stats[pipe] & PIPE_LEGACY_BLC_EVENT_STATUS)
+			blc_event = true;
+
+		if (pipe_stats[pipe] & PIPE_CRC_DONE_INTERRUPT_STATUS)
+			i9xx_pipe_crc_irq_handler(dev_priv, pipe);
+
+		if (pipe_stats[pipe] & PIPE_FIFO_UNDERRUN_STATUS)
+			intel_cpu_fifo_underrun_irq_handler(dev_priv, pipe);
+	}
+
+	if (blc_event || (iir & I915_ASLE_INTERRUPT))
+		intel_opregion_asle_intr(dev_priv);
+}
+
+static void i965_pipestat_irq_handler(struct drm_i915_private *dev_priv,
+				      u32 iir, u32 pipe_stats[I915_MAX_PIPES])
+{
+	bool blc_event = false;
+	enum pipe pipe;
+
+	for_each_pipe(dev_priv, pipe) {
+		if (pipe_stats[pipe] & PIPE_START_VBLANK_INTERRUPT_STATUS)
+			drm_handle_vblank(&dev_priv->drm, pipe);
+
+		if (pipe_stats[pipe] & PIPE_LEGACY_BLC_EVENT_STATUS)
+			blc_event = true;
+
+		if (pipe_stats[pipe] & PIPE_CRC_DONE_INTERRUPT_STATUS)
+			i9xx_pipe_crc_irq_handler(dev_priv, pipe);
+
+		if (pipe_stats[pipe] & PIPE_FIFO_UNDERRUN_STATUS)
+			intel_cpu_fifo_underrun_irq_handler(dev_priv, pipe);
+	}
+
+	if (blc_event || (iir & I915_ASLE_INTERRUPT))
+		intel_opregion_asle_intr(dev_priv);
+
+	if (pipe_stats[0] & PIPE_GMBUS_INTERRUPT_STATUS)
+		gmbus_irq_handler(dev_priv);
 }
 
 static void valleyview_pipestat_irq_handler(struct drm_i915_private *dev_priv,
@@ -1931,7 +1999,7 @@ static irqreturn_t valleyview_irq_handler(int irq, void *arg)
 
 		/* Call regardless, as some status bits might not be
 		 * signalled in iir */
-		valleyview_pipestat_irq_ack(dev_priv, iir, pipe_stats);
+		i9xx_pipestat_irq_ack(dev_priv, iir, pipe_stats);
 
 #ifdef __linux__
 		// Not yet supported in BSD
@@ -2018,9 +2086,10 @@ static irqreturn_t cherryview_irq_handler(int irq, void *arg)
 
 		/* Call regardless, as some status bits might not be
 		 * signalled in iir */
-		valleyview_pipestat_irq_ack(dev_priv, iir, pipe_stats);
+		i9xx_pipestat_irq_ack(dev_priv, iir, pipe_stats);
+
 #ifdef __linux__
-		// Not yet supported in BSD
+		// lpe audio not yet supported in BSD
 		if (iir & (I915_LPE_PIPE_A_INTERRUPT |
 		        I915_LPE_PIPE_B_INTERRUPT |
 		        I915_LPE_PIPE_C_INTERRUPT))
@@ -3646,8 +3715,6 @@ static irqreturn_t i8xx_irq_handler(int irq, void *arg)
 	struct drm_device *dev = arg;
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	u16 iir, new_iir;
-	u32 pipe_stats[2];
-	int pipe;
 	irqreturn_t ret;
 
 	if (!intel_irqs_enabled(dev_priv))
@@ -3662,26 +3729,14 @@ static irqreturn_t i8xx_irq_handler(int irq, void *arg)
 		goto out;
 
 	while (iir) {
-		/* Can't rely on pipestat interrupt bit in iir as it might
-		 * have been cleared after the pipestat interrupt was received.
-		 * It doesn't set the bit in iir again, but it still produces
-		 * interrupts (for non-MSI).
-		 */
-		spin_lock(&dev_priv->irq_lock);
+		u32 pipe_stats[I915_MAX_PIPES] = {};
+
 		if (iir & I915_RENDER_COMMAND_PARSER_ERROR_INTERRUPT)
 			DRM_DEBUG("Command parser error, iir 0x%08x\n", iir);
 
-		for_each_pipe(dev_priv, pipe) {
-			i915_reg_t reg = PIPESTAT(pipe);
-			pipe_stats[pipe] = I915_READ(reg);
-
-			/*
-			 * Clear the PIPE*STAT regs before the IIR
-			 */
-			if (pipe_stats[pipe] & 0x8000ffff)
-				I915_WRITE(reg, pipe_stats[pipe]);
-		}
-		spin_unlock(&dev_priv->irq_lock);
+		/* Call regardless, as some status bits might not be
+		 * signalled in iir */
+		i9xx_pipestat_irq_ack(dev_priv, iir, pipe_stats);
 
 		I915_WRITE16(IIR, iir);
 		new_iir = I915_READ16(IIR); /* Flush posted writes */
@@ -3689,21 +3744,7 @@ static irqreturn_t i8xx_irq_handler(int irq, void *arg)
 		if (iir & I915_USER_INTERRUPT)
 			notify_ring(dev_priv->engine[RCS]);
 
-		for_each_pipe(dev_priv, pipe) {
-			int plane = pipe;
-			if (HAS_FBC(dev_priv))
-				plane = !plane;
-
-			if (pipe_stats[pipe] & PIPE_VBLANK_INTERRUPT_STATUS)
-				drm_handle_vblank(&dev_priv->drm, pipe);
-
-			if (pipe_stats[pipe] & PIPE_CRC_DONE_INTERRUPT_STATUS)
-				i9xx_pipe_crc_irq_handler(dev_priv, pipe);
-
-			if (pipe_stats[pipe] & PIPE_FIFO_UNDERRUN_STATUS)
-				intel_cpu_fifo_underrun_irq_handler(dev_priv,
-								    pipe);
-		}
+		i8xx_pipestat_irq_handler(dev_priv, iir, pipe_stats);
 
 		iir = new_iir;
 	}
@@ -3785,8 +3826,8 @@ static irqreturn_t i915_irq_handler(int irq, void *arg)
 {
 	struct drm_device *dev = arg;
 	struct drm_i915_private *dev_priv = to_i915(dev);
-	u32 iir, new_iir, pipe_stats[I915_MAX_PIPES];
-	int pipe, ret = IRQ_NONE;
+	u32 iir, new_iir;
+	int ret = IRQ_NONE;
 
 	if (!intel_irqs_enabled(dev_priv))
 		return IRQ_NONE;
@@ -3796,29 +3837,15 @@ static irqreturn_t i915_irq_handler(int irq, void *arg)
 
 	iir = I915_READ(IIR);
 	do {
-		bool irq_received = (iir) != 0;
-		bool blc_event = false;
+		u32 pipe_stats[I915_MAX_PIPES] = {};
+		bool irq_received = iir != 0;
 
-		/* Can't rely on pipestat interrupt bit in iir as it might
-		 * have been cleared after the pipestat interrupt was received.
-		 * It doesn't set the bit in iir again, but it still produces
-		 * interrupts (for non-MSI).
-		 */
-		spin_lock(&dev_priv->irq_lock);
 		if (iir & I915_RENDER_COMMAND_PARSER_ERROR_INTERRUPT)
 			DRM_DEBUG("Command parser error, iir 0x%08x\n", iir);
 
-		for_each_pipe(dev_priv, pipe) {
-			i915_reg_t reg = PIPESTAT(pipe);
-			pipe_stats[pipe] = I915_READ(reg);
-
-			/* Clear the PIPE*STAT regs before the IIR */
-			if (pipe_stats[pipe] & 0x8000ffff) {
-				I915_WRITE(reg, pipe_stats[pipe]);
-				irq_received = true;
-			}
-		}
-		spin_unlock(&dev_priv->irq_lock);
+		/* Call regardless, as some status bits might not be
+		 * signalled in iir */
+		i9xx_pipestat_irq_ack(dev_priv, iir, pipe_stats);
 
 		if (!irq_received)
 			break;
@@ -3837,27 +3864,7 @@ static irqreturn_t i915_irq_handler(int irq, void *arg)
 		if (iir & I915_USER_INTERRUPT)
 			notify_ring(dev_priv->engine[RCS]);
 
-		for_each_pipe(dev_priv, pipe) {
-			int plane = pipe;
-			if (HAS_FBC(dev_priv))
-				plane = !plane;
-
-			if (pipe_stats[pipe] & PIPE_VBLANK_INTERRUPT_STATUS)
-				drm_handle_vblank(&dev_priv->drm, pipe);
-
-			if (pipe_stats[pipe] & PIPE_LEGACY_BLC_EVENT_STATUS)
-				blc_event = true;
-
-			if (pipe_stats[pipe] & PIPE_CRC_DONE_INTERRUPT_STATUS)
-				i9xx_pipe_crc_irq_handler(dev_priv, pipe);
-
-			if (pipe_stats[pipe] & PIPE_FIFO_UNDERRUN_STATUS)
-				intel_cpu_fifo_underrun_irq_handler(dev_priv,
-								    pipe);
-		}
-
-		if (blc_event || (iir & I915_ASLE_INTERRUPT))
-			intel_opregion_asle_intr(dev_priv);
+		i915_pipestat_irq_handler(dev_priv, iir, pipe_stats);
 
 		/* With MSI, interrupts are only generated when iir
 		 * transitions from zero to nonzero.  If another bit got
@@ -3998,8 +4005,7 @@ static irqreturn_t i965_irq_handler(int irq, void *arg)
 	struct drm_device *dev = arg;
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	u32 iir, new_iir;
-	u32 pipe_stats[I915_MAX_PIPES];
-	int ret = IRQ_NONE, pipe;
+	int ret = IRQ_NONE;
 
 	if (!intel_irqs_enabled(dev_priv))
 		return IRQ_NONE;
@@ -4010,31 +4016,15 @@ static irqreturn_t i965_irq_handler(int irq, void *arg)
 	iir = I915_READ(IIR);
 
 	for (;;) {
-		bool irq_received = (iir) != 0;
-		bool blc_event = false;
+		u32 pipe_stats[I915_MAX_PIPES] = {};
+		bool irq_received = iir != 0;
 
-		/* Can't rely on pipestat interrupt bit in iir as it might
-		 * have been cleared after the pipestat interrupt was received.
-		 * It doesn't set the bit in iir again, but it still produces
-		 * interrupts (for non-MSI).
-		 */
-		spin_lock(&dev_priv->irq_lock);
 		if (iir & I915_RENDER_COMMAND_PARSER_ERROR_INTERRUPT)
 			DRM_DEBUG("Command parser error, iir 0x%08x\n", iir);
 
-		for_each_pipe(dev_priv, pipe) {
-			i915_reg_t reg = PIPESTAT(pipe);
-			pipe_stats[pipe] = I915_READ(reg);
-
-			/*
-			 * Clear the PIPE*STAT regs before the IIR
-			 */
-			if (pipe_stats[pipe] & 0x8000ffff) {
-				I915_WRITE(reg, pipe_stats[pipe]);
-				irq_received = true;
-			}
-		}
-		spin_unlock(&dev_priv->irq_lock);
+		/* Call regardless, as some status bits might not be
+		 * signalled in iir */
+		i9xx_pipestat_irq_ack(dev_priv, iir, pipe_stats);
 
 		if (!irq_received)
 			break;
@@ -4056,25 +4046,7 @@ static irqreturn_t i965_irq_handler(int irq, void *arg)
 		if (iir & I915_BSD_USER_INTERRUPT)
 			notify_ring(dev_priv->engine[VCS]);
 
-		for_each_pipe(dev_priv, pipe) {
-			if (pipe_stats[pipe] & PIPE_START_VBLANK_INTERRUPT_STATUS)
-				drm_handle_vblank(&dev_priv->drm, pipe);
-
-			if (pipe_stats[pipe] & PIPE_LEGACY_BLC_EVENT_STATUS)
-				blc_event = true;
-
-			if (pipe_stats[pipe] & PIPE_CRC_DONE_INTERRUPT_STATUS)
-				i9xx_pipe_crc_irq_handler(dev_priv, pipe);
-
-			if (pipe_stats[pipe] & PIPE_FIFO_UNDERRUN_STATUS)
-				intel_cpu_fifo_underrun_irq_handler(dev_priv, pipe);
-		}
-
-		if (blc_event || (iir & I915_ASLE_INTERRUPT))
-			intel_opregion_asle_intr(dev_priv);
-
-		if (pipe_stats[0] & PIPE_GMBUS_INTERRUPT_STATUS)
-			gmbus_irq_handler(dev_priv);
+		i965_pipestat_irq_handler(dev_priv, iir, pipe_stats);
 
 		/* With MSI, interrupts are only generated when iir
 		 * transitions from zero to nonzero.  If another bit got
