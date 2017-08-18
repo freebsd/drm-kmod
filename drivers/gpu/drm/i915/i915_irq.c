@@ -1712,6 +1712,19 @@ static void gen9_guc_irq_handler(struct drm_i915_private *dev_priv, u32 gt_iir)
 	}
 }
 
+static void i9xx_pipestat_irq_reset(struct drm_i915_private *dev_priv)
+{
+	enum pipe pipe;
+
+	for_each_pipe(dev_priv, pipe) {
+		I915_WRITE(PIPESTAT(pipe),
+			   PIPESTAT_INT_STATUS_MASK |
+			   PIPE_FIFO_UNDERRUN_STATUS);
+
+		dev_priv->pipestat_irq_mask[pipe] = 0;
+	}
+}
+
 static void valleyview_pipestat_irq_ack(struct drm_i915_private *dev_priv,
 					u32 iir, u32 pipe_stats[I915_MAX_PIPES])
 {
@@ -2914,8 +2927,6 @@ static void gen5_gt_irq_reset(struct drm_i915_private *dev_priv)
 
 static void vlv_display_irq_reset(struct drm_i915_private *dev_priv)
 {
-	enum pipe pipe;
-
 	if (IS_CHERRYVIEW(dev_priv))
 		I915_WRITE(DPINVGTT, DPINVGTT_STATUS_MASK_CHV);
 	else
@@ -2924,12 +2935,7 @@ static void vlv_display_irq_reset(struct drm_i915_private *dev_priv)
 	i915_hotplug_interrupt_update_locked(dev_priv, 0xffffffff, 0);
 	I915_WRITE(PORT_HOTPLUG_STAT, I915_READ(PORT_HOTPLUG_STAT));
 
-	for_each_pipe(dev_priv, pipe) {
-		I915_WRITE(PIPESTAT(pipe),
-			   PIPE_FIFO_UNDERRUN_STATUS |
-			   PIPESTAT_INT_STATUS_MASK);
-		dev_priv->pipestat_irq_mask[pipe] = 0;
-	}
+	i9xx_pipestat_irq_reset(dev_priv);
 
 	GEN5_IRQ_RESET(VLV_);
 	dev_priv->irq_mask = ~0;
@@ -3582,10 +3588,9 @@ static void ironlake_irq_uninstall(struct drm_device *dev)
 static void i8xx_irq_preinstall(struct drm_device * dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
-	int pipe;
 
-	for_each_pipe(dev_priv, pipe)
-		I915_WRITE(PIPESTAT(pipe), 0);
+	i9xx_pipestat_irq_reset(dev_priv);
+
 	I915_WRITE16(IMR, 0xffff);
 	I915_WRITE16(IER, 0x0);
 	POSTING_READ16(IER);
@@ -3697,13 +3702,9 @@ out:
 static void i8xx_irq_uninstall(struct drm_device * dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
-	int pipe;
 
-	for_each_pipe(dev_priv, pipe) {
-		/* Clear enable bits; then clear status bits */
-		I915_WRITE(PIPESTAT(pipe), 0);
-		I915_WRITE(PIPESTAT(pipe), I915_READ(PIPESTAT(pipe)));
-	}
+	i9xx_pipestat_irq_reset(dev_priv);
+
 	I915_WRITE16(IMR, 0xffff);
 	I915_WRITE16(IER, 0x0);
 	I915_WRITE16(IIR, I915_READ16(IIR));
@@ -3712,16 +3713,16 @@ static void i8xx_irq_uninstall(struct drm_device * dev)
 static void i915_irq_preinstall(struct drm_device * dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
-	int pipe;
 
 	if (I915_HAS_HOTPLUG(dev_priv)) {
 		i915_hotplug_interrupt_update(dev_priv, 0xffffffff, 0);
 		I915_WRITE(PORT_HOTPLUG_STAT, I915_READ(PORT_HOTPLUG_STAT));
 	}
 
+	i9xx_pipestat_irq_reset(dev_priv);
+
 	I915_WRITE16(HWSTAM, 0xeffe);
-	for_each_pipe(dev_priv, pipe)
-		I915_WRITE(PIPESTAT(pipe), 0);
+
 	I915_WRITE(IMR, 0xffffffff);
 	I915_WRITE(IER, 0x0);
 	POSTING_READ(IER);
@@ -3877,36 +3878,32 @@ static irqreturn_t i915_irq_handler(int irq, void *arg)
 static void i915_irq_uninstall(struct drm_device * dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
-	int pipe;
 
 	if (I915_HAS_HOTPLUG(dev_priv)) {
 		i915_hotplug_interrupt_update(dev_priv, 0xffffffff, 0);
 		I915_WRITE(PORT_HOTPLUG_STAT, I915_READ(PORT_HOTPLUG_STAT));
 	}
 
+	i9xx_pipestat_irq_reset(dev_priv);
+
 	I915_WRITE16(HWSTAM, 0xffff);
-	for_each_pipe(dev_priv, pipe) {
-		/* Clear enable bits; then clear status bits */
-		I915_WRITE(PIPESTAT(pipe), 0);
-		I915_WRITE(PIPESTAT(pipe), I915_READ(PIPESTAT(pipe)));
-	}
+
 	I915_WRITE(IMR, 0xffffffff);
 	I915_WRITE(IER, 0x0);
-
 	I915_WRITE(IIR, I915_READ(IIR));
 }
 
 static void i965_irq_preinstall(struct drm_device * dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
-	int pipe;
 
 	i915_hotplug_interrupt_update(dev_priv, 0xffffffff, 0);
 	I915_WRITE(PORT_HOTPLUG_STAT, I915_READ(PORT_HOTPLUG_STAT));
 
+	i9xx_pipestat_irq_reset(dev_priv);
+
 	I915_WRITE(HWSTAM, 0xeffe);
-	for_each_pipe(dev_priv, pipe)
-		I915_WRITE(PIPESTAT(pipe), 0);
+
 	I915_WRITE(IMR, 0xffffffff);
 	I915_WRITE(IER, 0x0);
 	POSTING_READ(IER);
@@ -4100,7 +4097,6 @@ static irqreturn_t i965_irq_handler(int irq, void *arg)
 static void i965_irq_uninstall(struct drm_device * dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
-	int pipe;
 
 	if (!dev_priv)
 		return;
@@ -4108,15 +4104,12 @@ static void i965_irq_uninstall(struct drm_device * dev)
 	i915_hotplug_interrupt_update(dev_priv, 0xffffffff, 0);
 	I915_WRITE(PORT_HOTPLUG_STAT, I915_READ(PORT_HOTPLUG_STAT));
 
+	i9xx_pipestat_irq_reset(dev_priv);
+
 	I915_WRITE(HWSTAM, 0xffffffff);
-	for_each_pipe(dev_priv, pipe)
-		I915_WRITE(PIPESTAT(pipe), 0);
+
 	I915_WRITE(IMR, 0xffffffff);
 	I915_WRITE(IER, 0x0);
-
-	for_each_pipe(dev_priv, pipe)
-		I915_WRITE(PIPESTAT(pipe),
-			   I915_READ(PIPESTAT(pipe)) & 0x8000ffff);
 	I915_WRITE(IIR, I915_READ(IIR));
 }
 
