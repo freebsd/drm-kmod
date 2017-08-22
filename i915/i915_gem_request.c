@@ -24,7 +24,7 @@
 
 #include <linux/prefetch.h>
 #ifdef __FreeBSD__
-#include <linux/smp.h>
+#include <asm/smp.h>
 #endif
 
 #include "i915_drv.h"

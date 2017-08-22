@@ -128,7 +128,7 @@ intel_gtt_insert_page(dma_addr_t addr, unsigned int pg, unsigned int flags)
 }
 
 void
-intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
+linux_intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
     unsigned int flags)
 {
 	struct sg_page_iter sg_iter;
