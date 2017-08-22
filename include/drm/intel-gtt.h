@@ -5,8 +5,13 @@
 
 struct agp_bridge_data;
 
+#ifdef __FreeBSD__
+struct intel_gtt;
+struct intel_gtt *intel_gtt_get(void);
+#else
 void intel_gtt_get(u64 *gtt_total, size_t *stolen_size,
 		   phys_addr_t *mappable_base, u64 *mappable_end);
+#endif
 
 int intel_gmch_probe(struct pci_dev *bridge_pdev, struct pci_dev *gpu_pdev,
 		     struct agp_bridge_data *bridge);
@@ -14,7 +19,11 @@ void intel_gmch_remove(void);
 
 bool intel_enable_gtt(void);
 
+#ifdef __FreeBSD__
+int intel_gtt_chipset_flush(void);
+#else
 void intel_gtt_chipset_flush(void);
+#endif
 void intel_gtt_insert_page(dma_addr_t addr,
 			   unsigned int pg,
 			   unsigned int flags);

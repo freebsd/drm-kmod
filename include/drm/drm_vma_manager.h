@@ -192,6 +192,7 @@ static inline __u64 drm_vma_node_offset_addr(struct drm_vma_offset_node *node)
 	return ((__u64)node->vm_node.start) << PAGE_SHIFT;
 }
 
+#ifndef __FreeBSD__
 /**
  * drm_vma_node_unmap() - Unmap offset node
  * @node: Offset node
@@ -212,6 +213,7 @@ static inline void drm_vma_node_unmap(struct drm_vma_offset_node *node,
 				    drm_vma_node_offset_addr(node),
 				    drm_vma_node_size(node) << PAGE_SHIFT, 1);
 }
+#endif
 
 /**
  * drm_vma_node_verify_access() - Access verification helper for TTM

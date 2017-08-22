@@ -33,7 +33,6 @@
 #define _DRM_P_H_
 
 #if defined(_KERNEL) || defined(__KERNEL__)
-#define _SYS_TREE_H_
 #include <sys/param.h>
 #include <sys/queue.h>
 #include <sys/malloc.h>
@@ -60,6 +59,8 @@
 #include <sys/poll.h>
 #include <sys/sbuf.h>
 #include <sys/taskqueue.h>
+#include <sys/resourcevar.h>
+#include <sys/vmmeter.h>
 #include <vm/vm.h>
 #include <vm/pmap.h>
 #include <vm/vm_extern.h>
@@ -110,6 +111,7 @@
 #include <linux/ioctl.h>
 #include <linux/workqueue.h>
 #include <linux/fence.h>
+#include <linux/math64.h>
 
 #include <drm/drm_hashtab.h>
 
@@ -864,10 +866,10 @@ struct drm_device {
 	struct drm_master *master;
 
 	atomic_t unplugged;			/**< Flag whether dev is dead */
-#ifdef __linux__
+#ifndef __FreeBSD__
 	struct inode *anon_inode;		/**< inode for private address-space */
-#endif
 	struct address_space *anon_mapping;	/**< private address-space */
+#endif
 	char *unique;				/**< unique name of the device */
 	/*@} */
 
@@ -988,6 +990,15 @@ struct drm_device {
 	int modesetting;
 
 	const drm_pci_id_list_t *id_entry;	/* PCI ID, name, and chipset private */
+
+#ifdef __FreeBSD__
+#define	DRM_PCI_RESOURCE_MAX	7
+
+	struct drm_pci_resource {
+		struct resource *res;
+		int rid;
+	} drm_pcir[DRM_PCI_RESOURCE_MAX];
+#endif
 };
 
 #include <drm/drm_irq.h>

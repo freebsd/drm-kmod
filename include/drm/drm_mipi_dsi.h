@@ -106,7 +106,9 @@ struct mipi_dsi_host {
 
 int mipi_dsi_host_register(struct mipi_dsi_host *host);
 void mipi_dsi_host_unregister(struct mipi_dsi_host *host);
+#ifndef __FreeBSD__
 struct mipi_dsi_host *of_find_mipi_dsi_host_by_node(struct device_node *node);
+#endif
 
 /* DSI mode flags */
 

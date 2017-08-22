@@ -545,11 +545,13 @@ struct ttm_bo_device {
 	 */
 	struct list_head ddestroy;
 
+#ifndef __FreeBSD__
 	/*
 	 * Protected by load / firstopen / lastclose /unload sync.
 	 */
 
 	struct address_space *dev_mapping;
+#endif
 
 	/*
 	 * Internal protection.
@@ -740,7 +742,11 @@ extern int ttm_bo_device_release(struct ttm_bo_device *bdev);
 extern int ttm_bo_device_init(struct ttm_bo_device *bdev,
 			      struct ttm_bo_global *glob,
 			      struct ttm_bo_driver *driver,
+#ifdef __FreeBSD__
+			      void *dummy,
+#else
 			      struct address_space *mapping,
+#endif
 			      uint64_t file_page_offset, bool need_dma32);
 
 /**
