@@ -1,22 +1,17 @@
 # $FreeBSD$
 
-.PATH:	../amdgpu ../scheduler ../powerplay ../powerplay/eventmgr ../powerplay/hwmgr ../powerplay/smumgr
+.PATH:	${.CURDIR:H}/amdgpu \
+	${.CURDIR:H}/scheduler \
+	${.CURDIR:H}/powerplay \
+	${.CURDIR:H}/powerplay/eventmgr \
+	${.CURDIR:H}/powerplay/hwmgr \
+	${.CURDIR:H}/powerplay/smumgr
 
-KMOD	= amdgpu
+KMOD=	amdgpu
 
-# XXX we do not enable this yet
-#       amdgpu_acp.h \
-#       amdgpu_acp.c
-# XXX not ported yet
-#	gpu_scheduler.c : kfifo
-# XXX not enabled:
-#	amdgpu_mn.c 
-
-SRCS	= \
-	amdgpu.h \
-        amdgpu_acpi.c \
-        amdgpu_afmt.c \
-        amdgpu_amdkfd.c \
+SRCS=	amdgpu_acpi.c \
+	amdgpu_afmt.c \
+	amdgpu_amdkfd.c \
 	amdgpu_amdkfd_gfx_v7.c \
 	amdgpu_amdkfd_gfx_v8.c \
 	amdgpu_atombios.c \
@@ -43,7 +38,6 @@ SRCS	= \
 	amdgpu_i2c.c \
 	amdgpu_ib.c \
 	amdgpu_ih.c \
-	amdgpu_ioc32.c \
 	amdgpu_irq.c \
 	amdgpu_job.c \
 	amdgpu_kms.c \
@@ -75,9 +69,9 @@ SRCS	= \
 	cik_sdma.c \
 	cz_clockpowergating.c \
 	cz_dpm.c \
-        cz_ih.c \
+	cz_ih.c \
 	cz_hwmgr.c \
-        cz_smc.c \
+	cz_smc.c \
 	cz_smumgr.c \
 	dce_v6_0.c \
 	dce_v8_0.c \
@@ -139,28 +133,29 @@ SRCS	= \
 	vce_v3_0.c \
 	vi.c
 
+CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/dummy/include
+CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
+CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include
 
+CFLAGS+= -I${.CURDIR:H:H}/include
+CFLAGS+= -I${.CURDIR:H:H}/include/drm
+CFLAGS+= -I${.CURDIR:H:H}/include/uapi
+CFLAGS+= -I${.CURDIR:H:H}
 
+CFLAGS+= -I${.CURDIR}
+CFLAGS+= -I${.CURDIR:H}/include
+CFLAGS+= -I${.CURDIR:H}/acp/include
+CFLAGS+= -I${.CURDIR:H}/powerplay/eventmgr
+CFLAGS+= -I${.CURDIR:H}/powerplay/hwmgr
+CFLAGS+= -I${.CURDIR:H}/powerplay/inc
+CFLAGS+= -I${.CURDIR:H}/powerplay/smumgr
+CFLAGS+= -I${.CURDIR:H}/scheduler
+CFLAGS+= -I${.CURDIR:H}/include/asic_reg
 
-CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/gplv2/include
-CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include
-CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include/drm
-CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
-CFLAGS+=	-I./amdgpu
-CFLAGS+=	-I../include
-CFLAGS+=	-I../acp/include
-CFLAGS+=	-I../powerplay/eventmgr
-CFLAGS+=	-I../powerplay/hwmgr
-CFLAGS+=	-I../powerplay/inc
-CFLAGS+=	-I../powerplay/smumgr
-CFLAGS+=	-I../scheduler
-CFLAGS+=	-I../include/asic_reg
-CFLAGS+=	'-DKBUILD_MODNAME="${KMOD}"'
-#CFLAGS+=	-O0
-CFLAGS+=	-include ../../drm/drm_os_config.h
+CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
+CFLAGS+= -include ${.CURDIR:H:H}/drm/drm_os_config.h
 
-
-SRCS	+=device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
+SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
         opt_vm.h opt_compat.h opt_syscons.h opt_acpi.h
 
 .include <bsd.kmod.mk>
@@ -182,7 +177,6 @@ CWARNFLAGS.amdgpu_device.c=	 -Wno-cast-qual -Wno-missing-prototypes
 CWARNFLAGS.amdgpu_gfx.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_job.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ih.c=	-Wno-cast-qual
-CWARNFLAGS.amdgpu_ioc32.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_mn.c=		-Wno-unused-variable
 CWARNFLAGS.amdgpu_pll.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_pm.c=		-Wno-missing-prototypes -Wno-enum-conversion

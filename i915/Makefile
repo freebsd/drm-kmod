@@ -1,9 +1,7 @@
 # $FreeBSD$
 
-#.PATH:	${SRCTOP}/sys/dev/drm/i915
-KMOD	= i915kms
-SRCS	= \
-	dvo_ch7017.c \
+KMOD=	i915kms
+SRCS=	dvo_ch7017.c \
 	dvo_ch7xxx.c \
 	dvo_ivch.c \
 	dvo_ns2501.c \
@@ -91,18 +89,22 @@ SRCS	= \
 	intel_tv.c \
 	intel_uncore.c
 
-#
+CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
-CLEANFILES += ${KMOD}.ko.full ${KMOD}.ko.debug
-CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/gplv2/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include
-CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
+
+CFLAGS+= -I${.CURDIR:H}/include
+CFLAGS+= -I${.CURDIR:H}/include/drm
+CFLAGS+= -I${.CURDIR:H}/include/uapi
+CFLAGS+= -I${.CURDIR:H}
+
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -include ../drm/drm_os_config.h
-#CFLAGS += -DPRINT_UNIMPLEMENTED
+CFLAGS+= -include ${.CURDIR:H}/drm/drm_os_config.h
 
 .if ${MACHINE_CPUARCH} == "amd64"
-SRCS	+= i915_ioc32.c
+SRCS+= i915_ioc32.c
 .endif
 
 SRCS	+=								\

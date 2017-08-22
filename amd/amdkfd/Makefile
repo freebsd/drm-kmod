@@ -34,21 +34,26 @@ SRCS	= \
 	kfd_queue.c #\
 #	kfd_topology.c
 
-CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/gplv2/include
-CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include
-CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include/drm
-CFLAGS+=	-I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
-CFLAGS+=	-I.
-CFLAGS+=	-I../amdgpu
-CFLAGS+=	-I../include
-CFLAGS+=	-I../acp/include
-CFLAGS+=	-I../powerplay/inc
-CFLAGS+=	-I../scheduler
-CFLAGS+=	-I../include/asic_reg
-CFLAGS+=	'-DKBUILD_MODNAME="${KMOD}"'
+CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/dummy/include
+CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
+CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include
 
-SRCS	+=device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
-        opt_vm.h opt_compat.h opt_syscons.h
+CFLAGS+= -I${.CURDIR:H:H}/include
+CFLAGS+= -I${.CURDIR:H:H}/include/drm
+CFLAGS+= -I${.CURDIR:H:H}/include/uapi
+CFLAGS+= -I${.CURDIR:H:H}
+
+CFLAGS+= -I${.CURDIR:H}/amdgpu
+CFLAGS+= -I${.CURDIR:H}/include
+CFLAGS+= -I${.CURDIR:H}/acp/include
+CFLAGS+= -I${.CURDIR:H}/powerplay/inc
+CFLAGS+= -I${.CURDIR:H}/scheduler
+CFLAGS+= -I${.CURDIR:H}/include/asic_reg
+
+CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
+
+SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
+	opt_vm.h opt_compat.h opt_syscons.h
 
 .include <bsd.kmod.mk>
 

@@ -1,13 +1,7 @@
 # $FreeBSD$
 
-#.PATH:	${SRCTOP}/sys/dev/drm/radeon
-
-# XXX not ported:
-#	radeon_mn.c
-
-KMOD	= radeonkms
-SRCS	= \
-	atom.c \
+KMOD=	radeonkms
+SRCS=	atom.c \
 	atombios_crtc.c \
 	atombios_dp.c \
 	atombios_encoders.c \
@@ -69,7 +63,6 @@ SRCS	= \
 	radeon_gem.c \
 	radeon_i2c.c \
 	radeon_ib.c \
-	radeon_ioc32.c \
 	radeon_irq_kms.c \
 	radeon_kfd.c \
 	radeon_kms.c \
@@ -118,18 +111,21 @@ SRCS	= \
 	vce_v1_0.c \
 	vce_v2_0.c
 
-CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/gplv2/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include
-CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/drm
-CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
-CFLAGS+= -I.
-CFLAGS+= -I../amd/include
-CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -O0
-CFLAGS+= -include ../drm/drm_os_config.h
 
-SRCS    +=device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
-        opt_vm.h opt_compat.h opt_syscons.h opt_acpi.h
+CFLAGS+= -I${.CURDIR:H}/include
+CFLAGS+= -I${.CURDIR:H}/include/drm
+CFLAGS+= -I${.CURDIR:H}/include/uapi
+CFLAGS+= -I${.CURDIR:H}
+CFLAGS+= -I${.CURDIR:H}/amd/include
+
+CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
+CFLAGS+= -include ${.CURDIR:H}/drm/drm_os_config.h
+
+SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
+	opt_vm.h opt_compat.h opt_syscons.h opt_acpi.h
 
 .include <bsd.kmod.mk>
 
@@ -159,7 +155,6 @@ CWARNFLAGS.radeon_clocks.c=	-Wno-missing-prototypes
 CWARNFLAGS.radeon_device.c=	-Wno-cast-qual -Wno-missing-prototypes
 CWARNFLAGS.radeon_dp_mst.c=	-Wno-missing-prototypes
 CWARNFLAGS.radeon_gem.c=	-Wno-missing-prototypes
-CWARNFLAGS.radeon_ioc32.c=	-Wno-missing-prototypes -Wno-int-conversion
 CWARNFLAGS.radeon_irq_kms.c=	-Wno-missing-prototypes
 CWARNFLAGS.radeon_kms.c=	-Wno-missing-prototypes
 CWARNFLAGS.radeon_legacy_encoders.c=	-Wno-missing-prototypes

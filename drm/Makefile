@@ -1,9 +1,9 @@
 # $FreeBSD$
 
-.PATH:	. ./ttm
-KMOD	= drm
-SRCS	= \
-	ati_pcigart.c \
+.PATH:	${.CURDIR} ${.CURDIR}/ttm
+
+KMOD=	drm
+SRCS=	ati_pcigart.c \
 	drm_agpsupport.c \
 	drm_atomic.c \
 	drm_atomic_helper.c \
@@ -79,40 +79,31 @@ SRCS	= \
 	ttm_module.c \
 	ttm_page_alloc.c \
 	ttm_page_alloc_dma.c \
-	ttm_bo_vm.c \
+	ttm_bo_vm.c
 
-
-
-        # drm_of.c
-        # 	
-       # drm_platform.c
-        # 
-
-#	drm_fb_cma_helper.c \
-
-CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/gplv2/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include
-CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/drm
-CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include/uapi
-CFLAGS+= -I.
-CFLAGS+= -I./ttm
-CFLAGS+= -I..
-CFLAGS+= -I${SRC_BASE}/include
+CFLAGS+= -I${.CURDIR}
+CFLAGS+= -I${.CURDIR}/ttm
+CFLAGS+= -I${.CURDIR:H}/include
+CFLAGS+= -I${.CURDIR:H}/include/drm
+CFLAGS+= -I${.CURDIR:H}/include/uapi
+CFLAGS+= -I${.CURDIR:H}
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -include ./drm_os_config.h
 
-# until stable
-#CFLAGS += -O0
-#CFLAGS += -DDRM_DEBUG_LOG_ALL
-#CFLAGS += -DPRINT_UNIMPLEMENTED
+CFLAGS+= -include ${.CURDIR}/drm_os_config.h
 
-.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_ARCH} == "powerpc64"
-SRCS	+= drm_ioc32.c
-.endif
-
-SRCS	+=device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
-	opt_vm.h opt_compat.h opt_syscons.h
-
+SRCS+=	device_if.h \
+	vnode_if.h \
+	bus_if.h \
+	pci_if.h \
+	device_if.h \
+	iicbus_if.h \
+	opt_drm.h \
+	opt_vm.h \
+	opt_compat.h \
+	opt_syscons.h
 
 .if ${MACHINE_CPUARCH} == "powerpc"
 CWARNFLAGS+=-Wno-cast-qual

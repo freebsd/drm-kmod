@@ -7,8 +7,7 @@ _amdgpu=	amdgpu
 _amdkfd=	amdkfd
 .endif
 
-SUBDIR = \
-        ${_amdgpu} \
-	${_amdkfd} \
+SUBDIR=	${_amdgpu} \
+	${_amdkfd}
 
 .include <bsd.subdir.mk>

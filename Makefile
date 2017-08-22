@@ -1,6 +1,7 @@
 # $FreeBSD$
 
 SYSDIR?=${SRC_BASE}/sys
+
 .include "${SYSDIR}/conf/kern.opts.mk"
 
 SUBDIR=	drm	\
