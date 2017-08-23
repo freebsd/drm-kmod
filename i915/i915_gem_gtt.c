@@ -2573,7 +2573,7 @@ static void i915_ggtt_insert_entries(struct i915_address_space *vm,
 
 	rpm_atomic_seq = assert_rpm_atomic_begin(dev_priv);
 
-	intel_gtt_insert_sg_entries(pages, start >> PAGE_SHIFT, flags);
+	linux_intel_gtt_insert_sg_entries(pages, start >> PAGE_SHIFT, flags);
 
 	assert_rpm_atomic_end(dev_priv, rpm_atomic_seq);
 

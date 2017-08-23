@@ -33,6 +33,7 @@
 #include <linux/slab.h>
 #include <linux/export.h>
 #include <linux/list_sort.h>
+#include <asm/msr.h>
 #include <asm/msr-index.h>
 #include <drm/drmP.h>
 #include "intel_drv.h"
