@@ -67,19 +67,19 @@
 	GEN_DEFAULT_PIPEOFFSETS, \
 	CURSOR_OFFSETS
 
-static const struct intel_device_info intel_i830_info = {
+static const struct intel_device_info intel_i830_info __initconst = {
 	GEN2_FEATURES,
 	.platform = INTEL_I830,
 	.is_mobile = 1, .cursor_needs_physical = 1,
 	.num_pipes = 2, /* legal, last one wins */
 };
 
-static const struct intel_device_info intel_i845g_info = {
+static const struct intel_device_info intel_i845g_info __initconst = {
 	GEN2_FEATURES,
 	.platform = INTEL_I845G,
 };
 
-static const struct intel_device_info intel_i85x_info = {
+static const struct intel_device_info intel_i85x_info __initconst = {
 	GEN2_FEATURES,
 	.platform = INTEL_I85X, .is_mobile = 1,
 	.num_pipes = 2, /* legal, last one wins */
@@ -87,7 +87,7 @@ static const struct intel_device_info intel_i85x_info = {
 	.has_fbc = 1,
 };
 
-static const struct intel_device_info intel_i865g_info = {
+static const struct intel_device_info intel_i865g_info __initconst = {
 	GEN2_FEATURES,
 	.platform = INTEL_I865G,
 };
@@ -99,7 +99,7 @@ static const struct intel_device_info intel_i865g_info = {
 	GEN_DEFAULT_PIPEOFFSETS, \
 	CURSOR_OFFSETS
 
-static const struct intel_device_info intel_i915g_info = {
+static const struct intel_device_info intel_i915g_info __initconst = {
 	GEN3_FEATURES,
 	.platform = INTEL_I915G, .cursor_needs_physical = 1,
 	.has_overlay = 1, .overlay_needs_physical = 1,
@@ -107,7 +107,7 @@ static const struct intel_device_info intel_i915g_info = {
 	.unfenced_needs_alignment = 1,
 };
 
-static const struct intel_device_info intel_i915gm_info = {
+static const struct intel_device_info intel_i915gm_info __initconst = {
 	GEN3_FEATURES,
 	.platform = INTEL_I915GM,
 	.is_mobile = 1,
@@ -119,7 +119,7 @@ static const struct intel_device_info intel_i915gm_info = {
 	.unfenced_needs_alignment = 1,
 };
 
-static const struct intel_device_info intel_i945g_info = {
+static const struct intel_device_info intel_i945g_info __initconst = {
 	GEN3_FEATURES,
 	.platform = INTEL_I945G,
 	.has_hotplug = 1, .cursor_needs_physical = 1,
@@ -128,7 +128,7 @@ static const struct intel_device_info intel_i945g_info = {
 	.unfenced_needs_alignment = 1,
 };
 
-static const struct intel_device_info intel_i945gm_info = {
+static const struct intel_device_info intel_i945gm_info __initconst = {
 	GEN3_FEATURES,
 	.platform = INTEL_I945GM, .is_mobile = 1,
 	.has_hotplug = 1, .cursor_needs_physical = 1,
@@ -139,14 +139,14 @@ static const struct intel_device_info intel_i945gm_info = {
 	.unfenced_needs_alignment = 1,
 };
 
-static const struct intel_device_info intel_g33_info = {
+static const struct intel_device_info intel_g33_info __initconst = {
 	GEN3_FEATURES,
 	.platform = INTEL_G33,
 	.has_hotplug = 1,
 	.has_overlay = 1,
 };
 
-static const struct intel_device_info intel_pineview_info = {
+static const struct intel_device_info intel_pineview_info __initconst = {
 	GEN3_FEATURES,
 	.platform = INTEL_PINEVIEW, .is_mobile = 1,
 	.has_hotplug = 1,
@@ -161,14 +161,14 @@ static const struct intel_device_info intel_pineview_info = {
 	GEN_DEFAULT_PIPEOFFSETS, \
 	CURSOR_OFFSETS
 
-static const struct intel_device_info intel_i965g_info = {
+static const struct intel_device_info intel_i965g_info __initconst = {
 	GEN4_FEATURES,
 	.platform = INTEL_I965G,
 	.has_overlay = 1,
 	.hws_needs_physical = 1,
 };
 
-static const struct intel_device_info intel_i965gm_info = {
+static const struct intel_device_info intel_i965gm_info __initconst = {
 	GEN4_FEATURES,
 	.platform = INTEL_I965GM,
 	.is_mobile = 1, .has_fbc = 1,
@@ -177,14 +177,14 @@ static const struct intel_device_info intel_i965gm_info = {
 	.hws_needs_physical = 1,
 };
 
-static const struct intel_device_info intel_g45_info = {
+static const struct intel_device_info intel_g45_info __initconst = {
 	GEN4_FEATURES,
 	.platform = INTEL_G45,
 	.has_pipe_cxsr = 1,
 	.ring_mask = RENDER_RING | BSD_RING,
 };
 
-static const struct intel_device_info intel_gm45_info = {
+static const struct intel_device_info intel_gm45_info __initconst = {
 	GEN4_FEATURES,
 	.platform = INTEL_GM45,
 	.is_mobile = 1, .has_fbc = 1,
@@ -201,12 +201,12 @@ static const struct intel_device_info intel_gm45_info = {
 	GEN_DEFAULT_PIPEOFFSETS, \
 	CURSOR_OFFSETS
 
-static const struct intel_device_info intel_ironlake_d_info = {
+static const struct intel_device_info intel_ironlake_d_info __initconst = {
 	GEN5_FEATURES,
 	.platform = INTEL_IRONLAKE,
 };
 
-static const struct intel_device_info intel_ironlake_m_info = {
+static const struct intel_device_info intel_ironlake_m_info __initconst = {
 	GEN5_FEATURES,
 	.platform = INTEL_IRONLAKE,
 	.is_mobile = 1, .has_fbc = 1,
@@ -229,12 +229,12 @@ static const struct intel_device_info intel_ironlake_m_info = {
 	GEN6_FEATURES, \
 	.platform = INTEL_SANDYBRIDGE
 
-static const struct intel_device_info intel_sandybridge_d_gt1_info = {
+static const struct intel_device_info intel_sandybridge_d_gt1_info __initconst = {
 	SNB_D_PLATFORM,
 	.gt = 1,
 };
 
-static const struct intel_device_info intel_sandybridge_d_gt2_info = {
+static const struct intel_device_info intel_sandybridge_d_gt2_info __initconst = {
 	SNB_D_PLATFORM,
 	.gt = 2,
 };
@@ -245,12 +245,12 @@ static const struct intel_device_info intel_sandybridge_d_gt2_info = {
 	.is_mobile = 1
 
 
-static const struct intel_device_info intel_sandybridge_m_gt1_info = {
+static const struct intel_device_info intel_sandybridge_m_gt1_info __initconst = {
 	SNB_M_PLATFORM,
 	.gt = 1,
 };
 
-static const struct intel_device_info intel_sandybridge_m_gt2_info = {
+static const struct intel_device_info intel_sandybridge_m_gt2_info __initconst = {
 	SNB_M_PLATFORM,
 	.gt = 2,
 };
@@ -274,12 +274,12 @@ static const struct intel_device_info intel_sandybridge_m_gt2_info = {
 	.platform = INTEL_IVYBRIDGE, \
 	.has_l3_dpf = 1
 
-static const struct intel_device_info intel_ivybridge_d_gt1_info = {
+static const struct intel_device_info intel_ivybridge_d_gt1_info __initconst = {
 	IVB_D_PLATFORM,
 	.gt = 1,
 };
 
-static const struct intel_device_info intel_ivybridge_d_gt2_info = {
+static const struct intel_device_info intel_ivybridge_d_gt2_info __initconst = {
 	IVB_D_PLATFORM,
 	.gt = 2,
 };
@@ -290,17 +290,17 @@ static const struct intel_device_info intel_ivybridge_d_gt2_info = {
 	.is_mobile = 1, \
 	.has_l3_dpf = 1
 
-static const struct intel_device_info intel_ivybridge_m_gt1_info = {
+static const struct intel_device_info intel_ivybridge_m_gt1_info __initconst = {
 	IVB_M_PLATFORM,
 	.gt = 1,
 };
 
-static const struct intel_device_info intel_ivybridge_m_gt2_info = {
+static const struct intel_device_info intel_ivybridge_m_gt2_info __initconst = {
 	IVB_M_PLATFORM,
 	.gt = 2,
 };
 
-static const struct intel_device_info intel_ivybridge_q_info = {
+static const struct intel_device_info intel_ivybridge_q_info __initconst = {
 	GEN7_FEATURES,
 	.platform = INTEL_IVYBRIDGE,
 	.gt = 2,
@@ -308,7 +308,7 @@ static const struct intel_device_info intel_ivybridge_q_info = {
 	.has_l3_dpf = 1,
 };
 
-static const struct intel_device_info intel_valleyview_info = {
+static const struct intel_device_info intel_valleyview_info __initconst = {
 	.platform = INTEL_VALLEYVIEW,
 	.gen = 7,
 	.is_lp = 1,
@@ -343,17 +343,17 @@ static const struct intel_device_info intel_valleyview_info = {
 	.platform = INTEL_HASWELL, \
 	.has_l3_dpf = 1
 
-static const struct intel_device_info intel_haswell_gt1_info = {
+static const struct intel_device_info intel_haswell_gt1_info __initconst = {
 	HSW_PLATFORM,
 	.gt = 1,
 };
 
-static const struct intel_device_info intel_haswell_gt2_info = {
+static const struct intel_device_info intel_haswell_gt2_info __initconst = {
 	HSW_PLATFORM,
 	.gt = 2,
 };
 
-static const struct intel_device_info intel_haswell_gt3_info = {
+static const struct intel_device_info intel_haswell_gt3_info __initconst = {
 	HSW_PLATFORM,
 	.gt = 3,
 };
@@ -371,17 +371,17 @@ static const struct intel_device_info intel_haswell_gt3_info = {
 	.gen = 8, \
 	.platform = INTEL_BROADWELL
 
-static const struct intel_device_info intel_broadwell_gt1_info = {
+static const struct intel_device_info intel_broadwell_gt1_info __initconst = {
 	BDW_PLATFORM,
 	.gt = 1,
 };
 
-static const struct intel_device_info intel_broadwell_gt2_info = {
+static const struct intel_device_info intel_broadwell_gt2_info __initconst = {
 	BDW_PLATFORM,
 	.gt = 2,
 };
 
-static const struct intel_device_info intel_broadwell_rsvd_info = {
+static const struct intel_device_info intel_broadwell_rsvd_info __initconst = {
 	BDW_PLATFORM,
 	.gt = 3,
 	/* According to the device ID those devices are GT3, they were
@@ -389,13 +389,13 @@ static const struct intel_device_info intel_broadwell_rsvd_info = {
 	 */
 };
 
-static const struct intel_device_info intel_broadwell_gt3_info = {
+static const struct intel_device_info intel_broadwell_gt3_info __initconst = {
 	BDW_PLATFORM,
 	.gt = 3,
 	.ring_mask = RENDER_RING | BSD_RING | BLT_RING | VEBOX_RING | BSD2_RING,
 };
 
-static const struct intel_device_info intel_cherryview_info = {
+static const struct intel_device_info intel_cherryview_info __initconst = {
 	.gen = 8, .num_pipes = 3,
 	.has_hotplug = 1,
 	.is_lp = 1,
@@ -426,12 +426,12 @@ static const struct intel_device_info intel_cherryview_info = {
 	.has_guc = 1, \
 	.ddb_size = 896
 
-static const struct intel_device_info intel_skylake_gt1_info = {
+static const struct intel_device_info intel_skylake_gt1_info __initconst = {
 	SKL_PLATFORM,
 	.gt = 1,
 };
 
-static const struct intel_device_info intel_skylake_gt2_info = {
+static const struct intel_device_info intel_skylake_gt2_info __initconst = {
 	SKL_PLATFORM,
 	.gt = 2,
 };
@@ -441,12 +441,12 @@ static const struct intel_device_info intel_skylake_gt2_info = {
 	.ring_mask = RENDER_RING | BSD_RING | BLT_RING | VEBOX_RING | BSD2_RING
 
 
-static const struct intel_device_info intel_skylake_gt3_info = {
+static const struct intel_device_info intel_skylake_gt3_info __initconst = {
 	SKL_GT3_PLUS_PLATFORM,
 	.gt = 3,
 };
 
-static const struct intel_device_info intel_skylake_gt4_info = {
+static const struct intel_device_info intel_skylake_gt4_info __initconst = {
 	SKL_GT3_PLUS_PLATFORM,
 	.gt = 4,
 };
@@ -478,13 +478,13 @@ static const struct intel_device_info intel_skylake_gt4_info = {
 	IVB_CURSOR_OFFSETS, \
 	BDW_COLORS
 
-static const struct intel_device_info intel_broxton_info = {
+static const struct intel_device_info intel_broxton_info __initconst = {
 	GEN9_LP_FEATURES,
 	.platform = INTEL_BROXTON,
 	.ddb_size = 512,
 };
 
-static const struct intel_device_info intel_geminilake_info = {
+static const struct intel_device_info intel_geminilake_info __initconst = {
 	GEN9_LP_FEATURES,
 	.platform = INTEL_GEMINILAKE,
 	.ddb_size = 1024,
@@ -499,17 +499,17 @@ static const struct intel_device_info intel_geminilake_info = {
 	.has_guc = 1, \
 	.ddb_size = 896
 
-static const struct intel_device_info intel_kabylake_gt1_info = {
+static const struct intel_device_info intel_kabylake_gt1_info __initconst = {
 	KBL_PLATFORM,
 	.gt = 1,
 };
 
-static const struct intel_device_info intel_kabylake_gt2_info = {
+static const struct intel_device_info intel_kabylake_gt2_info __initconst = {
 	KBL_PLATFORM,
 	.gt = 2,
 };
 
-static const struct intel_device_info intel_kabylake_gt3_info = {
+static const struct intel_device_info intel_kabylake_gt3_info __initconst = {
 	KBL_PLATFORM,
 	.gt = 3,
 	.ring_mask = RENDER_RING | BSD_RING | BLT_RING | VEBOX_RING | BSD2_RING,
@@ -524,23 +524,23 @@ static const struct intel_device_info intel_kabylake_gt3_info = {
 	.has_guc = 1, \
 	.ddb_size = 896
 
-static const struct intel_device_info intel_coffeelake_gt1_info = {
+static const struct intel_device_info intel_coffeelake_gt1_info __initconst = {
 	CFL_PLATFORM,
 	.gt = 1,
 };
 
-static const struct intel_device_info intel_coffeelake_gt2_info = {
+static const struct intel_device_info intel_coffeelake_gt2_info __initconst = {
 	CFL_PLATFORM,
 	.gt = 2,
 };
 
-static const struct intel_device_info intel_coffeelake_gt3_info = {
+static const struct intel_device_info intel_coffeelake_gt3_info __initconst = {
 	CFL_PLATFORM,
 	.gt = 3,
 	.ring_mask = RENDER_RING | BSD_RING | BLT_RING | VEBOX_RING | BSD2_RING,
 };
 
-static const struct intel_device_info intel_cannonlake_gt2_info = {
+static const struct intel_device_info intel_cannonlake_gt2_info __initconst = {
 	BDW_FEATURES,
 	.is_alpha_support = 1,
 	.platform = INTEL_CANNONLAKE,
