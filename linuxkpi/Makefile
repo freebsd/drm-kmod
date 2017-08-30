@@ -37,7 +37,7 @@ CFLAGS+= -include ${.CURDIR}/../drm/drm_os_config.h
 CFLAGS+= -I${.CURDIR}/../include
 CFLAGS+= -I${.CURDIR}/dummy/include
 CFLAGS+= -I${.CURDIR}/gplv2/include
-CFLAGS+= -I${SRCTOP}/sys/compat/linuxkpi/common/include
+CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 
 .include <bsd.kmod.mk>

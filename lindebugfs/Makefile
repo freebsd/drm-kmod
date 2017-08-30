@@ -9,6 +9,6 @@ SRCS=	vnode_if.h \
 
 CFLAGS+= -I${.CURDIR}/../linuxkpi/dummy/include
 CFLAGS+= -I${.CURDIR}/../linuxkpi/gplv2/include
-CFLAGS+= -I${SRCTOP}/sys/compat/linuxkpi/common/include
+CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 
 .include <bsd.kmod.mk>

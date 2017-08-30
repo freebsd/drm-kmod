@@ -1,9 +1,5 @@
 # $FreeBSD$
 
-SYSDIR?=${SRC_BASE}/sys
-
-.include "${SYSDIR}/conf/kern.opts.mk"
-
 SUBDIR=	drm		\
 	amd		\
 	i915		\
@@ -19,7 +15,10 @@ SUBDIR=	drm		\
 # WARNING: THIS WILL CHANGE THE SOURCE TREE!  ONLY USE IF THERE ARE NO OTHER
 #          CHANGES THAT NEED TO BE RECOVERED!
 #
+.if make(drm2-debug-source-changes)
+SYSDIR?=	/usr/src/sys
 DRM_DEBUG_EXCLUDES=	drm_mipi_dsi|drm_panel|linux_hdmi|ttm/ttm_object
+.endif
 drm2-debug-source-changes:
 	find ${SYSDIR}/dev/drm -name '*.[ch]' | \
 		egrep -v '(${DRM_DEBUG_EXCLUDES}).c' | \

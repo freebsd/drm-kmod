@@ -1,6 +1,6 @@
 # $FreeBSD$
 
-#.PATH:	${SRCTOP}/sys/dev/drm/amd/amdkfd
+#.PATH:	${SYSDIR}/dev/drm/amd/amdkfd
 
 KMOD	= amdkfd
 
@@ -36,7 +36,7 @@ SRCS	= \
 
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/dummy/include
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
-CFLAGS+= -I${SRC_BASE}/sys/compat/linuxkpi/common/include
+CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 
 CFLAGS+= -I${.CURDIR:H:H}/include
 CFLAGS+= -I${.CURDIR:H:H}/include/drm
