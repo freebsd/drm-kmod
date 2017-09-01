@@ -1035,6 +1035,6 @@ TRACE_EVENT(switch_mm,
 #ifdef __linux__
 /* This part must be outside protection */
 #undef TRACE_INCLUDE_PATH
-#define TRACE_INCLUDE_PATH .
+#define TRACE_INCLUDE_PATH ../../drivers/gpu/drm/i915
 #include <trace/define_trace.h>
 #endif
