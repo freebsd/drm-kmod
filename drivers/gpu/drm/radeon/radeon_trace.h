@@ -62,3 +62,8 @@ trace_radeon_vm_bo_update(void* bo_va){
 }
 
 #endif
+
+/* This part must be outside protection */
+#undef TRACE_INCLUDE_PATH
+#define TRACE_INCLUDE_PATH ../../drivers/gpu/drm/radeon
+#include <trace/define_trace.h>
