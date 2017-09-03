@@ -75,9 +75,9 @@ static bool igp_read_bios_from_vram(struct radeon_device *rdev)
 
 #ifdef __FreeBSD__
 #define	pci_map_rom(pdev, sizep)			\
-	vga_pci_map_bios(pdev->dev.bsddev, sizep)
+	vga_pci_map_bios(device_get_parent(pdev->dev.bsddev), sizep)
 #define	pci_unmap_rom(pdev, bios)			\
-	vga_pci_unmap_bios(pdev->dev.bsddev, bios)
+	vga_pci_unmap_bios(device_get_parent(pdev->dev.bsddev), bios)
 #endif
 
 static bool radeon_read_bios(struct radeon_device *rdev)
