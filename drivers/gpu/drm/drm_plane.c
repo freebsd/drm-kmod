@@ -834,7 +834,7 @@ static int drm_mode_cursor_common(struct drm_device *dev,
 		return -ENOENT;
 	}
 
-	drm_modeset_acquire_init(&ctx, 0);
+	drm_modeset_acquire_init(&ctx, DRM_MODESET_ACQUIRE_INTERRUPTIBLE);
 retry:
 	ret = drm_modeset_lock(&crtc->mutex, &ctx);
 	if (ret)
@@ -876,8 +876,9 @@ retry:
 	}
 out:
 	if (ret == -EDEADLK) {
-		drm_modeset_backoff(&ctx);
-		goto retry;
+		ret = drm_modeset_backoff(&ctx);
+		if (!ret)
+			goto retry;
 	}
 
 	drm_modeset_drop_locks(&ctx);
