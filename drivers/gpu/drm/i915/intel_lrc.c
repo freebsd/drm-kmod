@@ -244,7 +244,7 @@ int intel_sanitize_enable_execlists(struct drm_i915_private *dev_priv, int enabl
 
 	if (HAS_LOGICAL_RING_CONTEXTS(dev_priv) &&
 	    USES_PPGTT(dev_priv) &&
-	    i915.use_mmio_flip >= 0)
+	    i915_modparams.use_mmio_flip >= 0)
 		return 1;
 
 	return 0;
@@ -1327,7 +1327,7 @@ static int gen8_init_common_ring(struct intel_engine_cs *engine)
 	clear_bit(ENGINE_IRQ_EXECLIST, &engine->irq_posted);
 
 	/* After a GPU reset, we may have requests to replay */
-	if (!i915.enable_guc_submission && engine->execlist_first)
+	if (!i915_modparams.enable_guc_submission && engine->execlist_first)
 		tasklet_schedule(&engine->irq_tasklet);
 
 	return 0;
