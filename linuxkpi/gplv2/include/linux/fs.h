@@ -67,18 +67,4 @@ static const struct file_operations __fops = {				\
 	.llseek	 = generic_file_llseek,					\
 }
 
-unsigned long invalidate_mapping_pages(vm_object_t obj, pgoff_t start,
-    pgoff_t end);
-struct page *shmem_read_mapping_page_gfp(vm_object_t obj, int idx, gfp_t gfp);
-struct linux_file *shmem_file_setup(char *name, loff_t size,
-    unsigned long flags);
-void shmem_truncate_range(vm_object_t obj, loff_t, loff_t);
-
-static inline struct page *
-shmem_read_mapping_page(vm_object_t obj, int idx)
-{
-
-	return (shmem_read_mapping_page_gfp(obj, idx, 0));
-}
-
 #endif /* _LINUX_FS_NEXT_H_ */

@@ -274,7 +274,7 @@ do_shrink_slab(struct shrink_control *shrinkctl, struct shrinker *shrinker,
 	if (total_scan > 0)
 		new_nr = atomic_fetchadd_64(&shrinker->nr_deferred[nid].counter, total_scan);
 	else
-		new_nr = atomic_load_acq_64(&shrinker->nr_deferred[nid].counter);
+		new_nr = READ_ONCE(shrinker->nr_deferred[nid].counter);
 
 	return (freed);
 }
