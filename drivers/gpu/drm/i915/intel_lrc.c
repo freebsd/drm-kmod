@@ -1202,13 +1202,6 @@ static u32 *gen9_init_indirectctx_bb(struct intel_engine_cs *engine, u32 *batch)
 	return batch;
 }
 
-static u32 *gen9_init_perctx_bb(struct intel_engine_cs *engine, u32 *batch)
-{
-	*batch++ = MI_BATCH_BUFFER_END;
-
-	return batch;
-}
-
 #define CTX_WA_BB_OBJ_SIZE (PAGE_SIZE)
 
 static int lrc_setup_wa_ctx(struct intel_engine_cs *engine)
@@ -1265,7 +1258,7 @@ static int intel_init_workaround_bb(struct intel_engine_cs *engine)
 		return 0;
 	case 9:
 		wa_bb_fn[0] = gen9_init_indirectctx_bb;
-		wa_bb_fn[1] = gen9_init_perctx_bb;
+		wa_bb_fn[1] = NULL;
 		break;
 	case 8:
 		wa_bb_fn[0] = gen8_init_indirectctx_bb;
