@@ -162,7 +162,7 @@ debugfs_create_dir(const char *name, struct dentry *parent)
 	struct dentry *dnode;
 	struct pfs_node *pnode;
 
-	dm = malloc(sizeof(struct dentry), M_DFSINT, M_NOWAIT|M_ZERO);
+	dm = malloc(sizeof(*dm), M_DFSINT, M_NOWAIT | M_ZERO);
 	if (dm == NULL)
 		return (NULL);
 	dnode = &dm->dm_dnode;
