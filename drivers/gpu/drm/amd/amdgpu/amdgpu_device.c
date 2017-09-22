@@ -1609,6 +1609,7 @@ static int amdgpu_init(struct amdgpu_device *adev)
 			return r;
 		}
 		adev->ip_blocks[i].status.sw = true;
+
 		/* need to do gmc hw init early so we can allocate gpu mem */
 		if (adev->ip_blocks[i].version->type == AMD_IP_BLOCK_TYPE_GMC) {
 			r = amdgpu_vram_scratch_init(adev);
@@ -1638,6 +1639,11 @@ static int amdgpu_init(struct amdgpu_device *adev)
 			}
 		}
 	}
+
+	mutex_lock(&adev->firmware.mutex);
+	if (amdgpu_ucode_init_bo(adev))
+		adev->firmware.load_type = AMDGPU_FW_LOAD_DIRECT;
+	mutex_unlock(&adev->firmware.mutex);
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
 		if (!adev->ip_blocks[i].status.sw)
@@ -1774,6 +1780,8 @@ static int amdgpu_fini(struct amdgpu_device *adev)
 
 		adev->ip_blocks[i].status.hw = false;
 	}
+	if (adev->firmware.load_type != AMDGPU_FW_LOAD_DIRECT)
+		amdgpu_ucode_fini_bo(adev);
 
 	for (i = adev->num_ip_blocks - 1; i >= 0; i--) {
 		if (!adev->ip_blocks[i].status.sw)
