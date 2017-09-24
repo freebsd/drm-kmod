@@ -38,6 +38,7 @@ SRCS=	amdgpu_acpi.c \
 	amdgpu_i2c.c \
 	amdgpu_ib.c \
 	amdgpu_ih.c \
+	amdgpu_ioc32.c \
 	amdgpu_irq.c \
 	amdgpu_job.c \
 	amdgpu_kms.c \

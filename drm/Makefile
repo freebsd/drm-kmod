@@ -38,6 +38,7 @@ SRCS=	ati_pcigart.c \
 	drm_gem_cma_helper.c \
 	drm_global.c \
 	drm_hashtab.c \
+	drm_ioc32.c \
 	drm_ioctl.c \
 	drm_info.c \
 	drm_irq.c \
