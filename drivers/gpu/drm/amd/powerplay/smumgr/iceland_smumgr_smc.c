@@ -22,9 +22,8 @@
  */
 
 #include "pp_debug.h"
-#include "iceland_smc.h"
-#include "smu7_dyn_defaults.h"
-
+#include "ci_smumgr.h"
+#include "ppsmc.h"
 #include "smu7_hwmgr.h"
 #include "hardwaremanager.h"
 #include "ppatomctrl.h"
@@ -99,7 +98,147 @@ static const struct iceland_pt_defaults defaults_icelandpro = {
 	{ 0x1EA, 0x0, 0x0, 0x224, 0x0, 0x0, 0x25E, 0x0, 0x0, 0x28E, 0x0, 0x0, 0x2AB, 0x0, 0x0}
 };
 
-static void iceland_initialize_power_tune_defaults(struct pp_hwmgr *hwmgr)
+static int ci_set_smc_sram_address(struct pp_hwmgr *hwmgr,
+					uint32_t smc_addr, uint32_t limit)
+{
+	if ((0 != (3 & smc_addr))
+		|| ((smc_addr + 3) >= limit)) {
+		pr_err("smc_addr invalid \n");
+		return -EINVAL;
+	}
+
+	cgs_write_register(hwmgr->device, mmSMC_IND_INDEX_0, smc_addr);
+	PHM_WRITE_FIELD(hwmgr->device, SMC_IND_ACCESS_CNTL, AUTO_INCREMENT_IND_0, 0);
+	return 0;
+}
+
+static int ci_copy_bytes_to_smc(struct pp_hwmgr *hwmgr, uint32_t smc_start_address,
+				const uint8_t *src, uint32_t byte_count, uint32_t limit)
+{
+	int result;
+	uint32_t data = 0;
+	uint32_t original_data;
+	uint32_t addr = 0;
+	uint32_t extra_shift;
+
+	if ((3 & smc_start_address)
+		|| ((smc_start_address + byte_count) >= limit)) {
+		pr_err("smc_start_address invalid \n");
+		return -EINVAL;
+	}
+
+	addr = smc_start_address;
+
+	while (byte_count >= 4) {
+	/* Bytes are written into the SMC address space with the MSB first. */
+		data = src[0] * 0x1000000 + src[1] * 0x10000 + src[2] * 0x100 + src[3];
+
+		result = ci_set_smc_sram_address(hwmgr, addr, limit);
+
+		if (0 != result)
+			return result;
+
+		cgs_write_register(hwmgr->device, mmSMC_IND_DATA_0, data);
+
+		src += 4;
+		byte_count -= 4;
+		addr += 4;
+	}
+
+	if (0 != byte_count) {
+
+		data = 0;
+
+		result = ci_set_smc_sram_address(hwmgr, addr, limit);
+
+		if (0 != result)
+			return result;
+
+
+		original_data = cgs_read_register(hwmgr->device, mmSMC_IND_DATA_0);
+
+		extra_shift = 8 * (4 - byte_count);
+
+		while (byte_count > 0) {
+			/* Bytes are written into the SMC addres space with the MSB first. */
+			data = (0x100 * data) + *src++;
+			byte_count--;
+		}
+
+		data <<= extra_shift;
+
+		data |= (original_data & ~((~0UL) << extra_shift));
+
+		result = ci_set_smc_sram_address(hwmgr, addr, limit);
+
+		if (0 != result)
+			return result;
+
+		cgs_write_register(hwmgr->device, mmSMC_IND_DATA_0, data);
+	}
+
+	return 0;
+}
+
+
+static int ci_program_jump_on_start(struct pp_hwmgr *hwmgr)
+{
+	static const unsigned char data[4] = { 0xE0, 0x00, 0x80, 0x40 };
+
+	ci_copy_bytes_to_smc(hwmgr, 0x0, data, 4, sizeof(data)+1);
+
+	return 0;
+}
+
+bool ci_is_smc_ram_running(struct pp_hwmgr *hwmgr)
+{
+	return ((0 == PHM_READ_VFPF_INDIRECT_FIELD(hwmgr->device,
+			CGS_IND_REG__SMC, SMC_SYSCON_CLOCK_CNTL_0, ck_disable))
+	&& (0x20100 <= cgs_read_ind_register(hwmgr->device,
+			CGS_IND_REG__SMC, ixSMC_PC_C)));
+}
+
+static int ci_read_smc_sram_dword(struct pp_hwmgr *hwmgr, uint32_t smc_addr,
+				uint32_t *value, uint32_t limit)
+{
+	int result;
+
+	result = ci_set_smc_sram_address(hwmgr, smc_addr, limit);
+
+	if (result)
+		return result;
+
+	*value = cgs_read_register(hwmgr->device, mmSMC_IND_DATA_0);
+	return 0;
+}
+
+static int ci_send_msg_to_smc(struct pp_hwmgr *hwmgr, uint16_t msg)
+{
+	int ret;
+
+	if (!ci_is_smc_ram_running(hwmgr))
+		return -EINVAL;
+
+	cgs_write_register(hwmgr->device, mmSMC_MESSAGE_0, msg);
+
+	PHM_WAIT_FIELD_UNEQUAL(hwmgr, SMC_RESP_0, SMC_RESP, 0);
+
+	ret = PHM_READ_FIELD(hwmgr->device, SMC_RESP_0, SMC_RESP);
+
+	if (ret != 1)
+		pr_info("\n failed to send message %x ret is %d\n",  msg, ret);
+
+	return 0;
+}
+
+static int ci_send_msg_to_smc_with_parameter(struct pp_hwmgr *hwmgr,
+					uint16_t msg, uint32_t parameter)
+{
+	cgs_write_register(hwmgr->device, mmSMC_MSG_ARG_0, parameter);
+	return ci_send_msg_to_smc(hwmgr, msg);
+}
+
+static void ci_initialize_power_tune_defaults(struct pp_hwmgr *hwmgr)
 {
 	struct iceland_smumgr *smu_data = (struct iceland_smumgr *)(hwmgr->smu_backend);
 	struct cgs_system_info sys_info = {0};
@@ -130,8 +269,113 @@ static void iceland_initialize_power_tune_defaults(struct pp_hwmgr *hwmgr)
 
 static int iceland_populate_svi_load_line(struct pp_hwmgr *hwmgr)
 {
-	struct iceland_smumgr *smu_data = (struct iceland_smumgr *)(hwmgr->smu_backend);
-	const struct iceland_pt_defaults *defaults = smu_data->power_tune_defaults;
+	int result;
+	struct smu7_hwmgr *data = (struct smu7_hwmgr *)(hwmgr->backend);
+
+
+	result = ci_calculate_sclk_params(hwmgr, clock, level);
+
+	/* populate graphics levels */
+	result = ci_get_dependency_volt_by_clk(hwmgr,
+			hwmgr->dyn_state.vddc_dependency_on_sclk, clock,
+			(uint32_t *)(&level->MinVddc));
+	if (result) {
+		pr_err("vdd_dep_on_sclk table is NULL\n");
+		return result;
+	}
+
+	level->SclkFrequency = clock;
+	level->MinVddcPhases = 1;
+
+	if (data->vddc_phase_shed_control)
+		ci_populate_phase_value_based_on_sclk(hwmgr,
+				hwmgr->dyn_state.vddc_phase_shed_limits_table,
+				clock,
+				&level->MinVddcPhases);
+
+	level->ActivityLevel = sclk_al_threshold;
+	level->CcPwrDynRm = 0;
+	level->CcPwrDynRm1 = 0;
+	level->EnabledForActivity = 0;
+	/* this level can be used for throttling.*/
+	level->EnabledForThrottle = 1;
+	level->UpH = 0;
+	level->DownH = 0;
+	level->VoltageDownH = 0;
+	level->PowerThrottle = 0;
+
+
+	if (phm_cap_enabled(hwmgr->platform_descriptor.platformCaps,
+			PHM_PlatformCaps_SclkDeepSleep))
+		level->DeepSleepDivId =
+				ci_get_sleep_divider_id_from_clock(clock,
+						CISLAND_MINIMUM_ENGINE_CLOCK);
+
+	/* Default to slow, highest DPM level will be set to PPSMC_DISPLAY_WATERMARK_LOW later.*/
+	level->DisplayWatermark = PPSMC_DISPLAY_WATERMARK_LOW;
+
+	if (0 == result) {
+		level->MinVddc = PP_HOST_TO_SMC_UL(level->MinVddc * VOLTAGE_SCALE);
+		CONVERT_FROM_HOST_TO_SMC_UL(level->MinVddcPhases);
+		CONVERT_FROM_HOST_TO_SMC_UL(level->SclkFrequency);
+		CONVERT_FROM_HOST_TO_SMC_US(level->ActivityLevel);
+		CONVERT_FROM_HOST_TO_SMC_UL(level->CgSpllFuncCntl3);
+		CONVERT_FROM_HOST_TO_SMC_UL(level->CgSpllFuncCntl4);
+		CONVERT_FROM_HOST_TO_SMC_UL(level->SpllSpreadSpectrum);
+		CONVERT_FROM_HOST_TO_SMC_UL(level->SpllSpreadSpectrum2);
+		CONVERT_FROM_HOST_TO_SMC_UL(level->CcPwrDynRm);
+		CONVERT_FROM_HOST_TO_SMC_UL(level->CcPwrDynRm1);
+	}
+
+	return result;
+}
+
+static int ci_populate_all_graphic_levels(struct pp_hwmgr *hwmgr)
+{
+	struct smu7_hwmgr *data = (struct smu7_hwmgr *)(hwmgr->backend);
+	struct ci_smumgr *smu_data = (struct ci_smumgr *)(hwmgr->smu_backend);
+	struct smu7_dpm_table *dpm_table = &data->dpm_table;
+	int result = 0;
+	uint32_t array = smu_data->dpm_table_start +
+			offsetof(SMU7_Discrete_DpmTable, GraphicsLevel);
+	uint32_t array_size = sizeof(struct SMU7_Discrete_GraphicsLevel) *
+			SMU7_MAX_LEVELS_GRAPHICS;
+	struct SMU7_Discrete_GraphicsLevel *levels =
+			smu_data->smc_state_table.GraphicsLevel;
+	uint32_t i;
+
+	for (i = 0; i < dpm_table->sclk_table.count; i++) {
+		result = ci_populate_single_graphic_level(hwmgr,
+				dpm_table->sclk_table.dpm_levels[i].value,
+				(uint16_t)smu_data->activity_target[i],
+				&levels[i]);
+		if (result)
+			return result;
+		if (i > 1)
+			smu_data->smc_state_table.GraphicsLevel[i].DeepSleepDivId = 0;
+		if (i == (dpm_table->sclk_table.count - 1))
+			smu_data->smc_state_table.GraphicsLevel[i].DisplayWatermark =
+				PPSMC_DISPLAY_WATERMARK_HIGH;
+	}
+
+	smu_data->smc_state_table.GraphicsLevel[0].EnabledForActivity = 1;
+
+	smu_data->smc_state_table.GraphicsDpmLevelCount = (u8)dpm_table->sclk_table.count;
+	data->dpm_level_enable_mask.sclk_dpm_enable_mask =
+		phm_get_dpm_level_enable_mask_value(&dpm_table->sclk_table);
+
+	result = ci_copy_bytes_to_smc(hwmgr, array,
+				   (u8 *)levels, array_size,
+				   SMC_RAM_END);
+
+	return result;
+
+}
+
+static int ci_populate_svi_load_line(struct pp_hwmgr *hwmgr)
+{
+	struct ci_smumgr *smu_data = (struct ci_smumgr *)(hwmgr->smu_backend);
+	const struct ci_pt_defaults *defaults = smu_data->power_tune_defaults;
 
 	smu_data->power_tune_table.SviLoadLineEn = defaults->svi_load_line_en;
 	smu_data->power_tune_table.SviLoadLineVddC = defaults->svi_load_line_vddc;
@@ -1198,13 +1442,7 @@ static int iceland_populate_single_memory_level(
 	return result;
 }
 
-/**
- * Populates all SMC MCLK levels' structure based on the trimmed allowed dpm memory clock states
- *
- * @param    hwmgr      the address of the hardware manager
- */
-
-int iceland_populate_all_memory_levels(struct pp_hwmgr *hwmgr)
+static int ci_populate_all_memory_levels(struct pp_hwmgr *hwmgr)
 {
 	struct smu7_hwmgr *data = (struct smu7_hwmgr *)(hwmgr->backend);
 	struct iceland_smumgr *smu_data = (struct iceland_smumgr *)(hwmgr->smu_backend);
@@ -1802,14 +2040,7 @@ static int iceland_populate_smc_svi2_config(struct pp_hwmgr *hwmgr,
 	return 0;
 }
 
-/**
- * Initializes the SMC table and uploads it
- *
- * @param    hwmgr  the address of the powerplay hardware manager.
- * @param    pInput  the pointer to input data (PowerState)
- * @return   always 0
- */
-int iceland_init_smc_table(struct pp_hwmgr *hwmgr)
+static int ci_init_smc_table(struct pp_hwmgr *hwmgr)
 {
 	int result;
 	struct smu7_hwmgr *data = (struct smu7_hwmgr *)(hwmgr->backend);
@@ -1969,16 +2200,7 @@ int iceland_init_smc_table(struct pp_hwmgr *hwmgr)
 	return 0;
 }
 
-/**
-* Set up the fan table to control the fan using the SMC.
-* @param    hwmgr  the address of the powerplay hardware manager.
-* @param    pInput the pointer to input data
-* @param    pOutput the pointer to output data
-* @param    pStorage the pointer to temporary storage
-* @param    Result the last failure code
-* @return   result from set temperature range routine
-*/
-int iceland_thermal_setup_fan_table(struct pp_hwmgr *hwmgr)
+static int ci_thermal_setup_fan_table(struct pp_hwmgr *hwmgr)
 {
 	struct smu7_smumgr *smu7_data = (struct smu7_smumgr *)(hwmgr->smu_backend);
 	SMU71_Discrete_FanTable fan_table = { FDO_MODE_HARDWARE };
@@ -2067,7 +2289,7 @@ static int iceland_program_mem_timing_parameters(struct pp_hwmgr *hwmgr)
 	return 0;
 }
 
-int iceland_update_sclk_threshold(struct pp_hwmgr *hwmgr)
+static int ci_update_sclk_threshold(struct pp_hwmgr *hwmgr)
 {
 	struct smu7_hwmgr *data = (struct smu7_hwmgr *)(hwmgr->backend);
 	struct iceland_smumgr *smu_data = (struct iceland_smumgr *)(hwmgr->smu_backend);
@@ -2108,7 +2330,7 @@ int iceland_update_sclk_threshold(struct pp_hwmgr *hwmgr)
 	return result;
 }
 
-uint32_t iceland_get_offsetof(uint32_t type, uint32_t member)
+static uint32_t ci_get_offsetof(uint32_t type, uint32_t member)
 {
 	switch (type) {
 	case SMU_SoftRegisters:
@@ -2136,7 +2358,7 @@ uint32_t iceland_get_offsetof(uint32_t type, uint32_t member)
 	return 0;
 }
 
-uint32_t iceland_get_mac_definition(uint32_t value)
+static uint32_t ci_get_mac_definition(uint32_t value)
 {
 	switch (value) {
 	case SMU_MAX_LEVELS_GRAPHICS:
@@ -2159,13 +2381,23 @@ uint32_t iceland_get_mac_definition(uint32_t value)
 	return 0;
 }
 
-/**
- * Get the location of various tables inside the FW image.
- *
- * @param    hwmgr  the address of the powerplay hardware manager.
- * @return   always 0
- */
-int iceland_process_firmware_header(struct pp_hwmgr *hwmgr)
+static int ci_upload_firmware(struct pp_hwmgr *hwmgr)
+{
+	if (ci_is_smc_ram_running(hwmgr)) {
+		pr_info("smc is running, no need to load smc firmware\n");
+		return 0;
+	}
+	PHM_WAIT_INDIRECT_FIELD(hwmgr, SMC_IND, RCU_UC_EVENTS,
+			boot_seq_done, 1);
+	PHM_WRITE_INDIRECT_FIELD(hwmgr->device, CGS_IND_REG__SMC, SMC_SYSCON_MISC_CNTL,
+			pre_fetcher_en, 1);
+
+	PHM_WRITE_INDIRECT_FIELD(hwmgr->device, CGS_IND_REG__SMC, SMC_SYSCON_CLOCK_CNTL_0, ck_disable, 1);
+	PHM_WRITE_INDIRECT_FIELD(hwmgr->device, CGS_IND_REG__SMC, SMC_SYSCON_RESET_CNTL, rst_reg, 1);
+	return ci_load_smc_ucode(hwmgr);
+}
+
+static int ci_process_firmware_header(struct pp_hwmgr *hwmgr)
 {
 	struct smu7_hwmgr *data = (struct smu7_hwmgr *)(hwmgr->backend);
 	struct smu7_smumgr *smu7_data = (struct smu7_smumgr *)(hwmgr->smu_backend);
@@ -2505,7 +2737,7 @@ static int iceland_set_valid_flag(struct iceland_mc_reg_table *table)
 	return 0;
 }
 
-int iceland_initialize_mc_reg_table(struct pp_hwmgr *hwmgr)
+static int ci_initialize_mc_reg_table(struct pp_hwmgr *hwmgr)
 {
 	int result;
 	struct iceland_smumgr *smu_data = (struct iceland_smumgr *)(hwmgr->smu_backend);
@@ -2560,9 +2792,71 @@ int iceland_initialize_mc_reg_table(struct pp_hwmgr *hwmgr)
 	return result;
 }
 
-bool iceland_is_dpm_running(struct pp_hwmgr *hwmgr)
+static bool ci_is_dpm_running(struct pp_hwmgr *hwmgr)
+{
+	return ci_is_smc_ram_running(hwmgr);
+}
+
+static int ci_populate_requested_graphic_levels(struct pp_hwmgr *hwmgr,
+						struct amd_pp_profile *request)
 {
 	return (1 == PHM_READ_INDIRECT_FIELD(hwmgr->device,
 			CGS_IND_REG__SMC, FEATURE_STATUS, VOLTAGE_CONTROLLER_ON))
 			? true : false;
 }
+
+
+static int ci_smu_init(struct pp_hwmgr *hwmgr)
+{
+	int i;
+	struct ci_smumgr *ci_priv = NULL;
+
+	ci_priv = kzalloc(sizeof(struct ci_smumgr), GFP_KERNEL);
+
+	if (ci_priv == NULL)
+		return -ENOMEM;
+
+	for (i = 0; i < SMU7_MAX_LEVELS_GRAPHICS; i++)
+		ci_priv->activity_target[i] = 30;
+
+	hwmgr->smu_backend = ci_priv;
+
+	return 0;
+}
+
+static int ci_smu_fini(struct pp_hwmgr *hwmgr)
+{
+	kfree(hwmgr->smu_backend);
+	hwmgr->smu_backend = NULL;
+	cgs_rel_firmware(hwmgr->device, CGS_UCODE_ID_SMU);
+	return 0;
+}
+
+static int ci_start_smu(struct pp_hwmgr *hwmgr)
+{
+	return 0;
+}
+
+const struct pp_smumgr_func ci_smu_funcs = {
+	.smu_init = ci_smu_init,
+	.smu_fini = ci_smu_fini,
+	.start_smu = ci_start_smu,
+	.check_fw_load_finish = NULL,
+	.request_smu_load_fw = NULL,
+	.request_smu_load_specific_fw = NULL,
+	.send_msg_to_smc = ci_send_msg_to_smc,
+	.send_msg_to_smc_with_parameter = ci_send_msg_to_smc_with_parameter,
+	.download_pptable_settings = NULL,
+	.upload_pptable_settings = NULL,
+	.get_offsetof = ci_get_offsetof,
+	.process_firmware_header = ci_process_firmware_header,
+	.init_smc_table = ci_init_smc_table,
+	.update_sclk_threshold = ci_update_sclk_threshold,
+	.thermal_setup_fan_table = ci_thermal_setup_fan_table,
+	.populate_all_graphic_levels = ci_populate_all_graphic_levels,
+	.populate_all_memory_levels = ci_populate_all_memory_levels,
+	.get_mac_definition = ci_get_mac_definition,
+	.initialize_mc_reg_table = ci_initialize_mc_reg_table,
+	.is_dpm_running = ci_is_dpm_running,
+	.populate_requested_graphic_levels = ci_populate_requested_graphic_levels,
+};
