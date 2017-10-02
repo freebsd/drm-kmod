@@ -30,6 +30,8 @@ int drm_of_find_panel_or_bridge(const struct device_node *np,
 				int port, int endpoint,
 				struct drm_panel **panel,
 				struct drm_bridge **bridge);
+int drm_of_panel_bridge_remove(const struct device_node *np,
+			       int port, int endpoint);
 #else
 static inline uint32_t drm_of_find_possible_crtcs(struct drm_device *dev,
 						  struct device_node *port)
@@ -63,6 +65,12 @@ static inline int drm_of_find_panel_or_bridge(const struct device_node *np,
 					      int port, int endpoint,
 					      struct drm_panel **panel,
 					      struct drm_bridge **bridge)
+{
+	return -EINVAL;
+}
+
+static inline int drm_of_panel_bridge_remove(const struct device_node *np,
+					     int port, int endpoint)
 {
 	return -EINVAL;
 }
