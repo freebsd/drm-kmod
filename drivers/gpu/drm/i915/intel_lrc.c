@@ -874,7 +874,7 @@ static void intel_lrc_irq_handler(unsigned long data)
 				continue;
 
 #ifdef __linux__
-			// XXX: won't build unless macro defined...
+			// XXX: won't build GEM_DEBUG_BUG_ON
 			/* Check the context/desc id for this event matches */
 			GEM_DEBUG_BUG_ON(buf[2 * head + 1] != port->context_id);
 
