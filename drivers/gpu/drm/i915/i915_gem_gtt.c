@@ -208,8 +208,6 @@ static int ppgtt_bind_vma(struct i915_vma *vma,
 			return ret;
 	}
 
-	vma->pages = vma->obj->mm.pages;
-
 	/* Currently applicable only to VLV */
 	pte_flags = 0;
 	if (vma->obj->gt_ro)
@@ -223,6 +221,26 @@ static int ppgtt_bind_vma(struct i915_vma *vma,
 static void ppgtt_unbind_vma(struct i915_vma *vma)
 {
 	vma->vm->clear_range(vma->vm, vma->node.start, vma->size);
+}
+
+static int ppgtt_set_pages(struct i915_vma *vma)
+{
+	GEM_BUG_ON(vma->pages);
+
+	vma->pages = vma->obj->mm.pages;
+
+	return 0;
+}
+
+static void clear_pages(struct i915_vma *vma)
+{
+	GEM_BUG_ON(!vma->pages);
+
+	if (vma->pages != vma->obj->mm.pages) {
+		sg_free_table(vma->pages);
+		kfree(vma->pages);
+	}
+	vma->pages = NULL;
 }
 
 static gen8_pte_t gen8_pte_encode(dma_addr_t addr,
@@ -1451,6 +1469,8 @@ static int gen8_ppgtt_init(struct i915_hw_ppgtt *ppgtt)
 	ppgtt->base.cleanup = gen8_ppgtt_cleanup;
 	ppgtt->base.unbind_vma = ppgtt_unbind_vma;
 	ppgtt->base.bind_vma = ppgtt_bind_vma;
+	ppgtt->base.set_pages = ppgtt_set_pages;
+	ppgtt->base.clear_pages = clear_pages;
 	ppgtt->debug_dump = gen8_dump_ppgtt;
 
 	return 0;
@@ -1890,6 +1910,8 @@ static int gen6_ppgtt_init(struct i915_hw_ppgtt *ppgtt)
 	ppgtt->base.insert_entries = gen6_ppgtt_insert_entries;
 	ppgtt->base.unbind_vma = ppgtt_unbind_vma;
 	ppgtt->base.bind_vma = ppgtt_bind_vma;
+	ppgtt->base.set_pages = ppgtt_set_pages;
+	ppgtt->base.clear_pages = clear_pages;
 	ppgtt->base.cleanup = gen6_ppgtt_cleanup;
 	ppgtt->debug_dump = gen6_dump_ppgtt;
 
@@ -2406,12 +2428,6 @@ static int ggtt_bind_vma(struct i915_vma *vma,
 	struct drm_i915_gem_object *obj = vma->obj;
 	u32 pte_flags;
 
-	if (unlikely(!vma->pages)) {
-		int ret = i915_get_ggtt_vma_pages(vma);
-		if (ret)
-			return ret;
-	}
-
 	/* Currently applicable only to VLV */
 	pte_flags = 0;
 	if (obj->gt_ro)
@@ -2448,12 +2464,6 @@ static int aliasing_gtt_bind_vma(struct i915_vma *vma,
 	u32 pte_flags;
 	int ret;
 
-	if (unlikely(!vma->pages)) {
-		ret = i915_get_ggtt_vma_pages(vma);
-		if (ret)
-			return ret;
-	}
-
 	/* Currently applicable only to VLV */
 	pte_flags = 0;
 	if (vma->obj->gt_ro)
@@ -2468,7 +2478,7 @@ static int aliasing_gtt_bind_vma(struct i915_vma *vma,
 							     vma->node.start,
 							     vma->size);
 			if (ret)
-				goto err_pages;
+				return ret;
 		}
 
 		appgtt->base.insert_entries(&appgtt->base, vma, cache_level,
@@ -2482,17 +2492,6 @@ static int aliasing_gtt_bind_vma(struct i915_vma *vma,
 	}
 
 	return 0;
-
-err_pages:
-	if (!(vma->flags & (I915_VMA_GLOBAL_BIND | I915_VMA_LOCAL_BIND))) {
-		if (vma->pages != vma->obj->mm.pages) {
-			GEM_BUG_ON(!vma->pages);
-			sg_free_table(vma->pages);
-			kfree(vma->pages);
-		}
-		vma->pages = NULL;
-	}
-	return ret;
 }
 
 static void aliasing_gtt_unbind_vma(struct i915_vma *vma)
@@ -2528,6 +2527,19 @@ void i915_gem_gtt_finish_pages(struct drm_i915_gem_object *obj,
 	}
 
 	dma_unmap_sg(kdev, pages->sgl, pages->nents, PCI_DMA_BIDIRECTIONAL);
+}
+
+static int ggtt_set_pages(struct i915_vma *vma)
+{
+	int ret;
+
+	GEM_BUG_ON(vma->pages);
+
+	ret = i915_get_ggtt_vma_pages(vma);
+	if (ret)
+		return ret;
+
+	return 0;
 }
 
 static void i915_gtt_color_adjust(const struct drm_mm_node *node,
@@ -3152,6 +3164,8 @@ static int gen8_gmch_probe(struct i915_ggtt *ggtt)
 	ggtt->base.cleanup = gen6_gmch_remove;
 	ggtt->base.bind_vma = ggtt_bind_vma;
 	ggtt->base.unbind_vma = ggtt_unbind_vma;
+	ggtt->base.set_pages = ggtt_set_pages;
+	ggtt->base.clear_pages = clear_pages;
 	ggtt->base.insert_page = gen8_ggtt_insert_page;
 	ggtt->base.clear_range = nop_clear_range;
 	if (!USES_FULL_PPGTT(dev_priv) || intel_scanout_needs_vtd_wa(dev_priv))
@@ -3210,6 +3224,8 @@ static int gen6_gmch_probe(struct i915_ggtt *ggtt)
 	ggtt->base.insert_entries = gen6_ggtt_insert_entries;
 	ggtt->base.bind_vma = ggtt_bind_vma;
 	ggtt->base.unbind_vma = ggtt_unbind_vma;
+	ggtt->base.set_pages = ggtt_set_pages;
+	ggtt->base.clear_pages = clear_pages;
 	ggtt->base.cleanup = gen6_gmch_remove;
 
 	ggtt->invalidate = gen6_ggtt_invalidate;
@@ -3265,6 +3281,8 @@ static int i915_gmch_probe(struct i915_ggtt *ggtt)
 	ggtt->base.clear_range = i915_ggtt_clear_range;
 	ggtt->base.bind_vma = ggtt_bind_vma;
 	ggtt->base.unbind_vma = ggtt_unbind_vma;
+	ggtt->base.set_pages = ggtt_set_pages;
+	ggtt->base.clear_pages = clear_pages;
 	ggtt->base.cleanup = i915_gmch_remove;
 
 	ggtt->invalidate = gmch_ggtt_invalidate;
