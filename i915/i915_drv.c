@@ -230,7 +230,7 @@ static void intel_detect_pch(struct drm_device *dev)
 	pci_dev_put(pch);
 }
 
-static int i915_getparam(struct drm_device *dev, void *data,
+int i915_getparam(struct drm_device *dev, void *data,
 			 struct drm_file *file_priv)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
