@@ -1997,18 +1997,22 @@ int i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	if (ret)
 		goto err_unpin;
 
-	/* Mark as being mmapped into userspace for later revocation */
-	assert_rpm_wakelock_held(dev_priv);
-	if (list_empty(&obj->userfault_link))
-		list_add(&obj->userfault_link, &dev_priv->mm.userfault_list);
-
 	/* Finally, remap it using the new GTT offset */
 	ret = remap_io_mapping(area,
 			       area->vm_start + (vma->ggtt_view.partial.offset << PAGE_SHIFT),
 			       (ggtt->mappable_base + vma->node.start) >> PAGE_SHIFT,
 			       min_t(u64, vma->size, area->vm_end - area->vm_start),
 			       &ggtt->mappable);
+	if (ret)
+		goto err_fence;
 
+	/* Mark as being mmapped into userspace for later revocation */
+	assert_rpm_wakelock_held(dev_priv);
+	if (!i915_vma_set_userfault(vma) && !obj->userfault_count++)
+		list_add(&obj->userfault_link, &dev_priv->mm.userfault_list);
+	GEM_BUG_ON(!obj->userfault_count);
+
+err_fence:
 	i915_vma_unpin_fence(vma);
 err_unpin:
 	__i915_vma_unpin(vma);
@@ -2061,6 +2065,33 @@ err:
 	return ret;
 }
 
+static void __i915_gem_object_release_mmap(struct drm_i915_gem_object *obj)
+{
+	struct i915_vma *vma;
+
+	GEM_BUG_ON(!obj->userfault_count);
+
+	obj->userfault_count = 0;
+	list_del(&obj->userfault_link);
+
+#ifdef __linux__
+	drm_vma_node_unmap(&obj->base.vma_node,
+			   obj->base.dev->anon_inode->i_mapping);
+#else
+	struct drm_vma_offset_node *node;
+
+	node = &obj->base.vma_node;
+	unmap_mapping_range(obj, drm_vma_node_offset_addr(node),
+	    drm_vma_node_size(node) << PAGE_SHIFT, 1);
+#endif
+	list_for_each_entry(vma, &obj->vma_list, obj_link) {
+		if (!i915_vma_is_ggtt(vma))
+			break;
+
+		i915_vma_unset_userfault(vma);
+	}
+}
+
 /**
  * i915_gem_release_mmap - remove physical page mappings
  * @obj: obj in question
@@ -2091,20 +2122,10 @@ i915_gem_release_mmap(struct drm_i915_gem_object *obj)
 	lockdep_assert_held(&i915->drm.struct_mutex);
 	intel_runtime_pm_get(i915);
 
-	if (list_empty(&obj->userfault_link))
+	if (!obj->userfault_count)
 		goto out;
 
-	list_del_init(&obj->userfault_link);
-
-#ifndef __linux__
-	struct drm_vma_offset_node *node;
-
-	node = &obj->base.vma_node;
-	unmap_mapping_range(obj, drm_vma_node_offset_addr(node),
-	    drm_vma_node_size(node) << PAGE_SHIFT, 1);
-#else
-	drm_vma_node_unmap(&obj->base.vma_node,
-			   obj->base.dev->anon_inode->i_mapping);
+	__i915_gem_object_release_mmap(obj);
 
 	/* Ensure that the CPU's PTE are revoked and there are not outstanding
 	 * memory transactions from userspace before we return. The TLB
@@ -2114,7 +2135,6 @@ i915_gem_release_mmap(struct drm_i915_gem_object *obj)
 	 * memory writes before touching registers / GSM.
 	 */
 	wmb();
-#endif
 
 out:
 	intel_runtime_pm_put(i915);
@@ -2133,19 +2153,8 @@ void i915_gem_runtime_suspend(struct drm_i915_private *dev_priv)
 	 */
 
 	list_for_each_entry_safe(obj, on,
-				 &dev_priv->mm.userfault_list, userfault_link) {
-		list_del_init(&obj->userfault_link);
-#ifndef __linux__
-		struct drm_vma_offset_node *node;
-
-		node = &obj->base.vma_node;
-		unmap_mapping_range(obj, drm_vma_node_offset_addr(node),
-		    drm_vma_node_size(node) << PAGE_SHIFT, 1);
-#else
-		drm_vma_node_unmap(&obj->base.vma_node,
-				   obj->base.dev->anon_inode->i_mapping);
-#endif
-	}
+				 &dev_priv->mm.userfault_list, userfault_link)
+		__i915_gem_object_release_mmap(obj);
 
 	/* The fence will be lost when the device powers down. If any were
 	 * in use by hardware (i.e. they are pinned), we should not be powering
@@ -2168,7 +2177,7 @@ void i915_gem_runtime_suspend(struct drm_i915_private *dev_priv)
 		if (!reg->vma)
 			continue;
 
-		GEM_BUG_ON(!list_empty(&reg->vma->obj->userfault_link));
+		GEM_BUG_ON(i915_vma_has_userfault(reg->vma));
 		reg->dirty = true;
 	}
 }
@@ -4416,7 +4425,6 @@ void i915_gem_object_init(struct drm_i915_gem_object *obj,
 	mutex_init(&obj->mm.lock);
 
 	INIT_LIST_HEAD(&obj->global_link);
-	INIT_LIST_HEAD(&obj->userfault_link);
 	INIT_LIST_HEAD(&obj->vma_list);
 	INIT_LIST_HEAD(&obj->lut_list);
 	INIT_LIST_HEAD(&obj->batch_pool_link);
@@ -4609,6 +4617,7 @@ static void __i915_gem_free_objects(struct drm_i915_private *i915,
 
 	llist_for_each_entry_safe(obj, on, freed, freed) {
 		GEM_BUG_ON(obj->bind_count);
+		GEM_BUG_ON(obj->userfault_count);
 		GEM_BUG_ON(atomic_read(&obj->frontbuffer_bits));
 		GEM_BUG_ON(!list_empty(&obj->lut_list));
 
