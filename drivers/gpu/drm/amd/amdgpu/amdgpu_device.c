@@ -2371,6 +2371,9 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	    (uintmax_t)adev->mc.aper_base,
 	    (uintmax_t)adev->mc.aper_base + adev->mc.visible_vram_size);
 #endif
+	if (amdgpu_sriov_vf(adev))
+		amdgpu_virt_init_data_exchange(adev);
+
 	amdgpu_fbdev_init(adev);
 
 	r = amdgpu_pm_sysfs_init(adev);
