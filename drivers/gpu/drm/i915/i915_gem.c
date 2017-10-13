@@ -2295,7 +2295,7 @@ void __i915_gem_object_invalidate(struct drm_i915_gem_object *obj)
 #endif
 
 	lockdep_assert_held(&obj->mm.lock);
-	GEM_BUG_ON(obj->mm.pages);
+	GEM_BUG_ON(i915_gem_object_has_pages(obj));
 
 	switch (obj->mm.madv) {
 	case I915_MADV_DONTNEED:
@@ -2364,7 +2364,7 @@ void __i915_gem_object_put_pages(struct drm_i915_gem_object *obj,
 		return;
 
 	GEM_BUG_ON(obj->bind_count);
-	if (!READ_ONCE(obj->mm.pages))
+	if (!i915_gem_object_has_pages(obj))
 		return;
 
 	/* May be called by shrinker from within get_pages() (on another bo) */
@@ -2679,7 +2679,7 @@ int __i915_gem_object_get_pages(struct drm_i915_gem_object *obj)
 	if (err)
 		return err;
 
-	if (unlikely(IS_ERR_OR_NULL(obj->mm.pages))) {
+	if (unlikely(!i915_gem_object_has_pages(obj))) {
 		GEM_BUG_ON(i915_gem_object_has_pinned_pages(obj));
 
 		err = ____i915_gem_object_get_pages(obj);
@@ -2764,7 +2764,7 @@ void *i915_gem_object_pin_map(struct drm_i915_gem_object *obj,
 	type &= ~I915_MAP_OVERRIDE;
 
 	if (!atomic_inc_not_zero(&obj->mm.pages_pin_count)) {
-		if (unlikely(IS_ERR_OR_NULL(obj->mm.pages))) {
+		if (unlikely(!i915_gem_object_has_pages(obj))) {
 			GEM_BUG_ON(i915_gem_object_has_pinned_pages(obj));
 
 			ret = ____i915_gem_object_get_pages(obj);
@@ -2776,7 +2776,7 @@ void *i915_gem_object_pin_map(struct drm_i915_gem_object *obj,
 		atomic_inc(&obj->mm.pages_pin_count);
 		pinned = false;
 	}
-	GEM_BUG_ON(!obj->mm.pages);
+	GEM_BUG_ON(!i915_gem_object_has_pages(obj));
 
 	ptr = page_unpack_bits(obj->mm.mapping, &has_type);
 	if (ptr && has_type != type) {
@@ -2835,7 +2835,7 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 	 * allows it to avoid the cost of retrieving a page (either swapin
 	 * or clearing-before-use) before it is overwritten.
 	 */
-	if (READ_ONCE(obj->mm.pages))
+	if (i915_gem_object_has_pages(obj))
 		return -ENODEV;
 
 	if (obj->mm.madv != I915_MADV_WILLNEED)
@@ -4409,7 +4409,7 @@ i915_gem_madvise_ioctl(struct drm_device *dev, void *data,
 	if (err)
 		goto out;
 
-	if (obj->mm.pages &&
+	if (i915_gem_object_has_pages(obj) &&
 	    i915_gem_object_is_tiled(obj) &&
 	    dev_priv->quirks & QUIRK_PIN_SWIZZLED_PAGES) {
 		if (obj->mm.madv == I915_MADV_WILLNEED) {
@@ -4428,7 +4428,8 @@ i915_gem_madvise_ioctl(struct drm_device *dev, void *data,
 		obj->mm.madv = args->madv;
 
 	/* if the object is no longer attached, discard its backing storage */
-	if (obj->mm.madv == I915_MADV_DONTNEED && !obj->mm.pages)
+	if (obj->mm.madv == I915_MADV_DONTNEED &&
+	    !i915_gem_object_has_pages(obj))
 		i915_gem_object_truncate(obj);
 
 	args->retained = obj->mm.madv != __I915_MADV_PURGED;
@@ -4657,7 +4658,7 @@ static void __i915_gem_free_objects(struct drm_i915_private *i915,
 		if (WARN_ON(i915_gem_object_has_pinned_pages(obj)))
 			atomic_set(&obj->mm.pages_pin_count, 0);
 		__i915_gem_object_put_pages(obj, I915_MM_NORMAL);
-		GEM_BUG_ON(obj->mm.pages);
+		GEM_BUG_ON(i915_gem_object_has_pages(obj));
 
 		if (obj->base.import_attach)
 			drm_prime_gem_destroy(&obj->base, NULL);
