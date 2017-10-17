@@ -1121,6 +1121,8 @@ struct intel_fbc {
 			 */
 			int adjusted_x;
 			int adjusted_y;
+
+			int y;
 		} plane;
 
 		struct {
