@@ -2875,10 +2875,12 @@ static void dce110_apply_ctx_for_surface(
 		struct pipe_ctx *pipe_ctx = &context->res_ctx.pipe_ctx[i];
 		struct pipe_ctx *old_pipe_ctx = &dc->current_state->res_ctx.pipe_ctx[i];
 
-		if (stream == pipe_ctx->stream) {
+		if (stream == context->res_ctx.pipe_ctx[i].stream) {
+			be_idx = context->res_ctx.pipe_ctx[i].stream_res.tg->inst;
 			if (!pipe_ctx->top_pipe &&
 				(pipe_ctx->plane_state || old_pipe_ctx->plane_state))
 				dc->hwss.pipe_control_lock(dc, pipe_ctx, true);
+			break;
 		}
 	}
 
