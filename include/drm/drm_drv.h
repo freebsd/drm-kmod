@@ -592,23 +592,6 @@ struct drm_driver {
 	int dev_priv_size;
 };
 
-__printf(6, 7)
-void drm_dev_printk(const struct device *dev, const char *level,
-		    unsigned int category, const char *function_name,
-		    const char *prefix, const char *format, ...);
-
-#ifndef __linux__
-__printf(5, 6)
-	void drm_printk(const char *level, unsigned int category,
-					const char *function_name, const char *prefix,
-					const char *format, ...);
-#else
-__printf(3, 4)
-
-void drm_printk(const char *level, unsigned int category,
-		const char *format, ...);
-#endif
-
 extern unsigned int drm_debug;
 
 int drm_dev_init(struct drm_device *dev,
