@@ -879,7 +879,6 @@ static void intel_lrc_irq_handler(unsigned long data)
 				continue;
 
 #ifdef __linux__
-			// XXX: won't build GEM_DEBUG_BUG_ON
 			GEM_BUG_ON(!execlists_is_active(execlists,
 							EXECLISTS_ACTIVE_USER));
 
