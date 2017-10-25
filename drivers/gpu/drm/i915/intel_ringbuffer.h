@@ -366,6 +366,9 @@ struct intel_engine_cs {
 	void		(*reset_hw)(struct intel_engine_cs *engine,
 				    struct drm_i915_gem_request *req);
 
+	void		(*park)(struct intel_engine_cs *engine);
+	void		(*unpark)(struct intel_engine_cs *engine);
+
 	void		(*set_default_submission)(struct intel_engine_cs *engine);
 
 	struct intel_ring *(*context_pin)(struct intel_engine_cs *engine,
@@ -869,7 +872,9 @@ bool intel_engines_are_idle(struct drm_i915_private *dev_priv);
 
 bool intel_engine_has_kernel_context(const struct intel_engine_cs *engine);
 
-void intel_engines_mark_idle(struct drm_i915_private *i915);
+void intel_engines_park(struct drm_i915_private *i915);
+void intel_engines_unpark(struct drm_i915_private *i915);
+
 void intel_engines_reset_default_submission(struct drm_i915_private *i915);
 
 bool intel_engine_can_store_dword(struct intel_engine_cs *engine);
