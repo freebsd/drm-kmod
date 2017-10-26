@@ -868,6 +868,13 @@ static __always_inline void free_param(const char *type, void *x)
 		kfree(*(void **)x);
 }
 
+static void cleanup_params(struct i915_gpu_state *error)
+{
+#define FREE(T, x, ...) free_param(#T, &error->params.x);
+	I915_PARAMS_FOR_EACH(FREE);
+#undef FREE
+}
+
 static void cleanup_uc_state(struct i915_gpu_state *error)
 {
 	struct i915_error_uc *error_uc = &error->uc;
@@ -911,10 +918,7 @@ void __i915_gpu_state_free(struct kref *error_ref)
 	kfree(error->overlay);
 	kfree(error->display);
 
-#define FREE(T, x, ...) free_param(#T, &error->params.x);
-	I915_PARAMS_FOR_EACH(FREE);
-#undef FREE
-
+	cleanup_params(error);
 	cleanup_uc_state(error);
 
 	kfree(error);
@@ -1752,6 +1756,16 @@ static __always_inline void dup_param(const char *type, void *x)
 		*(void **)x = kstrdup(*(void **)x, GFP_ATOMIC);
 }
 
+static void capture_params(struct i915_gpu_state *error)
+{
+	error->params = i915_modparams;
+#ifdef __linux__ /* assert panic in strlen here */
+#define DUP(T, x, ...) dup_param(#T, &error->params.x);
+	I915_PARAMS_FOR_EACH(DUP);
+#undef DUP
+#endif
+}
+
 static int capture(void *data)
 {
 	struct i915_gpu_state *error = data;
@@ -1762,13 +1776,7 @@ static int capture(void *data)
 		ktime_to_timeval(ktime_sub(ktime_get(),
 					   error->i915->gt.last_init_time));
 
-	error->params = i915_modparams;
-#ifdef __linux__ /* assert panic in strlen here */
-#define DUP(T, x, ...) dup_param(#T, &error->params.x);
-	I915_PARAMS_FOR_EACH(DUP);
-#undef DUP
-#endif
-
+	capture_params(error);
 	capture_uc_state(error);
 
 	i915_capture_gen_state(error->i915, error);
