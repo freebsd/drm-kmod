@@ -23,6 +23,8 @@
  * Rob Clark <robdclark@gmail.com>
  */
 
+#define DEBUG /* for pr_debug() */
+
 #ifndef __linux__
 #include <machine/stdarg.h>
 #else
