@@ -11589,10 +11589,8 @@ verify_crtc_state(struct drm_crtc *crtc,
 				"Encoder connected to wrong pipe %c\n",
 				pipe_name(pipe));
 
-		if (active) {
-			pipe_config->output_types |= 1 << encoder->type;
+		if (active)
 			encoder->get_config(encoder, pipe_config);
-		}
 	}
 
 	intel_crtc_compute_pixel_rate(pipe_config);
@@ -14994,7 +14992,6 @@ static void intel_modeset_readout_hw_state(struct drm_device *dev)
 			crtc_state = to_intel_crtc_state(crtc->base.state);
 
 			encoder->base.crtc = &crtc->base;
-			crtc_state->output_types |= 1 << encoder->type;
 			encoder->get_config(encoder, crtc_state);
 		} else {
 			encoder->base.crtc = NULL;
