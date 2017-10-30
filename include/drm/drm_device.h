@@ -17,6 +17,7 @@ struct drm_vblank_crtc;
 struct drm_sg_mem;
 struct drm_local_map;
 struct drm_vma_offset_manager;
+struct drm_fb_helper;
 
 struct inode;
 
@@ -208,6 +209,13 @@ struct drm_device {
 		int rid;
 	} drm_pcir[DRM_PCI_RESOURCE_MAX];
 #endif
+	/**
+	 * @fb_helper:
+	 *
+	 * Pointer to the fbdev emulation structure.
+	 * Set by drm_fb_helper_init() and cleared by drm_fb_helper_fini().
+	 */
+	struct drm_fb_helper *fb_helper;
 };
 
 #endif
