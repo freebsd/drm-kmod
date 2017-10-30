@@ -43,7 +43,6 @@
 #include <drm/drm_fb_helper.h>
 
 #include <drm/drm_crtc_helper.h>
-#include "radeon_kfd.h"
 
 #define pci_restore_state linux_pci_restore_state
 #define pci_save_state linux_pci_save_state
@@ -344,14 +343,6 @@ static int radeon_pci_probe(struct pci_dev *pdev,
 			    const struct pci_device_id *ent)
 {
 	int ret;
-
-	/*
-	 * Initialize amdkfd before starting radeon. If it was not loaded yet,
-	 * defer radeon probing
-	 */
-	ret = radeon_kfd_init();
-	if (ret == -EPROBE_DEFER)
-		return ret;
 
 	if (vga_switcheroo_client_probe_defer(pdev))
 		return -EPROBE_DEFER;
@@ -662,7 +653,6 @@ static int __init radeon_init(void)
 
 static void __exit radeon_exit(void)
 {
-	radeon_kfd_fini();
 	pci_unregister_driver(pdriver);
 	radeon_unregister_atpx_handler();
 }
