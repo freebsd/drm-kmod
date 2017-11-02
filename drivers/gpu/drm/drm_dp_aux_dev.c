@@ -271,14 +271,6 @@ static struct drm_dp_aux_dev *drm_dp_aux_dev_get_by_aux(struct drm_dp_aux *aux)
 	return aux_dev;
 }
 
-#ifdef __linux__
-static int auxdev_wait_atomic_t(atomic_t *p)
-{
-	schedule();
-	return 0;
-}
-#endif
-
 void drm_dp_aux_unregister_devnode(struct drm_dp_aux *aux)
 {
 	struct drm_dp_aux_dev *aux_dev;
@@ -298,7 +290,7 @@ void drm_dp_aux_unregister_devnode(struct drm_dp_aux *aux)
 	// See wait.h in linuxkpi
 	wait_on_atomic_t(&aux_dev->usecount, TASK_UNINTERRUPTIBLE);
 #else
-	wait_on_atomic_t(&aux_dev->usecount, auxdev_wait_atomic_t,
+	wait_on_atomic_t(&aux_dev->usecount, atomic_t_wait,
 			 TASK_UNINTERRUPTIBLE);
 #endif
 
