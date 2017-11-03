@@ -345,7 +345,7 @@ static int ttm_page_pool_free(struct ttm_page_pool *pool, unsigned nr_free,
 		pages_to_free = kmalloc(npages_to_free * sizeof(struct page *),
 					GFP_KERNEL);
 	if (!pages_to_free) {
-		pr_err("Failed to allocate memory for pool free operation\n");
+		pr_debug("Failed to allocate memory for pool free operation\n");
 		return 0;
 	}
 
@@ -563,7 +563,7 @@ static int ttm_alloc_new_pages(struct pglist *pages, gfp_t gfp_flags,
 	caching_array = kmalloc(max_cpages*sizeof(struct page *), GFP_KERNEL);
 
 	if (!caching_array) {
-		pr_err("Unable to allocate table for new pages\n");
+		pr_debug("Unable to allocate table for new pages\n");
 		return -ENOMEM;
 	}
 
@@ -571,7 +571,7 @@ static int ttm_alloc_new_pages(struct pglist *pages, gfp_t gfp_flags,
 		p = alloc_pages(gfp_flags, order);
 
 		if (!p) {
-			pr_err("Unable to get page %u\n", i);
+			pr_debug("Unable to get page %u\n", i);
 
 			/* store already allocated pages in the pool after
 			 * setting the caching state */
@@ -690,7 +690,7 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool, int ttm_flags,
 			++pool->nrefills;
 			pool->npages += alloc_size;
 		} else {
-			pr_err("Failed to fill pool (%p)\n", pool);
+			pr_debug("Failed to fill pool (%p)\n", pool);
 			/* If we have any pages left put them to the pool. */
 #ifdef __linux__
 			list_for_each_entry(p, &new_pages, lru) {
@@ -997,8 +997,7 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 		while (npages) {
 			p = alloc_page(gfp_flags);
 			if (!p) {
-
-				pr_err("Unable to allocate page\n");
+				pr_debug("Unable to allocate page\n");
 				return -ENOMEM;
 			}
 
@@ -1098,7 +1097,7 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 		/* If there is any pages in the list put them back to
 		 * the pool.
 		 */
-		pr_err("Failed to allocate extra pages for large request\n");
+		pr_debug("Failed to allocate extra pages for large request\n");
 		ttm_put_pages(pages, count, flags, cstate);
 		return r;
 	}
