@@ -491,20 +491,21 @@ error:
 }
 
 /**
- * function ttm_bo_cleanup_refs_and_unlock
+ * function ttm_bo_cleanup_refs
  * If bo idle, remove from delayed- and lru lists, and unref.
  * If not idle, do nothing.
  *
  * Must be called with lru_lock and reservation held, this function
- * will drop both before returning.
+ * will drop the lru lock and optionally the reservation lock before returning.
  *
  * @interruptible         Any sleeps should occur interruptibly.
  * @no_wait_gpu           Never wait for gpu. Return -EBUSY instead.
+ * @unlock_resv           Unlock the reservation lock as well.
  */
 
-static int ttm_bo_cleanup_refs_and_unlock(struct ttm_buffer_object *bo,
-					  bool interruptible,
-					  bool no_wait_gpu)
+static int ttm_bo_cleanup_refs(struct ttm_buffer_object *bo,
+			       bool interruptible, bool no_wait_gpu,
+			       bool unlock_resv)
 {
 	struct ttm_bo_global *glob = bo->glob;
 	struct reservation_object *resv;
@@ -523,7 +524,8 @@ static int ttm_bo_cleanup_refs_and_unlock(struct ttm_buffer_object *bo,
 	if (ret && !no_wait_gpu) {
 		long lret;
 
-		reservation_object_unlock(bo->resv);
+		if (unlock_resv)
+			reservation_object_unlock(bo->resv);
 		spin_unlock(&glob->lru_lock);
 
 		lret = reservation_object_wait_timeout_rcu(resv, true,
@@ -536,24 +538,24 @@ static int ttm_bo_cleanup_refs_and_unlock(struct ttm_buffer_object *bo,
 			return -EBUSY;
 
 		spin_lock(&glob->lru_lock);
-		ret = reservation_object_trylock(bo->resv) ? 0 : -EBUSY;
-
-		/*
-		 * We raced, and lost, someone else holds the reservation now,
-		 * and is probably busy in ttm_bo_cleanup_memtype_use.
-		 *
-		 * Even if it's not the case, because we finished waiting any
-		 * delayed destruction would succeed, so just return success
-		 * here.
-		 */
-		if (ret) {
+		if (unlock_resv && !reservation_object_trylock(bo->resv)) {
+			/*
+			 * We raced, and lost, someone else holds the reservation now,
+			 * and is probably busy in ttm_bo_cleanup_memtype_use.
+			 *
+			 * Even if it's not the case, because we finished waiting any
+			 * delayed destruction would succeed, so just return success
+			 * here.
+			 */
 			spin_unlock(&glob->lru_lock);
 			return 0;
 		}
+		ret = 0;
 	}
 
 	if (ret || unlikely(list_empty(&bo->ddestroy))) {
-		reservation_object_unlock(bo->resv);
+		if (unlock_resv)
+			reservation_object_unlock(bo->resv);
 		spin_unlock(&glob->lru_lock);
 		return ret;
 	}
@@ -564,7 +566,9 @@ static int ttm_bo_cleanup_refs_and_unlock(struct ttm_buffer_object *bo,
 
 	spin_unlock(&glob->lru_lock);
 	ttm_bo_cleanup_memtype_use(bo);
-	reservation_object_unlock(bo->resv);
+
+	if (unlock_resv)
+		reservation_object_unlock(bo->resv);
 
 	return 0;
 }
@@ -605,8 +609,8 @@ static int ttm_bo_delayed_delete(struct ttm_bo_device *bdev, bool remove_all)
 		}
 
 		if (!ret)
-			ret = ttm_bo_cleanup_refs_and_unlock(entry, false,
-							     !remove_all);
+			ret = ttm_bo_cleanup_refs(entry, false, !remove_all,
+						  true);
 		else
 			spin_unlock(&glob->lru_lock);
 
@@ -775,8 +779,7 @@ static int ttm_mem_evict_first(struct ttm_bo_device *bdev,
 	kref_get(&bo->list_kref);
 
 	if (!list_empty(&bo->ddestroy)) {
-		ret = ttm_bo_cleanup_refs_and_unlock(bo, interruptible,
-						     no_wait_gpu);
+		ret = ttm_bo_cleanup_refs(bo, interruptible, no_wait_gpu, true);
 		kref_put(&bo->list_kref, ttm_bo_release_list);
 		return ret;
 	}
@@ -1754,7 +1757,7 @@ static int ttm_bo_swapout(struct ttm_mem_shrink *shrink)
 	kref_get(&bo->list_kref);
 
 	if (!list_empty(&bo->ddestroy)) {
-		ret = ttm_bo_cleanup_refs_and_unlock(bo, false, false);
+		ret = ttm_bo_cleanup_refs(bo, false, false, true);
 		kref_put(&bo->list_kref, ttm_bo_release_list);
 		return ret;
 	}
