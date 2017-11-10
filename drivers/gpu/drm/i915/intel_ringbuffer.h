@@ -166,7 +166,6 @@ struct i915_ctx_workarounds {
 };
 
 struct drm_i915_gem_request;
-struct intel_render_state;
 
 /*
  * Engine IDs definitions.
@@ -308,7 +307,6 @@ struct intel_engine_cs {
 	struct intel_timeline *timeline;
 
 	struct drm_i915_gem_object *default_state;
-	struct intel_render_state *render_state;
 
 	atomic_t irq_count;
 	unsigned long irq_posted;
