@@ -15235,8 +15235,6 @@ void intel_modeset_gem_init(struct drm_device *dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
 
-	intel_init_clock_gating(dev_priv);
-
 	intel_setup_overlay(dev_priv);
 }
 
