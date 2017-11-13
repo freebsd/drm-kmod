@@ -2383,6 +2383,9 @@ struct drm_i915_private {
 	 */
 	struct workqueue_struct *wq;
 
+	/* ordered wq for modesets */
+	struct workqueue_struct *modeset_wq;
+
 	/* Display functions */
 	struct drm_i915_display_funcs display;
 
