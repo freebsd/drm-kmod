@@ -1749,7 +1749,7 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 	 */
 	if (!obj->base.filp) {
 		i915_gem_object_put(obj);
-		return -EINVAL;
+		return -ENXIO;
 	}
 
 #ifdef __linux__
