@@ -3084,7 +3084,7 @@ const struct intel_ppat_entry *
 intel_ppat_get(struct drm_i915_private *i915, u8 value)
 {
 	struct intel_ppat *ppat = &i915->ppat;
-	struct intel_ppat_entry *entry;
+	struct intel_ppat_entry *entry = NULL;
 	unsigned int scanned, best_score;
 	int i;
 
@@ -3107,7 +3107,7 @@ intel_ppat_get(struct drm_i915_private *i915, u8 value)
 	}
 
 	if (scanned == ppat->max_entries) {
-		if (!best_score)
+		if (!entry)
 			return ERR_PTR(-ENOSPC);
 
 		kref_get(&entry->ref);
