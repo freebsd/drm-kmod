@@ -30,7 +30,7 @@
 #include <linux/sort.h>
 #include <linux/sched/mm.h>
 #include "intel_drv.h"
-#include "i915_guc_submission.h"
+#include "intel_guc_submission.h"
 
 #ifndef __linux__
 #include <asm/msr.h>
