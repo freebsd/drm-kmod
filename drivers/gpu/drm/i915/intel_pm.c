@@ -8515,12 +8515,6 @@ static void cnl_init_clock_gating(struct drm_i915_private *dev_priv)
 	if (IS_CNL_REVID(dev_priv, CNL_REVID_A0, CNL_REVID_B0))
 		val |= SARBUNIT_CLKGATE_DIS;
 	I915_WRITE(SLICE_UNIT_LEVEL_CLKGATE, val);
-
-	/* Display WA #1133: WaFbcSkipSegments:cnl */
-	/* val = I915_READ(ILK_DPFC_CHICKEN); */
-	/* val &= ~GLK_SKIP_SEG_COUNT_MASK; */
-	/* val |= GLK_SKIP_SEG_EN | GLK_SKIP_SEG_COUNT(1); */
-	/* I915_WRITE(ILK_DPFC_CHICKEN, val); */
 }
 
 static void cfl_init_clock_gating(struct drm_i915_private *dev_priv)
