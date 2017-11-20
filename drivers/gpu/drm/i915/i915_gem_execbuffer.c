@@ -1116,10 +1116,6 @@ static int __reloc_gpu_alloc(struct i915_execbuffer *eb,
 	if (err)
 		goto err_request;
 
-	err = i915_switch_context(rq);
-	if (err)
-		goto err_request;
-
 	err = eb->engine->emit_bb_start(rq,
 					batch->node.start, PAGE_SIZE,
 					cache->gen > 5 ? 0 : I915_DISPATCH_SECURE);
@@ -1971,10 +1967,6 @@ static int eb_submit(struct i915_execbuffer *eb)
 	int err;
 
 	err = eb_move_to_gpu(eb);
-	if (err)
-		return err;
-
-	err = i915_switch_context(eb->request);
 	if (err)
 		return err;
 
