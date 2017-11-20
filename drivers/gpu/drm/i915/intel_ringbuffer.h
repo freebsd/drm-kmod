@@ -252,6 +252,7 @@ struct intel_engine_execlists {
 	unsigned int active;
 #define EXECLISTS_ACTIVE_USER 0
 #define EXECLISTS_ACTIVE_PREEMPT 1
+#define EXECLISTS_ACTIVE_HWACK 2
 
 	/**
 	 * @port_mask: number of execlist ports - 1
