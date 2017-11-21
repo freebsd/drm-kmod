@@ -48,6 +48,7 @@
 
 #include "i915_drv.h"
 #include "i915_trace.h"
+#include "i915_pmu.h"
 #include "i915_vgpu.h"
 #include "intel_drv.h"
 #include "intel_uc.h"
@@ -1306,6 +1307,7 @@ static void i915_driver_register(struct drm_i915_private *dev_priv)
 	struct drm_device *dev = &dev_priv->drm;
 
 	i915_gem_shrinker_init(dev_priv);
+	i915_pmu_register(dev_priv);
 
 	/*
 	 * Notify a valid surface after modesetting,
@@ -1366,6 +1368,9 @@ static void i915_driver_unregister(struct drm_i915_private *dev_priv)
 #ifdef CONFIG_I915_PERF // Not yet. i915_perf.c opens a can of worms...
 	i915_perf_unregister(dev_priv);
 #endif
+
+	i915_pmu_unregister(dev_priv);
+
 #ifdef __linux__
 	i915_teardown_sysfs(dev_priv);
 #endif
