@@ -460,9 +460,15 @@ static int i915_getparam_ioctl(struct drm_device *dev, void *data,
 
 static int i915_get_bridge_dev(struct drm_device *dev)
 {
-	struct drm_i915_private *dev_priv = to_i915(dev);
+#ifdef __linux__
+	int domain = pci_domain_nr(dev_priv->drm.pdev->bus);
 
+	dev_priv->bridge_dev =
+	        pci_get_domain_bus_and_slot(domain, 0, PCI_DEVFN(0, 0));
+#else
+	struct drm_i915_private *dev_priv = to_i915(dev);
 	dev_priv->bridge_dev = pci_get_bus_and_slot(0, PCI_DEVFN(0, 0));
+#endif
 	if (!dev_priv->bridge_dev) {
 		DRM_ERROR("bridge device not found\n");
 		return -1;
