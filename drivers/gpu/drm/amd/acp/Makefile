@@ -20,11 +20,8 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 #
-# Makefile for the virtual sub-component of DAL.
-# It provides the control and status of HW CRTC block.
+# Makefile for the ACP, which is a sub-component
+# of AMDSOC/AMDGPU drm driver.
+# It provides the HW control for ACP related functionalities.
 
-VIRTUAL = virtual_link_encoder.o virtual_stream_encoder.o
-
-AMD_DAL_VIRTUAL = $(addprefix $(AMDDALPATH)/dc/virtual/,$(VIRTUAL))
-
-AMD_DISPLAY_FILES += $(AMD_DAL_VIRTUAL)
+AMD_ACP_FILES := $(AMDACPPATH)/acp_hw.o
