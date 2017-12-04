@@ -1041,7 +1041,6 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 			vm_page_wire(p);
 			vm_page_unlock(p);
 #endif
-
 			/* Swap the pages if we detect consecutive order */
 			if (i > first && pages[i - 1] == p - 1)
 				swap(p, pages[i - 1]);
