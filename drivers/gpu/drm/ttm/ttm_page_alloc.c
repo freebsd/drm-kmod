@@ -1071,8 +1071,14 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 	r = ttm_page_pool_get_pages(pool, &plist, flags, cstate,
 				    npages - count, 0);
 
-	list_for_each_entry(p, &plist, lru)
-		pages[count++] = p;
+	first = count;
+	list_for_each_entry(p, &plist, lru) {
+		struct page *tmp = p;
+
+		/* Swap the pages if we detect consecutive order */
+		if (count > first && pages[count - 1] == tmp - 1)
+			swap(tmp, pages[count - 1]);
+		pages[count++] = tmp;
 	}
 #else
 	TAILQ_INIT(&plist);
@@ -1080,53 +1086,14 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 	    npages, 0);
 	count = 0;
 	TAILQ_FOREACH(p, &plist, plinks.q) {
-		pages[count++] = p;
+		struct page *tmp = p;
+
+		/* Swap the pages if we detect consecutive order */
+		if (count > first && pages[count - 1] == tmp - 1)
+			swap(tmp, pages[count - 1]);
+		pages[count++] = tmp;
 	}
 #endif
-
-// XXX moved to ttm_page_pool_get_pages !
-// double check bsd patches
-
-/* 	/\* clear the pages coming from the pool if requested *\/ */
-/* 	if (flags & TTM_PAGE_FLAG_ZERO_ALLOC) { */
-/* #ifdef __linux__ */
-/* 		list_for_each_entry(p, &plist, lru) { */
-/* 			if (PageHighMem(p)) */
-/* 				clear_highpage(p); */
-/* 			else */
-/* 				clear_page(page_address(p)); */
-/* #else */
-/* 		TAILQ_FOREACH(p, &plist, plinks.q) { */
-/* 			pmap_zero_page(p); */
-/* #endif */
-/* 		} */
-/* 	} */
-
-/* 	/\* If pool didn't have enough pages allocate new one. *\/ */
-/* 	if (npages > 0) { */
-/* 		/\* ttm_alloc_new_pages doesn't reference pool so we can run */
-/* 		 * multiple requests in parallel. */
-/* 		 **\/ */
-/* #ifdef __linux__ */
-/* 		INIT_LIST_HEAD(&plist); */
-/* 		r = ttm_alloc_new_pages(&plist, gfp_flags, flags, cstate, npages); */
-/* 		list_for_each_entry(p, &plist, lru) { */
-/* 			pages[count++] = p; */
-/* 		} */
-/* #else */
-/* 		TAILQ_INIT(&plist); */
-/* 		r = ttm_alloc_new_pages(&plist, gfp_flags, flags, cstate, npages); */
-/* 		TAILQ_FOREACH(p, &plist, plinks.q) { */
-/* 			pages[count++] = p; */
-/* 		} */
-/* #endif */
-/* 		if (r) { */
-/* 			/\* If there is any pages in the list put them back to */
-/* 			 * the pool. *\/ */
-/* 			pr_err("Failed to allocate extra pages for large request\n"); */
-/* 			ttm_put_pages(pages, count, flags, cstate); */
-/* 			return r; */
-/* 		} */
 
 	if (r) {
 		/* If there is any pages in the list put them back to
