@@ -1084,6 +1084,7 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 			swap(tmp, pages[count - 1]);
 		pages[count++] = tmp;
 	}
+
 #else
 	TAILQ_INIT(&plist);
 	r = ttm_page_pool_get_pages(pool, &plist, flags, cstate,
