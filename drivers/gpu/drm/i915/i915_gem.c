@@ -729,10 +729,7 @@ flush_write_domain(struct drm_i915_gem_object *obj, unsigned int flush_domains)
 		intel_fb_obj_flush(obj,
 				   fb_write_origin(obj, I915_GEM_DOMAIN_GTT));
 
-		list_for_each_entry(vma, &obj->vma_list, obj_link) {
-			if (!i915_vma_is_ggtt(vma))
-				break;
-
+		for_each_ggtt_vma(vma, obj) {
 			if (vma->iomap)
 				continue;
 
@@ -1584,10 +1581,7 @@ static void i915_gem_object_bump_inactive_ggtt(struct drm_i915_gem_object *obj)
 
 	GEM_BUG_ON(!i915_gem_object_has_pinned_pages(obj));
 
-	list_for_each_entry(vma, &obj->vma_list, obj_link) {
-		if (!i915_vma_is_ggtt(vma))
-			break;
-
+	for_each_ggtt_vma(vma, obj) {
 		if (i915_vma_is_active(vma))
 			continue;
 
@@ -2142,12 +2136,8 @@ static void __i915_gem_object_release_mmap(struct drm_i915_gem_object *obj)
 	unmap_mapping_range(obj, drm_vma_node_offset_addr(node),
 	    drm_vma_node_size(node) << PAGE_SHIFT, 1);
 #endif
-	list_for_each_entry(vma, &obj->vma_list, obj_link) {
-		if (!i915_vma_is_ggtt(vma))
-			break;
-
+	for_each_ggtt_vma(vma, obj)
 		i915_vma_unset_userfault(vma);
-	}
 }
 
 /**
@@ -3948,7 +3938,7 @@ restart:
 			 * dropped the fence as all snoopable access is
 			 * supposed to be linear.
 			 */
-			list_for_each_entry(vma, &obj->vma_list, obj_link) {
+			for_each_ggtt_vma(vma, obj) {
 				ret = i915_vma_put_fence(vma);
 				if (ret)
 					return ret;
