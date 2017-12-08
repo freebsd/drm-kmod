@@ -997,7 +997,7 @@ void ttm_mem_io_free(struct ttm_bo_device *bdev,
  */
 
 int ttm_bo_move_ttm(struct ttm_buffer_object *bo,
-		    bool interruptible, bool no_wait_gpu,
+		    struct ttm_operation_ctx *ctx,
 		    struct ttm_mem_reg *new_mem);
 
 /**
@@ -1019,7 +1019,7 @@ int ttm_bo_move_ttm(struct ttm_buffer_object *bo,
  */
 
 int ttm_bo_move_memcpy(struct ttm_buffer_object *bo,
-		       bool interruptible, bool no_wait_gpu,
+		       struct ttm_operation_ctx *ctx,
 		       struct ttm_mem_reg *new_mem);
 
 /**
