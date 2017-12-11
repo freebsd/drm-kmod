@@ -12,7 +12,7 @@ struct intel_gtt *intel_gtt_get(void);
 #else
 void intel_gtt_get(u64 *gtt_total,
 		   phys_addr_t *mappable_base,
-		   u64 *mappable_end);
+		   resource_size_t *mappable_end);
 #endif
 
 int intel_gmch_probe(struct pci_dev *bridge_pdev, struct pci_dev *gpu_pdev,
