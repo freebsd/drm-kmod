@@ -2603,7 +2603,6 @@ int amdgpu_device_suspend(struct drm_device *dev, bool suspend, bool fbcon)
 	 */
 	amdgpu_bo_evict_vram(adev);
 
-	amdgpu_atombios_scratch_regs_save(adev);
 	pci_save_state(dev->pdev);
 	if (suspend) {
 		/* Shut down the device */
@@ -2652,7 +2651,6 @@ int amdgpu_device_resume(struct drm_device *dev, bool resume, bool fbcon)
 		if (r)
 			goto unlock;
 	}
-	amdgpu_atombios_scratch_regs_restore(adev);
 
 	/* post card */
 	if (amdgpu_need_post(adev)) {
