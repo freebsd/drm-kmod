@@ -307,6 +307,7 @@ static int __i915_sw_fence_await_sw_fence(struct i915_sw_fence *fence,
 	int pending;
 
 	debug_fence_assert(fence);
+	might_sleep_if(gfpflags_allow_blocking(gfp));
 
 	if (i915_sw_fence_done(signaler))
 		return 0;
@@ -434,6 +435,7 @@ int i915_sw_fence_await_dma_fence(struct i915_sw_fence *fence,
 	int ret;
 
 	debug_fence_assert(fence);
+	might_sleep_if(gfpflags_allow_blocking(gfp));
 
 	if (dma_fence_is_signaled(dma))
 		return 0;
@@ -482,6 +484,7 @@ int i915_sw_fence_await_reservation(struct i915_sw_fence *fence,
 	int ret = 0, pending;
 
 	debug_fence_assert(fence);
+	might_sleep_if(gfpflags_allow_blocking(gfp));
 
 	if (write) {
 		struct dma_fence **shared;
