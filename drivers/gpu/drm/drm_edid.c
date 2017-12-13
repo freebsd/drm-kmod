@@ -4429,6 +4429,7 @@ drm_reset_display_info(struct drm_connector *connector)
 	info->cea_rev = 0;
 	info->max_tmds_clock = 0;
 	info->dvi_dual = false;
+	info->has_hdmi_infoframe = false;
 
 	info->non_desktop = 0;
 }
@@ -4671,8 +4672,6 @@ int drm_add_edid_modes(struct drm_connector *connector, struct edid *edid)
 			 connector->name);
 		return 0;
 	}
-
-	quirks = edid_get_quirks(edid);
 
 	drm_edid_to_eld(connector, edid);
 
