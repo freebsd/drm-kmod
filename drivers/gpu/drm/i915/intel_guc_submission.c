@@ -1150,6 +1150,10 @@ int intel_guc_submission_init(struct intel_guc *guc)
 		goto err_log;
 	GEM_BUG_ON(!guc->ads_vma);
 
+	ret = guc_clients_create(guc);
+	if (ret)
+		return ret;
+
 	for_each_engine(engine, dev_priv, id) {
 		guc->preempt_work[id].engine = engine;
 		INIT_WORK(&guc->preempt_work[id].work, inject_preempt_context);
@@ -1173,6 +1177,7 @@ void intel_guc_submission_fini(struct intel_guc *guc)
 	for_each_engine(engine, dev_priv, id)
 		cancel_work_sync(&guc->preempt_work[id].work);
 
+	guc_clients_destroy(guc);
 	guc_ads_destroy(guc);
 	intel_guc_log_destroy(guc);
 	guc_stage_desc_pool_destroy(guc);
@@ -1278,28 +1283,18 @@ int intel_guc_submission_enable(struct intel_guc *guc)
 		     sizeof(struct guc_wq_item) *
 		     I915_NUM_ENGINES > GUC_WQ_SIZE);
 
-	/*
-	 * We're being called on both module initialization and on reset,
-	 * until this flow is changed, we're using regular client presence to
-	 * determine which case are we in, and whether we should allocate new
-	 * clients or just reset their workqueues.
-	 */
-	if (!guc->execbuf_client) {
-		err = guc_clients_create(guc);
-		if (err)
-			return err;
-	} else {
-		guc_reset_wq(guc->execbuf_client);
-		guc_reset_wq(guc->preempt_client);
-	}
+	GEM_BUG_ON(!guc->execbuf_client);
+
+	guc_reset_wq(guc->execbuf_client);
+	guc_reset_wq(guc->preempt_client);
 
 	err = intel_guc_sample_forcewake(guc);
 	if (err)
-		goto err_free_clients;
+		return err;
 
 	err = guc_clients_doorbell_init(guc);
 	if (err)
-		goto err_free_clients;
+		return err;
 
 	/* Take over from manual control of ELSP (execlists) */
 	guc_interrupts_capture(dev_priv);
@@ -1316,10 +1311,6 @@ int intel_guc_submission_enable(struct intel_guc *guc)
 	}
 
 	return 0;
-
-err_free_clients:
-	guc_clients_destroy(guc);
-	return err;
 }
 
 void intel_guc_submission_disable(struct intel_guc *guc)
@@ -1333,8 +1324,6 @@ void intel_guc_submission_disable(struct intel_guc *guc)
 
 	/* Revert back to manual ELSP submission */
 	intel_engines_reset_default_submission(dev_priv);
-
-	guc_clients_destroy(guc);
 }
 
 #if IS_ENABLED(CONFIG_DRM_I915_SELFTEST)
