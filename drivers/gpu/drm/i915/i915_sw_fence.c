@@ -373,6 +373,7 @@ struct i915_sw_dma_fence_cb {
 #ifdef __linux__
 	struct irq_work work;
 #endif
+	struct rcu_head rcu;
 };
 
 static void timer_i915_sw_fence_wake(struct timer_list *t)
@@ -420,7 +421,7 @@ static void irq_i915_sw_fence_work(struct irq_work *wrk)
 	del_timer_sync(&cb->timer);
 	dma_fence_put(cb->dma);
 
-	kfree(cb);
+	kfree_rcu(cb, rcu);
 }
 #endif
 
