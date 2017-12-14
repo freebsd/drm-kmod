@@ -539,7 +539,7 @@ void amdgpu_device_wb_free(struct amdgpu_device *adev, u32 wb)
 }
 
 /**
- * amdgpu_vram_location - try to find VRAM location
+ * amdgpu_device_vram_location - try to find VRAM location
  * @adev: amdgpu device structure holding all necessary informations
  * @mc: memory controller structure holding memory informations
  * @base: base address at which to put VRAM
@@ -547,7 +547,8 @@ void amdgpu_device_wb_free(struct amdgpu_device *adev, u32 wb)
  * Function will try to place VRAM at base address provided
  * as parameter.
  */
-void amdgpu_vram_location(struct amdgpu_device *adev, struct amdgpu_mc *mc, u64 base)
+void amdgpu_device_vram_location(struct amdgpu_device *adev,
+				 struct amdgpu_mc *mc, u64 base)
 {
 	uint64_t limit = (uint64_t)amdgpu_vram_limit << 20;
 
@@ -561,7 +562,7 @@ void amdgpu_vram_location(struct amdgpu_device *adev, struct amdgpu_mc *mc, u64 
 }
 
 /**
- * amdgpu_gart_location - try to find GTT location
+ * amdgpu_device_gart_location - try to find GTT location
  * @adev: amdgpu device structure holding all necessary informations
  * @mc: memory controller structure holding memory informations
  *
@@ -572,7 +573,8 @@ void amdgpu_vram_location(struct amdgpu_device *adev, struct amdgpu_mc *mc, u64 
  *
  * FIXME: when reducing GTT size align new size on power of 2.
  */
-void amdgpu_gart_location(struct amdgpu_device *adev, struct amdgpu_mc *mc)
+void amdgpu_device_gart_location(struct amdgpu_device *adev,
+				 struct amdgpu_mc *mc)
 {
 	u64 size_af, size_bf;
 
