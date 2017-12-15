@@ -37,6 +37,8 @@ struct drm_fb_helper;
 
 #define fb_info linux_fb_info
 #include <drm/drm_crtc.h>
+#include <drm/drm_device.h>
+#include <linux/kgdb.h>
 
 enum mode_set_atomic {
 	LEAVE_ATOMIC_MODE_SET,
@@ -335,11 +337,17 @@ static inline int drm_fb_helper_init(struct drm_device *dev,
 		       struct drm_fb_helper *helper,
 		       int max_conn)
 {
+	/* So drivers can use it to free the struct */
+	helper->dev = dev;
+	dev->fb_helper = helper;
+
 	return 0;
 }
 
 static inline void drm_fb_helper_fini(struct drm_fb_helper *helper)
 {
+	if (helper && helper->dev)
+		helper->dev->fb_helper = NULL;
 }
 
 static inline int drm_fb_helper_blank(int blank, struct fb_info *info)
