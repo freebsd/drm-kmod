@@ -1969,7 +1969,7 @@ static void dcn10_apply_ctx_for_surface(
 
 	tg = top_pipe_to_program->stream_res.tg;
 
-	tg->funcs->lock(tg);
+	dcn10_pipe_control_lock(dc, top_pipe_to_program, true);
 
 	if (num_planes == 0) {
 
@@ -2018,7 +2018,7 @@ static void dcn10_apply_ctx_for_surface(
 	if (num_planes > 0)
 		program_all_pipe_in_tree(dc, top_pipe_to_program, context);
 
-	tg->funcs->unlock(tg);
+	dcn10_pipe_control_lock(dc, top_pipe_to_program, false);
 
 	if (num_planes == 0)
 		false_optc_underflow_wa(dc, stream, tg);
