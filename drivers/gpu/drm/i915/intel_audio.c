@@ -782,6 +782,9 @@ static struct intel_encoder *get_saved_enc(struct drm_i915_private *dev_priv,
 {
 	struct intel_encoder *encoder;
 
+	if (WARN_ON(pipe >= ARRAY_SIZE(dev_priv->av_enc_map)))
+		return NULL;
+
 	/* MST */
 	if (pipe >= 0) {
 		if (WARN_ON(pipe >= ARRAY_SIZE(dev_priv->av_enc_map)))
