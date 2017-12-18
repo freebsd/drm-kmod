@@ -2395,11 +2395,6 @@ create_stream_for_sink(struct amdgpu_dm_connector *aconnector,
 		return stream;
 	}
 
-	if (dm_state == NULL) {
-		DRM_ERROR("dm_state is NULL!\n");
-		return stream;
-	}
-
 	drm_connector = &aconnector->base;
 
 	if (!aconnector->dc_sink) {
