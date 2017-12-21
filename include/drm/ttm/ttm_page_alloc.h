@@ -48,7 +48,7 @@ void ttm_page_alloc_fini(void);
  *
  * Add backing pages to all of @ttm
  */
-int ttm_pool_populate(struct ttm_tt *ttm);
+int ttm_pool_populate(struct ttm_tt *ttm, struct ttm_operation_ctx *ctx);
 
 /**
  * ttm_pool_unpopulate:
@@ -62,7 +62,8 @@ void ttm_pool_unpopulate(struct ttm_tt *ttm);
 /**
  * Populates and DMA maps pages to fullfil a ttm_dma_populate() request
  */
-int ttm_populate_and_map_pages(struct device *dev, struct ttm_dma_tt *tt);
+int ttm_populate_and_map_pages(struct device *dev, struct ttm_dma_tt *tt,
+				struct ttm_operation_ctx *ctx);
 
 /**
  * Unpopulates and DMA unmaps pages as part of a
@@ -90,7 +91,8 @@ void ttm_dma_page_alloc_fini(void);
  */
 int ttm_dma_page_alloc_debugfs(struct seq_file *m, void *data);
 
-int ttm_dma_populate(struct ttm_dma_tt *ttm_dma, struct device *dev);
+int ttm_dma_populate(struct ttm_dma_tt *ttm_dma, struct device *dev,
+			struct ttm_operation_ctx *ctx);
 void ttm_dma_unpopulate(struct ttm_dma_tt *ttm_dma, struct device *dev);
 
 #else
@@ -107,7 +109,8 @@ static inline int ttm_dma_page_alloc_debugfs(struct seq_file *m, void *data)
 	return 0;
 }
 static inline int ttm_dma_populate(struct ttm_dma_tt *ttm_dma,
-				   struct device *dev)
+				struct device *dev,
+				struct ttm_operation_ctx *ctx)
 {
 	return -ENOMEM;
 }
