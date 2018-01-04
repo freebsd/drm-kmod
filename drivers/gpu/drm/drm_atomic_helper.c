@@ -3428,11 +3428,8 @@ void __drm_atomic_helper_crtc_destroy_state(struct drm_crtc_state *state)
 		 * -ERESTARTSYS before the commit_tail work is queued, we will
 		 * have an extra reference to the commit object. Release it, if
 		 * the event has not been consumed by the worker.
-		 *
-		 * state->event may be freed, so we can't directly look at
-		 * state->event->base.completion.
 		 */
-		if (state->event && state->commit->abort_completion)
+		if (state->event)
 			drm_crtc_commit_put(state->commit);
 
 		kfree(state->commit->event);
