@@ -552,7 +552,7 @@ void amdgpu_device_wb_free(struct amdgpu_device *adev, u32 wb)
  * as parameter.
  */
 void amdgpu_device_vram_location(struct amdgpu_device *adev,
-				 struct amdgpu_mc *mc, u64 base)
+				 struct amdgpu_gmc *mc, u64 base)
 {
 	uint64_t limit = (uint64_t)amdgpu_vram_limit << 20;
 
@@ -578,11 +578,11 @@ void amdgpu_device_vram_location(struct amdgpu_device *adev,
  * FIXME: when reducing GTT size align new size on power of 2.
  */
 void amdgpu_device_gart_location(struct amdgpu_device *adev,
-				 struct amdgpu_mc *mc)
+				 struct amdgpu_gmc *mc)
 {
 	u64 size_af, size_bf;
 
-	size_af = adev->mc.mc_mask - mc->vram_end;
+	size_af = adev->gmc.mc_mask - mc->vram_end;
 	size_bf = mc->vram_start;
 	if (size_bf > size_af) {
 		if (mc->gart_size > size_bf) {
@@ -621,7 +621,8 @@ int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 	UNIMPLEMENTED();
 	return -ENODEV;
 #else
-	u64 space_needed = roundup_pow_of_two(adev->mc.real_vram_size);
+	u64 space_needed = roundup_pow_of_two(adev->gmc.real_vram_size);
+
 	u32 rbar_size = order_base_2(((space_needed >> 20) | 1)) - 1;
 	struct pci_bus *root;
 	struct resource *res;
@@ -1786,7 +1787,7 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	adev->flags = flags;
 	adev->asic_type = flags & AMD_ASIC_MASK;
 	adev->usec_timeout = AMDGPU_MAX_USEC_TIMEOUT;
-	adev->mc.gart_size = 512 * 1024 * 1024;
+	adev->gmc.gart_size = 512 * 1024 * 1024;
 	adev->accel_working = false;
 	adev->num_rings = 0;
 	adev->mman.buffer_funcs = NULL;
