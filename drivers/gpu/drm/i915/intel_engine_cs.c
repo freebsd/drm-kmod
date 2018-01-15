@@ -1963,25 +1963,17 @@ int intel_enable_engine_stats(struct intel_engine_cs *engine)
 
 	tasklet_disable(&execlists->tasklet);
 	spin_lock_irqsave(&engine->stats.lock, flags);
-	if (engine->stats.enabled == ~0)
-		goto busy;
+
+	if (unlikely(engine->stats.enabled == ~0)) {
+		err = -EBUSY;
+		goto unlock;
+	}
+
 	if (engine->stats.enabled++ == 0) {
-		struct intel_engine_execlists *execlists = &engine->execlists;
 		const struct execlist_port *port = execlists->port;
 		unsigned int num_ports = execlists_num_ports(execlists);
 
 		engine->stats.enabled_at = ktime_get();
-
-		/* XXX submission method oblivious? */
-		while (num_ports-- && port_isset(port)) {
-			engine->stats.active++;
-			port++;
-		}
-
-		if (engine->stats.active)
-			engine->stats.start = engine->stats.enabled_at;
-	}
-	spin_unlock_irqrestore(&engine->stats.lock, flags);
 
 		/* XXX submission method oblivious? */
 		while (num_ports-- && port_isset(port)) {
