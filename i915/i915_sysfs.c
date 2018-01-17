@@ -59,7 +59,7 @@ static u32 calc_residency(struct drm_i915_private *dev_priv,
 
 		if (I915_READ(VLV_COUNTER_CONTROL) & VLV_COUNT_RANGE_HIGH)
 			units <<= 8;
-	} else if (IS_BROXTON(dev_priv)) {
+	} else if (IS_GEN9_LP(dev_priv)) {
 		units = 1;
 		div = 1200;		/* 833.33ns */
 	}
@@ -463,7 +463,7 @@ static ssize_t gt_min_freq_mhz_store(struct device *kdev,
 #ifndef __FreeBSD__
 static DEVICE_ATTR(gt_act_freq_mhz, S_IRUGO, gt_act_freq_mhz_show, NULL);
 static DEVICE_ATTR(gt_cur_freq_mhz, S_IRUGO, gt_cur_freq_mhz_show, NULL);
-static DEVICE_ATTR(gt_boost_freq_mhz, S_IRUGO, gt_boost_freq_mhz_show, gt_boost_freq_mhz_store);
+static DEVICE_ATTR(gt_boost_freq_mhz, S_IRUGO | S_IWUSR, gt_boost_freq_mhz_show, gt_boost_freq_mhz_store);
 static DEVICE_ATTR(gt_max_freq_mhz, S_IRUGO | S_IWUSR, gt_max_freq_mhz_show, gt_max_freq_mhz_store);
 static DEVICE_ATTR(gt_min_freq_mhz, S_IRUGO | S_IWUSR, gt_min_freq_mhz_show, gt_min_freq_mhz_store);
 
@@ -517,6 +517,8 @@ static const struct attribute *vlv_attrs[] = {
 	NULL,
 };
 
+#if IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR)
+
 static ssize_t error_state_read(struct file *filp, struct kobject *kobj,
 				struct bin_attribute *attr, char *buf,
 				loff_t off, size_t count)
@@ -536,7 +538,7 @@ static ssize_t error_state_read(struct file *filp, struct kobject *kobj,
 	if (ret)
 		return ret;
 
-	error_priv.dev = dev;
+	error_priv.i915 = dev_priv;
 	i915_error_state_get(dev, &error_priv);
 
 	ret = i915_error_state_to_str(&error_str, &error_priv);
@@ -561,7 +563,7 @@ static ssize_t error_state_write(struct file *file, struct kobject *kobj,
 	struct drm_i915_private *dev_priv = kdev_minor_to_i915(kdev);
 
 	DRM_DEBUG_DRIVER("Resetting error state\n");
-	i915_destroy_error_state(&dev_priv->drm);
+	i915_destroy_error_state(dev_priv);
 
 	return count;
 }
@@ -573,6 +575,21 @@ static struct bin_attribute error_state_attr = {
 	.read = error_state_read,
 	.write = error_state_write,
 };
+#endif
+
+static void i915_setup_error_capture(struct device *kdev)
+{
+	if (sysfs_create_bin_file(&kdev->kobj, &error_state_attr))
+		DRM_ERROR("error_state sysfs setup failed\n");
+}
+
+static void i915_teardown_error_capture(struct device *kdev)
+{
+	sysfs_remove_bin_file(&kdev->kobj, &error_state_attr);
+}
+#else
+static void i915_setup_error_capture(struct device *kdev) {}
+static void i915_teardown_error_capture(struct device *kdev) {}
 #endif
 
 void i915_setup_sysfs(struct drm_i915_private *dev_priv)
@@ -626,6 +643,7 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 				    &error_state_attr);
 	if (ret)
 		DRM_ERROR("error_state sysfs setup failed\n");
+	i915_setup_error_capture(kdev);
 #endif
 }
 
@@ -634,7 +652,8 @@ void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
 #ifndef __FreeBSD__
 	struct device *kdev = dev_priv->drm.primary->kdev;
 
-	sysfs_remove_bin_file(&kdev->kobj, &error_state_attr);
+	i915_teardown_error_capture(kdev);
+
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
 		sysfs_remove_files(&kdev->kobj, vlv_attrs);
 	else

@@ -141,6 +141,13 @@ trace_i915_gem_evict_everything(struct drm_device *dev){
 }
 
 static inline void
+trace_i915_gem_evict_node(struct i915_address_space *vm,
+						  struct drm_mm_node *target,
+						  unsigned int flags) {
+	CTR3(KTR_DRM, "evict_node vm %p, target %p, flags %u", vm, target, flags);
+}
+
+static inline void
 trace_i915_gem_object_fault(void *obj, off_t off, int bit, int write)
 {
 	CTR4(KTR_DRM, "gem_object_fault obj %p off %zd bit %d write: %d", obj, off, bit, write);

@@ -1,7 +1,8 @@
 # $FreeBSD$
 
 KMOD=	i915kms
-SRCS=	dvo_ch7017.c \
+SRCS=	\
+	dvo_ch7017.c \
 	dvo_ch7xxx.c \
 	dvo_ivch.c \
 	dvo_ns2501.c \
@@ -16,25 +17,28 @@ SRCS=	dvo_ch7017.c \
 	i915_gem_dmabuf.c \
 	i915_gem_evict.c \
 	i915_gem_execbuffer.c \
-	i915_gem_fence.c \
+	i915_gem_fence_reg.c \
 	i915_gem_gtt.c \
+	i915_gem_internal.c \
 	i915_gem_render_state.c \
 	i915_gem_request.c \
 	i915_gem_stolen.c \
 	i915_gem_shrinker.c \
 	i915_gem_tiling.c \
+	i915_gem_timeline.c \
 	i915_gem_userptr.c \
 	i915_gpu_error.c \
 	i915_guc_submission.c \
 	i915_memcpy.c \
+	i915_oa_hsw.c \
 	i915_params.c \
 	i915_pci.c \
 	i915_irq.c \
 	i915_suspend.c \
 	i915_sw_fence.c \
-	i915_sysfs.c \
 	i915_trace_points.c \
 	i915_vgpu.c \
+	i915_vma.c \
 	intel_acpi.c \
 	intel_atomic.c \
 	intel_atomic_plane.c \
@@ -65,16 +69,21 @@ SRCS=	dvo_ch7017.c \
 	intel_freebsd.c \
 	intel_frontbuffer.c \
 	intel_guc_loader.c \
+	intel_guc_log.c \
+	intel_hangcheck.c \
 	intel_hdmi.c \
 	intel_hotplug.c \
+	intel_huc.c \
 	intel_i2c.c \
 	intel_lrc.c \
+	intel_lspcon.c \
 	intel_lvds.c \
 	intel_modes.c \
 	intel_mocs.c \
 	intel_opregion.c \
 	intel_overlay.c \
 	intel_panel.c \
+	intel_pipe_crc.c \
 	intel_pm.c \
 	intel_psr.c \
 	intel_renderstate_gen6.c \
@@ -87,7 +96,33 @@ SRCS=	dvo_ch7017.c \
 	intel_sideband.c \
 	intel_sprite.c \
 	intel_tv.c \
+	intel_uc.c \
 	intel_uncore.c
+
+# i915_perf.c         # This one opens a can of worms. Hold off for now.
+# intel_lpe_audio.c   # Not yet. (why was this?)
+
+# In case we want to build gvt some day...
+# GVT_DIR	= gvt
+# SRCS	+= ${GVT_DIR}/aperture_gm.c
+# SRCS	+= ${GVT_DIR}/cfg_space.c
+# SRCS	+= ${GVT_DIR}/cmd_parser.c
+# SRCS	+= ${GVT_DIR}/display.c
+# SRCS	+= ${GVT_DIR}/edid.c
+# SRCS	+= ${GVT_DIR}/execlist.c
+# SRCS	+= ${GVT_DIR}/firmware.c
+# SRCS	+= ${GVT_DIR}/gtt.c
+# SRCS	+= ${GVT_DIR}/gvt.c
+# SRCS	+= ${GVT_DIR}/handlers.c
+# SRCS	+= ${GVT_DIR}/interrupt.c
+# SRCS	+= ${GVT_DIR}/kvmgt.c
+# SRCS	+= ${GVT_DIR}/mmio.c
+# SRCS	+= ${GVT_DIR}/opregion.c
+# SRCS	+= ${GVT_DIR}/render.c
+# SRCS	+= ${GVT_DIR}/sched_policy.c
+# SRCS	+= ${GVT_DIR}/scheduler.c
+# SRCS	+= ${GVT_DIR}/trace_points.c
+# SRCS	+= ${GVT_DIR}/vgpu.c
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
@@ -107,16 +142,16 @@ CFLAGS+= -include ${.CURDIR:H}/drm/drm_os_config.h
 SRCS+= i915_ioc32.c
 .endif
 
-SRCS	+=								\
-	opt_acpi.h							\
-	opt_compat.h							\
-	opt_drm.h							\
-	opt_syscons.h							\
-	acpi_if.h							\
-	bus_if.h							\
-	fb_if.h								\
-	device_if.h							\
-	pci_if.h							\
+SRCS	+=			\
+	opt_acpi.h		\
+	opt_compat.h	\
+	opt_drm.h		\
+	opt_syscons.h	\
+	acpi_if.h		\
+	bus_if.h		\
+	fb_if.h			\
+	device_if.h		\
+	pci_if.h		\
 	vnode_if.h
 
 .include <bsd.kmod.mk>
