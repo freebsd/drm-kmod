@@ -1,11 +1,17 @@
 # $FreeBSD$
 
 SUBDIR=	drm		\
-	amd		\
+	amd			\
 	i915		\
 	radeon		\
 	lindebugfs	\
-	linuxkpi
+	linuxkpi	\
+	${_staging}	
+
+
+.if defined(STAGING)
+_staging=	staging
+.endif
 
 # Special target that causes drm2 code to printf error returns.  Useful for
 # determining the root cause of errors.  Depends on drmP.h macro DRM_ERR_RET.

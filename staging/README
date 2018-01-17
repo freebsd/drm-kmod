@@ -1,0 +1,25 @@
+Staging area
+============
+
+vc4
+---
+Broadcom VC4 DRM Driver
+
+TODO:
+linuxkpi: need ARM's platform_of
+Probably more stuff missing?
+--------------------------------------------------------------
+
+
+
+Vboxvideo
+---------
+VirtualBox driver is being moved to Linux kernel. Not yet there in 4.11 but once we caught up to were it's in staging we can copy it here and start planning for adding it to drm drivers.
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/staging/vboxvideo
+
+TODO:
+Unknown at the moment if there are pieces missing in lkpi for this driver
+--------------------------------------------------------------
+
+
