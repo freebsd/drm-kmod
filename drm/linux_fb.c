@@ -58,6 +58,10 @@ vt_restore_fbdev_mode(void *arg, int pending)
 	sc = (struct vt_kms_softc *)arg;
 	fb_helper = sc->fb_helper;
 	linux_set_current(curthread);
+	if(!fb_helper) {
+		DRM_DEBUG("fb helper is null!\n");
+		return;
+	}
 	drm_fb_helper_restore_fbdev_mode_unlocked(fb_helper);
 }
 
@@ -81,6 +85,10 @@ vt_kms_postswitch(void *arg)
 			EVENTHANDLER_INVOKE(shutdown_final, RB_NOSYNC);
 		}
 		linux_set_current(curthread);
+		if(!sc->fb_helper) {
+			DRM_DEBUG("fb helper is null!\n");
+			return -1;
+		}
 		drm_fb_helper_restore_fbdev_mode_unlocked(sc->fb_helper);
 	}
 	return (0);

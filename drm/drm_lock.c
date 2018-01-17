@@ -36,6 +36,9 @@
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
+#include <linux/export.h>
+#include <linux/sched/signal.h>
+
 #include <drm/drmP.h>
 #include <linux/spinlock.h>
 #include "drm_legacy.h"
@@ -179,7 +182,8 @@ int drm_legacy_lock(struct drm_device *dev, void *data,
 #if defined(__linux__)
 	DRM_DEBUG("%d (pid %d) requests lock (0x%08x), flags = 0x%08x\n",
 		  lock->context, task_pid_nr(current),
-		  master->lock.hw_lock->lock, lock->flags);
+		  master->lock.hw_lock ? master->lock.hw_lock->lock : -1,
+		  lock->flags);
 
 	add_wait_queue(&master->lock.lock_queue, &entry);
 	spin_lock_bh(&master->lock.spinlock);
@@ -219,7 +223,7 @@ int drm_legacy_lock(struct drm_device *dev, void *data,
 		  ret ? "interrupted" : "has lock");
 	if (ret) return ret;
 
-	/* don't set the block all signals on the master process for now 
+	/* don't set the block all signals on the master process for now
 	 * really probably not the correct answer but lets us debug xkb
  	 * xserver for now */
 	if (!drm_is_current_master(file_priv)) {

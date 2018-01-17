@@ -123,6 +123,8 @@ drm_find_description(int vendor, int device, const drm_pci_id_list_t *idlist)
 int
 drm_probe_helper(device_t kdev, const drm_pci_id_list_t *idlist)
 {
+	DRM_DEBUG("entering %s\n", __func__);
+
 	const drm_pci_id_list_t *id_entry;
 	int vendor, device;
 
@@ -206,6 +208,7 @@ drm_pci_device_is_agp(struct drm_device *dev)
 int
 drm_pci_device_is_pcie(struct drm_device *dev)
 {
+	DRM_DEBUG("entering %s\n", __func__);
 
 	return (drm_device_find_capability(dev, PCIY_EXPRESS));
 }
@@ -259,6 +262,7 @@ drm_clflush_virt_range(void *addr, unsigned long length)
 
 static char *drm_devnode(struct device *dev, umode_t *mode)
 {
+	DRM_DEBUG("entering %s\n", __func__);
 	return kasprintf(GFP_KERNEL, "dri/%s", dev_name(dev));
 }
 
@@ -308,7 +312,6 @@ out:
 static int
 drm_modevent(module_t mod, int type, void *data)
 {
-
 	switch (type) {
 	case MOD_LOAD:
 		TUNABLE_INT_FETCH("drm.debug", &drm_debug);
@@ -324,7 +327,7 @@ static moduledata_t drm_mod = {
 };
 
 DECLARE_MODULE(drmn, drm_mod, SI_SUB_DRIVERS, SI_ORDER_FIRST);
-MODULE_VERSION(drmn, 2);
+MODULE_VERSION(drmn, 1);
 MODULE_DEPEND(drmn, agp, 1, 1, 1);
 MODULE_DEPEND(drmn, pci, 1, 1, 1);
 MODULE_DEPEND(drmn, mem, 1, 1, 1);
