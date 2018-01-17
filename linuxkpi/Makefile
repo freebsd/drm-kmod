@@ -10,19 +10,22 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_component.c	\
 	linux_device.c		\
 	linux_dmabuf.c		\
-	linux_fence.c		\
+	linux_dmafence.c	\
 	linux_firmware.c	\
 	linux_fs.c		\
 	linux_fs_attr.c		\
 	linux_hrtimer.c		\
 	linux_i2c.c		\
 	linux_irq.c		\
+	linux_llist.c	\
 	linux_mtrr.c		\
 	linux_notifier.c	\
 	linux_page.c		\
+	linux_relay.c		\
 	linux_reservation.c	\
 	linux_seq_file.c	\
 	linux_sort.c		\
+	linux_syncfile.c	\
 	linux_video.c		\
 	interval_tree.c
 

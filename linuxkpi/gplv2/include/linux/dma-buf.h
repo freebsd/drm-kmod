@@ -31,7 +31,7 @@
 #include <linux/list.h>
 #include <linux/dma-mapping.h>
 #include <linux/fs.h>
-#include <linux/fence.h>
+#include <linux/dma-fence.h>
 #include <linux/wait.h>
 #include <linux/module.h>
 
@@ -115,7 +115,7 @@ struct dma_buf {
 	wait_queue_head_t poll;
 
 	struct dma_buf_poll_cb_t {
-		struct fence_cb cb;
+		struct dma_fence_cb cb;
 		wait_queue_head_t *poll;
 
 		unsigned long active;
@@ -128,7 +128,7 @@ struct dma_buf_attachment {
 	struct list_head node;
 	void *priv;
 };
-#define file linux_file 
+#define file linux_file
 static inline void
 get_dma_buf(struct dma_buf *dmabuf)
 {

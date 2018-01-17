@@ -107,3 +107,11 @@ linux_hrtimer_start_range_ns(struct hrtimer *hrtimer, ktime_t time, long nsec)
 	hrtimer->flags |= HRTIMER_ACTIVE;
 	mtx_unlock(&hrtimer->mtx);
 }
+
+void
+linux_hrtimer_forward_now(struct hrtimer *hrtimer, ktime_t interval)
+{
+	mtx_lock(&hrtimer->mtx);
+	callout_schedule(&hrtimer->callout, nstosbt(interval));
+	mtx_unlock(&hrtimer->mtx);
+}
