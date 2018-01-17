@@ -33,6 +33,29 @@ pci_bus_read_config_byte(struct pci_bus *bus, unsigned int devfn, int where, u8 
 	return (pci_bus_read_config(bus, devfn, where, (uint32_t *)val, 1));
 }
 
+static inline int
+pci_bus_write_config(struct pci_bus *bus, unsigned int devfn, int where,
+    uint32_t val, int size)
+{
+	device_t dev;
+	int dom, busid, slot, func;
+
+	dom = pci_get_domain(bus->self->dev.bsddev);
+	busid = pci_get_bus(bus->self->dev.bsddev);
+	slot = ((devfn >> 3) & 0x1f);
+	func = devfn & 0x7;
+	dev = pci_find_dbsf(dom, busid, slot, func);
+	pci_write_config(dev, where, val, size);
+	return (0);
+}
+
+static inline int
+pci_bus_write_config_byte(struct pci_bus *bus, unsigned int devfn, int where,
+    uint8_t val)
+{
+	return (pci_bus_write_config(bus, devfn, where, val, 1));
+}
+
 extern struct pci_dev *pci_get_bus_and_slot(unsigned int bus, unsigned int devfn);
 
 void pci_dev_put(struct pci_dev *pdev);

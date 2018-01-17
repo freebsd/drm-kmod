@@ -70,5 +70,21 @@ void gpiod_set_array_value_cansleep(unsigned int array_size,
 				    struct gpio_desc **desc_array,
 				    int *value_array);
 
+static inline struct gpio_desc *
+devm_gpiod_get_index(struct device *dev,
+		       const char *con_id,
+		       unsigned int idx,
+		       enum gpiod_flags flags)
+{
+	UNIMPLEMENTED();
+	return ERR_PTR(-ENOSYS);
+}
+
+static inline void gpiod_set_value(struct gpio_desc *desc, int value)
+{
+	UNIMPLEMENTED();
+	/* GPIO can never have been requested */
+	WARN_ON(1);
+}
 
 #endif
