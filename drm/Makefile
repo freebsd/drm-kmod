@@ -18,12 +18,14 @@ SRCS=	ati_pcigart.c \
 	drm_crtc.c \
 	drm_crtc_helper.c \
 	drm_debugfs.c \
+	drm_debugfs_crc.c \
 	drm_dma.c \
 	drm_dp_aux_dev.c \
 	drm_dp_dual_mode_helper.c \
 	drm_dp_helper.c \
 	drm_dp_mst_topology.c \
 	drm_drv.c \
+	drm_dumb_buffers.c \
 	drm_edid.c \
 	drm_edid_load.c \
 	drm_encoder.c \
@@ -48,6 +50,7 @@ SRCS=	ati_pcigart.c \
 	drm_mipi_dsi.c \
 	drm_mm.c \
 	drm_modes.c \
+	drm_mode_config.c \
 	drm_mode_object.c \
 	drm_modeset_lock.c \
 	drm_modeset_helper.c \
@@ -56,6 +59,7 @@ SRCS=	ati_pcigart.c \
 	drm_pci.c \
 	drm_plane.c \
 	drm_plane_helper.c \
+	drm_print.c \
 	drm_prime.c \
 	drm_probe_helper.c \
 	drm_property.c \
