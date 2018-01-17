@@ -38,6 +38,7 @@
 #include <linux/module.h>
 #include <linux/pm_runtime.h>
 #include <linux/vga_switcheroo.h>
+#include <linux/compat.h>
 #include <drm/drm_gem.h>
 #include <drm/drm_fb_helper.h>
 
@@ -100,12 +101,13 @@
  *   2.46.0 - Add PFP_SYNC_ME support on evergreen
  *   2.47.0 - Add UVD_NO_OP register support
  *   2.48.0 - TA_CS_BC_BASE_ADDR allowed on SI
+ *   2.49.0 - DRM_RADEON_GEM_INFO ioctl returns correct vram_size/visible values
  */
 #define KMS_DRIVER_MAJOR	2
-#define KMS_DRIVER_MINOR	48
+#define KMS_DRIVER_MINOR	49
 #define KMS_DRIVER_PATCHLEVEL	0
 int radeon_driver_load_kms(struct drm_device *dev, unsigned long flags);
-int radeon_driver_unload_kms(struct drm_device *dev);
+void radeon_driver_unload_kms(struct drm_device *dev);
 void radeon_driver_lastclose_kms(struct drm_device *dev);
 int radeon_driver_open_kms(struct drm_device *dev, struct drm_file *file_priv);
 void radeon_driver_postclose_kms(struct drm_device *dev,
@@ -157,8 +159,6 @@ void radeon_gem_prime_unpin(struct drm_gem_object *obj);
 struct reservation_object *radeon_gem_prime_res_obj(struct drm_gem_object *);
 void *radeon_gem_prime_vmap(struct drm_gem_object *obj);
 void radeon_gem_prime_vunmap(struct drm_gem_object *obj, void *vaddr);
-extern long radeon_kms_compat_ioctl(struct file *filp, unsigned int cmd,
-				    unsigned long arg);
 
 /* atpx handler */
 #if defined(CONFIG_VGA_SWITCHEROO)
@@ -373,11 +373,10 @@ static void
 radeon_pci_shutdown(struct pci_dev *pdev)
 {
 	/* if we are running in a VM, make sure the device
-	 * torn down properly on reboot/shutdown.
-	 * unfortunately we can't detect certain
-	 * hypervisors so just do this all the time.
+	 * torn down properly on reboot/shutdown
 	 */
-	radeon_pci_remove(pdev);
+	if (radeon_device_is_virtual())
+		radeon_pci_remove(pdev);
 }
 
 static int radeon_pmops_suspend(struct device *dev)
@@ -512,6 +511,21 @@ long radeon_drm_ioctl(struct file *filp,
 	pm_runtime_put_autosuspend(dev->dev);
 	return ret;
 }
+
+#ifdef CONFIG_COMPAT
+static long radeon_kms_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+	unsigned int nr = DRM_IOCTL_NR(cmd);
+	int ret;
+
+	if (nr < DRM_COMMAND_BASE)
+		return drm_compat_ioctl(filp, cmd, arg);
+
+	ret = radeon_drm_ioctl(filp, cmd, arg);
+
+	return ret;
+}
+#endif
 
 static const struct dev_pm_ops radeon_pm_ops = {
 	.suspend = radeon_pmops_suspend,
