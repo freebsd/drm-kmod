@@ -70,10 +70,15 @@ static void amdgpu_bo_list_destroy(struct amdgpu_fpriv *fpriv, int id)
 	struct amdgpu_bo_list *list;
 
 	mutex_lock(&fpriv->bo_list_lock);
-	list = idr_find(&fpriv->bo_list_handles, id);
+#ifdef __FreeBSD__
+	list = NULL;  // idr_remove does not return anything in linuxkpi
+	idr_remove((struct idr *)&fpriv->bo_list_handles, id);
+#else
+	list = idr_remove(&fpriv->bo_list_handles, id);
+#endif
 	if (list) {
+		/* Another user may have a reference to this list still */
 		mutex_lock(&list->lock);
-		idr_remove(&fpriv->bo_list_handles, id);
 		mutex_unlock(&list->lock);
 		amdgpu_bo_list_free(list);
 	}
