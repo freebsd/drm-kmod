@@ -25,7 +25,7 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_reservation.c	\
 	linux_seq_file.c	\
 	linux_sort.c		\
-	linux_syncfile.c	\
+	linux_sync_file.c	\
 	linux_video.c		\
 	interval_tree.c
 
