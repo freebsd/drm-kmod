@@ -1,0 +1,68 @@
+# $FreeBSD$
+
+#.PATH:	${SYSDIR}/dev/drm/amd/amdkfd
+
+KMOD	= amdkfd
+
+# XXX NOT PORTED YET:
+#	kfd_device.c : amd_iommu 
+#	kfd_chardev.c : lots of missing stuff
+#	kfd_device_queue_manager_cik.c : memset declaration missing in rwsem
+#	kfd_device_queue_manager_vi.c : memset declaration missing in rwsem
+#	kfd_events.c : incomplete mm struct
+#	kfd_module.c : module version macros
+#	kfd_mqd_manager_cik.c : we seem to be missing an include w/ basic types
+#	kfd_mqd_manager_vi.c : we seem to be missing an include w/ basic types
+#	kfd_process.c : srcu
+#	kfd_topology.c : rwsems
+
+SRCS	= \
+	cik_event_interrupt.c \
+	kfd_dbgdev.c \
+	kfd_dbgmgr.c \
+	kfd_device_queue_manager.c \
+	kfd_doorbell.c \
+	kfd_flat_memory.c \
+	kfd_interrupt.c \
+	kfd_kernel_queue.c \
+	kfd_kernel_queue_cik.c \
+	kfd_kernel_queue_vi.c \
+	kfd_mqd_manager.c \
+	kfd_packet_manager.c \
+	kfd_pasid.c \
+	kfd_process_queue_manager.c \
+	kfd_queue.c #\
+#	kfd_topology.c
+
+CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/dummy/include
+CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
+CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
+
+CFLAGS+= -I${.CURDIR:H:H}/include
+CFLAGS+= -I${.CURDIR:H:H}/include/drm
+CFLAGS+= -I${.CURDIR:H:H}/include/uapi
+CFLAGS+= -I${.CURDIR:H:H}
+
+CFLAGS+= -I${.CURDIR:H}/amdgpu
+CFLAGS+= -I${.CURDIR:H}/include
+CFLAGS+= -I${.CURDIR:H}/acp/include
+CFLAGS+= -I${.CURDIR:H}/powerplay/inc
+CFLAGS+= -I${.CURDIR:H}/scheduler
+CFLAGS+= -I${.CURDIR:H}/include/asic_reg
+
+CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
+
+SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
+	opt_vm.h opt_compat.h opt_syscons.h
+
+.include <bsd.kmod.mk>
+
+CWARNFLAGS+=	-Wno-pointer-arith
+CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
+
+CWARNFLAGS.kfd_chardev.c=	-Wno-format
+CWARNFLAGS.kfd_dbgdev.c=	-Wno-format
+CWARNFLAGS.kfd_device_queue_manager.c=	-Wno-format
+CWARNFLAGS.kfd_doorbell.c=	-Wno-format
+CWARNFLAGS.kfd_packet_manager.c=	-Wno-format
+CWARNFLAGS.kfd_queue.c= -Wno-format
