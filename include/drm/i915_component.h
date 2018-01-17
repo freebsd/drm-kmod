@@ -66,7 +66,7 @@ struct i915_audio_component_ops {
 	 * Called from audio driver. After audio driver sets the
 	 * sample rate, it will call this function to set n/cts
 	 */
-	int (*sync_audio_rate)(struct device *, int port, int rate);
+	int (*sync_audio_rate)(struct device *, int port, int pipe, int rate);
 	/**
 	 * @get_eld: fill the audio state and ELD bytes for the given port
 	 *
@@ -79,7 +79,7 @@ struct i915_audio_component_ops {
 	 * Note that the returned size may be over @max_bytes.  Then it
 	 * implies that only a part of ELD has been copied to the buffer.
 	 */
-	int (*get_eld)(struct device *, int port, bool *enabled,
+	int (*get_eld)(struct device *, int port, int pipe, bool *enabled,
 		       unsigned char *buf, int max_bytes);
 };
 
@@ -99,7 +99,7 @@ struct i915_audio_component_audio_ops {
 	 * status accordingly (even when the HDA controller is in power save
 	 * mode).
 	 */
-	void (*pin_eld_notify)(void *audio_ptr, int port);
+	void (*pin_eld_notify)(void *audio_ptr, int port, int pipe);
 };
 
 /**

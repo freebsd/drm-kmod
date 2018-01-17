@@ -64,7 +64,7 @@ typedef uint64_t __u64;
 #endif
 typedef size_t   __kernel_size_t;
 typedef unsigned long drm_handle_t;
-#include <drm/drm_os_freebsd.h>
+#include <dev/drm/drm_os_freebsd.h>
 #endif
 
 #if defined(__cplusplus)
