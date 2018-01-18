@@ -1848,6 +1848,7 @@ int intel_hdcp_init(struct intel_connector *connector,
 int intel_hdcp_enable(struct intel_connector *connector);
 int intel_hdcp_disable(struct intel_connector *connector);
 int intel_hdcp_check_link(struct intel_connector *connector);
+bool is_hdcp_supported(struct drm_i915_private *dev_priv, enum port port);
 
 /* intel_psr.c */
 #define CAN_PSR(dev_priv) (HAS_PSR(dev_priv) && dev_priv->psr.sink_support)
