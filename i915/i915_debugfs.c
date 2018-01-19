@@ -30,6 +30,10 @@
 #include <linux/list_sort.h>
 #include "intel_drv.h"
 
+#ifdef __FreeBSD__
+#include <asm/msr.h>
+#endif
+
 static inline struct drm_i915_private *node_to_i915(struct drm_info_node *node)
 {
 	return to_i915(node->minor->dev);

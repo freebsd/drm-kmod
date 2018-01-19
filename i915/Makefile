@@ -155,7 +155,18 @@ SRCS	+=			\
 	vnode_if.h
 
 .include <bsd.kmod.mk>
-CWARNFLAGS += -Wno-pointer-arith -Wno-format
+
+# Re-instate -Wno-cast-qual for all files
+# Reason: More or less all files need it due to use of test_bit() macro
+# error: cast from 'const unsigned long *' to 'volatile unsigned long *'
+CWARNFLAGS += -Wno-pointer-arith -Wno-format -Wno-cast-qual
+
+CWARNFLAGS.dvo_ch7017.c=	-Wno-cast-qual
+CWARNFLAGS.dvo_ch7xxx.c=	-Wno-cast-qual
+CWARNFLAGS.dvo_ivch.c=		-Wno-cast-qual
+CWARNFLAGS.dvo_ns2501.c=	-Wno-cast-qual
+CWARNFLAGS.dvo_sil164.c=	-Wno-cast-qual
+CWARNFLAGS.dvo_tfp410.c=	-Wno-cast-qual
 
 CWARNFLAGS.intel_audio.c=	-Wno-cast-qual
 CWARNFLAGS.intel_bios.c=	-Wno-cast-qual
@@ -166,6 +177,7 @@ CWARNFLAGS.intel_display.c=	-Wno-tautological-pointer-compare -Wno-enum-conversi
 CWARNFLAGS.intel_dpll_mgr.c=	-Wno-compare-distinct-pointer-types
 CWARNFLAGS.intel_dsi_panel_vbt.c= -Wno-cast-qual
 CWARNFLAGS.intel_engine_cs.c= -Wno-cast-qual
+CWARNFLAGS.intel_fbdev.c=	-Wno-initializer-overrides
 CWARNFLAGS.intel_guc_loader.c= 	-Wno-cast-qual
 CWARNFLAGS.intel_hdmi.c=	-Wno-enum-conversion
 CWARNFLAGS.intel_hotplug.c=	-Wno-missing-prototypes
@@ -177,10 +189,26 @@ CWARNFLAGS.intel_psr.c=		-Wno-cast-qual
 CWARNFLAGS.intel_runtime_pm.c=		-Wno-cast-qual 
 CWARNFLAGS.intel_sdvo.c=	-Wno-cast-qual -Wno-enum-conversion
 CWARNFLAGS.intel_tv.c=		-Wno-unused
+
+CWARNFLAGS.i915_cmd_parser.c= -Wno-cast-qual
 CWARNFLAGS.i915_debugfs.c=	-Wno-unused-function -Wno-cast-qual -Wno-format -Wno-dangling-else
-CWARNFLAGS.i915_gem.c=		-Wno-tautological-pointer-compare -Wno-pointer-arith -Wno-cast-qual -Wno-int-conversion
 CWARNFLAGS.i915_drv.c=		-Wno-initializer-overrides -Wno-cast-qual -Wno-missing-prototypes
-CWARNFLAGS.i915_gem_gtt.c=	-Wno-tautological-pointer-compare
-CWARNFLAGS.i915_gem_tiling.c=	-Wno-tautological-pointer-compare
-CWARNFLAGS.i915_gem_execbuffer.c=	-Wno-tautological-pointer-compare  -Wno-pointer-arith
+CWARNFLAGS.i915_gem.c=		-Wno-tautological-pointer-compare -Wno-pointer-arith -Wno-cast-qual -Wno-int-conversion
+CWARNFLAGS.i915_gem_batch_pool.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_context.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_dmabuf.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_evict.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_execbuffer.c= -Wno-tautological-pointer-compare  -Wno-pointer-arith -Wno-cast-qual
+CWARNFLAGS.i915_gem_fence_reg.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_gtt.c=	-Wno-tautological-pointer-compare -Wno-cast-qual
+CWARNFLAGS.i915_gem_internal.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_render_state.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_request.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_shrinker.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_stolen.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_tiling.c=	-Wno-tautological-pointer-compare -Wno-cast-qual
+CWARNFLAGS.i915_gem_timeline.c= -Wno-cast-qual
+CWARNFLAGS.i915_gem_userptr.c= -Wno-cast-qual
+CWARNFLAGS.i915_gpu_error.c= -Wno-cast-qual
+CWARNFLAGS.i915_guc_submission.c= -Wno-cast-qual
 CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides 
