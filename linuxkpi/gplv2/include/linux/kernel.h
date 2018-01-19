@@ -11,5 +11,6 @@
 
 #include <asm/cpufeature.h>
 #include <asm/processor.h>
+#include <asm/barrier.h>
 
 #endif /* _KERNEL_GPLV2_H_ */
