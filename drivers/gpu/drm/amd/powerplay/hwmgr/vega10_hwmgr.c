@@ -5043,7 +5043,7 @@ static int vega10_get_power_profile_mode(struct pp_hwmgr *hwmgr, char *buf)
 					"POWER_SAVING",
 					"VIDEO",
 					"VR",
-					"COMPUTER",
+					"COMPUTE",
 					"CUSTOM"};
 	static const char *title[6] = {"NUM",
 			"MODE_NAME",
