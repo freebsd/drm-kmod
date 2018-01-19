@@ -58,6 +58,12 @@
 #define CONFIG_DRM_AMD_POWERPLAY 1
 
 
+// Linux Makefile drm/amd/amdgpu/Makefile:
+// amdgpu-$(CONFIG_DRM_AMDGPU_SI)+= si.o gmc_v6_0.o gfx_v6_0.o si_ih.o
+//                                  si_dma.o dce_v6_0.o si_dpm.o si_smc.o
+// Since we always build those files, define here to avoid build error
+#define CONFIG_DRM_AMDGPU_SI
+	 
 // Let try to do without this one. Opens a can of worms.
 //#define CONFIG_LOCKDEP 1
 
