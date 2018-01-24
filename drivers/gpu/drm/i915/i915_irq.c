@@ -457,6 +457,8 @@ void gen6_disable_rps_interrupts(struct drm_i915_private *dev_priv)
 
 void gen9_reset_guc_interrupts(struct drm_i915_private *dev_priv)
 {
+	assert_rpm_wakelock_held(dev_priv);
+
 	spin_lock_irq(&dev_priv->irq_lock);
 	gen6_reset_pm_iir(dev_priv, dev_priv->pm_guc_events);
 	spin_unlock_irq(&dev_priv->irq_lock);
@@ -464,6 +466,8 @@ void gen9_reset_guc_interrupts(struct drm_i915_private *dev_priv)
 
 void gen9_enable_guc_interrupts(struct drm_i915_private *dev_priv)
 {
+	assert_rpm_wakelock_held(dev_priv);
+
 	spin_lock_irq(&dev_priv->irq_lock);
 	if (!dev_priv->guc.interrupts_enabled) {
 		WARN_ON_ONCE(I915_READ(gen6_pm_iir(dev_priv)) &
@@ -476,6 +480,8 @@ void gen9_enable_guc_interrupts(struct drm_i915_private *dev_priv)
 
 void gen9_disable_guc_interrupts(struct drm_i915_private *dev_priv)
 {
+	assert_rpm_wakelock_held(dev_priv);
+
 	spin_lock_irq(&dev_priv->irq_lock);
 	dev_priv->guc.interrupts_enabled = false;
 
