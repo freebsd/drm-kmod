@@ -1766,8 +1766,8 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 #endif
 
 out:
-#ifdef __linux__
 	i915_gem_object_put(obj);
+#ifdef __linux__
 	if (IS_ERR((void *)addr))
 		return addr;
 #else
