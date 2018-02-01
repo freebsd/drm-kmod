@@ -1091,10 +1091,15 @@ long i915_wait_request(struct drm_i915_gem_request *req,
 	struct intel_wait wait;
 
 	might_sleep();
+#ifdef __FreeBSD__
+	GEM_BUG_ON(!!lockdep_is_held(&req->i915->drm.struct_mutex) !=
+		   !!(flags & I915_WAIT_LOCKED));
+#else
 #if IS_ENABLED(CONFIG_LOCKDEP)
 	GEM_BUG_ON(debug_locks &&
 		   !!lockdep_is_held(&req->i915->drm.struct_mutex) !=
 		   !!(flags & I915_WAIT_LOCKED));
+#endif
 #endif
 	GEM_BUG_ON(timeout < 0);
 
