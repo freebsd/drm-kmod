@@ -44,7 +44,11 @@ EXPORT_SYMBOL(__drm_printfn_seq_file);
 
 void __drm_printfn_info(struct drm_printer *p, struct va_format *vaf)
 {
-	dev_printk(KERN_INFO, p->arg, "[" DRM_NAME "] %pV", vaf);
+#ifdef __FreeBSD__
+	dev_printk(KERN_INFO, (const struct device *)(p->arg), "[" DRM_NAME "] %pV", vaf);
+#else
+	dev_printk(KERN_INFO, p->arg, "[" DRM_NAME "] %pV", vaf);	
+#endif	
 }
 EXPORT_SYMBOL(__drm_printfn_info);
 

@@ -488,12 +488,10 @@ const char *drm_get_connector_status_name(enum drm_connector_status status)
 }
 EXPORT_SYMBOL(drm_get_connector_status_name);
 
-#ifndef __FreeBSD__
 #ifdef CONFIG_LOCKDEP
 static struct lockdep_map connector_list_iter_dep_map = {
 	.name = "drm_connector_list_iter"
 };
-#endif
 #endif
 
 /**
@@ -511,9 +509,7 @@ void drm_connector_list_iter_get(struct drm_device *dev,
 {
 	iter->dev = dev;
 	iter->conn = NULL;
-#ifndef __FreeBSD__ // XXX: FIXME!
 	lock_acquire_shared_recursive(&connector_list_iter_dep_map, 0, 1, NULL, _RET_IP_);
-#endif
 }
 EXPORT_SYMBOL(drm_connector_list_iter_get);
 

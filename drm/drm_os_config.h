@@ -64,7 +64,13 @@
 // Since we always build those files, define here to avoid build error
 #define CONFIG_DRM_AMDGPU_SI
 	 
-// Let try to do without this one. Opens a can of worms.
+
+// Let try to do without this CONFIG_LOCKDEP. Opens a can of worms.
+// FreeBSD does some lock checking even without this macro.
+// See $SRC/sys/compat/linuxkpi/common/include/linux/lockdep.h
+// For the functions that we implement, override IS_ENABLED(CONFIG_LOCKDEP)
+// by using #if IS_ENABLED(CONFIG_LOCKDEP) || defined(__FreeBSD__) in
+// drm drivers
 //#define CONFIG_LOCKDEP 1
 
 
