@@ -1102,9 +1102,9 @@ extern const struct ttm_mem_type_manager_func ttm_bo_manager_func;
  */
 struct ttm_tt *ttm_agp_tt_create(struct ttm_bo_device *bdev,
 #ifdef __linux__
-					struct agp_bridge_data *bridge,
+				 struct agp_bridge_data *bridge,
 #else
-					device_t bridge,
+				 device_t bridge,
 #endif
 				 unsigned long size, uint32_t page_flags);
 int ttm_agp_tt_populate(struct ttm_tt *ttm, struct ttm_operation_ctx *ctx);
