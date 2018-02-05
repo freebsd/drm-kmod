@@ -302,6 +302,14 @@ static void engine_event_destroy(struct perf_event *event)
 		intel_disable_engine_stats(engine);
 }
 
+static void i915_pmu_event_destroy(struct perf_event *event)
+{
+	WARN_ON(event->parent);
+
+	if (is_engine_event(event))
+		engine_event_destroy(event);
+}
+
 static int
 engine_event_status(struct intel_engine_cs *engine,
 		    enum drm_i915_pmu_engine_sample sample)
@@ -352,13 +360,23 @@ static int engine_event_init(struct perf_event *event)
 	struct drm_i915_private *i915 =
 		container_of(event->pmu, typeof(*i915), pmu.base);
 	struct intel_engine_cs *engine;
+	u8 sample;
+	int ret;
 
 	engine = intel_engine_lookup_user(i915, engine_event_class(event),
 					  engine_event_instance(event));
 	if (!engine)
 		return -ENODEV;
 
-	return engine_event_status(engine, engine_event_sample(event));
+	sample = engine_event_sample(event);
+	ret = engine_event_status(engine, sample);
+	if (ret)
+		return ret;
+
+	if (sample == I915_SAMPLE_BUSY && intel_engine_supports_stats(engine))
+		ret = intel_enable_engine_stats(engine);
+
+	return ret;
 }
 
 static int i915_pmu_event_init(struct perf_event *event)
