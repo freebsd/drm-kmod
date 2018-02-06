@@ -703,6 +703,7 @@ static int intel_breadcrumbs_signaler(void *arg)
 				      &request->fence.flags)) {
 				local_bh_disable();
 				dma_fence_signal(&request->fence);
+				GEM_BUG_ON(!i915_gem_request_completed(request));
 				local_bh_enable(); /* kick start the tasklets */
 			}
 
