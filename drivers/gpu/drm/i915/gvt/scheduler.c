@@ -52,52 +52,27 @@ static void set_context_pdp_root_pointer(
 		pdp_pair[i].val = pdp[7 - i];
 }
 
-/*
- * when populating shadow ctx from guest, we should not overrride oa related
- * registers, so that they will not be overlapped by guest oa configs. Thus
- * made it possible to capture oa data from host for both host and guests.
- */
-static void sr_oa_regs(struct intel_vgpu_workload *workload,
-		u32 *reg_state, bool save)
+static void update_shadow_pdps(struct intel_vgpu_workload *workload)
 {
-	struct drm_i915_private *dev_priv = workload->vgpu->gvt->dev_priv;
-	u32 ctx_oactxctrl = dev_priv->perf.oa.ctx_oactxctrl_offset;
-	u32 ctx_flexeu0 = dev_priv->perf.oa.ctx_flexeu0_offset;
-	int i = 0;
-	u32 flex_mmio[] = {
-		i915_mmio_reg_offset(EU_PERF_CNTL0),
-		i915_mmio_reg_offset(EU_PERF_CNTL1),
-		i915_mmio_reg_offset(EU_PERF_CNTL2),
-		i915_mmio_reg_offset(EU_PERF_CNTL3),
-		i915_mmio_reg_offset(EU_PERF_CNTL4),
-		i915_mmio_reg_offset(EU_PERF_CNTL5),
-		i915_mmio_reg_offset(EU_PERF_CNTL6),
-	};
+	struct intel_vgpu *vgpu = workload->vgpu;
+	int ring_id = workload->ring_id;
+	struct i915_gem_context *shadow_ctx = vgpu->submission.shadow_ctx;
+	struct drm_i915_gem_object *ctx_obj =
+		shadow_ctx->engine[ring_id].state->obj;
+	struct execlist_ring_context *shadow_ring_context;
+	struct page *page;
 
-	if (!workload || !reg_state || workload->ring_id != RCS)
+	if (WARN_ON(!workload->shadow_mm))
 		return;
 
-	if (save) {
-		workload->oactxctrl = reg_state[ctx_oactxctrl + 1];
+	if (WARN_ON(!atomic_read(&workload->shadow_mm->pincount)))
+		return;
 
-		for (i = 0; i < ARRAY_SIZE(workload->flex_mmio); i++) {
-			u32 state_offset = ctx_flexeu0 + i * 2;
-
-			workload->flex_mmio[i] = reg_state[state_offset + 1];
-		}
-	} else {
-		reg_state[ctx_oactxctrl] =
-			i915_mmio_reg_offset(GEN8_OACTXCONTROL);
-		reg_state[ctx_oactxctrl + 1] = workload->oactxctrl;
-
-		for (i = 0; i < ARRAY_SIZE(workload->flex_mmio); i++) {
-			u32 state_offset = ctx_flexeu0 + i * 2;
-			u32 mmio = flex_mmio[i];
-
-			reg_state[state_offset] = mmio;
-			reg_state[state_offset + 1] = workload->flex_mmio[i];
-		}
-	}
+	page = i915_gem_object_get_page(ctx_obj, LRC_STATE_PN);
+	shadow_ring_context = kmap(page);
+	set_context_pdp_root_pointer(shadow_ring_context,
+			(void *)workload->shadow_mm->ppgtt_mm.shadow_pdps);
+	kunmap(page);
 }
 
 static int populate_shadow_context(struct intel_vgpu_workload *workload)
@@ -160,9 +135,6 @@ static int populate_shadow_context(struct intel_vgpu_workload *workload)
 		COPY_REG(rcs_indirect_ctx_offset);
 	}
 #undef COPY_REG
-
-	set_context_pdp_root_pointer(shadow_ring_context,
-				     (void *)workload->shadow_mm->ppgtt_mm.shadow_pdps);
 
 	intel_gvt_hypervisor_read_gpa(vgpu,
 			workload->ring_context_gpa +
@@ -569,6 +541,8 @@ static int prepare_workload(struct intel_vgpu_workload *workload)
 		gvt_vgpu_err("fail to vgpu pin mm\n");
 		return ret;
 	}
+
+	update_shadow_pdps(workload);
 
 	ret = intel_vgpu_sync_oos_pages(workload->vgpu);
 	if (ret) {
