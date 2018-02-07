@@ -2044,7 +2044,8 @@ void i915_reset(struct drm_i915_private *i915, unsigned int flags)
 	 */
 	ret = i915_ggtt_enable_hw(i915);
 	if (ret) {
-		DRM_ERROR("Failed to re-enable GGTT following reset %d\n", ret);
+		DRM_ERROR("Failed to re-enable GGTT following reset (%d)\n",
+			  ret);
 		goto error;
 	}
 
@@ -2061,7 +2062,8 @@ void i915_reset(struct drm_i915_private *i915, unsigned int flags)
 	 */
 	ret = i915_gem_init_hw(i915);
 	if (ret) {
-		DRM_ERROR("Failed hw init on reset %d\n", ret);
+		DRM_ERROR("Failed to initialise HW following reset (%d)\n",
+			  ret);
 		goto error;
 	}
 
