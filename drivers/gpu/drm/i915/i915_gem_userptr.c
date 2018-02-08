@@ -726,7 +726,7 @@ static const struct drm_i915_gem_object_ops i915_gem_userptr_ops = {
 	.release = i915_gem_userptr_release,
 };
 
-/**
+/*
  * Creates a new mm object that wraps some normal memory from the process
  * context - user memory.
  *
@@ -762,7 +762,9 @@ static const struct drm_i915_gem_object_ops i915_gem_userptr_ops = {
  * dma-buf instead.
  */
 int
-i915_gem_userptr_ioctl(struct drm_device *dev, void *data, struct drm_file *file)
+i915_gem_userptr_ioctl(struct drm_device *dev,
+		       void *data,
+		       struct drm_file *file)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	struct drm_i915_gem_userptr *args = data;
