@@ -1989,7 +1989,7 @@ static int eb_submit(struct i915_execbuffer *eb)
 	return 0;
 }
 
-/**
+/*
  * Find one BSD ring to dispatch the corresponding BSD command.
  * The engine index is returned.
  */
