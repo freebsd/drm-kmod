@@ -7565,7 +7565,7 @@ unsigned long i915_chipset_val(struct drm_i915_private *dev_priv)
 {
 	unsigned long val;
 
-	if (INTEL_GEN(dev_priv) != 5)
+	if (!IS_GEN5(dev_priv))
 		return 0;
 
 	spin_lock_irq(&mchdev_lock);
@@ -7652,7 +7652,7 @@ static void __i915_update_gfx_val(struct drm_i915_private *dev_priv)
 
 void i915_update_gfx_val(struct drm_i915_private *dev_priv)
 {
-	if (INTEL_GEN(dev_priv) != 5)
+	if (!IS_GEN5(dev_priv))
 		return;
 
 	spin_lock_irq(&mchdev_lock);
@@ -7703,7 +7703,7 @@ unsigned long i915_gfx_val(struct drm_i915_private *dev_priv)
 {
 	unsigned long val;
 
-	if (INTEL_GEN(dev_priv) != 5)
+	if (!IS_GEN5(dev_priv))
 		return 0;
 
 	spin_lock_irq(&mchdev_lock);
