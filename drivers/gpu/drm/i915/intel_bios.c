@@ -1711,6 +1711,8 @@ void intel_bios_cleanup(struct drm_i915_private *dev_priv)
 	dev_priv->vbt.dsi.pps = NULL;
 	kfree(dev_priv->vbt.dsi.config);
 	dev_priv->vbt.dsi.config = NULL;
+	kfree(dev_priv->vbt.dsi.deassert_seq);
+	dev_priv->vbt.dsi.deassert_seq = NULL;
 }
 
 /**
