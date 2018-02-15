@@ -10719,6 +10719,7 @@ static bool check_digital_port_conflicts(struct drm_atomic_state *state)
 	struct drm_connector_list_iter conn_iter;
 	unsigned int used_ports = 0;
 	unsigned int used_mst_ports = 0;
+	bool ret = true;
 
 	/*
 	 * Walk the connector list instead of the encoder
@@ -10753,7 +10754,7 @@ static bool check_digital_port_conflicts(struct drm_atomic_state *state)
 
 			/* the same port mustn't appear more than once */
 			if (used_ports & port_mask)
-				return false;
+				ret = false;
 
 			used_ports |= port_mask;
 			break;
@@ -10771,7 +10772,7 @@ static bool check_digital_port_conflicts(struct drm_atomic_state *state)
 	if (used_ports & used_mst_ports)
 		return false;
 
-	return true;
+	return ret;
 }
 
 static void
