@@ -388,6 +388,7 @@ static const struct intel_device_info intel_haswell_gt3_info = {
 
 #define GEN8_FEATURES \
 	G75_FEATURES, \
+	GEN(8), \
 	BDW_COLORS, \
 	.page_sizes = I915_GTT_PAGE_SIZE_4K | \
 		      I915_GTT_PAGE_SIZE_2M, \
@@ -398,7 +399,6 @@ static const struct intel_device_info intel_haswell_gt3_info = {
 
 #define BDW_PLATFORM \
 	GEN8_FEATURES, \
-	GEN(8), \
 	.platform = INTEL_BROADWELL
 
 static const struct intel_device_info intel_broadwell_gt1_info = {
@@ -457,6 +457,7 @@ static const struct intel_device_info intel_cherryview_info = {
 
 #define GEN9_FEATURES \
 	GEN8_FEATURES, \
+	GEN(9), \
 	GEN9_DEFAULT_PAGE_SIZES, \
 	.has_logical_ring_preemption = 1, \
 	.has_csr = 1, \
@@ -466,7 +467,6 @@ static const struct intel_device_info intel_cherryview_info = {
 
 #define SKL_PLATFORM \
 	GEN9_FEATURES, \
-	GEN(9), \
 	.platform = INTEL_SKYLAKE
 
 static const struct intel_device_info intel_skylake_gt1_info = {
@@ -540,7 +540,6 @@ static const struct intel_device_info intel_geminilake_info = {
 
 #define KBL_PLATFORM \
 	GEN9_FEATURES, \
-	GEN(9),  \
 	.platform = INTEL_KABYLAKE
 
 static const struct intel_device_info intel_kabylake_gt1_info = {
@@ -561,7 +560,6 @@ static const struct intel_device_info intel_kabylake_gt3_info = {
 
 #define CFL_PLATFORM \
 	GEN9_FEATURES, \
-	GEN(9), \
 	.platform = INTEL_COFFEELAKE
 
 static const struct intel_device_info intel_coffeelake_gt1_info = {
@@ -582,12 +580,12 @@ static const struct intel_device_info intel_coffeelake_gt3_info = {
 
 #define GEN10_FEATURES \
 	GEN9_FEATURES, \
+	GEN(10), \
 	.ddb_size = 1024, \
 	GLK_COLORS
 
 static const struct intel_device_info intel_cannonlake_info = {
 	GEN10_FEATURES,
-	GEN(10),
 	.platform = INTEL_CANNONLAKE,
 	.gt = 2,
 };
