@@ -30,9 +30,9 @@
 
 #define pr_fmt(fmt) "[TTM] " fmt
 
-#include <drm/ttm/ttm_module.h>
-#include <drm/ttm/ttm_bo_driver.h>
-#include <drm/ttm/ttm_placement.h>
+#include <ttm/ttm_module.h>
+#include <ttm/ttm_bo_driver.h>
+#include <ttm/ttm_placement.h>
 #include <drm/drm_vma_manager.h>
 #include <linux/mm.h>
 #include <linux/pfn_t.h>
@@ -81,7 +81,6 @@ static int ttm_bo_vm_fault_idle(struct ttm_buffer_object *bo,
 	 */
 	ret = dma_fence_wait(bo->moving, true);
 	if (unlikely(ret != 0)) {
-		printf("fence_wait returned with error %d\n", ret);
 		ret = (ret != -ERESTARTSYS) ? VM_FAULT_SIGBUS :
 			VM_FAULT_NOPAGE;
 		goto out_unlock;
@@ -152,8 +151,6 @@ static int ttm_bo_vm_fault(struct vm_fault *vmf)
 	 * (if at all) by redirecting mmap to the exporter.
 	 */
 	if (bo->ttm && (bo->ttm->page_flags & TTM_PAGE_FLAG_SG)) {
-		printf("refused to fault all pages\n");
-
 		retval = VM_FAULT_SIGBUS;
 		goto out_unlock;
 	}
@@ -168,7 +165,6 @@ static int ttm_bo_vm_fault(struct vm_fault *vmf)
 			retval = VM_FAULT_NOPAGE;
 			goto out_unlock;
 		default:
-			printf("reverse_notify failed\n");
 			retval = VM_FAULT_SIGBUS;
 			goto out_unlock;
 		}
@@ -198,7 +194,6 @@ static int ttm_bo_vm_fault(struct vm_fault *vmf)
 	}
 	ret = ttm_mem_io_reserve_vm(bo);
 	if (unlikely(ret != 0)) {
-		printf("mem_io_reserve failed\n");
 		retval = VM_FAULT_SIGBUS;
 		goto out_io_unlock;
 	}
@@ -209,7 +204,6 @@ static int ttm_bo_vm_fault(struct vm_fault *vmf)
 		drm_vma_node_start(&bo->vma_node);
 
 	if (unlikely(page_offset >= bo->num_pages)) {
-		printf("page_offset past num_pages\n");
 		retval = VM_FAULT_SIGBUS;
 		goto out_io_unlock;
 	}
@@ -241,48 +235,7 @@ static int ttm_bo_vm_fault(struct vm_fault *vmf)
 	 * Speculatively prefault a number of pages. Only error on
 	 * first page.
 	 */
-#ifdef __linux__
-	for (i = 0; i < TTM_BO_VM_NUM_PREFAULT; ++i) {
-		if (bo->mem.bus.is_iomem)
-			pfn = ((bo->mem.bus.base + bo->mem.bus.offset) >> PAGE_SHIFT) + page_offset;
-		else {
-			page = ttm->pages[page_offset];
-			if (unlikely(!page && i == 0)) {
-				retval = VM_FAULT_OOM;
-				goto out_io_unlock;
-			} else if (unlikely(!page)) {
-				break;
-			}
-			page->mapping = vma->vm_file->f_mapping;
-			page->index = drm_vma_node_start(&bo->vma_node) +
-				page_offset;
-			pfn = page_to_pfn(page);
-		}
-
-		if (vma->vm_flags & VM_MIXEDMAP)
-			ret = vm_insert_mixed(&cvma, address,
-					__pfn_to_pfn_t(pfn, PFN_DEV));
-		else
-			ret = vm_insert_pfn(&cvma, address, pfn);
-
-		/*
-		 * Somebody beat us to this PTE or prefaulting to
-		 * an already populated PTE, or prefaulting error.
-		 */
-
-		if (unlikely((ret == -EBUSY) || (ret != 0 && i > 0)))
-			break;
-		else if (unlikely(ret != 0)) {
-			retval =
-			    (ret == -ENOMEM) ? VM_FAULT_OOM : VM_FAULT_SIGBUS;
-			goto out_io_unlock;
-		}
-
-		address += PAGE_SIZE;
-		if (unlikely(++page_offset >= page_last))
-			break;
-	}
-#else
+#ifdef __FreeBSD__
 	vm_object_t obj;
 	vm_pindex_t pidx;
 
@@ -326,6 +279,47 @@ fail:
 		break;
 	}
 	VM_OBJECT_WUNLOCK(obj);
+#else
+	for (i = 0; i < TTM_BO_VM_NUM_PREFAULT; ++i) {
+		if (bo->mem.bus.is_iomem)
+			pfn = ((bo->mem.bus.base + bo->mem.bus.offset) >> PAGE_SHIFT) + page_offset;
+		else {
+			page = ttm->pages[page_offset];
+			if (unlikely(!page && i == 0)) {
+				retval = VM_FAULT_OOM;
+				goto out_io_unlock;
+			} else if (unlikely(!page)) {
+				break;
+			}
+			page->mapping = vma->vm_file->f_mapping;
+			page->index = drm_vma_node_start(&bo->vma_node) +
+				page_offset;
+			pfn = page_to_pfn(page);
+		}
+
+		if (vma->vm_flags & VM_MIXEDMAP)
+			ret = vm_insert_mixed(&cvma, address,
+					__pfn_to_pfn_t(pfn, PFN_DEV));
+		else
+			ret = vm_insert_pfn(&cvma, address, pfn);
+
+		/*
+		 * Somebody beat us to this PTE or prefaulting to
+		 * an already populated PTE, or prefaulting error.
+		 */
+
+		if (unlikely((ret == -EBUSY) || (ret != 0 && i > 0)))
+			break;
+		else if (unlikely(ret != 0)) {
+			retval =
+			    (ret == -ENOMEM) ? VM_FAULT_OOM : VM_FAULT_SIGBUS;
+			goto out_io_unlock;
+		}
+
+		address += PAGE_SIZE;
+		if (unlikely(++page_offset >= page_last))
+			break;
+	}
 #endif
 out_io_unlock:
 	ttm_mem_io_unlock(man);

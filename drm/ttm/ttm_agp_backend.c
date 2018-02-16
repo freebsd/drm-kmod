@@ -29,28 +29,39 @@
  *          Keith Packard.
  */
 
-#include <drm/drmP.h>
+#define pr_fmt(fmt) "[TTM] " fmt
+
 #include <drm/ttm/ttm_module.h>
 #include <drm/ttm/ttm_bo_driver.h>
 #include <drm/ttm/ttm_page_alloc.h>
 #include <drm/ttm/ttm_placement.h>
+#include <linux/agp_backend.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+#include <linux/io.h>
+#include <asm/agp.h>
 
 struct ttm_agp_backend {
 	struct ttm_tt ttm;
+#ifdef __FreeBSD__
 	vm_offset_t offset;
-	vm_page_t *pages;
 	device_t bridge;
+	struct page **pages;
+#else
+	struct agp_memory *mem;
+	struct agp_bridge_data *bridge;
+#endif
 };
 
 static int ttm_agp_bind(struct ttm_tt *ttm, struct ttm_mem_reg *bo_mem)
 {
 	struct ttm_agp_backend *agp_be = container_of(ttm, struct ttm_agp_backend, ttm);
 	struct drm_mm_node *node = bo_mem->mm_node;
-	int ret;
 	unsigned i;
-
+#ifdef __FreeBSD__
+	int ret;
 	for (i = 0; i < ttm->num_pages; i++) {
-		vm_page_t page = ttm->pages[i];
+		struct page *page = ttm->pages[i];
 
 		if (!page)
 			page = ttm->dummy_read_page;
@@ -60,7 +71,31 @@ static int ttm_agp_bind(struct ttm_tt *ttm, struct ttm_mem_reg *bo_mem)
 
 	agp_be->offset = node->start * PAGE_SIZE;
 	ret = -agp_bind_pages(agp_be->bridge, agp_be->pages,
-			      ttm->num_pages << PAGE_SHIFT, agp_be->offset);
+	    ttm->num_pages << PAGE_SHIFT, agp_be->offset);
+#else
+	struct agp_memory *mem;
+	int cached = (bo_mem->placement & TTM_PL_FLAG_CACHED);
+
+	mem = agp_allocate_memory(agp_be->bridge, ttm->num_pages, AGP_USER_MEMORY);
+	if (unlikely(mem == NULL))
+		return -ENOMEM;
+
+	mem->page_count = 0;
+	for (i = 0; i < ttm->num_pages; i++) {
+		struct page *page = ttm->pages[i];
+
+		if (!page)
+			page = ttm->dummy_read_page;
+
+		mem->pages[mem->page_count++] = page;
+	}
+	agp_be->mem = mem;
+
+	mem->is_flushed = 1;
+	mem->type = (cached) ? AGP_USER_CACHED_MEMORY : AGP_USER_MEMORY;
+
+	ret = agp_bind_memory(mem, node->start);
+#endif
 	if (ret)
 		pr_err("AGP Bind memory failed\n");
 
@@ -71,16 +106,31 @@ static int ttm_agp_unbind(struct ttm_tt *ttm)
 {
 	struct ttm_agp_backend *agp_be = container_of(ttm, struct ttm_agp_backend, ttm);
 
+#ifdef __FreeBSD__
 	return -agp_unbind_pages(agp_be->bridge, ttm->num_pages << PAGE_SHIFT,
-				 agp_be->offset);
+	    agp_be->offset);
+#else
+	if (agp_be->mem) {
+		if (agp_be->mem->is_bound)
+			return agp_unbind_memory(agp_be->mem);
+		agp_free_memory(agp_be->mem);
+		agp_be->mem = NULL;
+	}
+	return 0;
+#endif
 }
 
 static void ttm_agp_destroy(struct ttm_tt *ttm)
 {
 	struct ttm_agp_backend *agp_be = container_of(ttm, struct ttm_agp_backend, ttm);
 
-	ttm_tt_fini(ttm);
+#ifdef __FreeBSD__
 	kfree(agp_be->pages);
+#else
+	if (agp_be->mem)
+		ttm_agp_unbind(ttm);
+#endif
+	ttm_tt_fini(ttm);
 	kfree(agp_be);
 }
 
@@ -91,9 +141,13 @@ static struct ttm_backend_func ttm_agp_func = {
 };
 
 struct ttm_tt *ttm_agp_tt_create(struct ttm_bo_device *bdev,
+#ifdef __FreeBSD__
 				 device_t bridge,
+#else
+				 struct agp_bridge_data *bridge,
+#endif
 				 unsigned long size, uint32_t page_flags,
-				 vm_page_t dummy_read_page)
+				 struct page *dummy_read_page)
 {
 	struct ttm_agp_backend *agp_be;
 
@@ -101,17 +155,22 @@ struct ttm_tt *ttm_agp_tt_create(struct ttm_bo_device *bdev,
 	if (!agp_be)
 		return NULL;
 
+#ifndef __FreeBSD__
+	agp_be->mem = NULL;
+#endif
 	agp_be->bridge = bridge;
 	agp_be->ttm.func = &ttm_agp_func;
 
 	if (ttm_tt_init(&agp_be->ttm, bdev, size, page_flags, dummy_read_page)) {
+		kfree(agp_be);
 		return NULL;
 	}
 
+#ifdef __FreeBSD__
 	agp_be->offset = 0;
 	agp_be->pages = kmalloc(agp_be->ttm.num_pages * sizeof(*agp_be->pages),
 			       GFP_KERNEL);
-
+#endif
 	return &agp_be->ttm;
 }
 EXPORT_SYMBOL(ttm_agp_tt_create);

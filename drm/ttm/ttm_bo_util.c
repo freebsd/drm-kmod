@@ -45,8 +45,8 @@ void ttm_bo_free_old_node(struct ttm_buffer_object *bo)
 }
 
 int ttm_bo_move_ttm(struct ttm_buffer_object *bo,
-		    bool interruptible,
-		    bool no_wait_gpu, struct ttm_mem_reg *new_mem)
+		    bool interruptible, bool no_wait_gpu,
+		    struct ttm_mem_reg *new_mem)
 {
 	struct ttm_tt *ttm = bo->ttm;
 	struct ttm_mem_reg *old_mem = &bo->mem;
@@ -329,8 +329,7 @@ static int ttm_copy_ttm_io_page(struct ttm_tt *ttm, void *dst,
 }
 
 int ttm_bo_move_memcpy(struct ttm_buffer_object *bo,
-		       bool interruptible,
-		       bool no_wait_gpu,
+		       bool interruptible, bool no_wait_gpu,
 		       struct ttm_mem_reg *new_mem)
 {
 	struct ttm_bo_device *bdev = bo->bdev;
@@ -414,7 +413,7 @@ out2:
 	*old_mem = *new_mem;
 	new_mem->mm_node = NULL;
 
-	if ((man->flags & TTM_MEMTYPE_FLAG_FIXED) && (ttm != NULL)) {
+	if (man->flags & TTM_MEMTYPE_FLAG_FIXED) {
 		ttm_tt_destroy(ttm);
 		bo->ttm = NULL;
 	}
@@ -661,8 +660,7 @@ int ttm_bo_move_accel_cleanup(struct ttm_buffer_object *bo,
 		if (ret)
 			return ret;
 
-		if ((man->flags & TTM_MEMTYPE_FLAG_FIXED) &&
-		    (bo->ttm != NULL)) {
+		if (man->flags & TTM_MEMTYPE_FLAG_FIXED) {
 			ttm_tt_destroy(bo->ttm);
 			bo->ttm = NULL;
 		}

@@ -25,10 +25,17 @@
  *
  **************************************************************************/
 
-#include <drm/drmP.h>
+#define pr_fmt(fmt) "[TTM] " fmt
+
 #include <drm/ttm/ttm_memory.h>
 #include <drm/ttm/ttm_module.h>
 #include <drm/ttm/ttm_page_alloc.h>
+#include <linux/spinlock.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#include <linux/mm.h>
+#include <linux/module.h>
+#include <linux/slab.h>
 
 #define TTM_MEMORY_ALLOC_RETRIES 4
 
@@ -43,6 +50,27 @@ struct ttm_mem_zone {
 	uint64_t used_mem;
 };
 
+static struct attribute ttm_mem_sys = {
+	.name = "zone_memory",
+	.mode = S_IRUGO
+};
+static struct attribute ttm_mem_emer = {
+	.name = "emergency_memory",
+	.mode = S_IRUGO | S_IWUSR
+};
+static struct attribute ttm_mem_max = {
+	.name = "available_memory",
+	.mode = S_IRUGO | S_IWUSR
+};
+static struct attribute ttm_mem_swap = {
+	.name = "swap_limit",
+	.mode = S_IRUGO | S_IWUSR
+};
+static struct attribute ttm_mem_used = {
+	.name = "used_memory",
+	.mode = S_IRUGO
+};
+
 static void ttm_mem_zone_kobj_release(struct kobject *kobj)
 {
 	struct ttm_mem_zone *zone =
@@ -53,12 +81,14 @@ static void ttm_mem_zone_kobj_release(struct kobject *kobj)
 	kfree(zone);
 }
 
-#if 0
+/* #ifndef __FreeBSD__ */
 /* XXXKIB sysctl */
-static ssize_t ttm_mem_zone_show(struct ttm_mem_zone *zone;
+static ssize_t ttm_mem_zone_show(struct kobject *kobj,
 				 struct attribute *attr,
 				 char *buffer)
 {
+	struct ttm_mem_zone *zone =
+		container_of(kobj, struct ttm_mem_zone, kobj);
 	uint64_t val = 0;
 
 	spin_lock(&zone->glob->lock);
@@ -77,17 +107,19 @@ static ssize_t ttm_mem_zone_show(struct ttm_mem_zone *zone;
 	return snprintf(buffer, PAGE_SIZE, "%llu\n",
 			(unsigned long long) val >> 10);
 }
-#endif
+/* #endif */
 
 static void ttm_check_swapping(struct ttm_mem_global *glob);
 
-#if 0
+/* #ifndef __FreeBSD__ */
 /* XXXKIB sysctl */
-static ssize_t ttm_mem_zone_store(struct ttm_mem_zone *zone,
+static ssize_t ttm_mem_zone_store(struct kobject *kobj,
 				  struct attribute *attr,
 				  const char *buffer,
 				  size_t size)
 {
+	struct ttm_mem_zone *zone =
+		container_of(kobj, struct ttm_mem_zone, kobj);
 	int chars;
 	unsigned long val;
 	uint64_t val64;
@@ -118,31 +150,38 @@ static ssize_t ttm_mem_zone_store(struct ttm_mem_zone *zone,
 
 	return size;
 }
-#endif
+/* #endif */
 
 static struct attribute *ttm_mem_zone_attrs[] = {
-        NULL
+	&ttm_mem_sys,
+	&ttm_mem_emer,
+	&ttm_mem_max,
+	&ttm_mem_swap,
+	&ttm_mem_used,
+	NULL
 };
 
 static const struct sysfs_ops ttm_mem_zone_ops = {
+	.show = &ttm_mem_zone_show,
+	.store = &ttm_mem_zone_store
 };
 
 static struct kobj_type ttm_mem_zone_kobj_type = {
-        .release = &ttm_mem_zone_kobj_release,
-        .sysfs_ops = &ttm_mem_zone_ops,
-        .default_attrs = ttm_mem_zone_attrs,
+	.release = &ttm_mem_zone_kobj_release,
+	.sysfs_ops = &ttm_mem_zone_ops,
+	.default_attrs = ttm_mem_zone_attrs,
 };
 
 static void ttm_mem_global_kobj_release(struct kobject *kobj)
 {
 	struct ttm_mem_global *glob =
-                container_of(kobj, struct ttm_mem_global, kobj);
+		container_of(kobj, struct ttm_mem_global, kobj);
 
-        kfree(glob);
+	kfree(glob);
 }
 
 static struct kobj_type ttm_mem_glob_kobj_type = {
-        .release = &ttm_mem_global_kobj_release,
+	.release = &ttm_mem_global_kobj_release,
 };
 
 static bool ttm_zones_above_swap_target(struct ttm_mem_global *glob,
@@ -157,7 +196,11 @@ static bool ttm_zones_above_swap_target(struct ttm_mem_global *glob,
 
 		if (from_wq)
 			target = zone->swap_limit;
+#ifdef __FreeBSD__
 		else if (priv_check(curthread, PRIV_VM_MLOCK) == 0)
+#else
+		else if (capable(CAP_SYS_ADMIN))
+#endif
 			target = zone->emer_mem;
 		else
 			target = zone->max_mem;
@@ -210,14 +253,25 @@ static void ttm_shrink_work(struct work_struct *work)
 }
 
 static int ttm_mem_init_kernel_zone(struct ttm_mem_global *glob,
-    uint64_t mem)
+#ifdef __FreeBSD__
+				    uint64_t mem)
+#else
+				    const struct sysinfo *si)
+#endif
 {
 	struct ttm_mem_zone *zone = kzalloc(sizeof(*zone), GFP_KERNEL);
+#ifndef __FreeBSD__
+	uint64_t mem;
+#endif
 	int ret;
 
 	if (unlikely(!zone))
 		return -ENOMEM;
 
+#ifndef __FreeBSD__
+	mem = si->totalram - si->totalhigh;
+	mem *= si->mem_unit;
+#endif
 
 	zone->name = "kernel";
 	zone->zone_mem = mem;
@@ -237,15 +291,63 @@ static int ttm_mem_init_kernel_zone(struct ttm_mem_global *glob,
 	return 0;
 }
 
-static int ttm_mem_init_dma32_zone(struct ttm_mem_global *glob,
-    uint64_t mem)
+#ifdef CONFIG_HIGHMEM /* Not on FreeBSD */
+static int ttm_mem_init_highmem_zone(struct ttm_mem_global *glob,
+				     const struct sysinfo *si)
 {
 	struct ttm_mem_zone *zone;
+	uint64_t mem;
 	int ret;
+
+	if (si->totalhigh == 0)
+		return 0;
 
 	zone = kzalloc(sizeof(*zone), GFP_KERNEL);
 	if (unlikely(!zone))
 		return -ENOMEM;
+
+	mem = si->totalram;
+	mem *= si->mem_unit;
+
+	zone->name = "highmem";
+	zone->zone_mem = mem;
+	zone->max_mem = mem >> 1;
+	zone->emer_mem = (mem >> 1) + (mem >> 2);
+	zone->swap_limit = zone->max_mem - (mem >> 3);
+	zone->used_mem = 0;
+	zone->glob = glob;
+	glob->zone_highmem = zone;
+	ret = kobject_init_and_add(
+		&zone->kobj, &ttm_mem_zone_kobj_type, &glob->kobj, "%s",
+		zone->name);
+	if (unlikely(ret != 0)) {
+		kobject_put(&zone->kobj);
+		return ret;
+	}
+	glob->zones[glob->num_zones++] = zone;
+	return 0;
+}
+#else
+static int ttm_mem_init_dma32_zone(struct ttm_mem_global *glob,
+#ifdef __FreeBSD__
+				   uint64_t mem)
+#else
+				   const struct sysinfo *si)
+#endif
+{
+	struct ttm_mem_zone *zone = kzalloc(sizeof(*zone), GFP_KERNEL);
+#ifndef __FreeBSD__
+	uint64_t mem;
+#endif
+	int ret;
+
+	if (unlikely(!zone))
+		return -ENOMEM;
+
+#ifndef __FreeBSD__
+	mem = si->totalram;
+	mem *= si->mem_unit;
+#endif
 
 	/**
 	 * No special dma32 zone needed.
@@ -280,10 +382,15 @@ static int ttm_mem_init_dma32_zone(struct ttm_mem_global *glob,
 	glob->zones[glob->num_zones++] = zone;
 	return 0;
 }
+#endif
 
 int ttm_mem_global_init(struct ttm_mem_global *glob)
 {
+#ifdef __FreeBSD__
 	u_int64_t mem;
+#else
+	struct sysinfo si;
+#endif
 	int ret;
 	int i;
 	struct ttm_mem_zone *zone;
@@ -298,14 +405,32 @@ int ttm_mem_global_init(struct ttm_mem_global *glob)
 		return ret;
 	}
 
+#ifdef __FreeBSD__
 	mem = physmem * PAGE_SIZE;
+#else
+	si_meminfo(&si);
+#endif
 
+#ifdef __FreeBSD__
 	ret = ttm_mem_init_kernel_zone(glob, mem);
+#else
+	ret = ttm_mem_init_kernel_zone(glob, &si);
+#endif
 	if (unlikely(ret != 0))
 		goto out_no_zone;
+#ifdef CONFIG_HIGHMEM /* Not on FreeBSD */
+	ret = ttm_mem_init_highmem_zone(glob, &si);
+	if (unlikely(ret != 0))
+		goto out_no_zone;
+#else
+#ifdef __FreeBSD__
 	ret = ttm_mem_init_dma32_zone(glob, mem);
+#else
+	ret = ttm_mem_init_dma32_zone(glob, &si);
+#endif
 	if (unlikely(ret != 0))
 		goto out_no_zone;
+#endif
 	for (i = 0; i < glob->num_zones; ++i) {
 		zone = glob->zones[i];
 		pr_info("Zone %7s: Available graphics memory: %llu kiB\n",
@@ -403,7 +528,11 @@ static int ttm_mem_global_reserve(struct ttm_mem_global *glob,
 		if (single_zone && zone != single_zone)
 			continue;
 
+#ifdef __FreeBSD__
 		limit = (priv_check(curthread, PRIV_VM_MLOCK) == 0) ?
+#else
+		limit = (capable(CAP_SYS_ADMIN)) ?
+#endif
 			zone->emer_mem : zone->max_mem;
 
 		if (zone->used_mem > limit)
@@ -463,7 +592,7 @@ int ttm_mem_global_alloc(struct ttm_mem_global *glob, uint64_t memory,
 EXPORT_SYMBOL(ttm_mem_global_alloc);
 
 int ttm_mem_global_alloc_page(struct ttm_mem_global *glob,
-			      struct vm_page *page,
+			      struct page *page,
 			      bool no_wait, bool interruptible)
 {
 
@@ -474,18 +603,28 @@ int ttm_mem_global_alloc_page(struct ttm_mem_global *glob,
 	 * only if highmem or !dma32.
 	 */
 
+#ifdef CONFIG_HIGHMEM
+	if (PageHighMem(page) && glob->zone_highmem != NULL)
+		zone = glob->zone_highmem;
+#else
 	if (glob->zone_dma32 && page_to_pfn(page) > 0x00100000UL)
 		zone = glob->zone_kernel;
+#endif
 	return ttm_mem_global_alloc_zone(glob, zone, PAGE_SIZE, no_wait,
 					 interruptible);
 }
 
-void ttm_mem_global_free_page(struct ttm_mem_global *glob, struct vm_page *page)
+void ttm_mem_global_free_page(struct ttm_mem_global *glob, struct page *page)
 {
 	struct ttm_mem_zone *zone = NULL;
 
+#ifdef CONFIG_HIGHMEM
+	if (PageHighMem(page) && glob->zone_highmem != NULL)
+		zone = glob->zone_highmem;
+#else
 	if (glob->zone_dma32 && page_to_pfn(page) > 0x00100000UL)
 		zone = glob->zone_kernel;
+#endif
 	ttm_mem_global_free_zone(glob, zone, PAGE_SIZE);
 }
 

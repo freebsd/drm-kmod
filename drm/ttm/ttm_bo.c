@@ -74,8 +74,13 @@ static void ttm_mem_type_debug(struct ttm_bo_device *bdev, int mem_type)
 	pr_err("    has_type: %d\n", man->has_type);
 	pr_err("    use_type: %d\n", man->use_type);
 	pr_err("    flags: 0x%08X\n", man->flags);
+#ifdef __FreeBSD__
 	pr_err("    gpu_offset: 0x%08zX\n", man->gpu_offset);
 	pr_err("    size: %zu\n", man->size);
+#else
+	pr_err("    gpu_offset: 0x%08llX\n", man->gpu_offset);
+	pr_err("    size: %llu\n", man->size);
+#endif
 	pr_err("    available_caching: 0x%08X\n", man->available_caching);
 	pr_err("    default_caching: 0x%08X\n", man->default_caching);
 	if (mem_type != TTM_PL_SYSTEM)
@@ -146,9 +151,7 @@ static void ttm_bo_release_list(struct kref *list_kref)
 	BUG_ON(bo->mem.mm_node != NULL);
 	BUG_ON(!list_empty(&bo->lru));
 	BUG_ON(!list_empty(&bo->ddestroy));
-
-	if (bo->ttm)
-		ttm_tt_destroy(bo->ttm);
+	ttm_tt_destroy(bo->ttm);
 	atomic_dec(&bo->glob->bo_count);
 	dma_fence_put(bo->moving);
 	if (bo->resv == &bo->ttm_resv)
@@ -193,8 +196,6 @@ static void ttm_bo_ref_bug(struct kref *list_kref)
 
 void ttm_bo_del_from_lru(struct ttm_buffer_object *bo)
 {
-	int put_count = 0;
-
 	if (!list_empty(&bo->swap)) {
 		list_del_init(&bo->swap);
 		kref_put(&bo->list_kref, ttm_bo_ref_bug);
@@ -210,13 +211,6 @@ void ttm_bo_del_from_lru(struct ttm_buffer_object *bo)
 	 */
 }
 
-void ttm_bo_list_ref_sub(struct ttm_buffer_object *bo, int count,
-			 bool never_free)
-{
-	kref_sub(&bo->list_kref, count,
-		 (never_free) ? ttm_bo_ref_bug : ttm_bo_release_list);
-}
-
 void ttm_bo_del_sub_from_lru(struct ttm_buffer_object *bo)
 {
 	spin_lock(&bo->glob->lru_lock);
@@ -227,11 +221,9 @@ EXPORT_SYMBOL(ttm_bo_del_sub_from_lru);
 
 void ttm_bo_move_to_lru_tail(struct ttm_buffer_object *bo)
 {
-	int put_count = 0;
-
 	lockdep_assert_held(&bo->resv->lock.base);
 
-	ttm_bo_list_ref_sub(bo, put_count, true);
+	ttm_bo_del_from_lru(bo);
 	ttm_bo_add_to_lru(bo);
 }
 EXPORT_SYMBOL(ttm_bo_move_to_lru_tail);
@@ -379,7 +371,7 @@ moved:
 
 out_err:
 	new_man = &bdev->man[bo->mem.mem_type];
-	if ((new_man->flags & TTM_MEMTYPE_FLAG_FIXED) && bo->ttm) {
+	if (new_man->flags & TTM_MEMTYPE_FLAG_FIXED) {
 		ttm_tt_destroy(bo->ttm);
 		bo->ttm = NULL;
 	}
@@ -400,10 +392,8 @@ static void ttm_bo_cleanup_memtype_use(struct ttm_buffer_object *bo)
 	if (bo->bdev->driver->move_notify)
 		bo->bdev->driver->move_notify(bo, false, NULL);
 
-	if (bo->ttm) {
-		ttm_tt_destroy(bo->ttm);
-		bo->ttm = NULL;
-	}
+	ttm_tt_destroy(bo->ttm);
+	bo->ttm = NULL;
 	ttm_bo_mem_put(bo, &bo->mem);
 
 	ww_mutex_unlock (&bo->resv->lock);
@@ -719,7 +709,7 @@ static int ttm_mem_evict_first(struct ttm_bo_device *bdev,
 	struct ttm_bo_global *glob = bdev->glob;
 	struct ttm_mem_type_manager *man = &bdev->man[mem_type];
 	struct ttm_buffer_object *bo;
-	int ret = -EBUSY, put_count;
+	int ret = -EBUSY;
 	unsigned i;
 
 	spin_lock(&glob->lru_lock);
@@ -1670,10 +1660,8 @@ static int ttm_bo_swapout(struct ttm_mem_shrink *shrink)
 	    container_of(shrink, struct ttm_bo_global, shrink);
 	struct ttm_buffer_object *bo;
 	int ret = -EBUSY;
-	int put_count;
-	uint32_t swap_placement = (TTM_PL_FLAG_CACHED | TTM_PL_FLAG_SYSTEM);
 	unsigned i;
-
+	
 	spin_lock(&glob->lru_lock);
 	for (i = 0; i < TTM_MAX_BO_PRIORITY; ++i) {
 		list_for_each_entry(bo, &glob->swap_lru[i], swap) {
