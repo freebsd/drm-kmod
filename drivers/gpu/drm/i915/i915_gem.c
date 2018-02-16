@@ -248,8 +248,8 @@ err_phys:
 
 static void __start_cpu_write(struct drm_i915_gem_object *obj)
 {
-	obj->base.read_domains = I915_GEM_DOMAIN_CPU;
-	obj->base.write_domain = I915_GEM_DOMAIN_CPU;
+	obj->read_domains = I915_GEM_DOMAIN_CPU;
+	obj->write_domain = I915_GEM_DOMAIN_CPU;
 	if (cpu_write_needs_clflush(obj))
 		obj->cache_dirty = true;
 }
@@ -265,7 +265,7 @@ __i915_gem_object_release_shmem(struct drm_i915_gem_object *obj,
 		obj->mm.dirty = false;
 
 	if (needs_clflush &&
-	    (obj->base.read_domains & I915_GEM_DOMAIN_CPU) == 0 &&
+	    (obj->read_domains & I915_GEM_DOMAIN_CPU) == 0 &&
 	    !(obj->cache_coherent & I915_BO_CACHE_COHERENT_FOR_READ))
 		drm_clflush_sg(pages);
 
@@ -730,10 +730,10 @@ flush_write_domain(struct drm_i915_gem_object *obj, unsigned int flush_domains)
 	struct drm_i915_private *dev_priv = to_i915(obj->base.dev);
 	struct i915_vma *vma;
 
-	if (!(obj->base.write_domain & flush_domains))
+	if (!(obj->write_domain & flush_domains))
 		return;
 
-	switch (obj->base.write_domain) {
+	switch (obj->write_domain) {
 	case I915_GEM_DOMAIN_GTT:
 		i915_gem_flush_ggtt_writes(dev_priv);
 
@@ -758,7 +758,7 @@ flush_write_domain(struct drm_i915_gem_object *obj, unsigned int flush_domains)
 		break;
 	}
 
-	obj->base.write_domain = 0;
+	obj->write_domain = 0;
 }
 
 static inline int
@@ -858,7 +858,7 @@ int i915_gem_obj_prepare_shmem_read(struct drm_i915_gem_object *obj,
 	 * anyway again before the next pread happens.
 	 */
 	if (!obj->cache_dirty &&
-	    !(obj->base.read_domains & I915_GEM_DOMAIN_CPU))
+	    !(obj->read_domains & I915_GEM_DOMAIN_CPU))
 		*needs_clflush = CLFLUSH_BEFORE;
 
 out:
@@ -917,7 +917,7 @@ int i915_gem_obj_prepare_shmem_write(struct drm_i915_gem_object *obj,
 		 * Same trick applies to invalidate partially written
 		 * cachelines read before writing.
 		 */
-		if (!(obj->base.read_domains & I915_GEM_DOMAIN_CPU))
+		if (!(obj->read_domains & I915_GEM_DOMAIN_CPU))
 			*needs_clflush |= CLFLUSH_BEFORE;
 	}
 
@@ -2510,8 +2510,8 @@ static int i915_gem_object_get_pages_gtt(struct drm_i915_gem_object *obj)
 	 * wasn't in the GTT, there shouldn't be any way it could have been in
 	 * a GPU cache
 	 */
-	GEM_BUG_ON(obj->base.read_domains & I915_GEM_GPU_DOMAINS);
-	GEM_BUG_ON(obj->base.write_domain & I915_GEM_GPU_DOMAINS);
+	GEM_BUG_ON(obj->read_domains & I915_GEM_GPU_DOMAINS);
+	GEM_BUG_ON(obj->write_domain & I915_GEM_GPU_DOMAINS);
 
 	st = kmalloc(sizeof(*st), GFP_KERNEL);
 	if (st == NULL)
@@ -3848,7 +3848,7 @@ static void __i915_gem_object_flush_for_display(struct drm_i915_gem_object *obj)
 	flush_write_domain(obj, ~I915_GEM_DOMAIN_CPU);
 	if (obj->cache_dirty)
 		i915_gem_clflush_object(obj, I915_CLFLUSH_FORCE);
-	obj->base.write_domain = 0;
+	obj->write_domain = 0;
 }
 
 void i915_gem_object_flush_if_display(struct drm_i915_gem_object *obj)
@@ -3885,7 +3885,7 @@ i915_gem_object_set_to_wc_domain(struct drm_i915_gem_object *obj, bool write)
 	if (ret)
 		return ret;
 
-	if (obj->base.write_domain == I915_GEM_DOMAIN_WC)
+	if (obj->write_domain == I915_GEM_DOMAIN_WC)
 		return 0;
 
 	/* Flush and acquire obj->pages so that we are coherent through
@@ -3906,17 +3906,17 @@ i915_gem_object_set_to_wc_domain(struct drm_i915_gem_object *obj, bool write)
 	 * coherent writes from the GPU, by effectively invalidating the
 	 * WC domain upon first access.
 	 */
-	if ((obj->base.read_domains & I915_GEM_DOMAIN_WC) == 0)
+	if ((obj->read_domains & I915_GEM_DOMAIN_WC) == 0)
 		mb();
 
 	/* It should now be out of any other write domains, and we can update
 	 * the domain values for our changes.
 	 */
-	GEM_BUG_ON((obj->base.write_domain & ~I915_GEM_DOMAIN_WC) != 0);
-	obj->base.read_domains |= I915_GEM_DOMAIN_WC;
+	GEM_BUG_ON((obj->write_domain & ~I915_GEM_DOMAIN_WC) != 0);
+	obj->read_domains |= I915_GEM_DOMAIN_WC;
 	if (write) {
-		obj->base.read_domains = I915_GEM_DOMAIN_WC;
-		obj->base.write_domain = I915_GEM_DOMAIN_WC;
+		obj->read_domains = I915_GEM_DOMAIN_WC;
+		obj->write_domain = I915_GEM_DOMAIN_WC;
 		obj->mm.dirty = true;
 	}
 
@@ -3948,7 +3948,7 @@ i915_gem_object_set_to_gtt_domain(struct drm_i915_gem_object *obj, bool write)
 	if (ret)
 		return ret;
 
-	if (obj->base.write_domain == I915_GEM_DOMAIN_GTT)
+	if (obj->write_domain == I915_GEM_DOMAIN_GTT)
 		return 0;
 
 	/* Flush and acquire obj->pages so that we are coherent through
@@ -3969,17 +3969,17 @@ i915_gem_object_set_to_gtt_domain(struct drm_i915_gem_object *obj, bool write)
 	 * coherent writes from the GPU, by effectively invalidating the
 	 * GTT domain upon first access.
 	 */
-	if ((obj->base.read_domains & I915_GEM_DOMAIN_GTT) == 0)
+	if ((obj->read_domains & I915_GEM_DOMAIN_GTT) == 0)
 		mb();
 
 	/* It should now be out of any other write domains, and we can update
 	 * the domain values for our changes.
 	 */
-	GEM_BUG_ON((obj->base.write_domain & ~I915_GEM_DOMAIN_GTT) != 0);
-	obj->base.read_domains |= I915_GEM_DOMAIN_GTT;
+	GEM_BUG_ON((obj->write_domain & ~I915_GEM_DOMAIN_GTT) != 0);
+	obj->read_domains |= I915_GEM_DOMAIN_GTT;
 	if (write) {
-		obj->base.read_domains = I915_GEM_DOMAIN_GTT;
-		obj->base.write_domain = I915_GEM_DOMAIN_GTT;
+		obj->read_domains = I915_GEM_DOMAIN_GTT;
+		obj->write_domain = I915_GEM_DOMAIN_GTT;
 		obj->mm.dirty = true;
 	}
 
@@ -4291,7 +4291,7 @@ i915_gem_object_pin_to_display_plane(struct drm_i915_gem_object *obj,
 	/* It should now be out of any other write domains, and we can update
 	 * the domain values for our changes.
 	 */
-	obj->base.read_domains |= I915_GEM_DOMAIN_GTT;
+	obj->read_domains |= I915_GEM_DOMAIN_GTT;
 
 	return vma;
 
@@ -4344,15 +4344,15 @@ i915_gem_object_set_to_cpu_domain(struct drm_i915_gem_object *obj, bool write)
 	flush_write_domain(obj, ~I915_GEM_DOMAIN_CPU);
 
 	/* Flush the CPU cache if it's still invalid. */
-	if ((obj->base.read_domains & I915_GEM_DOMAIN_CPU) == 0) {
+	if ((obj->read_domains & I915_GEM_DOMAIN_CPU) == 0) {
 		i915_gem_clflush_object(obj, I915_CLFLUSH_SYNC);
-		obj->base.read_domains |= I915_GEM_DOMAIN_CPU;
+		obj->read_domains |= I915_GEM_DOMAIN_CPU;
 	}
 
 	/* It should now be out of any other write domains, and we can update
 	 * the domain values for our changes.
 	 */
-	GEM_BUG_ON(obj->base.write_domain & ~I915_GEM_DOMAIN_CPU);
+	GEM_BUG_ON(obj->write_domain & ~I915_GEM_DOMAIN_CPU);
 
 	/* If we're writing through the CPU, then the GPU read domains will
 	 * need to be invalidated at next use.
@@ -4796,8 +4796,8 @@ i915_gem_object_create(struct drm_i915_private *dev_priv, u64 size)
 
 	i915_gem_object_init(obj, &i915_gem_object_ops);
 
-	obj->base.write_domain = I915_GEM_DOMAIN_CPU;
-	obj->base.read_domains = I915_GEM_DOMAIN_CPU;
+	obj->write_domain = I915_GEM_DOMAIN_CPU;
+	obj->read_domains = I915_GEM_DOMAIN_CPU;
 
 	if (HAS_LLC(dev_priv))
 		/* On some devices, we can have the GPU use the LLC (the CPU
@@ -5859,7 +5859,7 @@ i915_gem_object_create_from_data(struct drm_i915_private *dev_priv,
 	if (IS_ERR(obj))
 		return obj;
 
-	GEM_BUG_ON(obj->base.write_domain != I915_GEM_DOMAIN_CPU);
+	GEM_BUG_ON(obj->write_domain != I915_GEM_DOMAIN_CPU);
 
 	file = obj->base.filp;
 	offset = 0;
