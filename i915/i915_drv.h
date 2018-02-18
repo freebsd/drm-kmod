@@ -664,7 +664,10 @@ enum forcewake_domain_id {
 	FW_DOMAIN_ID_BLITTER,
 	FW_DOMAIN_ID_MEDIA,
 
-	FW_DOMAIN_ID_COUNT
+	FW_DOMAIN_ID_COUNT,
+#ifndef __linux__
+	FW_DOMAIN_ID_DUMMY = -1, /* force enum type signed */
+#endif
 };
 
 enum forcewake_domains {
@@ -3361,7 +3364,11 @@ int __must_check i915_gem_wait_for_idle(struct drm_i915_private *dev_priv,
 					unsigned int flags);
 int __must_check i915_gem_suspend(struct drm_i915_private *dev_priv);
 void i915_gem_resume(struct drm_i915_private *dev_priv);
+#ifdef __linux__
 int i915_gem_fault(struct vm_fault *vmf);
+#else
+int i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf);
+#endif
 /**** FreeBSD ****/
 
 
