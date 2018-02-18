@@ -26,6 +26,9 @@
 #define I915_GEM_REQUEST_H
 
 #include <linux/dma-fence.h>
+#ifndef __linux__
+#include <linux/lockdep.h>
+#endif
 
 #include "i915_gem.h"
 #include "i915_sw_fence.h"

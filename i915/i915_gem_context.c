@@ -291,11 +291,7 @@ __create_hw_context(struct drm_i915_private *dev_priv,
 
 	ctx->file_priv = file_priv;
 	if (file_priv) {
-#ifdef __linux__
 		ctx->pid = get_task_pid(current, PIDTYPE_PID);
-#else
-		ctx->pid = curthread->td_tid;
-#endif
 		ctx->name = kasprintf(GFP_KERNEL, "%s[%d]/%x",
 				      current->comm,
 				      pid_nr(ctx->pid),

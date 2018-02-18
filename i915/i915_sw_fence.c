@@ -236,7 +236,11 @@ void __i915_sw_fence_init(struct i915_sw_fence *fence,
 
 	debug_fence_init(fence);
 
+#ifdef __linux__
 	__init_waitqueue_head(&fence->wait, name, key);
+#else
+	init_waitqueue_head(&fence->wait);
+#endif
 	kref_init(&fence->kref);
 	atomic_set(&fence->pending, 1);
 	fence->flags = (unsigned long)fn;

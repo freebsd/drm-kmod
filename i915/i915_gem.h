@@ -30,7 +30,11 @@
 #define GEM_WARN_ON(expr) WARN_ON(expr)
 #else
 #define GEM_BUG_ON(expr) BUILD_BUG_ON_INVALID(expr)
-#define GEM_WARN_ON(expr) (BUILD_BUG_ON_INVALID(expr), 0)
+#ifdef __linux__
+#define GEM_WARN_ON(expr) (BUILD_BUG_ON_INVALID(expr),0)
+#else
+#define GEM_WARN_ON(expr) ({ BUILD_BUG_ON_INVALID(expr); 0; })
+#endif
 #endif
 
 #define I915_NUM_ENGINES 5
