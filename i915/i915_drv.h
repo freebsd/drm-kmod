@@ -325,6 +325,9 @@ enum dpio_phy {
 	DPIO_PHY0,
 	DPIO_PHY1,
 	DPIO_PHY2,
+#ifndef __linux__
+	DPIO_DUMMY = -1,	/* force enum type signed */
+#endif
 };
 
 enum intel_display_power_domain {
