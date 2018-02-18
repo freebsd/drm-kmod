@@ -44,11 +44,6 @@
 #include <linux/dma-buf.h>
 #include <linux/pagemap.h>
 
-#ifdef __FreeBSD__
-// The GPLv2 part of radix-tree
-#include <linux/radix-tree-iter.h>
-#endif
-
 static void i915_gem_flush_free_objects(struct drm_i915_private *i915);
 static void i915_gem_object_flush_gtt_write_domain(struct drm_i915_gem_object *obj);
 static void i915_gem_object_flush_cpu_write_domain(struct drm_i915_gem_object *obj);
