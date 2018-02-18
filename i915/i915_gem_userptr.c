@@ -501,6 +501,7 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 
 	pvec = drm_malloc_gfp(npages, sizeof(struct page *), GFP_TEMPORARY);
 	if (pvec != NULL) {
+#ifdef __linux__
 		struct mm_struct *mm = obj->userptr.mm->mm;
 		unsigned int flags = 0;
 
@@ -508,12 +509,8 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 			flags |= FOLL_WRITE;
 
 		ret = -EFAULT;
-#ifdef __FreeBSD__
-		/* XXXmarkj this code is non-functional anyway. */
-		if (0) {
-#else
+
 		if (mmget_not_zero(mm)) {
-#endif
 			down_read(&mm->mmap_sem);
 			while (pinned < npages) {
 				ret = get_user_pages_remote
@@ -530,8 +527,11 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 			up_read(&mm->mmap_sem);
 			mmput(mm);
 		}
+#else
+		/* XXXmarkj this code is non-functional anyway. */
+		ret = -EFAULT;
+#endif
 	}
-
 	mutex_lock(&obj->mm.lock);
 	if (obj->userptr.work == &work->work) {
 		struct sg_table *pages = ERR_PTR(ret);

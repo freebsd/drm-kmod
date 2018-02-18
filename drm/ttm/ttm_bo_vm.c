@@ -94,7 +94,11 @@ out_unlock:
 	return ret;
 }
 
+#ifdef __linux__
 static int ttm_bo_vm_fault(struct vm_fault *vmf)
+#else
+static int ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
+#endif
 {
 	struct vm_area_struct *vma = vmf->vma;
 	struct ttm_buffer_object *bo = (struct ttm_buffer_object *)

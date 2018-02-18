@@ -693,6 +693,7 @@ struct drm_device {
 
 #ifdef __FreeBSD__
 #define	DRM_PCI_RESOURCE_MAX	7
+#define	MAX_ORDER 11
 
 	struct drm_pci_resource {
 		struct resource *res;

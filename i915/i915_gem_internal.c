@@ -26,11 +26,6 @@
 #include <drm/i915_drm.h>
 #include "i915_drv.h"
 
-#ifdef __FreeBSD__
-// This should be included through drmP.h??
-#include <linux/mmzone.h>
-#endif
-
 #define QUIET (__GFP_NORETRY | __GFP_NOWARN)
 
 /* convert swiotlb segment size into sensible units (pages)! */
