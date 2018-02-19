@@ -4915,6 +4915,9 @@ static void __i915_gem_free_objects(struct drm_i915_private *i915,
 		kfree(obj->bit_17);
 		i915_gem_object_free(obj);
 
+		GEM_BUG_ON(!atomic_read(&i915->mm.free_count));
+		atomic_dec(&i915->mm.free_count);
+
 		if (on)
 			cond_resched();
 	}
@@ -5003,6 +5006,7 @@ void i915_gem_free_object(struct drm_gem_object *gem_obj)
 	 * i915_gem_busy_ioctl(). For the corresponding synchronized
 	 * lookup see i915_gem_object_lookup_rcu().
 	 */
+	atomic_inc(&to_i915(obj->base.dev)->mm.free_count);
 	call_rcu(&obj->rcu, __i915_gem_free_object_rcu);
 }
 
@@ -5703,7 +5707,8 @@ err_out:
 void i915_gem_load_cleanup(struct drm_i915_private *dev_priv)
 {
 	i915_gem_drain_freed_objects(dev_priv);
-	WARN_ON(!llist_empty(&dev_priv->mm.free_list));
+	GEM_BUG_ON(!llist_empty(&dev_priv->mm.free_list));
+	GEM_BUG_ON(atomic_read(&dev_priv->mm.free_count));
 	WARN_ON(dev_priv->mm.object_count);
 
 	mutex_lock(&dev_priv->drm.struct_mutex);
