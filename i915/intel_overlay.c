@@ -713,16 +713,19 @@ static bool update_scaling_factors(struct intel_overlay *overlay,
 static void update_colorkey(struct intel_overlay *overlay,
 			    struct overlay_registers __iomem *regs)
 {
-	const struct drm_framebuffer *fb =
-		overlay->crtc->base.primary->fb;
+	const struct intel_plane_state *state =
+		to_intel_plane_state(overlay->crtc->base.primary->state);
 	u32 key = overlay->color_key;
-	u32 flags;
+	u32 format = 0;
+	u32 flags = 0;
 
-	flags = 0;
 	if (overlay->color_key_enabled)
 		flags |= DST_KEY_ENABLE;
 
-	switch (fb->format->format) {
+	if (state->base.visible)
+		format = state->base.fb->format->format;
+
+	switch (format) {
 	case DRM_FORMAT_C8:
 		key = 0;
 		flags |= CLK_RGB8I_MASK;
@@ -890,14 +893,6 @@ static int intel_overlay_do_put_image(struct intel_overlay *overlay,
 	ret = intel_overlay_continue(overlay, vma, scale_changed);
 	if (ret)
 		goto out_unpin;
-
-	i915_gem_track_fb(overlay->vma ? overlay->vma->obj : NULL,
-			  vma->obj, INTEL_FRONTBUFFER_OVERLAY(pipe));
-
-	overlay->old_vma = overlay->vma;
-	overlay->vma = vma;
-
-	intel_frontbuffer_flip(dev_priv, INTEL_FRONTBUFFER_OVERLAY(pipe));
 
 	return 0;
 

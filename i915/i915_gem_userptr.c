@@ -509,7 +509,6 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 			flags |= FOLL_WRITE;
 
 		ret = -EFAULT;
-
 		if (mmget_not_zero(mm)) {
 			down_read(&mm->mmap_sem);
 			while (pinned < npages) {
@@ -532,6 +531,7 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 		ret = -EFAULT;
 #endif
 	}
+
 	mutex_lock(&obj->mm.lock);
 	if (obj->userptr.work == &work->work) {
 		struct sg_table *pages = ERR_PTR(ret);

@@ -100,7 +100,7 @@ SRCS=	\
 	intel_uncore.c
 
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
-# intel_lpe_audio.c   # Not yet. (why was this?)
+# intel_lpe_audio.c   # Need platform and irq_chip support
 
 # In case we want to build gvt some day...
 # GVT_DIR	= gvt

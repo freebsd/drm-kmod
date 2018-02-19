@@ -653,8 +653,10 @@ int intel_setup_gmbus(struct drm_i915_private *dev_priv)
 		bus->adapter.dev.parent = &pdev->dev;
 		bus->dev_priv = dev_priv;
 
+#ifndef __linux__
 		/* needed by FreeBSD linux compat */
 		bus->adapter.dev.class = drm_class;
+#endif
 		bus->adapter.algo = &gmbus_algorithm;
 
 		/*

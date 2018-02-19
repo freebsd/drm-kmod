@@ -23,6 +23,9 @@
  */
 
 #include <linux/kernel.h>
+#ifdef __linux__
+#include <asm/fpu/api.h>
+#endif
 
 #include "i915_drv.h"
 

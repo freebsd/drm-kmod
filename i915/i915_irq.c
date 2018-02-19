@@ -36,7 +36,11 @@
 #include "i915_drv.h"
 #include "i915_trace.h"
 #include "intel_drv.h"
+
+#ifndef __linux__
+// drm/drm_os_freebsd.c:
 extern int drm_panic_on_error;
+#endif
 
 /**
  * DOC: interrupt handling
@@ -1912,6 +1916,13 @@ static irqreturn_t valleyview_irq_handler(int irq, void *arg)
 		 * signalled in iir */
 		valleyview_pipestat_irq_ack(dev_priv, iir, pipe_stats);
 
+#ifdef __linux__
+		// Not yet supported in BSD
+		if (iir & (I915_LPE_PIPE_A_INTERRUPT |
+		        I915_LPE_PIPE_B_INTERRUPT))
+			intel_lpe_audio_irq_handler(dev_priv);
+#endif
+
 		/*
 		 * VLV_IIR is single buffered, and reflects the level
 		 * from PIPESTAT/PORT_HOTPLUG_STAT, hence clear it last.
@@ -1991,7 +2002,13 @@ static irqreturn_t cherryview_irq_handler(int irq, void *arg)
 		/* Call regardless, as some status bits might not be
 		 * signalled in iir */
 		valleyview_pipestat_irq_ack(dev_priv, iir, pipe_stats);
-
+#ifdef __linux__
+		// Not yet supported in BSD
+		if (iir & (I915_LPE_PIPE_A_INTERRUPT |
+		        I915_LPE_PIPE_B_INTERRUPT |
+		        I915_LPE_PIPE_C_INTERRUPT))
+			intel_lpe_audio_irq_handler(dev_priv);
+#endif
 		/*
 		 * VLV_IIR is single buffered, and reflects the level
 		 * from PIPESTAT/PORT_HOTPLUG_STAT, hence clear it last.
@@ -2741,9 +2758,11 @@ void i915_handle_error(struct drm_i915_private *dev_priv,
 	va_list args;
 	char error_msg[80];
 
+#ifndef __linux__
 	if (drm_panic_on_error)
 		panic("dev=%p failure\n", dev_priv);
-	
+#endif
+
 	va_start(args, fmt);
 	vscnprintf(error_msg, sizeof(error_msg), fmt, args);
 	va_end(args);
@@ -2941,6 +2960,7 @@ static void vlv_display_irq_postinstall(struct drm_i915_private *dev_priv)
 	u32 pipestat_mask;
 	u32 enable_mask;
 	enum pipe pipe;
+	u32 val;
 
 	pipestat_mask = PLANE_FLIP_DONE_INT_STATUS_VLV |
 			PIPE_CRC_DONE_INTERRUPT_STATUS;
@@ -2956,6 +2976,12 @@ static void vlv_display_irq_postinstall(struct drm_i915_private *dev_priv)
 		enable_mask |= I915_DISPLAY_PIPE_C_EVENT_INTERRUPT;
 
 	WARN_ON(dev_priv->irq_mask != ~0);
+
+	val = (I915_LPE_PIPE_A_INTERRUPT |
+		I915_LPE_PIPE_B_INTERRUPT |
+		I915_LPE_PIPE_C_INTERRUPT);
+
+	enable_mask |= val;
 
 	dev_priv->irq_mask = ~enable_mask;
 

@@ -35,7 +35,7 @@
 #include <drm/i915_drm.h>
 #include "i915_drv.h"
 
-#ifdef CONFIG_COMPAT
+#if !defined(__linux__) && defined(CONFIG_COMPAT)
 struct drm_i915_getparam32 {
 	s32 param;
 	/*
@@ -46,12 +46,30 @@ struct drm_i915_getparam32 {
 	u32 value;
 };
 
+#ifndef __linux__
 extern int i915_getparam(struct drm_device *dev, void *data,
 			 struct drm_file *file_priv);
+#endif
 
 static int compat_i915_getparam(struct file *file, unsigned int cmd,
 				unsigned long arg)
 {
+#ifdef __linux__
+ 	struct drm_i915_getparam32 req32;
+	drm_i915_getparam_t __user *request;
+	if (copy_from_user(&req32, (void __user *)arg, sizeof(req32)))
+ 		return -EFAULT;
+	
+	request = compat_alloc_user_space(sizeof(*request));
+	if (!access_ok(VERIFY_WRITE, request, sizeof(*request))
+	    || __put_user(req32.param, &request->param)
+	    || __put_user((void __user *)(unsigned long)req32.value,
+	        &request->value))
+		return -EFAULT;
+	
+	return drm_ioctl(file, DRM_IOCTL_I915_GETPARAM,
+			 (unsigned long)request);
+#else
 	drm_i915_getparam_t __user *request = (void __user *)arg;
 	struct drm_i915_getparam32 req32;
 	struct drm_i915_getparam req;
@@ -64,6 +82,7 @@ static int compat_i915_getparam(struct file *file, unsigned int cmd,
 
 	return drm_ioctl_kernel(file, i915_getparam,
 			 &req, DRM_AUTH|DRM_RENDER_ALLOW);
+#endif
 }
 
 static drm_ioctl_compat_t *i915_compat_ioctls[] = {

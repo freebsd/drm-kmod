@@ -639,10 +639,6 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 	if (ret)
 		DRM_ERROR("RPS sysfs setup failed\n");
 
-	ret = sysfs_create_bin_file(&kdev->kobj,
-				    &error_state_attr);
-	if (ret)
-		DRM_ERROR("error_state sysfs setup failed\n");
 	i915_setup_error_capture(kdev);
 #endif
 }

@@ -95,6 +95,8 @@ static inline bool i915_mmio_reg_valid(i915_reg_t reg)
 #define DEVEN 0x54
 #define   DEVEN_MCHBAR_EN (1 << 28)
 
+/* BSM in include/drm/i915_drm.h */
+
 #define HPLLCC	0xc0 /* 85x only */
 #define   GC_CLOCK_CONTROL_MASK		(0x7 << 0)
 #define   GC_CLOCK_133_200		(0 << 0)
@@ -3066,7 +3068,11 @@ enum skl_disp_power_wells {
 
 #define TSC1			_MMIO(0x11001)
 #define   TSE			(1<<0)
-#define I915_TR1			_MMIO(0x11006)
+#ifdef __linux__ // FreeBSD already has TR1
+#define TR1			_MMIO(0x11006)
+#else
+#define I915_TR1		_MMIO(0x11006)
+#endif
 #define TSFS			_MMIO(0x11020)
 #define   TSFS_SLOPE_MASK	0x0000ff00
 #define   TSFS_SLOPE_SHIFT	8

@@ -78,7 +78,6 @@ MODULE_FIRMWARE(I915_KBL_HUC_UCODE);
  */
 static int huc_ucode_xfer(struct drm_i915_private *dev_priv)
 {
-	DRM_INFO("%s: enter\n", __func__);
 	struct intel_uc_fw *huc_fw = &dev_priv->huc.fw;
 	struct i915_vma *vma;
 	unsigned long offset = 0;
@@ -123,16 +122,9 @@ static int huc_ucode_xfer(struct drm_i915_private *dev_priv)
 	I915_WRITE(DMA_CTRL, _MASKED_BIT_ENABLE(HUC_UKERNEL | START_DMA));
 
 	/* Wait for DMA to finish */
-#ifndef __linux__
-	// Double the time to see if we increase success rate
 	ret = wait_for((I915_READ(DMA_CTRL) & START_DMA) == 0, 100);
-#else
-	ret = wait_for((I915_READ(DMA_CTRL) & START_DMA) == 0, 100);
-#endif
 
-
-	DRM_INFO("HuC DMA transfer wait over with ret %d\n", ret);
-	/* DRM_DEBUG_DRIVER("HuC DMA transfer wait over with ret %d\n", ret); */
+	DRM_DEBUG_DRIVER("HuC DMA transfer wait over with ret %d\n", ret);
 
 	/* Disable the bits once DMA is over */
 	I915_WRITE(DMA_CTRL, _MASKED_BIT_DISABLE(HUC_UKERNEL));
@@ -144,7 +136,7 @@ static int huc_ucode_xfer(struct drm_i915_private *dev_priv)
 	 * now that DMA has completed, so it doesn't continue to take up space.
 	 */
 	i915_vma_unpin(vma);
-	DRM_INFO("%s: exit\n", __func__);
+
 	return ret;
 }
 
@@ -162,7 +154,6 @@ static int huc_ucode_xfer(struct drm_i915_private *dev_priv)
  */
 void intel_huc_init(struct drm_i915_private *dev_priv)
 {
-	DRM_INFO("%s\n", __func__);
 	struct intel_huc *huc = &dev_priv->huc;
 	struct intel_uc_fw *huc_fw = &huc->fw;
 	const char *fw_path = NULL;
@@ -214,7 +205,6 @@ void intel_huc_init(struct drm_i915_private *dev_priv)
  */
 int intel_huc_load(struct drm_i915_private *dev_priv)
 {
-	DRM_INFO("%s: enter\n", __func__);
 	struct intel_uc_fw *huc_fw = &dev_priv->huc.fw;
 	int err;
 
@@ -264,7 +254,6 @@ int intel_huc_load(struct drm_i915_private *dev_priv)
 		intel_uc_fw_status_repr(huc_fw->fetch_status),
 		intel_uc_fw_status_repr(huc_fw->load_status));
 
-	DRM_INFO("%s: exit\n", __func__);
 	return 0;
 
 fail:
@@ -273,7 +262,6 @@ fail:
 
 	DRM_ERROR("Failed to complete HuC uCode load with ret %d\n", err);
 
-	DRM_INFO("%s: exit with error\n", __func__);
 	return err;
 }
 
@@ -285,7 +273,6 @@ fail:
  */
 void intel_huc_fini(struct drm_i915_private *dev_priv)
 {
-	DRM_INFO("%s: enter\n", __func__);
 	struct intel_uc_fw *huc_fw = &dev_priv->huc.fw;
 
 	mutex_lock(&dev_priv->drm.struct_mutex);
@@ -295,7 +282,6 @@ void intel_huc_fini(struct drm_i915_private *dev_priv)
 	mutex_unlock(&dev_priv->drm.struct_mutex);
 
 	huc_fw->fetch_status = INTEL_UC_FIRMWARE_NONE;
-	DRM_INFO("%s: exit\n", __func__);
 }
 
 /**
@@ -307,8 +293,6 @@ void intel_huc_fini(struct drm_i915_private *dev_priv)
  */
 void intel_guc_auth_huc(struct drm_i915_private *dev_priv)
 {
-	DRM_INFO("%s: enter\n", __func__);
-	
 	struct intel_guc *guc = &dev_priv->guc;
 	struct intel_huc *huc = &dev_priv->huc;
 	struct i915_vma *vma;
@@ -341,20 +325,14 @@ void intel_guc_auth_huc(struct drm_i915_private *dev_priv)
 				HUC_STATUS2,
 				HUC_FW_VERIFIED,
 				HUC_FW_VERIFIED,
-// FreeBSD: Double timeout to see if success rate increases
-#ifndef __linux__
 				50);
-#else
-				50);
-#endif
+
 	if (ret) {
 		DRM_ERROR("HuC: Authentication failed %d\n", ret);
 		goto out;
 	}
-	DRM_INFO("HuC: Authentication successful\n");
 
 out:
 	i915_vma_unpin(vma);
-	DRM_INFO("%s: exit\n", __func__);
 }
 

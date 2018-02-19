@@ -30,7 +30,7 @@
 #include "i915_drv.h"
 
 struct i915_params i915 __read_mostly = {
-	.modeset = 1,
+	.modeset = -1,
 	.panel_ignore_lid = 1,
 	.semaphores = -1,
 	.lvds_channel_mode = 0,
