@@ -60,7 +60,9 @@ void drm_global_release(void)
 		struct drm_global_item *item = &glob[i];
 		BUG_ON(item->object != NULL);
 		BUG_ON(item->refcount != 0);
+#ifndef __linux__
 		mutex_destroy(&item->mutex);
+#endif
 	}
 }
 

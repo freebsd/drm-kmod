@@ -74,12 +74,12 @@ static void ttm_mem_type_debug(struct ttm_bo_device *bdev, int mem_type)
 	pr_err("    has_type: %d\n", man->has_type);
 	pr_err("    use_type: %d\n", man->use_type);
 	pr_err("    flags: 0x%08X\n", man->flags);
-#ifdef __FreeBSD__
-	pr_err("    gpu_offset: 0x%08zX\n", man->gpu_offset);
-	pr_err("    size: %zu\n", man->size);
-#else
+#ifdef __linux__
 	pr_err("    gpu_offset: 0x%08llX\n", man->gpu_offset);
 	pr_err("    size: %llu\n", man->size);
+#else
+	pr_err("    gpu_offset: 0x%08zX\n", man->gpu_offset);
+	pr_err("    size: %zu\n", man->size);
 #endif
 	pr_err("    available_caching: 0x%08X\n", man->available_caching);
 	pr_err("    default_caching: 0x%08X\n", man->default_caching);
@@ -1508,10 +1508,10 @@ EXPORT_SYMBOL(ttm_bo_device_release);
 int ttm_bo_device_init(struct ttm_bo_device *bdev,
 		       struct ttm_bo_global *glob,
 		       struct ttm_bo_driver *driver,
-#ifdef __FreeBSD__
-		       void *dummy,
-#else
+#ifdef __linux__
 		       struct address_space *mapping,
+#else
+		       void *dummy,
 #endif
 		       uint64_t file_page_offset,
 		       bool need_dma32)
@@ -1534,7 +1534,7 @@ int ttm_bo_device_init(struct ttm_bo_device *bdev,
 				    0x10000000);
 	INIT_DELAYED_WORK(&bdev->wq, ttm_bo_delayed_workqueue);
 	INIT_LIST_HEAD(&bdev->ddestroy);
-#ifndef __FreeBSD__
+#ifdef __linux__
 	bdev->dev_mapping = mapping;
 #endif
 	bdev->glob = glob;
@@ -1572,16 +1572,16 @@ bool ttm_mem_reg_is_pci(struct ttm_bo_device *bdev, struct ttm_mem_reg *mem)
 
 void ttm_bo_unmap_virtual_locked(struct ttm_buffer_object *bo)
 {
-#ifdef __FreeBSD__
+#ifdef __linux__
+	struct ttm_bo_device *bdev = bo->bdev;
+
+	drm_vma_node_unmap(&bo->vma_node, bdev->dev_mapping);
+#else
 	struct drm_vma_offset_node *node;
 
 	node = &bo->vma_node;
 	unmap_mapping_range(bo, drm_vma_node_offset_addr(node),
 	    drm_vma_node_size(node) << PAGE_SHIFT, 1);
-#else
-	struct ttm_bo_device *bdev = bo->bdev;
-
-	drm_vma_node_unmap(&bo->vma_node, bdev->dev_mapping);
 #endif
 	ttm_mem_io_free_vm(bo);
 }

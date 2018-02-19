@@ -56,7 +56,7 @@ static bool
 drm_get_last_vbltimestamp(struct drm_device *dev, unsigned int pipe,
 			  struct timeval *tvblank, unsigned flags);
 
-unsigned int drm_timestamp_precision = 20;  /* Default to 20 usecs. */
+static unsigned int drm_timestamp_precision = 20;  /* Default to 20 usecs. */
 
 /*
  * Default to use monotonic timestamps for wait-for-vblank and page-flip
@@ -64,7 +64,7 @@ unsigned int drm_timestamp_precision = 20;  /* Default to 20 usecs. */
  */
 unsigned int drm_timestamp_monotonic = 1;
 
-int drm_vblank_offdelay = 5000;    /* Default to 5000 msecs. */
+static int drm_vblank_offdelay = 5000;    /* Default to 5000 msecs. */
 
 module_param_named(vblankoffdelay, drm_vblank_offdelay, int, 0600);
 module_param_named(timestamp_precision_usec, drm_timestamp_precision, int, 0600);
@@ -352,9 +352,11 @@ void drm_vblank_cleanup(struct drm_device *dev)
 	}
 
 	kfree(dev->vblank);
+#ifndef __linux__
 	spin_lock_destroy(&dev->vbl_lock);
 	spin_lock_destroy(&dev->vblank_time_lock);
-
+#endif
+	
 	dev->num_crtcs = 0;
 }
 EXPORT_SYMBOL(drm_vblank_cleanup);
@@ -788,11 +790,11 @@ int drm_calc_vbltimestamp_from_scanoutpos(struct drm_device *dev,
 	delta_ns = div_s64(1000000LL * (vpos * mode->crtc_htotal + hpos),
 			   mode->crtc_clock);
 
-#ifdef __FreeBSD__
-	MPASS(drm_timestamp_monotonic);
-#else
+#ifdef __linux__
 	if (!drm_timestamp_monotonic)
 		etime = ktime_mono_to_real(etime);
+#else
+	MPASS(drm_timestamp_monotonic);
 #endif
 
 	/* save this only for debugging purposes */

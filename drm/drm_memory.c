@@ -36,6 +36,8 @@
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
+#include <linux/highmem.h>
+#include <linux/export.h>
 #include <drm/drmP.h>
 #include "drm_legacy.h"
 
@@ -54,18 +56,63 @@ __FBSDID("$FreeBSD$");
 static void *agp_remap(unsigned long offset, unsigned long size,
 		       struct drm_device * dev)
 {
+#ifdef __linux__
+	unsigned long i, num_pages =
+	    PAGE_ALIGN(size) / PAGE_SIZE;
+	struct drm_agp_mem *agpmem;
+	struct page **page_map;
+	struct page **phys_page_map;
+	void *addr;
+
+	size = PAGE_ALIGN(size);
+
+#ifdef __alpha__
+	offset -= dev->hose->mem_space->start;
+#endif
+
+	list_for_each_entry(agpmem, &dev->agp->memory, head)
+		if (agpmem->bound <= offset
+		    && (agpmem->bound + (agpmem->pages << PAGE_SHIFT)) >=
+		    (offset + size))
+			break;
+	if (&agpmem->head == &dev->agp->memory)
+		return NULL;
+
+	/*
+	 * OK, we're mapping AGP space on a chipset/platform on which memory accesses by
+	 * the CPU do not get remapped by the GART.  We fix this by using the kernel's
+	 * page-table instead (that's probably faster anyhow...).
+	 */
+	/* note: use vmalloc() because num_pages could be large... */
+	page_map = vmalloc(num_pages * sizeof(struct page *));
+	if (!page_map)
+		return NULL;
+
+	phys_page_map = (agpmem->memory->pages + (offset - agpmem->bound) / PAGE_SIZE);
+	for (i = 0; i < num_pages; ++i)
+		page_map[i] = phys_page_map[i];
+	addr = vmap(page_map, num_pages, VM_IOREMAP, PAGE_AGP);
+	vfree(page_map);
+
+	return addr;
+#else
 	/*
 	 * FIXME Linux<->FreeBSD: Not implemented. This is never called
 	 * on FreeBSD anyway, because drm_agp_mem->cant_use_aperture is
 	 * set to 0.
 	 */
 	return NULL;
+#endif
 }
 
 #define	vunmap(handle)
 
 /** Wrapper around agp_free_memory() */
+#ifdef __linux__
+void drm_free_agp(struct agp_memory * handle, int pages)
+#else
 void drm_free_agp(DRM_AGP_MEM * handle, int pages)
+#endif
 {
 	device_t agpdev;
 
@@ -73,11 +120,19 @@ void drm_free_agp(DRM_AGP_MEM * handle, int pages)
 	if (!agpdev || !handle)
 		return;
 
+#ifdef __linux__
+	agp_free_memory(handle);
+#else
 	agp_free_memory(agpdev, handle);
+#endif
 }
 
 /** Wrapper around agp_bind_memory() */
+#ifdef __linux__
+int drm_bind_agp(struct agp_memory * handle, unsigned int start)
+#else
 int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
+#endif
 {
 	device_t agpdev;
 
@@ -85,11 +140,19 @@ int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
 	if (!agpdev || !handle)
 		return -EINVAL;
 
+#ifdef __linux__
+	return agp_bind_memory(handle, start);
+#else
 	return -agp_bind_memory(agpdev, handle, start * PAGE_SIZE);
+#endif
 }
 
 /** Wrapper around agp_unbind_memory() */
+#ifdef __linux__
+int drm_unbind_agp(struct agp_memory * handle)
+#else
 int drm_unbind_agp(DRM_AGP_MEM * handle)
+#endif
 {
 	device_t agpdev;
 
@@ -97,7 +160,11 @@ int drm_unbind_agp(DRM_AGP_MEM * handle)
 	if (!agpdev || !handle)
 		return -EINVAL;
 
+#ifdef __linux__
+	return agp_unbind_memory(handle);
+#else
 	return -agp_unbind_memory(agpdev, handle);
+#endif
 }
 
 #else /*  CONFIG_AGP  */

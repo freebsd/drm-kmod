@@ -179,7 +179,7 @@ int drm_legacy_lock(struct drm_device *dev, void *data,
 			  task_pid_nr(current), lock->context);
 		return -EINVAL;
 	}
-#if defined(__linux__)
+#ifdef __linux__
 	DRM_DEBUG("%d (pid %d) requests lock (0x%08x), flags = 0x%08x\n",
 		  lock->context, task_pid_nr(current),
 		  master->lock.hw_lock ? master->lock.hw_lock->lock : -1,

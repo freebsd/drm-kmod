@@ -196,10 +196,10 @@ static bool ttm_zones_above_swap_target(struct ttm_mem_global *glob,
 
 		if (from_wq)
 			target = zone->swap_limit;
-#ifdef __FreeBSD__
-		else if (priv_check(curthread, PRIV_VM_MLOCK) == 0)
-#else
+#ifdef __linux__
 		else if (capable(CAP_SYS_ADMIN))
+#else
+		else if (priv_check(curthread, PRIV_VM_MLOCK) == 0)
 #endif
 			target = zone->emer_mem;
 		else
@@ -253,14 +253,14 @@ static void ttm_shrink_work(struct work_struct *work)
 }
 
 static int ttm_mem_init_kernel_zone(struct ttm_mem_global *glob,
-#ifdef __FreeBSD__
-				    uint64_t mem)
-#else
+#ifdef __linux__
 				    const struct sysinfo *si)
+#else
+				    uint64_t mem)
 #endif
 {
 	struct ttm_mem_zone *zone = kzalloc(sizeof(*zone), GFP_KERNEL);
-#ifndef __FreeBSD__
+#ifdef __linux__
 	uint64_t mem;
 #endif
 	int ret;
@@ -268,7 +268,7 @@ static int ttm_mem_init_kernel_zone(struct ttm_mem_global *glob,
 	if (unlikely(!zone))
 		return -ENOMEM;
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	mem = si->totalram - si->totalhigh;
 	mem *= si->mem_unit;
 #endif
@@ -329,14 +329,14 @@ static int ttm_mem_init_highmem_zone(struct ttm_mem_global *glob,
 }
 #else
 static int ttm_mem_init_dma32_zone(struct ttm_mem_global *glob,
-#ifdef __FreeBSD__
-				   uint64_t mem)
-#else
+#ifdef __linux__
 				   const struct sysinfo *si)
+#else
+				   uint64_t mem)
 #endif
 {
 	struct ttm_mem_zone *zone = kzalloc(sizeof(*zone), GFP_KERNEL);
-#ifndef __FreeBSD__
+#ifdef __linux__
 	uint64_t mem;
 #endif
 	int ret;
@@ -344,7 +344,7 @@ static int ttm_mem_init_dma32_zone(struct ttm_mem_global *glob,
 	if (unlikely(!zone))
 		return -ENOMEM;
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	mem = si->totalram;
 	mem *= si->mem_unit;
 #endif
@@ -386,10 +386,10 @@ static int ttm_mem_init_dma32_zone(struct ttm_mem_global *glob,
 
 int ttm_mem_global_init(struct ttm_mem_global *glob)
 {
-#ifdef __FreeBSD__
-	u_int64_t mem;
-#else
+#ifdef __linux__
 	struct sysinfo si;
+#else
+	u_int64_t mem;
 #endif
 	int ret;
 	int i;
@@ -405,16 +405,16 @@ int ttm_mem_global_init(struct ttm_mem_global *glob)
 		return ret;
 	}
 
-#ifdef __FreeBSD__
-	mem = physmem * PAGE_SIZE;
-#else
+#ifdef __linux__
 	si_meminfo(&si);
+#else
+	mem = physmem * PAGE_SIZE;
 #endif
 
-#ifdef __FreeBSD__
-	ret = ttm_mem_init_kernel_zone(glob, mem);
-#else
+#ifdef __linux__
 	ret = ttm_mem_init_kernel_zone(glob, &si);
+#else
+	ret = ttm_mem_init_kernel_zone(glob, mem);
 #endif
 	if (unlikely(ret != 0))
 		goto out_no_zone;
@@ -423,10 +423,10 @@ int ttm_mem_global_init(struct ttm_mem_global *glob)
 	if (unlikely(ret != 0))
 		goto out_no_zone;
 #else
-#ifdef __FreeBSD__
-	ret = ttm_mem_init_dma32_zone(glob, mem);
-#else
+#ifdef __linux__
 	ret = ttm_mem_init_dma32_zone(glob, &si);
+#else
+	ret = ttm_mem_init_dma32_zone(glob, mem);
 #endif
 	if (unlikely(ret != 0))
 		goto out_no_zone;
@@ -528,11 +528,7 @@ static int ttm_mem_global_reserve(struct ttm_mem_global *glob,
 		if (single_zone && zone != single_zone)
 			continue;
 
-#ifdef __FreeBSD__
-		limit = (priv_check(curthread, PRIV_VM_MLOCK) == 0) ?
-#else
 		limit = (capable(CAP_SYS_ADMIN)) ?
-#endif
 			zone->emer_mem : zone->max_mem;
 
 		if (zone->used_mem > limit)

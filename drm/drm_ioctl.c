@@ -95,9 +95,6 @@
  * broken.
  */
 
-int drm_version(struct drm_device *dev, void *data,
-		       struct drm_file *file_priv);
-
 /*
  * Get the bus id.
  *
@@ -109,7 +106,7 @@ int drm_version(struct drm_device *dev, void *data,
  *
  * Copies the bus id from drm_device::unique into user space.
  */
-int drm_getunique(struct drm_device *dev, void *data,
+static int drm_getunique(struct drm_device *dev, void *data,
 		  struct drm_file *file_priv)
 {
 	struct drm_unique *u = data;
@@ -174,7 +171,7 @@ static int drm_set_busid(struct drm_device *dev, struct drm_file *file_priv)
  * Searches for the client with the specified index and copies its information
  * into userspace
  */
-int drm_getclient(struct drm_device *dev, void *data,
+static int drm_getclient(struct drm_device *dev, void *data,
 		  struct drm_file *file_priv)
 {
 	struct drm_client *client = data;
@@ -460,7 +457,7 @@ static int drm_copy_field(char __user *buf, size_t *buf_len, const char *value)
  *
  * Fills in the version information in \p arg.
  */
-int drm_version(struct drm_device *dev, void *data,
+static int drm_version(struct drm_device *dev, void *data,
 		       struct drm_file *file_priv)
 {
 	struct drm_version *version = data;
@@ -549,7 +546,7 @@ static const struct drm_ioctl_desc drm_ioctls[] = {
 	DRM_IOCTL_DEF(DRM_IOCTL_GET_MAGIC, drm_getmagic, DRM_UNLOCKED),
 	DRM_IOCTL_DEF(DRM_IOCTL_IRQ_BUSID, drm_irq_by_busid, DRM_MASTER|DRM_ROOT_ONLY),
 	DRM_IOCTL_DEF(DRM_IOCTL_GET_MAP, drm_legacy_getmap_ioctl, DRM_UNLOCKED),
-	DRM_IOCTL_DEF(DRM_IOCTL_GET_CLIENT, drm_getclient, DRM_UNLOCKED|DRM_RENDER_ALLOW),
+	DRM_IOCTL_DEF(DRM_IOCTL_GET_CLIENT, drm_getclient, DRM_UNLOCKED),
 	DRM_IOCTL_DEF(DRM_IOCTL_GET_STATS, drm_getstats, DRM_UNLOCKED),
 	DRM_IOCTL_DEF(DRM_IOCTL_GET_CAP, drm_getcap, DRM_UNLOCKED|DRM_RENDER_ALLOW),
 	DRM_IOCTL_DEF(DRM_IOCTL_SET_CLIENT_CAP, drm_setclientcap, DRM_UNLOCKED),
@@ -657,7 +654,7 @@ static const struct drm_ioctl_desc drm_ioctls[] = {
 
 #define DRM_CORE_IOCTL_COUNT	ARRAY_SIZE( drm_ioctls )
 
-
+#ifndef __linux__
 long drm_ioctl_kernel(struct file *file, drm_ioctl_t *func, void *kdata,
 		      u32 flags)
 {
@@ -683,6 +680,7 @@ long drm_ioctl_kernel(struct file *file, drm_ioctl_t *func, void *kdata,
 	}
 	return retcode;
 }
+#endif
 
 /**
  * drm_ioctl - ioctl callback implementation for DRM drivers
@@ -751,6 +749,10 @@ long drm_ioctl(struct file *filp,
 		goto err_i1;
 	}
 
+	retcode = drm_ioctl_permit(ioctl->flags, file_priv);
+	if (unlikely(retcode))
+		goto err_i1;
+
 	if (ksize <= sizeof(stack_kdata)) {
 		kdata = stack_kdata;
 	} else {
@@ -768,23 +770,25 @@ long drm_ioctl(struct file *filp,
 
 	if (ksize > in_size)
 		memset(kdata + in_size, 0, ksize - in_size);
-
-#ifndef __FreeBSD__
-	// Merge conflict 2017-12-13
-	// HPS replaced this with drm_ioctl_kernel call?
 	
 	/* Enforce sane locking for modern driver ioctls. */
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY) ||
 	    (ioctl->flags & DRM_UNLOCKED))
+#ifdef __linux__
 		retcode = func(dev, kdata, file_priv);
+#else
+		retcode = drm_ioctl_kernel(filp, func, kdata, ioctl->flags);
+#endif
 	else {
 		mutex_lock(&drm_global_mutex);
+#ifdef __linux__
 		retcode = func(dev, kdata, file_priv);
+#else
+		retcode = drm_ioctl_kernel(filp, func, kdata, ioctl->flags);
+#endif
 		mutex_unlock(&drm_global_mutex);
 	}
-#else
-	retcode = drm_ioctl_kernel(filp, func, kdata, ioctl->flags);
-#endif
+
 	if (copy_to_user((void __user *)arg, kdata, out_size) != 0)
 		retcode = -EFAULT;
 

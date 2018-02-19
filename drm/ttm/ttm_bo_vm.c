@@ -66,7 +66,7 @@ static int ttm_bo_vm_fault_idle(struct ttm_buffer_object *bo,
 			goto out_unlock;
 
 		ttm_bo_reference(bo);
-#ifndef __FreeBSD__
+#ifdef __linux__
 		/* On FreeBSD we're not holding locks here. */
 		up_read(&vmf->vma->vm_mm->mmap_sem);
 #endif
@@ -131,7 +131,7 @@ static int ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 		if (vmf->flags & FAULT_FLAG_ALLOW_RETRY) {
 			if (!(vmf->flags & FAULT_FLAG_RETRY_NOWAIT)) {
 				ttm_bo_reference(bo);
-#ifndef __FreeBSD__
+#ifdef __linux__
 				/* On FreeBSD we're not holding locks here. */
 				up_read(&vmf->vma->vm_mm->mmap_sem);
 #endif
@@ -239,7 +239,48 @@ static int ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	 * Speculatively prefault a number of pages. Only error on
 	 * first page.
 	 */
-#ifdef __FreeBSD__
+#ifdef __linux__
+	for (i = 0; i < TTM_BO_VM_NUM_PREFAULT; ++i) {
+		if (bo->mem.bus.is_iomem)
+			pfn = ((bo->mem.bus.base + bo->mem.bus.offset) >> PAGE_SHIFT) + page_offset;
+		else {
+			page = ttm->pages[page_offset];
+			if (unlikely(!page && i == 0)) {
+				retval = VM_FAULT_OOM;
+				goto out_io_unlock;
+			} else if (unlikely(!page)) {
+				break;
+			}
+			page->mapping = vma->vm_file->f_mapping;
+			page->index = drm_vma_node_start(&bo->vma_node) +
+				page_offset;
+			pfn = page_to_pfn(page);
+		}
+
+		if (vma->vm_flags & VM_MIXEDMAP)
+			ret = vm_insert_mixed(&cvma, address,
+					__pfn_to_pfn_t(pfn, PFN_DEV));
+		else
+			ret = vm_insert_pfn(&cvma, address, pfn);
+
+		/*
+		 * Somebody beat us to this PTE or prefaulting to
+		 * an already populated PTE, or prefaulting error.
+		 */
+
+		if (unlikely((ret == -EBUSY) || (ret != 0 && i > 0)))
+			break;
+		else if (unlikely(ret != 0)) {
+			retval =
+			    (ret == -ENOMEM) ? VM_FAULT_OOM : VM_FAULT_SIGBUS;
+			goto out_io_unlock;
+		}
+
+		address += PAGE_SIZE;
+		if (unlikely(++page_offset >= page_last))
+			break;
+	}
+#else
 	vm_object_t obj;
 	vm_pindex_t pidx;
 
@@ -283,47 +324,6 @@ fail:
 		break;
 	}
 	VM_OBJECT_WUNLOCK(obj);
-#else
-	for (i = 0; i < TTM_BO_VM_NUM_PREFAULT; ++i) {
-		if (bo->mem.bus.is_iomem)
-			pfn = ((bo->mem.bus.base + bo->mem.bus.offset) >> PAGE_SHIFT) + page_offset;
-		else {
-			page = ttm->pages[page_offset];
-			if (unlikely(!page && i == 0)) {
-				retval = VM_FAULT_OOM;
-				goto out_io_unlock;
-			} else if (unlikely(!page)) {
-				break;
-			}
-			page->mapping = vma->vm_file->f_mapping;
-			page->index = drm_vma_node_start(&bo->vma_node) +
-				page_offset;
-			pfn = page_to_pfn(page);
-		}
-
-		if (vma->vm_flags & VM_MIXEDMAP)
-			ret = vm_insert_mixed(&cvma, address,
-					__pfn_to_pfn_t(pfn, PFN_DEV));
-		else
-			ret = vm_insert_pfn(&cvma, address, pfn);
-
-		/*
-		 * Somebody beat us to this PTE or prefaulting to
-		 * an already populated PTE, or prefaulting error.
-		 */
-
-		if (unlikely((ret == -EBUSY) || (ret != 0 && i > 0)))
-			break;
-		else if (unlikely(ret != 0)) {
-			retval =
-			    (ret == -ENOMEM) ? VM_FAULT_OOM : VM_FAULT_SIGBUS;
-			goto out_io_unlock;
-		}
-
-		address += PAGE_SIZE;
-		if (unlikely(++page_offset >= page_last))
-			break;
-	}
 #endif
 out_io_unlock:
 	ttm_mem_io_unlock(man);
@@ -337,7 +337,7 @@ static void ttm_bo_vm_open(struct vm_area_struct *vma)
 	struct ttm_buffer_object *bo =
 	    (struct ttm_buffer_object *)vma->vm_private_data;
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	WARN_ON(bo->bdev->dev_mapping != vma->vm_file->f_mapping);
 #endif
 
