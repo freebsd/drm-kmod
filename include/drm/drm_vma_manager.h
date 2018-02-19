@@ -192,7 +192,7 @@ static inline __u64 drm_vma_node_offset_addr(struct drm_vma_offset_node *node)
 	return ((__u64)node->vm_node.start) << PAGE_SHIFT;
 }
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 /**
  * drm_vma_node_unmap() - Unmap offset node
  * @node: Offset node

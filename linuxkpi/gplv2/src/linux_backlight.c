@@ -25,7 +25,7 @@ static struct list_head backlight_dev_list;
 static struct mutex backlight_dev_list_mutex;
 static struct blocking_notifier_head backlight_notifier;
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static const char *const backlight_types[] = {
 	[BACKLIGHT_RAW] = "raw",
 	[BACKLIGHT_PLATFORM] = "platform",
@@ -119,13 +119,13 @@ static void backlight_generate_event(struct backlight_device *bd,
 		break;
 	}
 	envp[1] = NULL;
-#ifndef __FreeBSD__
+#ifdef __linux__
 	kobject_uevent_env(&bd->dev.kobj, KOBJ_CHANGE, envp);
 	sysfs_notify(&bd->dev.kobj, NULL, "actual_brightness");
 #endif
 }
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static ssize_t bl_power_show(struct device *dev, struct device_attribute *attr,
 		char *buf)
 {
@@ -278,7 +278,7 @@ static void bl_device_release(struct device *dev)
 	kfree(bd);
 }
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static struct attribute *bl_device_attrs[] = {
 	&dev_attr_bl_power.attr,
 	&dev_attr_brightness.attr,
@@ -588,7 +588,7 @@ static int __init backlight_class_init(void)
 		return PTR_ERR(backlight_class);
 	}
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	backlight_class->dev_groups = bl_device_groups;
 #endif
 	backlight_class->pm = &backlight_class_dev_pm_ops;

@@ -2073,7 +2073,7 @@ struct drm_i915_private {
 	const struct intel_device_info info;
 
 	void __iomem *regs;
-#ifdef __FreeBSD__
+#ifndef __linux__
 	int mmio_rid;
 	int mmio_restype;
 #endif
@@ -2115,7 +2115,7 @@ struct drm_i915_private {
 	struct i915_vma *semaphore;
 
 	struct drm_dma_handle *status_page_dmah;
-#ifdef __FreeBSD__
+#ifndef __linux__
 #undef resource
 	struct resource *mch_res;
 	int mch_res_rid;
@@ -2475,6 +2475,12 @@ struct drm_i915_private {
 
 	/* Used to save the pipe-to-encoder mapping for audio */
 	struct intel_encoder *av_enc_map[I915_MAX_PIPES];
+
+	/* necessary resource sharing with HDMI LPE audio driver. */
+	struct {
+		struct platform_device *platdev;
+		int	irq;
+	} lpe_audio;
 
 	/*
 	 * NOTE: This is the dri1/ums dungeon, don't add stuff here. Your patch
@@ -3718,7 +3724,11 @@ static inline void intel_unregister_dsm_handler(void) { return; }
 static inline struct intel_device_info *
 mkwrite_device_info(struct drm_i915_private *dev_priv)
 {
+#ifdef __linux__
+	return (struct intel_device_info *)&dev_priv->info;
+#else
 	return __DECONST(struct intel_device_info *, &dev_priv->info);
+#endif
 }
 
 const char *intel_platform_name(enum intel_platform platform);
@@ -4032,8 +4042,10 @@ __i915_request_irq_complete(struct drm_i915_gem_request *req)
 	return false;
 }
 
-
+#ifndef __linux__
+// intel_freebsd.c
 void i915_locks_destroy(struct drm_i915_private *dev_priv);
+#endif
 
 void i915_memcpy_init_early(struct drm_i915_private *dev_priv);
 bool i915_memcpy_from_wc(void *dst, const void *src, unsigned long len);

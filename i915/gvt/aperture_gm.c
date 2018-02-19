@@ -41,23 +41,18 @@ static int alloc_gm(struct intel_vgpu *vgpu, bool high_gm)
 {
 	struct intel_gvt *gvt = vgpu->gvt;
 	struct drm_i915_private *dev_priv = gvt->dev_priv;
-	u32 alloc_flag, search_flag;
+	unsigned int flags;
 	u64 start, end, size;
 	struct drm_mm_node *node;
-	int retried = 0;
 	int ret;
 
 	if (high_gm) {
-		search_flag = DRM_MM_SEARCH_BELOW;
-		alloc_flag = DRM_MM_CREATE_TOP;
 		node = &vgpu->gm.high_gm_node;
 		size = vgpu_hidden_sz(vgpu);
 		start = ALIGN(gvt_hidden_gmadr_base(gvt), I915_GTT_PAGE_SIZE);
 		end = ALIGN(gvt_hidden_gmadr_end(gvt), I915_GTT_PAGE_SIZE);
 		flags = PIN_HIGH;
 	} else {
-		search_flag = DRM_MM_SEARCH_DEFAULT;
-		alloc_flag = DRM_MM_CREATE_DEFAULT;
 		node = &vgpu->gm.low_gm_node;
 		size = vgpu_aperture_sz(vgpu);
 		start = ALIGN(gvt_aperture_gmadr_base(gvt), I915_GTT_PAGE_SIZE);
@@ -71,6 +66,10 @@ static int alloc_gm(struct intel_vgpu *vgpu, bool high_gm)
 				  I915_COLOR_UNEVICTABLE,
 				  start, end, flags);
 	mutex_unlock(&dev_priv->drm.struct_mutex);
+	if (ret)
+		gvt_err("fail to alloc %s gm space from host\n",
+			high_gm ? "high" : "low");
+
 	return ret;
 }
 

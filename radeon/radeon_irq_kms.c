@@ -215,7 +215,7 @@ static bool radeon_msi_ok(struct radeon_device *rdev)
 	 */
 	if (rdev->family < CHIP_BONAIRE) {
 		dev_info(rdev->dev, "radeon: MSI limited to 32-bit\n");
-#ifndef __FreeBSD__
+#ifdef __linux__
 		rdev->pdev->no_64bit_msi = 1;
 #endif
 	}
@@ -294,7 +294,7 @@ int radeon_irq_kms_init(struct radeon_device *rdev)
 	rdev->msi_enabled = 0;
 
 	if (radeon_msi_ok(rdev)) {
-#ifndef __FreeBSD__
+#ifdef __linux__
 		int ret = pci_enable_msi(rdev->pdev);
 		if (!ret) {
 			rdev->msi_enabled = 1;
@@ -332,7 +332,7 @@ void radeon_irq_kms_fini(struct radeon_device *rdev)
 	if (rdev->irq.installed) {
 		drm_irq_uninstall(rdev->ddev);
 		rdev->irq.installed = false;
-#ifndef __FreeBSD__
+#ifdef __linux__
 		if (rdev->msi_enabled)
 			pci_disable_msi(rdev->pdev);
 #endif

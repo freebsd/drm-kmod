@@ -1458,7 +1458,7 @@ static const struct vbt_header *find_vbt(void __iomem *bios, size_t size)
 	return NULL;
 }
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #define	pci_map_rom(pdev, sizep)			\
 	vga_pci_map_bios(device_get_parent(pdev->dev.bsddev), sizep)
 #define	pci_unmap_rom(pdev, bios)			\

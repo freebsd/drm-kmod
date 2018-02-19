@@ -45,7 +45,7 @@
  * subset of the MIPI DCS command set.
  */
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static int mipi_dsi_device_match(struct device *dev, struct device_driver *drv)
 {
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
@@ -1092,7 +1092,7 @@ int mipi_dsi_dcs_get_display_brightness(struct mipi_dsi_device *dsi,
 }
 EXPORT_SYMBOL(mipi_dsi_dcs_get_display_brightness);
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static int mipi_dsi_drv_probe(struct device *dev)
 {
 	struct mipi_dsi_driver *drv = to_mipi_dsi_driver(dev->driver);

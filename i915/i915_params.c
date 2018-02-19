@@ -22,7 +22,7 @@
  * IN THE SOFTWARE.
  */
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #include <linux/types.h>
 #endif
 

@@ -2193,7 +2193,7 @@ intel_sdvo_connector_register(struct drm_connector *connector)
 	if (ret)
 		return ret;
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	(void)sdvo;
 	return (0);
 #else
@@ -2206,7 +2206,7 @@ intel_sdvo_connector_register(struct drm_connector *connector)
 static void
 intel_sdvo_connector_unregister(struct drm_connector *connector)
 {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	struct intel_sdvo *sdvo = intel_attached_sdvo(connector);
 
 	sysfs_remove_link(&connector->kdev->kobj,

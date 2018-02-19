@@ -31,7 +31,7 @@
 #include "drm_legacy.h"
 
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #define aper_base ai_aperture_base
 #define aper_size ai_aperture_size
 
@@ -59,8 +59,7 @@ drm_pci_busdma_callback(void *arg, bus_dma_segment_t *segs, int nsegs, int error
  */
 drm_dma_handle_t *drm_pci_alloc(struct drm_device * dev, size_t size, size_t align)
 {
-	printf("%s\n", __func__);
-#ifdef __FreeBSD__
+#ifndef __linux__
 	drm_dma_handle_t *dmah;
 	int ret;
 
@@ -153,7 +152,7 @@ void __drm_legacy_pci_free(struct drm_device * dev, drm_dma_handle_t * dmah)
 	unsigned long addr;
 	size_t sz;
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	if (dmah == NULL)
 		return;
 
@@ -200,7 +199,7 @@ static int drm_get_pci_domain(struct drm_device *dev)
 		return 0;
 #endif /* __alpha__ */
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	return pci_get_domain(dev->dev->bsddev);
 #else
 	return pci_domain_nr(dev->pdev->bus);
@@ -209,7 +208,7 @@ static int drm_get_pci_domain(struct drm_device *dev)
 
 int drm_pci_set_busid(struct drm_device *dev, struct drm_master *master)
 {
-#ifdef __FreeBSD__
+#ifndef __linux__
 	master->unique = kasprintf(GFP_KERNEL, "pci:%04x:%02x:%02x.%d",
 					drm_get_pci_domain(dev),
 					pci_get_bus(dev->dev->bsddev),
@@ -325,8 +324,6 @@ int drm_get_pci_dev(struct pci_dev *pdev, const struct pci_device_id *ent,
 	if (IS_ERR(dev))
 		return PTR_ERR(dev);
 
-	printf("%s\n", __func__);
-
 	ret = pci_enable_device(pdev);
 	if (ret)
 		goto err_free;
@@ -377,15 +374,13 @@ EXPORT_SYMBOL(drm_get_pci_dev);
  */
 int drm_pci_init(struct drm_driver *driver, struct pci_driver *pdriver)
 {
-	printf("%s: entering", __func__);
-
 	struct pci_dev *pdev = NULL;
 	const struct pci_device_id *pid;
 	int i;
 
 	DRM_DEBUG("\n");
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 
 	pdriver->bsdclass = drm_devclass;
 	pdriver->name = "drmn";
@@ -427,7 +422,7 @@ int drm_pci_init(struct drm_driver *driver, struct pci_driver *pdriver)
 
 int drm_pcie_get_speed_cap_mask(struct drm_device *dev, u32 *mask)
 {
-#ifdef __FreeBSD__
+#ifndef __linux__
 	device_t root;
 	u32 lnkcap, lnkcap2;
 	int error, pos;
@@ -482,7 +477,7 @@ int drm_pcie_get_speed_cap_mask(struct drm_device *dev, u32 *mask)
 			*mask |= (DRM_PCIE_SPEED_25 | DRM_PCIE_SPEED_50);
 	}
 	DRM_INFO("probing gen 2 caps for device %x:%x = %x/%x\n",
-#ifdef __FreeBSD__
+#ifndef __linux__
 			pci_get_vendor(root), pci_get_device(root), lnkcap, lnkcap2);
 #else
 			root->vendor, root->device, lnkcap, lnkcap2);

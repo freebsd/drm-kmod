@@ -487,7 +487,7 @@ void i915_gem_shrinker_init(struct drm_i915_private *dev_priv)
 	WARN_ON(register_oom_notifier(&dev_priv->mm.oom_notifier));
 
 	dev_priv->mm.vmap_notifier.notifier_call = i915_gem_shrinker_vmap;
-#ifndef __FreeBSD__
+#ifdef __linux__
 	WARN_ON(register_vmap_purge_notifier(&dev_priv->mm.vmap_notifier));
 #endif
 }
@@ -500,7 +500,7 @@ void i915_gem_shrinker_init(struct drm_i915_private *dev_priv)
  */
 void i915_gem_shrinker_cleanup(struct drm_i915_private *dev_priv)
 {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	WARN_ON(unregister_vmap_purge_notifier(&dev_priv->mm.vmap_notifier));
 #endif
 	WARN_ON(unregister_oom_notifier(&dev_priv->mm.oom_notifier));

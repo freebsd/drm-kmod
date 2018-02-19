@@ -1382,7 +1382,7 @@ struct amdgpu_device {
 	amdgpu_block_wreg_t		audio_endpt_wreg;
 	void __iomem                    *rio_mem;
 	resource_size_t			rio_mem_size;
-#ifdef __FreeBSD__
+#ifndef __linux__
 	int				rio_rid;
 #endif
 	struct amdgpu_doorbell		doorbell;

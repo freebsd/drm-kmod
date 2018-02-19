@@ -143,7 +143,7 @@ void drm_atomic_state_default_clear(struct drm_atomic_state *state)
 	for (i = 0; i < state->num_connector; i++) {
 		struct drm_connector *connector = state->connectors[i].ptr;
 
-		if (!connector || !connector->funcs)
+		if (!connector)
 			continue;
 
 		connector->funcs->atomic_destroy_state(connector,

@@ -148,7 +148,7 @@ struct amdgpu_ring {
 	struct amdgpu_bo	*ring_obj;
 // XXX: Get conversion compiler errors in a lot of files, all pointing to code at amdgpu.h:1605.
 //	Best approach for fix?
-#ifdef __FreeBSD__
+#ifndef __linux__
     uint32_t	*ring;
 #else
 	volatile uint32_t	*ring;

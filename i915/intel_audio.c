@@ -631,7 +631,7 @@ void intel_audio_codec_enable(struct intel_encoder *intel_encoder,
 		acomp->audio_ops->pin_eld_notify(acomp->audio_ops->audio_ptr,
 						 (int) port, (int) pipe);
 	}
-#ifndef __FreeBSD__
+#ifdef __linux__
 	switch (intel_encoder->type) {
 	case INTEL_OUTPUT_HDMI:
 		intel_lpe_audio_notify(dev_priv, connector->eld, port, pipe,
@@ -681,7 +681,7 @@ void intel_audio_codec_disable(struct intel_encoder *intel_encoder)
 						 (int) port, (int) pipe);
 	}
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	intel_lpe_audio_notify(dev_priv, NULL, port, pipe, 0, false, 0);
 #endif
 }

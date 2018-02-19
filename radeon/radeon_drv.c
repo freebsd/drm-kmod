@@ -325,7 +325,7 @@ static int radeon_kick_out_firmware_fb(struct pci_dev *pdev)
 	ap->ranges[0].size = pci_resource_len(pdev, 0);
 
 #ifdef CONFIG_X86
-#ifdef __FreeBSD__
+#ifndef __linux__
 	primary = false;
 #else
 	primary = pdev->resource[PCI_ROM_RESOURCE].flags & IORESOURCE_ROM_SHADOW;

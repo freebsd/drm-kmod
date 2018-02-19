@@ -23,7 +23,7 @@
 #ifndef _SMUMGR_H_
 #define _SMUMGR_H_
 #include <linux/types.h>
-#ifdef __FreeBSD__
+#ifndef __linux__
 #include <linux/math64.h>
 #endif
 #include "pp_instance.h"

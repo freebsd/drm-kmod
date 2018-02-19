@@ -374,14 +374,14 @@ is_primary(struct linux_fb_info *info)
 {
 	struct device *device = info->device;
 	struct pci_dev *pci_dev = NULL;
-#ifndef __FreeBSD__
+#ifdef __linux__
 	struct linux_resource *res = NULL;
 #endif
 
 	if (device &&  (pci_dev = to_pci_dev(device)) == NULL)
 		return (0);
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	res = &pci_dev->resource[PCI_ROM_RESOURCE];
 	if (res && res->flags & IORESOURCE_ROM_SHADOW)
 		return (1);

@@ -2380,7 +2380,7 @@ struct radeon_device {
 	/* io port */
 	void __iomem                    *rio_mem;
 	resource_size_t			rio_mem_size;
-#ifdef __FreeBSD__
+#ifndef __linux__
 	int				rio_rid;
 #endif
 	struct radeon_clock             clock;

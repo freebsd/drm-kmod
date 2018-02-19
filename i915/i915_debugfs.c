@@ -30,7 +30,7 @@
 #include <linux/list_sort.h>
 #include "intel_drv.h"
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #include <asm/msr.h>
 #endif
 
@@ -654,14 +654,11 @@ static void print_request(struct seq_file *m,
 			  const char *prefix)
 {
 #ifdef __linux__
-	struct pid *pid = rq->ctx->pid;
-	rcu_read_lock();
 	seq_printf(m, "%s%x [%x:%x] prio=%d @ %dms: %s\n", prefix,
 		   rq->global_seqno, rq->ctx->hw_id, rq->fence.seqno,
 		   rq->priotree.priority,
 		   jiffies_to_msecs(jiffies - rq->emitted_jiffies),
 		   rq->timeline->common->name);
-	rcu_read_unlock();
 #else
 	pid_t pid = rq->ctx->pid;
 	struct thread *td = tdfind(pid, -1);
@@ -2802,7 +2799,7 @@ static int i915_runtime_pm_status(struct seq_file *m, void *unused)
 	seq_printf(m, "GPU idle: %s\n", yesno(!dev_priv->gt.awake));
 	seq_printf(m, "IRQs disabled: %s\n",
 		   yesno(!intel_irqs_enabled(dev_priv)));
-#ifdef __FreeBSD__
+#ifndef __linux__
 	(void)pdev;
 #else
 #ifdef CONFIG_PM

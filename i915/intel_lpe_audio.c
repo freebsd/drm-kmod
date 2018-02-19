@@ -64,7 +64,7 @@
 #include <linux/device.h>
 #include <linux/pci.h>
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #include <linux/platform_device.h>
 #include <linux/irq.h>
 

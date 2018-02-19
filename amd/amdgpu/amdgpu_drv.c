@@ -203,7 +203,7 @@ module_param_named(cg_mask, amdgpu_cg_mask, uint, 0444);
 MODULE_PARM_DESC(pg_mask, "Powergating flags mask (0 = disable power gating)");
 module_param_named(pg_mask, amdgpu_pg_mask, uint, 0444);
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 MODULE_PARM_DESC(disable_cu, "Disable CUs (se.sh.cu,...)");
 module_param_named(disable_cu, amdgpu_disable_cu, charp, 0444);
 
@@ -449,7 +449,7 @@ static int amdgpu_kick_out_firmware_fb(struct pci_dev *pdev)
 	ap->ranges[0].size = pci_resource_len(pdev, 0);
 
 #ifdef CONFIG_X86
-#ifdef __FreeBSD__
+#ifndef __linux__
 	primary = false;
 #else
 	primary = pdev->resource[PCI_ROM_RESOURCE].flags & IORESOURCE_ROM_SHADOW;

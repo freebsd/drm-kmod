@@ -544,11 +544,13 @@ static int intel_vgpu_open(struct mdev_device *mdev)
 	if (ret)
 		goto undo_group;
 
+	intel_gvt_ops->vgpu_activate(vgpu);
+
 	atomic_set(&vgpu->vdev.released, 0);
 	return ret;
 
 undo_group:
-	vfio_unregister_notifier(&mdev->dev, VFIO_GROUP_NOTIFY,
+	vfio_unregister_notifier(mdev_dev(mdev), VFIO_GROUP_NOTIFY,
 					&vgpu->vdev.group_notifier);
 
 undo_iommu:
@@ -566,9 +568,16 @@ static void __intel_vgpu_release(struct intel_vgpu *vgpu)
 	if (!handle_valid(vgpu->handle))
 		return;
 
-	vfio_unregister_notifier(mdev_dev(vgpu->vdev.mdev), VFIO_IOMMU_NOTIFY,
+	if (atomic_cmpxchg(&vgpu->vdev.released, 0, 1))
+		return;
+
+	intel_gvt_ops->vgpu_deactivate(vgpu);
+
+	ret = vfio_unregister_notifier(mdev_dev(vgpu->vdev.mdev), VFIO_IOMMU_NOTIFY,
 					&vgpu->vdev.iommu_notifier);
-	vfio_unregister_notifier(mdev_dev(vgpu->vdev.mdev), VFIO_GROUP_NOTIFY,
+	WARN(ret, "vfio_unregister_notifier for iommu failed: %d\n", ret);
+
+	ret = vfio_unregister_notifier(mdev_dev(vgpu->vdev.mdev), VFIO_GROUP_NOTIFY,
 					&vgpu->vdev.group_notifier);
 	WARN(ret, "vfio_unregister_notifier for group failed: %d\n", ret);
 

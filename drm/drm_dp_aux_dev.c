@@ -280,7 +280,7 @@ static struct drm_dp_aux_dev *drm_dp_aux_dev_get_by_aux(struct drm_dp_aux *aux)
 	return aux_dev;
 }
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static int auxdev_wait_atomic_t(atomic_t *p)
 {
 	schedule();
@@ -302,7 +302,9 @@ void drm_dp_aux_unregister_devnode(struct drm_dp_aux *aux)
 	mutex_unlock(&aux_idr_mutex);
 
 	atomic_dec(&aux_dev->usecount);
-#ifdef __FreeBSD__
+#ifndef __linux__
+	// It's OK to ignore the callback as long as it only schedule()
+	// See wait.h in linuxkpi
 	wait_on_atomic_t(&aux_dev->usecount, TASK_UNINTERRUPTIBLE);
 #else
 	wait_on_atomic_t(&aux_dev->usecount, auxdev_wait_atomic_t,
@@ -352,13 +354,13 @@ int drm_dp_aux_dev_init(void)
 	if (IS_ERR(drm_dp_aux_dev_class)) {
 		return PTR_ERR(drm_dp_aux_dev_class);
 	}
-#ifdef __FreeBSD__
+#ifndef __linux__
 	(void)drm_dp_aux_groups;
 #else
 	drm_dp_aux_dev_class->dev_groups = drm_dp_aux_groups;
 #endif
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	res = register_chrdev_p(DRM_MAJOR+1, "aux", &auxdev_fops,
 	    DRM_DEV_UID, DRM_DEV_GID, DRM_DEV_MODE);
 	if (res == 0)

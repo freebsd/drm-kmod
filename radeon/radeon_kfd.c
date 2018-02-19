@@ -164,7 +164,7 @@ int radeon_kfd_init(void)
 
 void radeon_kfd_fini(void)
 {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	if (kgd2kfd) {
 		kgd2kfd->exit();
 		symbol_put(kgd2kfd_init);

@@ -23,7 +23,7 @@
  * Rob Clark <robdclark@gmail.com>
  */
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #include <machine/stdarg.h>
 #else
 #include <stdarg.h>
@@ -34,7 +34,7 @@
 
 void __drm_printfn_seq_file(struct drm_printer *p, struct va_format *vaf)
 {
-#ifdef __FreeBSD__
+#ifndef __linux__
 	seq_printf((struct seq_file *)(p->arg), "%pV", vaf);
 #else
 	seq_printf(p->arg, "%pV", vaf);
@@ -44,10 +44,10 @@ EXPORT_SYMBOL(__drm_printfn_seq_file);
 
 void __drm_printfn_info(struct drm_printer *p, struct va_format *vaf)
 {
-#ifdef __FreeBSD__
+#ifndef __linux__
 	dev_printk(KERN_INFO, (const struct device *)(p->arg), "[" DRM_NAME "] %pV", vaf);
 #else
-	dev_printk(KERN_INFO, p->arg, "[" DRM_NAME "] %pV", vaf);	
+	dev_printk(KERN_INFO, p->arg, "[" DRM_NAME "] %pV", vaf);
 #endif	
 }
 EXPORT_SYMBOL(__drm_printfn_info);

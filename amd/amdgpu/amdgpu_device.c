@@ -1060,7 +1060,7 @@ static void amdgpu_switcheroo_set_state(struct pci_dev *pdev, enum vga_switchero
 		return;
 
 	if (state == VGA_SWITCHEROO_ON) {
-#ifndef __FreeBSD__
+#ifdef __linux__
 		unsigned d3_delay = dev->pdev->d3_delay;
 #endif
 
@@ -1070,7 +1070,7 @@ static void amdgpu_switcheroo_set_state(struct pci_dev *pdev, enum vga_switchero
 
 		amdgpu_device_resume(dev, true, true);
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 		dev->pdev->d3_delay = d3_delay;
 #endif
 
@@ -1745,14 +1745,14 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 		/* doorbell bar mapping */
 		amdgpu_doorbell_init(adev);
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #define	DEVICE_COUNT_RESOURCE	5
 #endif
 
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_IO) {
-#ifdef __FreeBSD__
+#ifndef __linux__
 			struct resource *res;
 			int rid;
 
@@ -1873,7 +1873,7 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	if (r)
 		DRM_ERROR("ib ring test failed (%d).\n", r);
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	r = vm_phys_fictitious_reg_range(adev->mc.aper_base,
 	    adev->mc.aper_base + adev->mc.visible_vram_size,
 	    VM_MEMATTR_WRITE_COMBINING);
@@ -1974,7 +1974,7 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	if (adev->flags & AMD_IS_PX)
 		vga_switcheroo_fini_domain_pm_ops(adev->dev);
 	vga_client_register(adev->pdev, NULL, NULL, NULL);
-#ifdef __FreeBSD__
+#ifndef __linux__
 	if (adev->rio_mem) {
 		int rid;
 
@@ -2196,13 +2196,13 @@ int amdgpu_device_resume(struct drm_device *dev, bool resume, bool fbcon)
 	 * temporarily disable the rpm helpers so this doesn't deadlock us.
 	 */
 #ifdef CONFIG_PM
-#ifndef __FreeBSD__
+#ifdef __linux__
 	dev->dev->power.disable_depth++;
 #endif
 #endif
 	drm_helper_hpd_irq_event(dev);
 #ifdef CONFIG_PM
-#ifndef __FreeBSD__
+#ifdef __linux__
 	dev->dev->power.disable_depth--;
 #endif
 #endif

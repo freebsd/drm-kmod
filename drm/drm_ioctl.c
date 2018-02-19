@@ -189,8 +189,13 @@ static int drm_getclient(struct drm_device *dev, void *data,
 	 */
 	if (client->idx == 0) {
 		client->auth = file_priv->authenticated;
+#ifdef __linux__
+		client->pid = task_pid_vnr(current);
+		client->uid = overflowuid;
+#else
 		client->pid = file_priv->pid;
 		client->uid = 0;
+#endif
 		client->magic = 0;
 		client->iocs = 0;
 

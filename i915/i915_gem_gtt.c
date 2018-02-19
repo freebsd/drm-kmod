@@ -35,7 +35,7 @@
 #include "intel_drv.h"
 #include "intel_frontbuffer.h"
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #include <dev/agp/agp_i810.h>
 #endif
 
@@ -3154,7 +3154,7 @@ static int i915_gmch_probe(struct i915_ggtt *ggtt)
 		return -EIO;
 	}
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	struct intel_gtt *gtt;
 
 	gtt = intel_gtt_get();
@@ -3164,9 +3164,9 @@ static int i915_gmch_probe(struct i915_ggtt *ggtt)
 	ggtt->mappable_end = gtt->gtt_mappable_entries << PAGE_SHIFT;
 #else
 	intel_gtt_get(&ggtt->base.total,
-				  &ggtt->stolen_size,
-				  &ggtt->mappable_base,
-				  &ggtt->mappable_end);
+		      &ggtt->stolen_size,
+		      &ggtt->mappable_base,
+		      &ggtt->mappable_end);
 #endif
 
 	ggtt->do_idle_maps = needs_idle_maps(dev_priv);

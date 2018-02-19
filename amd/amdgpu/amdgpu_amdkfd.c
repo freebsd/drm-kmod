@@ -80,7 +80,7 @@ bool amdgpu_amdkfd_load_interface(struct amdgpu_device *rdev)
 
 void amdgpu_amdkfd_fini(void)
 {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	if (kgd2kfd) {
 		kgd2kfd->exit();
 		symbol_put(kgd2kfd_init);

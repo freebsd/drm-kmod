@@ -546,7 +546,7 @@ static int __init i915_init(void)
 		return 0;
 	}
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	i915_pci_driver.bsdclass = drm_devclass;
 	i915_pci_driver.name = "drmn";
 	return linux_pci_register_drm_driver(&i915_pci_driver);
@@ -557,7 +557,7 @@ static int __init i915_init(void)
 
 static void __exit i915_exit(void)
 {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	if (!i915_pci_driver.driver.owner)
 		return;
 

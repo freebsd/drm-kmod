@@ -242,7 +242,7 @@ static unsigned long i915_stolen_to_physical(struct drm_i915_private *dev_priv)
 		}
 	}
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	(void)r;
 #else
 	/* Verify that nothing else uses this physical address. Stolen

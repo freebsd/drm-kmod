@@ -38,7 +38,7 @@ static inline struct drm_i915_private *kdev_minor_to_i915(struct device *kdev)
 	return to_i915(minor->dev);
 }
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 #ifdef CONFIG_PM
 static u32 calc_residency(struct drm_i915_private *dev_priv,
 			  i915_reg_t reg)
@@ -460,7 +460,7 @@ static ssize_t gt_min_freq_mhz_store(struct device *kdev,
 
 }
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static DEVICE_ATTR(gt_act_freq_mhz, S_IRUGO, gt_act_freq_mhz_show, NULL);
 static DEVICE_ATTR(gt_cur_freq_mhz, S_IRUGO, gt_cur_freq_mhz_show, NULL);
 static DEVICE_ATTR(gt_boost_freq_mhz, S_IRUGO | S_IWUSR, gt_boost_freq_mhz_show, gt_boost_freq_mhz_store);
@@ -594,7 +594,7 @@ static void i915_teardown_error_capture(struct device *kdev) {}
 
 void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	struct device *kdev = dev_priv->drm.primary->kdev;
 	int ret;
 
@@ -649,7 +649,7 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 
 void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
 {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	struct device *kdev = dev_priv->drm.primary->kdev;
 
 	i915_teardown_error_capture(kdev);

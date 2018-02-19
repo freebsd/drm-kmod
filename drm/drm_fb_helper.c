@@ -124,20 +124,21 @@ int drm_fb_helper_single_add_all_connectors(struct drm_fb_helper *fb_helper)
 {
 	struct drm_device *dev = fb_helper->dev;
 	struct drm_connector *connector;
-	int i, ret;
+	struct drm_connector_list_iter conn_iter;
+	int i, ret = 0;
 
 	if (!drm_fbdev_emulation)
 		return 0;
 
 	mutex_lock(&dev->mode_config.mutex);
-	drm_for_each_connector(connector, dev) {
+	drm_connector_list_iter_get(dev, &conn_iter);
+	drm_for_each_connector_iter(connector, &conn_iter) {
 		ret = drm_fb_helper_add_one_connector(fb_helper, connector);
 
 		if (ret)
 			goto fail;
 	}
-	mutex_unlock(&dev->mode_config.mutex);
-	return 0;
+	goto out;
 fail:
 	drm_fb_helper_for_each_connector(fb_helper, i) {
 		struct drm_fb_helper_connector *fb_helper_connector =
@@ -149,6 +150,8 @@ fail:
 		fb_helper->connector_info[i] = NULL;
 	}
 	fb_helper->connector_count = 0;
+out:
+	drm_connector_list_iter_put(&conn_iter);
 	mutex_unlock(&dev->mode_config.mutex);
 
 	return ret;
@@ -405,7 +408,7 @@ static int restore_fbdev_mode(struct drm_fb_helper *fb_helper)
 
 	drm_warn_on_modeset_not_all_locked(dev);
 
-	if (dev->mode_config.funcs->atomic_commit)
+	if (drm_drv_uses_atomic_modeset(dev))
 		return restore_fbdev_mode_atomic(fb_helper);
 
 	drm_for_each_plane(plane, dev) {
@@ -910,7 +913,10 @@ static void drm_fb_helper_dirty(struct fb_info *info, u32 x, u32 y,
 	schedule_work(&helper->dirty_work);
 }
 
-#if defined(CONFIG_FB_DEFERRED_IO)
+#ifdef __linux__
+// ifdef CONFIG_FB_DEFERRED_IO removed upstream
+// Does not compile, FreeBSD vm_page has no field lru
+
 /**
  * drm_fb_helper_deferred_io() - fbdev deferred_io callback function
  * @info: fb_info struct pointer
@@ -929,7 +935,7 @@ void drm_fb_helper_deferred_io(struct fb_info *info,
 	min = ULONG_MAX;
 	max = 0;
 	list_for_each_entry(page, pagelist, lru) {
-		start = page->pindex << PAGE_SHIFT;
+		start = page->index << PAGE_SHIFT;
 		end = start + PAGE_SIZE - 1;
 		min = min(min, start);
 		max = max(max, end);
@@ -1449,7 +1455,7 @@ int drm_fb_helper_pan_display(struct fb_var_screeninfo *var,
 		return -EBUSY;
 	}
 
-	if (dev->mode_config.funcs->atomic_commit) {
+	if (drm_drv_uses_atomic_modeset(dev)) {
 		ret = pan_display_atomic(var, info);
 		goto unlock;
 	}
@@ -1486,8 +1492,10 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 	int crtc_count = 0;
 	int i;
 	struct drm_fb_helper_surface_size sizes;
-	struct vt_kms_softc *sc;
 	int gamma_size = 0;
+#ifndef __linux__
+	struct vt_kms_softc *sc;
+#endif
 
 	memset(&sizes, 0, sizeof(struct drm_fb_helper_surface_size));
 	sizes.surface_depth = 24;
@@ -1630,7 +1638,9 @@ void drm_fb_helper_fill_fix(struct fb_info *info, uint32_t pitch,
 	info->fix.accel = FB_ACCEL_NONE;
 
 	info->fix.line_length = pitch;
+#ifndef __linux__
 	info->fbio.fb_stride = pitch;
+#endif
 	return;
 }
 EXPORT_SYMBOL(drm_fb_helper_fill_fix);
@@ -1721,7 +1731,7 @@ void drm_fb_helper_fill_var(struct fb_info *info, struct drm_fb_helper *fb_helpe
 	info->var.xres = fb_width;
 	info->var.yres = fb_height;
 
-#ifdef __FreeBSD__ // fbio is freebsd stuff
+#ifndef __linux__ // fbio is BSD stuff
 	info->fbio.fb_name = device_get_nameunit(fb_helper->dev->dev->bsddev);
 	info->fbio.fb_width = fb->width;
 	info->fbio.fb_height = fb->height;
@@ -2073,7 +2083,7 @@ static int drm_pick_crtcs(struct drm_fb_helper *fb_helper,
 	 * NULL we fallback to the default drm_atomic_helper_best_encoder()
 	 * helper.
 	 */
-	if (fb_helper->dev->mode_config.funcs->atomic_commit &&
+	if (drm_drv_uses_atomic_modeset(fb_helper->dev) &&
 	    !connector_funcs->best_encoder)
 		encoder = drm_atomic_helper_best_encoder(connector);
 	else
@@ -2272,7 +2282,7 @@ int drm_fb_helper_initial_config(struct drm_fb_helper *fb_helper, int bpp_sel)
 	info = fb_helper->fbdev;
 	info->var.pixclock = 0;
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	info->fbio.fb_video_dev = device_get_parent(fb_helper->dev->dev->bsddev);
 	info->fbio.fb_bpp = bpp_sel;
 	info->fb_bsddev = fb_helper->dev->dev->bsddev;

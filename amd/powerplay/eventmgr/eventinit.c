@@ -25,7 +25,7 @@
 #include "ppinterrupt.h"
 #include "hardwaremanager.h"
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #include <linux/kernel.h>	/* for printk() */
 #endif
 

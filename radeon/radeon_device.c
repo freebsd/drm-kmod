@@ -1244,7 +1244,7 @@ static void radeon_check_arguments(struct radeon_device *rdev)
 static void radeon_switcheroo_set_state(struct pci_dev *pdev, enum vga_switcheroo_state state)
 {
 	struct drm_device *dev = pci_get_drvdata(pdev);
-#ifndef __FreeBSD__
+#ifdef __linux__
 	struct radeon_device *rdev = dev->dev_private;
 #endif
 
@@ -1252,7 +1252,7 @@ static void radeon_switcheroo_set_state(struct pci_dev *pdev, enum vga_switchero
 		return;
 
 	if (state == VGA_SWITCHEROO_ON) {
-#ifndef __FreeBSD__
+#ifdef __linux__
 		unsigned d3_delay = dev->pdev->d3_delay;
 #endif
 
@@ -1260,14 +1260,14 @@ static void radeon_switcheroo_set_state(struct pci_dev *pdev, enum vga_switchero
 		/* don't suspend or resume card normally */
 		dev->switch_power_state = DRM_SWITCH_POWER_CHANGING;
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 		if (d3_delay < 20 && (rdev->px_quirk_flags & RADEON_PX_QUIRK_LONG_WAKEUP))
 			dev->pdev->d3_delay = 20;
 #endif
 
 		radeon_resume_kms(dev, true, true);
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 		dev->pdev->d3_delay = d3_delay;
 #endif
 
@@ -1461,14 +1461,14 @@ int radeon_device_init(struct radeon_device *rdev,
 	if (rdev->family >= CHIP_BONAIRE)
 		radeon_doorbell_init(rdev);
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #define	DEVICE_COUNT_RESOURCE	5
 #endif
 
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		if (pci_resource_flags(rdev->pdev, i) & IORESOURCE_IO) {
-#ifdef __FreeBSD__
+#ifndef __linux__
 			struct resource *res;
 			int rid;
 
@@ -1598,7 +1598,7 @@ void radeon_device_fini(struct radeon_device *rdev)
 	if (rdev->flags & RADEON_IS_PX)
 		vga_switcheroo_fini_domain_pm_ops(rdev->dev);
 	vga_client_register(rdev->pdev, NULL, NULL, NULL);
-#ifdef __FreeBSD__
+#ifndef __linux__
 	if (rdev->rio_mem) {
 		int rid;
 

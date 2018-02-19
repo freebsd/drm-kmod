@@ -13178,7 +13178,7 @@ pipe_config_err(bool adjust, const char *name, const char *format, ...)
 	va_start(args, format);
 	vaf.fmt = format;
 	vaf.va = &args;
-#ifdef __FreeBSD__
+#ifndef __linux__
 	drm_printk(level, category, __func__, name, format);
 #else
 	drm_printk(level, category, "mismatch in %s %pV", name, &vaf);

@@ -167,7 +167,7 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 	}
 
 	/* NOTE Linux<->FreeBSD: Mesa needs the hw.dri sysctl tree. */
-#ifdef __FreeBSD__
+#ifndef __linux__
 	if (minor->type != DRM_MINOR_CONTROL &&
 	    minor->type != DRM_MINOR_RENDER)
 		drm_sysctl_init(minor->dev);
@@ -184,7 +184,9 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 	if (dev->driver->debugfs_init) {
 		ret = dev->driver->debugfs_init(minor);
 		if (ret) {
+#ifndef __linux__ 
 			drm_sysctl_cleanup(minor->dev);
+#endif
 			DRM_ERROR("DRM: Driver failed to initialize "
 				  "/sys/kernel/debug/dri.\n");
 			return ret;
@@ -259,7 +261,7 @@ int drm_debugfs_cleanup(struct drm_minor *minor)
 		dev->driver->debugfs_cleanup(minor);
 
 	/* NOTE Linux<->FreeBSD: Mesa needs the hw.dri sysctl tree. */
-#ifdef __FreeBSD__ // XXX: Need this? (drm_atomic_debugfs_cleanup() removed on linux)
+#ifndef __linux__ 
 	drm_sysctl_cleanup(minor->dev);
 #endif
 	drm_debugfs_remove_all_files(minor);

@@ -76,8 +76,11 @@ int drm_clients_info(struct seq_file *m, void *data)
 	struct drm_info_node *node = (struct drm_info_node *) m->private;
 	struct drm_device *dev = node->minor->dev;
 	struct drm_file *priv;
+#ifdef __linux__
+	kuid_t uid;
+#else	
 	uid_t uid;
-
+#endif
 	seq_printf(m,
 		   "%20s %5s %3s master a %5s %10s\n",
 		   "command",
@@ -104,6 +107,7 @@ int drm_clients_info(struct seq_file *m, void *data)
 			   priv->authenticated ? 'y' : 'n',
 			   from_kuid_munged(seq_user_ns(m), uid),
 			   priv->magic);
+
 		rcu_read_unlock();
 #else
 		struct thread *td;

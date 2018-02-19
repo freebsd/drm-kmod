@@ -29,7 +29,7 @@
 #include <drm/drm_plane_helper.h>
 #include "i915_drv.h"
 #include "intel_drv.h"
-#ifdef __FreeBSD__
+#ifndef __linux__
 #include <machine/clock.h>
 #else
 #include "../../../platform/x86/intel_ips.h"
@@ -5639,7 +5639,7 @@ static void gen6_update_ring_freq(struct drm_i915_private *dev_priv)
 		 * Default to measured freq if none found, PCU will ensure we
 		 * don't go over
 		 */
-#ifdef __FreeBSD__
+#ifndef __linux__
 		max_ia_freq = tsc_freq / 1000;
 #else
 		max_ia_freq = tsc_khz;
@@ -6286,7 +6286,7 @@ unsigned long i915_mch_val(struct drm_i915_private *dev_priv)
 	tsfs = I915_READ(TSFS);
 
 	m = ((tsfs & TSFS_SLOPE_MASK) >> TSFS_SLOPE_SHIFT);
-#ifdef __FreeBSD__
+#ifndef __linux__
 	x = I915_READ8(I915_TR1);
 #else
 	x = I915_READ8(TR1);

@@ -489,7 +489,7 @@ void intel_guc_log_create(struct intel_guc *guc)
 		 */
 		
 		// Force guc log with "slow" memcpy for testing (fast read n/a on FreeBSD)
-#ifndef __FreeBSD__
+#ifdef __linux__
 		if (WARN_ON(!i915_has_memcpy_from_wc())) {
 			/* logging will not be enabled */
 			i915.guc_log_level = -1;

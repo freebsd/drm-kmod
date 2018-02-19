@@ -5,7 +5,7 @@
 
 struct agp_bridge_data;
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 struct intel_gtt;
 struct intel_gtt *intel_gtt_get(void);
 #else
@@ -21,7 +21,7 @@ void intel_gmch_remove(void);
 
 bool intel_enable_gtt(void);
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 int intel_gtt_chipset_flush(void);
 #else
 void intel_gtt_chipset_flush(void);

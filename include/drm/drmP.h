@@ -566,7 +566,7 @@ struct drm_device {
 	struct drm_master *master;
 
 	atomic_t unplugged;			/**< Flag whether dev is dead */
-#ifndef __FreeBSD__
+#ifdef __linux__
 	struct inode *anon_inode;		/**< inode for private address-space */
 	struct address_space *anon_mapping;	/**< private address-space */
 #endif
@@ -691,7 +691,7 @@ struct drm_device {
 
 	const drm_pci_id_list_t *id_entry;	/* PCI ID, name, and chipset private */
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #define	DRM_PCI_RESOURCE_MAX	7
 #define	MAX_ORDER 11
 

@@ -27,7 +27,7 @@
 
 #include "i915_drv.h"
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #define	prio	task_thread->td_priority
 #endif
 

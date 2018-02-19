@@ -145,9 +145,14 @@ static enum intel_pch intel_virt_detect_pch(struct drm_i915_private *dev_priv)
 	return ret;
 }
 
+#ifdef __linux__
+static void intel_detect_pch(struct drm_i915_private *dev_priv)
+{
+#else
 static void intel_detect_pch(struct drm_device *dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
+#endif
 	struct pci_dev *pch = NULL;
 
 	/* In all current cases, num_pipes is equivalent to the PCH_NOP setting
@@ -404,7 +409,7 @@ intel_alloc_mchbar_resource(struct drm_device *dev)
 #endif
 
 	/* Get some space for it */
-#ifdef __FreeBSD__
+#ifndef __linux__
 #undef resource
 	device_t vga;
 	(void)ret;
@@ -517,7 +522,7 @@ intel_teardown_mchbar(struct drm_device *dev)
 		}
 	}
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	if (dev_priv->mch_res != NULL) {
 		device_t vga;
 
@@ -708,7 +713,7 @@ static int i915_kick_out_firmware_fb(struct drm_i915_private *dev_priv)
 	ap->ranges[0].base = ggtt->mappable_base;
 	ap->ranges[0].size = ggtt->mappable_end;
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	(void)pdev;
 	primary = false;
 #else
@@ -938,7 +943,7 @@ static int i915_mmio_setup(struct drm_device *dev)
 		mmio_size = 512 * 1024;
 	else
 		mmio_size = 2 * 1024 * 1024;
-#ifdef __FreeBSD__
+#ifndef __linux__
 	struct resource *res;
 	int rid, type;
 
@@ -973,7 +978,7 @@ static void i915_mmio_cleanup(struct drm_device *dev)
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 
 	intel_teardown_mchbar(dev);
-#ifdef __FreeBSD__
+#ifndef __linux__
 	int rid;
 
 	rid = dev_priv->mmio_rid;
@@ -1137,7 +1142,7 @@ static int i915_driver_init_hw(struct drm_i915_private *dev_priv)
 
 	i915_gem_load_init_fences(dev_priv);
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	/* On the 945G/GM, the chipset reports the MSI capability on the
 	 * integrated graphics even though the support isn't actually there
 	 * according to the published specs.  It doesn't appear to function
@@ -1173,7 +1178,7 @@ out_ggtt:
  */
 static void i915_driver_cleanup_hw(struct drm_i915_private *dev_priv)
 {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 
 	if (pdev->msi_enabled)
@@ -1209,7 +1214,7 @@ static void i915_driver_register(struct drm_i915_private *dev_priv)
 		i915_debugfs_register(dev_priv);
 		i915_guc_log_register(dev_priv);
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 		i915_setup_sysfs(dev_priv);
 #endif
 #ifdef CONFIG_I915_PERF // Not yet. i915_perf.c opens a can of worms...
@@ -1255,7 +1260,7 @@ static void i915_driver_unregister(struct drm_i915_private *dev_priv)
 #ifdef CONFIG_I915_PERF // Not yet. i915_perf.c opens a can of worms...
 	i915_perf_unregister(dev_priv);
 #endif
-#ifndef __FreeBSD__
+#ifdef __linux__
 	i915_teardown_sysfs(dev_priv);
 #endif
 	i915_guc_log_unregister(dev_priv);

@@ -441,7 +441,7 @@ void drm_dev_printk(const struct device *dev, const char *level,
 		    unsigned int category, const char *function_name,
 		    const char *prefix, const char *format, ...);
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 extern __printf(5, 6)
 	void drm_printk(const char *level, unsigned int category,
 					const char *function_name, const char *prefix,

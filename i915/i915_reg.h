@@ -66,7 +66,7 @@ static inline bool i915_mmio_reg_valid(i915_reg_t reg)
 			     (phy) == DPIO_PHY1 ? (b) : (c))
 #define _MMIO_PHY3(phy, a, b, c) _MMIO(_PHY3(phy, a, b, c))
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 /* clang's _Static_assert barfs on these. */
 #undef BUILD_BUG_ON_MSG
 #define	BUILD_BUG_ON_MSG(x, msg)

@@ -90,7 +90,6 @@ static int drm_open_helper(struct file *filp, struct drm_minor *minor);
 
 static int drm_setup(struct drm_device * dev)
 {
-	printf("entering %s\n", __func__);
 	int ret;
 
 	if (dev->driver->firstopen &&
@@ -124,8 +123,6 @@ static int drm_setup(struct drm_device * dev)
  */
 int drm_open(struct inode *inode, struct file *filp)
 {
-	printf("entering %s\n", __func__);
-
 	struct drm_device *dev;
 	struct drm_minor *minor;
 	int retcode;
@@ -139,9 +136,9 @@ int drm_open(struct inode *inode, struct file *filp)
 	if (!dev->open_count++)
 		need_setup = 1;
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	/* share address_space across all char-devs of a single device */
-	filp->f_mapping = dev->anon_mapping;
+	filp->f_mapping = dev->anon_inode;
 #endif
 
 	retcode = drm_open_helper(filp, minor);
@@ -560,7 +557,7 @@ unsigned int drm_poll(struct file *filp, struct poll_table_struct *wait)
 	struct drm_file *file_priv = filp->private_data;
 	unsigned int mask = 0;
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	spin_lock(&file_priv->minor->dev->event_lock);
 
 	if (list_empty(&file_priv->event_list))

@@ -75,13 +75,15 @@ void drm_sysfs_destroy(void)
 {
 	if (IS_ERR_OR_NULL(drm_class))
 		return;
+#ifndef __linux__
 	cancel_reset_debug_log();
+#endif
 	class_remove_file(drm_class, &class_attr_version.attr);
 	class_destroy(drm_class);
 	drm_class = NULL;
 }
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 /*
  * Connector properties
  */
@@ -166,7 +168,7 @@ static ssize_t enabled_show(struct device *device,
 	return snprintf(buf, PAGE_SIZE, enabled ? "enabled\n" : "disabled\n");
 }
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static ssize_t edid_show(struct file *filp, struct kobject *kobj,
 			 struct bin_attribute *attr, char *buf, loff_t off,
 			 size_t count)
@@ -219,7 +221,7 @@ static ssize_t modes_show(struct device *device,
 	return written;
 }
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static DEVICE_ATTR_RW(status);
 #endif
 static DEVICE_ATTR_RO(enabled);
@@ -227,7 +229,7 @@ static DEVICE_ATTR_RO(dpms);
 static DEVICE_ATTR_RO(modes);
 
 static struct attribute *connector_dev_attrs[] = {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	&dev_attr_status.attr,
 #endif
 	&dev_attr_enabled.attr,
@@ -236,7 +238,7 @@ static struct attribute *connector_dev_attrs[] = {
 	NULL
 };
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static struct bin_attribute edid_attr = {
 	.attr.name = "edid",
 	.attr.mode = 0444,
@@ -252,7 +254,7 @@ static struct bin_attribute *connector_bin_attrs[] = {
 
 static const struct attribute_group connector_dev_group = {
 	.attrs = connector_dev_attrs,
-#ifndef __FreeBSD__
+#ifdef __linux__
 	.bin_attrs = connector_bin_attrs,
 #endif
 };
@@ -331,7 +333,7 @@ void drm_sysfs_connector_remove(struct drm_connector *connector)
  */
 void drm_sysfs_hotplug_event(struct drm_device *dev)
 {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	char *event_string = "HOTPLUG=1";
 	char *envp[] = { event_string, NULL };
 
@@ -377,22 +379,28 @@ struct device *drm_sysfs_minor_alloc(struct drm_minor *minor)
 	kdev = kzalloc(sizeof(*kdev), GFP_KERNEL);
 	if (!kdev)
 		return ERR_PTR(-ENOMEM);
-
+#ifdef __linux__
+	device_initialize(kdev);
+#endif
 	kdev->devt = MKDEV(DRM_MAJOR, minor->index);
 	kdev->class = drm_class;
 	kdev->type = &drm_sysfs_device_minor;
 	kdev->parent = minor->dev->dev;
 	kdev->release = drm_sysfs_release;
+#ifndef __linux__
 	/* FreeBSD needs the class and parent to be set first */
 	device_initialize(kdev);
+#endif
 	dev_set_drvdata(kdev, minor);
 
 	r = dev_set_name(kdev, minor_str, minor->index);
 	if (r < 0)
 		goto err_free;
+#ifndef __linux__
 	r = drm_dev_alias(kdev, minor, minor_str);
 	if (r < 0)
 		goto err_free;
+#endif
 	return kdev;
 
 err_free:

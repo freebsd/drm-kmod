@@ -562,7 +562,7 @@ static bool radeon_atpx_detect(void)
 		has_atpx |= (radeon_atpx_pci_probe_handle(pdev) == true);
 
 		parent_pdev = pci_upstream_bridge(pdev);
-#ifndef __FreeBSD__
+#ifdef __linux__
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
 #endif
 	}
@@ -574,7 +574,7 @@ static bool radeon_atpx_detect(void)
 		has_atpx |= (radeon_atpx_pci_probe_handle(pdev) == true);
 
 		parent_pdev = pci_upstream_bridge(pdev);
-#ifndef __FreeBSD__
+#ifdef __linux__
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
 #endif
 	}

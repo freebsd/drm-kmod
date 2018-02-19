@@ -54,7 +54,7 @@ int drm_i2c_encoder_init(struct drm_device *dev,
 			 struct i2c_adapter *adap,
 			 const struct i2c_board_info *info)
 {
-#ifndef __FreeBSD__
+#ifdef __linux__
 	struct module *module = NULL;
 #endif
 	struct i2c_client *client;
@@ -74,7 +74,7 @@ int drm_i2c_encoder_init(struct drm_device *dev,
 		goto fail_unregister;
 	}
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	module = client->dev.driver->owner;
 	if (!try_module_get(module)) {
 		err = -ENODEV;
@@ -98,7 +98,7 @@ int drm_i2c_encoder_init(struct drm_device *dev,
 
 fail_unregister:
 	i2c_unregister_device(client);
-#ifndef __FreeBSD__
+#ifdef __linux__
 	module_put(module);
 #endif
 fail:
@@ -117,14 +117,14 @@ void drm_i2c_encoder_destroy(struct drm_encoder *drm_encoder)
 {
 	struct drm_encoder_slave *encoder = to_encoder_slave(drm_encoder);
 	struct i2c_client *client = drm_i2c_encoder_get_client(drm_encoder);
-#ifndef __FreeBSD__
+#ifdef __linux__
 	struct module *module = client->dev.driver->owner;
 #endif
 
 	i2c_unregister_device(client);
 	encoder->bus_priv = NULL;
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	module_put(module);
 #endif
 }

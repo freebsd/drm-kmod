@@ -89,7 +89,7 @@ void drm_dev_printk(const struct device *dev, const char *level,
 	vaf.fmt = format;
 	vaf.va = &args;
 	
-#ifdef __FreeBSD__
+#ifndef __linux__
 	printf("[" DRM_NAME ":%s] *ERROR* ", function_name);
 	vprintf(format, args);
 #else
@@ -104,7 +104,7 @@ void drm_dev_printk(const struct device *dev, const char *level,
 }
 EXPORT_SYMBOL(drm_dev_printk);
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 void drm_printk(const char *level, unsigned int category,
 				const char *function_name, const char *prefix,
 				const char *format, ...)
@@ -123,7 +123,7 @@ void drm_printk(const char *level, unsigned int category,
 	vaf.fmt = format;
 	vaf.va = &args;
 	
-#ifdef __FreeBSD__
+#ifndef __linux__
 	if (SCHEDULER_STOPPED() || kdb_active) {
 		printf(" ");
 		return;
@@ -243,8 +243,6 @@ static int drm_minor_register(struct drm_device *dev, unsigned int type)
 	struct drm_minor *minor;
 	unsigned long flags;
 	int ret;
-
-	DRM_DEBUG("\n");
 
 	minor = *drm_minor_get_slot(dev, type);
 	if (!minor)
@@ -375,8 +373,6 @@ void drm_minor_release(struct drm_minor *minor)
  */
 void drm_put_dev(struct drm_device *dev)
 {
-	DRM_DEBUG("\n");
-
 	if (!dev) {
 		DRM_ERROR("cleanup called no dev\n");
 		return;
@@ -403,7 +399,7 @@ void drm_unplug_dev(struct drm_device *dev)
 }
 EXPORT_SYMBOL(drm_unplug_dev);
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 /*
  * DRM internal mount
  * We want to be able to allocate our own "struct address_space" to control
@@ -530,11 +526,11 @@ int drm_dev_init(struct drm_device *dev,
 	mutex_init(&dev->ctxlist_mutex);
 	mutex_init(&dev->master_mutex);
 
-#ifndef __FreeBSD__
-	dev->anon_mapping = drm_fs_inode_new();
-	if (IS_ERR(dev->anon_mapping)) {
-		ret = PTR_ERR(dev->anon_mapping);
-		DRM_ERROR("Cannot allocate anonymous mapping: %d\n", ret);
+#ifdef __linux__
+	dev->anon_inode = drm_fs_inode_new();
+	if (IS_ERR(dev->anon_inode)) {
+		ret = PTR_ERR(dev->anon_inode);
+		DRM_ERROR("Cannot allocate anonymous inode: %d\n", ret);
 		goto err_free;
 	}
 #endif
@@ -581,12 +577,12 @@ err_minors:
 	drm_minor_free(dev, DRM_MINOR_PRIMARY);
 	drm_minor_free(dev, DRM_MINOR_RENDER);
 	drm_minor_free(dev, DRM_MINOR_CONTROL);
-#ifndef __FreeBSD__
-	drm_fs_inode_free(dev->anon_mapping);
+#ifdef __linux__
+	drm_fs_inode_free(dev->anon_inode);
 #endif
 err_free:
 
-#ifdef __FreeBSD__ // In LKPI spinlock is a mutex so we need to destroy them
+#ifndef __linux__ // In LKPI spinlock is a mutex so we need to destroy them
 	spin_lock_destroy(&dev->buf_lock);
 	spin_lock_destroy(&dev->event_lock);
 #endif
@@ -620,7 +616,7 @@ void drm_dev_fini(struct drm_device *dev)
 
 	drm_legacy_ctxbitmap_cleanup(dev);
 	drm_ht_remove(&dev->map_hash);
-#ifndef __FreeBSD__
+#ifdef __linux__
 	drm_fs_inode_free(dev->anon_inode);
 #endif
 
@@ -628,7 +624,7 @@ void drm_dev_fini(struct drm_device *dev)
 	drm_minor_free(dev, DRM_MINOR_RENDER);
 	drm_minor_free(dev, DRM_MINOR_CONTROL);
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	spin_lock_destroy(&dev->buf_lock);
 	spin_lock_destroy(&dev->event_lock);
 #endif
@@ -754,7 +750,7 @@ static int create_compat_control_link(struct drm_device *dev)
 	if (!name)
 		return -ENOMEM;
 
-#ifndef __FreeBSD__ // XXX: ignore sysfs for now (johalun 20170914)
+#ifdef __linux__ // XXX: ignore sysfs for now (johalun 20170914)
 	ret = sysfs_create_link(minor->kdev->kobj.parent,
 				&minor->kdev->kobj,
 				name);
@@ -780,7 +776,7 @@ static void remove_compat_control_link(struct drm_device *dev)
 	if (!name)
 		return;
 
-#ifndef __FreeBSD__ // XXX: ignore sysfs for now (johalun 20170914)
+#ifdef __linux__ // XXX: ignore sysfs for now (johalun 20170914)
 	sysfs_remove_link(minor->kdev->kobj.parent, name);
 #endif
 
@@ -809,7 +805,6 @@ static void remove_compat_control_link(struct drm_device *dev)
  */
 int drm_dev_register(struct drm_device *dev, unsigned long flags)
 {
-	DRM_DEBUG("%s: entering\n", __func__);
 	struct drm_driver *driver = dev->driver;
 	int ret;
 
@@ -947,8 +942,6 @@ static int drm_stub_open(struct inode *inode, struct file *filp)
 	struct drm_minor *minor;
 	int err;
 
-	DRM_DEBUG("\n");
-
 	mutex_lock(&drm_global_mutex);
 	minor = drm_minor_acquire(iminor(inode));
 	if (IS_ERR(minor)) {
@@ -1016,7 +1009,7 @@ static int __init drm_core_init(void)
 	if (ret < 0)
 		goto error;
 
-	/* DRM_DEBUG("Initialized\n"); */
+	DRM_DEBUG("Initialized\n");
 
 	return 0;
 

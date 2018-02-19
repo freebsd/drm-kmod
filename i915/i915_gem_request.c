@@ -28,7 +28,7 @@
 #include <linux/sched/clock.h>
 #include <linux/sched/signal.h>
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 #include <asm/smp.h>
 #endif
 
@@ -929,7 +929,7 @@ void __i915_add_request(struct drm_i915_gem_request *request, bool flush_caches)
 	 * decide whether to preempt the entire chain so that it is ready to
 	 * run at the earliest possible convenience.
 	 */
-#ifdef __FreeBSD__
+#ifndef __linux__
 #undef schedule
 #endif
 	if (engine->schedule)
@@ -1091,7 +1091,7 @@ long i915_wait_request(struct drm_i915_gem_request *req,
 	struct intel_wait wait;
 
 	might_sleep();
-#ifdef __FreeBSD__
+#ifndef __linux__
 	GEM_BUG_ON(!!lockdep_is_held(&req->i915->drm.struct_mutex) !=
 		   !!(flags & I915_WAIT_LOCKED));
 #else

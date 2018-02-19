@@ -42,7 +42,6 @@
 #include <linux/swap.h>
 #include <linux/pci.h>
 #include <linux/dma-buf.h>
-#include <linux/pagemap.h>
 
 static void i915_gem_flush_free_objects(struct drm_i915_private *i915);
 static void i915_gem_object_flush_gtt_write_domain(struct drm_i915_gem_object *obj);
@@ -174,13 +173,12 @@ i915_gem_get_aperture_ioctl(struct drm_device *dev, void *data,
 static struct sg_table *
 i915_gem_object_get_pages_phys(struct drm_i915_gem_object *obj)
 {
-#ifdef __FreeBSD__
+#ifndef __linux__
 	vm_object_t mapping = obj->base.filp->f_shmem;
 #else
 	struct address_space *mapping = obj->base.filp->f_mapping;
 #endif
 	drm_dma_handle_t *phys;
-
 	struct sg_table *st;
 	struct scatterlist *sg;
 	char *vaddr;
@@ -274,7 +272,7 @@ i915_gem_object_put_pages_phys(struct drm_i915_gem_object *obj,
 	__i915_gem_object_release_shmem(obj, pages, false);
 
 	if (obj->mm.dirty) {
-#ifdef __FreeBSD__
+#ifndef __linux__
 		vm_object_t mapping = obj->base.filp->f_shmem;
 #else
 		struct address_space *mapping = obj->base.filp->f_mapping;
@@ -483,7 +481,7 @@ static void __fence_set_priority(struct dma_fence *fence, int prio)
 	engine = rq->engine;
 	if (!engine->schedule)
 		return;
-#ifdef __FreeBSD__
+#ifndef __linux__
 #undef schedule
 #endif
 	engine->schedule(rq, prio);
@@ -551,7 +549,7 @@ i915_gem_object_wait(struct drm_i915_gem_object *obj,
 		     struct intel_rps_client *rps)
 {
 	might_sleep();
-#ifdef __FreeBSD__
+#ifndef __linux__
 	GEM_BUG_ON(!!lockdep_is_held(&obj->base.dev->struct_mutex) !=
 		   !!(flags & I915_WAIT_LOCKED));
 #else
@@ -1895,7 +1893,7 @@ int i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 
 	/* We don't use vmf->pgoff since that has the fake offset */
 	page_offset = (vmf->address - area->vm_start) >> PAGE_SHIFT;
-	
+
 	trace_i915_gem_object_fault(obj, page_offset, true, write);
 
 	/* Try to flush the object off the GPU first without holding the lock.
@@ -1972,7 +1970,7 @@ int i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 			       (ggtt->mappable_base + vma->node.start) >> PAGE_SHIFT,
 			       min_t(u64, vma->size, area->vm_end - area->vm_start),
 			       &ggtt->mappable);
-	
+
 err_unpin:
 	__i915_vma_unpin(vma);
 err_unlock:
@@ -2059,7 +2057,7 @@ i915_gem_release_mmap(struct drm_i915_gem_object *obj)
 
 	list_del_init(&obj->userfault_link);
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	struct drm_vma_offset_node *node;
 
 	node = &obj->base.vma_node;
@@ -2067,7 +2065,7 @@ i915_gem_release_mmap(struct drm_i915_gem_object *obj)
 	    drm_vma_node_size(node) << PAGE_SHIFT, 1);
 #else
 	drm_vma_node_unmap(&obj->base.vma_node,
-			   obj->base.dev->anon_mapping);
+			   obj->base.dev->anon_inode->i_mapping);
 
 	/* Ensure that the CPU's PTE are revoked and there are not outstanding
 	 * memory transactions from userspace before we return. The TLB
@@ -2098,7 +2096,7 @@ void i915_gem_runtime_suspend(struct drm_i915_private *dev_priv)
 	list_for_each_entry_safe(obj, on,
 				 &dev_priv->mm.userfault_list, userfault_link) {
 		list_del_init(&obj->userfault_link);
-#ifdef __FreeBSD__
+#ifndef __linux__
 		struct drm_vma_offset_node *node;
 
 		node = &obj->base.vma_node;
@@ -2225,18 +2223,19 @@ i915_gem_object_truncate(struct drm_i915_gem_object *obj)
 	 * To do this we must instruct the shmfs to drop all of its
 	 * backing pages, *now*.
 	 */
-#ifdef __FreeBSD__
+#ifndef __linux__
 	shmem_truncate_range(obj->base.filp->f_shmem, 0, (loff_t)-1);
 #else
 	shmem_truncate_range(file_inode(obj->base.filp), 0, (loff_t)-1);
 #endif
 	obj->mm.madv = __I915_MADV_PURGED;
+	obj->mm.pages = ERR_PTR(-EFAULT);
 }
 
 /* Try to discard unwanted pages */
 void __i915_gem_object_invalidate(struct drm_i915_gem_object *obj)
 {
-#ifdef __FreeBSD__
+#ifndef __linux__
 	vm_object_t mapping;
 #else
 	struct address_space *mapping;
@@ -2255,7 +2254,7 @@ void __i915_gem_object_invalidate(struct drm_i915_gem_object *obj)
 	if (obj->base.filp == NULL)
 		return;
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	mapping = obj->base.filp->f_shmem;
 #else
 	mapping = obj->base.filp->f_mapping,
@@ -2374,10 +2373,9 @@ static struct sg_table *
 i915_gem_object_get_pages_gtt(struct drm_i915_gem_object *obj)
 {
 	struct drm_i915_private *dev_priv = to_i915(obj->base.dev);
-
 	const unsigned long page_count = obj->base.size / PAGE_SIZE;
 	unsigned long i;
-#ifdef __FreeBSD__
+#ifndef __linux__
 	vm_object_t mapping;
 #else
 	struct address_space *mapping;
@@ -2398,7 +2396,7 @@ i915_gem_object_get_pages_gtt(struct drm_i915_gem_object *obj)
 	GEM_BUG_ON(obj->base.read_domains & I915_GEM_GPU_DOMAINS);
 	GEM_BUG_ON(obj->base.write_domain & I915_GEM_GPU_DOMAINS);
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 	/* !CONFIG_SWIOTLB */
 	max_segment = 0;
 #else
@@ -2422,7 +2420,7 @@ rebuild_st:
 	 *
 	 * Fail silently without starting the shrinker
 	 */
-#ifdef __FreeBSD__
+#ifndef __linux__
 	mapping = obj->base.filp->f_shmem;
 	gfp = 0;
 #else
@@ -2704,7 +2702,7 @@ static int
 i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 			   const struct drm_i915_gem_pwrite *arg)
 {
-#ifdef __FreeBSD__
+#ifndef __linux__
 	vm_object_t mapping = obj->base.filp->f_shmem;
 #else
 	struct address_space *mapping = obj->base.filp->f_mapping;
@@ -2745,7 +2743,7 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 		if (len > remain)
 			len = remain;
 
-#ifdef __FreeBSD__
+#ifndef __linux__
 		(void)data;
 		(void)err;
 		page = shmem_read_mapping_page(mapping, offset);
@@ -2761,7 +2759,7 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 		unwritten = copy_from_user(vaddr + pg, user_data, len);
 		kunmap(page);
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 		err = pagecache_write_end(obj->base.filp, mapping,
 					  offset, len, len - unwritten,
 					  page, data);
@@ -4233,7 +4231,7 @@ struct drm_i915_gem_object *
 i915_gem_object_create(struct drm_i915_private *dev_priv, u64 size)
 {
 	struct drm_i915_gem_object *obj;
-#ifndef __FreeBSD__
+#ifdef __linux__
 	struct address_space *mapping;
 #endif
 	gfp_t mask;
@@ -4265,7 +4263,7 @@ i915_gem_object_create(struct drm_i915_private *dev_priv, u64 size)
 		mask |= __GFP_DMA32;
 	}
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 	mapping = obj->base.filp->f_mapping;
 	mapping_set_gfp_mask(mapping, mask);
 #endif
@@ -4322,7 +4320,7 @@ static bool discard_backing_storage(struct drm_i915_gem_object *obj)
 	 * acquiring such a reference whilst we are in the middle of
 	 * freeing the object.
 	 */
-#ifdef __FreeBSD__
+#ifndef __linux__
 	return file_count(obj->base.filp) == 1;
 #else
 	return atomic_long_read(&obj->base.filp->f_count) == 1;

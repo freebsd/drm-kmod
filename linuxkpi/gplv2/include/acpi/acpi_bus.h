@@ -637,7 +637,7 @@ static inline bool acpi_device_can_wakeup(struct acpi_device *adev)
 	return adev->wakeup.flags.valid;
 }
 
-#ifndef __FreeBSD__
+#ifdef __linux__
 static inline bool acpi_device_can_poweroff(struct acpi_device *adev)
 {
 	return adev->power.states[ACPI_STATE_D3_COLD].flags.valid ||

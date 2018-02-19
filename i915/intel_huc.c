@@ -123,7 +123,7 @@ static int huc_ucode_xfer(struct drm_i915_private *dev_priv)
 	I915_WRITE(DMA_CTRL, _MASKED_BIT_ENABLE(HUC_UKERNEL | START_DMA));
 
 	/* Wait for DMA to finish */
-#ifdef __FreeBSD__
+#ifndef __linux__
 	// Double the time to see if we increase success rate
 	ret = wait_for((I915_READ(DMA_CTRL) & START_DMA) == 0, 100);
 #else
@@ -342,7 +342,7 @@ void intel_guc_auth_huc(struct drm_i915_private *dev_priv)
 				HUC_FW_VERIFIED,
 				HUC_FW_VERIFIED,
 // FreeBSD: Double timeout to see if success rate increases
-#ifdef __FreeBSD__
+#ifndef __linux__
 				50);
 #else
 				50);

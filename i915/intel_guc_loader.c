@@ -323,7 +323,7 @@ static int guc_ucode_xfer_dma(struct drm_i915_private *dev_priv,
 	 * (Higher levels of the driver will attempt to fall back to
 	 * execlist mode if this happens.)
 	 */
-#ifdef __FreeBSD__
+#ifndef __linux__
 	// Double the time to see if we increase success rate
 	ret = wait_for(guc_ucode_response(dev_priv, &status), 500);
 #else
