@@ -1982,6 +1982,10 @@ static int fill_plane_attributes(struct amdgpu_device *adev,
 	 * every time.
 	 */
 	ret = amdgpu_dm_set_degamma_lut(crtc_state, dc_plane_state);
+	if (ret) {
+		dc_transfer_func_release(dc_plane_state->in_transfer_func);
+		dc_plane_state->in_transfer_func = NULL;
+	}
 
 	return ret;
 }
@@ -4773,6 +4777,13 @@ static int dm_update_planes_state(struct dc *dc,
 				return ret;
 			}
 
+			/*
+			 * Any atomic check errors that occur after this will
+			 * not need a release. The plane state will be attached
+			 * to the stream, and therefore part of the atomic
+			 * state. It'll be released when the atomic state is
+			 * cleaned.
+			 */
 			if (!dc_add_plane_to_context(
 					dc,
 					dm_new_crtc_state->stream,
