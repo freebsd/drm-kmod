@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 SUBDIR=	drm		\
-	amd			\
+	amd		\
 	i915		\
 	radeon		\
 	lindebugfs	\

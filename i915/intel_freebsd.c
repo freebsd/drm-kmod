@@ -46,7 +46,7 @@ intel_enable_gtt(void)
 {
 	u8 __iomem *reg;
 
-	printf("entering %s\n", __func__);
+	DRM_DEBUG("entering %s\n", __func__);
 #ifdef __notyet__
 	/* too old */
 	if (INTEL_GTT_GEN == 2) {
@@ -89,7 +89,7 @@ intel_enable_gtt(void)
 
 	if (INTEL_GTT_GEN >= 3)
 		writel(0, intel_private.registers + GFX_FLSH_CNTL_BSD);
-	printf("exiting %s\n", __func__);
+	DRM_DEBUG("exiting %s\n", __func__);
 	return (1);
 }
 
@@ -97,7 +97,7 @@ int
 intel_gmch_probe(struct pci_dev *bridge_pdev, struct pci_dev *gpu_pdev,
 		 struct agp_bridge_data *bridge)
 {
-	printf("entering %s\n", __func__);
+	DRM_DEBUG("entering %s\n", __func__);
 	intel_private.registers = NULL; //intel_gtt_get_registers();
 	intel_private.gma_bus_addr = pci_bus_address(gpu_pdev, I915_GMADR_BAR);
 	DRM_DEBUG("bus_addr %lx\n", intel_private.gma_bus_addr);
@@ -110,7 +110,7 @@ intel_gmch_probe(struct pci_dev *bridge_pdev, struct pci_dev *gpu_pdev,
 	if (HAS_PGTBL_EN)
 		intel_private.PGTBL_save |= AGP_I810_PGTBL_ENABLED;
 
-	printf("exiting %s\n", __func__);
+	DRM_DEBUG("exiting %s\n", __func__);
 	return (1);
 }
 
@@ -200,7 +200,7 @@ retry:
 			}
 			if (vm_page_insert(m, vm_obj, pidx)) {
 				VM_OBJECT_WUNLOCK(vm_obj);
-				VM_WAIT;
+				vm_wait(vm_obj);
 				VM_OBJECT_WLOCK(vm_obj);
 				goto retry;
 			}
@@ -214,7 +214,7 @@ retry:
 	return (rc);
 }
 
-MODULE_DEPEND(i915kms, drmn, 1, 1, 1);
+MODULE_DEPEND(i915kms, drmn, 2, 2, 2);
 MODULE_DEPEND(i915kms, agp, 1, 1, 1);
 MODULE_DEPEND(i915kms, linuxkpi, 1, 1, 1);
 MODULE_DEPEND(i915kms, linuxkpi_gplv2, 1, 1, 1);
