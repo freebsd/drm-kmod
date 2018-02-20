@@ -200,7 +200,11 @@ retry:
 			}
 			if (vm_page_insert(m, vm_obj, pidx)) {
 				VM_OBJECT_WUNLOCK(vm_obj);
-				vm_wait(vm_obj);
+#ifdef VM_WAIT
+				VM_WAIT;
+#else
+				vm_wait(NULL);
+#endif
 				VM_OBJECT_WLOCK(vm_obj);
 				goto retry;
 			}
