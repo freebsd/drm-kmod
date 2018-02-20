@@ -669,6 +669,7 @@ struct intel_fbc {
 	 */
 	struct intel_fbc_state_cache {
 		struct i915_vma *vma;
+		unsigned long flags;
 
 		struct {
 			unsigned int mode_flags;
@@ -707,6 +708,7 @@ struct intel_fbc {
 	 */
 	struct intel_fbc_reg_params {
 		struct i915_vma *vma;
+		unsigned long flags;
 
 		struct {
 			enum pipe pipe;
