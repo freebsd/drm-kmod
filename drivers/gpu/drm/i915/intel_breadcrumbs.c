@@ -592,7 +592,7 @@ void intel_engine_remove_wait(struct intel_engine_cs *engine,
 	spin_unlock_irq(&b->rb_lock);
 }
 
-static bool signal_complete(const struct drm_i915_gem_request *request)
+static bool signal_complete(const struct i915_request *request)
 {
 	if (!request)
 		return false;
@@ -604,9 +604,9 @@ static bool signal_complete(const struct drm_i915_gem_request *request)
 	return __i915_request_irq_complete(request);
 }
 
-static struct drm_i915_gem_request *to_signaler(struct rb_node *rb)
+static struct i915_request *to_signaler(struct rb_node *rb)
 {
-	return rb_entry(rb, struct drm_i915_gem_request, signaling.node);
+	return rb_entry(rb, struct i915_request, signaling.node);
 }
 
 static void signaler_set_rtpriority(void)
@@ -617,7 +617,7 @@ static void signaler_set_rtpriority(void)
 }
 
 static void __intel_engine_remove_signal(struct intel_engine_cs *engine,
-					 struct drm_i915_gem_request *request)
+					 struct i915_request *request)
 {
 	struct intel_breadcrumbs *b = &engine->breadcrumbs;
 
@@ -648,7 +648,7 @@ static void __intel_engine_remove_signal(struct intel_engine_cs *engine,
 	}
 }
 
-static struct drm_i915_gem_request *
+static struct i915_request *
 get_first_signal_rcu(struct intel_breadcrumbs *b)
 {
 	/*
@@ -658,18 +658,18 @@ get_first_signal_rcu(struct intel_breadcrumbs *b)
 	 * the required memory barriers.
 	 */
 	do {
-		struct drm_i915_gem_request *request;
+		struct i915_request *request;
 
 		request = rcu_dereference(b->first_signal);
 		if (request)
-			request = i915_gem_request_get_rcu(request);
+			request = i915_request_get_rcu(request);
 
 		barrier();
 
 		if (!request || request == rcu_access_pointer(b->first_signal))
 			return rcu_pointer_handoff(request);
 
-		i915_gem_request_put(request);
+		i915_request_put(request);
 	} while (1);
 }
 
@@ -677,7 +677,7 @@ static int intel_breadcrumbs_signaler(void *arg)
 {
 	struct intel_engine_cs *engine = arg;
 	struct intel_breadcrumbs *b = &engine->breadcrumbs;
-	struct drm_i915_gem_request *request;
+	struct i915_request *request;
 
 	/* Install ourselves with high priority to reduce signalling latency */
 	signaler_set_rtpriority();
@@ -703,7 +703,7 @@ static int intel_breadcrumbs_signaler(void *arg)
 				      &request->fence.flags)) {
 				local_bh_disable();
 				dma_fence_signal(&request->fence);
-				GEM_BUG_ON(!i915_gem_request_completed(request));
+				GEM_BUG_ON(!i915_request_completed(request));
 				local_bh_enable(); /* kick start the tasklets */
 			}
 
@@ -722,7 +722,7 @@ static int intel_breadcrumbs_signaler(void *arg)
 			 */
 			do_schedule = need_resched();
 		}
-		i915_gem_request_put(request);
+		i915_request_put(request);
 
 		if (unlikely(do_schedule)) {
 			if (kthread_should_park())
@@ -739,8 +739,7 @@ static int intel_breadcrumbs_signaler(void *arg)
 	return 0;
 }
 
-void intel_engine_enable_signaling(struct drm_i915_gem_request *request,
-				   bool wakeup)
+void intel_engine_enable_signaling(struct i915_request *request, bool wakeup)
 {
 	struct intel_engine_cs *engine = request->engine;
 	struct intel_breadcrumbs *b = &engine->breadcrumbs;
@@ -757,7 +756,7 @@ void intel_engine_enable_signaling(struct drm_i915_gem_request *request,
 	GEM_BUG_ON(!irqs_disabled());
 	lockdep_assert_held(&request->lock);
 
-	seqno = i915_gem_request_global_seqno(request);
+	seqno = i915_request_global_seqno(request);
 	if (!seqno)
 		return;
 
@@ -778,7 +777,7 @@ void intel_engine_enable_signaling(struct drm_i915_gem_request *request,
 	 */
 	wakeup &= __intel_engine_add_wait(engine, &request->signaling.wait);
 
-	if (!__i915_gem_request_completed(request, seqno)) {
+	if (!__i915_request_completed(request, seqno)) {
 		struct rb_node *parent, **p;
 		bool first;
 
@@ -815,7 +814,7 @@ void intel_engine_enable_signaling(struct drm_i915_gem_request *request,
 		wake_up_process(b->signaler);
 }
 
-void intel_engine_cancel_signaling(struct drm_i915_gem_request *request)
+void intel_engine_cancel_signaling(struct i915_request *request)
 {
 	GEM_BUG_ON(!irqs_disabled());
 	lockdep_assert_held(&request->lock);
