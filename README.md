@@ -41,12 +41,11 @@ For testing the 4.11 development branch please use
 Needed for changes in non-gplv2 part of linuxkpi.  
 ~~https://github.com/FreeBSDDesktop/freebsd-base-graphics/tree/linuxkpi411~~ In HEAD now.
 
-
 #### Kernel Modules
 https://github.com/FreeBSDDesktop/kms-drm/tree/linuxkpi411
 
 #### GPU Firmware 
-https://github.com/FreeBSDDesktop/kms-firmware/tree/linuxkpi411
+https://github.com/FreeBSDDesktop/kms-firmware (or `pkg install gpu-firmware-kmod`)
 
 ### Known bugs
 - amdgpu: kernel panic when exiting glxgears  
