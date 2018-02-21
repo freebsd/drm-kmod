@@ -63,6 +63,7 @@
 //                                  si_dma.o dce_v6_0.o si_dpm.o si_smc.o
 // Since we always build those files, define here to avoid build error
 #define CONFIG_DRM_AMDGPU_SI
+#define CONFIG_DRM_AMDGPU_CIK
 	 
 
 // Let try to do without this CONFIG_LOCKDEP. Opens a can of worms.
