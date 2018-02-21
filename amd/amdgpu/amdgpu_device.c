@@ -1658,7 +1658,9 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	int r, i;
 	bool runtime = false;
 	u32 max_MBps;
-
+#ifndef __linux__
+	(void)i;
+#endif
 	adev->shutdown = false;
 	adev->dev = &pdev->dev;
 	adev->ddev = ddev;
@@ -1745,36 +1747,16 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 		/* doorbell bar mapping */
 		amdgpu_doorbell_init(adev);
 
-#ifndef __linux__
-#define	DEVICE_COUNT_RESOURCE	5
-#endif
-
+#ifdef __linux__
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
-#ifndef __linux__
-		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_MEM) {
-			struct resource *res;
-			int rid;
-
-			rid = PCIR_BAR(i);
-			res = bus_alloc_resource_any(adev->pdev->dev.bsddev,
-			    SYS_RES_MEMORY, &rid, RF_ACTIVE);
-			if (res == NULL)
-				continue;
-			ddev->drm_pcir[i].res = res;
-			ddev->drm_pcir[i].rid = rid;
-
-			adev->rio_mem = (void *)rman_get_bushandle(res);
-			adev->rio_mem_size = rman_get_size(res);
-			adev->rio_rid = i;
-#else
 		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_IO) {
 			adev->rio_mem_size = pci_resource_len(adev->pdev, i);
 			adev->rio_mem = pci_iomap(adev->pdev, i, adev->rio_mem_size);
-#endif
 			break;
 		}
 	}
+#endif
 	if (adev->rio_mem == NULL)
 		DRM_INFO("PCI I/O BAR is not found.\n");
 
@@ -1976,16 +1958,7 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	if (adev->flags & AMD_IS_PX)
 		vga_switcheroo_fini_domain_pm_ops(adev->dev);
 	vga_client_register(adev->pdev, NULL, NULL, NULL);
-#ifndef __linux__
-	if (adev->rio_mem) {
-		int rid;
-
-		rid = adev->rio_rid;
-		/* XXX check for error */
-		bus_release_resource(adev->pdev->dev.bsddev, SYS_RES_MEMORY,
-		    rid, adev->ddev->drm_pcir[rid].res);
-	}
-#else
+#ifdef __linux__
 	if (adev->rio_mem)
 		pci_iounmap(adev->pdev, adev->rio_mem);
 #endif
