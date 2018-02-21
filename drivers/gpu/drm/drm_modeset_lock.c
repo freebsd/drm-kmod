@@ -118,6 +118,7 @@ retry:
 		kfree(ctx);
 		return;
 	}
+	ww_acquire_done(&ctx->ww_ctx);
 
 	WARN_ON(config->acquire_ctx);
 
