@@ -1751,14 +1751,16 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
-		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_IO) {
 #ifndef __linux__
+		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_MEM) {
 			struct resource *res;
 			int rid;
 
 			rid = PCIR_BAR(i);
 			res = bus_alloc_resource_any(adev->pdev->dev.bsddev,
-			    SYS_RES_IOPORT, &rid, RF_ACTIVE);
+			    SYS_RES_MEMORY, &rid, RF_ACTIVE);
+			if (res == NULL)
+				continue;
 			ddev->drm_pcir[i].res = res;
 			ddev->drm_pcir[i].rid = rid;
 
@@ -1766,6 +1768,7 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 			adev->rio_mem_size = rman_get_size(res);
 			adev->rio_rid = i;
 #else
+		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_IO) {
 			adev->rio_mem_size = pci_resource_len(adev->pdev, i);
 			adev->rio_mem = pci_iomap(adev->pdev, i, adev->rio_mem_size);
 #endif
@@ -1956,8 +1959,7 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 
 	DRM_INFO("amdgpu: finishing device.\n");
 	adev->shutdown = true;
-	if (adev->mode_info.mode_config_initialized)
-		drm_crtc_force_disable_all(adev->ddev);
+	drm_crtc_force_disable_all(adev->ddev);
 	/* evict vram memory */
 	amdgpu_bo_evict_vram(adev);
 	amdgpu_ib_pool_fini(adev);
@@ -1980,7 +1982,7 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 
 		rid = adev->rio_rid;
 		/* XXX check for error */
-		bus_release_resource(adev->pdev->dev.bsddev, SYS_RES_IOPORT,
+		bus_release_resource(adev->pdev->dev.bsddev, SYS_RES_MEMORY,
 		    rid, adev->ddev->drm_pcir[rid].res);
 	}
 #else
@@ -3230,8 +3232,9 @@ static int amdgpu_debugfs_regs_init(struct amdgpu_device *adev)
 			}
 			return PTR_ERR(ent);
 		}
+
 		if (!i)
-			i_size_write(ent->d_inode, adev->rmmio_size);		
+			i_size_write(ent->d_inode, adev->rmmio_size);
 		adev->debugfs_regs[i] = ent;
 	}
 

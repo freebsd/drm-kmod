@@ -1467,14 +1467,16 @@ int radeon_device_init(struct radeon_device *rdev,
 
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
-		if (pci_resource_flags(rdev->pdev, i) & IORESOURCE_IO) {
 #ifndef __linux__
+		if (pci_resource_flags(rdev->pdev, i) & IORESOURCE_MEM) {
 			struct resource *res;
 			int rid;
 
 			rid = PCIR_BAR(i);
 			res = bus_alloc_resource_any(rdev->pdev->dev.bsddev,
-			    SYS_RES_IOPORT, &rid, RF_ACTIVE);
+			    SYS_RES_MEMORY, &rid, RF_ACTIVE);
+			if (res == NULL)
+				continue;
 			ddev->drm_pcir[i].res = res;
 			ddev->drm_pcir[i].rid = rid;
 
@@ -1482,6 +1484,7 @@ int radeon_device_init(struct radeon_device *rdev,
 			rdev->rio_mem_size = rman_get_size(res);
 			rdev->rio_rid = i;
 #else
+		if (pci_resource_flags(rdev->pdev, i) & IORESOURCE_IO) {
 			rdev->rio_mem_size = pci_resource_len(rdev->pdev, i);
 			rdev->rio_mem = pci_iomap(rdev->pdev, i, rdev->rio_mem_size);
 #endif
@@ -1604,7 +1607,7 @@ void radeon_device_fini(struct radeon_device *rdev)
 
 		rid = rdev->rio_rid;
 		/* XXX check for error */
-		bus_release_resource(rdev->pdev->dev.bsddev, SYS_RES_IOPORT,
+		bus_release_resource(rdev->pdev->dev.bsddev, SYS_RES_MEMORY,
 		    rid, rdev->ddev->drm_pcir[rid].res);
 	}
 #else
