@@ -213,6 +213,9 @@ void amd_sched_entity_fini(struct amd_gpu_scheduler *sched,
 	 * The client will not queue more IBs during this fini, consume existing
 	 * queued IBs
 	*/
+#ifndef __linux__
+	if (sched->thread)
+#endif
 	wait_event(sched->job_scheduled, amd_sched_entity_is_idle(entity));
 
 	amd_sched_rq_remove_entity(rq, entity);
