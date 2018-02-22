@@ -32,14 +32,26 @@
 #ifndef _TTM_BO_DRIVER_H_
 #define _TTM_BO_DRIVER_H_
 
+
+#ifndef __linux__
 #include <drm/drmP.h>
-#include <drm/ttm/ttm_bo_api.h>
-#include <drm/ttm/ttm_memory.h>
-#include <drm/ttm/ttm_module.h>
-#include <drm/ttm/ttm_placement.h>
+#endif
+#include <ttm/ttm_bo_api.h>
+#include <ttm/ttm_memory.h>
+#include <ttm/ttm_module.h>
+#include <ttm/ttm_placement.h>
+#include <drm/drm_mm.h>
 #include <drm/drm_global.h>
+#include <drm/drm_vma_manager.h>
+#include <linux/workqueue.h>
+#include <linux/fs.h>
+#include <linux/spinlock.h>
+#include <linux/reservation.h>
+
+#ifndef __linux__
 #include <sys/rwlock.h>
 #include <sys/tree.h>
+#endif
 
 #define TTM_MAX_BO_PRIORITY	16U
 
@@ -115,13 +127,13 @@ enum ttm_caching_state {
 struct ttm_tt {
 	struct ttm_bo_device *bdev;
 	struct ttm_backend_func *func;
-	struct vm_page *dummy_read_page;
-	struct vm_page **pages;
+	struct page *dummy_read_page;
+	struct page **pages;
 	uint32_t page_flags;
 	unsigned long num_pages;
 	struct sg_table *sg; /* for SG objects via dma-buf */
 	struct ttm_bo_global *glob;
-	struct linux_file *swap_storage;
+	struct file *swap_storage;
 	enum ttm_caching_state caching_state;
 	enum {
 		tt_bound,
@@ -278,7 +290,7 @@ struct ttm_mem_type_manager {
 	bool has_type;
 	bool use_type;
 	uint32_t flags;
-	unsigned long gpu_offset;
+	uint64_t gpu_offset; /* GPU address space is independent of CPU word size */
 	uint64_t size;
 	uint32_t available_caching;
 	uint32_t default_caching;
@@ -338,7 +350,7 @@ struct ttm_bo_driver {
 	struct ttm_tt *(*ttm_tt_create)(struct ttm_bo_device *bdev,
 					unsigned long size,
 					uint32_t page_flags,
-					struct vm_page *dummy_read_page);
+					struct page *dummy_read_page);
 
 	/**
 	 * ttm_tt_populate
@@ -430,7 +442,8 @@ struct ttm_bo_driver {
 	 * access for all buffer objects.
 	 * This function should return 0 if access is granted, -EPERM otherwise.
 	 */
-	int (*verify_access) (struct ttm_buffer_object *bo, struct linux_file *filp);
+	int (*verify_access)(struct ttm_buffer_object *bo,
+			     struct file *filp);
 
 	/**
 	 * Hook to notify driver about a driver move so it
@@ -494,7 +507,7 @@ struct ttm_bo_global {
 
 	struct kobject kobj;
 	struct ttm_mem_global *mem_glob;
-	struct vm_page *dummy_read_page;
+	struct page *dummy_read_page;
 	struct ttm_mem_shrink shrink;
 	struct mutex device_list_mutex;
 	spinlock_t lru_lock;
@@ -523,9 +536,7 @@ struct ttm_bo_global {
  *
  * @driver: Pointer to a struct ttm_bo_driver struct setup by the driver.
  * @man: An array of mem_type_managers.
- * @fence_lock: Protects the synchronizing members on *all* bos belonging
- * to this device.
- * @addr_space_mm: Range manager for the device address space.
+ * @vma_manager: Address space manager
  * lru_lock: Spinlock that protects the buffer+device lru lists and
  * ddestroy lists.
  * @dev_mapping: A pointer to the struct address_space representing the
@@ -542,9 +553,11 @@ struct ttm_bo_device {
 	struct list_head device_list;
 	struct ttm_bo_global *glob;
 	struct ttm_bo_driver *driver;
-	rwlock_t vm_lock;
 	struct ttm_mem_type_manager man[TTM_NUM_MEM_TYPES];
+#ifndef __linux__
+	rwlock_t vm_lock;
 	spinlock_t fence_lock;
+#endif
 	/*
 	 * Protected by the vm lock.
 	 */
@@ -605,10 +618,10 @@ ttm_flag_masked(uint32_t *old, uint32_t new, uint32_t mask)
  */
 extern int ttm_tt_init(struct ttm_tt *ttm, struct ttm_bo_device *bdev,
 			unsigned long size, uint32_t page_flags,
-			struct vm_page *dummy_read_page);
+			struct page *dummy_read_page);
 extern int ttm_dma_tt_init(struct ttm_dma_tt *ttm_dma, struct ttm_bo_device *bdev,
 			   unsigned long size, uint32_t page_flags,
-			   struct vm_page *dummy_read_page);
+			   struct page *dummy_read_page);
 
 /**
  * ttm_tt_fini
@@ -672,7 +685,7 @@ extern int ttm_tt_swapin(struct ttm_tt *ttm);
  */
 extern int ttm_tt_set_placement_caching(struct ttm_tt *ttm, uint32_t placement);
 extern int ttm_tt_swapout(struct ttm_tt *ttm,
-			  struct linux_file *persistent_swap_storage);
+			  struct file *persistent_swap_storage);
 
 /**
  * ttm_tt_unpopulate - free pages from a ttm
@@ -1089,9 +1102,13 @@ extern const struct ttm_mem_type_manager_func ttm_bo_manager_func;
  * bind and unbind memory backing a ttm_tt.
  */
 extern struct ttm_tt *ttm_agp_tt_create(struct ttm_bo_device *bdev,
+#ifdef __linux__
+					struct agp_bridge_data *bridge,
+#else
 					device_t bridge,
+#endif
 					unsigned long size, uint32_t page_flags,
-					struct vm_page *dummy_read_page);
+					struct page *dummy_read_page);
 int ttm_agp_tt_populate(struct ttm_tt *ttm);
 void ttm_agp_tt_unpopulate(struct ttm_tt *ttm);
 #endif

@@ -65,7 +65,7 @@ struct ttm_place;
  */
 struct ttm_bus_placement {
 	void		*addr;
-	unsigned long	base;
+	phys_addr_t	base;
 	unsigned long	size;
 	unsigned long	offset;
 	bool		is_iomem;
@@ -189,7 +189,7 @@ struct ttm_buffer_object {
 	 */
 
 	struct ttm_mem_reg mem;
-	struct linux_file *persistent_swap_storage;
+	struct file *persistent_swap_storage;
 	struct ttm_tt *ttm;
 	bool evicted;
 
@@ -224,7 +224,7 @@ struct ttm_buffer_object {
 	 * either of these locks held.
 	 */
 
-	unsigned long offset;
+	uint64_t offset; /* GPU address space is independent of CPU word size */
 	uint32_t cur_placement;
 
 	struct sg_table *sg;
@@ -250,7 +250,7 @@ struct ttm_buffer_object {
 #define TTM_BO_MAP_IOMEM_MASK 0x80
 struct ttm_bo_kmap_obj {
 	void *virtual;
-	struct vm_page *page;
+	struct page *page;
 	enum {
 		ttm_bo_map_iomap        = 1 | TTM_BO_MAP_IOMEM_MASK,
 		ttm_bo_map_vmap         = 2,
@@ -482,7 +482,7 @@ extern int ttm_bo_init(struct ttm_bo_device *bdev,
 			struct ttm_placement *placement,
 			uint32_t page_alignment,
 			bool interrubtible,
-			struct linux_file *persistent_swap_storage,
+			struct file *persistent_swap_storage,
 			size_t acc_size,
 			struct sg_table *sg,
 			struct reservation_object *resv,
@@ -519,7 +519,7 @@ extern int ttm_bo_create(struct ttm_bo_device *bdev,
 				struct ttm_placement *placement,
 				uint32_t page_alignment,
 				bool interruptible,
-				struct linux_file *persistent_swap_storage,
+				struct file *persistent_swap_storage,
 				struct ttm_buffer_object **p_bo);
 
 /**
@@ -664,7 +664,7 @@ extern int ttm_fbdev_mmap(struct vm_area_struct *vma,
  * if the device address space is to be backed by the bo manager.
  */
 
-extern int ttm_bo_mmap(struct linux_file *filp, struct vm_area_struct *vma,
+extern int ttm_bo_mmap(struct file *filp, struct vm_area_struct *vma,
 		       struct ttm_bo_device *bdev);
 
 /**
@@ -689,8 +689,8 @@ extern int ttm_bo_mmap(struct linux_file *filp, struct vm_area_struct *vma,
  */
 
 extern ssize_t ttm_bo_io(struct ttm_bo_device *bdev, struct file *filp,
-			 const char *wbuf, char *rbuf,
-			 size_t count, off_t *f_pos, bool write);
+			 const char __user *wbuf, char __user *rbuf,
+			 size_t count, loff_t *f_pos, bool write);
 
 extern void ttm_bo_swapout_all(struct ttm_bo_device *bdev);
 extern int ttm_bo_wait_unreserved(struct ttm_buffer_object *bo);

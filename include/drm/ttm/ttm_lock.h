@@ -50,7 +50,7 @@
 #ifndef _TTM_LOCK_H_
 #define _TTM_LOCK_H_
 
-#include <drm/ttm/ttm_object.h>
+#include <ttm/ttm_object.h>
 #include <linux/wait.h>
 #include <linux/atomic.h>
 

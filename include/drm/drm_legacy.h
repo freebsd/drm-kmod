@@ -78,8 +78,10 @@ typedef struct drm_dma_handle {
 	dma_addr_t busaddr;
 	void *vaddr;
 	size_t size;
+#ifndef __linux__
 	bus_dma_tag_t tag;
 	bus_dmamap_t map;
+#endif
 } drm_dma_handle_t;
 
 /**

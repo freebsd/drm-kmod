@@ -22,7 +22,6 @@
  * Authors: Dave Airlie
  *          Christian König
  */
-
 #ifndef DRM_FIXED_H
 #define DRM_FIXED_H
 

@@ -84,7 +84,11 @@ struct ttm_mem_global {
 	struct ttm_mem_zone *zones[TTM_MEM_MAX_ZONES];
 	unsigned int num_zones;
 	struct ttm_mem_zone *zone_kernel;
+#ifdef CONFIG_HIGHMEM
+	struct ttm_mem_zone *zone_highmem;
+#else
 	struct ttm_mem_zone *zone_dma32;
+#endif
 };
 
 /**
@@ -140,8 +144,6 @@ static inline void ttm_mem_unregister_shrink(struct ttm_mem_global *glob,
 	spin_unlock(&glob->lock);
 }
 
-struct vm_page;
-
 extern int ttm_mem_global_init(struct ttm_mem_global *glob);
 extern void ttm_mem_global_release(struct ttm_mem_global *glob);
 extern int ttm_mem_global_alloc(struct ttm_mem_global *glob, uint64_t memory,
@@ -149,10 +151,10 @@ extern int ttm_mem_global_alloc(struct ttm_mem_global *glob, uint64_t memory,
 extern void ttm_mem_global_free(struct ttm_mem_global *glob,
 				uint64_t amount);
 extern int ttm_mem_global_alloc_page(struct ttm_mem_global *glob,
-				     struct vm_page *page,
+				     struct page *page,
 				     bool no_wait, bool interruptible);
 extern void ttm_mem_global_free_page(struct ttm_mem_global *glob,
-				     struct vm_page *page);
+				     struct page *page);
 extern size_t ttm_round_pot(size_t size);
 extern uint64_t ttm_get_kernel_zone_memory_size(struct ttm_mem_global *glob);
 #endif

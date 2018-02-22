@@ -381,7 +381,7 @@ struct drm_connector_funcs {
 	 * core drm connector interfaces. Everything added from this callback
 	 * should be unregistered in the early_unregister callback.
 	 *
-	 * This is called while holding drm_connector->mutex.
+	 * This is called while holding &drm_connector.mutex.
 	 *
 	 * Returns:
 	 *
@@ -398,7 +398,7 @@ struct drm_connector_funcs {
 	 * early in the driver unload sequence to disable userspace access
 	 * before data structures are torndown.
 	 *
-	 * This is called while holding drm_connector->mutex.
+	 * This is called while holding &drm_connector.mutex.
 	 */
 	void (*early_unregister)(struct drm_connector *connector);
 
@@ -563,9 +563,6 @@ struct drm_cmdline_mode {
  * @interlace_allowed: can this connector handle interlaced modes?
  * @doublescan_allowed: can this connector handle doublescan?
  * @stereo_allowed: can this connector handle stereo modes?
- * @modes: modes available on this connector (from fill_modes() + user)
- * @status: one of the drm_connector_status enums (connected, not, or unknown)
- * @probed_modes: list of modes derived directly from the display
  * @funcs: connector control functions
  * @edid_blob_ptr: DRM property containing EDID if present
  * @properties: property tracking for this connector
@@ -612,8 +609,8 @@ struct drm_connector {
 
 	/**
 	 * @mutex: Lock for general connector state, but currently only protects
-	 * @registered. Most of the connector state is still protected by the
-	 * mutex in &drm_mode_config.
+	 * @registered. Most of the connector state is still protected by
+	 * &drm_mode_config.mutex.
 	 */
 	struct mutex mutex;
 
