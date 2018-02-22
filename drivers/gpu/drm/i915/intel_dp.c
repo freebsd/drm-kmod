@@ -952,8 +952,7 @@ intel_dp_aux_wait_done(struct intel_dp *intel_dp, bool has_aux_irq)
 
 static uint32_t g4x_get_aux_clock_divider(struct intel_dp *intel_dp, int index)
 {
-	struct intel_digital_port *intel_dig_port = dp_to_dig_port(intel_dp);
-	struct drm_i915_private *dev_priv = to_i915(intel_dig_port->base.base.dev);
+	struct drm_i915_private *dev_priv = to_i915(intel_dp_to_dev(intel_dp));
 
 	if (index)
 		return 0;
@@ -967,8 +966,7 @@ static uint32_t g4x_get_aux_clock_divider(struct intel_dp *intel_dp, int index)
 
 static uint32_t ilk_get_aux_clock_divider(struct intel_dp *intel_dp, int index)
 {
-	struct intel_digital_port *intel_dig_port = dp_to_dig_port(intel_dp);
-	struct drm_i915_private *dev_priv = to_i915(intel_dig_port->base.base.dev);
+	struct drm_i915_private *dev_priv = to_i915(intel_dp_to_dev(intel_dp));
 
 	if (index)
 		return 0;
@@ -978,7 +976,7 @@ static uint32_t ilk_get_aux_clock_divider(struct intel_dp *intel_dp, int index)
 	 * like to run at 2MHz.  So, take the cdclk or PCH rawclk value and
 	 * divide by 2000 and use that
 	 */
-	if (intel_dig_port->base.port == PORT_A)
+	if (intel_dp->aux_ch == AUX_CH_A)
 		return DIV_ROUND_CLOSEST(dev_priv->cdclk.hw.cdclk, 2000);
 	else
 		return DIV_ROUND_CLOSEST(dev_priv->rawclk_freq, 2000);
@@ -986,10 +984,9 @@ static uint32_t ilk_get_aux_clock_divider(struct intel_dp *intel_dp, int index)
 
 static uint32_t hsw_get_aux_clock_divider(struct intel_dp *intel_dp, int index)
 {
-	struct intel_digital_port *intel_dig_port = dp_to_dig_port(intel_dp);
-	struct drm_i915_private *dev_priv = to_i915(intel_dig_port->base.base.dev);
+	struct drm_i915_private *dev_priv = to_i915(intel_dp_to_dev(intel_dp));
 
-	if (intel_dig_port->base.port != PORT_A && HAS_PCH_LPT_H(dev_priv)) {
+	if (intel_dp->aux_ch != AUX_CH_A && HAS_PCH_LPT_H(dev_priv)) {
 		/* Workaround for non-ULT HSW */
 		switch (index) {
 		case 0: return 63;
