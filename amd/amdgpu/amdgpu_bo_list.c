@@ -71,8 +71,8 @@ static void amdgpu_bo_list_destroy(struct amdgpu_fpriv *fpriv, int id)
 
 	mutex_lock(&fpriv->bo_list_lock);
 #ifndef __linux__
-	list = NULL;  // idr_remove does not return anything in linuxkpi
-	idr_remove((struct idr *)&fpriv->bo_list_handles, id);
+	list = idr_find(&fpriv->bo_list_handles, id);
+	idr_remove(&fpriv->bo_list_handles, id);
 #else
 	list = idr_remove(&fpriv->bo_list_handles, id);
 #endif
