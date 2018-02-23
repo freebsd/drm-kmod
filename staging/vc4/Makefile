@@ -1,8 +1,8 @@
 # $FreeBSD$
 
-MODDIR=	${.CURDIR:H:H}/drivers/gpu/drm/vc4
+SRCDIR=	${.CURDIR:H:H}/drivers/gpu/drm/vc4
 
-.PATH:	${MODDIR}
+.PATH:	${SRCDIR}
 
 KMOD= vc4
 SRCS= \
@@ -37,10 +37,10 @@ CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm
 CFLAGS+= -I${.CURDIR:H}/include/uapi
-CFLAGS+= -I${.CURDIR:H}
+CFLAGS+= -I${SRCDIR:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -include ${.CURDIR:H}/drm/drm_os_config.h
+CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
 
 
 # Copied from i915kms, can probably clean up a bit

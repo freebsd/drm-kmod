@@ -38,8 +38,8 @@ SRCS+=	bus_if.h		\
 	pci_if.h		\
 	vnode_if.h
 
-CFLAGS+= -include ${.CURDIR}/../drm/drm_os_config.h
-CFLAGS+= -I${.CURDIR}/../include
+CFLAGS+= -include ${.CURDIR:H}/drivers/gpu/drm/drm_os_config.h
+CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR}/dummy/include
 CFLAGS+= -I${.CURDIR}/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include

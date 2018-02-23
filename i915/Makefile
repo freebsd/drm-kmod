@@ -1,8 +1,8 @@
 # $FreeBSD$
 
-MODDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
+SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
-.PATH:	${MODDIR}
+.PATH:	${SRCDIR}
 
 KMOD=	i915kms
 SRCS=	\
@@ -107,7 +107,7 @@ SRCS=	\
 # intel_lpe_audio.c   # Need platform and irq_chip support
 
 # In case we want to build gvt some day...
-# GVT_DIR	= ${MODDIR}/gvt
+# GVT_DIR	= ${SRCDIR}/gvt
 # SRCS	+= ${GVT_DIR}/aperture_gm.c
 # SRCS	+= ${GVT_DIR}/cfg_space.c
 # SRCS	+= ${GVT_DIR}/cmd_parser.c
@@ -137,10 +137,10 @@ CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm
 CFLAGS+= -I${.CURDIR:H}/include/uapi
-CFLAGS+= -I${.CURDIR:H}
+CFLAGS+= -I${SRCDIR:H:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -include ${.CURDIR:H}/drm/drm_os_config.h
+CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
 
 .if ${MACHINE_CPUARCH} == "amd64"
 SRCS+= i915_ioc32.c

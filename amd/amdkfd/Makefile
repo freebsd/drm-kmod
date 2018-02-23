@@ -1,8 +1,8 @@
 # $FreeBSD$
 
-MODDIR=	${.CURDIR:H:H}/drivers/gpu/drm/amd
+SRCDIR=	${.CURDIR:H:H}/drivers/gpu/drm/amd
 
-.PATH:	${MODDIR}/amdkfd
+.PATH:	${SRCDIR}/amdkfd
 
 KMOD	= amdkfd
 
@@ -43,14 +43,14 @@ CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H:H}/include
 CFLAGS+= -I${.CURDIR:H:H}/include/drm
 CFLAGS+= -I${.CURDIR:H:H}/include/uapi
-CFLAGS+= -I${.CURDIR:H:H}
+CFLAGS+= -I${SRCDIR:H:H}
 
-CFLAGS+= -I${.CURDIR:H}/amdgpu
-CFLAGS+= -I${.CURDIR:H}/include
-CFLAGS+= -I${.CURDIR:H}/acp/include
-CFLAGS+= -I${.CURDIR:H}/powerplay/inc
-CFLAGS+= -I${.CURDIR:H}/scheduler
-CFLAGS+= -I${.CURDIR:H}/include/asic_reg
+CFLAGS+= -I${SRCDIR}/amdgpu
+CFLAGS+= -I${SRCDIR}/include
+CFLAGS+= -I${SRCDIR}/acp/include
+CFLAGS+= -I${SRCDIR}/powerplay/inc
+CFLAGS+= -I${SRCDIR}/scheduler
+CFLAGS+= -I${SRCDIR}/include/asic_reg
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 

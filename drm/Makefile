@@ -1,8 +1,8 @@
 # $FreeBSD$
 
-MODDIR=	${.CURDIR:H}/drivers/gpu/drm
+SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
-.PATH:	${MODDIR} ${MODDIR}/ttm
+.PATH:	${SRCDIR} ${SRCDIR}/ttm
 
 KMOD=	drm
 SRCS=	ati_pcigart.c \
@@ -91,15 +91,15 @@ SRCS=	ati_pcigart.c \
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
-CFLAGS+= -I${.CURDIR}
-CFLAGS+= -I${.CURDIR}/ttm
+CFLAGS+= -I${SRCDIR}
+CFLAGS+= -I${SRCDIR}/ttm
 CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm
 CFLAGS+= -I${.CURDIR:H}/include/uapi
-CFLAGS+= -I${.CURDIR:H}
+CFLAGS+= -I${SRCDIR:H}
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 
-CFLAGS+= -include ${.CURDIR}/drm_os_config.h
+CFLAGS+= -include ${SRCDIR}/drm_os_config.h
 
 SRCS+=	device_if.h \
 	vnode_if.h \

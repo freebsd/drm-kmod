@@ -1,13 +1,13 @@
 # $FreeBSD$
 
-MODDIR=	${.CURDIR:H:H}/drivers/gpu/drm/amd
+SRCDIR=	${.CURDIR:H:H}/drivers/gpu/drm/amd
 
-.PATH:	${MODDIR}/amdgpu \
-	${MODDIR}/scheduler \
-	${MODDIR}/powerplay \
-	${MODDIR}/powerplay/eventmgr \
-	${MODDIR}/powerplay/hwmgr \
-	${MODDIR}/powerplay/smumgr
+.PATH:	${SRCDIR}/amdgpu \
+	${SRCDIR}/scheduler \
+	${SRCDIR}/powerplay \
+	${SRCDIR}/powerplay/eventmgr \
+	${SRCDIR}/powerplay/hwmgr \
+	${SRCDIR}/powerplay/smumgr
 
 KMOD=	amdgpu
 SRCS=	amdgpu_acpi.c \
@@ -143,20 +143,21 @@ CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H:H}/include
 CFLAGS+= -I${.CURDIR:H:H}/include/drm
 CFLAGS+= -I${.CURDIR:H:H}/include/uapi
-CFLAGS+= -I${.CURDIR:H:H}
+CFLAGS+= -I${SRCDIR:H:H}
 
-CFLAGS+= -I${.CURDIR}
-CFLAGS+= -I${.CURDIR:H}/include
-CFLAGS+= -I${.CURDIR:H}/acp/include
-CFLAGS+= -I${.CURDIR:H}/powerplay/eventmgr
-CFLAGS+= -I${.CURDIR:H}/powerplay/hwmgr
-CFLAGS+= -I${.CURDIR:H}/powerplay/inc
-CFLAGS+= -I${.CURDIR:H}/powerplay/smumgr
-CFLAGS+= -I${.CURDIR:H}/scheduler
-CFLAGS+= -I${.CURDIR:H}/include/asic_reg
+CFLAGS+= -I${SRCDIR}
+CFLAGS+= -I${SRCDIR}/amdgpu
+CFLAGS+= -I${SRCDIR}/include
+CFLAGS+= -I${SRCDIR}/acp/include
+CFLAGS+= -I${SRCDIR}/powerplay/eventmgr
+CFLAGS+= -I${SRCDIR}/powerplay/hwmgr
+CFLAGS+= -I${SRCDIR}/powerplay/inc
+CFLAGS+= -I${SRCDIR}/powerplay/smumgr
+CFLAGS+= -I${SRCDIR}/scheduler
+CFLAGS+= -I${SRCDIR}/include/asic_reg
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -include ${.CURDIR:H:H}/drm/drm_os_config.h
+CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
 
 SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
         opt_vm.h opt_compat.h opt_syscons.h opt_acpi.h

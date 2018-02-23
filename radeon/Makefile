@@ -1,8 +1,8 @@
 # $FreeBSD$
 
-MODDIR=	${.CURDIR:H}/drivers/gpu/drm/radeon
+SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/radeon
 
-.PATH:	${MODDIR}
+.PATH:	${SRCDIR}
 
 KMOD=	radeonkms
 SRCS=	atom.c \
@@ -122,11 +122,11 @@ CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm
 CFLAGS+= -I${.CURDIR:H}/include/uapi
-CFLAGS+= -I${.CURDIR:H}
-CFLAGS+= -I${.CURDIR:H}/amd/include
+CFLAGS+= -I${SRCDIR:H:H}
+CFLAGS+= -I${SRCDIR:H}/amd/include
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -include ${.CURDIR:H}/drm/drm_os_config.h
+CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
 
 SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
 	opt_vm.h opt_compat.h opt_syscons.h opt_acpi.h
