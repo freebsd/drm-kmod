@@ -1,4 +1,5 @@
 *.[oa]
+*.sh
 TAGS
 patches
 patches_path_fix.sh
