@@ -1,5 +1,9 @@
 # $FreeBSD$
 
+MODDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
+
+.PATH:	${MODDIR}
+
 KMOD=	i915kms
 SRCS=	\
 	dvo_ch7017.c \
@@ -103,7 +107,7 @@ SRCS=	\
 # intel_lpe_audio.c   # Need platform and irq_chip support
 
 # In case we want to build gvt some day...
-# GVT_DIR	= gvt
+# GVT_DIR	= ${MODDIR}/gvt
 # SRCS	+= ${GVT_DIR}/aperture_gm.c
 # SRCS	+= ${GVT_DIR}/cfg_space.c
 # SRCS	+= ${GVT_DIR}/cmd_parser.c

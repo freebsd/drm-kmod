@@ -1,6 +1,8 @@
 # $FreeBSD$
 
-.PATH:	${.CURDIR} ${.CURDIR}/ttm
+MODDIR=	${.CURDIR:H}/drivers/gpu/drm
+
+.PATH:	${MODDIR} ${MODDIR}/ttm
 
 KMOD=	drm
 SRCS=	ati_pcigart.c \

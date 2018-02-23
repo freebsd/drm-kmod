@@ -1,14 +1,15 @@
 # $FreeBSD$
 
-.PATH:	${.CURDIR:H}/amdgpu \
-	${.CURDIR:H}/scheduler \
-	${.CURDIR:H}/powerplay \
-	${.CURDIR:H}/powerplay/eventmgr \
-	${.CURDIR:H}/powerplay/hwmgr \
-	${.CURDIR:H}/powerplay/smumgr
+MODDIR=	${.CURDIR:H:H}/drivers/gpu/drm/amd
+
+.PATH:	${MODDIR}/amdgpu \
+	${MODDIR}/scheduler \
+	${MODDIR}/powerplay \
+	${MODDIR}/powerplay/eventmgr \
+	${MODDIR}/powerplay/hwmgr \
+	${MODDIR}/powerplay/smumgr
 
 KMOD=	amdgpu
-
 SRCS=	amdgpu_acpi.c \
 	amdgpu_afmt.c \
 	amdgpu_amdkfd.c \

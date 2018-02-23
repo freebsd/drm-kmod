@@ -1,5 +1,9 @@
 # $FreeBSD$
 
+MODDIR=	${.CURDIR:H}/drivers/gpu/drm/radeon
+
+.PATH:	${MODDIR}
+
 KMOD=	radeonkms
 SRCS=	atom.c \
 	atombios_crtc.c \

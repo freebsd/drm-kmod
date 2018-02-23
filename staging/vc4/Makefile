@@ -1,7 +1,10 @@
 # $FreeBSD$
 
-KMOD= vc4
+MODDIR=	${.CURDIR:H:H}/drivers/gpu/drm/vc4
 
+.PATH:	${MODDIR}
+
+KMOD= vc4
 SRCS= \
 	vc4_freebsd.c 
 

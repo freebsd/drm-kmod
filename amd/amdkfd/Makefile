@@ -1,6 +1,8 @@
 # $FreeBSD$
 
-#.PATH:	${SYSDIR}/dev/drm/amd/amdkfd
+MODDIR=	${.CURDIR:H:H}/drivers/gpu/drm/amd
+
+.PATH:	${MODDIR}/amdkfd
 
 KMOD	= amdkfd
 
