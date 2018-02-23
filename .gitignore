@@ -2,6 +2,7 @@
 *.sh
 TAGS
 patches
+patches.log
 patches_path_fix.sh
 drm/x86
 i915/x86
