@@ -32,7 +32,7 @@
  * @cb:			fence callback information
  */
 struct sync_file {
-	struct file		*file;
+	struct linux_file	*linux_file;
 	struct kref		kref;
 	char			name[32];
 #ifdef CONFIG_DEBUG_FS

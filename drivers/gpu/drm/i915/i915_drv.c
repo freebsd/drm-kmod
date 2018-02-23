@@ -843,7 +843,9 @@ static void intel_detect_preproduction_hw(struct drm_i915_private *dev_priv)
 	if (pre) {
 		DRM_ERROR("This is a pre-production stepping. "
 			  "It may not be fully functional.\n");
+#ifdef __linux__
 		add_taint(TAINT_MACHINE_CHECK, LOCKDEP_STILL_OK);
+#endif
 	}
 }
 
