@@ -1424,8 +1424,6 @@ execbuf_submit(struct i915_execbuffer_params *params,
 	       struct list_head *vmas)
 {
 	u64 exec_start, exec_len;
-	int instp_mode;
-	u32 instp_mask, *cs;
 	int ret;
 
 	ret = i915_gem_execbuffer_move_to_gpu(params->request, vmas);
@@ -1439,21 +1437,6 @@ execbuf_submit(struct i915_execbuffer_params *params,
 	if (args->flags & I915_EXEC_CONSTANTS_MASK) {
 		DRM_DEBUG("I915_EXEC_CONSTANTS_* unsupported\n");
 		return -EINVAL;
-	}
-
-	if (params->engine->id == RCS &&
-	    instp_mode != dev_priv->relative_constants_mode) {
-		cs = intel_ring_begin(params->request, 4);
-		if (IS_ERR(cs))
-			return PTR_ERR(cs);
-
-		*cs++ = MI_NOOP;
-		*cs++ = MI_LOAD_REGISTER_IMM(1);
-		*cs++ = i915_mmio_reg_offset(INSTPM);
-		*cs++ = instp_mask << 16 | instp_mode;
-		intel_ring_advance(params->request, cs);
-
-		dev_priv->relative_constants_mode = instp_mode;
 	}
 
 	if (args->flags & I915_EXEC_GEN7_SOL_RESET) {

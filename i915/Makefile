@@ -215,4 +215,5 @@ CWARNFLAGS.i915_gem_timeline.c= -Wno-cast-qual
 CWARNFLAGS.i915_gem_userptr.c= -Wno-cast-qual
 CWARNFLAGS.i915_gpu_error.c= -Wno-cast-qual
 CWARNFLAGS.i915_guc_submission.c= -Wno-cast-qual
+CWARNFLAGS.i915_irq.c=		-Wno-unused-function
 CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides 
