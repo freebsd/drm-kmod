@@ -1951,7 +1951,7 @@ static int prepare_crtc_signaling(struct drm_device *dev,
 		return 0;
 
 	for_each_new_crtc_in_state(state, crtc, crtc_state, i) {
-		u64 __user *fence_ptr;
+		s32 __user *fence_ptr;
 
 		fence_ptr = get_out_fence_for_crtc(crtc_state->state, crtc);
 
@@ -2031,6 +2031,7 @@ static void complete_crtc_signaling(struct drm_device *dev,
 	}
 
 	for_each_new_crtc_in_state(state, crtc, crtc_state, i) {
+		struct drm_pending_vblank_event *event = crtc_state->event;
 		/*
 		 * Free the allocated event. drm_atomic_helper_setup_commit
 		 * can allocate an event too, so only free it if it's ours

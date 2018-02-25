@@ -49,6 +49,7 @@ SRCS=	\
 	intel_audio.c \
 	intel_bios.c \
 	intel_breadcrumbs.c \
+	intel_cdclk.c \
 	intel_color.c \
 	intel_crt.c \
 	intel_csr.c \
@@ -215,5 +216,4 @@ CWARNFLAGS.i915_gem_timeline.c= -Wno-cast-qual
 CWARNFLAGS.i915_gem_userptr.c= -Wno-cast-qual
 CWARNFLAGS.i915_gpu_error.c= -Wno-cast-qual
 CWARNFLAGS.i915_guc_submission.c= -Wno-cast-qual
-CWARNFLAGS.i915_irq.c=		-Wno-unused-function
 CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides 
