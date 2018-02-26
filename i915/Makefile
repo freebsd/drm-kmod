@@ -17,6 +17,7 @@ SRCS=	\
 	i915_drv.c \
 	i915_gem.c \
 	i915_gem_batch_pool.c \
+	i915_gem_clflush.c \
 	i915_gem_context.c \
 	i915_gem_dmabuf.c \
 	i915_gem_evict.c \

@@ -175,8 +175,8 @@ trace_i915_context_free(void *ctx) {
 }
 
 static inline void
-trace_i915_gem_request_wait_begin(void *req) {
-	CTR1(KTR_DRM, "request_wait_begin req %p", req);
+trace_i915_gem_request_wait_begin(void *req, uint32_t flags) {
+	CTR2(KTR_DRM, "request_wait_begin req %p flags %x", req, flags);
 }
 
 static inline void
@@ -192,6 +192,31 @@ trace_i915_gem_request_retire(void *req) {
 static inline void
 trace_i915_gem_request_notify(void *req) {
 	CTR1(KTR_DRM, "request_notify req %p", req);
+}
+
+static inline void
+trace_i915_gem_request_execute(void *req) {
+	CTR1(KTR_DRM, "request_execute req %p", req);
+}
+
+static inline void
+trace_i915_gem_request_submit(void *req) {
+	CTR1(KTR_DRM, "request_submit req %p", req);
+}
+
+static inline void
+trace_i915_gem_request_queue(struct drm_i915_gem_request *req, uint32_t flags) {
+	CTR2(KTR_DRM, "request_queue req %p flags %x", req, flags);
+}
+
+static inline void
+trace_i915_gem_request_in(struct drm_i915_gem_request *req, uint32_t flags) {
+	CTR2(KTR_DRM, "request_in req %p flags %x", req, flags);
+}
+
+static inline void
+trace_i915_gem_request_out(struct drm_i915_gem_request *req) {
+	CTR1(KTR_DRM, "request_out req %p", req);
 }
 
 static inline void
@@ -268,6 +293,12 @@ static inline void
 trace_intel_gpu_freq_change(uint32_t freq)
 {
 	CTR1(KTR_DRM, "gpu_freq_change %x", freq);
+}
+
+static inline void
+trace_intel_engine_notify(struct intel_engine_cs *engine, bool waiters)
+{
+	CTR2(KTR_DRM, "engine_notify engine %p waiters %x", engine, waiters);
 }
 
 static inline void
