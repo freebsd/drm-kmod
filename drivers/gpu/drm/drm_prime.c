@@ -230,30 +230,30 @@ void drm_gem_map_detach(struct dma_buf *dma_buf,
 	struct drm_prime_attachment *prime_attach = attach->priv;
 	struct drm_gem_object *obj = dma_buf->priv;
 	struct drm_device *dev = obj->dev;
-	struct sg_table *sgt;
 
-	if (dev->driver->gem_prime_unpin)
-		dev->driver->gem_prime_unpin(obj);
+	if (prime_attach) {
+		struct sg_table *sgt = prime_attach->sgt;
 
-	if (!prime_attach)
-		return;
-
-	sgt = prime_attach->sgt;
-	if (sgt) {
-		if (prime_attach->dir != DMA_NONE)
+		if (sgt) {
 #ifdef __linux__
 			// This function does nothing and linuxkpi's
 			// dma_attrs is old and incompatible
-			dma_unmap_sg_attrs(attach->dev, sgt->sgl, sgt->nents,
-					   prime_attach->dir,
-					   DMA_ATTR_SKIP_CPU_SYNC);
+			if (prime_attach->dir != DMA_NONE)
+				dma_unmap_sg_attrs(attach->dev, sgt->sgl,
+						   sgt->nents,
+						   prime_attach->dir,
+						   DMA_ATTR_SKIP_CPU_SYNC);
 #endif
-		sg_free_table(sgt);
+			sg_free_table(sgt);
+		}
+
+		kfree(sgt);
+		kfree(prime_attach);
+		attach->priv = NULL;
 	}
 
-	kfree(sgt);
-	kfree(prime_attach);
-	attach->priv = NULL;
+	if (dev->driver->gem_prime_unpin)
+		dev->driver->gem_prime_unpin(obj);
 }
 EXPORT_SYMBOL(drm_gem_map_detach);
 
