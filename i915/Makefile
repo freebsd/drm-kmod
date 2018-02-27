@@ -65,7 +65,7 @@ SRCS=	\
 	intel_dpll_mgr.c \
 	intel_dsi.c \
 	intel_dsi_dcs_backlight.c \
-	intel_dsi_panel_vbt.c \
+	intel_dsi_vbt.c \
 	intel_dsi_pll.c \
 	intel_dvo.c \
 	intel_fbc.c \
@@ -178,7 +178,7 @@ CWARNFLAGS.intel_audio.c=	-Wno-cast-qual
 CWARNFLAGS.intel_bios.c=	-Wno-cast-qual
 CWARNFLAGS.intel_csr.c=		-Wno-cast-qual
 CWARNFLAGS.intel_dp.c=		-Wno-enum-conversion -Wno-format -Wno-unused
-CWARNFLAGS.intel_ddi.c=		-Wno-compare-distinct-pointer-types		
+CWARNFLAGS.intel_ddi.c=		-Wno-compare-distinct-pointer-types -Wno-unused
 CWARNFLAGS.intel_display.c=	-Wno-tautological-pointer-compare -Wno-enum-conversion -Wno-cast-qual -Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.intel_dpll_mgr.c=	-Wno-compare-distinct-pointer-types
 CWARNFLAGS.intel_dsi_panel_vbt.c= -Wno-cast-qual

@@ -15,4 +15,6 @@
 #define FB_BACKLIGHT_MAX        0xFF
 #endif
 
+#define FBIO_WAITFORVSYNC	_IOW('F', 0x20, __u32)
+
 #endif

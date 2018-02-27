@@ -5889,6 +5889,41 @@ out_vdd_off:
 	return false;
 }
 
+/* Set up the hotplug pin and aux power domain. */
+static void
+intel_dp_init_connector_port_info(struct intel_digital_port *intel_dig_port)
+{
+	struct intel_encoder *encoder = &intel_dig_port->base;
+	struct intel_dp *intel_dp = &intel_dig_port->dp;
+
+	switch (intel_dig_port->port) {
+	case PORT_A:
+		encoder->hpd_pin = HPD_PORT_A;
+		intel_dp->aux_power_domain = POWER_DOMAIN_AUX_A;
+		break;
+	case PORT_B:
+		encoder->hpd_pin = HPD_PORT_B;
+		intel_dp->aux_power_domain = POWER_DOMAIN_AUX_B;
+		break;
+	case PORT_C:
+		encoder->hpd_pin = HPD_PORT_C;
+		intel_dp->aux_power_domain = POWER_DOMAIN_AUX_C;
+		break;
+	case PORT_D:
+		encoder->hpd_pin = HPD_PORT_D;
+		intel_dp->aux_power_domain = POWER_DOMAIN_AUX_D;
+		break;
+	case PORT_E:
+		encoder->hpd_pin = HPD_PORT_E;
+
+		/* FIXME: Check VBT for actual wiring of PORT E */
+		intel_dp->aux_power_domain = POWER_DOMAIN_AUX_D;
+		break;
+	default:
+		MISSING_CASE(intel_dig_port->port);
+	}
+}
+
 bool
 intel_dp_init_connector(struct intel_digital_port *intel_dig_port,
 			struct intel_connector *intel_connector)

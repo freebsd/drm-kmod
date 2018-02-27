@@ -78,4 +78,10 @@
 // Uncomment this or remove #ifdefs in i915_drv.c when enabling i915_perf
 //#define CONFIG_I915_PERF 
 
+// Overallocation of the fbdev buffer
+// Defines the fbdev buffer overallocation in percent. Default is 100.
+// Typical values for double buffering will be 200, triple buffering 300.
+#define CONFIG_DRM_FBDEV_OVERALLOC 100
+
+
 #endif

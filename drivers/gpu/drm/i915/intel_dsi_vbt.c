@@ -424,6 +424,72 @@ static const char *sequence_name(enum mipi_seq seq_id)
 		return "(unknown)";
 }
 
+void intel_dsi_vbt_exec_sequence(struct intel_dsi *intel_dsi,
+				 enum mipi_seq seq_id)
+{
+	struct drm_i915_private *dev_priv = to_i915(intel_dsi->base.base.dev);
+	const u8 *data;
+	fn_mipi_elem_exec mipi_elem_exec;
+
+	if (WARN_ON(seq_id >= ARRAY_SIZE(dev_priv->vbt.dsi.sequence)))
+		return;
+
+	data = dev_priv->vbt.dsi.sequence[seq_id];
+	if (!data)
+		return;
+
+	WARN_ON(*data != seq_id);
+
+	DRM_DEBUG_KMS("Starting MIPI sequence %d - %s\n",
+		      seq_id, sequence_name(seq_id));
+
+	/* Skip Sequence Byte. */
+	data++;
+
+	/* Skip Size of Sequence. */
+	if (dev_priv->vbt.dsi.seq_version >= 3)
+		data += 4;
+
+	while (1) {
+		u8 operation_byte = *data++;
+		u8 operation_size = 0;
+
+		if (operation_byte == MIPI_SEQ_ELEM_END)
+			break;
+
+		if (operation_byte < ARRAY_SIZE(exec_elem))
+			mipi_elem_exec = exec_elem[operation_byte];
+		else
+			mipi_elem_exec = NULL;
+
+		/* Size of Operation. */
+		if (dev_priv->vbt.dsi.seq_version >= 3)
+			operation_size = *data++;
+
+		if (mipi_elem_exec) {
+			const u8 *next = data + operation_size;
+
+			data = mipi_elem_exec(intel_dsi, data);
+
+			/* Consistency check if we have size. */
+			if (operation_size && data != next) {
+				DRM_ERROR("Inconsistent operation size\n");
+				return;
+			}
+		} else if (operation_size) {
+			/* We have size, skip. */
+			DRM_DEBUG_KMS("Unsupported MIPI operation byte %u\n",
+				      operation_byte);
+			data += operation_size;
+		} else {
+			/* No size, can't skip without parsing. */
+			DRM_ERROR("Unsupported MIPI operation byte %u\n",
+				  operation_byte);
+			return;
+		}
+	}
+}
+
 static void generic_exec_sequence(struct drm_panel *panel, enum mipi_seq seq_id)
 {
 	struct vbt_panel *vbt_panel = to_vbt_panel(panel);
