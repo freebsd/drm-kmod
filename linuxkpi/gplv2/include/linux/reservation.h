@@ -154,6 +154,12 @@ reservation_object_unlock(struct reservation_object *obj)
 	ww_mutex_unlock(&obj->lock);
 }
 
+static inline bool
+reservation_object_trylock(struct reservation_object *obj)
+{
+	return ww_mutex_trylock(&obj->lock);
+}
+
 int reservation_object_reserve_shared(struct reservation_object *obj);
 void reservation_object_add_shared_fence(struct reservation_object *obj,
 					 struct dma_fence *fence);

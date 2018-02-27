@@ -58,10 +58,8 @@
 #define CONFIG_DRM_AMD_POWERPLAY 1
 
 
-// Linux Makefile drm/amd/amdgpu/Makefile:
-// amdgpu-$(CONFIG_DRM_AMDGPU_SI)+= si.o gmc_v6_0.o gfx_v6_0.o si_ih.o
-//                                  si_dma.o dce_v6_0.o si_dpm.o si_smc.o
-// Since we always build those files, define here to avoid build error
+// Enable amdgpu driver for older SI and CIK cards
+// Not enabled by default in Linux v4.12
 #define CONFIG_DRM_AMDGPU_SI
 #define CONFIG_DRM_AMDGPU_CIK
 	 
@@ -82,6 +80,12 @@
 // Defines the fbdev buffer overallocation in percent. Default is 100.
 // Typical values for double buffering will be 200, triple buffering 300.
 #define CONFIG_DRM_FBDEV_OVERALLOC 100
+
+
+// From v4.12 Intel start using this in intel_uncore.c
+// Probably only used in Atom SOCs. Should be easy to port.
+// Only include header in asm/iosf_mbi.h for now and keep disabled
+//#define CONFIG_IOSF_MBI 1
 
 
 #endif

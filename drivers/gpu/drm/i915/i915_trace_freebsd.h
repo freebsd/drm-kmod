@@ -260,6 +260,7 @@ trace_i915_pipe_update_end(void *crtc, u32 end_vbl_count, int scanline_end)
 {
 	CTR3(KTR_DRM, "pipe_update_end %p end_vbl_count %d scanline_end %d", crtc, end_vbl_count, scanline_end);
 }
+
 static inline void
 trace_i915_gem_request_add(void *req)
 {
@@ -290,18 +291,6 @@ trace_i915_vma_unbind(void *vma)
 }
 
 static inline void
-trace_intel_gpu_freq_change(uint32_t freq)
-{
-	CTR1(KTR_DRM, "gpu_freq_change %x", freq);
-}
-
-static inline void
-trace_intel_engine_notify(struct intel_engine_cs *engine, bool waiters)
-{
-	CTR2(KTR_DRM, "engine_notify engine %p waiters %x", engine, waiters);
-}
-
-static inline void
 trace_i915_ppgtt_create(void *base)
 {
 
@@ -320,6 +309,60 @@ trace_i915_reg_rw(boolean_t rw, i915_reg_t reg, uint64_t val, int sz, bool trace
 {
 
         CTR4(KTR_DRM_REG, "[%x/%d] %c %x", reg.reg, sz, rw ? "w" : "r", val);
+}
+
+static inline void
+trace_intel_gpu_freq_change(uint32_t freq)
+{
+	CTR1(KTR_DRM, "gpu_freq_change %x", freq);
+}
+
+static inline void
+trace_intel_engine_notify(struct intel_engine_cs *engine, bool waiters)
+{
+	CTR2(KTR_DRM, "engine_notify engine %p waiters %x", engine, waiters);
+}
+
+static inline void
+trace_intel_update_plane(void *plane, void *crtc)
+{
+	CTR2(KTR_DRM, "update_plane plane %p crtc %p", plane, crtc);
+}
+
+static inline void
+trace_intel_disable_plane(void *plane, void *crtc)
+{
+	CTR2(KTR_DRM, "disable_plane plane %p crtc %p", plane, crtc);
+}
+
+static inline void
+trace_intel_cpu_fifo_underrun(void *dev_priv, int pipe)
+{
+	CTR2(KTR_DRM, "cpu_fifo_underrun drm_i915_private %p pipe %d", dev_priv, pipe);
+}
+
+static inline void
+trace_intel_pch_fifo_underrun(void *dev_priv, int pch_transcoder)
+{
+	CTR2(KTR_DRM, "pch_fifo_underrun drm_i915_private %p pch_transcoder %d", dev_priv, pch_transcoder);
+}
+
+static inline void
+trace_intel_memory_cxsr(void *dev_priv, bool old, bool new)
+{
+	CTR3(KTR_DRM, "memory_cxsr drm_i915_private %p old %d new %d", dev_priv, old, new);
+}
+
+static inline void
+trace_vlv_wm(void *crtc, void *wm)
+{
+	CTR2(KTR_DRM, "vlv_wm crtc %p wm %p", crtc, wm);
+}
+
+static inline void
+trace_vlv_fifo_size(void *crtc, uint32_t sprite0_start, uint32_t sprite1_start, uint32_t fifo_size)
+{
+	CTR4(KTR_DRM, "vlv_fifo_size crtc %p sprite0_start %x, sprite1_start %x, fifo_size %x", crtc, sprite0_start, sprite1_start, fifi_size);
 }
 
 #endif /* _I915_TRACE_H_ */
