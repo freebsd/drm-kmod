@@ -67,7 +67,11 @@ struct drm_minor {
 	int type;                       /* Control or render */
 	struct device *kdev;		/* Linux device */
 	struct drm_device *dev;
-
+#ifndef __linux__
+	device_t bsd_kdev; 		/* OS device */
+	struct cdev *bsd_device; 	/* Device number for mknod */
+	struct sigio *buf_sigio; 	/* Processes waiting for SIGIO */
+#endif
 	struct dentry *debugfs_root;
 
 	struct list_head debugfs_list;
@@ -204,7 +208,12 @@ struct drm_file {
 	struct drm_master *master;
 
 	/** @pid: Process that opened this file. */
+#ifdef __linux__
 	struct pid *pid;
+#else
+	pid_t pid;
+	unsigned long ioctl_count;
+#endif
 
 	/** @magic: Authentication magic, see @authenticated. */
 	drm_magic_t magic;

@@ -34,6 +34,10 @@
 
 #include <linux/pci.h>
 
+#ifndef __linux__
+#include <linux/platform_device.h>
+#endif
+
 struct drm_dma_handle;
 struct drm_device;
 struct drm_driver;

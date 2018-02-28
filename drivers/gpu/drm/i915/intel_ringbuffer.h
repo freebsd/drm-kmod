@@ -468,9 +468,9 @@ intel_write_status_page(struct intel_engine_cs *engine,
 			int reg, u32 value)
 {
 	mb();
-	clflush(&engine->status_page.page_addr[reg]);
+	clflush((u_long)&engine->status_page.page_addr[reg]);
 	engine->status_page.page_addr[reg] = value;
-	clflush(&engine->status_page.page_addr[reg]);
+	clflush((u_long)&engine->status_page.page_addr[reg]);
 	mb();
 }
 

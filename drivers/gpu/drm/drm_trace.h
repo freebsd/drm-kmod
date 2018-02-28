@@ -5,6 +5,8 @@
 #include <linux/types.h>
 #include <linux/tracepoint.h>
 
+#ifdef __linux__
+
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM drm
 #define TRACE_INCLUDE_FILE drm_trace
@@ -56,6 +58,10 @@ TRACE_EVENT(drm_vblank_event_delivered,
 	    TP_printk("file=%p, crtc=%d, seq=%u", __entry->file, __entry->crtc, \
 		      __entry->seq)
 );
+
+#else
+#include "drm_trace_freebsd.h"
+#endif
 
 #endif /* _DRM_TRACE_H_ */
 
