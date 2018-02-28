@@ -31,30 +31,3 @@ If the patch can be avoided by adding functionality to LinuxKPI, please consider
 Folders `lindebugfs`, `linuxkpi`
 
 Code style and rules same as FreeBSD kernel. If a GPL'd file is copy-paste from Linux, it's OK to leave style as is.
-
-
-
-## Development branches
-For testing the 4.11 development branch please use 
-
-#### FreeBSD 12-CURRENT
-Needed for changes in non-gplv2 part of linuxkpi.  
-~~https://github.com/FreeBSDDesktop/freebsd-base-graphics/tree/linuxkpi411~~ In HEAD now.
-
-#### Kernel Modules
-https://github.com/FreeBSDDesktop/kms-drm/tree/linuxkpi411
-
-#### GPU Firmware 
-https://github.com/FreeBSDDesktop/kms-firmware (or `pkg install gpu-firmware-kmod`)
-
-### Known bugs
-- amdgpu: kernel panic when exiting glxgears  
-- radeonkms: kernel panic at kldload  
-- FIXED: ~~i915: is leaking memory (gem objects).~~  
-- FIXED: ~~i915: use after free (gem object).~~  
-- DMC & HuC firmware loading seem fine but GuC loading sometimes fails but it is also disabled by default in Linux so might be upstream error.  
-Enable by adding to your /boot/loader.conf  
-compat.linuxkpi.enable_guc_submission=2  
-compat.linuxkpi.enable_guc_loading=2
-
-
