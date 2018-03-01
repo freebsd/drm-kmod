@@ -44,7 +44,6 @@
 			     (long)(x), __func__)
 
 #if defined(__linux__) && GCC_VERSION >= 70000
-#if GCC_VERSION >= 70000
 #define add_overflows(A, B) \
 	__builtin_add_overflow_p((A), (B), (typeof((A) + (B)))0)
 #else
