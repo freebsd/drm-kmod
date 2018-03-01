@@ -67,6 +67,7 @@ SRCS=	ati_pcigart.c \
 	drm_property.c \
 	drm_rect.c \
 	drm_scatter.c \
+	drm_scdc_helper.c \
 	drm_sysfs.c \
 	drm_sysctl.c \
 	drm_vma_manager.c \

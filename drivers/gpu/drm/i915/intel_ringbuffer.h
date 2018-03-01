@@ -521,12 +521,6 @@ intel_ring_wrap(const struct intel_ring *ring, u32 pos)
 }
 
 static inline u32
-intel_ring_wrap(const struct intel_ring *ring, u32 pos)
-{
-	return pos & (ring->size - 1);
-}
-
-static inline u32
 intel_ring_offset(const struct drm_i915_gem_request *req, void *addr)
 {
 	/* Don't write ring->size (equivalent to 0) as that hangs some GPUs. */

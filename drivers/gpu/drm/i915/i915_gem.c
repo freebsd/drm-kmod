@@ -2466,7 +2466,11 @@ rebuild_st:
 			 * defer the oom here by reporting the ENOMEM back
 			 * to userspace.
 			 */
+#ifdef __linux__
 			reclaim = mapping_gfp_constraint(mapping, 0);
+#else
+			reclaim = 0;
+#endif
 			reclaim |= __GFP_NORETRY; /* reclaim, but no oom */
 
 			page = shmem_read_mapping_page_gfp(mapping, i, reclaim);
@@ -5135,21 +5139,29 @@ i915_gem_object_create_from_data(struct drm_i915_private *dev_priv,
 		struct page *page;
 		void *pgdata, *vaddr;
 
+#ifdef __linux__
 		err = pagecache_write_begin(file, file->f_mapping,
 					    offset, len, 0,
 					    &page, &pgdata);
 		if (err < 0)
 			goto fail;
+#else
+		(void)err;
+		(void)pgdata;
+		page = shmem_read_mapping_page(obj->base.filp->f_shmem, offset);
+#endif
 
 		vaddr = kmap(page);
 		memcpy(vaddr, data, len);
 		kunmap(page);
 
+#ifdef __linux__
 		err = pagecache_write_end(file, file->f_mapping,
 					  offset, len, len,
 					  page, pgdata);
 		if (err < 0)
 			goto fail;
+#endif
 
 		size -= len;
 		data += len;
@@ -5158,9 +5170,11 @@ i915_gem_object_create_from_data(struct drm_i915_private *dev_priv,
 
 	return obj;
 
+#ifdef __linux__
 fail:
 	i915_gem_object_put(obj);
 	return ERR_PTR(err);
+#endif
 }
 
 struct scatterlist *
