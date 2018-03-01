@@ -2437,7 +2437,7 @@ rebuild_st:
 	 */
 #ifndef __linux__
 	mapping = obj->base.filp->f_shmem;
-	gfp = 0;
+	noreclaim = 0;
 #else
 	mapping = obj->base.filp->f_mapping;
 	noreclaim = mapping_gfp_constraint(mapping,
