@@ -5,6 +5,11 @@
 #include "amdgpu.h"
 
 static inline void
+trace_amdgpu_iv(struct amdgpu_iv_entry *iv){
+	CTR1(KTR_DRM, "amdgpu_iv %p", iv);
+}
+
+static inline void
 trace_amdgpu_cs_ioctl(struct amdgpu_job *job){
 	CTR1(KTR_DRM, "amdgpu_cs_ioctl %p", job);
 }
