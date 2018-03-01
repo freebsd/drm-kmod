@@ -677,7 +677,7 @@ intel_crt_detect(struct drm_connector *connector,
 	struct drm_i915_private *dev_priv = to_i915(connector->dev);
 	struct intel_crt *crt = intel_attached_crt(connector);
 	struct intel_encoder *intel_encoder = &crt->base;
-	int status, ret;
+	int status = 0, ret;
 	struct intel_load_detect_pipe tmp;
 
 	DRM_DEBUG_KMS("[CONNECTOR:%d:%s] force=%d\n",
