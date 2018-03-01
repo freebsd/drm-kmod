@@ -84,11 +84,13 @@ struct dma_buf_ops {
 
 	int (*begin_cpu_access)(struct dma_buf *, enum dma_data_direction);
 	int (*end_cpu_access)(struct dma_buf *, enum dma_data_direction);
-	void *(*kmap_atomic)(struct dma_buf *, unsigned long);
-	void (*kunmap_atomic)(struct dma_buf *, unsigned long, void *);
-	void *(*kmap)(struct dma_buf *, unsigned long);
-	void (*kunmap)(struct dma_buf *, unsigned long, void *);
 
+	void *(*map_atomic)(struct dma_buf *, unsigned long);
+	void (*unmap_atomic)(struct dma_buf *, unsigned long, void *);
+
+	void *(*map)(struct dma_buf *, unsigned long);
+	void (*unmap)(struct dma_buf *, unsigned long, void *);
+	
 	int (*mmap)(struct dma_buf *, struct vm_area_struct *vma);
 
 	void *(*vmap)(struct dma_buf *);

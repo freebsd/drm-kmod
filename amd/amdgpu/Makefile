@@ -191,6 +191,7 @@ CWARNFLAGS.amdgpu_connectors.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_cs.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_device.c=	 -Wno-cast-qual -Wno-missing-prototypes
 CWARNFLAGS.amdgpu_gfx.c=	-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_gtt_mgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_job.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ih.c=	-Wno-cast-qual
 CWARNFLAGS.amdgpu_mn.c=		-Wno-unused-variable

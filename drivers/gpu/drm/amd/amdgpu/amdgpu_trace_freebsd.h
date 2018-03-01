@@ -39,8 +39,8 @@ trace_amdgpu_bo_list_set(void *a, void *b) {
         CTR3(KTR_DRM, "amdgpu_vm_grab_id %p %u %p", (vm), (idx), (job));
 
 static inline void
-trace_amdgpu_vm_flush(uint64_t pd_addr, int idx, unsigned vm_id){
-	CTR3(KTR_DRM, "amdgpu_vm_flush %x %u %u", pd_addr, idx, vm_id);
+trace_amdgpu_vm_flush(struct amdgpu_ring *ring, unsigned vm_id, uint64_t pd_addr){
+	CTR3(KTR_DRM, "amdgpu_vm_flush ring %p, vm_id %u, pd_addr %u", ring, vm_id, pd_addr);
 }
 
 static inline void
