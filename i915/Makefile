@@ -87,6 +87,7 @@ SRCS=	\
 	intel_hdmi.c \
 	intel_hotplug.c \
 	intel_huc.c \
+	intel_huc_fw.c \
 	intel_i2c.c \
 	intel_lrc.c \
 	intel_lspcon.c \
