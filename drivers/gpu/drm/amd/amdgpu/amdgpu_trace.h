@@ -370,7 +370,6 @@ TRACE_EVENT(amdgpu_ttm_bo_move,
 );
 
 #undef AMDGPU_JOB_GET_TIMELINE_NAME
-#endif
 
 /* This part must be outside protection */
 #undef TRACE_INCLUDE_PATH
