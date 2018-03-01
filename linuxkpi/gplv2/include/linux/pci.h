@@ -75,6 +75,13 @@ pci_upstream_bridge(struct pci_dev *dev)
 	return (NULL);
 }
 
+static inline bool
+pci_is_thunderbolt_attached(struct pci_dev *pdev)
+{
+	UNIMPLEMENTED();
+	return false;
+}
+
 static inline void *
 pci_platform_rom(struct pci_dev *pdev, size_t *size)
 {
