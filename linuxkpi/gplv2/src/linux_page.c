@@ -46,6 +46,8 @@
 #include <linux/pfn_t.h>
 #include <linux/vmalloc.h>
 
+#include <asm/set_memory.h>
+
 #if defined(__amd64__) || defined(__aarch64__) || defined(__riscv__)
 #define	LINUXKPI_HAVE_DMAP
 #else
