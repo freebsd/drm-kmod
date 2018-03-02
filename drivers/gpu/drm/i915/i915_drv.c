@@ -2680,7 +2680,7 @@ static int intel_runtime_suspend(struct device *kdev)
 	 */
 	i915_gem_runtime_suspend(dev_priv);
 
-	intel_guc_suspend(dev_priv);
+	intel_uc_suspend(dev_priv);
 
 	intel_runtime_pm_disable_interrupts(dev_priv);
 
@@ -2702,7 +2702,7 @@ static int intel_runtime_suspend(struct device *kdev)
 
 		intel_runtime_pm_enable_interrupts(dev_priv);
 
-		intel_guc_resume(dev_priv);
+		intel_uc_resume(dev_priv);
 
 		i915_gem_init_swizzling(dev_priv);
 		i915_gem_restore_fences(dev_priv);
@@ -2788,7 +2788,7 @@ static int intel_runtime_resume(struct device *kdev)
 
 	intel_runtime_pm_enable_interrupts(dev_priv);
 
-	intel_guc_resume(dev_priv);
+	intel_uc_resume(dev_priv);
 
 	/*
 	 * No point of rolling back things in case of an error, as the best
