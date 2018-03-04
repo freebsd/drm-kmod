@@ -563,8 +563,10 @@ static __always_inline void err_print_param(struct drm_i915_error_state_buf *m,
 		err_printf(m, "i915.%s=%u\n", name, *(const unsigned int *)x);
 	else if (!__builtin_strcmp(type, "char *"))
 		err_printf(m, "i915.%s=%s\n", name, *(const char **)x);
+#ifdef __linux__
 	else
 		BUILD_BUG();
+#endif
 }
 
 static void err_print_params(struct drm_i915_error_state_buf *m,

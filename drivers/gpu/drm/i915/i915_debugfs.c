@@ -52,8 +52,10 @@ static __always_inline void seq_print_param(struct seq_file *m,
 		seq_printf(m, "i915.%s=%u\n", name, *(const unsigned int *)x);
 	else if (!__builtin_strcmp(type, "char *"))
 		seq_printf(m, "i915.%s=%s\n", name, *(const char **)x);
+#ifdef __linux__
 	else
 		BUILD_BUG();
+#endif
 }
 
 static int i915_capabilities(struct seq_file *m, void *data)
