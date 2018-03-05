@@ -17,8 +17,8 @@
 
 struct file *
 anon_inode_getfile(const char *name,
-				   const struct file_operations *fops,
-				   void *priv, int flags) {
+    const struct file_operations *fops,
+    void *priv, int flags) {
 
 	/* LINUX:
 
@@ -91,7 +91,7 @@ err_module:
 	printf("%s: created unique name = %s\n", __func__, unique_name);
 
 	struct dentry *d = anon_inodefs_create_file(unique_name, mode,
-												NULL, NULL, NULL);
+	    NULL, NULL, NULL);
 	free(unique_name, M_KMALLOC);	
 	if (!d) {
 		printf("%s: ERROR: anon_inodefs_create_file\n", __func__);
