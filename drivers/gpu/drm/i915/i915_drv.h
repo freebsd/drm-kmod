@@ -1,6 +1,5 @@
 /* i915_drv.h -- Private header for the I915 driver -*- linux-c -*-
  */
-
 /*
  *
  * Copyright 2003 Tungsten Graphics, Inc., Cedar Park, Texas.
@@ -2547,6 +2546,12 @@ struct drm_i915_private {
 	/* Used to save the pipe-to-encoder mapping for audio */
 	struct intel_encoder *av_enc_map[I915_MAX_PIPES];
 
+	/* necessary resource sharing with HDMI LPE audio driver. */
+	struct {
+		struct platform_device *platdev;
+		int	irq;
+	} lpe_audio;
+
 	/*
 	 * NOTE: This is the dri1/ums dungeon, don't add stuff here. Your patch
 	 * will be rejected. Instead look for a better place.
@@ -4008,14 +4013,35 @@ __raw_write(64, q)
 #undef __raw_read
 #undef __raw_write
 
+#ifndef __linux__
 #define outb _outb
+#endif
 
 /* These are untraced mmio-accessors that are only valid to be used inside
- * critical sections inside IRQ handlers where forcewake is explicitly
+ * critical sections, such as inside IRQ handlers, where forcewake is explicitly
  * controlled.
+ *
  * Think twice, and think again, before using these.
- * Note: Should only be used between intel_uncore_forcewake_irqlock() and
- * intel_uncore_forcewake_irqunlock().
+ *
+ * As an example, these accessors can possibly be used between:
+ *
+ * spin_lock_irq(&dev_priv->uncore.lock);
+ * intel_uncore_forcewake_get__locked();
+ *
+ * and
+ *
+ * intel_uncore_forcewake_put__locked();
+ * spin_unlock_irq(&dev_priv->uncore.lock);
+ *
+ *
+ * Note: some registers may not need forcewake held, so
+ * intel_uncore_forcewake_{get,put} can be omitted, see
+ * intel_uncore_forcewake_for_reg().
+ *
+ * Certain architectures will die if the same cacheline is concurrently accessed
+ * by different clients (e.g. on Ivybridge). Access to registers should
+ * therefore generally be serialised, by either the dev_priv->uncore.lock or
+ * a more localised lock guarding all access to that bank of registers.
  */
 #define I915_READ_FW(reg__) __raw_i915_read32(dev_priv, (reg__))
 #define I915_WRITE_FW(reg__, val__) __raw_i915_write32(dev_priv, (reg__), (val__))

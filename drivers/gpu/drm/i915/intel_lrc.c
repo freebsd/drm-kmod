@@ -635,7 +635,6 @@ static void execlists_submit_request(struct drm_i915_gem_request *request)
 
 	if (insert_request(&request->priotree, &engine->execlist_queue)) {
 		engine->execlist_first = &request->priotree.node;
-		smp_wmb();
 		if (execlists_elsp_ready(engine))
 			tasklet_hi_schedule(&engine->irq_tasklet);
 	}
@@ -733,11 +732,8 @@ static void execlists_schedule(struct drm_i915_gem_request *request, int prio)
 				engine->execlist_first = &pt->node;
 		}
 	}
-	
-#ifndef __linux__
-		if (engine)
-#endif
-			spin_unlock_irq(&engine->timeline->lock);
+
+	spin_unlock_irq(&engine->timeline->lock);
 
 	/* XXX Do we need to preempt to make room for us and our deps? */
 }

@@ -245,7 +245,7 @@ static void intel_detect_pch(struct drm_device *dev)
 	pci_dev_put(pch);
 }
 
-int i915_getparam(struct drm_device *dev, void *data,
+static int i915_getparam(struct drm_device *dev, void *data,
 			 struct drm_file *file_priv)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
@@ -1260,7 +1260,7 @@ static void i915_driver_register(struct drm_i915_private *dev_priv)
 	if (IS_GEN5(dev_priv))
 		intel_gpu_ips_init(dev_priv);
 
-	i915_audio_component_init(dev_priv);
+	intel_audio_init(dev_priv);
 
 	/*
 	 * Some ports require correctly set-up hpd registers for detection to
@@ -1278,7 +1278,7 @@ static void i915_driver_register(struct drm_i915_private *dev_priv)
  */
 static void i915_driver_unregister(struct drm_i915_private *dev_priv)
 {
-	i915_audio_component_cleanup(dev_priv);
+	intel_audio_deinit(dev_priv);
 
 	intel_gpu_ips_teardown();
 	acpi_video_unregister();
@@ -1426,6 +1426,8 @@ void i915_driver_unload(struct drm_device *dev)
 	intel_display_power_get(dev_priv, POWER_DOMAIN_INIT);
 
 	drm_atomic_helper_shutdown(dev);
+
+	intel_gvt_cleanup(dev_priv);
 
 	i915_driver_unregister(dev_priv);
 
@@ -2725,7 +2727,7 @@ static struct drm_driver driver = {
 	 * deal with them for Intel hardware.
 	 */
 	.driver_features =
-	DRIVER_HAVE_IRQ | DRIVER_IRQ_SHARED | DRIVER_GEM | DRIVER_PRIME |
+	    DRIVER_HAVE_IRQ | DRIVER_IRQ_SHARED | DRIVER_GEM | DRIVER_PRIME |
 	    DRIVER_RENDER | DRIVER_MODESET | DRIVER_ATOMIC,
 	.release = i915_driver_release,
 	.open = i915_driver_open,

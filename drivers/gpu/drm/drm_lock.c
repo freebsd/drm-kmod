@@ -179,7 +179,7 @@ int drm_legacy_lock(struct drm_device *dev, void *data,
 			  task_pid_nr(current), lock->context);
 		return -EINVAL;
 	}
-#ifdef __linux__
+
 	DRM_DEBUG("%d (pid %d) requests lock (0x%08x), flags = 0x%08x\n",
 		  lock->context, task_pid_nr(current),
 		  master->lock.hw_lock ? master->lock.hw_lock->lock : -1,
@@ -223,35 +223,13 @@ int drm_legacy_lock(struct drm_device *dev, void *data,
 		  ret ? "interrupted" : "has lock");
 	if (ret) return ret;
 
-	/* don't set the block all signals on the master process for now
+	/* don't set the block all signals on the master process for now 
 	 * really probably not the correct answer but lets us debug xkb
  	 * xserver for now */
 	if (!drm_is_current_master(file_priv)) {
 		dev->sigdata.context = lock->context;
 		dev->sigdata.lock = master->lock.hw_lock;
 	}
-#else
-	spin_lock_bh(&master->lock.spinlock);
-	master->lock.user_waiters++;
-	spin_unlock_bh(&master->lock.spinlock);
-	for (;;) {
-		if (drm_lock_take(&master->lock, lock->context)) {
-			master->lock.file_priv = file_priv;
-			master->lock.lock_time = jiffies;
-			break;	/* Got lock */
-		}
-		ret = -sx_sleep(&master->lock.lock_queue, &drm_global_mutex.sx,
-		    PCATCH, "drmlk2", 0);
-		if (ret == -ERESTART)
-			ret = -ERESTARTSYS;
-		if (ret != 0)
-			break;
-	}
-
-	spin_lock_bh(&master->lock.spinlock);
-	master->lock.user_waiters--;
-	spin_unlock_bh(&master->lock.spinlock);
-#endif
 
 	if (dev->driver->dma_quiescent && (lock->flags & _DRM_LOCK_QUIESCENT))
 	{

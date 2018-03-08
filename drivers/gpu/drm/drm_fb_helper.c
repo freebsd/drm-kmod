@@ -182,6 +182,7 @@ int drm_fb_helper_single_add_all_connectors(struct drm_fb_helper *fb_helper)
 			goto fail;
 	}
 	goto out;
+
 fail:
 	drm_fb_helper_for_each_connector(fb_helper, i) {
 		struct drm_fb_helper_connector *fb_helper_connector =
@@ -890,6 +891,9 @@ void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 		framebuffer_release(info);
 	}
 	fb_helper->fbdev = NULL;
+
+	cancel_work_sync(&fb_helper->resume_work);
+	cancel_work_sync(&fb_helper->dirty_work);
 
 	mutex_lock(&kernel_fb_helper_lock);
 	if (!list_empty(&fb_helper->kernel_fb_list)) {

@@ -244,6 +244,8 @@ static int drm_minor_register(struct drm_device *dev, unsigned int type)
 	unsigned long flags;
 	int ret;
 
+	DRM_DEBUG("\n");
+
 	minor = *drm_minor_get_slot(dev, type);
 	if (!minor)
 		return 0;
@@ -373,6 +375,8 @@ void drm_minor_release(struct drm_minor *minor)
  */
 void drm_put_dev(struct drm_device *dev)
 {
+	DRM_DEBUG("\n");
+
 	if (!dev) {
 		DRM_ERROR("cleanup called no dev\n");
 		return;
@@ -947,6 +951,8 @@ static int drm_stub_open(struct inode *inode, struct file *filp)
 	struct drm_minor *minor;
 	int err;
 
+	DRM_DEBUG("\n");
+
 	mutex_lock(&drm_global_mutex);
 	minor = drm_minor_acquire(iminor(inode));
 	if (IS_ERR(minor)) {
@@ -980,7 +986,7 @@ static const struct file_operations drm_stub_fops = {
 };
 
 static void drm_core_exit(void)
-{	
+{
 	unregister_chrdev(DRM_MAJOR, "drm");
 	debugfs_remove(drm_debugfs_root);
 	drm_sysfs_destroy();
@@ -1009,13 +1015,16 @@ static int __init drm_core_init(void)
 		DRM_ERROR("Cannot create debugfs-root: %d\n", ret);
 		goto error;
 	}
-
-	ret = register_chrdev_p(DRM_MAJOR, "drm", &drm_stub_fops, DRM_DEV_UID, DRM_DEV_GID, DRM_DEV_MODE);
+#ifdef __linux__
+	ret = register_chrdev(DRM_MAJOR, "drm", &drm_stub_fops);
+#else
+	ret = register_chrdev_p(DRM_MAJOR, "drm", &drm_stub_fops,
+	    DRM_DEV_UID, DRM_DEV_GID, DRM_DEV_MODE);
+#endif
 	if (ret < 0)
 		goto error;
 
 	DRM_DEBUG("Initialized\n");
-
 	return 0;
 
 error:

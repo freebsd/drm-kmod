@@ -918,8 +918,8 @@ __gen2_read(64)
 	trace_i915_reg_rw(false, reg, val, sizeof(val), trace); \
 	return val
 
-static __noinline void ___force_wake_auto(struct drm_i915_private *dev_priv,
-					  enum forcewake_domains fw_domains)
+static noinline void ___force_wake_auto(struct drm_i915_private *dev_priv,
+					enum forcewake_domains fw_domains)
 {
 	struct intel_uncore_forcewake_domain *domain;
 	unsigned int tmp;
@@ -1240,9 +1240,9 @@ static void intel_uncore_fw_domains_init(struct drm_i915_private *dev_priv)
 			       FORCEWAKE_MT, FORCEWAKE_MT_ACK);
 
 		spin_lock_irq(&dev_priv->uncore.lock);
-		fw_domains_get_with_thread_status(dev_priv, FORCEWAKE_ALL);
+		fw_domains_get_with_thread_status(dev_priv, FORCEWAKE_RENDER);
 		ecobus = __raw_i915_read32(dev_priv, ECOBUS);
-		fw_domains_put_with_fifo(dev_priv, FORCEWAKE_ALL);
+		fw_domains_put_with_fifo(dev_priv, FORCEWAKE_RENDER);
 		spin_unlock_irq(&dev_priv->uncore.lock);
 
 		if (!(ecobus & FORCEWAKE_MT_ENABLE)) {

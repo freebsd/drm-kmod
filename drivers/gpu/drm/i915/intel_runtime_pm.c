@@ -1164,7 +1164,8 @@ static void vlv_display_power_well_deinit(struct drm_i915_private *dev_priv)
 	intel_power_sequencer_reset(dev_priv);
 
 #ifdef __linux__
-	/* Prevent us from re-enabling polling on accident in late suspend */
+	// No dev->power on BSD
+	/* Prevent us from re-enabling polling on accident in late suspend */	
 	if (!dev_priv->drm.dev->power.is_suspended)
 		intel_hpd_poll_init(dev_priv);
 #endif

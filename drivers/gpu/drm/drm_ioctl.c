@@ -29,6 +29,7 @@
  */
 
 #include <drm/drmP.h>
+// drmP.h must be the first to include because of file -> linux_file definition
 #include <drm/drm_ioctl.h>
 #include <drm/drm_auth.h>
 #include "drm_legacy.h"
@@ -190,11 +191,10 @@ static int drm_getclient(struct drm_device *dev, void *data,
 	 */
 	if (client->idx == 0) {
 		client->auth = file_priv->authenticated;
-#ifdef __linux__
 		client->pid = task_pid_vnr(current);
+#ifdef __linux__
 		client->uid = overflowuid;
 #else
-		client->pid = file_priv->pid;
 		client->uid = 0;
 #endif
 		client->magic = 0;

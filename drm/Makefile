@@ -34,8 +34,8 @@ SRCS=	ati_pcigart.c \
 	drm_encoder_slave.c \
 	drm_fb_helper.c \
 	drm_fb_helper_freebsd.c \
+	drm_file.c \
 	drm_flip_work.c \
-	drm_fops.c \
 	drm_fourcc.c \
 	drm_framebuffer.c \
 	drm_gem.c \
@@ -68,10 +68,10 @@ SRCS=	ati_pcigart.c \
 	drm_rect.c \
 	drm_scatter.c \
 	drm_scdc_helper.c \
+	drm_sysctl_freebsd.c \
 	drm_sysfs.c \
-	drm_sysctl.c \
-	drm_vma_manager.c \
 	drm_vm.c \
+	drm_vma_manager.c \
 	linux_fb.c \
 	tainted_linux_fb.c \
 	linux_hdmi.c \
@@ -88,6 +88,8 @@ SRCS=	ati_pcigart.c \
 	ttm_page_alloc.c \
 	ttm_page_alloc_dma.c \
 	ttm_bo_vm.c
+
+# drm_fops.c \ deleted in v4.12
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
