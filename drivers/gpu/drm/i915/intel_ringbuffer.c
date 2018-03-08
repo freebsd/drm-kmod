@@ -47,9 +47,14 @@ static int __intel_ring_space(int head, int tail, int size)
 	return space - I915_RING_FREE_SPACE;
 }
 
-void intel_ring_update_space(struct intel_ring *ring)
+unsigned int intel_ring_update_space(struct intel_ring *ring)
 {
-	ring->space = __intel_ring_space(ring->head, ring->emit, ring->size);
+	unsigned int space;
+
+	space = __intel_ring_space(ring->head, ring->emit, ring->size);
+
+	ring->space = space;
+	return space;
 }
 
 static int
