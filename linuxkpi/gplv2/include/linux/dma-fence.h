@@ -157,7 +157,11 @@ dma_fence_signal(struct dma_fence *fence)
 
 	if (!ktime_to_ns(fence->timestamp)) {
 		fence->timestamp = ktime_get();
+#ifdef __FreeBSD__
+		mb();
+#else
 		smp_mb__before_atomic();
+#endif
 	}
 
 	if (test_and_set_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
@@ -165,14 +169,29 @@ dma_fence_signal(struct dma_fence *fence)
 
 
 	if (test_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &fence->flags)) {
-		struct dma_fence_cb *cur, *tmp;
 
+#ifdef __linux__
+		struct dma_fence_cb *cur, *tmp;
 		spin_lock_irqsave(fence->lock, flags);
 		list_for_each_entry_safe(cur, tmp, &fence->cb_list, node) {
 			list_del_init(&cur->node);
 			cur->func(fence, cur);
 		}
 		spin_unlock_irqrestore(fence->lock, flags);
+#else
+		// On FreeBSD spinlock is a sleep lock
+		// Fix calling callout function with non-sleepable lock help
+		struct dma_fence_cb *cur;
+		spin_lock_irqsave(fence->lock, flags);
+		while (!list_empty(&fence->cb_list)) {			
+			cur = list_first_entry(&fence->cb_list, struct dma_fence_cb, node);
+			list_del_init(&cur->node);
+			spin_unlock_irqrestore(fence->lock, flags);
+			cur->func(fence, cur);
+			spin_lock_irqsave(fence->lock, flags);
+		}
+		spin_unlock_irqrestore(fence->lock, flags);
+#endif
 	}
 	return (0);
 }
@@ -367,7 +386,7 @@ dma_fence_test_signaled_any(struct dma_fence **fences, uint32_t count)
 
 static inline signed long
 dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count,
-						   bool intr, signed long timeout, uint32_t *idx)
+    bool intr, signed long timeout, uint32_t *idx)
 {
 	struct default_wait_cb *cb;
 	signed long ret;
