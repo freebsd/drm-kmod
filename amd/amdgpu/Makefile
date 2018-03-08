@@ -137,6 +137,7 @@ SRCS=	amdgpu_acpi.c \
 	smu7_powertune.c \
 	smu7_smumgr.c \
 	smu7_thermal.c \
+	soc15.c \
 	tonga_ih.c \
 	tonga_smumgr.c \
 	tonga_smumgr_smc.c \
@@ -256,6 +257,7 @@ CWARNFLAGS.sdma_v4_0.c=		-Wno-missing-prototypes -Wno-cast-qual -Wno-sometimes-u
 CWARNFLAGS.si.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu7_clockpowergating.c=		-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.smu7_hwmgr.c=		-Wno-missing-prototypes  -Wno-cast-qual
+CWARNFLAGS.soc15.c=		-Wno-missing-prototypes
 CWARNFLAGS.tonga_clockpowergating.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.tonga_hwmgr.c=	-Wno-missing-prototypes -Wno-cast-qual -Wno-unused-const-variable
 CWARNFLAGS.tonga_smumgr.c=	-Wno-missing-prototypes -Wno-cast-qual
