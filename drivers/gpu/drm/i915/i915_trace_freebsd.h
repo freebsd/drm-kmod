@@ -360,6 +360,12 @@ trace_vlv_wm(void *crtc, void *wm)
 }
 
 static inline void
+trace_g4x_wm(void *crtc, void *wm)
+{
+	CTR2(KTR_DRM, "g4x_wm crtc %p wm %p", crtc, wm);
+}
+
+static inline void
 trace_vlv_fifo_size(void *crtc, uint32_t sprite0_start, uint32_t sprite1_start, uint32_t fifo_size)
 {
 	CTR4(KTR_DRM, "vlv_fifo_size crtc %p sprite0_start %x, sprite1_start %x, fifo_size %x", crtc, sprite0_start, sprite1_start, fifi_size);
