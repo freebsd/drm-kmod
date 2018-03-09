@@ -22,6 +22,10 @@
  *
  */
 
+#ifndef __linux__
+#include "i915_drv.h" /* Missing various macros */
+#endif
+
 #include <linux/slab.h>
 
 #include "i915_syncmap.h"
