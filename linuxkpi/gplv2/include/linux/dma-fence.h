@@ -106,10 +106,22 @@ dma_fence_release(struct kref *kref)
 		kfree(fence);
 }
 
+static inline void
+dma_fence_signal_locked_sub(struct dma_fence *fence)
+{
+	struct dma_fence_cb *cur;
+
+	while ((cur = list_first_entry_or_null(&fence->cb_list, struct dma_fence_cb, node)) != NULL) {
+		list_del_init(&cur->node);
+		spin_unlock(fence->lock);
+		cur->func(fence, cur);
+		spin_lock(fence->lock);
+	}
+}
+
 static inline int
 dma_fence_signal_locked(struct dma_fence *fence)
 {
-	struct dma_fence_cb *cur, *tmp;
 	int ret = 0;
 
 	if (WARN_ON(!fence))
@@ -123,35 +135,25 @@ dma_fence_signal_locked(struct dma_fence *fence)
 	if (test_and_set_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags)) {
 		ret = -EINVAL;
 	}
-	list_for_each_entry_safe(cur, tmp, &fence->cb_list, node) {
-		list_del_init(&cur->node);
-		cur->func(fence, cur);
-	}
+	dma_fence_signal_locked_sub(fence);
 	return (ret);
 }
 
 static inline void
 dma_fence_enable_sw_signaling(struct dma_fence *fence)
 {
-	unsigned long flags;
-
 	if (!test_and_set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &fence->flags) &&
 	    !test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags)) {
-		spin_lock_irqsave(fence->lock, flags);
-
+		spin_lock(fence->lock);
 		if (!fence->ops->enable_signaling(fence))
 			dma_fence_signal_locked(fence);
-
-		spin_unlock_irqrestore(fence->lock, flags);
+		spin_unlock(fence->lock);
 	}
 }
-
 
 static inline int
 dma_fence_signal(struct dma_fence *fence)
 {
-	unsigned long flags;
-
 	if (!fence)
 		return (-EINVAL);
 
@@ -169,29 +171,9 @@ dma_fence_signal(struct dma_fence *fence)
 
 
 	if (test_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &fence->flags)) {
-
-#ifdef __linux__
-		struct dma_fence_cb *cur, *tmp;
-		spin_lock_irqsave(fence->lock, flags);
-		list_for_each_entry_safe(cur, tmp, &fence->cb_list, node) {
-			list_del_init(&cur->node);
-			cur->func(fence, cur);
-		}
-		spin_unlock_irqrestore(fence->lock, flags);
-#else
-		// On FreeBSD spinlock is a sleep lock
-		// Fix calling callout function with non-sleepable lock help
-		struct dma_fence_cb *cur;
-		spin_lock_irqsave(fence->lock, flags);
-		while (!list_empty(&fence->cb_list)) {			
-			cur = list_first_entry(&fence->cb_list, struct dma_fence_cb, node);
-			list_del_init(&cur->node);
-			spin_unlock_irqrestore(fence->lock, flags);
-			cur->func(fence, cur);
-			spin_lock_irqsave(fence->lock, flags);
-		}
-		spin_unlock_irqrestore(fence->lock, flags);
-#endif
+		spin_lock(fence->lock);
+		dma_fence_signal_locked_sub(fence);
+		spin_unlock(fence->lock);
 	}
 	return (0);
 }
@@ -249,7 +231,6 @@ static inline int
 dma_fence_add_callback(struct dma_fence *fence, struct dma_fence_cb *cb,
 		   dma_fence_func_t func)
 {
-	unsigned long flags;
 	int ret = 0;
 	bool was_set;
 
@@ -261,25 +242,23 @@ dma_fence_add_callback(struct dma_fence *fence, struct dma_fence_cb *cb,
 		return -ENOENT;
 	}
 
-	spin_lock_irqsave(fence->lock, flags);
+	spin_lock(fence->lock);
 
 	was_set = test_and_set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &fence->flags);
 
-	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
+	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags)) {
+		INIT_LIST_HEAD(&cb->node);
 		ret = -ENOENT;
-	else if (!was_set) {
-		if (!fence->ops->enable_signaling(fence)) {
-			dma_fence_signal_locked(fence);
-			ret = -ENOENT;
-		}
-	}
-
-	if (!ret) {
+	} else if (was_set == 0 &&
+		   fence->ops->enable_signaling(fence) == 0) {
+		INIT_LIST_HEAD(&cb->node);
+		ret = -ENOENT;
+		dma_fence_signal_locked(fence);
+	} else {
 		cb->func = func;
 		list_add_tail(&cb->node, &fence->cb_list);
-	} else
-		INIT_LIST_HEAD(&cb->node);
-	spin_unlock_irqrestore(fence->lock, flags);
+	}
+	spin_unlock(fence->lock);
 
 	return (ret);
 }
@@ -287,16 +266,15 @@ dma_fence_add_callback(struct dma_fence *fence, struct dma_fence_cb *cb,
 static inline bool
 dma_fence_remove_callback(struct dma_fence *fence, struct dma_fence_cb *cb)
 {
-	unsigned long flags;
         bool ret;
 
-        spin_lock_irqsave(fence->lock, flags);
+        spin_lock(fence->lock);
 
         ret = !list_empty(&cb->node);
         if (ret)
                 list_del_init(&cb->node);
 
-        spin_unlock_irqrestore(fence->lock, flags);
+        spin_unlock(fence->lock);
 
         return ret;
 }
@@ -314,7 +292,6 @@ static inline signed long
 dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
 {
 	struct default_wait_cb cb;
-	unsigned long flags;
 	signed long ret;
 	bool was_set;
 
@@ -325,7 +302,7 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
 	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
 		return timeout;
 
-	spin_lock_irqsave(fence->lock, flags);
+	spin_lock(fence->lock);
 
 	if (intr && signal_pending(current)) {
 		ret = -ERESTARTSYS;
@@ -353,11 +330,11 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
 			__set_current_state(TASK_INTERRUPTIBLE);
 		else
 			__set_current_state(TASK_UNINTERRUPTIBLE);
-		spin_unlock_irqrestore(fence->lock, flags);
+		spin_unlock(fence->lock);
 
 		ret = schedule_timeout(ret);
 
-		spin_lock_irqsave(fence->lock, flags);
+		spin_lock(fence->lock);
 		if (ret > 0 && intr && signal_pending(current))
 			ret = -ERESTARTSYS;
 	}
@@ -367,7 +344,7 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
 	__set_current_state(TASK_RUNNING);
 
 out:
-	spin_unlock_irqrestore(fence->lock, flags);
+	spin_unlock(fence->lock);
 	return ret;
 }
 
