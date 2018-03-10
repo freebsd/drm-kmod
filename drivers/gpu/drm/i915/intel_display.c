@@ -4687,7 +4687,7 @@ int skl_update_scaler_crtc(struct intel_crtc_state *state)
 	const struct drm_display_mode *adjusted_mode = &state->base.adjusted_mode;
 
 	return skl_update_scaler(state, !state->base.active, SKL_CRTC_INDEX,
-		&state->scaler_state.scaler_id, DRM_MODE_ROTATE_0,
+		&state->scaler_state.scaler_id,
 		state->pipe_src_w, state->pipe_src_h,
 		adjusted_mode->crtc_hdisplay, adjusted_mode->crtc_vdisplay);
 }
@@ -9171,7 +9171,7 @@ static u32 intel_cursor_base(const struct intel_plane_state *plane_state)
 
 	/* ILK+ do this automagically */
 	if (HAS_GMCH_DISPLAY(dev_priv) &&
-	    plane_state->base.rotation & DRM_ROTATE_180)
+	    plane_state->base.rotation & DRM_MODE_ROTATE_180)
 		base += (plane_state->base.crtc_h *
 			 plane_state->base.crtc_w - 1) * fb->format->cpp[0];
 
@@ -9426,7 +9426,7 @@ static bool i9xx_cursor_size_ok(const struct intel_plane_state *plane_state)
 	 * cursors.
 	 */
 	if (HAS_CUR_FBC(dev_priv) &&
-	    plane_state->base.rotation & DRM_ROTATE_0) {
+	    plane_state->base.rotation & DRM_MODE_ROTATE_0) {
 		if (height < 8 || height > width)
 			return false;
 	} else {
