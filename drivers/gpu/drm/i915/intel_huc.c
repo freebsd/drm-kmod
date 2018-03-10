@@ -56,9 +56,15 @@
 #define GLK_HUC_FW_MINOR 00
 #define GLK_BLD_NUM 1748
 
+#ifdef __linux__
 #define HUC_FW_PATH(platform, major, minor, bld_num) \
 	"i915/" __stringify(platform) "_huc_ver" __stringify(major) "_" \
 	__stringify(minor) "_" __stringify(bld_num) ".bin"
+#else
+#define HUC_FW_PATH(platform, major, minor, bld_num) \
+	"i915/" __stringify(platform) "_huc_ver" __stringify(major) "_" \
+	__stringify(minor) ".bin"
+#endif
 
 #define I915_SKL_HUC_UCODE HUC_FW_PATH(skl, SKL_HUC_FW_MAJOR, \
 	SKL_HUC_FW_MINOR, SKL_BLD_NUM)
