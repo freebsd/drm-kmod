@@ -18,6 +18,7 @@ SRCS= \
 # 	vc4_bo.c \
 # 	vc4_vec.c \
 # 	vc4_dsi.c \
+#	vc4_fence.c \
 # 	vc4_gem.c \
 # 	vc4_hvs.c \
 # 	vc4_v3d.c \
