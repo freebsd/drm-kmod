@@ -59,6 +59,7 @@ SRCS=	amdgpu_acpi.c \
 	amdgpu_ucode.c \
 	amdgpu_uvd.c \
 	amdgpu_vce.c \
+	amdgpu_vcn.c \
 	amdgpu_virt.c \
 	amdgpu_vm.c \
 	amdgpu_vram_mgr.c \
@@ -109,12 +110,14 @@ SRCS=	amdgpu_acpi.c \
 	kv_dpm.c \
 	kv_smc.c \
 	nbio_v6_1.c \
+	nbio_v7_0.c \
 	mmhub_v1_0.c \
 	mxgpu_ai.c \
 	mxgpu_vi.c \
 	polaris10_smc.c \
 	polaris10_smumgr.c \
 	pp_acpi.c \
+	pp_overdriver.c \
 	ppatomctrl.c \
 	ppatomfwctrl.c \
 	pppcielanes.c \
@@ -123,6 +126,8 @@ SRCS=	amdgpu_acpi.c \
 	psm.c \
 	psp_v3_1.c \
 	psp_v10_0.c \
+	rv_hwmgr.c \
+	rv_smumgr.c \
 	sched_fence.c \
 	sdma_v2_4.c \
 	sdma_v3_0.c \
@@ -149,6 +154,7 @@ SRCS=	amdgpu_acpi.c \
 	vce_v2_0.c \
 	vce_v3_0.c \
 	vce_v4_0.c \
+	vcn_v1_0.c \
 	vega10_hwmgr.c \
 	vega10_ih.c \
 	vega10_powertune.c \
@@ -254,6 +260,8 @@ CWARNFLAGS.processpptables.c=	-Wno-missing-prototypes -Wno-sometimes-uninitializ
 CWARNFLAGS.process_pptables_v1_0.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.psp_v3_1.c=	-Wno-cast-qual
 CWARNFLAGS.psp_v10_0.c=	-Wno-cast-qual
+CWARNFLAGS.rv_hwmgr.c=	-Wno-cast-qual
+CWARNFLAGS.rv_smumgr.c=	-Wno-cast-qual -Wno-missing-prototypes
 CWARNFLAGS.sdma_v3_0.c=		-Wno-missing-prototypes
 CWARNFLAGS.sdma_v4_0.c=		-Wno-missing-prototypes -Wno-cast-qual -Wno-sometimes-uninitialized
 CWARNFLAGS.si.c=		-Wno-missing-prototypes
