@@ -75,6 +75,7 @@ SRCS=	\
 	intel_fifo_underrun.c \
 	intel_freebsd.c \
 	intel_frontbuffer.c \
+	intel_guc_ct.c \
 	intel_guc_loader.c \
 	intel_guc_log.c \
 	intel_hangcheck.c \
