@@ -663,34 +663,6 @@ static const struct drm_ioctl_desc drm_ioctls[] = {
 
 #define DRM_CORE_IOCTL_COUNT	ARRAY_SIZE( drm_ioctls )
 
-#ifndef __linux__
-long drm_ioctl_kernel(struct file *file, drm_ioctl_t *func, void *kdata,
-		      u32 flags)
-{
-	struct drm_file *file_priv = file->private_data;
-	struct drm_device *dev = file_priv->minor->dev;
-	int retcode;
-
-	if (drm_device_is_unplugged(dev))
-		return -ENODEV;
-
-	retcode = drm_ioctl_permit(flags, file_priv);
-	if (unlikely(retcode))
-		return retcode;
-
-	/* Enforce sane locking for modern driver ioctls. */
-	if (!drm_core_check_feature(dev, DRIVER_LEGACY) ||
-	    (flags & DRM_UNLOCKED))
-		retcode = func(dev, kdata, file_priv);
-	else {
-		mutex_lock(&drm_global_mutex);
-		retcode = func(dev, kdata, file_priv);
-		mutex_unlock(&drm_global_mutex);
-	}
-	return retcode;
-}
-#endif
-
 /**
  * DOC: driver specific ioctls
  *
