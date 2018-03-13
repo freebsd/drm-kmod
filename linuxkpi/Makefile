@@ -4,8 +4,8 @@ KMOD=	linuxkpi_gplv2
 
 SRCS=	linux_kmod_gplv2.c	\
 	linux_acpi.c		\
-	linux_anon_inodefs.c \
-	linux_anon_inodes.c \
+	linux_anon_inodefs.c 	\
+	linux_anon_inodes.c 	\
 	linux_async.c		\
 	linux_backlight.c	\
 	linux_compat.c		\
@@ -16,10 +16,9 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_firmware.c	\
 	linux_fs.c		\
 	linux_fs_attr.c		\
-	linux_hrtimer.c		\
 	linux_i2c.c		\
 	linux_irq.c		\
-	linux_llist.c	\
+	linux_llist.c		\
 	linux_mtrr.c		\
 	linux_notifier.c	\
 	linux_page.c		\
