@@ -122,6 +122,7 @@ SRCS=	amdgpu_acpi.c \
 	process_pptables_v1_0.c \
 	psm.c \
 	psp_v3_1.c \
+	psp_v10_0.c \
 	sched_fence.c \
 	sdma_v2_4.c \
 	sdma_v3_0.c \
@@ -252,6 +253,7 @@ CWARNFLAGS.ppatomfwctrl.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.processpptables.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized
 CWARNFLAGS.process_pptables_v1_0.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.psp_v3_1.c=	-Wno-cast-qual
+CWARNFLAGS.psp_v10_0.c=	-Wno-cast-qual
 CWARNFLAGS.sdma_v3_0.c=		-Wno-missing-prototypes
 CWARNFLAGS.sdma_v4_0.c=		-Wno-missing-prototypes -Wno-cast-qual -Wno-sometimes-uninitialized
 CWARNFLAGS.si.c=		-Wno-missing-prototypes
