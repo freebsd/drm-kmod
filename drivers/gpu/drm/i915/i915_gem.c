@@ -5437,6 +5437,10 @@ int i915_gem_init(struct drm_i915_private *dev_priv)
 	if (ret)
 		return ret;
 
+	ret = intel_wopcm_init(&dev_priv->wopcm);
+	if (ret)
+		return ret;
+
 	ret = intel_uc_init_misc(dev_priv);
 	if (ret)
 		return ret;
