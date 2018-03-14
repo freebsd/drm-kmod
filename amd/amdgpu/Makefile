@@ -50,6 +50,7 @@ SRCS=	amdgpu_acpi.c \
 	amdgpu_powerplay.c \
 	amdgpu_prime.c \
 	amdgpu_psp.c \
+	amdgpu_queue_mgr.c \
 	amdgpu_ring.c \
 	amdgpu_sa.c \
 	amdgpu_sync.c \
