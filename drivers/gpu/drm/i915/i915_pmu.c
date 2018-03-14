@@ -452,28 +452,15 @@ static u64 get_rc6(struct drm_i915_private *i915)
 		spin_lock_irqsave(&i915->pmu.lock, flags);
 		spin_lock(&kdev->power.lock);
 
-		/*
-		 * After the above branch intel_runtime_pm_get_if_in_use failed
-		 * to get the runtime PM reference we cannot assume we are in
-		 * runtime suspend since we can either: a) race with coming out
-		 * of it before we took the power.lock, or b) there are other
-		 * states than suspended which can bring us here.
-		 *
-		 * We need to double-check that we are indeed currently runtime
-		 * suspended and if not we cannot do better than report the last
-		 * known RC6 value.
-		 */
-		if (kdev->power.runtime_status == RPM_SUSPENDED) {
-			if (!i915->pmu.sample[__I915_SAMPLE_RC6_ESTIMATED].cur)
-				i915->pmu.suspended_jiffies_last =
-						  kdev->power.suspended_jiffies;
+		if (!i915->pmu.sample[__I915_SAMPLE_RC6_ESTIMATED].cur)
+			i915->pmu.suspended_jiffies_last =
+						kdev->power.suspended_jiffies;
 
 			val = kdev->power.suspended_jiffies -
 			      i915->pmu.suspended_jiffies_last;
 			val += jiffies - kdev->power.accounting_timestamp;
 
-			val = jiffies_to_nsecs(val);
-			val += i915->pmu.sample[__I915_SAMPLE_RC6].cur;
+		spin_unlock(&kdev->power.lock);
 
 			i915->pmu.sample[__I915_SAMPLE_RC6_ESTIMATED].cur = val;
 		} else if (i915->pmu.sample[__I915_SAMPLE_RC6_ESTIMATED].cur) {
@@ -482,7 +469,6 @@ static u64 get_rc6(struct drm_i915_private *i915)
 			val = i915->pmu.sample[__I915_SAMPLE_RC6].cur;
 		}
 
-		spin_unlock(&kdev->power.lock);
 		spin_unlock_irqrestore(&i915->pmu.lock, flags);
 	}
 
