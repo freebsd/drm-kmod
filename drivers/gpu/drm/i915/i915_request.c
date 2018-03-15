@@ -213,10 +213,15 @@ static int reset_all_global_seqno(struct drm_i915_private *i915, u32 seqno)
 	if (ret)
 		return ret;
 
+	GEM_BUG_ON(i915->gt.active_requests);
+
 	/* If the seqno wraps around, we need to clear the breadcrumb rbtree */
 	for_each_engine(engine, i915, id) {
 		struct i915_gem_timeline *timeline;
 		struct intel_timeline *tl = engine->timeline;
+
+		GEM_TRACE("%s seqno %d -> %d\n",
+			  engine->name, tl->seqno, seqno);
 
 		if (!i915_seqno_passed(seqno, tl->seqno)) {
 			/* Flush any waiters before we reuse the seqno */
@@ -387,6 +392,11 @@ static void i915_request_retire(struct i915_request *request)
 	struct intel_engine_cs *engine = request->engine;
 	struct i915_gem_active *active, *next;
 
+	GEM_TRACE("%s(%d) fence %llx:%d, global_seqno %d\n",
+		  engine->name, intel_engine_get_seqno(engine),
+		  request->fence.context, request->fence.seqno,
+		  request->global_seqno);
+
 	lockdep_assert_held(&request->i915->drm.struct_mutex);
 	GEM_BUG_ON(!i915_sw_fence_signaled(&request->submit));
 	GEM_BUG_ON(!i915_request_completed(request));
@@ -494,6 +504,11 @@ void __i915_request_submit(struct i915_request *request)
 	struct intel_timeline *timeline;
 	u32 seqno;
 
+	GEM_TRACE("%s fence %llx:%d -> global_seqno %d\n",
+		  request->engine->name,
+		  request->fence.context, request->fence.seqno,
+		  engine->timeline->seqno);
+
 	GEM_BUG_ON(!irqs_disabled());
 	lockdep_assert_held(&engine->timeline->lock);
 
@@ -542,6 +557,11 @@ void __i915_request_unsubmit(struct i915_request *request)
 {
 	struct intel_engine_cs *engine = request->engine;
 	struct intel_timeline *timeline;
+
+	GEM_TRACE("%s fence %llx:%d <- global_seqno %d\n",
+		  request->engine->name,
+		  request->fence.context, request->fence.seqno,
+		  request->global_seqno);
 
 	GEM_BUG_ON(!irqs_disabled());
 	lockdep_assert_held(&engine->timeline->lock);
@@ -1001,6 +1021,9 @@ void __i915_request_add(struct i915_request *request, bool flush_caches)
 	struct i915_request *prev;
 	u32 *cs;
 	int err;
+
+	GEM_TRACE("%s fence %llx:%d\n",
+		  engine->name, request->fence.context, request->fence.seqno);
 
 	lockdep_assert_held(&request->i915->drm.struct_mutex);
 	trace_i915_request_add(request);
