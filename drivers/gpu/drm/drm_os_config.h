@@ -73,7 +73,7 @@
 //#define CONFIG_LOCKDEP 1
 
 
-// Uncomment this or remove #ifdefs in i915_drv.c when enabling i915_perf
+// Uncomment this or remove #ifdefs in source files when enabling i915_perf
 //#define CONFIG_I915_PERF 
 
 // Overallocation of the fbdev buffer

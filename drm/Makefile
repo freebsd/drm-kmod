@@ -68,6 +68,7 @@ SRCS=	ati_pcigart.c \
 	drm_rect.c \
 	drm_scatter.c \
 	drm_scdc_helper.c \
+	drm_syncobj.c \
 	drm_sysctl_freebsd.c \
 	drm_sysfs.c \
 	drm_vblank.c \

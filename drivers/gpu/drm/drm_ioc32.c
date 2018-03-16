@@ -78,6 +78,17 @@
 
 #define DRM_IOCTL_MODE_ADDFB232		DRM_IOWR(0xb8, drm_mode_fb_cmd232_t)
 
+#ifndef __linux__
+extern int drm_version(struct drm_device *dev, void *data,
+			struct drm_file *file_priv);
+
+extern int drm_getunique(struct drm_device *dev, void *data,
+			struct drm_file *file_priv);
+
+extern int drm_getclient(struct drm_device *dev, void *data,
+			struct drm_file *file_priv);
+#endif
+
 typedef struct drm_version_32 {
 	int version_major;	  /* Major version */
 	int version_minor;	  /* Minor version */
