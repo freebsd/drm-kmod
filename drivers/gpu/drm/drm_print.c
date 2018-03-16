@@ -75,37 +75,91 @@ void drm_printf(struct drm_printer *p, const char *f, ...)
 }
 EXPORT_SYMBOL(drm_printf);
 
-#define DRM_PRINTK_FMT "[" DRM_NAME ":%s]%s %pV"
-
+#ifdef __linux__
 void drm_dev_printk(const struct device *dev, const char *level,
-		    unsigned int category, const char *function_name,
-		    const char *prefix, const char *format, ...)
+		    const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
 
-	if (category != DRM_UT_NONE && !(drm_debug & category))
-		return;
+	va_start(args, format);
+	vaf.fmt = format;
+	vaf.va = &args;
+
+	if (dev)
+		dev_printk(level, dev, "[" DRM_NAME ":%ps] %pV",
+			   __builtin_return_address(0), &vaf);
+	else
+		printk("%s" "[" DRM_NAME ":%ps] %pV",
+		       level, __builtin_return_address(0), &vaf);
+
+	va_end(args);
+}
+EXPORT_SYMBOL(drm_dev_printk);
+#else
+void drm_dev_printk(const struct device *dev, const char *level,
+		    const char *function_name, const char *format, ...)
+{
+	struct va_format vaf;
+	va_list args;
 
 	va_start(args, format);
 	vaf.fmt = format;
 	vaf.va = &args;
-#ifdef __linux__
-	if (dev)
-		dev_printk(level, dev, DRM_PRINTK_FMT, function_name, prefix,
-			   &vaf);
-	else
-		printk("%s" DRM_PRINTK_FMT, level, function_name, prefix, &vaf);
-#else
 	if (dev)
 		device_printf((dev)->bsddev, "[" DRM_NAME ":%s] ", function_name);
 	else
 		printf("[" DRM_NAME ":%s] ", function_name);
 	vprintf(format, args);
-#endif
 	va_end(args);
 }
-EXPORT_SYMBOL(drm_dev_printk);
+#endif
+
+#ifdef __linux__
+void drm_dev_dbg(const struct device *dev, unsigned int category,
+		 const char *format, ...)
+{
+	struct va_format vaf;
+	va_list args;
+
+	if (!(drm_debug & category))
+		return;
+
+	va_start(args, format);
+	vaf.fmt = format;
+	vaf.va = &args;
+
+	if (dev)
+		dev_printk(KERN_DEBUG, dev, "[" DRM_NAME ":%ps] %pV",
+			   __builtin_return_address(0), &vaf);
+	else
+		printk(KERN_DEBUG "[" DRM_NAME ":%ps] %pV",
+		       __builtin_return_address(0), &vaf);
+
+	va_end(args);
+}
+EXPORT_SYMBOL(drm_dev_dbg);
+#else
+void drm_dev_dbg(const struct device *dev, unsigned int category,
+		 const char *function_name, const char *format, ...)
+{
+	struct va_format vaf;
+	va_list args;
+
+	if (!(drm_debug & category))
+		return;
+
+	va_start(args, format);
+	vaf.fmt = format;
+	vaf.va = &args;
+	if (dev)
+		device_printf((dev)->bsddev, "[" DRM_NAME ":%s] ", function_name);
+	else
+		printf("[" DRM_NAME ":%s] ", function_name);
+	vprintf(format, args);
+	va_end(args);
+}
+#endif
 
 #ifdef __linux__
 void drm_dbg(unsigned int category, const char *format, ...)
@@ -133,7 +187,7 @@ void drm_dbg(const char *level, unsigned int category,
 	struct va_format vaf;
 	va_list args;
 
-	if (category != DRM_UT_NONE && !(drm_debug & category))
+	if (!(drm_debug & category))
 		return;
 
 	va_start(args, format);
