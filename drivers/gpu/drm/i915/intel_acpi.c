@@ -77,8 +77,12 @@ static void intel_dsm_platform_mux_info(void)
 {
 	int i;
 	union acpi_object *pkg, *connector_count;
-
-	pkg = acpi_evaluate_dsm_typed(intel_dsm_priv.dhandle, &intel_dsm_guid,
+	pkg = acpi_evaluate_dsm_typed(intel_dsm_priv.dhandle,
+#ifdef __linux__
+	    &intel_dsm_guid,
+#else
+	    (const u8 *)&intel_dsm_guid,
+#endif
 			INTEL_DSM_REVISION_ID, INTEL_DSM_FN_PLATFORM_MUX_INFO,
 			NULL, ACPI_TYPE_PACKAGE);
 	if (!pkg) {
@@ -116,7 +120,13 @@ static bool intel_dsm_pci_probe(struct pci_dev *pdev)
 	if (!dhandle)
 		return false;
 
-	if (!acpi_check_dsm(dhandle, &intel_dsm_guid, INTEL_DSM_REVISION_ID,
+	if (!acpi_check_dsm(dhandle,
+#ifdef __linux__
+	        &intel_dsm_guid,
+#else
+	        (const u8 *)&intel_dsm_guid,
+#endif
+	        INTEL_DSM_REVISION_ID,
 			    1 << INTEL_DSM_FN_PLATFORM_MUX_INFO)) {
 		DRM_DEBUG_KMS("no _DSM method for intel device\n");
 		return false;
