@@ -214,7 +214,11 @@ static inline struct drm_i915_gem_request *
 to_request(struct dma_fence *fence)
 {
 	/* We assume that NULL fence/request are interoperable */
+#ifndef __linux__
+	// XXX Fail on FreeBSD
+	// static_assert expression is not an integral constant expression
 	BUILD_BUG_ON(offsetof(struct drm_i915_gem_request, fence) != 0);
+#endif
 	GEM_BUG_ON(fence && !dma_fence_is_i915(fence));
 	return container_of(fence, struct drm_i915_gem_request, fence);
 }

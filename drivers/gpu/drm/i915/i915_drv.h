@@ -44,6 +44,7 @@
 #include <linux/pm_qos.h>
 #include <linux/reservation.h>
 #include <linux/shmem_fs.h>
+#include <linux/typecheck.h>
 
 #include <drm/drmP.h>
 #include <drm/intel-gtt.h>

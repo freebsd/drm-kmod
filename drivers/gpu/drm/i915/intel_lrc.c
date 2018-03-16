@@ -1967,8 +1967,9 @@ static void execlists_init_reg_state(u32 *regs,
 		regs[CTX_LRI_HEADER_2] = MI_LOAD_REGISTER_IMM(1);
 		CTX_REG(regs, CTX_R_PWR_CLK_STATE, GEN8_R_PWR_CLK_STATE,
 			make_rpcs(dev_priv));
-
+#ifdef CONFIG_I915_PERF
 		i915_oa_init_reg_state(engine, ctx, regs);
+#endif
 	}
 }
 
