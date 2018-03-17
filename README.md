@@ -4,9 +4,9 @@ The DRM part of the linuxkpi-based KMS
 ## Contributing
 
 ### Linux source code
-Folders `amd`, `drm`, `i915`, `radeon`
+Folders `amd`, `drm`, `i915`, `radeon` contain FreeBSD Makefiles for the driver modules.  
 
-These folders contain source code from Linux, patched (minimally) to run on FreeBSD with LinuxKPI.
+Folder `drivers` contain source code from Linux, patched (minimally) to run on FreeBSD with LinuxKPI.
 Try to keep changes to the code to a minimum but if you have to patch it, leave the Linux source code intact like so:
 
 ```
