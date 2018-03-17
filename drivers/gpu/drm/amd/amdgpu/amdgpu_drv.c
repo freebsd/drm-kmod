@@ -895,6 +895,18 @@ static int __init amdgpu_init(void)
 	driver->num_ioctls = amdgpu_max_kms_ioctl;
 	amdgpu_register_atpx_handler();
 	/* let modprobe override vga console setting */
+
+#ifndef __linux__
+	pdriver->bsdclass = drm_devclass;
+	pdriver->name = "drmn";
+
+	if (!(driver->driver_features & DRIVER_LEGACY))
+		return linux_pci_register_drm_driver(pdriver);
+
+	DRM_ERROR("FreeBSD needs DRIVER_MODESET");
+	return (-ENOTSUP);
+#endif
+
 	return pci_register_driver(pdriver);
 
 error_sched:
