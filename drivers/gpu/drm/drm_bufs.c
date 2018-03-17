@@ -1460,6 +1460,11 @@ int __drm_legacy_mapbufs(struct drm_device *dev, void *data, int *p,
 	unsigned long virtual;
 	int i;
 
+#ifndef __linux__
+	struct vmspace *vms;
+	vms = DRM_CURPROC->td_proc->p_vmspace;
+#endif
+
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
 		return -EINVAL;
 

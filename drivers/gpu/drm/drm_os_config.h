@@ -42,11 +42,20 @@
 
 #define CONFIG_BACKLIGHT_CLASS_DEVICE 1
 
+// Do we need this? Need to replace {read,write}_iter
+// impl in drm_dp_aux_dev.c
 #define CONFIG_DRM_DP_AUX_CHARDEV 1
 
 #define CONFIG_SMP 1
 
 #define CONFIG_PM 1
+
+/*
+ * DMI stands for "Desktop Management Interface".  It is part
+ * of and an antecedent to, SMBIOS, which stands for System
+ * Management BIOS.  See further: http://www.dmtf.org/standards
+ */
+#define CONFIG_DMI 1
 
 #define CONFIG_DRM_LOAD_EDID_FIRMWARE 1
 
@@ -59,7 +68,9 @@
 
 
 // Enable amdgpu driver for older SI and CIK cards
-// Not enabled by default in Linux v4.12
+// Not enabled by default in Linux v4.13
+// Also require sysnobs compat.linuxkpi.{si,cik}_support=1
+// to enable amdgpu on those GPUs
 #define CONFIG_DRM_AMDGPU_SI
 #define CONFIG_DRM_AMDGPU_CIK
 	 

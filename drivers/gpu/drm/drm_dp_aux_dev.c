@@ -32,7 +32,9 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/uaccess.h>
+#ifdef __linux__
 #include <linux/uio.h>
+#endif
 #include <drm/drm_dp_helper.h>
 #include <drm/drm_crtc.h>
 #include <drm/drmP.h>
@@ -141,6 +143,9 @@ static loff_t auxdev_llseek(struct file *file, loff_t offset, int whence)
 	return fixed_size_llseek(file, offset, whence, AUX_MAX_OFFSET);
 }
 
+#ifdef __linux__
+// XXX Missing {read,write}_iter
+// Disabled in drm_os_config.h
 static ssize_t auxdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
 {
 	struct drm_dp_aux_dev *aux_dev = iocb->ki_filp->private_data;
@@ -222,6 +227,7 @@ static ssize_t auxdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	wake_up_atomic_t(&aux_dev->usecount);
 	return res;
 }
+#endif
 
 static int auxdev_release(struct inode *inode, struct file *file)
 {
@@ -234,8 +240,10 @@ static int auxdev_release(struct inode *inode, struct file *file)
 static const struct file_operations auxdev_fops = {
 	.owner		= THIS_MODULE,
 	.llseek		= auxdev_llseek,
+#ifdef __linux__
 	.read_iter	= auxdev_read_iter,
 	.write_iter	= auxdev_write_iter,
+#endif
 	.open		= auxdev_open,
 	.release	= auxdev_release,
 };
