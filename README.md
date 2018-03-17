@@ -31,3 +31,9 @@ If the patch can be avoided by adding functionality to LinuxKPI, please consider
 Folders `lindebugfs`, `linuxkpi`
 
 Code style and rules same as FreeBSD kernel. If a GPL'd file is copy-paste from Linux, it's OK to leave style as is.
+
+
+
+## Testing
+For testing work in progress branches please see the wiki:  
+https://github.com/FreeBSDDesktop/kms-drm/wiki/Testing  
