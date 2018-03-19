@@ -2322,7 +2322,8 @@ static void i915_ggtt_insert_entries(struct i915_address_space *vm,
 	intel_gtt_insert_sg_entries(vma->pages, vma->node.start >> PAGE_SHIFT,
 				    flags);
 #else
-	linux_intel_gtt_insert_sg_entries(vma->pages, start >> PAGE_SHIFT, flags);
+	linux_intel_gtt_insert_sg_entries(vma->pages,
+	    vma->node.start >> PAGE_SHIFT, flags);
 #endif
 }
 

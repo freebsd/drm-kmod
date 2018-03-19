@@ -2646,16 +2646,16 @@ static void __fini_wedge(struct wedge_me *w)
  */
 static void i915_reset_device(struct drm_i915_private *dev_priv)
 {
+	struct wedge_me w;
+	DRM_DEBUG_DRIVER("resetting chip\n");
 #ifdef __linux__
 	struct kobject *kobj = &dev_priv->drm.primary->kdev->kobj;
 	char *error_event[] = { I915_ERROR_UEVENT "=1", NULL };
 	char *reset_event[] = { I915_RESET_UEVENT "=1", NULL };
 	char *reset_done_event[] = { I915_ERROR_UEVENT "=0", NULL };
-	struct wedge_me w;
 
 	kobject_uevent_env(kobj, KOBJ_CHANGE, error_event);
 
-	DRM_DEBUG_DRIVER("resetting chip\n");
 	kobject_uevent_env(kobj, KOBJ_CHANGE, reset_event);
 #endif
 
