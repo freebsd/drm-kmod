@@ -647,7 +647,16 @@ static int __init radeon_init(void)
 		DRM_ERROR("No UMS support in radeon module!\n");
 		return -EINVAL;
 	}
+#ifndef __linux__
+	pdriver->bsdclass = drm_devclass;
+	pdriver->name = "drmn";
 
+	if (!(driver->driver_features & DRIVER_LEGACY))
+		return linux_pci_register_drm_driver(pdriver);
+
+	DRM_ERROR("FreeBSD needs DRIVER_MODESET");
+	return (-ENOTSUP);
+#endif
 	/* let modprobe override vga console setting */
 	return pci_register_driver(pdriver);
 }
