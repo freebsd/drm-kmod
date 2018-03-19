@@ -1341,8 +1341,6 @@ static void i915_driver_register(struct drm_i915_private *dev_priv)
 #ifdef __linux__
 		i915_setup_sysfs(dev_priv);
 #endif
-		/* Depends on debugfs having been initialized */
-		intel_uc_register(dev_priv);
 
 #ifdef CONFIG_I915_PERF
 		/* Not yet. i915_perf.c opens a can of worms... */
@@ -1408,8 +1406,6 @@ static void i915_driver_unregister(struct drm_i915_private *dev_priv)
 #ifdef __linux__
 	i915_teardown_sysfs(dev_priv);
 #endif
-	intel_uc_unregister(dev_priv);
-
 	drm_dev_unregister(&dev_priv->drm);
 
 	i915_gem_shrinker_unregister(dev_priv);
