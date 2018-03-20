@@ -27,12 +27,17 @@ request_firmware(const struct linux_firmware **lkfwp, const char *name,
 	lkfw = malloc(sizeof(*lkfw), M_LKPI_FW, M_WAITOK);
 
 	retries = 0;
+	device_printf(device->bsddev, "try to load firmware with "
+	    "name: %s\n", name);
 	fw = firmware_get(name);
 	if (fw == NULL) {
 		pause("fwwait", hz/2);
+		device_printf(device->bsddev, "retry to load firmware "
+		    "with name: %s\n", name);
 		fw = firmware_get(name);
 	}
-	if (fw == NULL && ((index(name, '/') != NULL) || (index(name, '.') != NULL))) {
+	if (fw == NULL &&
+	    ((index(name, '/') != NULL) || (index(name, '.') != NULL))) {
 		mapped_name = strdup(name, M_LKPI_FW);
 		if (mapped_name == NULL) {
 			rc = -ENOMEM;
@@ -43,14 +48,22 @@ request_firmware(const struct linux_firmware **lkfwp, const char *name,
 		while ((pindex = index(mapped_name, '.')) != NULL)
 			*pindex = '_';
 		if (linker_reference_module(mapped_name, NULL, &result)) {
-			device_printf(device->bsddev, "failed to load firmware image %s\n", mapped_name);
+			device_printf(device->bsddev, "failed to link firmware "
+			    "module with mapped name: %s\n", mapped_name);
 			rc = -ENOENT;
 			goto fail;
 		}
+		device_printf(device->bsddev, "successfully linked firmware "
+		    "module with mapped name: %s\n", mapped_name);
 	retry:
 		pause("fwwait", hz/4);
+		device_printf(device->bsddev, "try (%d) to load firmware "
+		    "image with name: %s\n", retries, name);
 		fw = firmware_get(name);
 		if (fw == NULL) {
+			device_printf(device->bsddev, "try (%d) to load "
+			    "firmware image with mapped name: %s\n",
+			    retries, name);
 			fw = firmware_get(mapped_name);
 			if (fw == NULL) {
 				if (retries++ < 10)
@@ -64,13 +77,17 @@ request_firmware(const struct linux_firmware **lkfwp, const char *name,
 #endif
 	}
 	if (fw == NULL) {
-		device_printf(device->bsddev, "failed to load firmware image %s\n", name);
+		device_printf(device->bsddev, "failed to load firmware "
+		    "image with name: %s\n", name);
 		if (mapped_name)
-			device_printf(device->bsddev, "failed to load firmware image %s\n", mapped_name);
+			device_printf(device->bsddev, "failed to load firmware "
+			    "image with mapped name: %s\n", mapped_name);
 		rc = -ENOENT;
 		goto fail;
 	}
 
+	device_printf(device->bsddev, "successfully loaded firmware "
+	    "image with name: %s\n", name);
 
 	free(mapped_name, M_LKPI_FW);
 	lkfw->priv = __DECONST(void *, fw);
