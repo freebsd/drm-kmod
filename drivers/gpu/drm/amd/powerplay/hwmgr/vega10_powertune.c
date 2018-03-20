@@ -1122,7 +1122,11 @@ static int vega10_disable_se_edc_config(struct pp_hwmgr *hwmgr)
 
 static int vega10_enable_psm_gc_edc_config(struct pp_hwmgr *hwmgr)
 {
+#ifdef __linux__
 	int result;
+#else
+	int result = 0;
+#endif
 	uint32_t num_se = 0;
 	uint32_t count, data;
 	struct cgs_system_info sys_info = {0};

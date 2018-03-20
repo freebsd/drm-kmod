@@ -1487,8 +1487,6 @@ void i915_driver_unload(struct drm_device *dev)
 
 	intel_gvt_cleanup(dev_priv);
 
-	drm_vblank_cleanup(dev);
-
 	intel_modeset_cleanup(dev);
 
 	/*
