@@ -61,6 +61,7 @@ SRCS=	amdgpu_acpi.c \
 	amdgpu_uvd.c \
 	amdgpu_vce.c \
 	amdgpu_vcn.c \
+	amdgpu_vf_error.c \
 	amdgpu_virt.c \
 	amdgpu_vm.c \
 	amdgpu_vram_mgr.c \
