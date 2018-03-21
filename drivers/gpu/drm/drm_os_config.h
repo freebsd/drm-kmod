@@ -62,6 +62,8 @@
 // for i915_error_printf function declaration in i915_drv.h
 #define CONFIG_DRM_I915_CAPTURE_ERROR 1
 
+/* #define	CONFIG_DRM_I915_DEBUG_GEM 1 */
+
 #define CONFIG_DRM_I915_ALPHA_SUPPORT 1
 
 #define CONFIG_DRM_AMD_POWERPLAY 1

@@ -2819,7 +2819,11 @@ static int i915_energy_uJ(struct seq_file *m, void *data)
 
 	intel_runtime_pm_get(dev_priv);
 
+#ifdef __linux__
 	if (rdmsrl_safe(MSR_RAPL_POWER_UNIT, &power)) {
+#else
+	if (rdmsrl_safe(MSR_RAPL_POWER_UNIT, (uint64_t *)(&power))) {
+#endif
 		intel_runtime_pm_put(dev_priv);
 		return -ENODEV;
 	}
