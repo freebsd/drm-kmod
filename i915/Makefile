@@ -178,6 +178,7 @@ CWARNFLAGS.dvo_tfp410.c=	-Wno-cast-qual
 
 CWARNFLAGS.intel_audio.c=	-Wno-cast-qual
 CWARNFLAGS.intel_bios.c=	-Wno-cast-qual
+CWARNFLAGS.intel_color.c=	-Wno-missing-prototypes
 CWARNFLAGS.intel_csr.c=		-Wno-cast-qual
 CWARNFLAGS.intel_dp.c=		-Wno-enum-conversion -Wno-format -Wno-unused
 CWARNFLAGS.intel_ddi.c=		-Wno-compare-distinct-pointer-types -Wno-unused
