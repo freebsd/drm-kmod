@@ -4,6 +4,35 @@
 
 static atomic64_t dma_fence_context_counter = ATOMIC64_INIT(0);
 
+
+/*
+ * dma-fence.h
+ */
+
+u64
+dma_fence_context_alloc(unsigned num)
+{
+	return (atomic64_add_return(num, &dma_fence_context_counter) - num);
+}
+
+int
+dma_fence_get_status(struct dma_fence *fence)
+{
+	unsigned long flags;
+	int status;
+
+	spin_lock_irqsave(fence->lock, flags);
+	status = dma_fence_get_status_locked(fence);
+	spin_unlock_irqrestore(fence->lock, flags);
+
+	return (status);
+}
+
+
+/*
+ * dma-fence-array.h
+ */
+
 static const char *
 dma_fence_array_get_driver_name(struct dma_fence *fence)
 {
@@ -78,12 +107,6 @@ const struct dma_fence_ops dma_fence_array_ops = {
 	.wait = dma_fence_default_wait,
 	.release = dma_fence_array_release,
 };
-
-u64
-dma_fence_context_alloc(unsigned num)
-{
-	return (atomic64_add_return(num, &dma_fence_context_counter) - num);
-}
 
 struct dma_fence_array *dma_fence_array_create(int num_fences, struct dma_fence **fences,
 				       u64 context, unsigned seqno,

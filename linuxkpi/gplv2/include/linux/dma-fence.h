@@ -54,6 +54,7 @@ struct dma_fence {
 
 enum dma_fence_flag_bits {
 	DMA_FENCE_FLAG_SIGNALED_BIT,
+	DMA_FENCE_FLAG_TIMESTAMP_BIT,
 	DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT,
 	DMA_FENCE_FLAG_USER_BITS, /* must always be last member */
 };
@@ -71,10 +72,34 @@ struct dma_fence_ops {
 	void (*timeline_value_str)(struct dma_fence *fence, char *str, int size);
 };
 
+
+u64 dma_fence_context_alloc(unsigned num);
+int dma_fence_get_status(struct dma_fence *fence);
+
+
 static inline void
 dma_fence_free(struct dma_fence *fence)
 {
 	kfree_rcu(fence, rcu);
+}
+
+static inline void
+dma_fence_release(struct kref *kref)
+{
+	struct dma_fence *fence = container_of(kref, struct dma_fence, refcount);
+
+	BUG_ON(!list_empty(&fence->cb_list));
+	if (fence->ops->release)
+		fence->ops->release(fence);
+	else
+		kfree(fence);
+}
+
+static inline void
+dma_fence_put(struct dma_fence *fence)
+{
+	if (fence)
+		kref_put(&fence->refcount, dma_fence_release);
 }
 
 static inline struct dma_fence *
@@ -94,16 +119,21 @@ dma_fence_get_rcu(struct dma_fence *fence)
 		return (NULL);
 }
 
-static inline void
-dma_fence_release(struct kref *kref)
+static inline struct dma_fence *
+dma_fence_get_rcu_safe(struct dma_fence * __rcu *fencep)
 {
-	struct dma_fence *fence = container_of(kref, struct dma_fence, refcount);
+	do {
+		struct dma_fence *fence;
 
-	BUG_ON(!list_empty(&fence->cb_list));
-	if (fence->ops->release)
-		fence->ops->release(fence);
-	else
-		kfree(fence);
+		fence = rcu_dereference(*fencep);
+		if (!fence || !dma_fence_get_rcu(fence))
+			return NULL;
+
+		if (fence == rcu_access_pointer(*fencep))
+			return rcu_pointer_handoff(fence);
+
+		dma_fence_put(fence);
+	} while (1);
 }
 
 static inline void
@@ -111,7 +141,8 @@ dma_fence_signal_locked_sub(struct dma_fence *fence)
 {
 	struct dma_fence_cb *cur;
 
-	while ((cur = list_first_entry_or_null(&fence->cb_list, struct dma_fence_cb, node)) != NULL) {
+	while ((cur = list_first_entry_or_null(&fence->cb_list,
+	            struct dma_fence_cb, node)) != NULL) {
 		list_del_init(&cur->node);
 		spin_unlock(fence->lock);
 		cur->func(fence, cur);
@@ -127,28 +158,15 @@ dma_fence_signal_locked(struct dma_fence *fence)
 	if (WARN_ON(!fence))
 		return (-EINVAL);
 
-	if (!ktime_to_ns(fence->timestamp)) {
+	if (test_and_set_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags)) {
+		ret = (-EINVAL);
+	} else {
 		fence->timestamp = ktime_get();
-		smp_mb__before_atomic();
+		set_bit(DMA_FENCE_FLAG_TIMESTAMP_BIT, &fence->flags);
 	}
 
-	if (test_and_set_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags)) {
-		ret = -EINVAL;
-	}
 	dma_fence_signal_locked_sub(fence);
 	return (ret);
-}
-
-static inline void
-dma_fence_enable_sw_signaling(struct dma_fence *fence)
-{
-	if (!test_and_set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &fence->flags) &&
-	    !test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags)) {
-		spin_lock(fence->lock);
-		if (!fence->ops->enable_signaling(fence))
-			dma_fence_signal_locked(fence);
-		spin_unlock(fence->lock);
-	}
 }
 
 static inline int
@@ -157,18 +175,11 @@ dma_fence_signal(struct dma_fence *fence)
 	if (!fence)
 		return (-EINVAL);
 
-	if (!ktime_to_ns(fence->timestamp)) {
-		fence->timestamp = ktime_get();
-#ifdef __FreeBSD__
-		mb();
-#else
-		smp_mb__before_atomic();
-#endif
-	}
-
 	if (test_and_set_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
 		return (-EINVAL);
 
+	fence->timestamp = ktime_get();
+	set_bit(DMA_FENCE_FLAG_TIMESTAMP_BIT, &fence->flags);
 
 	if (test_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &fence->flags)) {
 		spin_lock(fence->lock);
@@ -176,6 +187,18 @@ dma_fence_signal(struct dma_fence *fence)
 		spin_unlock(fence->lock);
 	}
 	return (0);
+}
+
+static inline void
+dma_fence_enable_sw_signaling(struct dma_fence *fence)
+{
+	if (!test_and_set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &fence->flags)
+	    && !test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags)) {
+		spin_lock(fence->lock);
+		if (!fence->ops->enable_signaling(fence))
+			dma_fence_signal_locked(fence);
+		spin_unlock(fence->lock);
+	}
 }
 
 static inline bool
@@ -190,6 +213,29 @@ dma_fence_is_signaled(struct dma_fence *fence)
 	}
 
 	return (false);
+}
+
+static inline bool
+dma_fence_is_signaled_locked(struct dma_fence *fence)
+{
+	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
+		return (true);
+
+	if (fence->ops->signaled && fence->ops->signaled(fence)) {
+		dma_fence_signal_locked(fence);
+		return (true);
+	}
+
+	return (false);
+}
+
+static inline int
+dma_fence_get_status_locked(struct dma_fence *fence)
+{
+	if (dma_fence_is_signaled_locked(fence))
+		return (fence->error ?: 1);
+	else
+		return (0);
 }
 
 static inline signed long
@@ -219,13 +265,6 @@ dma_fence_wait(struct dma_fence *fence, bool intr)
 	return (ret < 0 ? ret : 0);
 }
 
-
-static inline void
-dma_fence_put(struct dma_fence *fence)
-{
-	if (fence)
-		kref_put(&fence->refcount, dma_fence_release);
-}
 
 static inline int
 dma_fence_add_callback(struct dma_fence *fence, struct dma_fence_cb *cb,
@@ -431,8 +470,6 @@ err_free_cb:
 
 	return (ret);
 }
-
-u64 dma_fence_context_alloc(unsigned num);
 
 static inline void
 dma_fence_init(struct dma_fence *fence, const struct dma_fence_ops *ops,
