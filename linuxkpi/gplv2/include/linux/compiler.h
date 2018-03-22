@@ -36,4 +36,6 @@
 #define	WARN_NOT()	UNIMPLEMENTED_ONCE()
 #define	DODGY()		DODGY_ONCE()
 
+#define	unreachable()	__unreachable()
+
 #endif /* _LINUX_GPLV2_COMPILER_H_ */

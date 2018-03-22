@@ -5,6 +5,7 @@
 #include <linux/mutex.h>
 #include <linux/shrinker.h>
 #include <linux/llist.h>
+#include <linux/uuid.h>
 
 #include_next <linux/fs.h>
 

@@ -189,6 +189,17 @@ struct drm_device {
 	int switch_power_state;
 
 #ifndef __linux__
+	struct drm_sysctl_info *sysctl;
+	int		  sysctl_node_idx;
+
+	void		  *drm_ttm_bdev;
+
+	void *sysctl_private;
+	char busid_str[128];
+	int modesetting;
+
+	/* const drm_pci_id_list_t *id_entry;	/\* PCI ID, name, and chipset private *\/ */
+
 #define	DRM_PCI_RESOURCE_MAX	7
 #define	MAX_ORDER 11
 
