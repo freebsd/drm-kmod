@@ -215,9 +215,9 @@ void amd_sched_entity_fini(struct amd_gpu_scheduler *sched,
 	*/
 
 #ifndef __linux__
+	// XXX: Why?
 	if (sched->thread) {
 #endif
-
 	if ((current->flags & PF_SIGNALED) && current->exit_code == SIGKILL)
 		r = -ERESTARTSYS;
 	else
