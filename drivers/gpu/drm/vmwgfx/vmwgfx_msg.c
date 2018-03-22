@@ -329,6 +329,8 @@ int vmw_host_get_guestinfo(const char *guest_info_param,
 	struct rpc_channel channel;
 	char *msg, *reply = NULL;
 	size_t reply_len = 0;
+	int ret = 0;
+
 
 	if (!vmw_msg_enabled)
 		return -ENODEV;
@@ -342,12 +344,14 @@ int vmw_host_get_guestinfo(const char *guest_info_param,
 		return -ENOMEM;
 	}
 
-	if (vmw_open_channel(&channel, RPCI_PROTOCOL_NUM))
-		goto out_open;
+	if (vmw_open_channel(&channel, RPCI_PROTOCOL_NUM) ||
+	    vmw_send_msg(&channel, msg) ||
+	    vmw_recv_msg(&channel, (void *) &reply, &reply_len) ||
+	    vmw_close_channel(&channel)) {
+		DRM_ERROR("Failed to get %s", guest_info_param);
 
-	if (vmw_send_msg(&channel, msg) ||
-	    vmw_recv_msg(&channel, (void *) &reply, &reply_len))
-		goto out_msg;
+		ret = -EINVAL;
+	}
 
 	vmw_close_channel(&channel);
 	if (buffer && reply && reply_len > 0) {
@@ -407,11 +411,10 @@ int vmw_host_log(const char *log)
 		return -ENOMEM;
 	}
 
-	if (vmw_open_channel(&channel, RPCI_PROTOCOL_NUM))
-		goto out_open;
-
-	if (vmw_send_msg(&channel, msg))
-		goto out_msg;
+	if (vmw_open_channel(&channel, RPCI_PROTOCOL_NUM) ||
+	    vmw_send_msg(&channel, msg) ||
+	    vmw_close_channel(&channel)) {
+		DRM_ERROR("Failed to send log\n");
 
 	vmw_close_channel(&channel);
 	kfree(msg);
