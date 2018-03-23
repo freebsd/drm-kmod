@@ -37,6 +37,12 @@
 #include "amdgpu.h"
 #include "amdgpu_trace.h"
 
+#ifndef __linux__
+// defined in /usr/src/sys/vm/vm_map.h
+#undef	min_offset
+#undef	max_offset
+#endif
+
 static void amdgpu_ttm_bo_destroy(struct ttm_buffer_object *tbo)
 {
 	struct amdgpu_device *adev = amdgpu_ttm_adev(tbo->bdev);

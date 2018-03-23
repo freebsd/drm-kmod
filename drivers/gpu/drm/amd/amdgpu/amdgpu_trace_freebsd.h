@@ -69,6 +69,32 @@ trace_amdgpu_vm_bo_mapping(struct amdgpu_bo_va_mapping * mapping){
 	CTR1(KTR_DRM, "amdgpu_vm_bo_mapping %p", mapping);
 }
 
+static inline int
+trace_amdgpu_ttm_tt_populate_enabled(void){
+	CTR0(KTR_DRM, "trace_amdgpu_ttm_tt_populate_enabled");
+	return (0);
+}
+
+static inline void
+trace_amdgpu_ttm_tt_populate(struct amdgpu_device *adev, uint64_t dma_address,
+    uint64_t phys_address){
+	CTR3(KTR_DRM, "amdgpu_device %p, dma_address %lu, phys_addr %lu",
+	    adev, dma_address, phys_address);
+}
+
+static inline int
+trace_amdgpu_ttm_tt_unpopulate_enabled(void){
+	CTR0(KTR_DRM, "trace_amdgpu_ttm_tt_unpopulate_enabled");
+	return (0);
+}
+
+static inline void
+trace_amdgpu_ttm_tt_unpopulate(struct amdgpu_device *adev, uint64_t dma_address,
+    uint64_t phys_address){
+	CTR3(KTR_DRM, "amdgpu_device %p, dma_address %lu, phys_addr %lu",
+	    adev, dma_address, phys_address);
+}
+
 #define trace_amdgpu_mm_rreg(dev, reg, ret)	\
 	CTR3(KTR_DRM, "amdgpu_mm_rreg %p %x %d", (dev), (reg), (ret))
 
