@@ -29,6 +29,7 @@
 #ifndef	_LINUX_RBTREE_H
 #define	_LINUX_RBTREE_H
 
+
 /*
  * Include some FreeBSD headers which depend on tree.h.
  */
@@ -45,6 +46,8 @@
 #undef RB_RED
 #undef RB_BLACK
 
+
+#include <linux/kernel.h>
 #include <linux/stddef.h>
 #include <linux/rcupdate.h>
 
@@ -53,15 +56,31 @@ struct rb_node {
 	struct rb_node *rb_right;
 	struct rb_node *rb_left;
 } __attribute__((aligned(sizeof(long))));
+    /* The alignment might seem pointless, but allegedly CRIS needs it */
 
 struct rb_root {
 	struct rb_node *rb_node;
 };
 
+/*
+ * Leftmost-cached rbtrees.
+ *
+ * We do not cache the rightmost node based on footprint
+ * size vs number of potential users that could benefit
+ * from O(1) rb_last(). Just not worth it, users that want
+ * this feature can always implement the logic explicitly.
+ * Furthermore, users that want to cache both pointers may
+ * find it a bit asymmetric, but that's ok.
+ */
+struct rb_root_cached {
+	struct rb_root rb_root;
+	struct rb_node *rb_leftmost;
+};
 
 #define rb_parent(r)   ((struct rb_node *)((r)->__rb_parent_color & ~3))
 
 #define RB_ROOT	(struct rb_root) { NULL, }
+#define RB_ROOT_CACHED (struct rb_root_cached) { {NULL, }, NULL }
 #define	rb_entry(ptr, type, member) container_of(ptr, type, member)
 
 #define RB_EMPTY_ROOT(root)  (READ_ONCE((root)->rb_node) == NULL)
@@ -72,82 +91,37 @@ struct rb_root {
 #define RB_CLEAR_NODE(node)  \
 	((node)->__rb_parent_color = (unsigned long)(node))
 
-static inline struct rb_node *
-rb_first(const struct rb_root *root)
-{
-	struct rb_node	*n;
 
-	n = __DECONST(struct rb_node *, root->rb_node);
-	if (n == NULL)
-		return (NULL);
-	while (n->rb_left)
-		n = n->rb_left;
-	return (n);
-}
+extern void rb_insert_color(struct rb_node *, struct rb_root *);
+extern void rb_erase(struct rb_node *, struct rb_root *);
 
-static inline struct rb_node *
-rb_last(const struct rb_root *root)
-{
-	struct rb_node	*n;
 
-	n = __DECONST(struct rb_node *, root->rb_node);
-	if (n == NULL)
-		return (NULL);
-	while (n->rb_right)
-		n = n->rb_right;
-	return (n);
-}
+/* Find logical next and previous nodes in a tree */
+extern struct rb_node *rb_next(const struct rb_node *);
+extern struct rb_node *rb_prev(const struct rb_node *);
+extern struct rb_node *rb_first(const struct rb_root *);
+extern struct rb_node *rb_last(const struct rb_root *);
 
-static inline struct rb_node *
-rb_next(const struct rb_node *node)
-{
-	struct rb_node *parent;
-	struct rb_node *n = __DECONST(struct rb_node *, node);
+extern void rb_insert_color_cached(struct rb_node *,
+				   struct rb_root_cached *, bool);
+extern void rb_erase_cached(struct rb_node *node, struct rb_root_cached *);
+/* Same as rb_first(), but O(1) */
+#define rb_first_cached(root) (root)->rb_leftmost
 
-	if (RB_EMPTY_NODE(n))
-		return (NULL);
+/* Postorder iteration - always visit the parent after its children */
+extern struct rb_node *rb_first_postorder(const struct rb_root *);
+extern struct rb_node *rb_next_postorder(const struct rb_node *);
 
-	if (n->rb_right) {
-		n = n->rb_right; 
-		while (n->rb_left)
-			n = n->rb_left;
-		return (n);
-	}
-
-	while ((parent = rb_parent(n)) && n == parent->rb_right)
-		n = parent;
-
-	return (parent);
-}
-
-static inline struct rb_node *
-rb_prev(const struct rb_node *node)
-{
-	struct rb_node *parent;
-	struct rb_node *n = __DECONST(struct rb_node *, node);
-
-	if (RB_EMPTY_NODE(n))
-		return (NULL);
-
-	if (n->rb_left) {
-		n = n->rb_left; 
-		while (n->rb_right)
-			n = n->rb_right;
-		return (n);
-	}
-
-	while ((parent = rb_parent(n)) && n == parent->rb_left)
-		n = parent;
-
-	return (parent);
-}
-
+/* Fast replacement of a single node without remove/rebalance/add/rebalance */
+extern void rb_replace_node(struct rb_node *victim, struct rb_node *new,
+			    struct rb_root *root);
 extern void rb_replace_node_rcu(struct rb_node *victim, struct rb_node *new,
 				struct rb_root *root);
+extern void rb_replace_node_cached(struct rb_node *victim, struct rb_node *new,
+				   struct rb_root_cached *root);
 
-static inline void
-rb_link_node(struct rb_node *node, struct rb_node *parent,
-	     struct rb_node **rb_link)
+static inline void rb_link_node(struct rb_node *node, struct rb_node *parent,
+				struct rb_node **rb_link)
 {
 	node->__rb_parent_color = (unsigned long)parent;
 	node->rb_left = node->rb_right = NULL;
@@ -155,9 +129,8 @@ rb_link_node(struct rb_node *node, struct rb_node *parent,
 	*rb_link = node;
 }
 
-static inline void
-rb_link_node_rcu(struct rb_node *node, struct rb_node *parent,
-		 struct rb_node **rb_link)
+static inline void rb_link_node_rcu(struct rb_node *node, struct rb_node *parent,
+				    struct rb_node **rb_link)
 {
 	node->__rb_parent_color = (unsigned long)parent;
 	node->rb_left = node->rb_right = NULL;
@@ -170,45 +143,6 @@ rb_link_node_rcu(struct rb_node *node, struct rb_node *parent,
 	   ____ptr ? rb_entry(____ptr, type, member) : NULL; \
 	})
 
-static inline struct rb_node *
-rb_left_deepest_node(const struct rb_node *node)
-{
-	struct rb_node *n = __DECONST(struct rb_node *, node);
-	
-	for (;;) {
-		if (n->rb_left)
-			n = n->rb_left;
-		else if (n->rb_right)
-			n = node->rb_right;
-		else
-			return (n);
-	}
-}
-
-/* Postorder iteration - always visit the parent after its children */
-static inline struct rb_node *
-rb_next_postorder(const struct rb_node *node)
-{
-	struct rb_node *parent;
-
-	if (node == NULL)
-		return (NULL);
-	parent = rb_parent(node);
-
-	if (parent && (node == parent->rb_left) && parent->rb_right) {
-		return rb_left_deepest_node(parent->rb_right);
-	} else
-		return (parent);
-}
-
-static inline struct rb_node *
-rb_first_postorder(const struct rb_root *root)
-{
-	if (!root->rb_node)
-		return (NULL);
-
-	return (rb_left_deepest_node(root->rb_node));
-}
 /**
  * rbtree_postorder_for_each_entry_safe - iterate in post-order over rb_root of
  * given type allowing the backing memory of @pos to be invalidated
@@ -231,7 +165,5 @@ rb_first_postorder(const struct rb_root *root)
 	     pos && ({ n = rb_entry_safe(rb_next_postorder(&pos->field), \
 			typeof(*pos), field); 1; }); \
 	     pos = n)
-
-#include <linux/rbtree_augmented.h>
 
 #endif	/* _LINUX_RBTREE_H */
