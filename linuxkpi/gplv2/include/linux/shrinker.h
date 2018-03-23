@@ -16,6 +16,13 @@ struct shrink_control {
 	 */
 	unsigned long nr_to_scan;
 
+	/*
+	 * How many objects did scan_objects process?
+	 * This defaults to nr_to_scan before every call, but the callee
+	 * should track its actual progress.
+	 */
+	unsigned long nr_scanned;
+
 	int nid;
 };
 
