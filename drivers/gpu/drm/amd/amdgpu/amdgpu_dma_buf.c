@@ -38,6 +38,9 @@
 #include <drm/amdgpu_drm.h>
 #include <linux/dma-buf.h>
 #include <linux/dma-fence-array.h>
+#ifdef __linux__
+#include <linux/pci-p2pdma.h>
+#endif
 
 /**
  * amdgpu_gem_prime_vmap - &dma_buf_ops.vmap implementation
@@ -178,6 +181,11 @@ static int amdgpu_dma_buf_attach(struct dma_buf *dmabuf,
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	int r;
+
+#ifdef __linux__
+	if (pci_p2pdma_distance_many(adev->pdev, &attach->dev, 1, true) < 0)
+		attach->peer2peer = false;
+#endif
 
 	if (attach->dev->driver == adev->dev->driver)
 		return 0;
