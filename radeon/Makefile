@@ -115,9 +115,9 @@ SRCS=	atom.c \
 	vce_v1_0.c \
 	vce_v2_0.c
 
-CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 
 CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm

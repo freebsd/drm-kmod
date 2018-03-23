@@ -93,9 +93,9 @@ SRCS=	ati_pcigart.c \
 
 # drm_fops.c \ deleted in v4.12
 
-CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include # fallback to dummy
 CFLAGS+= -I${SRCDIR}
 CFLAGS+= -I${SRCDIR}/ttm
 CFLAGS+= -I${.CURDIR:H}/include

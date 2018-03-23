@@ -18,18 +18,19 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_fs.c		\
 	linux_fs_attr.c		\
 	linux_i2c.c		\
+	linux_interval_tree.c	\
 	linux_irq.c		\
 	linux_llist.c		\
 	linux_mtrr.c		\
 	linux_notifier.c	\
 	linux_page.c		\
+	linux_rbtree.c		\
 	linux_relay.c		\
 	linux_reservation.c	\
 	linux_seq_file.c	\
 	linux_sort.c		\
 	linux_sync_file.c	\
-	linux_video.c		\
-	interval_tree.c
+	linux_video.c
 
 SRCS+=	opt_acpi.h
 

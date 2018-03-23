@@ -135,9 +135,9 @@ SRCS=	\
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
-CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 
 CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm
