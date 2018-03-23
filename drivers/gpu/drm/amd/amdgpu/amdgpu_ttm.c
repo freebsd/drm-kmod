@@ -699,7 +699,7 @@ struct amdgpu_ttm_tt {
 	struct ttm_dma_tt	ttm;
 	u64			offset;
 	uint64_t		userptr;
-	struct mm_struct	*usermm;
+	struct task_struct	*usertask;
 	uint32_t		userflags;
 	spinlock_t              guptasklock;
 	struct list_head        guptasks;
@@ -710,16 +710,19 @@ struct amdgpu_ttm_tt {
 int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 {
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
+	struct mm_struct *mm = gtt->usertask->mm;
 	unsigned int flags = 0;
 	unsigned pinned = 0;
 	int r;
 
+	if (!mm) /* Happens during process shutdown */
+		return -ESRCH;
 
 	if (!(gtt->userflags & AMDGPU_GEM_USERPTR_READONLY))
 		flags |= FOLL_WRITE;
 
-	down_read(&current->mm->mmap_sem);
-	printf("%s: Missing userptr support\n");
+	down_read(&mm->mmap_sem);
+
 #ifdef __notyet__
 	/* BSDFIXME: no userptr support yet */
 	if (gtt->userflags & AMDGPU_GEM_USERPTR_ANONONLY) {
@@ -728,9 +731,9 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 		unsigned long end = gtt->userptr + ttm->num_pages * PAGE_SIZE;
 		struct vm_area_struct *vma;
 
-		vma = find_vma(gtt->usermm, gtt->userptr);
+		vma = find_vma(mm, gtt->userptr);
 		if (!vma || vma->vm_file || vma->vm_end < end) {
-			up_read(&current->mm->mmap_sem);
+			up_read(&mm->mmap_sem);
 			return -EPERM;
 		}
 	}
@@ -746,7 +749,12 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 		list_add(&guptask.list, &gtt->guptasks);
 		spin_unlock(&gtt->guptasklock);
 
-		r = get_user_pages(userptr, num_pages, flags, p, NULL);
+		if (mm == current->mm)
+			r = get_user_pages(userptr, num_pages, flags, p, NULL);
+		else
+			r = get_user_pages_remote(gtt->usertask,
+					mm, userptr, num_pages,
+					flags, p, NULL, NULL);
 
 		spin_lock(&gtt->guptasklock);
 		list_del(&guptask.list);
@@ -759,12 +767,12 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 
 	} while (pinned < ttm->num_pages);
 
-	up_read(&current->mm->mmap_sem);
+	up_read(&mm->mmap_sem);
 	return 0;
 
 release_pages:
 	release_pages(pages, pinned);
-	up_read(&current->mm->mmap_sem);
+	up_read(&mm->mmap_sem);
 	return r;
 }
 
@@ -985,6 +993,9 @@ static void amdgpu_ttm_backend_destroy(struct ttm_tt *ttm)
 {
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 
+	if (gtt->usertask)
+		put_task_struct(gtt->usertask);
+
 	ttm_dma_tt_fini(&gtt->ttm);
 	kfree(gtt);
 }
@@ -1086,8 +1097,13 @@ int amdgpu_ttm_tt_set_userptr(struct ttm_tt *ttm, uint64_t addr,
 		return -EINVAL;
 
 	gtt->userptr = addr;
-	gtt->usermm = current->mm;
 	gtt->userflags = flags;
+
+	if (gtt->usertask)
+		put_task_struct(gtt->usertask);
+	gtt->usertask = current->group_leader;
+	get_task_struct(gtt->usertask);
+
 	spin_lock_init(&gtt->guptasklock);
 	INIT_LIST_HEAD(&gtt->guptasks);
 	atomic_set(&gtt->mmu_invalidations, 0);
@@ -1103,7 +1119,10 @@ struct mm_struct *amdgpu_ttm_tt_get_usermm(struct ttm_tt *ttm)
 	if (gtt == NULL)
 		return NULL;
 
-	return gtt->usermm;
+	if (gtt->usertask == NULL)
+		return NULL;
+
+	return gtt->usertask->mm;
 }
 
 bool amdgpu_ttm_tt_affect_userptr(struct ttm_tt *ttm, unsigned long start,
