@@ -37,7 +37,6 @@
 #include <asm/smp.h>
 
 #define clflushopt(addr) linux_clflushopt(addr)
-#define EXPORT_SYMBOL(x)
 
 /*
  * clflushopt is an unordered instruction which needs fencing with mfence or

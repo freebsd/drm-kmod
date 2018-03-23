@@ -26,8 +26,6 @@
 #include <linux/sync_file.h>
 #include <uapi/linux/sync_file.h>
 
-#define	EXPORT_SYMBOL(x)
-
 static const struct file_operations sync_file_fops;
 
 static struct sync_file *sync_file_alloc(void)
