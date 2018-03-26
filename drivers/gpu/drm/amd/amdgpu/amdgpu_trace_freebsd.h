@@ -44,6 +44,11 @@ trace_amdgpu_vm_flush(struct amdgpu_ring *ring, unsigned vm_id, uint64_t pd_addr
 }
 
 static inline void
+trace_amdgpu_vm_bo_map(struct amdgpu_bo_va * bo_va, struct amdgpu_bo_va_mapping * mapping){
+	CTR2(KTR_DRM, "amdgpu_vm_bo_unmap %p %p", bo_va, mapping);
+}
+
+static inline void
 trace_amdgpu_vm_bo_unmap(struct amdgpu_bo_va * bo_va, struct amdgpu_bo_va_mapping * mapping){
 	CTR2(KTR_DRM, "amdgpu_vm_bo_unmap %p %p", bo_va, mapping);
 }
