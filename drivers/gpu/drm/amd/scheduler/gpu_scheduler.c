@@ -213,7 +213,12 @@ void amd_sched_entity_fini(struct amd_gpu_scheduler *sched,
 	 * The client will not queue more IBs during this fini, consume existing
 	 * queued IBs or discard them on SIGKILL
 	*/
+#ifdef __linux__
 	if ((current->flags & PF_SIGNALED) && current->exit_code == SIGKILL)
+#else
+	// XXX: OK?
+	if (fatal_signal_pending(current))
+#endif
 		r = -ERESTARTSYS;
 	else
 		r = wait_event_killable(sched->job_scheduled,
