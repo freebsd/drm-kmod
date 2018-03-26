@@ -47,6 +47,10 @@
 #include "amdgpu_trace.h"
 #include "bif/bif_4_1_d.h"
 
+#ifndef __linux__
+#include "sys/cdefs.h" // for __DECONST()
+#endif
+
 #define DRM_FILE_PAGE_OFFSET (0x100000000ULL >> PAGE_SHIFT)
 
 static int amdgpu_map_buffer(struct ttm_buffer_object *bo,
@@ -1696,8 +1700,11 @@ static ssize_t amdgpu_ttm_vram_write(struct file *f, const char __user *buf,
 
 		if (*pos >= adev->mc.mc_vram_size)
 			return result;
-
+#ifdef __linux__
 		r = get_user(value, (uint32_t *)buf);
+#else
+		r = get_user(value, __DECONST(uint32_t *, buf));
+#endif
 		if (r)
 			return r;
 
