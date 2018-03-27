@@ -2859,8 +2859,12 @@ static inline struct scatterlist *__sg_next(struct scatterlist *sg)
 
 static inline unsigned int i915_sg_segment_size(void)
 {
+#ifdef __linux__
 	unsigned int size = swiotlb_max_segment();
-
+#else
+	/* !CONFIG_SWIOTLB */
+	unsigned int size = 0;
+#endif
 	if (size == 0)
 		return SCATTERLIST_MAX_SEGMENT;
 

@@ -4637,6 +4637,9 @@ static void skl_compute_transition_wm(struct intel_crtc_state *cstate,
 	const uint16_t trans_amount = 10; /* This is configurable amount */
 	uint16_t trans_offset_b, res_blocks;
 
+#ifndef __linux__
+	trans_min = 0;
+#endif
 	if (!cstate->base.active)
 		goto exit;
 
