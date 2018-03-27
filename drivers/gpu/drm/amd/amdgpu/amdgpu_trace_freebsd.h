@@ -1,4 +1,4 @@
-#if !defined(_AMDGPU_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
+#if !defined(_AMDGPU_TRACE_FREEBSD_H_) || defined(TRACE_HEADER_MULTI_READ)
 #define _AMDGPU_TRACE_FREEBSD_H_
 
 #include <drm/drmP.h>
