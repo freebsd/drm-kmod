@@ -2093,22 +2093,8 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	/* doorbell bar mapping */
 	amdgpu_doorbell_init(adev);
 
+#ifdef __linux__
 	/* io port mapping */
-#ifndef __linux__
-	for (i = 0; i < DRM_PCI_RESOURCE_MAX; i++) {
-		uint32_t data;
-
-		data = pci_read_config(device_get_parent(pdev->dev.bsddev),
-		    PCIR_BAR(i), 4);
-		if (PCI_BAR_IO(data)) {
-			adev->rio_rid = PCIR_BAR(i);
-			adev->rio_mem = bus_alloc_resource_any(pdev->dev.bsddev,
-			    SYS_RES_IOPORT, &adev->rio_rid,
-			    RF_ACTIVE | RF_SHAREABLE);
-			break;
-		}
-	}
-#else
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_IO) {
 			adev->rio_mem_size = pci_resource_len(adev->pdev, i);
@@ -2345,11 +2331,8 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	if (adev->flags & AMD_IS_PX)
 		vga_switcheroo_fini_domain_pm_ops(adev->dev);
 	vga_client_register(adev->pdev, NULL, NULL, NULL);
+#ifdef __linux__
 	if (adev->rio_mem)
-#ifndef __linux__
-		bus_release_resource(adev->dev->bsddev, SYS_RES_IOPORT,
-		    adev->rio_rid, adev->rio_mem);
-#else
 		pci_iounmap(adev->pdev, adev->rio_mem);
 #endif
 	adev->rio_mem = NULL;
