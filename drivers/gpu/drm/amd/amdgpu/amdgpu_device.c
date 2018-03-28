@@ -1053,10 +1053,11 @@ static const struct vga_switcheroo_client_ops amdgpu_switcheroo_ops = {
  * the hardware IP specified.
  * Returns the error code from the last instance.
  */
-int amdgpu_device_ip_set_clockgating_state(struct amdgpu_device *adev,
+int amdgpu_device_ip_set_clockgating_state(void *dev,
 					   enum amd_ip_block_type block_type,
 					   enum amd_clockgating_state state)
 {
+	struct amdgpu_device *adev = dev;
 	int i, r = 0;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -1086,10 +1087,11 @@ int amdgpu_device_ip_set_clockgating_state(struct amdgpu_device *adev,
  * the hardware IP specified.
  * Returns the error code from the last instance.
  */
-int amdgpu_device_ip_set_powergating_state(struct amdgpu_device *adev,
+int amdgpu_device_ip_set_powergating_state(void *dev,
 					   enum amd_ip_block_type block_type,
 					   enum amd_powergating_state state)
 {
+	struct amdgpu_device *adev = dev;
 	int i, r = 0;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
