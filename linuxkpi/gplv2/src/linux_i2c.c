@@ -302,6 +302,9 @@ i2c_sendbyte(struct i2c_algo_bit_data *adap, unsigned char data)
 		}
 	}
 
+	sdahi(adap);
+	if (sclhi(adap) < 0)
+		return (-ETIMEDOUT);
 	ack = (getsda(adap) == 0);
 	scllo(adap);
 	return ack;
