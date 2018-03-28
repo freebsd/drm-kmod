@@ -1439,8 +1439,22 @@ int radeon_device_init(struct radeon_device *rdev,
 	if (rdev->family >= CHIP_BONAIRE)
 		radeon_doorbell_init(rdev);
 
-#ifdef __linux__
 	/* io port mapping */
+#ifndef __linux__
+	for (i = 0; i < DRM_PCI_RESOURCE_MAX; i++) {
+		uint32_t data;
+
+		data = pci_read_config(device_get_parent(pdev->dev.bsddev),
+		    PCIR_BAR(i), 4);
+		if (PCI_BAR_IO(data)) {
+			rdev->rio_rid = PCIR_BAR(i);
+			rdev->rio_mem = bus_alloc_resource_any(pdev->dev.bsddev,
+			    SYS_RES_IOPORT, &rdev->rio_rid,
+			    RF_ACTIVE | RF_SHAREABLE);
+			break;
+		}
+	}
+#else
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		if (pci_resource_flags(rdev->pdev, i) & IORESOURCE_IO) {
 			rdev->rio_mem_size = pci_resource_len(rdev->pdev, i);
@@ -1562,8 +1576,11 @@ void radeon_device_fini(struct radeon_device *rdev)
 	if (rdev->flags & RADEON_IS_PX)
 		vga_switcheroo_fini_domain_pm_ops(rdev->dev);
 	vga_client_register(rdev->pdev, NULL, NULL, NULL);
-#ifdef __linux__
 	if (rdev->rio_mem)
+#ifndef __linux__
+		bus_release_resource(rdev->dev->bsddev, SYS_RES_IOPORT,
+		    rdev->rio_rid, rdev->rio_mem);
+#else
 		pci_iounmap(rdev->pdev, rdev->rio_mem);
 #endif
 	rdev->rio_mem = NULL;
