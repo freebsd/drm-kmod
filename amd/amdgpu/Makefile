@@ -85,12 +85,6 @@ SRCS=	amdgpu_acpi.c \
 	dce_v10_0.c \
 	dce_v11_0.c \
 	dce_virtual.c \
-	eventactionchains.c \
-	eventinit.c \
-	eventmanagement.c \
-	eventmgr.c \
-	eventsubchains.c \
-	eventtasks.c \
 	fiji_smumgr.c \
 	fiji_smumgr_smc.c \
 	functiontables.c \
@@ -125,7 +119,6 @@ SRCS=	amdgpu_acpi.c \
 	pppcielanes.c \
 	processpptables.c \
 	process_pptables_v1_0.c \
-	psm.c \
 	psp_v3_1.c \
 	psp_v10_0.c \
 	rv_hwmgr.c \
