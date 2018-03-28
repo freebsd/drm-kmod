@@ -114,6 +114,7 @@ SRCS=	amdgpu_acpi.c \
 	polaris10_smumgr.c \
 	pp_acpi.c \
 	pp_overdriver.c \
+	pp_psm.c \
 	ppatomctrl.c \
 	ppatomfwctrl.c \
 	pppcielanes.c \
