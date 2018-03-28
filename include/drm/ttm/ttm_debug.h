@@ -27,5 +27,24 @@
 /*
  * Authors: Tom St Denis <tom.stdenis@amd.com>
  */
+#ifdef __linux__
+
 extern void ttm_trace_dma_map(struct device *dev, struct ttm_dma_tt *tt);
 extern void ttm_trace_dma_unmap(struct device *dev, struct ttm_dma_tt *tt);
+
+#else
+
+#include <drm/drmP.h>
+#include "ttm_bo_driver.h"
+
+static inline void
+ttm_trace_dma_map(struct device *dev, struct ttm_dma_tt *tt){
+	CTR2(KTR_DRM, "ttm_dma_map dev %p, ttm_dma_tt %p", dev, tt);
+}
+
+static inline void
+ttm_trace_dma_unmap(struct device *dev, struct ttm_dma_tt *tt){
+	CTR2(KTR_DRM, "ttm_dma_unmap dev %p, ttm_dma_tt %p", dev, tt);
+}
+
+#endif
