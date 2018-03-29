@@ -842,7 +842,10 @@ static int rv_read_sensor(struct pp_hwmgr *hwmgr, int idx,
 static const struct pp_hwmgr_func rv_hwmgr_funcs = {
 	.backend_init = rv_hwmgr_backend_init,
 	.backend_fini = rv_hwmgr_backend_fini,
+#ifdef __linux__
+	// XXX: set lower down??
 	.asic_setup = NULL,
+#endif
 	.apply_state_adjust_rules = rv_apply_state_adjust_rules,
 	.force_dpm_level = rv_dpm_force_dpm_level,
 	.get_power_state_size = rv_get_power_state_size,
