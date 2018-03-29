@@ -87,7 +87,6 @@ SRCS=	amdgpu_acpi.c \
 	dce_virtual.c \
 	fiji_smumgr.c \
 	fiji_smumgr_smc.c \
-	functiontables.c \
 	gfx_v6_0.c \
 	gfx_v7_0.c \
 	gfx_v8_0.c \
