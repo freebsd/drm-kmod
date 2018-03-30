@@ -44,7 +44,7 @@
  */
 struct radeon_fbdev {
 	struct drm_fb_helper helper;
-	struct radeon_framebuffer rfb;
+	struct drm_framebuffer fb;
 	struct radeon_device *rdev;
 };
 
@@ -247,13 +247,13 @@ static int radeonfb_create(struct drm_fb_helper *helper,
 
 	info->par = rfbdev;
 
-	ret = radeon_framebuffer_init(rdev->ddev, &rfbdev->rfb, &mode_cmd, gobj);
+	ret = radeon_framebuffer_init(rdev->ddev, &rfbdev->fb, &mode_cmd, gobj);
 	if (ret) {
 		DRM_ERROR("failed to initialize framebuffer %d\n", ret);
 		goto out;
 	}
 
-	fb = &rfbdev->rfb.base;
+	fb = &rfbdev->fb;
 
 	/* setup helper */
 	rfbdev->helper.fb = fb;
@@ -309,15 +309,15 @@ out:
 
 static int radeon_fbdev_destroy(struct drm_device *dev, struct radeon_fbdev *rfbdev)
 {
-	struct radeon_framebuffer *rfb = &rfbdev->rfb;
+	struct drm_framebuffer *fb = &rfbdev->fb;
 
 	drm_fb_helper_unregister_fbi(&rfbdev->helper);
 
-	if (rfb->base.obj[0]) {
-		radeonfb_destroy_pinned_object(rfb->base.obj[0]);
-		rfb->base.obj[0] = NULL;
-		drm_framebuffer_unregister_private(&rfb->base);
-		drm_framebuffer_cleanup(&rfb->base);
+	if (fb->obj[0]) {
+		radeonfb_destroy_pinned_object(fb->obj[0]);
+		fb->obj[0] = NULL;
+		drm_framebuffer_unregister_private(fb);
+		drm_framebuffer_cleanup(fb);
 	}
 	drm_fb_helper_fini(&rfbdev->helper);
 
@@ -401,7 +401,7 @@ bool radeon_fbdev_robj_is_fb(struct radeon_device *rdev, struct radeon_bo *robj)
 	if (!rdev->mode_info.rfbdev)
 		return false;
 
-	if (robj == gem_to_radeon_bo(rdev->mode_info.rfbdev->rfb.base.obj[0]))
+	if (robj == gem_to_radeon_bo(rdev->mode_info.rfbdev->fb.obj[0]))
 		return true;
 	return false;
 }
