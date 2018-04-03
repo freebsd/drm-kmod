@@ -62,6 +62,11 @@
 #include "dce_virtual.h"
 #include "mxgpu_ai.h"
 
+#ifndef __linux__
+#define	pci_save_state		linux_pci_save_state
+#define	pci_restore_state	linux_pci_restore_state
+#endif
+
 #define mmFabricConfigAccessControl                                                                    0x0410
 #define mmFabricConfigAccessControl_BASE_IDX                                                           0
 #define mmFabricConfigAccessControl_DEFAULT                                      0x00000000

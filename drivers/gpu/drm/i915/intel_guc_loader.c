@@ -130,7 +130,7 @@ static void guc_params_init(struct drm_i915_private *dev_priv)
 			GUC_CTL_VCS2_ENABLED;
 
 	params[GUC_CTL_LOG_PARAMS] = guc->log.flags;
-
+#ifdef __linux__
 	if (i915.guc_log_level >= 0) {
 		params[GUC_CTL_DEBUG] =
 			i915.guc_log_level << GUC_LOG_VERBOSITY_SHIFT;
@@ -155,7 +155,7 @@ static void guc_params_init(struct drm_i915_private *dev_priv)
 		/* Unmask this bit to enable the GuC's internal scheduler */
 		params[GUC_CTL_FEATURE] &= ~GUC_CTL_DISABLE_SCHEDULER;
 	}
-
+#endif
 	I915_WRITE(SOFT_SCRATCH(0), 0);
 
 	for (i = 0; i < GUC_CTL_MAX_DWORDS; i++)
@@ -366,12 +366,12 @@ int intel_guc_init_hw(struct intel_guc *guc)
 		return -EAGAIN;
 
 	guc->fw.load_status = INTEL_UC_FIRMWARE_SUCCESS;
-
+#ifdef __linux__
 	DRM_INFO("GuC %s (firmware %s [version %u.%u])\n",
 		 i915.enable_guc_submission ? "submission enabled" : "loaded",
 		 guc->fw.path,
 		 guc->fw.major_ver_found, guc->fw.minor_ver_found);
-
+#endif
 	return 0;
 }
 
@@ -389,12 +389,14 @@ int intel_guc_select_fw(struct intel_guc *guc)
 	guc->fw.fetch_status = INTEL_UC_FIRMWARE_NONE;
 	guc->fw.load_status = INTEL_UC_FIRMWARE_NONE;
 	guc->fw.type = INTEL_UC_FW_TYPE_GUC;
-
+#ifdef __linux__
 	if (i915.guc_firmware_path) {
 		guc->fw.path = i915.guc_firmware_path;
 		guc->fw.major_ver_wanted = 0;
 		guc->fw.minor_ver_wanted = 0;
-	} else if (IS_SKYLAKE(dev_priv)) {
+	} else
+#endif
+		if (IS_SKYLAKE(dev_priv)) {
 		guc->fw.path = I915_SKL_GUC_UCODE;
 		guc->fw.major_ver_wanted = SKL_FW_MAJOR;
 		guc->fw.minor_ver_wanted = SKL_FW_MINOR;
@@ -414,6 +416,5 @@ int intel_guc_select_fw(struct intel_guc *guc)
 		DRM_ERROR("No GuC firmware known for platform with GuC!\n");
 		return -ENOENT;
 	}
-
 	return 0;
 }

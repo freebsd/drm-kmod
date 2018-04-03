@@ -108,6 +108,7 @@ SRCS=	\
 	intel_uc.c \
 	intel_uncore.c
 
+
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
 # intel_lpe_audio.c   # Need platform and irq_chip support
 
@@ -192,7 +193,7 @@ CWARNFLAGS.intel_guc_ct.c=	-Wno-address-of-packed-member # probably false positi
 CWARNFLAGS.intel_guc_loader.c= 	-Wno-cast-qual
 CWARNFLAGS.intel_hdmi.c=	-Wno-enum-conversion
 CWARNFLAGS.intel_hotplug.c=	-Wno-missing-prototypes
-CWARNFLAGS.intel_lrc.c=		-Wno-cast-qual
+CWARNFLAGS.intel_lrc.c=		-Wno-cast-qual -Wno-unused-variable
 CWARNFLAGS.intel_lvds.c=	-Wno-unused
 CWARNFLAGS.intel_overlay.c=	-Wno-tautological-pointer-compare
 CWARNFLAGS.intel_pm.c=		-Wno-cast-qual -Wno-incompatible-pointer-types-discards-qualifiers -Wno-unused-const-variable

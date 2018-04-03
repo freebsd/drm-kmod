@@ -27,7 +27,11 @@
 #include <linux/types.h>
 #include <linux/hash.h>
 #include <linux/bug.h>
+#ifdef __linux__
 #include <asm/bitsperlong.h>
+#else
+#include <linux/bitops.h>
+#endif
 
 #if BITS_PER_LONG == 32
 # define _CHASH_LONG_SHIFT 5

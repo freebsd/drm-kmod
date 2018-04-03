@@ -3,6 +3,7 @@
 SRCDIR=	${.CURDIR:H:H}/drivers/gpu/drm/amd
 
 .PATH:	${SRCDIR}/amdgpu \
+	${SRCDIR}/lib \
 	${SRCDIR}/scheduler \
 	${SRCDIR}/powerplay \
 	${SRCDIR}/powerplay/eventmgr \
@@ -73,6 +74,8 @@ SRCS=	amdgpu_acpi.c \
 	atombios_i2c.c \
 	ci_dpm.c \
 	ci_smc.c \
+	ci_smc_pp.c \
+	ci_smumgr.c \
 	cik.c \
 	cik_ih.c \
 	cik_sdma.c \
@@ -156,7 +159,8 @@ SRCS=	amdgpu_acpi.c \
 	vega10_processpptables.c \
 	vega10_smumgr.c \
 	vega10_thermal.c \
-	vi.c
+	vi.c \
+	chash.c
 
 
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
@@ -217,6 +221,7 @@ CWARNFLAGS.amd_powerplay.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.atombios_crtc.c=	-Wno-missing-prototypes
 CWARNFLAGS.atombios_i2c.c=	-Wno-missing-prototypes
 CWARNFLAGS.ci_dpm.c=	-Wno-unused-const-variable
+CWARNFLAGS.ci_smc_pp.c=	-Wno-missing-prototypes
 CWARNFLAGS.cik.c=	-Wno-unused-const-variable
 CWARNFLAGS.cz_smc.c=	-Wno-missing-prototypes
 CWARNFLAGS.cz_clockpowergating.c=	-Wno-missing-prototypes -Wno-enum-conversion
@@ -258,7 +263,7 @@ CWARNFLAGS.psp_v3_1.c=	-Wno-cast-qual
 CWARNFLAGS.psp_v10_0.c=	-Wno-cast-qual
 CWARNFLAGS.rv_hwmgr.c=	-Wno-cast-qual
 CWARNFLAGS.rv_smumgr.c=	-Wno-cast-qual -Wno-missing-prototypes
-CWARNFLAGS.sdma_v3_0.c=		-Wno-missing-prototypes
+CWARNFLAGS.sdma_v3_0.c=		-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.sdma_v4_0.c=		-Wno-missing-prototypes -Wno-cast-qual -Wno-sometimes-uninitialized
 CWARNFLAGS.si.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu7_clockpowergating.c=		-Wno-missing-prototypes -Wno-enum-conversion
@@ -269,7 +274,8 @@ CWARNFLAGS.tonga_hwmgr.c=	-Wno-missing-prototypes -Wno-cast-qual -Wno-unused-con
 CWARNFLAGS.tonga_smumgr.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.tonga_smumgr_smc.c=	-Wno-parentheses-equality
 CWARNFLAGS.tonga_thermal.c=	-Wno-missing-prototypes
-CWARNFLAGS.vega10_hwmgr.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized
+CWARNFLAGS.vega10_hwmgr.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized -Wno-cast-qual
+CWARNFLAGS.vega10_ih.c= 	-Wno-cast-qual
 CWARNFLAGS.vega10_powertune.c=	-Wno-unused-const-variable
 CWARNFLAGS.vega10_processpptables.c= -Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.vega10_smumgr.c=	-Wno-missing-prototypes

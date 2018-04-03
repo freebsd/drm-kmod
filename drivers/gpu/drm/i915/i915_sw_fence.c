@@ -361,7 +361,9 @@ struct i915_sw_dma_fence_cb {
 	struct i915_sw_fence *fence;
 	struct dma_fence *dma;
 	struct timer_list timer;
+#ifdef __linux__
 	struct irq_work work;
+#endif
 };
 
 static void timer_i915_sw_fence_wake(unsigned long data)
@@ -390,10 +392,18 @@ static void dma_i915_sw_fence_wake(struct dma_fence *dma,
 	fence = xchg(&cb->fence, NULL);
 	if (fence)
 		i915_sw_fence_complete(fence);
-
+#ifdef __linux__
 	irq_work_queue(&cb->work);
+#else
+	// We're already in threaded context - no need for irq_work
+	del_timer_sync(&cb->timer);
+	dma_fence_put(cb->dma);
+
+	kfree(cb);
+#endif	
 }
 
+#ifdef __linux__
 static void irq_i915_sw_fence_work(struct irq_work *wrk)
 {
 	struct i915_sw_dma_fence_cb *cb = container_of(wrk, typeof(*cb), work);
@@ -403,6 +413,7 @@ static void irq_i915_sw_fence_work(struct irq_work *wrk)
 
 	kfree(cb);
 }
+#endif
 
 int i915_sw_fence_await_dma_fence(struct i915_sw_fence *fence,
 				  struct dma_fence *dma,
@@ -432,8 +443,10 @@ int i915_sw_fence_await_dma_fence(struct i915_sw_fence *fence,
 	__setup_timer(&cb->timer,
 		      timer_i915_sw_fence_wake, (unsigned long)cb,
 		      TIMER_IRQSAFE);
+#ifdef __linux__
 	init_irq_work(&cb->work, irq_i915_sw_fence_work);
-	if (timeout) {
+#endif
+        if (timeout) {
 		cb->dma = dma_fence_get(dma);
 		mod_timer(&cb->timer, round_jiffies_up(jiffies + timeout));
 	}
