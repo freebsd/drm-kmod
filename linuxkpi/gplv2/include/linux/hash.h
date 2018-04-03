@@ -29,6 +29,7 @@
 
 #include <asm/types.h>
 #include <sys/hash.h>
+#include <linux/bitops.h>
 
 static inline u64 hash_64(u64 val, unsigned int bits)
 {
