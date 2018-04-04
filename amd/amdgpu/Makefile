@@ -74,7 +74,6 @@ SRCS=	amdgpu_acpi.c \
 	atombios_i2c.c \
 	ci_dpm.c \
 	ci_smc.c \
-	ci_smc_pp.c \
 	ci_smumgr.c \
 	cik.c \
 	cik_ih.c \
@@ -174,6 +173,10 @@ CFLAGS+= -I${SRCDIR:H:H}
 
 CFLAGS+= -I${SRCDIR}
 CFLAGS+= -I${SRCDIR}/amdgpu
+CFLAGS+= -I${SRCDIR}/display
+CFLAGS+= -I${SRCDIR}/display/amdgpu_dm
+CFLAGS+= -I${SRCDIR}/display/dc
+CFLAGS+= -I${SRCDIR}/display/include
 CFLAGS+= -I${SRCDIR}/include
 CFLAGS+= -I${SRCDIR}/acp/include
 CFLAGS+= -I${SRCDIR}/powerplay/eventmgr

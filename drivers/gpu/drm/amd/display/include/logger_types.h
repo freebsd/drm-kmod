@@ -30,6 +30,10 @@
 
 #define MAX_NAME_LEN 32
 
+#if !defined(__linux__) && defined(LOG_WARNING)
+#undef LOG_WARNING // BSD: defined in syslog.h
+#endif
+
 struct dal_logger;
 
 enum dc_log_type {
