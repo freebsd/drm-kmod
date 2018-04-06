@@ -3341,7 +3341,8 @@ void i915_gem_reset_engine(struct intel_engine_cs *engine,
 	engine->reset_hw(engine, request);
 }
 
-void i915_gem_reset(struct drm_i915_private *dev_priv)
+void i915_gem_reset(struct drm_i915_private *dev_priv,
+		    unsigned int stalled_mask)
 {
 	struct intel_engine_cs *engine;
 	enum intel_engine_id id;
@@ -3355,7 +3356,7 @@ void i915_gem_reset(struct drm_i915_private *dev_priv)
 
 		i915_gem_reset_engine(engine,
 				      engine->hangcheck.active_request,
-				      engine->hangcheck.stalled);
+				      stalled_mask & ENGINE_MASK(id));
 		ctx = fetch_and_zero(&engine->last_retired_context);
 		if (ctx)
 			engine->context_unpin(engine, ctx);
