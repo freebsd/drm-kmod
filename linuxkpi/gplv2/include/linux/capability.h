@@ -10,7 +10,8 @@
 #define file_ns_capable(a, b, c) (1)
 
 enum __lkpi_capabilities {
-	CAP_SYS_ADMIN
+	CAP_SYS_ADMIN,
+	CAP_SYS_NICE
 };
 
 static inline bool
@@ -19,6 +20,7 @@ capable(enum __lkpi_capabilities cap)
 
 	switch (cap) {
 	case CAP_SYS_ADMIN:
+	case CAP_SYS_NICE: // XXX: What to do here?
 		return (priv_check(curthread, PRIV_DRIVER) == 0);
 	default:
 		panic("%s: unhandled capability: %0x", __func__, cap);
