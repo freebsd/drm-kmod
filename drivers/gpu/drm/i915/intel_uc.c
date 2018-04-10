@@ -22,8 +22,8 @@
  *
  */
 
-#include "intel_uc.h"
 #include "i915_drv.h"
+#include "intel_uc.h"
 #include "i915_guc_submission.h"
 
 /* Reset GuC providing us with fresh state for both GuC and HuC.

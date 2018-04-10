@@ -28,7 +28,9 @@
 #include <linux/spinlock.h>
 #include <linux/notifier.h>
 #include <linux/hrtimer.h>
-
+#ifndef __linux__
+#include <linux/bitops.h>
+#endif
 #include "i915_reg.h"
 
 struct drm_i915_private;

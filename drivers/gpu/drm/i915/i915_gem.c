@@ -4443,8 +4443,12 @@ static int i915_gem_object_create_shmem(struct drm_device *dev,
 	drm_gem_private_object_init(dev, obj, size);
 
 	if (i915->mm.gemfs)
+#ifdef __linux__
 		filp = shmem_file_setup_with_mnt(i915->mm.gemfs, "i915", size,
 						 flags);
+#else
+		panic("i915_gem.c: gemfs not supported\n");
+#endif
 	else
 		filp = shmem_file_setup("i915", size, flags);
 
