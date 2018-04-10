@@ -361,7 +361,7 @@ static int ctb_write(struct intel_guc_ct_buffer *ctb,
 		 (want_response ? GUC_CT_MSG_SEND_STATUS : 0) |
 		 (action[0] << GUC_CT_MSG_ACTION_SHIFT);
 
-	CT_DEBUG_DRIVER("CT: writing %*phn %*phn %*phn\n",
+	CT_DEBUG_DRIVER("CT: writing %*ph %*ph %*ph\n",
 			4, &header, 4, &fence,
 			4 * (len - 1), &action[1]);
 
@@ -613,7 +613,7 @@ static int ctb_read(struct intel_guc_ct_buffer *ctb, u32 *data)
 	/* message len with header */
 	len = ct_header_get_len(data[0]) + 1;
 	if (unlikely(len > (u32)available)) {
-		DRM_ERROR("CT: incomplete message %*phn %*phn %*phn\n",
+		DRM_ERROR("CT: incomplete message %*ph %*ph %*ph\n",
 			  4, data,
 			  4 * (head + available - 1 > size ?
 			       size - head : available - 1), &cmds[head],
@@ -626,7 +626,7 @@ static int ctb_read(struct intel_guc_ct_buffer *ctb, u32 *data)
 		data[i] = cmds[head];
 		head = (head + 1) % size;
 	}
-	CT_DEBUG_DRIVER("CT: received %*phn\n", 4 * len, data);
+	CT_DEBUG_DRIVER("CT: received %*ph\n", 4 * len, data);
 
 	desc->head = head * 4;
 	return 0;
@@ -668,7 +668,7 @@ static int ct_handle_response(struct intel_guc_ct *ct, const u32 *msg)
 #endif
 	/* Response payload shall at least include fence and status */
 	if (unlikely(len < 2)) {
-		DRM_ERROR("CT: corrupted response %*phn\n", 4 * msglen, msg);
+		DRM_ERROR("CT: corrupted response %*ph\n", 4 * msglen, msg);
 		return -EPROTO;
 	}
 
@@ -678,7 +678,7 @@ static int ct_handle_response(struct intel_guc_ct *ct, const u32 *msg)
 
 	/* Format of the status follows RESPONSE message */
 	if (unlikely(!INTEL_GUC_MSG_IS_RESPONSE(status))) {
-		DRM_ERROR("CT: corrupted response %*phn\n", 4 * msglen, msg);
+		DRM_ERROR("CT: corrupted response %*ph\n", 4 * msglen, msg);
 		return -EPROTO;
 	}
 
@@ -692,7 +692,7 @@ static int ct_handle_response(struct intel_guc_ct *ct, const u32 *msg)
 			continue;
 		}
 		if (unlikely(datalen > req->response_len)) {
-			DRM_ERROR("CT: response %u too long %*phn\n",
+			DRM_ERROR("CT: response %u too long %*ph\n",
 				  req->fence, 4 * msglen, msg);
 			datalen = 0;
 		}
@@ -706,7 +706,7 @@ static int ct_handle_response(struct intel_guc_ct *ct, const u32 *msg)
 	spin_unlock(&ct->lock);
 
 	if (!found)
-		DRM_ERROR("CT: unsolicited response %*phn\n", 4 * msglen, msg);
+		DRM_ERROR("CT: unsolicited response %*ph\n", 4 * msglen, msg);
 	return 0;
 }
 
@@ -715,7 +715,7 @@ static void ct_process_request(struct intel_guc_ct *ct,
 {
 	struct intel_guc *guc = ct_to_guc(ct);
 
-	CT_DEBUG_DRIVER("CT: request %x %*phn\n", action, 4 * len, payload);
+	CT_DEBUG_DRIVER("CT: request %x %*ph\n", action, 4 * len, payload);
 
 	switch (action) {
 	case INTEL_GUC_ACTION_DEFAULT:
@@ -726,7 +726,7 @@ static void ct_process_request(struct intel_guc_ct *ct,
 
 	default:
 fail_unexpected:
-		DRM_ERROR("CT: unexpected request %x %*phn\n",
+		DRM_ERROR("CT: unexpected request %x %*ph\n",
 			  action, 4 * len, payload);
 		break;
 	}
@@ -802,7 +802,7 @@ static int ct_handle_request(struct intel_guc_ct *ct, const u32 *msg)
 
 	request = kmalloc(sizeof(*request) + 4 * msglen, GFP_ATOMIC);
 	if (unlikely(!request)) {
-		DRM_ERROR("CT: dropping request %*phn\n", 4 * msglen, msg);
+		DRM_ERROR("CT: dropping request %*ph\n", 4 * msglen, msg);
 		return 0; /* XXX: -ENOMEM ? */
 	}
 	memcpy(request->msg, msg, 4 * msglen);
