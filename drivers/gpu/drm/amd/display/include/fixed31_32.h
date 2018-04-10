@@ -85,7 +85,9 @@ static inline struct fixed31_32 dal_fixed31_32_from_int(int64_t arg)
 {
 	if (__builtin_constant_p(arg)) {
 		struct fixed31_32 res;
+#ifdef __linux__ // clang don't like this...
 		BUILD_BUG_ON((LONG_MIN > arg) || (arg > LONG_MAX));
+#endif
 		res.value = arg << FIXED31_32_BITS_PER_FRACTIONAL_PART;
 		return res;
 	} else

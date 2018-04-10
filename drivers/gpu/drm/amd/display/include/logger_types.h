@@ -32,6 +32,7 @@
 
 #if !defined(__linux__) && defined(LOG_WARNING)
 #undef LOG_WARNING // BSD: defined in syslog.h
+#undef LOG_DEBUG // BSD: defined in syslog.h
 #endif
 
 struct dal_logger;
