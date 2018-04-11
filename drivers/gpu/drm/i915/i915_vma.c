@@ -704,11 +704,15 @@ void i915_vma_revoke_mmap(struct i915_vma *vma)
 	GEM_BUG_ON(!vma->obj->userfault_count);
 
 	vma_offset = vma->ggtt_view.partial.offset << PAGE_SHIFT;
+#ifdef __linux__
 	unmap_mapping_range(vma->vm->i915->drm.anon_inode->i_mapping,
 			    drm_vma_node_offset_addr(node) + vma_offset,
 			    vma->size,
 			    1);
-
+#else
+	unmap_mapping_range(vma->obj, drm_vma_node_offset_addr(node),
+	    drm_vma_node_size(node) << PAGE_SHIFT, 1);
+#endif
 	i915_vma_unset_userfault(vma);
 	if (!--vma->obj->userfault_count)
 		list_del(&vma->obj->userfault_link);

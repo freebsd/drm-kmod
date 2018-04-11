@@ -16,6 +16,7 @@ SRCS=	\
 	i915_debugfs.c \
 	i915_drv.c \
 	i915_gem.c \
+	i915_gemfs.c \
 	i915_gem_batch_pool.c \
 	i915_gem_clflush.c \
 	i915_gem_context.c \
@@ -76,6 +77,7 @@ SRCS=	\
 	intel_fifo_underrun.c \
 	intel_freebsd.c \
 	intel_frontbuffer.c \
+	intel_guc.c \
 	intel_guc_ct.c \
 	intel_guc_loader.c \
 	intel_guc_log.c \
@@ -106,6 +108,7 @@ SRCS=	\
 	intel_sprite.c \
 	intel_tv.c \
 	intel_uc.c \
+	intel_uc_fw.c \
 	intel_uncore.c
 
 
