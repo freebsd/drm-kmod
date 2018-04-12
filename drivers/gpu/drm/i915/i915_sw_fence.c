@@ -450,6 +450,7 @@ int i915_sw_fence_await_dma_fence(struct i915_sw_fence *fence,
 
 	cb->dma = NULL;
 	timer_setup(&cb->timer, timer_i915_sw_fence_wake, TIMER_IRQSAFE);
+#ifdef __linux__
 	init_irq_work(&cb->work, irq_i915_sw_fence_work);
 #endif
         if (timeout) {
