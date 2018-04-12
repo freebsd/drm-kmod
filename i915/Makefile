@@ -79,7 +79,7 @@ SRCS=	\
 	intel_frontbuffer.c \
 	intel_guc.c \
 	intel_guc_ct.c \
-	intel_guc_loader.c \
+	intel_guc_fw.c \
 	intel_guc_log.c \
 	intel_hangcheck.c \
 	intel_hdmi.c \
@@ -193,7 +193,6 @@ CWARNFLAGS.intel_dsi_panel_vbt.c= -Wno-cast-qual
 CWARNFLAGS.intel_engine_cs.c= -Wno-cast-qual
 CWARNFLAGS.intel_fbdev.c=	-Wno-initializer-overrides
 CWARNFLAGS.intel_guc_ct.c=	-Wno-address-of-packed-member # probably false positive
-CWARNFLAGS.intel_guc_loader.c= 	-Wno-cast-qual
 CWARNFLAGS.intel_hdmi.c=	-Wno-enum-conversion
 CWARNFLAGS.intel_hotplug.c=	-Wno-missing-prototypes
 CWARNFLAGS.intel_lrc.c=		-Wno-cast-qual -Wno-unused-variable
