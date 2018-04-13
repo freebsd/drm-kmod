@@ -87,7 +87,6 @@ SRCS=	amdgpu_acpi.c \
 	dce_v11_0.c \
 	dce_virtual.c \
 	fiji_smumgr.c \
-	fiji_smumgr_smc.c \
 	gfx_v6_0.c \
 	gfx_v7_0.c \
 	gfx_v8_0.c \
@@ -102,7 +101,6 @@ SRCS=	amdgpu_acpi.c \
 	hwmgr.c \
 	iceland_ih.c \
 	iceland_smumgr.c \
-	iceland_smumgr_smc.c \
 	kv_dpm.c \
 	kv_smc.c \
 	nbio_v6_1.c \
@@ -110,7 +108,6 @@ SRCS=	amdgpu_acpi.c \
 	mmhub_v1_0.c \
 	mxgpu_ai.c \
 	mxgpu_vi.c \
-	polaris10_smc.c \
 	polaris10_smumgr.c \
 	pp_acpi.c \
 	pp_overdriver.c \
@@ -142,7 +139,6 @@ SRCS=	amdgpu_acpi.c \
 	soc15.c \
 	tonga_ih.c \
 	tonga_smumgr.c \
-	tonga_smumgr_smc.c \
 	uvd_v4_2.c \
 	uvd_v5_0.c \
 	uvd_v6_0.c \
@@ -171,12 +167,12 @@ CFLAGS+= -I${.CURDIR:H:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H:H}
 
 CFLAGS+= -I${SRCDIR}
+CFLAGS+= -I${SRCDIR}/include
 CFLAGS+= -I${SRCDIR}/amdgpu
 CFLAGS+= -I${SRCDIR}/display
 CFLAGS+= -I${SRCDIR}/display/amdgpu_dm
 CFLAGS+= -I${SRCDIR}/display/dc
 CFLAGS+= -I${SRCDIR}/display/include
-CFLAGS+= -I${SRCDIR}/include
 CFLAGS+= -I${SRCDIR}/acp/include
 CFLAGS+= -I${SRCDIR}/powerplay/eventmgr
 CFLAGS+= -I${SRCDIR}/powerplay/hwmgr
@@ -237,7 +233,6 @@ CWARNFLAGS.eventtasks.c=	-Wno-missing-prototypes
 CWARNFLAGS.fiji_clockpowergating.c=	-Wno-enum-conversion
 CWARNFLAGS.fiji_hwmgr.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.fiji_smumgr.c=	-Wno-missing-prototypes -Wno-cast-qual
-CWARNFLAGS.fiji_smumgr_smc.c=	-Wno-missing-prototypes
 CWARNFLAGS.fiji_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.gmc_v6_0.c=	-Wno-unused-const-variable
 CWARNFLAGS.gfx_v6_0.c=	-Wno-cast-qual -Wno-unused-const-variable
@@ -247,7 +242,6 @@ CWARNFLAGS.gfx_v9_0.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.gpu_scheduler.c=	-Wno-missing-prototypes
 CWARNFLAGS.iceland_hwmgr.c=	-Wno-missing-prototypes  -Wno-cast-qual
 CWARNFLAGS.iceland_smumgr.c=	-Wno-missing-prototypes
-CWARNFLAGS.iceland_smumgr_smc.c=	-Wno-missing-prototypes
 CWARNFLAGS.iceland_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.kv_dpm.c=	-Wno-unused-const-variable
 CWARNFLAGS.mxgpu_vi.c=	-Wno-enum-conversion
@@ -274,7 +268,6 @@ CWARNFLAGS.soc15.c=		-Wno-missing-prototypes
 CWARNFLAGS.tonga_clockpowergating.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.tonga_hwmgr.c=	-Wno-missing-prototypes -Wno-cast-qual -Wno-unused-const-variable
 CWARNFLAGS.tonga_smumgr.c=	-Wno-missing-prototypes -Wno-cast-qual
-CWARNFLAGS.tonga_smumgr_smc.c=	-Wno-parentheses-equality
 CWARNFLAGS.tonga_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.vega10_hwmgr.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized -Wno-cast-qual
 CWARNFLAGS.vega10_ih.c= 	-Wno-cast-qual
