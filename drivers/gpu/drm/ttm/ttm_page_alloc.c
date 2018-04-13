@@ -785,12 +785,18 @@ out:
 	if (ttm_flags & TTM_PAGE_FLAG_ZERO_ALLOC) {
 		struct page *page;
 
+#ifdef __linux__
 		list_for_each_entry(page, pages, lru) {
 			if (PageHighMem(page))
 				clear_highpage(page);
 			else
 				clear_page(page_address(page));
 		}
+#else
+		TAILQ_FOREACH(page, pages, plinks.q) {
+			pmap_zero_page(p);
+		}
+#endif
 	}
 
 	/* If pool didn't have enough pages allocate new one. */
@@ -943,6 +949,7 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 	struct ttm_page_pool *huge = ttm_get_pool(flags, true, cstate);
 #endif
+#ifdef __linux__
 	struct list_head plist;
 #else
 	struct pglist plist;
@@ -1035,7 +1042,8 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 	}
 #else
 	TAILQ_INIT(&plist);
-	npages = ttm_page_pool_get_pages(pool, &plist, flags, cstate, npages);
+	r = ttm_page_pool_get_pages(pool, &plist, flags, cstate,
+	    npages, 0);
 	count = 0;
 	TAILQ_FOREACH(p, &plist, plinks.q) {
 		pages[count++] = p;
