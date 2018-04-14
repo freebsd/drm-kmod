@@ -553,11 +553,15 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 
 	/* Clone the lessor file to create a new file for us */
 	DRM_DEBUG_LEASE("Allocating lease file\n");
+#if __linux__
 	path_get(&lessor_file->f_path);
 	lessee_file = alloc_file(&lessor_file->f_path,
 				 lessor_file->f_mode,
 				 fops_get(lessor_file->f_inode->i_fop));
-
+#else
+	// BSDFIXME!!
+	lessee_file = NULL;
+#endif       
 	if (IS_ERR(lessee_file)) {
 		ret = PTR_ERR(lessee_file);
 		goto out_lessee;

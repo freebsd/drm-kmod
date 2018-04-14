@@ -332,8 +332,8 @@ struct pci_controller;
 #define DRM_DEBUG_VBL(fmt, args...)					\
 	drm_printk(KERN_DEBUG, DRM_UT_VBL, __func__, "", fmt, ##args)
 
-#define DRM_DEBUG_LEASE(fmt, ...)					\
-	drm_printk(KERN_DEBUG, DRM_UT_LEASE, fmt, ##__VA_ARGS__)
+#define DRM_DEBUG_LEASE(fmt, args...)					\
+	drm_printk(KERN_DEBUG, DRM_UT_LEASE, __func__, "", fmt, ##args)
 
 #define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, level, fmt, args...)	\
 ({									\

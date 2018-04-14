@@ -47,6 +47,7 @@ SRCS=	ati_pcigart.c \
 	drm_info.c \
 	drm_irq.c \
 	drm_kms_helper_common.c \
+	drm_lease.c \
 	drm_lock.c \
 	drm_memory.c \
 	drm_mipi_dsi.c \
