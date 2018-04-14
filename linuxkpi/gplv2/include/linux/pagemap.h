@@ -77,7 +77,7 @@ fault_in_pages_readable(char __user *uaddr, int size)
 }
 	
 static inline void
-release_pages(struct page **pages, int nr, bool cold)
+release_pages(struct page **pages, int nr)
 {
 	int i;
 

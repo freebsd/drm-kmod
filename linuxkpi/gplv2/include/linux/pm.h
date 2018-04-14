@@ -29,6 +29,10 @@
 #include <linux/timer.h>
 #include <linux/completion.h>
 
+#define	DPM_FLAG_NEVER_SKIP	BIT(0)
+#define	DPM_FLAG_SMART_PREPARE	BIT(1)
+#define	DPM_FLAG_SMART_SUSPEND	BIT(2)
+
 struct device;
 
 extern const char power_group_name[];		/* = "power" */

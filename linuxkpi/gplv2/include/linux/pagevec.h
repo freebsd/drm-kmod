@@ -18,27 +18,12 @@ struct address_space;
 
 struct pagevec {
 	unsigned long nr;
-	unsigned long cold;
 	struct page *pages[PAGEVEC_SIZE];
 };
 
-/* void __pagevec_release(struct pagevec *pvec); */
-/* void __pagevec_lru_add(struct pagevec *pvec); */
-/* unsigned pagevec_lookup_entries(struct pagevec *pvec, */
-/* 				struct address_space *mapping, */
-/* 				pgoff_t start, unsigned nr_entries, */
-/* 				pgoff_t *indices); */
-/* void pagevec_remove_exceptionals(struct pagevec *pvec); */
-/* unsigned pagevec_lookup(struct pagevec *pvec, struct address_space *mapping, */
-/* 		pgoff_t start, unsigned nr_pages); */
-/* unsigned pagevec_lookup_tag(struct pagevec *pvec, */
-/* 		struct address_space *mapping, pgoff_t *index, int tag, */
-/* 		unsigned nr_pages); */
-
-static inline void pagevec_init(struct pagevec *pvec, int cold)
+static inline void pagevec_init(struct pagevec *pvec)
 {
 	pvec->nr = 0;
-	pvec->cold = cold;
 }
 
 static inline void pagevec_reinit(struct pagevec *pvec)
@@ -68,7 +53,7 @@ static inline unsigned pagevec_add(struct pagevec *pvec, struct page *page)
 
 static inline void __pagevec_release(struct pagevec *pvec)
 {
-	release_pages(pvec->pages, pagevec_count(pvec), pvec->cold);
+	release_pages(pvec->pages, pagevec_count(pvec));
 	pagevec_reinit(pvec);
 }
 
