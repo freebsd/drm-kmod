@@ -68,7 +68,6 @@ SRCS=	atom.c \
 	radeon_i2c.c \
 	radeon_ib.c \
 	radeon_irq_kms.c \
-	radeon_kfd.c \
 	radeon_kms.c \
 	radeon_legacy_crtc.c \
 	radeon_legacy_encoders.c \
