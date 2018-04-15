@@ -25,6 +25,11 @@
 
 #include <drm/amd_asic_type.h>
 
+#ifndef __linux__
+// Fix compile error
+#include <linux/seq_file.h>
+#endif
+
 #define AMD_MAX_USEC_TIMEOUT		200000  /* 200 ms */
 
 /*

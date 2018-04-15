@@ -27,7 +27,9 @@
 #ifndef __DAL_FIXED32_32_H__
 #define __DAL_FIXED32_32_H__
 
-#include "os_types.h"
+#ifndef __linux__
+#include <linux/types.h>
+#endif
 
 struct fixed32_32 {
 	uint64_t value;

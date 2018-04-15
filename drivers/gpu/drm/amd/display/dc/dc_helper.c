@@ -27,7 +27,9 @@
  *      Author: agrodzov
  */
 #include "dm_services.h"
+#ifdef __linux__
 #include <stdarg.h>
+#endif
 
 uint32_t generic_reg_update_ex(const struct dc_context *ctx,
 		uint32_t addr, uint32_t reg_val, int n,
