@@ -111,6 +111,7 @@
 #include <linux/math64.h>
 #include <linux/dma-fence.h>
 #include <linux/module.h>
+#include <linux/refcount.h>
 
 #include <drm/drm_hashtab.h>
 #ifdef __linux__
@@ -134,13 +135,13 @@
 
 
 #include <asm/mtrr.h>
+#include <drm/drm_os_freebsd.h>
 #include <drm/drm_agpsupport.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_global.h>
 #include <drm/drm_hashtab.h>
 #include <drm/drm_mm.h>
-#include <drm/drm_os_freebsd.h>
 #include <drm/drm_ioctl.h>
 #include <uapi/drm/drm_sarea.h>
 #include <drm/drm_vma_manager.h>

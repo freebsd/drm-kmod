@@ -61,8 +61,8 @@ typedef int32_t  __s32;
 typedef uint32_t __u32;
 typedef int64_t  __s64;
 typedef uint64_t __u64;
-#endif
 typedef size_t   __kernel_size_t;
+#endif
 typedef unsigned long drm_handle_t;
 #include <drm/drm_os_freebsd.h>
 #endif

@@ -35,8 +35,8 @@
 #include <linux/slab.h>
 #include <linux/module.h>
 
-#include <drm/drm_file.h>
 #include <drm/drmP.h>
+#include <drm/drm_file.h>
 
 #include "drm_legacy.h"
 #include "drm_internal.h"

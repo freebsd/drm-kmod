@@ -30,6 +30,10 @@
 #undef	CONFIG_INTEL_IOMMU
 #endif
 
+#ifdef _KERNEL
+#define	__KERNEL__
+#endif
+
 // For platforms with SSE4.1 (needed for GuC logging)
 /* #define CONFIG_AS_MOVNTDQA */
 
@@ -100,5 +104,9 @@
 // Only include header in asm/iosf_mbi.h for now and keep disabled
 //#define CONFIG_IOSF_MBI 1
 
+
+// Enable new amd display controller
+#define	CONFIG_DRM_AMD_DC 1
+#define	CONFIG_DRM_AMD_DC_DCN1_0 1
 
 #endif
