@@ -315,9 +315,11 @@ static void ttm_pages_put(struct page *pages[], unsigned npages,
 			if (set_pages_wb(pages[i], pages_nr))
 				pr_err("Failed to set %d pages to wb!\n", pages_nr);
 		}
+#ifndef __linux__
 		vm_page_lock(pages[i]);
 		vm_page_unwire(pages[i], PQ_NONE);
 		vm_page_unlock(pages[i]);
+#endif
 		__free_pages(pages[i], order);
 	}
 }
@@ -383,9 +385,10 @@ restart:
 #ifdef __linux__
 			__list_del(p->lru.prev, &pool->list);
 #else
-			for (i = 0; i < freed_pages; i++)
+			for (i = 0; i < freed_pages; i++) {
 				TAILQ_REMOVE(&pool->list, pages_to_free[i],
 				    plinks.q);
+			}
 #endif
 
 			ttm_pool_update_free_locked(pool, freed_pages);
@@ -424,8 +427,9 @@ restart:
 #ifdef __linux__
 		__list_del(&p->lru, &pool->list);
 #else
-		for (i = 0; i < freed_pages; i++)
+		for (i = 0; i < freed_pages; i++) {
 			TAILQ_REMOVE(&pool->list, pages_to_free[i], plinks.q);
+		}
 #endif
 
 		ttm_pool_update_free_locked(pool, freed_pages);
@@ -821,7 +825,7 @@ out:
 		}
 #else
 		TAILQ_FOREACH(page, pages, plinks.q) {
-			pmap_zero_page(p);
+			pmap_zero_page(page);
 		}
 #endif
 	}
@@ -1033,15 +1037,16 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 				return -ENOMEM;
 			}
 
-			/* Swap the pages if we detect consecutive order */
-			if (i > first && pages[i - 1] == p - 1)
-				swap(p, pages[i - 1]);
-
 #ifndef __linux__
 			vm_page_lock(p);
 			vm_page_wire(p);
 			vm_page_unlock(p);
 #endif
+
+			/* Swap the pages if we detect consecutive order */
+			if (i > first && pages[i - 1] == p - 1)
+				swap(p, pages[i - 1]);
+
 			pages[i++] = p;
 			--npages;
 		}
