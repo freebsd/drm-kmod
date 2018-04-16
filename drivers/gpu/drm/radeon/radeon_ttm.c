@@ -953,14 +953,14 @@ static struct vm_operations_struct radeon_ttm_vm_ops;
 static const struct vm_operations_struct *ttm_vm_ops = NULL;
 
 #ifdef __linux__
-static int radeon_ttm_fault(struct vm_fault *vmf)
+static vm_fault_t radeon_ttm_fault(struct vm_fault *vmf)
 #else
-static int radeon_ttm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
+static vm_fault_t radeon_ttm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 #endif
 {
 	struct ttm_buffer_object *bo;
 	struct radeon_device *rdev;
-	int r;
+	vm_fault_t ret;
 
 	bo = (struct ttm_buffer_object *)vmf->vma->vm_private_data;
 	if (bo == NULL) {
@@ -969,12 +969,12 @@ static int radeon_ttm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	rdev = radeon_get_rdev(bo->bdev);
 	down_read(&rdev->pm.mclk_lock);
 #ifdef __linux__
-	r = ttm_vm_ops->fault(vmf);
+	ret = ttm_vm_ops->fault(vmf);
 #else
-	r = ttm_vm_ops->fault(dummy, vmf);
+	ret = ttm_vm_ops->fault(dummy, vmf);
 #endif
 	up_read(&rdev->pm.mclk_lock);
-	return r;
+	return ret;
 }
 
 int radeon_mmap(struct file *filp, struct vm_area_struct *vma)
