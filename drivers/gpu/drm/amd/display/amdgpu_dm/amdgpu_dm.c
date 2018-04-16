@@ -4626,8 +4626,8 @@ static int dm_update_crtcs_state(struct dc *dc,
 	for_each_oldnew_crtc_in_state(state, crtc, old_crtc_state, new_crtc_state, i) {
 		struct amdgpu_crtc *acrtc = NULL;
 		struct amdgpu_dm_connector *aconnector = NULL;
-		struct drm_connector_state *drm_new_conn_state = NULL, *drm_old_conn_state = NULL;
-		struct dm_connector_state *dm_new_conn_state = NULL, *dm_old_conn_state = NULL;
+		struct drm_connector_state *new_con_state = NULL;
+		struct dm_connector_state *dm_conn_state = NULL;
 		struct drm_plane_state *new_plane_state = NULL;
 
 		new_stream = NULL;
