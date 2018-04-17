@@ -258,7 +258,7 @@ static int dm_dp_mst_get_modes(struct drm_connector *connector)
 
 		if (aconnector->dc_sink)
 			amdgpu_dm_add_sink_to_freesync_module(
-					connector, aconnector->edid);
+					connector, edid);
 	}
 
 	drm_mode_connector_update_edid_property(
