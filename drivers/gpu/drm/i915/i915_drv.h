@@ -77,6 +77,7 @@
 #include "i915_gem_timeline.h"
 #include "i915_gpu_error.h"
 #include "i915_request.h"
+#include "i915_scheduler.h"
 #include "i915_vma.h"
 
 #include "intel_gvt.h"
@@ -3204,7 +3205,7 @@ int i915_gem_object_wait(struct drm_i915_gem_object *obj,
 			 struct intel_rps_client *rps);
 int i915_gem_object_wait_priority(struct drm_i915_gem_object *obj,
 				  unsigned int flags,
-				  int priority);
+				  const struct i915_sched_attr *attr);
 #define I915_PRIORITY_DISPLAY I915_PRIORITY_MAX
 
 int __must_check
