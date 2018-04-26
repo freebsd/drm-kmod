@@ -3,6 +3,7 @@
 #define _INTEL_RINGBUFFER_H_
 
 #include <linux/hashtable.h>
+#include <linux/seqlock.h>
 
 #ifndef __linux__
 /* For tasklet_struct */
@@ -600,7 +601,7 @@ struct intel_engine_cs {
 		/**
 		 * @lock: Lock protecting the below fields.
 		 */
-		spinlock_t lock;
+		seqlock_t lock;
 		/**
 		 * @enabled: Reference count indicating number of listeners.
 		 */
@@ -1069,7 +1070,7 @@ static inline void intel_engine_context_in(struct intel_engine_cs *engine)
 	if (READ_ONCE(engine->stats.enabled) == 0)
 		return;
 
-	spin_lock_irqsave(&engine->stats.lock, flags);
+	write_seqlock_irqsave(&engine->stats.lock, flags);
 
 	if (engine->stats.enabled > 0) {
 		if (engine->stats.active++ == 0)
@@ -1077,7 +1078,7 @@ static inline void intel_engine_context_in(struct intel_engine_cs *engine)
 		GEM_BUG_ON(engine->stats.active == 0);
 	}
 
-	spin_unlock_irqrestore(&engine->stats.lock, flags);
+	write_sequnlock_irqrestore(&engine->stats.lock, flags);
 }
 
 static inline void intel_engine_context_out(struct intel_engine_cs *engine)
@@ -1087,7 +1088,7 @@ static inline void intel_engine_context_out(struct intel_engine_cs *engine)
 	if (READ_ONCE(engine->stats.enabled) == 0)
 		return;
 
-	spin_lock_irqsave(&engine->stats.lock, flags);
+	write_seqlock_irqsave(&engine->stats.lock, flags);
 
 	if (engine->stats.enabled > 0) {
 		ktime_t last;
@@ -1114,7 +1115,7 @@ static inline void intel_engine_context_out(struct intel_engine_cs *engine)
 		}
 	}
 
-	spin_unlock_irqrestore(&engine->stats.lock, flags);
+	write_sequnlock_irqrestore(&engine->stats.lock, flags);
 }
 
 int intel_enable_engine_stats(struct intel_engine_cs *engine);
