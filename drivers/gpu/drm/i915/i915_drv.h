@@ -2077,8 +2077,9 @@ struct drm_i915_private {
 		void (*resume)(struct drm_i915_private *);
 		void (*cleanup_engine)(struct intel_engine_cs *engine);
 
-		struct list_head timelines;
 		struct i915_gem_timeline global_timeline;
+		struct list_head timelines;
+		struct list_head rings;
 		u32 active_requests;
 		u32 request_serial;
 
