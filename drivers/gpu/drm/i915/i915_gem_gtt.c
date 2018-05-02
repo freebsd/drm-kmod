@@ -2115,8 +2115,6 @@ static void i915_address_space_init(struct i915_address_space *vm,
 				    struct drm_i915_private *dev_priv,
 				    const char *name)
 {
-	i915_gem_timeline_init(dev_priv, &vm->timeline, name);
-
 	drm_mm_init(&vm->mm, 0, vm->total);
 	vm->mm.head_node.color = I915_COLOR_UNEVICTABLE;
 
@@ -2133,7 +2131,6 @@ static void i915_address_space_fini(struct i915_address_space *vm)
 	if (pagevec_count(&vm->free_pages))
 		vm_free_pages_release(vm, true);
 
-	i915_gem_timeline_fini(&vm->timeline);
 	drm_mm_takedown(&vm->mm);
 	list_del(&vm->global_link);
 }
