@@ -41,11 +41,9 @@
 #ifndef __linux__ // For linux_resource
 #include <linux/pci.h>
 #endif
-
-#include "i915_gem_timeline.h"
-
 #include "i915_request.h"
 #include "i915_selftest.h"
+#include "i915_timeline.h"
 
 #define I915_GTT_PAGE_SIZE_4K BIT(12)
 #define I915_GTT_PAGE_SIZE_64K BIT(16)
