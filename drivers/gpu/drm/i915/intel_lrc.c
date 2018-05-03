@@ -1934,7 +1934,7 @@ static int gen8_emit_bb_start(struct i915_request *rq,
 		rq->ctx->ppgtt->pd_dirty_rings &= ~intel_engine_flag(rq->engine);
 	}
 
-	cs = intel_ring_begin(rq, 4);
+	cs = intel_ring_begin(rq, 6);
 	if (IS_ERR(cs))
 		return PTR_ERR(cs);
 
@@ -1963,6 +1963,9 @@ static int gen8_emit_bb_start(struct i915_request *rq,
 		(flags & I915_DISPATCH_RS ? MI_BATCH_RESOURCE_STREAMER : 0);
 	*cs++ = lower_32_bits(offset);
 	*cs++ = upper_32_bits(offset);
+
+	*cs++ = MI_ARB_ON_OFF | MI_ARB_DISABLE;
+	*cs++ = MI_NOOP;
 	intel_ring_advance(rq, cs);
 
 	return 0;
@@ -2105,7 +2108,7 @@ static void gen8_emit_breadcrumb(struct i915_request *request, u32 *cs)
 	cs = gen8_emit_ggtt_write(cs, request->global_seqno,
 				  intel_hws_seqno_address(request->engine));
 	*cs++ = MI_USER_INTERRUPT;
-	*cs++ = MI_NOOP;
+	*cs++ = MI_ARB_ON_OFF | MI_ARB_ENABLE;
 	request->tail = intel_ring_offset(request, cs);
 	assert_ring_tail_valid(request->ring, request->tail);
 
@@ -2121,7 +2124,7 @@ static void gen8_emit_breadcrumb_rcs(struct i915_request *request, u32 *cs)
 	cs = gen8_emit_ggtt_write_rcs(cs, request->global_seqno,
 				      intel_hws_seqno_address(request->engine));
 	*cs++ = MI_USER_INTERRUPT;
-	*cs++ = MI_NOOP;
+	*cs++ = MI_ARB_ON_OFF | MI_ARB_ENABLE;
 	request->tail = intel_ring_offset(request, cs);
 	assert_ring_tail_valid(request->ring, request->tail);
 
