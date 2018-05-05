@@ -559,7 +559,9 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 				 lessor_file->f_mode,
 				 fops_get(lessor_file->f_inode->i_fop));
 #else
-	// BSDFIXME!!
+	// BSDFIXME!
+	// missing path_get
+	printf("%s: missing implementation!\n", __func__);
 	lessee_file = NULL;
 #endif       
 	if (IS_ERR(lessee_file)) {

@@ -231,4 +231,4 @@ anon_inodefs_uninit(PFS_INIT_ARGS)
 	return (0);
 }
 
-PSEUDOFS(anon_inodefs, 1, PR_ALLOW_MOUNT_LINSYSFS);
+PSEUDOFS(anon_inodefs, 1, VFCF_JAIL);

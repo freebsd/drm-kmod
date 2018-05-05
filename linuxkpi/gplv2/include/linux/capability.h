@@ -20,8 +20,12 @@ capable(enum __lkpi_capabilities cap)
 
 	switch (cap) {
 	case CAP_SYS_ADMIN:
-	case CAP_SYS_NICE: // XXX: What to do here?
 		return (priv_check(curthread, PRIV_DRIVER) == 0);
+		break;
+	case CAP_SYS_NICE:
+		// BSDFIXME: What to do for CAP_SYS_NICE?
+		return (priv_check(curthread, PRIV_DRIVER) == 0);
+		break;
 	default:
 		panic("%s: unhandled capability: %0x", __func__, cap);
 		return (false);

@@ -147,7 +147,7 @@ static int drm_set_busid(struct drm_device *dev, struct drm_file *file_priv)
 #ifdef __linux__
 	if (dev->dev && dev_is_pci(dev->dev)) {
 #else
-	// XXX: Assume it's PCI for now
+	// BSDFIXME: Assume it's PCI for now
 	if (dev->dev) {
 #endif
 		ret = drm_pci_set_busid(dev, master);

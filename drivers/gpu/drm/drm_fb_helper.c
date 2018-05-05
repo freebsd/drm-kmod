@@ -1444,6 +1444,7 @@ EXPORT_SYMBOL(drm_fb_helper_setcmap);
 int drm_fb_helper_ioctl(struct fb_info *info, unsigned int cmd,
 			unsigned long arg)
 {
+	printf("%s: cmd = %u\n", __func__, cmd);
 	struct drm_fb_helper *fb_helper = info->par;
 	struct drm_mode_set *mode_set;
 	struct drm_crtc *crtc;
