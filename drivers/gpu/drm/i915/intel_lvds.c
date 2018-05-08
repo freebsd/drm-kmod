@@ -1008,6 +1008,11 @@ void intel_lvds_init(struct drm_i915_private *dev_priv)
 	if (dmi_check_system(intel_no_lvds))
 		return;
 
+	if (!dev_priv->vbt.int_lvds_support) {
+		DRM_DEBUG_KMS("Internal LVDS support disabled by VBT\n");
+		return;
+	}
+
 	if (HAS_PCH_SPLIT(dev_priv))
 		lvds_reg = PCH_LVDS;
 	else
@@ -1018,10 +1023,6 @@ void intel_lvds_init(struct drm_i915_private *dev_priv)
 	if (HAS_PCH_SPLIT(dev_priv)) {
 		if ((lvds & LVDS_DETECTED) == 0)
 			return;
-		if (dev_priv->vbt.edp.support) {
-			DRM_DEBUG_KMS("disable LVDS for eDP support\n");
-			return;
-		}
 	}
 
 	pin = GMBUS_PIN_PANEL;
