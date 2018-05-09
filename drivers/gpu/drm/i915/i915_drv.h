@@ -1075,6 +1075,7 @@ struct intel_vbt_data {
 	} edp;
 
 	struct {
+		bool enable;
 		bool full_link;
 		bool require_aux_wakeup;
 		int idle_frames;
