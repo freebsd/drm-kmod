@@ -6,8 +6,8 @@
 #include <linux/types.h>
 
 struct dentry *anon_inodefs_create_file(const char *name, umode_t mode,
-										struct dentry *parent, void *data,
-										const struct file_operations *fops);
+    struct dentry *parent, void *data,
+    const struct file_operations *fops);
 
 void anon_inodefs_remove(struct dentry *dentry);
 

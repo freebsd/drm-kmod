@@ -30,7 +30,7 @@
  * @cb:			fence callback information
  */
 struct sync_file {
-	struct file		*file;
+	struct file		*file; /* linux_file */
 	/**
 	 * @user_name:
 	 *

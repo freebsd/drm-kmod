@@ -95,6 +95,7 @@
 #include <linux/idr.h>
 #include <linux/string.h>
 #include <linux/compat.h>
+#include <linux/compiler.h>
 #include <linux/fs.h>
 #include <linux/gfp.h>
 #include <linux/pm.h>

@@ -62,7 +62,6 @@ struct dentry_meta {
 static int
 anon_inodefs_attr(PFS_ATTR_ARGS)
 {
-	printf("%s: \n",__func__);
 	struct dentry_meta *dm;
 
 	dm = pn->pn_data;
@@ -74,7 +73,6 @@ anon_inodefs_attr(PFS_ATTR_ARGS)
 static int
 anon_inodefs_destroy(PFS_DESTROY_ARGS)
 {
-	printf("%s: \n",__func__);
 	struct dentry_meta *d;
 
 	d = pn->pn_data;
@@ -85,67 +83,22 @@ anon_inodefs_destroy(PFS_DESTROY_ARGS)
 static int
 anon_inodefs_fill(PFS_FILL_ARGS)
 {
-	printf("%s: \n",__func__);
+
 	return 0;
-
-	struct dentry_meta *d;
-	struct linux_file lf;
-	struct seq_file *sf;
-	struct vnode vn;
-	void *buf;
-	int rc;
-	size_t len;
-	off_t off;
-
-	d = pn->pn_data;
-
-	if ((rc = linux_set_current_flags(curthread, M_NOWAIT)))
-		return (rc);
-	vn.v_data = d->dm_data;
-	buf = uio->uio_iov[0].iov_base;
-	len = min(uio->uio_iov[0].iov_len, uio->uio_resid);
-	off = 0;
-	lf.private_data = NULL;
-	rc = d->dm_fops->open(&vn, &lf);
-	if (rc < 0) {
-#ifdef INVARIANTS
-		printf("open failed with %d\n", rc);
-#endif
-		return (-rc);
-	}
-	sf = lf.private_data;
-	sf->buf = sb;
-	if (uio->uio_rw == UIO_READ)
-		rc = d->dm_fops->read(&lf, NULL, len, &off);
-	else
-		rc = d->dm_fops->write(&lf, buf, len, &off);
-	if (d->dm_fops->release)
-		d->dm_fops->release(&vn, &lf);
-	else
-		single_release(&vn, &lf);
-	
-	if (rc < 0) {
-#ifdef INVARIANTS
-		printf("read/write return %d\n", rc);
-#endif
-		return (-rc);
-	}
-	return (0);
 }
 
 struct dentry *
 anon_inodefs_create_file(const char *name, umode_t mode,
-						 struct dentry *parent, void *data,
-						 const struct file_operations *fops)
+    struct dentry *parent, void *data,
+    const struct file_operations *fops)
 {
-	printf("%s: name = %s\n",__func__, name);
-	
 	struct pfs_node *p = pfs_find_node(anon_inodefs_root, name);
 	if (p) {
-		printf("%s: ERROR: node with name = %s already exists\n",__func__, name);
+		printf("%s: ERROR: node with name = %s already exists\n",
+		    __func__, name);
 		return NULL;
 	}
-	
+
 	struct dentry_meta *dm;
 	struct dentry *dnode;
 	struct pfs_node *pnode;
@@ -162,63 +115,25 @@ anon_inodefs_create_file(const char *name, umode_t mode,
 		pnode = parent->d_pfs_node;
 	else
 		pnode = anon_inodefs_root;
-	
-	flags = 0; //fops->write ? PFS_RDWR : PFS_RD;
+
+	flags = 0;
 	dnode->d_pfs_node = pfs_create_file(pnode, name, anon_inodefs_fill,
 	    anon_inodefs_attr, NULL, anon_inodefs_destroy, flags);
 	dnode->d_pfs_node->pn_data = dm;
 
 	return (dnode);
 }
-/*
-struct dentry *
-anon_inodefs_create_dir(const char *name, struct dentry *parent)
-{
-	printf("%s: \n",__func__);
-	struct dentry_meta *dm;
-	struct dentry *dnode;
-	struct pfs_node *pnode;
 
-	dm = malloc(sizeof(*dm), M_AFSINT, M_NOWAIT | M_ZERO);
-	if (dm == NULL)
-		return (NULL);
-	dnode = &dm->dm_dnode;
-	dm->dm_mode = 0700;
-	if (parent != NULL)
-		pnode = parent->d_pfs_node;
-	else
-		pnode = anon_inodefs_root;
-
-	dnode->d_pfs_node = pfs_create_dir(pnode, name, anon_inodefs_attr, NULL, anon_inodefs_destroy, PFS_RD);
-	dnode->d_pfs_node->pn_data = dm;
-	return (dnode);
-}
-*/
 void
 anon_inodefs_remove(struct dentry *dentry)
 {
-	printf("%s: \n",__func__);
 
-	struct pfs_node *parent = dentry->d_pfs_node->pn_parent;
-	if (parent)
-		mtx_lock(&parent->pn_mutex);
-	pfs_destroy(dentry->d_pfs_node);
-	if (parent)
-		mtx_unlock(&parent->pn_mutex);
-}
-/*
-void
-anon_inodefs_remove_recursive(struct dentry *dentry)
-{
-	printf("%s: \n",__func__);
 	pfs_destroy(dentry->d_pfs_node);
 }
-*/
 
 static int
 anon_inodefs_init(PFS_INIT_ARGS)
 {
-	printf("%s: \n",__func__);
 
 	anon_inodefs_root = pi->pi_root;
 	return (0);
@@ -227,7 +142,7 @@ anon_inodefs_init(PFS_INIT_ARGS)
 static int
 anon_inodefs_uninit(PFS_INIT_ARGS)
 {
-	printf("%s: \n",__func__);
+
 	return (0);
 }
 

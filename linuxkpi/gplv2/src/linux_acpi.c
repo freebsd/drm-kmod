@@ -3,6 +3,10 @@
 #include <linux/pci.h>
 
 
+#define	_COMPONENT	ACPI_OS_SERVICES
+
+ACPI_MODULE_NAME("linux_acpi")
+
 
 char empty_zero_page[PAGE_SIZE] __aligned(PAGE_SIZE);
 

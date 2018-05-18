@@ -307,6 +307,7 @@ static int sync_file_release(struct inode *inode, struct file *file)
 	if (test_bit(POLL_ENABLED, &sync_file->flags))
 		dma_fence_remove_callback(sync_file->fence, &sync_file->cb);
 	dma_fence_put(sync_file->fence);
+	anon_inode_release(file);
 	kfree(sync_file);
 
 	return 0;
