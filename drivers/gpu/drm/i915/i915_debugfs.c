@@ -1912,7 +1912,7 @@ static int i915_gem_framebuffer_info(struct seq_file *m, void *data)
 			   fbdev_fb->base.format->cpp[0] * 8,
 			   fbdev_fb->base.modifier,
 			   drm_framebuffer_read_refcount(&fbdev_fb->base));
-		describe_obj(m, fbdev_fb->obj);
+		describe_obj(m, intel_fb_obj(&fbdev_fb->base));
 		seq_putc(m, '\n');
 	}
 #endif
@@ -1930,7 +1930,7 @@ static int i915_gem_framebuffer_info(struct seq_file *m, void *data)
 			   fb->base.format->cpp[0] * 8,
 			   fb->base.modifier,
 			   drm_framebuffer_read_refcount(&fb->base));
-		describe_obj(m, fb->obj);
+		describe_obj(m, intel_fb_obj(&fb->base));
 		seq_putc(m, '\n');
 	}
 	mutex_unlock(&dev->mode_config.fb_lock);
