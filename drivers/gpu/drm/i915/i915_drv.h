@@ -2446,6 +2446,12 @@ intel_info(const struct drm_i915_private *dev_priv)
 
 #define HAS_LEGACY_SEMAPHORES(dev_priv) IS_GEN7(dev_priv)
 
+/*
+ * The Gen7 cmdparser copies the scanned buffer to the ggtt for execution
+ * All later gens can run the final buffer from the ppgtt
+ */
+#define CMDPARSER_USES_GGTT(dev_priv) IS_GEN7(dev_priv)
+
 #define HAS_LLC(dev_priv)	((dev_priv)->info.has_llc)
 #define HAS_SNOOP(dev_priv)	((dev_priv)->info.has_snoop)
 #define HAS_EDRAM(dev_priv)	(!!((dev_priv)->edram_cap & EDRAM_ENABLED))
@@ -2880,6 +2886,14 @@ i915_gem_object_ggtt_pin(struct drm_i915_gem_object *obj,
 
 int i915_gem_object_unbind(struct drm_i915_gem_object *obj);
 void i915_gem_release_mmap(struct drm_i915_gem_object *obj);
+
+struct i915_vma * __must_check
+i915_gem_object_pin(struct drm_i915_gem_object *obj,
+		    struct i915_address_space *vm,
+		    const struct i915_ggtt_view *view,
+		    u64 size,
+		    u64 alignment,
+		    u64 flags);
 
 void i915_gem_runtime_suspend(struct drm_i915_private *dev_priv);
 
