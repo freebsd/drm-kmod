@@ -1156,10 +1156,10 @@ static unsigned int dcn_find_normalized_clock_vdd_Level(
 
 	switch (clocks_type) {
 	case DM_PP_CLOCK_TYPE_DISPLAY_CLK:
-		if (clocks_in_khz > dc->dcn_soc->max_dispclk_vmax0p9*1000) {
+		/*if (clocks_in_khz > dc->dcn_soc->max_dispclk_vmax0p9*1000) {
 			vdd_level = dcn_bw_v_max0p91;
-			BREAK_TO_DEBUGGER();
-		} else if (clocks_in_khz > dc->dcn_soc->max_dispclk_vnom0p8*1000) {
+			//BREAK_TO_DEBUGGER();
+		} else*/ if (clocks_in_khz > dc->dcn_soc->max_dispclk_vnom0p8*1000) {
 			vdd_level = dcn_bw_v_max0p9;
 		} else if (clocks_in_khz > dc->dcn_soc->max_dispclk_vmid0p72*1000) {
 			vdd_level = dcn_bw_v_nom0p8;
@@ -1169,10 +1169,10 @@ static unsigned int dcn_find_normalized_clock_vdd_Level(
 			vdd_level = dcn_bw_v_min0p65;
 		break;
 	case DM_PP_CLOCK_TYPE_DISPLAYPHYCLK:
-		if (clocks_in_khz > dc->dcn_soc->phyclkv_max0p9*1000) {
+		/*if (clocks_in_khz > dc->dcn_soc->phyclkv_max0p9*1000) {
 			vdd_level = dcn_bw_v_max0p91;
 			BREAK_TO_DEBUGGER();
-		} else if (clocks_in_khz > dc->dcn_soc->phyclkv_nom0p8*1000) {
+		} else*/ if (clocks_in_khz > dc->dcn_soc->phyclkv_nom0p8*1000) {
 			vdd_level = dcn_bw_v_max0p9;
 		} else if (clocks_in_khz > dc->dcn_soc->phyclkv_mid0p72*1000) {
 			vdd_level = dcn_bw_v_nom0p8;
@@ -1183,10 +1183,10 @@ static unsigned int dcn_find_normalized_clock_vdd_Level(
 		break;
 
 	case DM_PP_CLOCK_TYPE_DPPCLK:
-		if (clocks_in_khz > dc->dcn_soc->max_dppclk_vmax0p9*1000) {
+		/*if (clocks_in_khz > dc->dcn_soc->max_dppclk_vmax0p9*1000) {
 			vdd_level = dcn_bw_v_max0p91;
 			BREAK_TO_DEBUGGER();
-		} else if (clocks_in_khz > dc->dcn_soc->max_dppclk_vnom0p8*1000) {
+		} else*/ if (clocks_in_khz > dc->dcn_soc->max_dppclk_vnom0p8*1000) {
 			vdd_level = dcn_bw_v_max0p9;
 		} else if (clocks_in_khz > dc->dcn_soc->max_dppclk_vmid0p72*1000) {
 			vdd_level = dcn_bw_v_nom0p8;
@@ -1200,10 +1200,10 @@ static unsigned int dcn_find_normalized_clock_vdd_Level(
 		{
 			unsigned factor = (ddr4_dram_factor_single_Channel * dc->dcn_soc->number_of_channels);
 
-			if (clocks_in_khz > dc->dcn_soc->fabric_and_dram_bandwidth_vmax0p9*1000000/factor) {
+			/*if (clocks_in_khz > dc->dcn_soc->fabric_and_dram_bandwidth_vmax0p9*1000000/factor) {
 				vdd_level = dcn_bw_v_max0p91;
 				BREAK_TO_DEBUGGER();
-			} else if (clocks_in_khz > dc->dcn_soc->fabric_and_dram_bandwidth_vnom0p8*1000000/factor) {
+			} else */if (clocks_in_khz > dc->dcn_soc->fabric_and_dram_bandwidth_vnom0p8*1000000/factor) {
 				vdd_level = dcn_bw_v_max0p9;
 			} else if (clocks_in_khz > dc->dcn_soc->fabric_and_dram_bandwidth_vmid0p72*1000000/factor) {
 				vdd_level = dcn_bw_v_nom0p8;
@@ -1215,10 +1215,10 @@ static unsigned int dcn_find_normalized_clock_vdd_Level(
 		break;
 
 	case DM_PP_CLOCK_TYPE_DCFCLK:
-		if (clocks_in_khz > dc->dcn_soc->dcfclkv_max0p9*1000) {
+		/*if (clocks_in_khz > dc->dcn_soc->dcfclkv_max0p9*1000) {
 			vdd_level = dcn_bw_v_max0p91;
 			BREAK_TO_DEBUGGER();
-		} else if (clocks_in_khz > dc->dcn_soc->dcfclkv_nom0p8*1000) {
+		} else */if (clocks_in_khz > dc->dcn_soc->dcfclkv_nom0p8*1000) {
 			vdd_level = dcn_bw_v_max0p9;
 		} else if (clocks_in_khz > dc->dcn_soc->dcfclkv_mid0p72*1000) {
 			vdd_level = dcn_bw_v_nom0p8;
@@ -1236,7 +1236,7 @@ static unsigned int dcn_find_normalized_clock_vdd_Level(
 
 unsigned int dcn_find_dcfclk_suits_all(
 	const struct dc *dc,
-	struct clocks_value *clocks)
+	struct dc_clocks *clocks)
 {
 	unsigned vdd_level, vdd_level_temp;
 	unsigned dcf_clk;
@@ -1248,20 +1248,20 @@ unsigned int dcn_find_dcfclk_suits_all(
 
 	/*find a common supported voltage level*/
 	vdd_level = dcn_find_normalized_clock_vdd_Level(
-		dc, DM_PP_CLOCK_TYPE_DISPLAY_CLK, clocks->dispclk_in_khz);
+		dc, DM_PP_CLOCK_TYPE_DISPLAY_CLK, clocks->dispclk_khz);
 	vdd_level_temp = dcn_find_normalized_clock_vdd_Level(
-		dc, DM_PP_CLOCK_TYPE_DISPLAYPHYCLK, clocks->phyclk_in_khz);
+		dc, DM_PP_CLOCK_TYPE_DISPLAYPHYCLK, clocks->phyclk_khz);
 
 	vdd_level = dcn_bw_max(vdd_level, vdd_level_temp);
 	vdd_level_temp = dcn_find_normalized_clock_vdd_Level(
-		dc, DM_PP_CLOCK_TYPE_DPPCLK, clocks->dppclk_in_khz);
+		dc, DM_PP_CLOCK_TYPE_DPPCLK, clocks->dppclk_khz);
 	vdd_level = dcn_bw_max(vdd_level, vdd_level_temp);
 
 	vdd_level_temp = dcn_find_normalized_clock_vdd_Level(
-		dc, DM_PP_CLOCK_TYPE_MEMORY_CLK, clocks->dcfclock_in_khz);
+		dc, DM_PP_CLOCK_TYPE_MEMORY_CLK, clocks->fclk_khz);
 	vdd_level = dcn_bw_max(vdd_level, vdd_level_temp);
 	vdd_level_temp = dcn_find_normalized_clock_vdd_Level(
-		dc, DM_PP_CLOCK_TYPE_DCFCLK, clocks->dcfclock_in_khz);
+		dc, DM_PP_CLOCK_TYPE_DCFCLK, clocks->dcfclk_khz);
 
 	/*find that level conresponding dcfclk*/
 	vdd_level = dcn_bw_max(vdd_level, vdd_level_temp);
