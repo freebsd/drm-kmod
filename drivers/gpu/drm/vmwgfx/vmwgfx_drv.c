@@ -1294,8 +1294,6 @@ static void vmw_master_drop(struct drm_device *dev,
 	dev_priv->active_master = &dev_priv->fbdev_master;
 	ttm_lock_set_kill(&dev_priv->fbdev_master.lock, false, SIGTERM);
 	ttm_vt_unlock(&dev_priv->fbdev_master.lock);
-
-	vmw_fb_refresh(dev_priv);
 }
 
 /**
@@ -1499,7 +1497,6 @@ static int vmw_pm_freeze(struct device *kdev)
 			vmw_kms_resume(dev);
 		if (dev_priv->enable_fb)
 			vmw_fb_on(dev_priv);
-		vmw_fb_refresh(dev_priv);
 		return -EBUSY;
 	}
 
@@ -1538,8 +1535,6 @@ static int vmw_pm_restore(struct device *kdev)
 
 	if (dev_priv->enable_fb)
 		vmw_fb_on(dev_priv);
-
-	vmw_fb_refresh(dev_priv);
 
 	return 0;
 }
