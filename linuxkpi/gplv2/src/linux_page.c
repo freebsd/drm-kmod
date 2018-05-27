@@ -208,21 +208,6 @@ arch_io_free_memtype_wc(resource_size_t start, resource_size_t size)
 	set_memory_wb(start, size >> PAGE_SHIFT);
 }
 
-void *
-linux_page_address(struct page *page)
-{
-
-	if (page->object != kmem_object && page->object != kernel_object) {
-#ifdef LINUXKPI_HAVE_DMAP
-		return ((void *)PHYS_TO_DMAP(VM_PAGE_TO_PHYS(page)));
-#else
-		return (NULL);
-#endif
-	}
-	return ((void *)(uintptr_t)(VM_MIN_KERNEL_ADDRESS +
-	    IDX_TO_OFF(page->pindex)));
-}
-
 vm_paddr_t
 page_to_phys(vm_page_t page)
 {
