@@ -1712,9 +1712,11 @@ static int capture(void *data)
 					   error->i915->gt.last_init_time));
 
 	error->params = i915_modparams;
+#ifdef __linux__ /* assert panic in strlen here */
 #define DUP(T, x, ...) dup_param(#T, &error->params.x);
 	I915_PARAMS_FOR_EACH(DUP);
 #undef DUP
+#endif
 
 	i915_capture_gen_state(error->i915, error);
 	i915_capture_reg_state(error->i915, error);
@@ -1726,7 +1728,6 @@ static int capture(void *data)
 
 	error->overlay = intel_overlay_capture_error_state(error->i915);
 	error->display = intel_display_capture_error_state(error->i915);
-
 	return 0;
 }
 
