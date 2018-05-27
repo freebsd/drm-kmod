@@ -33,6 +33,10 @@
 #include "dcn10/dcn10_resource.h"
 #include "dcn_calc_math.h"
 
+#ifndef __linux__
+#include <machine/fpu.h>
+#endif
+
 /* Defaults from spreadsheet rev#247 */
 const struct dcn_soc_bounding_box dcn10_soc_defaults = {
 		/* latencies */
@@ -1097,6 +1101,7 @@ bool dcn_validate_bandwidth(
 	bw_limit = dc->dcn_soc->percent_disp_bw_limit * v->fabric_and_dram_bandwidth_vmax0p9;
 	bw_limit_pass = (v->total_data_read_bandwidth / 1000.0) < bw_limit;
 
+#ifdef __linux__
 	kernel_fpu_end();
 
 	PERFORMANCE_TRACE_END();
@@ -1105,6 +1110,12 @@ bool dcn_validate_bandwidth(
 		return true;
 	else
 		return false;
+#else
+	PERFORMANCE_TRACE_END();
+	bool ret = bw_limit_pass && v->voltage_level != 5;
+	kernel_fpu_end();
+	return ret;
+#endif
 }
 
 static unsigned int dcn_find_normalized_clock_vdd_Level(
@@ -1204,6 +1215,11 @@ unsigned int dcn_find_dcfclk_suits_all(
 	unsigned vdd_level, vdd_level_temp;
 	unsigned dcf_clk;
 
+#ifndef __linux__
+	/*  FreeBSD claim access to FPU here */
+	kernel_fpu_begin();
+#endif
+
 	/*find a common supported voltage level*/
 	vdd_level = dcn_find_normalized_clock_vdd_Level(
 		dc, DM_PP_CLOCK_TYPE_DISPLAY_CLK, clocks->dispclk_in_khz);
@@ -1237,6 +1253,10 @@ unsigned int dcn_find_dcfclk_suits_all(
 
 	dm_logger_write(dc->ctx->logger, LOG_BANDWIDTH_CALCS,
 		"\tdcf_clk for voltage = %d\n", dcf_clk);
+
+#ifndef __linux__
+	kernel_fpu_end();
+#endif
 	return dcf_clk;
 }
 

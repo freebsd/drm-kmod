@@ -1,11 +1,11 @@
 # $FreeBSD$
 
-SUBDIR=	drm		\
-	amd		\
+SUBDIR=	linuxkpi	\
+	drm		\
 	i915		\
+	amd		\
 	radeon		\
 	lindebugfs	\
-	linuxkpi	\
 	${_staging}	
 
 

@@ -1307,24 +1307,6 @@ void intel_uncore_init(struct drm_i915_private *dev_priv)
 		ASSIGN_READ_MMIO_VFUNCS(dev_priv, fwtable);
 	}
 
-#ifdef __linux__
-	// Patched for v4.12:
-	// in i915/selftests/intel_uncore.c
-	// selftests not included in freebsd yet
-	intel_fw_table_check(dev_priv);
-	if (INTEL_GEN(dev_priv) >= 8)
-		intel_shadow_table_check();
-#endif
-
-#ifdef __linux__
-	// Patched for v4.12:
-	// Compile error: missing function vgpu_xxx
-	// Skip for now, we don't support GVT yet anyway.
-	if (intel_vgpu_active(dev_priv)) {
-		ASSIGN_WRITE_MMIO_VFUNCS(vgpu);
-		ASSIGN_READ_MMIO_VFUNCS(vgpu);
-	}
-#endif
 	iosf_mbi_register_pmic_bus_access_notifier(
 		&dev_priv->uncore.pmic_bus_access_nb);
 
