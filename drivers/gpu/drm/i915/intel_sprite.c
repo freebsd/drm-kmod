@@ -1355,16 +1355,14 @@ static bool skl_plane_format_mod_supported(struct drm_plane *_plane,
 	}
 }
 
-static const struct drm_plane_funcs g4x_sprite_funcs = {
-	.update_plane = drm_atomic_helper_update_plane,
-	.disable_plane = drm_atomic_helper_disable_plane,
-	.destroy = intel_plane_destroy,
-	.atomic_get_property = intel_plane_atomic_get_property,
-	.atomic_set_property = intel_plane_atomic_set_property,
-	.atomic_duplicate_state = intel_plane_duplicate_state,
-	.atomic_destroy_state = intel_plane_destroy_state,
-	.format_mod_supported = g4x_sprite_format_mod_supported,
-};
+static bool intel_sprite_plane_format_mod_supported(struct drm_plane *plane,
+						    uint32_t format,
+						    uint64_t modifier)
+{
+	struct drm_i915_private *dev_priv = to_i915(plane->dev);
+
+	if (WARN_ON(modifier == DRM_FORMAT_MOD_INVALID))
+		return false;
 
 static const struct drm_plane_funcs snb_sprite_funcs = {
 	.update_plane = drm_atomic_helper_update_plane,
@@ -1388,7 +1386,7 @@ static const struct drm_plane_funcs vlv_sprite_funcs = {
 	.format_mod_supported = vlv_sprite_format_mod_supported,
 };
 
-static const struct drm_plane_funcs skl_plane_funcs = {
+static const struct drm_plane_funcs intel_sprite_plane_funcs = {
 	.update_plane = drm_atomic_helper_update_plane,
 	.disable_plane = drm_atomic_helper_disable_plane,
 	.destroy = intel_plane_destroy,
@@ -1396,7 +1394,7 @@ static const struct drm_plane_funcs skl_plane_funcs = {
 	.atomic_set_property = intel_plane_atomic_set_property,
 	.atomic_duplicate_state = intel_plane_duplicate_state,
 	.atomic_destroy_state = intel_plane_destroy_state,
-	.format_mod_supported = skl_plane_format_mod_supported,
+	.format_mod_supported = intel_sprite_plane_format_mod_supported,
 };
 
 bool skl_plane_has_ccs(struct drm_i915_private *dev_priv,
