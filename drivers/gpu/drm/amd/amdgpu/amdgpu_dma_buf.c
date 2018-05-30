@@ -179,8 +179,97 @@ err_fences_put:
 }
 
 /**
- * amdgpu_dma_buf_map_attach - &dma_buf_ops.attach implementation
- * @dma_buf: Shared DMA buffer
+ * amdgpu_dma_buf_attach - &dma_buf_ops.attach implementation
+ *
+ * @dmabuf: DMA-buf where we attach to
+ * @attach: attachment to add
+ *
+ * Add the attachment as user to the exported DMA-buf.
+ */
+static int amdgpu_dma_buf_attach(struct dma_buf *dmabuf,
+				 struct dma_buf_attachment *attach)
+{
+	struct drm_gem_object *obj = dmabuf->priv;
+	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
+	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
+	int r;
+
+	if (attach->dev->driver == adev->dev->driver)
+		return 0;
+
+	r = amdgpu_bo_reserve(bo, false);
+	if (unlikely(r != 0))
+		return r;
+
+	/*
+	 * We only create shared fences for internal use, but importers
+	 * of the dmabuf rely on exclusive fences for implicitly
+	 * tracking write hazards. As any of the current fences may
+	 * correspond to a write, we need to convert all existing
+	 * fences on the reservation object into a single exclusive
+	 * fence.
+	 */
+	r = __dma_resv_make_exclusive(bo->tbo.base.resv);
+	if (r)
+		return r;
+
+	bo->prime_shared_count++;
+	amdgpu_bo_unreserve(bo);
+	return 0;
+}
+
+/**
+ * amdgpu_dma_buf_detach - &dma_buf_ops.detach implementation
+ *
+ * @dmabuf: DMA-buf where we remove the attachment from
+ * @attach: the attachment to remove
+ *
+ * Called when an attachment is removed from the DMA-buf.
+ */
+static void amdgpu_dma_buf_detach(struct dma_buf *dmabuf,
+				  struct dma_buf_attachment *attach)
+{
+	struct drm_gem_object *obj = dmabuf->priv;
+	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
+	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
+
+	if (attach->dev->driver != adev->dev->driver && bo->prime_shared_count)
+		bo->prime_shared_count--;
+}
+
+/**
+ * amdgpu_dma_buf_pin - &dma_buf_ops.pin implementation
+ *
+ * @attach: attachment to pin down
+ *
+ * Pin the BO which is backing the DMA-buf so that it can't move any more.
+ */
+static int amdgpu_dma_buf_pin(struct dma_buf_attachment *attach)
+{
+	struct drm_gem_object *obj = attach->dmabuf->priv;
+	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
+
+	/* pin buffer into GTT */
+	return amdgpu_bo_pin(bo, AMDGPU_GEM_DOMAIN_GTT);
+}
+
+/**
+ * amdgpu_dma_buf_unpin - &dma_buf_ops.unpin implementation
+ *
+ * @attach: attachment to unpin
+ *
+ * Unpin a previously pinned BO to make it movable again.
+ */
+static void amdgpu_dma_buf_unpin(struct dma_buf_attachment *attach)
+{
+	struct drm_gem_object *obj = attach->dmabuf->priv;
+	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
+
+	amdgpu_bo_unpin(bo);
+}
+
+/**
+ * amdgpu_dma_buf_map - &dma_buf_ops.map_dma_buf implementation
  * @attach: DMA-buf attachment
  *
  * Makes sure that the shared DMA buffer can be accessed by the target device.
@@ -198,27 +287,18 @@ static int amdgpu_dma_buf_map_attach(struct dma_buf *dma_buf,
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	long r;
 
-	r = drm_gem_map_attach(dma_buf, attach);
-	if (r)
-		return r;
+	if (!bo->pin_count) {
+		/* move buffer into GTT */
+		struct ttm_operation_ctx ctx = { false, false };
 
-	r = amdgpu_bo_reserve(bo, false);
-	if (unlikely(r != 0))
-		goto error_detach;
-
-
-	if (attach->dev->driver != adev->dev->driver) {
-		/*
-		 * We only create shared fences for internal use, but importers
-		 * of the dmabuf rely on exclusive fences for implicitly
-		 * tracking write hazards. As any of the current fences may
-		 * correspond to a write, we need to convert all existing
-		 * fences on the reservation object into a single exclusive
-		 * fence.
-		 */
-		r = __dma_resv_make_exclusive(bo->tbo.base.resv);
+		amdgpu_bo_placement_from_domain(bo, AMDGPU_GEM_DOMAIN_GTT);
+		r = ttm_bo_validate(&bo->tbo, &bo->placement, &ctx);
 		if (r)
-			goto error_unreserve;
+			return ERR_PTR(r);
+
+	} else if (!(amdgpu_mem_type_to_domain(bo->tbo.mem.mem_type) &
+		     AMDGPU_GEM_DOMAIN_GTT)) {
+		return ERR_PTR(-EBUSY);
 	}
 
 	/* pin buffer into GTT */
@@ -249,22 +329,9 @@ error_detach:
 static void amdgpu_dma_buf_map_detach(struct dma_buf *dma_buf,
 				      struct dma_buf_attachment *attach)
 {
-	struct drm_gem_object *obj = dma_buf->priv;
-	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
-	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
-	int ret = 0;
-
-	ret = amdgpu_bo_reserve(bo, true);
-	if (unlikely(ret != 0))
-		goto error;
-
-	amdgpu_bo_unpin(bo);
-	if (attach->dev->driver != adev->dev->driver && bo->prime_shared_count)
-		bo->prime_shared_count--;
-	amdgpu_bo_unreserve(bo);
-
-error:
-	drm_gem_map_detach(dma_buf, attach);
+	dma_unmap_sg(attach->dev, sgt->sgl, sgt->nents, dir);
+	sg_free_table(sgt);
+	kfree(sgt);
 }
 
 /**
@@ -308,10 +375,13 @@ static int amdgpu_dma_buf_begin_cpu_access(struct dma_buf *dma_buf,
 }
 
 const struct dma_buf_ops amdgpu_dmabuf_ops = {
-	.attach = amdgpu_dma_buf_map_attach,
-	.detach = amdgpu_dma_buf_map_detach,
-	.map_dma_buf = drm_gem_map_dma_buf,
-	.unmap_dma_buf = drm_gem_unmap_dma_buf,
+	.dynamic_mapping = true,
+	.attach = amdgpu_dma_buf_attach,
+	.detach = amdgpu_dma_buf_detach,
+	.pin = amdgpu_dma_buf_pin,
+	.unpin = amdgpu_dma_buf_unpin,
+	.map_dma_buf = amdgpu_dma_buf_map,
+	.unmap_dma_buf = amdgpu_dma_buf_unmap,
 	.release = drm_gem_dmabuf_release,
 	.begin_cpu_access = amdgpu_dma_buf_begin_cpu_access,
 	.mmap = drm_gem_dmabuf_mmap,
