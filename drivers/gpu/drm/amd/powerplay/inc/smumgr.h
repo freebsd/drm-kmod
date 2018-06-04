@@ -32,7 +32,6 @@
 enum SMU_TABLE {
 	SMU_UVD_TABLE = 0,
 	SMU_VCE_TABLE,
-	SMU_SAMU_TABLE,
 	SMU_BIF_TABLE,
 };
 
@@ -50,7 +49,6 @@ enum SMU_MEMBER {
 	UcodeLoadStatus,
 	UvdBootLevel,
 	VceBootLevel,
-	SamuBootLevel,
 	LowSclkInterruptThreshold,
 	DRAM_LOG_ADDR_H,
 	DRAM_LOG_ADDR_L,
