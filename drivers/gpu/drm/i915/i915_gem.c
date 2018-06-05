@@ -2081,7 +2081,7 @@ int i915_gem_fault(struct vm_fault *vmf)
 int i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 #endif
 {
-#define MIN_CHUNK_PAGES ((1 << 20) >> PAGE_SHIFT) /* 1 MiB */
+#define MIN_CHUNK_PAGES (SZ_1M >> PAGE_SHIFT)
 	struct vm_area_struct *area = vmf->vma;
 	struct drm_i915_gem_object *obj = to_intel_bo(area->vm_private_data);
 	struct drm_device *dev = obj->base.dev;
