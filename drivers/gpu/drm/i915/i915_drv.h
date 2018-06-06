@@ -41,6 +41,7 @@
 #include <linux/hash.h>
 #include <linux/intel-iommu.h>
 #include <linux/kref.h>
+#include <linux/mm_types.h>
 #include <linux/perf_event.h>
 #include <linux/pm_qos.h>
 #include <linux/reservation.h>
@@ -3208,13 +3209,12 @@ int i915_gem_wait_for_idle(struct drm_i915_private *dev_priv,
 int __must_check i915_gem_suspend(struct drm_i915_private *dev_priv);
 void i915_gem_suspend_late(struct drm_i915_private *dev_priv);
 void i915_gem_resume(struct drm_i915_private *dev_priv);
-#ifdef __linux__
-int i915_gem_fault(struct vm_fault *vmf);
-#else
-int i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf);
-#endif
-/**** FreeBSD ****/
 
+#ifdef __linux__
+vm_fault_t i915_gem_fault(struct vm_fault *vmf);
+#else
+vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf);
+#endif
 
 /******* FreeBSD support ************/
 extern struct drm_driver i915_driver_info;
