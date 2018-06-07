@@ -1583,9 +1583,12 @@ int amdgpu_cs_find_mapping(struct amdgpu_cs_parser *parser,
 	*bo = mapping->bo_va->base.bo;
 	*map = mapping;
 
+#ifdef __linux__
+	/* On FreeBSD we don't store the ww_acquire_ctx in the ww_mutex struct */
 	/* Double check that the BO is reserved by this CS */
 	if (READ_ONCE((*bo)->tbo.resv->lock.ctx) != &parser->ticket)
 		return -EINVAL;
+#endif
 
 	if (!((*bo)->flags & AMDGPU_GEM_CREATE_VRAM_CONTIGUOUS)) {
 		(*bo)->flags |= AMDGPU_GEM_CREATE_VRAM_CONTIGUOUS;
