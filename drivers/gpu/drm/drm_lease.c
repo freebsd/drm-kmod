@@ -554,7 +554,7 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 	/* Clone the lessor file to create a new file for us */
 	DRM_DEBUG_LEASE("Allocating lease file\n");
 #ifdef __linux__
-	lessee_file = filp_clone_open(lessor_file);
+	lessee_file = file_clone_open(lessor_file);
 #else
 	// BSDFIXME!
 	panic("%s: missing implementation!\n", __func__);
