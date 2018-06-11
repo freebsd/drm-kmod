@@ -501,7 +501,8 @@ void intel_engine_setup_common(struct intel_engine_cs *engine)
 	intel_engine_init_cmd_parser(engine);
 }
 
-int intel_engine_create_scratch(struct intel_engine_cs *engine, int size)
+int intel_engine_create_scratch(struct intel_engine_cs *engine,
+				unsigned int size)
 {
 	struct drm_i915_gem_object *obj;
 	struct i915_vma *vma;
@@ -535,7 +536,7 @@ err_unref:
 	return ret;
 }
 
-static void intel_engine_cleanup_scratch(struct intel_engine_cs *engine)
+void intel_engine_cleanup_scratch(struct intel_engine_cs *engine)
 {
 	i915_vma_unpin_and_release(&engine->scratch);
 }
