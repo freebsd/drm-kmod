@@ -21,7 +21,7 @@
 #include <linux/poll.h>
 #include <linux/sched.h>
 #include <linux/slab.h>
-#include <linux/uaccess.h>
+#include <asm/uaccess.h>
 #include <linux/anon_inodes.h>
 #include <linux/sync_file.h>
 #include <uapi/linux/sync_file.h>
