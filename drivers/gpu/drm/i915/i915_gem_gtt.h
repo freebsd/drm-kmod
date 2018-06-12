@@ -417,7 +417,7 @@ struct i915_hw_ppgtt {
 struct gen6_hw_ppgtt {
 	struct i915_hw_ppgtt base;
 
-	struct drm_mm_node node;
+	struct i915_vma *vma;
 	gen6_pte_t __iomem *pd_addr;
 };
 
