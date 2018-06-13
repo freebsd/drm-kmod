@@ -2648,6 +2648,8 @@ static void intel_ddi_pre_enable_dp(struct intel_encoder *encoder,
 	intel_dp_start_link_train(intel_dp);
 	if (port != PORT_A || INTEL_GEN(dev_priv) >= 9)
 		intel_dp_stop_link_train(intel_dp);
+
+	intel_ddi_enable_pipe_clock(crtc_state);
 }
 
 static void intel_ddi_pre_enable_hdmi(struct intel_encoder *encoder,
@@ -2681,6 +2683,8 @@ static void intel_ddi_pre_enable_hdmi(struct intel_encoder *encoder,
 	intel_dig_port->set_infoframes(&encoder->base,
 				       crtc_state->has_infoframe,
 				       crtc_state, conn_state);
+
+	intel_ddi_enable_pipe_clock(crtc_state);
 }
 
 static void intel_ddi_pre_enable(struct intel_encoder *encoder,
@@ -2747,6 +2751,8 @@ static void intel_ddi_post_disable_dp(struct intel_encoder *encoder,
 	bool is_mst = intel_crtc_has_type(old_crtc_state,
 					  INTEL_OUTPUT_DP_MST);
 
+	intel_ddi_disable_pipe_clock(old_crtc_state);
+
 	/*
 	 * Power down sink before disabling the port, otherwise we end
 	 * up getting interrupts from the sink on detecting link loss.
@@ -2771,6 +2777,8 @@ static void intel_ddi_post_disable_hdmi(struct intel_encoder *encoder,
 	struct drm_i915_private *dev_priv = to_i915(encoder->base.dev);
 	struct intel_digital_port *dig_port = enc_to_dig_port(&encoder->base);
 	struct intel_hdmi *intel_hdmi = &dig_port->hdmi;
+
+	intel_ddi_disable_pipe_clock(old_crtc_state);
 
 	intel_disable_ddi_buf(encoder);
 
