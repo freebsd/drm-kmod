@@ -1264,7 +1264,7 @@ static void linux_hexdump(struct drm_printer *m, const void *buf, size_t len)
 						line, sizeof(line),
 						false) >= sizeof(line));
 #endif
-		drm_printf(m, "%08zx %s\n", pos, line);
+		drm_printf(m, "[%04zx] %s\n", pos, line);
 
 		prev = buf + pos;
 		skip = false;
