@@ -72,7 +72,7 @@ static vm_fault_t ttm_bo_vm_fault_idle(struct ttm_buffer_object *bo,
 		up_read(&vmf->vma->vm_mm->mmap_sem);
 		(void) dma_fence_wait(bo->moving, true);
 		ttm_bo_unreserve(bo);
-		ttm_bo_unref(&bo);
+		ttm_bo_put(bo);
 		goto out_unlock;
 	}
 
@@ -145,7 +145,7 @@ static vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault 
 				ttm_bo_get(bo);
 				up_read(&vmf->vma->vm_mm->mmap_sem);
 				(void) ttm_bo_wait_unreserved(bo);
-				ttm_bo_unref(&bo);
+				ttm_bo_put(bo);
 			}
 
 			return VM_FAULT_RETRY;
@@ -360,7 +360,7 @@ static void ttm_bo_vm_close(struct vm_area_struct *vma)
 {
 	struct ttm_buffer_object *bo = (struct ttm_buffer_object *)vma->vm_private_data;
 
-	ttm_bo_unref(&bo);
+	ttm_bo_put(bo);
 	vma->vm_private_data = NULL;
 }
 
@@ -512,7 +512,7 @@ int ttm_bo_mmap(struct file *filp, struct vm_area_struct *vma,
 	vma->vm_flags |= VM_IO | VM_DONTEXPAND | VM_DONTDUMP;
 	return 0;
 out_unref:
-	ttm_bo_unref(&bo);
+	ttm_bo_put(bo);
 	return ret;
 }
 EXPORT_SYMBOL(ttm_bo_mmap);
