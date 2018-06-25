@@ -1096,7 +1096,7 @@ static const struct vga_switcheroo_client_ops amdgpu_switcheroo_ops = {
 /**
  * amdgpu_device_ip_set_clockgating_state - set the CG state
  *
- * @adev: amdgpu_device pointer
+ * @dev: amdgpu_device pointer
  * @block_type: Type of hardware IP (SMU, GFX, UVD, etc.)
  * @state: clockgating state (gate or ungate)
  *
@@ -1130,7 +1130,7 @@ int amdgpu_device_ip_set_clockgating_state(void *dev,
 /**
  * amdgpu_device_ip_set_powergating_state - set the PG state
  *
- * @adev: amdgpu_device pointer
+ * @dev: amdgpu_device pointer
  * @block_type: Type of hardware IP (SMU, GFX, UVD, etc.)
  * @state: powergating state (gate or ungate)
  *
@@ -1241,7 +1241,7 @@ bool amdgpu_device_ip_is_idle(struct amdgpu_device *adev,
  * amdgpu_device_ip_get_ip_block - get a hw IP pointer
  *
  * @adev: amdgpu_device pointer
- * @block_type: Type of hardware IP (SMU, GFX, UVD, etc.)
+ * @type: Type of hardware IP (SMU, GFX, UVD, etc.)
  *
  * Returns a pointer to the hardware IP block structure
  * if it exists for the asic, otherwise NULL.
@@ -2249,7 +2249,7 @@ bool amdgpu_device_has_dc_support(struct amdgpu_device *adev)
  * amdgpu_device_init - initialize the driver
  *
  * @adev: amdgpu_device pointer
- * @pdev: drm dev pointer
+ * @ddev: drm dev pointer
  * @pdev: pci dev pointer
  * @flags: driver flags
  *
@@ -2627,8 +2627,9 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 /**
  * amdgpu_device_suspend - initiate device suspend
  *
- * @pdev: drm dev pointer
- * @state: suspend state
+ * @dev: drm dev pointer
+ * @suspend: suspend state
+ * @fbcon : notify the fbdev of suspend
  *
  * Puts the hw in the suspend state (all asics).
  * Returns 0 for success or an error on failure.
@@ -2726,7 +2727,9 @@ int amdgpu_device_suspend(struct drm_device *dev, bool suspend, bool fbcon)
 /**
  * amdgpu_device_resume - initiate device resume
  *
- * @pdev: drm dev pointer
+ * @dev: drm dev pointer
+ * @resume: resume state
+ * @fbcon : notify the fbdev of resume
  *
  * Bring the hw back to operating state (all asics).
  * Returns 0 for success or an error on failure.
@@ -3196,6 +3199,7 @@ out:
  * amdgpu_device_reset_sriov - reset ASIC for SR-IOV vf
  *
  * @adev: amdgpu device pointer
+ * @from_hypervisor: request from hypervisor
  *
  * do VF FLR and reinitialize Asic
  * return 0 means successed otherwise failed
@@ -3243,7 +3247,7 @@ error:
  *
  * @adev: amdgpu device pointer
  * @job: which job trigger hang
- * @force forces reset regardless of amdgpu_gpu_recovery
+ * @force: forces reset regardless of amdgpu_gpu_recovery
  *
  * Attempt to reset the GPU if it has hung (all asics).
  * Returns 0 for success or an error on failure.
