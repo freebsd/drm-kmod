@@ -62,14 +62,4 @@ static inline int drm_get_pci_dev(struct pci_dev *pdev,
 }
 #endif
 
-#define DRM_PCIE_SPEED_25 1
-#define DRM_PCIE_SPEED_50 2
-#define DRM_PCIE_SPEED_80 4
-
-int drm_pcie_get_speed_cap_mask(struct drm_device *dev, u32 *speed_mask);
-int drm_pcie_get_max_link_width(struct drm_device *dev, u32 *mlw);
-
-/* platform section */
-extern int drm_platform_init(struct drm_driver *driver, struct platform_device *platform_device);
-
 #endif /* _DRM_PCI_H_ */
