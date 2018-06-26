@@ -65,8 +65,6 @@ struct amdgpu_atif_functions {
 };
 
 struct amdgpu_atif {
-	acpi_handle handle;
-
 	struct amdgpu_atif_notifications notifications;
 	struct amdgpu_atif_functions functions;
 	struct amdgpu_atif_notification_cfg notification_cfg;
@@ -711,7 +709,7 @@ static int amdgpu_acpi_event(struct notifier_block *nb,
  */
 int amdgpu_acpi_init(struct amdgpu_device *adev)
 {
-	acpi_handle handle, atif_handle;
+	acpi_handle handle;
 	struct amdgpu_atif *atif;
 	struct amdgpu_atcs *atcs = &adev->atcs;
 	int ret;
@@ -741,7 +739,13 @@ int amdgpu_acpi_init(struct amdgpu_device *adev)
 	atif->handle = atif_handle;
 
 	/* Call the ATIF method */
-	ret = amdgpu_atif_verify_interface(atif);
+	atif = kzalloc(sizeof(*atif), GFP_KERNEL);
+	if (!atif) {
+		DRM_WARN("Not enough memory to initialize ATIF\n");
+		goto out;
+	}
+
+	ret = amdgpu_atif_verify_interface(handle, atif);
 	if (ret) {
 		DRM_DEBUG_DRIVER("Call to ATIF verify_interface failed: %d\n", ret);
 		kfree(atif);
