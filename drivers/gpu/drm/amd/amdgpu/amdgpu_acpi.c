@@ -741,12 +741,6 @@ int amdgpu_acpi_init(struct amdgpu_device *adev)
 	atif->handle = atif_handle;
 
 	/* Call the ATIF method */
-	atif = kzalloc(sizeof(*atif), GFP_KERNEL);
-	if (!atif) {
-		DRM_WARN("Not enough memory to initialize ATIF\n");
-		goto out;
-	}
-
 	ret = amdgpu_atif_verify_interface(atif);
 	if (ret) {
 		DRM_DEBUG_DRIVER("Call to ATIF verify_interface failed: %d\n", ret);
