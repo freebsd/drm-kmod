@@ -1169,8 +1169,6 @@ static void notify_ring(struct intel_engine_cs *engine)
 	if (unlikely(!engine->breadcrumbs.irq_armed))
 		return;
 
-	atomic_inc(&engine->irq_count);
-
 	rcu_read_lock();
 
 	spin_lock(&engine->breadcrumbs.irq_lock);
@@ -1205,6 +1203,8 @@ static void notify_ring(struct intel_engine_cs *engine)
 				tsk = wait->tsk;
 			}
 		}
+
+		engine->breadcrumbs.irq_count++;
 	} else {
 		if (engine->breadcrumbs.irq_armed)
 			__intel_engine_disarm_breadcrumbs(engine);
