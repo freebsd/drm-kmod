@@ -1362,12 +1362,10 @@ static void intel_engine_print_registers(const struct intel_engine_cs *engine,
 		write = GEN8_CSB_WRITE_PTR(ptr);
 #ifdef __linux__
 		/* BSDFIXME: We don't have a tasklet.state */
-		drm_printf(m, "\tExeclist CSB read %d [%d cached], write %d [%d from hws], interrupt posted? %s, tasklet queued? %s (%s)\n",
+		drm_printf(m, "\tExeclist CSB read %d [%d cached], write %d [%d from hws], tasklet queued? %s (%s)\n",
 			   read, execlists->csb_head,
 			   write,
 			   intel_read_status_page(engine, intel_hws_csb_write_index(engine->i915)),
-			   yesno(test_bit(ENGINE_IRQ_EXECLIST,
-					  &engine->irq_posted)),
 			   yesno(test_bit(TASKLET_STATE_SCHED,
 					  &engine->execlists.tasklet.state)),
 			   enableddisabled(!atomic_read(&engine->execlists.tasklet.count)));
@@ -1580,11 +1578,9 @@ void intel_engine_dump(struct intel_engine_cs *engine,
 	spin_unlock(&b->rb_lock);
 	local_irq_restore(flags);
 
-	drm_printf(m, "IRQ? 0x%lx (breadcrumbs? %s) (execlists? %s)\n",
+	drm_printf(m, "IRQ? 0x%lx (breadcrumbs? %s)\n",
 		   engine->irq_posted,
 		   yesno(test_bit(ENGINE_IRQ_BREADCRUMB,
-				  &engine->irq_posted)),
-		   yesno(test_bit(ENGINE_IRQ_EXECLIST,
 				  &engine->irq_posted)));
 
 	drm_printf(m, "HWSP:\n");
