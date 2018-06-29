@@ -469,8 +469,7 @@ static void intel_engine_init_execlist(struct intel_engine_cs *engine)
 	GEM_BUG_ON(execlists_num_ports(execlists) > EXECLIST_MAX_PORTS);
 
 	execlists->queue_priority = INT_MIN;
-	execlists->queue = RB_ROOT;
-	execlists->first = NULL;
+	execlists->queue = RB_ROOT_CACHED;
 }
 
 /**
@@ -1007,7 +1006,7 @@ bool intel_engine_is_idle(struct intel_engine_cs *engine)
 	}
 
 	/* ELSP is empty, but there are ready requests? E.g. after reset */
-	if (READ_ONCE(engine->execlists.first))
+	if (!RB_EMPTY_ROOT(&engine->execlists.queue.rb_root))
 		return false;
 
 	/* Ring stopped? */
@@ -1551,7 +1550,7 @@ void intel_engine_dump(struct intel_engine_cs *engine,
 	last = NULL;
 	count = 0;
 	drm_printf(m, "\t\tQueue priority: %d\n", execlists->queue_priority);
-	for (rb = execlists->first; rb; rb = rb_next(rb)) {
+	for (rb = rb_first_cached(&execlists->queue); rb; rb = rb_next(rb)) {
 		struct i915_priolist *p =
 			rb_entry(rb, typeof(*p), node);
 
