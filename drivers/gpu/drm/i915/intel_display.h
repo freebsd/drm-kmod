@@ -126,16 +126,29 @@ enum port {
 
 #define port_name(p) ((p) + 'A')
 
-enum tc_port {
-	PORT_TC_NONE = -1,
-
-	PORT_TC1 = 0,
-	PORT_TC2,
-	PORT_TC3,
-	PORT_TC4,
-
-	I915_MAX_TC_PORTS
-};
+/*
+ * Ports identifier referenced from other drivers.
+ * Expected to remain stable over time
+ */
+static inline const char *port_identifier(enum port port)
+{
+	switch (port) {
+	case PORT_A:
+		return "Port A";
+	case PORT_B:
+		return "Port B";
+	case PORT_C:
+		return "Port C";
+	case PORT_D:
+		return "Port D";
+	case PORT_E:
+		return "Port E";
+	case PORT_F:
+		return "Port F";
+	default:
+		return "<invalid>";
+	}
+}
 
 enum dpio_channel {
 	DPIO_CH0,
