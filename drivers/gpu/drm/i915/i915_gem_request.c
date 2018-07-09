@@ -271,6 +271,9 @@ static void mark_busy(struct drm_i915_private *i915)
 	 */
 	intel_display_power_get(i915, POWER_DOMAIN_GT_IRQ);
 
+	if (NEEDS_RC6_CTX_CORRUPTION_WA(i915))
+		intel_uncore_forcewake_get(i915, FORCEWAKE_ALL);
+
 	i915->gt.awake = true;
 
 	intel_enable_gt_powersave(i915);

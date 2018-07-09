@@ -1707,6 +1707,7 @@ static int i915_drm_suspend_late(struct drm_device *dev, bool hibernation)
 	disable_rpm_wakeref_asserts(dev_priv);
 
 	intel_display_set_init_power(dev_priv, false);
+	i915_rc6_ctx_wa_suspend(dev_priv);
 
 	/*
 	 * In case of firmware assisted context save/restore don't manually
@@ -1935,6 +1936,7 @@ static int i915_drm_resume_early(struct drm_device *dev)
 		intel_display_set_init_power(dev_priv, true);
 
 	i915_gem_sanitize(dev_priv);
+	i915_rc6_ctx_wa_resume(dev_priv);
 
 	enable_rpm_wakeref_asserts(dev_priv);
 
