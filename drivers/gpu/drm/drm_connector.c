@@ -48,7 +48,7 @@
  *
  * Connectors must be attached to an encoder to be used. For devices that map
  * connectors to encoders 1:1, the connector should be attached at
- * initialization time with a call to drm_mode_connector_attach_encoder(). The
+ * initialization time with a call to drm_connector_attach_encoder(). The
  * driver must also set the &drm_connector.encoder field to point to the
  * attached encoder.
  *
@@ -303,7 +303,7 @@ EXPORT_SYMBOL(drm_connector_init);
  * Zero on success, negative errno on failure.
  */
 int drm_connector_attach_encoder(struct drm_connector *connector,
-				      struct drm_encoder *encoder)
+				 struct drm_encoder *encoder)
 {
 	int i;
 
