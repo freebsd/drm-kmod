@@ -737,7 +737,7 @@ static int i915_load_modeset_init(struct drm_device *dev)
 
 	ret = i915_gem_init(dev_priv);
 	if (ret)
-		goto cleanup_irq;
+		goto cleanup_modeset;
 
 	intel_setup_overlay(dev_priv);
 
@@ -757,6 +757,8 @@ cleanup_gem:
 	if (i915_gem_suspend(dev_priv))
 		DRM_ERROR("failed to idle hardware; continuing to unload!\n");
 	i915_gem_fini(dev_priv);
+cleanup_modeset:
+	intel_modeset_cleanup(dev);
 cleanup_irq:
 	drm_irq_uninstall(dev);
 	intel_teardown_gmbus(dev_priv);
