@@ -151,10 +151,10 @@ TRACE_EVENT(amdgpu_cs,
 
 	    TP_fast_assign(
 			   __entry->bo_list = p->bo_list;
-			   __entry->ring = p->job->ring->idx;
+			   __entry->ring = p->ring->idx;
 			   __entry->dw = p->job->ibs[i].length_dw;
 			   __entry->fences = amdgpu_fence_count_emitted(
-				p->job->ring);
+				p->ring);
 			   ),
 	    TP_printk("bo_list=%p, ring=%u, dw=%u, fences=%u",
 		      __entry->bo_list, __entry->ring, __entry->dw,
@@ -179,7 +179,7 @@ TRACE_EVENT(amdgpu_cs_ioctl,
 			   __assign_str(timeline, AMDGPU_JOB_GET_TIMELINE_NAME(job))
 			   __entry->context = job->base.s_fence->finished.context;
 			   __entry->seqno = job->base.s_fence->finished.seqno;
-			   __entry->ring_name = job->ring->name;
+			   __entry->ring_name = to_amdgpu_ring(job->base.sched)->name;
 			   __entry->num_ibs = job->num_ibs;
 			   ),
 	    TP_printk("sched_job=%llu, timeline=%s, context=%u, seqno=%u, ring_name=%s, num_ibs=%u",
@@ -204,7 +204,7 @@ TRACE_EVENT(amdgpu_sched_run_job,
 			   __assign_str(timeline, AMDGPU_JOB_GET_TIMELINE_NAME(job))
 			   __entry->context = job->base.s_fence->finished.context;
 			   __entry->seqno = job->base.s_fence->finished.seqno;
-			   __entry->ring_name = job->ring->name;
+			   __entry->ring_name = to_amdgpu_ring(job->base.sched)->name;
 			   __entry->num_ibs = job->num_ibs;
 			   ),
 	    TP_printk("sched_job=%llu, timeline=%s, context=%u, seqno=%u, ring_name=%s, num_ibs=%u",
