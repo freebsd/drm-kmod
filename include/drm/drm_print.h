@@ -195,6 +195,7 @@ static inline struct drm_printer drm_debug_printer(const char *prefix)
 #define DRM_UT_VBL		0x20
 #define DRM_UT_STATE		0x40
 #define DRM_UT_LEASE		0x80
+#define DRM_UT_DP		0x100
 
 
 #ifdef __linux__
@@ -342,6 +343,11 @@ void drm_err(const char *function_name, const char *format, ...);
 #define DRM_DEBUG_LEASE(fmt, ...)					\
 	drm_dbg(DRM_UT_LEASE, fmt, ##__VA_ARGS__)
 
+#define	DRM_DEV_DEBUG_DP(dev, fmt, ...)					\
+	drm_dev_dbg(dev, DRM_UT_DP, fmt, ## __VA_ARGS__)
+#define DRM_DEBUG_DP(dev, fmt, ...)					\
+	drm_dbg(DRM_UT_DP, fmt, ## __VA_ARGS__)
+
 #else
 
 #define DRM_DEV_DEBUG(dev, fmt, ...)					\
@@ -377,9 +383,14 @@ void drm_err(const char *function_name, const char *format, ...);
 #define DRM_DEBUG_LEASE(fmt, ...)					\
 	drm_dbg(DRM_UT_LEASE, __func__, fmt, ##__VA_ARGS__)
 
+#define	DRM_DEV_DEBUG_DP(dev, fmt, ...)					\
+	drm_dev_dbg(dev, DRM_UT_DP, __func__, fmt, ## __VA_ARGS__)
+#define DRM_DEBUG_DP(dev, fmt, ...)					\
+	drm_dbg(DRM_UT_DP, __func__, fmt, ## __VA_ARGS__)
 #endif
 
 #ifdef __linux__
+
 #define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, category, fmt, ...)	\
 ({									\
 	static DEFINE_RATELIMIT_STATE(_rs,				\
