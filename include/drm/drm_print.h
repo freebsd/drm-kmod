@@ -416,7 +416,7 @@ void drm_err(const char *function_name, const char *format, ...);
 
 #define	DRM_DEV_DEBUG_DP(dev, fmt, ...)					\
 	drm_dev_dbg(dev, DRM_UT_DP, fmt, ## __VA_ARGS__)
-#define DRM_DEBUG_DP(dev, fmt, ...)					\
+#define DRM_DEBUG_DP(fmt, ...)						\
 	drm_dbg(DRM_UT_DP, fmt, ## __VA_ARGS__)
 
 #else
