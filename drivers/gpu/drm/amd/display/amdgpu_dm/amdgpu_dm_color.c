@@ -28,6 +28,7 @@
 #include <drm/drm_os_freebsd.h>
 #endif
 
+#include "amdgpu.h"
 #include "amdgpu_mode.h"
 #include "amdgpu_dm.h"
 #include "dc.h"
@@ -127,6 +128,8 @@ int amdgpu_dm_set_regamma_lut(struct dm_crtc_state *crtc)
 {
 	struct drm_property_blob *blob = crtc->base.gamma_lut;
 	struct dc_stream_state *stream = crtc->stream;
+	struct amdgpu_device *adev = (struct amdgpu_device *)
+		crtc->base.state->dev->dev_private;
 	struct drm_color_lut *lut;
 	uint32_t lut_size;
 	struct dc_gamma *gamma;
@@ -167,7 +170,7 @@ int amdgpu_dm_set_regamma_lut(struct dm_crtc_state *crtc)
 	 */
 	stream->out_transfer_func->type = TF_TYPE_DISTRIBUTED_POINTS;
 	ret = mod_color_calculate_regamma_params(stream->out_transfer_func,
-						 gamma, true);
+						 gamma, true, adev->asic_type <= CHIP_RAVEN);
 	dc_gamma_release(&gamma);
 	if (!ret) {
 		stream->out_transfer_func->type = old_type;
