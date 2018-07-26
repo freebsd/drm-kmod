@@ -275,6 +275,7 @@ static void drm_sched_entity_kill_jobs_cb(struct dma_fence *f,
 long drm_sched_entity_flush(struct drm_sched_entity *entity, long timeout)
 {
 	struct drm_gpu_scheduler *sched;
+	struct task_struct *last_user;
 	long ret = timeout;
 
 	sched = entity->rq->sched;
@@ -299,7 +300,9 @@ long drm_sched_entity_flush(struct drm_sched_entity *entity, long timeout)
 
 	/* For killed process disable any more IBs enqueue right now */
 #ifdef __linux__
-	if ((current->flags & PF_EXITING) && (current->exit_code == SIGKILL))
+	last_user = cmpxchg(&entity->last_user, current->group_leader, NULL);
+	if ((!last_user || last_user == current->group_leader) &&
+	    (current->flags & PF_EXITING) && (current->exit_code == SIGKILL))
 		drm_sched_entity_set_rq(entity, NULL);
 #endif
 	return ret;
@@ -545,6 +548,7 @@ void drm_sched_entity_push_job(struct drm_sched_job *sched_job,
 
 	trace_drm_sched_job(sched_job, entity);
 
+	WRITE_ONCE(entity->last_user, current->group_leader);
 	first = spsc_queue_push(&entity->job_queue, &sched_job->queue_node);
 
 	/* first job wakes up scheduler */
