@@ -246,8 +246,6 @@ static inline int vga_switcheroo_get_client_state(struct pci_dev *pdev) { return
 #define pm_qos_remove_request(a)
 
 #define pci_get_power_state pci_get_powerstate
-/* XXX ?? */
-#define pci_disable_device(dev)
 
 #define in_dbg_master() (kdb_active)
 #define do_gettimeofday microtime
