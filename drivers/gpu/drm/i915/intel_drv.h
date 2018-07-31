@@ -485,6 +485,8 @@ struct intel_atomic_state {
 	 */
 	bool skip_intermediate_wm;
 
+	bool rps_interactive;
+
 	/* Gen9+ only */
 	struct skl_ddb_values wm_results;
 
