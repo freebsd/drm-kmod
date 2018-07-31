@@ -83,6 +83,30 @@ TRACE_EVENT(drm_sched_process_job,
 );
 #endif /* __linux__ */
 
+TRACE_EVENT(drm_sched_job_wait_dep,
+	    TP_PROTO(struct drm_sched_job *sched_job, struct dma_fence *fence),
+	    TP_ARGS(sched_job, fence),
+	    TP_STRUCT__entry(
+			     __field(const char *,name)
+			     __field(uint64_t, id)
+			     __field(struct dma_fence *, fence)
+			     __field(uint64_t, ctx)
+			     __field(unsigned, seqno)
+			     ),
+
+	    TP_fast_assign(
+			   __entry->name = sched_job->sched->name;
+			   __entry->id = sched_job->id;
+			   __entry->fence = fence;
+			   __entry->ctx = fence->context;
+			   __entry->seqno = fence->seqno;
+			   ),
+	    TP_printk("job ring=%s, id=%llu, depends fence=%p, context=%llu, seq=%u",
+		      __entry->name, __entry->id,
+		      __entry->fence, __entry->ctx,
+		      __entry->seqno)
+);
+
 #endif
 
 #ifdef __linux__
