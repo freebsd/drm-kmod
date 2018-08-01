@@ -1925,13 +1925,7 @@ static int i915_drm_resume_early(struct drm_device *dev)
 
 	intel_uncore_sanitize(dev_priv);
 
-#ifdef __linux__
 	if (IS_GEN9_LP(dev_priv) ||
-#else
-	// Include Skylake to work around resume bug where graphics do not
-	// get restored if DMC fw is loaded.
-	if (IS_GEN9(dev_priv) ||
-#endif
 	    !(dev_priv->suspended_to_idle && dev_priv->csr.dmc_payload))
 		intel_power_domains_init_hw(dev_priv, true);
 
