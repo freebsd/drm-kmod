@@ -47,6 +47,7 @@
 #include "amdgpu_object.h"
 #include "amdgpu_trace.h"
 #include "amdgpu_amdkfd.h"
+#include "amdgpu_sdma.h"
 #include "bif/bif_4_1_d.h"
 
 #ifndef __linux__
