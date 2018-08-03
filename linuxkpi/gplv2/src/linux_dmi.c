@@ -1,7 +1,5 @@
 #include <linux/dmi.h>
 
-// Only used by radeon to check if iMac as of v4.13
-// Ok to return false
 bool
 dmi_match(enum dmi_field f, const char *str)
 {
@@ -18,6 +16,16 @@ dmi_get_system_info(int field)
 {
 
 	UNIMPLEMENTED();
+	return NULL;
+}
+
+const struct dmi_system_id *
+dmi_first_match(const struct dmi_system_id *list)
+{
+
+	// v4.16 - used to find panel orientation
+	// Return NULL for now and let it have panel
+	// orientation unknown.
 	return NULL;
 }
 

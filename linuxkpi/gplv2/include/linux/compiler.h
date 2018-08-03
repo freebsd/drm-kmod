@@ -9,7 +9,7 @@
 #include <sys/syslog.h>
 
 #ifndef PRINT_UNIMPLEMENTED
-#define PRINT_UNIMPLEMENTED 0
+#define PRINT_UNIMPLEMENTED 1
 #endif
 
 #define	UNIMPLEMENTED_ONCE() do {		\
