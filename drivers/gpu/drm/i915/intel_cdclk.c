@@ -988,7 +988,7 @@ static void skl_set_cdclk(struct drm_i915_private *dev_priv,
 {
 	int cdclk = cdclk_state->cdclk;
 	int vco = cdclk_state->vco;
-	u32 freq_select;
+	u32 freq_select, cdclk_ctl;
 	int ret;
 
 	mutex_lock(&dev_priv->pcu_lock);

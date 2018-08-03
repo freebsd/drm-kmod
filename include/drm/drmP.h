@@ -166,12 +166,6 @@
 #include "opt_drm.h"
 #include "opt_syscons.h"
 
-#ifdef DRM_DEBUG
-#undef DRM_DEBUG
-#define DRM_DEBUG_DEFAULT_ON 1
-#endif /* DRM_DEBUG */
-
-
 #define __OS_HAS_AGP (defined(CONFIG_AGP) || (defined(CONFIG_AGP_MODULE) && defined(MODULE)))
 #define __OS_HAS_MTRR (defined(CONFIG_MTRR))
 

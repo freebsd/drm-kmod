@@ -3411,7 +3411,7 @@ static inline bool
 new_requests_since_last_retire(const struct drm_i915_private *i915)
 {
 	return (READ_ONCE(i915->gt.active_requests) ||
-		work_pending(&i915->gt.idle_work.work));
+	    work_pending(__DECONST(struct work_struct *, &i915->gt.idle_work.work)));
 }
 
 static void
