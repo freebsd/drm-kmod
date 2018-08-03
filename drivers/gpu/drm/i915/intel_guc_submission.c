@@ -495,8 +495,9 @@ static void guc_wq_item_append(struct intel_guc_client *client,
 	 * XXX: if not the case, we need save data to a temp wqi and copy it to
 	 * workqueue buffer dw by dw.
 	 */
+#ifdef __linux__
 	BUILD_BUG_ON(wqi_size != 16);
-
+#endif
 	/* Free space is guaranteed. */
 	wq_off = READ_ONCE(desc->tail);
 	GEM_BUG_ON(CIRC_SPACE(wq_off, READ_ONCE(desc->head),

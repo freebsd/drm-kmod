@@ -1885,8 +1885,11 @@ void intel_logical_ring_cleanup(struct intel_engine_cs *engine)
 	 * Tasklet cannot be active at this point due intel_mark_active/idle
 	 * so this is just for documentation.
 	 */
+#ifdef __linux__
+	/* BSD: Let's just wait until it finished executing */
 	if (WARN_ON(test_bit(TASKLET_STATE_SCHED,
 			     &engine->execlists.tasklet.state)))
+#endif
 		tasklet_kill(&engine->execlists.tasklet);
 
 	dev_priv = engine->i915;

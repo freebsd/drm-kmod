@@ -35,7 +35,6 @@ SRCS=	\
 	i915_gem_timeline.c \
 	i915_gem_userptr.c \
 	i915_gpu_error.c \
-	i915_guc_submission.c \
 	i915_memcpy.c \
 	i915_oa_hsw.c \
 	i915_params.c \
@@ -81,6 +80,7 @@ SRCS=	\
 	intel_guc_ct.c \
 	intel_guc_fw.c \
 	intel_guc_log.c \
+	intel_guc_submission.c \
 	intel_hangcheck.c \
 	intel_hdmi.c \
 	intel_hotplug.c \
@@ -193,6 +193,7 @@ CWARNFLAGS.intel_dsi_panel_vbt.c= -Wno-cast-qual
 CWARNFLAGS.intel_engine_cs.c= -Wno-cast-qual
 CWARNFLAGS.intel_fbdev.c=	-Wno-initializer-overrides
 CWARNFLAGS.intel_guc_ct.c=	-Wno-address-of-packed-member # probably false positive
+CWARNFLAGS.intel_guc_submission.c= -Wno-cast-qual
 CWARNFLAGS.intel_hdmi.c=	-Wno-enum-conversion
 CWARNFLAGS.intel_hotplug.c=	-Wno-missing-prototypes
 CWARNFLAGS.intel_lrc.c=		-Wno-cast-qual -Wno-unused-variable
@@ -224,6 +225,5 @@ CWARNFLAGS.i915_gem_tiling.c=	-Wno-tautological-pointer-compare -Wno-cast-qual
 CWARNFLAGS.i915_gem_timeline.c= -Wno-cast-qual
 CWARNFLAGS.i915_gem_userptr.c= -Wno-cast-qual
 CWARNFLAGS.i915_gpu_error.c= -Wno-cast-qual -Wno-unused-function
-CWARNFLAGS.i915_guc_submission.c= -Wno-cast-qual
 CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides 
 CWARNFLAGS.i915_sw_fence.c= -Wno-unused-function
