@@ -7,13 +7,13 @@
 #include "intel_ringbuffer.h"
 
 static inline void
-trace_i915_flip_complete(enum plane plane, struct drm_i915_gem_object *pending_flip_obj)
+trace_i915_flip_complete(int plane, struct drm_i915_gem_object *pending_flip_obj)
 {
 	CTR2(KTR_DRM, "i915_flip_complete %d %p", plane, pending_flip_obj);
 }
 
 static inline void
-trace_i915_flip_request(enum plane plane, struct drm_i915_gem_object *obj)
+trace_i915_flip_request(int plane, struct drm_i915_gem_object *obj)
 {
 	CTR2(KTR_DRM, "i915_flip_request %d %p", plane, obj);
 }

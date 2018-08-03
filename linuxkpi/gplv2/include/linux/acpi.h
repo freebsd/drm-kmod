@@ -18,8 +18,8 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 
-#ifndef _LINUX_ACPI_H_
-#define _LINUX_ACPI_H_
+#ifndef _LINUX_GPLV2_ACPI_H_
+#define _LINUX_GPLV2_ACPI_H_
 
 #include <linux/errno.h>
 #include <linux/resource_ext.h>
@@ -70,4 +70,4 @@ struct pci_dev *acpi_get_pci_dev(acpi_handle handle);
 
 int acpi_bus_get_device(acpi_handle handle, struct acpi_device **device);
 
-#endif /* _LINUX_ACPI_H_ */
+#endif /* _LINUX_GPLV2_ACPI_H_ */
