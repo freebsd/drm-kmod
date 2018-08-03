@@ -119,7 +119,7 @@ struct rchan_percpu_buf_dispatcher {
 	struct dentry *dentry;
 };
 
-static void __relay_set_buf_dentry(void *info)
+__unused static void __relay_set_buf_dentry(void *info)
 {
 	struct rchan_percpu_buf_dispatcher *p = info;
 
@@ -346,7 +346,7 @@ static void relay_close_buf(struct rchan_buf *buf)
 	kref_put(&buf->kref, relay_remove_buf);
 }
 
-static void wakeup_readers(struct irq_work *work)
+__unused static void wakeup_readers(struct irq_work *work)
 {
 	printf("%s\n", __func__);
 	struct rchan_buf *buf;

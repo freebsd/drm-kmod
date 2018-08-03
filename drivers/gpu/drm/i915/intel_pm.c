@@ -8468,6 +8468,7 @@ static void cnp_init_clock_gating(struct drm_i915_private *dev_priv)
 
 static void cnl_init_clock_gating(struct drm_i915_private *dev_priv)
 {
+	u32 val;
 	cnp_init_clock_gating(dev_priv);
 
 	/* This is not an Wa. Enable for better image quality */
@@ -8491,10 +8492,10 @@ static void cnl_init_clock_gating(struct drm_i915_private *dev_priv)
 	I915_WRITE(SLICE_UNIT_LEVEL_CLKGATE, val);
 
 	/* Display WA #1133: WaFbcSkipSegments:cnl */
-	val = I915_READ(ILK_DPFC_CHICKEN);
-	val &= ~GLK_SKIP_SEG_COUNT_MASK;
-	val |= GLK_SKIP_SEG_EN | GLK_SKIP_SEG_COUNT(1);
-	I915_WRITE(ILK_DPFC_CHICKEN, val);
+	/* val = I915_READ(ILK_DPFC_CHICKEN); */
+	/* val &= ~GLK_SKIP_SEG_COUNT_MASK; */
+	/* val |= GLK_SKIP_SEG_EN | GLK_SKIP_SEG_COUNT(1); */
+	/* I915_WRITE(ILK_DPFC_CHICKEN, val); */
 }
 
 static void cfl_init_clock_gating(struct drm_i915_private *dev_priv)
