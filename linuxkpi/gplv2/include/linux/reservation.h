@@ -148,6 +148,13 @@ reservation_object_lock(struct reservation_object *obj,
 	return ww_mutex_lock(&obj->lock, ctx);
 }
 
+static inline int
+reservation_object_lock_interruptible(struct reservation_object *obj,
+    struct ww_acquire_ctx *ctx)
+{
+	return ww_mutex_lock_interruptible(&obj->lock, ctx);
+}
+
 static inline void
 reservation_object_unlock(struct reservation_object *obj)
 {

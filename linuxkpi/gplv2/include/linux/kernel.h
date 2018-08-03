@@ -6,6 +6,8 @@
 /* XXX */
 #define	irqs_disabled() (curthread->td_critnest != 0 || curthread->td_intr_nesting_level != 0)
 
+#define add_taint(a,b)
+
 #include <linux/irqflags.h>
 #include <linux/kconfig.h>
 
