@@ -1172,9 +1172,9 @@ static int i915_driver_init_hw(struct drm_i915_private *dev_priv)
 	intel_device_info_runtime_init(dev_priv);
 
 	intel_sanitize_options(dev_priv);
-
+#ifdef CONFIG_I915_PERF
 	i915_perf_init(dev_priv);
-
+#endif
 	ret = i915_ggtt_probe_hw(dev_priv);
 	if (ret)
 		return ret;
