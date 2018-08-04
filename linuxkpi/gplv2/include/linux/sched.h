@@ -9,6 +9,15 @@
 #define	smp_mb__before_atomic()	atomic_thread_fence_seq_cst()
 struct seq_file;
 
+static inline struct work_struct *
+current_work()
+{
+	// XXX: Implement me?
+	// Called from drm_kms_helper_is_poll_worker()
+	UNIMPLEMENTED();
+	return (NULL);
+}
+
 static inline int
 sched_setscheduler(struct task_struct *t, int policy,
     const struct sched_param *param)
