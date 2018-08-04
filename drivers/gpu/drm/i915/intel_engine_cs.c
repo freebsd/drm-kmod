@@ -1673,8 +1673,11 @@ static void print_request(struct drm_printer *m,
 		   jiffies_to_msecs(jiffies - rq->emitted_jiffies),
 		   rq->timeline->common->name);
 }
-
+#ifdef __linux__
 static void hexdump(struct drm_printer *m, const void *buf, size_t len)
+#else
+static void linux_hexdump(struct drm_printer *m, const void *buf, size_t len)
+#endif
 {
 	const size_t rowsize = 8 * sizeof(u32);
 	const void *prev = NULL;
@@ -1691,11 +1694,12 @@ static void hexdump(struct drm_printer *m, const void *buf, size_t len)
 			}
 			continue;
 		}
-
+#ifdef __linux__
 		WARN_ON_ONCE(hex_dump_to_buffer(buf + pos, len - pos,
 						rowsize, sizeof(u32),
 						line, sizeof(line),
 						false) >= sizeof(line));
+#endif
 		drm_printf(m, "%08zx %s\n", pos, line);
 
 		prev = buf + pos;
@@ -1907,8 +1911,11 @@ void intel_engine_dump(struct intel_engine_cs *engine,
 				  &engine->irq_posted)));
 
 	drm_printf(m, "HWSP:\n");
+#ifdef __linux__
 	hexdump(m, engine->status_page.page_addr, PAGE_SIZE);
-
+#else
+	linux_hexdump(m, engine->status_page.page_addr, PAGE_SIZE);
+#endif
 	drm_printf(m, "Idle? %s\n", yesno(intel_engine_is_idle(engine)));
 }
 

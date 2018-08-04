@@ -1036,7 +1036,6 @@ void drm_fb_helper_deferred_io(struct fb_info *info,
 	}
 }
 EXPORT_SYMBOL(drm_fb_helper_deferred_io);
-#endif
 
 /**
  * drm_fb_helper_defio_init - fbdev deferred I/O initialization
@@ -1080,6 +1079,7 @@ int drm_fb_helper_defio_init(struct drm_fb_helper *fb_helper)
 	return 0;
 }
 EXPORT_SYMBOL(drm_fb_helper_defio_init);
+#endif
 
 /**
  * drm_fb_helper_sys_read - wrapper around fb_sys_read
@@ -2911,12 +2911,13 @@ void drm_fb_helper_fbdev_teardown(struct drm_device *dev)
 	if (fb_helper->fbdev && fb_helper->fbdev->dev)
 		drm_fb_helper_unregister_fbi(fb_helper);
 
+#if __linux__ //No deferred IO
 	if (fb_helper->fbdev && fb_helper->fbdev->fbdefio) {
 		fb_deferred_io_cleanup(fb_helper->fbdev);
 		kfree(fb_helper->fbdev->fbdefio);
 		fbops = fb_helper->fbdev->fbops;
 	}
-
+#endif
 	drm_fb_helper_fini(fb_helper);
 	kfree(fbops);
 

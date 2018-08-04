@@ -38,7 +38,10 @@ struct drm_fb_helper;
 #define fb_info linux_fb_info
 #include <drm/drm_crtc.h>
 #include <drm/drm_device.h>
+
+#ifdef __linux__
 #include <linux/kgdb.h>
+#endif
 
 enum mode_set_atomic {
 	LEAVE_ATOMIC_MODE_SET,
