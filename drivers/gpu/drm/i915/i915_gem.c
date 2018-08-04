@@ -46,6 +46,10 @@
 #include <linux/pci.h>
 #include <linux/dma-buf.h>
 
+#ifndef __linux__
+#define	resource linux_resource
+#endif
+
 static void i915_gem_flush_free_objects(struct drm_i915_private *i915);
 
 static bool cpu_write_needs_clflush(struct drm_i915_gem_object *obj)

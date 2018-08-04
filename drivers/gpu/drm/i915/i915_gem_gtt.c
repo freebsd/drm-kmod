@@ -43,6 +43,7 @@
 
 #ifndef __linux__
 #include <dev/agp/agp_i810.h>
+#define	resource linux_resource
 #endif
 
 #define I915_GFP_DMA (GFP_KERNEL | __GFP_HIGHMEM)
@@ -3423,8 +3424,7 @@ static int i915_gmch_probe(struct i915_ggtt *ggtt)
 
 	gtt = intel_gtt_get();
 	ggtt->base.total = gtt->gtt_total_entries << PAGE_SHIFT;
-	ggtt->stolen_size = gtt->stolen_size;
-	ggtt->mappable_base = gtt->gma_bus_addr;
+	gmadr_base = gtt->gma_bus_addr;
 	ggtt->mappable_end = gtt->gtt_mappable_entries << PAGE_SHIFT;
 #else
 	intel_gtt_get(&ggtt->base.total,
@@ -3465,6 +3465,10 @@ int i915_ggtt_probe_hw(struct drm_i915_private *dev_priv)
 
 	ggtt->base.i915 = dev_priv;
 	ggtt->base.dma = &dev_priv->drm.pdev->dev;
+
+	// XXX: BSD should set intel_graphics_stolen_res here!
+	// Let stolen memory size = 0 for now...
+	// (Intel moved it to early quirks in Linux *sigh*)
 
 	if (INTEL_GEN(dev_priv) <= 5)
 		ret = i915_gmch_probe(ggtt);

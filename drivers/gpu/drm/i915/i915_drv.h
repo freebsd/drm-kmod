@@ -2265,11 +2265,19 @@ struct drm_i915_private {
 	 * exactly how much of this we are actually allowed to use, given that
 	 * some portion of it is in fact reserved for use by hardware functions.
 	 */
+#ifdef __linux__
 	struct resource dsm;
+#else
+	struct linux_resource dsm;
+#endif
 	/**
 	 * Reseved portion of Data Stolen Memory
 	 */
+#ifdef __linux__
 	struct resource dsm_reserved;
+#else
+	struct linux_resource dsm_reserved;
+#endif
 
 	/*
 	 * Stolen memory is segmented in hardware with different portions
@@ -2329,14 +2337,12 @@ struct drm_i915_private {
 					    [MAX_ENGINE_INSTANCE + 1];
 
 	struct drm_dma_handle *status_page_dmah;
-#ifndef __linux__
-#undef resource
-	struct resource *mch_res;
-	int mch_res_rid;
-#else
+#ifdef __linux__
 	struct resource mch_res;
+#else
+	struct linux_resource mch_res;
+	int mch_res_rid;
 #endif
-
 	/* protects the irq masks */
 	spinlock_t irq_lock;
 

@@ -56,8 +56,13 @@ static unsigned int __intel_breadcrumbs_wakeup(struct intel_breadcrumbs *b)
 		 * signal should remain from genuine missed_breadcrumb()
 		 * for us to detect in CI.
 		 */
+#ifdef __linux__
 		bool was_asleep = task_asleep(wait->tsk);
-
+#else
+		// Added in 4.16, keep 4.15 behavior for now.
+		// Missing task_struct states...
+		bool was_asleep = true;
+#endif
 		result = ENGINE_WAKEUP_WAITER;
 		if (wake_up_process(wait->tsk) && was_asleep)
 			result |= ENGINE_WAKEUP_ASLEEP;

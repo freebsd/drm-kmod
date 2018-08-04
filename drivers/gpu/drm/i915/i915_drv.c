@@ -53,7 +53,10 @@
 #include "intel_drv.h"
 #include "intel_uc.h"
 
+#ifndef __linux__
 #define pci_get_class linux_pci_get_class
+#define	resource linux_resource
+#endif
 
 static struct drm_driver driver;
 
@@ -482,20 +485,15 @@ intel_alloc_mchbar_resource(struct drm_device *dev)
 
 	vga = device_get_parent(dev->dev->bsddev);
 	dev_priv->mch_res_rid = 0x100;
-	dev_priv->mch_res = BUS_ALLOC_RESOURCE(device_get_parent(vga),
+	dev_priv->mch_res.bsd_res = BUS_ALLOC_RESOURCE(device_get_parent(vga),
 	    dev->dev->bsddev, SYS_RES_MEMORY, &dev_priv->mch_res_rid, 0, ~0UL,
 	    MCHBAR_SIZE, RF_ACTIVE | RF_SHAREABLE);
-	if (dev_priv->mch_res == NULL) {
+	if (dev_priv->mch_res.bsd_res == NULL) {
 		DRM_DEBUG_DRIVER("failed bus alloc\n");
 		return -ENOMEM;
 	}
-
-	if (INTEL_INFO(dev_priv)->gen >= 4)
-		pci_write_config_dword(dev_priv->bridge_dev, reg + 4,
-		    upper_32_bits(rman_get_start(dev_priv->mch_res)));
-
-	pci_write_config_dword(dev_priv->bridge_dev, reg,
-	    lower_32_bits(rman_get_start(dev_priv->mch_res)));
+	dev_priv->mch_res.start = rman_get_start(dev_priv->mch_res.bsd_res);
+	dev_priv->mch_res.end = rman_get_end(dev_priv->mch_res.bsd_res);
 #else
 	dev_priv->mch_res.name = "i915 MCHBAR";
 	dev_priv->mch_res.flags = IORESOURCE_MEM;
@@ -510,6 +508,7 @@ intel_alloc_mchbar_resource(struct drm_device *dev)
 		dev_priv->mch_res.start = 0;
 		return ret;
 	}
+#endif
 
 	if (INTEL_GEN(dev_priv) >= 4)
 		pci_write_config_dword(dev_priv->bridge_dev, reg + 4,
@@ -517,7 +516,6 @@ intel_alloc_mchbar_resource(struct drm_device *dev)
 
 	pci_write_config_dword(dev_priv->bridge_dev, reg,
 			       lower_32_bits(dev_priv->mch_res.start));
-#endif
 	return 0;
 }
 
@@ -589,17 +587,17 @@ intel_teardown_mchbar(struct drm_device *dev)
 	}
 
 #ifndef __linux__
-	if (dev_priv->mch_res != NULL) {
+	if (dev_priv->mch_res.bsd_res != NULL) {
 		device_t vga;
 
 		vga = device_get_parent(dev->dev->bsddev);
 		BUS_DEACTIVATE_RESOURCE(device_get_parent(vga),
 		    dev->dev->bsddev, SYS_RES_MEMORY, dev_priv->mch_res_rid,
-		    dev_priv->mch_res);
+		    dev_priv->mch_res.bsd_res);
 		BUS_RELEASE_RESOURCE(device_get_parent(vga),
 		    dev->dev->bsddev, SYS_RES_MEMORY, dev_priv->mch_res_rid,
-		    dev_priv->mch_res);
-		dev_priv->mch_res = NULL;
+		    dev_priv->mch_res.bsd_res);
+		dev_priv->mch_res.bsd_res = NULL;
 	}
 #else
 	if (dev_priv->mch_res.start)

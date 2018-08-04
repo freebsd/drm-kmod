@@ -38,6 +38,10 @@
 #include <linux/mm.h>
 #include <linux/pagevec.h>
 
+#ifndef __linux__ // For linux_resource
+#include <linux/pci.h>
+#endif
+
 #include "i915_gem_timeline.h"
 #include "i915_gem_request.h"
 #include "i915_selftest.h"
@@ -370,7 +374,11 @@ struct i915_ggtt {
 	struct i915_address_space base;
 
 	struct io_mapping iomap;	/* Mapping to our CPU mappable region */
+#ifdef __linux__
 	struct resource gmadr;          /* GMADR resource */
+#else
+	struct linux_resource gmadr;          /* GMADR resource */
+#endif
 	resource_size_t mappable_end;	/* End offset that we can CPU map */
 
 	/** "Graphics Stolen Memory" holds the global PTEs */

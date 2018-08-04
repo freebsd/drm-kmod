@@ -1,9 +1,51 @@
 #ifndef _LINUX_GPLV2_PCI_H_
 #define	_LINUX_GPLV2_PCI_H_
 
+#include <sys/param.h>
+#include <sys/bus.h>
+#include <machine/bus.h>
+#include <sys/rman.h>
+#include <machine/resource.h>
+
 #include_next <linux/pci.h>
 
+#define	DEFINE_RES_MEM(_start, _size)		\
+	{					\
+	 .bsd_res = NULL,			\
+	 .start = (_start),			\
+	 .end = (_start) + (_size) - 1,		\
+	}
+
+#define BSD_TO_LINUX_RESOURCE(r)		\
+	{					\
+	 .bsd_res = (r),			\
+	 .start = rman_get_start(r),		\
+	 .end = rman_get_end(r),		\
+	}
+
+struct linux_resource {
+	struct resource *bsd_res;
+	resource_size_t start;
+	resource_size_t end;
+	/* const char *name; */
+	/* unsigned long flags; */
+	/* unsigned long desc; */
+	/* struct resource *parent, *sibling, *child; */
+};
+
 struct pci_dev *linux_pci_get_class(unsigned int class, struct pci_dev *from);
+
+static inline resource_size_t
+resource_size(const struct linux_resource *res)
+{
+	return res->end - res->start + 1;
+}
+
+static inline bool
+resource_contains(struct linux_resource *a, struct linux_resource *b)
+{
+	return a->start <= b->start && a->end >= b->end;
+}
 
 static inline int
 pci_bus_read_config(struct pci_bus *bus, unsigned int devfn,

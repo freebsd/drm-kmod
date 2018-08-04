@@ -30,6 +30,10 @@
 #include <drm/i915_drm.h>
 #include "i915_drv.h"
 
+#ifndef __linux__
+#define	resource linux_resource
+#endif
+
 /*
  * The BIOS typically reserves some of the system's memory for the exclusive
  * use of the integrated graphics. This memory is no longer available for
@@ -347,7 +351,6 @@ int i915_gem_init_stolen(struct drm_i915_private *dev_priv)
 
 	if (resource_size(&intel_graphics_stolen_res) == 0)
 		return 0;
-
 	dev_priv->dsm = intel_graphics_stolen_res;
 
 	if (i915_adjust_stolen(dev_priv, &dev_priv->dsm))
