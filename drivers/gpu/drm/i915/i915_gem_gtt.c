@@ -3501,9 +3501,11 @@ int i915_ggtt_probe_hw(struct drm_i915_private *dev_priv)
 	ggtt->base.i915 = dev_priv;
 	ggtt->base.dma = &dev_priv->drm.pdev->dev;
 
-	// XXX: BSD should set intel_graphics_stolen_res here!
+	// LKPIFIXME: BSD should set intel_graphics_stolen_res before here!
 	// Let stolen memory size = 0 for now...
-	// (Intel moved it to early quirks in Linux *sigh*)
+	// Intel moved it to early quirks in Linux. Should we also
+	// implement something  in early boot (before the OS reclaims
+	// the memory on buggy BIOS)?
 
 	if (INTEL_GEN(dev_priv) <= 5)
 		ret = i915_gmch_probe(ggtt);

@@ -59,7 +59,7 @@ static unsigned int __intel_breadcrumbs_wakeup(struct intel_breadcrumbs *b)
 #ifdef __linux__
 		bool was_asleep = task_asleep(wait->tsk);
 #else
-		// Added in 4.16, keep 4.15 behavior for now.
+		// LKPIFIXME: Added in 4.16, keep 4.15 behavior for now.
 		// Missing task_struct states...
 		bool was_asleep = true;
 #endif

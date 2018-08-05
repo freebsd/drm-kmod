@@ -671,6 +671,7 @@ out:
  */
 bool drm_kms_helper_is_poll_worker(void)
 {
+	// LKPIFIXME: current_work() needs to return something...
 	struct work_struct *work = current_work();
 
 	return work && work->func == output_poll_execute;
