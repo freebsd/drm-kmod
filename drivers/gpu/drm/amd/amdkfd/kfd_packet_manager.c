@@ -604,10 +604,11 @@ int pm_debugfs_runlist(struct seq_file *m, void *data)
 		seq_puts(m, "  No active runlist\n");
 		goto out;
 	}
-
+#ifdef __linux__
+	// TODO: implement this!
 	seq_hex_dump(m, "  ", DUMP_PREFIX_OFFSET, 32, 4,
 		     pm->ib_buffer_obj->cpu_ptr, pm->ib_size_bytes, false);
-
+#endif
 out:
 	mutex_unlock(&pm->lock);
 	return 0;

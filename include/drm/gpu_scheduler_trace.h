@@ -26,14 +26,15 @@
 
 #include <drm/drmP.h>
 
+
 static inline void
-trace_amd_sched_job(void* sched_job){
-	CTR1(KTR_DRM, "amd_sched_job %p",sched_job);
+trace_drm_sched_job(void *sched_job, void *entity){
+	CTR2(KTR_DRM, "drm_sched_job %p, entity %p", sched_job, entity);
 }
 
 static inline void
-trace_amd_sched_process_job(void* s_fence){
-	CTR1(KTR_DRM, "amd_process_sched_job %p",s_fence);
+trace_drm_sched_process_job(void *s_fence){
+	CTR1(KTR_DRM, "drm_process_sched_job %p", s_fence);
 }
 
 #ifdef __linux__

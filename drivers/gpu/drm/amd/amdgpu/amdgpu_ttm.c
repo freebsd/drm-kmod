@@ -1432,12 +1432,19 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 		 (unsigned) (adev->mc.real_vram_size / (1024 * 1024)));
 
 	if (amdgpu_gtt_size == -1) {
+#ifdef __linux__
 		struct sysinfo si;
 
 		si_meminfo(&si);
 		gtt_size = min(max((AMDGPU_DEFAULT_GTT_SIZE_MB << 20),
 			       adev->mc.mc_vram_size),
 			       ((uint64_t)si.totalram * si.mem_unit * 3/4));
+#else
+		// Missing sysinfo - assume we have enough free memory for now
+		// TODO: Get free memory?
+		gtt_size = max((AMDGPU_DEFAULT_GTT_SIZE_MB << 20),
+		    adev->mc.mc_vram_size);
+#endif
 	}
 	else
 		gtt_size = (uint64_t)amdgpu_gtt_size << 20;

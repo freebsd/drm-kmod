@@ -28,6 +28,10 @@
 #include <linux/list.h>
 #include <linux/dma-fence.h>
 
+#ifndef __linux__
+#include <asm/atomic64.h>
+#endif
+
 #include "amdgpu_sync.h"
 
 /* maximum number of VMIDs */

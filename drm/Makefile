@@ -2,7 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
-.PATH:	${SRCDIR} ${SRCDIR}/ttm
+.PATH:	${SRCDIR} ${SRCDIR}/ttm ${SRCDIR}/scheduler
 
 KMOD=	drm
 SRCS=	ati_pcigart.c \
@@ -93,7 +93,9 @@ SRCS=	ati_pcigart.c \
 	ttm_page_alloc_dma.c \
 	ttm_bo_vm.c
 
-# drm_fops.c \ deleted in v4.12
+# drm scheduler (moved from amdgpu)
+SRCS+=	gpu_scheduler.c \
+	sched_fence.c
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include

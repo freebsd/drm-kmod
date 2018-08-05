@@ -78,6 +78,7 @@ SRCS+=	amdgpu_acpi.c \
 	amdgpu_connectors.c \
 	amdgpu_cs.c \
 	amdgpu_ctx.c \
+	amdgpu_debugfs.c \
 	amdgpu_device.c \
 	amdgpu_display.c \
 	amdgpu_dpm.c \
@@ -92,6 +93,7 @@ SRCS+=	amdgpu_acpi.c \
 	amdgpu_gtt_mgr.c \
 	amdgpu_i2c.c \
 	amdgpu_ib.c \
+	amdgpu_ids.c \
 	amdgpu_ih.c \
 	amdgpu_ioc32.c \
 	amdgpu_irq.c \
@@ -251,13 +253,14 @@ SRCS+=	amdgpu_dm.c \
 	dcn10_dpp.c \
 	dcn10_dpp_cm.c \
 	dcn10_dpp_dscl.c \
+	dcn10_hubbub.c \
 	dcn10_hubp.c \
 	dcn10_hw_sequencer.c \
 	dcn10_ipp.c \
 	dcn10_mpc.c \
 	dcn10_opp.c \
+	dcn10_optc.c \
 	dcn10_resource.c \
-	dcn10_timing_generator.c \
 	dcn_calc_auto.c \
 	dcn_calc_math.c \
 	dcn_calcs.c \
@@ -273,7 +276,6 @@ SRCS+=	amdgpu_dm.c \
 	freesync.c \
 	gpio_base.c \
 	gpio_service.c \
-	grph_object_id.c \
 	hw_ddc.c \
 	hw_factory.c \
 	hw_factory_dce110.c \
@@ -351,12 +353,10 @@ SRCS+=	amd_powerplay.c \
 	vega10_hwmgr.c \
 	vega10_powertune.c \
 	vega10_processpptables.c \
+	vega10_reg_init.c \
 	vega10_smumgr.c \
 	vega10_thermal.c
 
-# scheduler
-SRCS+=	sched_fence.c \
-	gpu_scheduler.c
 
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
@@ -420,6 +420,7 @@ CWARNFLAGS.amdgpu_bo_list.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_cgs.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.amdgpu_connectors.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_cs.c=	-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_debugfs.c=	-Wno-cast-qual
 CWARNFLAGS.amdgpu_device.c=	 -Wno-cast-qual -Wno-missing-prototypes
 CWARNFLAGS.amdgpu_dm.c=		-Wno-cast-qual -Wno-missing-prototypes -Wno-pointer-bool-conversion
 CWARNFLAGS.amdgpu_dm_helpers.c=	-Wno-cast-qual
@@ -450,6 +451,7 @@ CWARNFLAGS.cz_clockpowergating.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.cz_hwmgr.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.dc.c=	-Wno-missing-prototypes
 CWARNFLAGS.dc_helper.c=	-Wno-missing-prototypes
+CWARNFLAGS.dc_hw_sequencer.c=	-Wno-missing-prototypes
 CWARNFLAGS.dc_link.c=	-Wno-enum-conversion 
 CWARNFLAGS.dc_link_ddc.c=	-Wno-cast-qual -Wno-unused-const-variable
 CWARNFLAGS.dc_link_dp.c=	-Wno-cast-qual -Wno-enum-conversion
@@ -477,6 +479,8 @@ CWARNFLAGS.dce_transform.c=	-Wno-enum-conversion
 CWARNFLAGS.dcn10_dpp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp_dscl.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn10_hw_sequencer.c=-Wno-missing-prototypes
+CWARNFLAGS.dcn10_opp.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn10_optc.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn10_resource.c=	-Wno-missing-prototypes	-Wno-initializer-overrides
 CWARNFLAGS.dcn_calcs.c=		-Wno-cast-qual -Wno-missing-prototypes
 CWARNFLAGS.dce_calc_auto.c=	-Wno-cast-qual -Wno-parentheses-equality
@@ -534,6 +538,7 @@ CWARNFLAGS.vega10_hwmgr.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized 
 CWARNFLAGS.vega10_ih.c= 	-Wno-cast-qual
 CWARNFLAGS.vega10_powertune.c=	-Wno-unused-const-variable
 CWARNFLAGS.vega10_processpptables.c= -Wno-missing-prototypes -Wno-cast-qual
+CWARNFLAGS.vega10_reg_init.c= 	-Wno-cast-qual
 CWARNFLAGS.vega10_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.vega10_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.vi.c= -Wno-unused-const-variable

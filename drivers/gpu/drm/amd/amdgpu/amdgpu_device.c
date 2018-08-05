@@ -60,6 +60,7 @@
 #ifndef __linux__
 #define pci_save_state linux_pci_save_state
 #define pci_restore_state linux_pci_restore_state
+#define	resource linux_resource
 #endif
 
 MODULE_FIRMWARE("amdgpu/vega10_gpu_info.bin");
@@ -407,10 +408,12 @@ static int amdgpu_device_doorbell_init(struct amdgpu_device *adev)
 		adev->doorbell.ptr = NULL;
 		return 0;
 	}
-
+#ifdef __linux__
 	if (pci_resource_flags(adev->pdev, 2) & IORESOURCE_UNSET)
+#else
+	if (pci_resource_flags(adev->pdev, 2) == 0)
+#endif
 		return -EINVAL;
-
 	/* doorbell bar mapping */
 	adev->doorbell.base = pci_resource_start(adev->pdev, 2);
 	adev->doorbell.size = pci_resource_len(adev->pdev, 2);
@@ -613,6 +616,10 @@ void amdgpu_device_gart_location(struct amdgpu_device *adev,
  */
 int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 {
+#ifndef __linux__
+	UNIMPLEMENTED();
+	return -ENODEV;
+#else
 	u64 space_needed = roundup_pow_of_two(adev->mc.real_vram_size);
 	u32 rbar_size = order_base_2(((space_needed >> 20) | 1)) - 1;
 	struct pci_bus *root;
@@ -670,6 +677,7 @@ int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 	pci_write_config_word(adev->pdev, PCI_COMMAND, cmd);
 
 	return 0;
+#endif
 }
 
 /*
