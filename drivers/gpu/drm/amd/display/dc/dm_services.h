@@ -33,8 +33,8 @@
 
 /* TODO: remove when DC is complete. */
 #include "dm_services_types.h"
-#include "link_service_types.h"
 #include "logger_interface.h"
+#include "link_service_types.h"
 
 #undef DEPRECATED
 

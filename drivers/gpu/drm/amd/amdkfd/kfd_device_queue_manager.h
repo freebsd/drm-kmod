@@ -197,7 +197,7 @@ static inline unsigned int get_sh_mem_bases_32(struct kfd_process_device *pdd)
 	return (pdd->lds_base >> 16) & 0xFF;
 }
 
-inline static unsigned int
+static inline unsigned int
 get_sh_mem_bases_nybble_64(struct kfd_process_device *pdd)
 {
 	return (pdd->lds_base >> 60) & 0x0E;

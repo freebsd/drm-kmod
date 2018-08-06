@@ -216,7 +216,7 @@ void drm_sched_entity_fini(struct drm_gpu_scheduler *sched,
 	 * queued IBs or discard them on SIGKILL
 	*/
 #ifdef __linux__
-	// LKPIFIXME: We don't have flags or exit_code...
+	// BSDFIXME: We don't have flags or exit_code...
 	if ((current->flags & PF_SIGNALED) && current->exit_code == SIGKILL)
 		r = -ERESTARTSYS;
 	else

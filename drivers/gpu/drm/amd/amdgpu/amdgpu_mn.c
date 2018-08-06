@@ -51,7 +51,7 @@ struct amdgpu_mn {
 
 	/* objects protected by lock */
 	struct rw_semaphore	lock;
-	struct rb_root		objects;
+	struct rb_root_cached	objects;
 	struct mutex		read_lock;
 	atomic_t		recursion;
 };
@@ -185,36 +185,6 @@ static void amdgpu_mn_invalidate_node(struct amdgpu_mn_node *node,
 }
 
 /**
- * amdgpu_mn_invalidate_page - callback to notify about mm change
- *
- * @mn: our notifier
- * @mn: the mm this callback is about
- * @address: address of invalidate page
- *
- * Invalidation of a single page. Blocks for all BOs mapping it
- * and unmap them by move them into system domain again.
- */
-static void amdgpu_mn_invalidate_page(struct mmu_notifier *mn,
-				      struct mm_struct *mm,
-				      unsigned long address)
-{
-	struct amdgpu_mn *rmn = container_of(mn, struct amdgpu_mn, mn);
-	struct interval_tree_node *it;
-
-	amdgpu_mn_read_lock(rmn);
-
-	it = interval_tree_iter_first(&rmn->objects, address, address);
-	if (it) {
-		struct amdgpu_mn_node *node;
-
-		node = container_of(it, struct amdgpu_mn_node, it);
-		amdgpu_mn_invalidate_node(node, address, address);
-	}
-
-	amdgpu_mn_read_unlock(rmn);
-}
-
-/**
  * amdgpu_mn_invalidate_range_start - callback to notify about mm change
  *
  * @mn: our notifier
@@ -308,7 +278,7 @@ struct amdgpu_mn *amdgpu_mn_get(struct amdgpu_device *adev)
 	rmn->mm = mm;
 	rmn->mn.ops = &amdgpu_mn_ops;
 	init_rwsem(&rmn->lock);
-	rmn->objects = RB_ROOT;
+	rmn->objects = RB_ROOT_CACHED;
 	mutex_init(&rmn->read_lock);
 	atomic_set(&rmn->recursion, 0);
 

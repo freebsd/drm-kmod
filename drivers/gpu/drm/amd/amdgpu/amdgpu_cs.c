@@ -576,7 +576,7 @@ static int amdgpu_cs_parser_bos(struct amdgpu_cs_parser *p,
 				 * invalidated it. Free it and try again
 				 */
 				release_pages(e->user_pages,
-					      e->robj->tbo.ttm->num_pages);
+					      bo->tbo.ttm->num_pages);
 				kvfree(e->user_pages);
 				e->user_pages = NULL;
 			}
@@ -1594,7 +1594,7 @@ int amdgpu_cs_find_mapping(struct amdgpu_cs_parser *parser,
 	*map = mapping;
 
 #ifdef __linux__
-	/* On FreeBSD we don't store the ww_acquire_ctx in the ww_mutex struct */
+	/* BSDFIXME: On FreeBSD we don't store the ww_acquire_ctx in the ww_mutex struct */
 	/* Double check that the BO is reserved by this CS */
 	if (READ_ONCE((*bo)->tbo.resv->lock.ctx) != &parser->ticket)
 		return -EINVAL;

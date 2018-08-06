@@ -96,12 +96,7 @@ static void amdgpu_bo_list_destroy(struct amdgpu_fpriv *fpriv, int id)
 	struct amdgpu_bo_list *list;
 
 	mutex_lock(&fpriv->bo_list_lock);
-#ifndef __linux__
-	list = idr_find(&fpriv->bo_list_handles, id);
-	idr_remove(&fpriv->bo_list_handles, id);
-#else
 	list = idr_remove(&fpriv->bo_list_handles, id);
-#endif
 	mutex_unlock(&fpriv->bo_list_lock);
 	if (list)
 		kref_put(&list->refcount, amdgpu_bo_list_release_rcu);

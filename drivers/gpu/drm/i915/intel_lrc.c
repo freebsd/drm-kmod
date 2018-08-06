@@ -800,8 +800,6 @@ static void execlists_submission_tasklet(unsigned long data)
 	 * new request (outside of the context-switch interrupt).
 	 */
 	while (test_bit(ENGINE_IRQ_EXECLIST, &engine->irq_posted)) {
-		u32 __iomem *csb_mmio =
-			dev_priv->regs + i915_mmio_reg_offset(RING_CONTEXT_STATUS_PTR(engine));
 		/* The HWSP contains a (cacheable) mirror of the CSB */
 		const u32 *buf =
 			&engine->status_page.page_addr[I915_HWS_CSB_BUF0_INDEX];
@@ -912,17 +910,6 @@ static void execlists_submission_tasklet(unsigned long data)
 
 			/* Check the context/desc id for this event matches */
 			GEM_DEBUG_BUG_ON(buf[2 * head + 1] != port->context_id);
-
-			/* Check the context/desc id for this event matches */
-                       if (readl(buf + 2 * head + 1) != port->context_id) {
-                               pr_err("%s: BUG CSB (%x head=%d, tail=%d), ctx=%d, rq=%d\n",
-                                               engine->name,
-                                               readl(csb_mmio),
-                                               head, tail,
-                                               readl(buf+2*head+1),
-                                               port->context_id);
-                               BUG();
-                       }
 #endif
 			rq = port_unpack(port, &count);
 			GEM_TRACE("%s out[0]: ctx=%d.%d, seqno=%x\n",
@@ -1005,10 +992,7 @@ pt_lock_engine(struct i915_priotree *pt, struct intel_engine_cs *locked)
 	GEM_BUG_ON(!locked);
 
 	if (engine != locked) {
-#ifndef __linux__
-		if (locked)
-#endif
-			spin_unlock(&locked->timeline->lock);
+		spin_unlock(&locked->timeline->lock);
 		spin_lock(&engine->timeline->lock);
 	}
 
@@ -1695,7 +1679,23 @@ static int gen8_emit_bb_start(struct drm_i915_gem_request *req,
 	if (IS_ERR(cs))
 		return PTR_ERR(cs);
 
-	/* WaDisableCtxRestoreArbitration:bdw,chv */
+	/*
+	 * WaDisableCtxRestoreArbitration:bdw,chv
+	 *
+	 * We don't need to perform MI_ARB_ENABLE as often as we do (in
+	 * particular all the gen that do not need the w/a at all!), if we
+	 * took care to make sure that on every switch into this context
+	 * (both ordinary and for preemption) that arbitrartion was enabled
+	 * we would be fine. However, there doesn't seem to be a downside to
+	 * being paranoid and making sure it is set before each batch and
+	 * every context-switch.
+	 *
+	 * Note that if we fail to enable arbitration before the request
+	 * is complete, then we do not see the context-switch interrupt and
+	 * the engine hangs (with RING_HEAD == RING_TAIL).
+	 *
+	 * That satisfies both the GPGPU w/a and our heavy-handed paranoia.
+	 */
 	*cs++ = MI_ARB_ON_OFF | MI_ARB_ENABLE;
 
 	/* FIXME(BDW): Address space and security selectors. */

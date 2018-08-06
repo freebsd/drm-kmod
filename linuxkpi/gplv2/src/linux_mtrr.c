@@ -101,6 +101,8 @@ arch_phys_wc_add(unsigned long base, unsigned long size)
 	mi->size = size;
 	rc = mtrr_add(base, size, MTRR_TYPE_WRCOMB);
 	if (rc >= 0) {
+		pr_warn("Successfully added WC MTRR for [%p-%p]: %d; ",
+		    (void *)base, (void *)(base + size - 1), rc);
 		rc2 = idr_get_new(&mtrr_idr, mi, &id);
 		MPASS(idr_find(&mtrr_idr, id) == mi);
 		MPASS(rc2 == 0);

@@ -605,7 +605,7 @@ int pm_debugfs_runlist(struct seq_file *m, void *data)
 		goto out;
 	}
 #ifdef __linux__
-	// TODO: implement this!
+	// BSDFIXME: implement this!
 	seq_hex_dump(m, "  ", DUMP_PREFIX_OFFSET, 32, 4,
 		     pm->ib_buffer_obj->cpu_ptr, pm->ib_size_bytes, false);
 #endif

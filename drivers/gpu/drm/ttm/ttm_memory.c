@@ -81,8 +81,6 @@ static void ttm_mem_zone_kobj_release(struct kobject *kobj)
 	kfree(zone);
 }
 
-/* #ifndef __FreeBSD__ */
-/* XXXKIB sysctl */
 static ssize_t ttm_mem_zone_show(struct kobject *kobj,
 				 struct attribute *attr,
 				 char *buffer)
@@ -107,12 +105,9 @@ static ssize_t ttm_mem_zone_show(struct kobject *kobj,
 	return snprintf(buffer, PAGE_SIZE, "%llu\n",
 			(unsigned long long) val >> 10);
 }
-/* #endif */
 
 static void ttm_check_swapping(struct ttm_mem_global *glob);
 
-/* #ifndef __FreeBSD__ */
-/* XXXKIB sysctl */
 static ssize_t ttm_mem_zone_store(struct kobject *kobj,
 				  struct attribute *attr,
 				  const char *buffer,
@@ -150,7 +145,6 @@ static ssize_t ttm_mem_zone_store(struct kobject *kobj,
 
 	return size;
 }
-/* #endif */
 
 static struct attribute *ttm_mem_zone_attrs[] = {
 	&ttm_mem_sys,

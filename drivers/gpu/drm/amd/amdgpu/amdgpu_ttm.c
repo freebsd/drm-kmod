@@ -697,7 +697,7 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 	int r;
 
 #ifdef __notyet__
-/* no userptr support yet */
+	/* BSDFIXME: no userptr support yet */
 	if (!(gtt->userflags & AMDGPU_GEM_USERPTR_READONLY))
 		flags |= FOLL_WRITE;
 
@@ -745,6 +745,7 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 
 release_pages:
 	release_pages(pages, pinned);
+	up_read(&current->mm->mmap_sem);
 	return r;
 }
 
@@ -880,7 +881,6 @@ int amdgpu_ttm_alloc_gart(struct ttm_buffer_object *bo)
 	struct ttm_operation_ctx ctx = { false, false };
 	struct amdgpu_ttm_tt *gtt = (void*)bo->ttm;
 	struct ttm_mem_reg tmp;
-
 	struct ttm_placement placement;
 	struct ttm_place placements;
 	uint64_t flags;

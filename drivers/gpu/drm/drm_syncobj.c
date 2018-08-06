@@ -399,23 +399,6 @@ static const struct file_operations drm_syncobj_file_fops = {
 	.release = drm_syncobj_file_release,
 };
 
-static int drm_syncobj_alloc_file(struct drm_syncobj *syncobj)
-{
-	struct file *file = anon_inode_getfile("syncobj_file",
-					       &drm_syncobj_file_fops,
-					       syncobj, 0);
-	if (IS_ERR(file))
-		return PTR_ERR(file);
-
-	drm_syncobj_get(syncobj);
-	if (cmpxchg(&syncobj->file, NULL, file)) {
-		/* lost the race */
-		fput(file);
-	}
-
-	return 0;
-}
-
 /**
  * drm_syncobj_get_fd - get a file descriptor from a syncobj
  * @syncobj: Sync object to export

@@ -184,12 +184,7 @@ static int amdgpu_ctx_free(struct amdgpu_fpriv *fpriv, uint32_t id)
 	struct amdgpu_ctx *ctx;
 
 	mutex_lock(&mgr->lock);
-#ifndef __linux__
-	ctx = idr_find(&mgr->ctx_handles, id);
-	idr_remove(&mgr->ctx_handles, id);
-#else
 	ctx = idr_remove(&mgr->ctx_handles, id);
-#endif
 	if (ctx)
 		kref_put(&ctx->refcount, amdgpu_ctx_do_release);
 	mutex_unlock(&mgr->lock);

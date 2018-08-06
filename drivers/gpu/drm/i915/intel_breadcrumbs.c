@@ -31,10 +31,10 @@
 #define	prio	task_thread->td_priority
 #endif
 
-#ifdef defined(__linux__) && defined(CONFIG_SMP)
+#if defined(__linux__) && defined(CONFIG_SMP)
 #define task_asleep(tsk) ((tsk)->state & TASK_NORMAL && !(tsk)->on_cpu)
 #else
-#define task_asleep(tsk) ((tsk)->state & TASK_NORMAL)
+#define task_asleep(tsk) (atomic_read(&(tsk)->state) & TASK_NORMAL)
 #endif
 
 static unsigned int __intel_breadcrumbs_wakeup(struct intel_breadcrumbs *b)

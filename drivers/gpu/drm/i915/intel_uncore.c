@@ -1808,6 +1808,7 @@ int intel_wait_for_register(struct drm_i915_private *dev_priv,
 	if (ret)
 		ret = wait_for((I915_READ_NOTRACE(reg) & mask) == value,
 			       timeout_ms);
+
 	return ret;
 }
 

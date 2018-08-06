@@ -1,6 +1,8 @@
 #ifndef _ASM_X86_FPU_API_H
 #define _ASM_X86_FPU_API_H
 
+#include <machine/fpu.h>
+
 #define	kernel_fpu_begin()			\
 	struct fpu_kern_ctx *__fpu_ctx;		\
 	__fpu_ctx = fpu_kern_alloc_ctx(0);	\

@@ -29,7 +29,6 @@
 #include <drm/amdgpu_drm.h>
 #include <linux/dma-buf.h>
 
-
 struct sg_table *amdgpu_gem_prime_get_sg_table(struct drm_gem_object *obj)
 {
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
@@ -164,6 +163,7 @@ struct reservation_object *amdgpu_gem_prime_res_obj(struct drm_gem_object *obj)
 
 	return bo->tbo.resv;
 }
+
 struct dma_buf *amdgpu_gem_prime_export(struct drm_device *dev,
 					struct drm_gem_object *gobj,
 					int flags)
@@ -181,7 +181,6 @@ struct dma_buf *amdgpu_gem_prime_export(struct drm_device *dev,
 		buf->file->f_mapping = dev->anon_inode->i_mapping;
 #else
 #undef file
-		// BSDFIXME: OK??
 		struct linux_file *f = (struct linux_file *)(buf->linux_file->f_data);
 		f->f_shmem = bo->gem_base.filp->f_shmem;
 #endif
