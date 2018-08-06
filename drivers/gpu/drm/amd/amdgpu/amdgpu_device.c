@@ -60,7 +60,7 @@
 #ifndef __linux__
 #define pci_save_state linux_pci_save_state
 #define pci_restore_state linux_pci_restore_state
-#define	resource linux_resource
+/* #define	resource linux_resource */
 #endif
 
 MODULE_FIRMWARE("amdgpu/vega10_gpu_info.bin");
@@ -617,6 +617,7 @@ void amdgpu_device_gart_location(struct amdgpu_device *adev,
 int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 {
 #ifndef __linux__
+	// BSDFIXME
 	UNIMPLEMENTED();
 	return -ENODEV;
 #else
@@ -1870,16 +1871,36 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	/* doorbell bar mapping */
 	amdgpu_device_doorbell_init(adev);
 
-#ifdef __linux__
+#ifndef __linux__
+#define DEVICE_COUNT_RESOURCE 5
+#endif
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_IO) {
 			adev->rio_mem_size = pci_resource_len(adev->pdev, i);
-			adev->rio_mem = pci_iomap(adev->pdev, i, adev->rio_mem_size);
+#ifdef __linux__
+			adev->rio_mem = pci_iomap(adev->pdev, i,
+			    adev->rio_mem_size);
+#else
+			struct resource *res;
+			int rid, type;
+
+			rid = PCIR_BAR(i);
+			// type = SYS_RES_IOPORT or SYS_RES_MEMORY
+			type = pci_resource_type(adev->pdev, i);
+			res = bus_alloc_resource_any(adev->pdev->dev.bsddev,
+			    type, &rid, RF_ACTIVE);
+			adev->rio_res = res;
+			adev->rio_rid = rid;
+			adev->rio_type = type;
+			adev->rio_mem = (void *)rman_get_bushandle(res);
+
+			DRM_INFO("register rio base: 0x%08X\n", (uint32_t)adev->rio_mem);
+			DRM_INFO("register rio size: %u\n", (unsigned)adev->rio_mem_size);
+#endif
 			break;
 		}
 	}
-#endif
 	if (adev->rio_mem == NULL)
 		DRM_INFO("PCI I/O BAR is not found.\n");
 
@@ -2122,10 +2143,15 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	if (adev->flags & AMD_IS_PX)
 		vga_switcheroo_fini_domain_pm_ops(adev->dev);
 	vga_client_register(adev->pdev, NULL, NULL, NULL);
+	if (adev->rio_mem) {
 #ifdef __linux__
-	if (adev->rio_mem)
 		pci_iounmap(adev->pdev, adev->rio_mem);
+#else
+		bus_release_resource(adev->pdev->dev.bsddev,
+		    adev->rio_type, adev->rio_rid, adev->rio_res);
+
 #endif
+	}
 	adev->rio_mem = NULL;
 	iounmap(adev->rmmio);
 	adev->rmmio = NULL;

@@ -1571,6 +1571,8 @@ struct amdgpu_device {
 	resource_size_t			rio_mem_size;
 #ifndef __linux__
 	int				rio_rid;
+	int				rio_type;
+	struct resource			*rio_res;
 #endif
 	struct amdgpu_doorbell		doorbell;
 
