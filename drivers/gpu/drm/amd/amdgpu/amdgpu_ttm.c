@@ -1440,10 +1440,9 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 			       adev->mc.mc_vram_size),
 			       ((uint64_t)si.totalram * si.mem_unit * 3/4));
 #else
-		// Missing sysinfo - assume we have enough free memory for now
-		// TODO: Get free memory?
-		gtt_size = max((AMDGPU_DEFAULT_GTT_SIZE_MB << 20),
-		    adev->mc.mc_vram_size);
+		gtt_size = min(max((AMDGPU_DEFAULT_GTT_SIZE_MB << 20),
+			       adev->mc.mc_vram_size),
+			       ((uint64_t)physmem * PAGE_SIZE * 3/4));
 #endif
 	}
 	else
