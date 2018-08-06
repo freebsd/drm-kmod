@@ -23,14 +23,16 @@
  */
 
 #include <linux/kernel.h>
-#ifdef __linux__
 #include <asm/fpu/api.h>
-#endif
 
 #include "i915_drv.h"
 
 #ifdef __linux__
 static DEFINE_STATIC_KEY_FALSE(has_movntdqa);
+#else
+#include <x86/x86_var.h>
+static bool has_movntdqa = false;
+#define	asm		__asm
 #endif
 
 #ifdef CONFIG_AS_MOVNTDQA
@@ -88,13 +90,20 @@ bool i915_memcpy_from_wc(void *dst, const void *src, unsigned long len)
 		return false;
 
 #ifdef CONFIG_AS_MOVNTDQA
+#ifdef __linux__
 	if (static_branch_likely(&has_movntdqa)) {
 		if (likely(len))
 			__memcpy_ntdqa(dst, src, len);
 		return true;
 	}
+#else
+	if (likely(has_movntdqa)) {
+		if (likely(len))
+			__memcpy_ntdqa(dst, src, len);
+		return true;
+	}
 #endif
-
+#endif
 	return false;
 }
 
@@ -108,5 +117,8 @@ void i915_memcpy_init_early(struct drm_i915_private *dev_priv)
 	if (static_cpu_has(X86_FEATURE_XMM4_1) &&
 	    !boot_cpu_has(X86_FEATURE_HYPERVISOR))
 		static_branch_enable(&has_movntdqa);
+#else
+	if (cpu_feature2 & CPUID2_SSE41)
+		has_movntdqa = true;
 #endif
 }

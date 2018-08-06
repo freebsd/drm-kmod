@@ -28,14 +28,13 @@
 #define	CONFIG_ACPI_SLEEP 1
 #define	CONFIG_DRM_I915_KMS 1
 #undef	CONFIG_INTEL_IOMMU
+// For platforms with SSE4.1 (needed for GuC)
+#define CONFIG_AS_MOVNTDQA
 #endif
-
 #ifdef _KERNEL
 #define	__KERNEL__
 #endif
 
-// For platforms with SSE4.1 (needed for GuC logging)
-/* #define CONFIG_AS_MOVNTDQA */
 
 #define	CONFIG_AGP	1
 #define	CONFIG_MTRR	1
