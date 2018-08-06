@@ -1048,8 +1048,6 @@ static void vlv_display_power_well_deinit(struct drm_i915_private *dev_priv)
 static void vlv_display_power_well_enable(struct drm_i915_private *dev_priv,
 					  struct i915_power_well *power_well)
 {
-	WARN_ON_ONCE(power_well->id != PUNIT_POWER_WELL_DISP2D);
-
 	vlv_set_power_well(dev_priv, power_well, true);
 
 	vlv_display_power_well_init(dev_priv);
@@ -1058,8 +1056,6 @@ static void vlv_display_power_well_enable(struct drm_i915_private *dev_priv,
 static void vlv_display_power_well_disable(struct drm_i915_private *dev_priv,
 					   struct i915_power_well *power_well)
 {
-	WARN_ON_ONCE(power_well->id != PUNIT_POWER_WELL_DISP2D);
-
 	vlv_display_power_well_deinit(dev_priv);
 
 	vlv_set_power_well(dev_priv, power_well, false);
@@ -1068,8 +1064,6 @@ static void vlv_display_power_well_disable(struct drm_i915_private *dev_priv,
 static void vlv_dpio_cmn_power_well_enable(struct drm_i915_private *dev_priv,
 					   struct i915_power_well *power_well)
 {
-	WARN_ON_ONCE(power_well->id != PUNIT_POWER_WELL_DPIO_CMN_BC);
-
 	/* since ref/cri clock was enabled */
 	udelay(1); /* >10ns for cmnreset, >0ns for sidereset */
 
@@ -1093,8 +1087,6 @@ static void vlv_dpio_cmn_power_well_disable(struct drm_i915_private *dev_priv,
 					    struct i915_power_well *power_well)
 {
 	enum pipe pipe;
-
-	WARN_ON_ONCE(power_well->id != PUNIT_POWER_WELL_DPIO_CMN_BC);
 
 	for_each_pipe(dev_priv, pipe)
 		assert_pll_disabled(dev_priv, pipe);
@@ -1519,8 +1511,6 @@ out:
 static void chv_pipe_power_well_enable(struct drm_i915_private *dev_priv,
 				       struct i915_power_well *power_well)
 {
-	WARN_ON_ONCE(power_well->id != CHV_DISP_PW_PIPE_A);
-
 	chv_set_pipe_power_well(dev_priv, power_well, true);
 
 	vlv_display_power_well_init(dev_priv);
@@ -1529,8 +1519,6 @@ static void chv_pipe_power_well_enable(struct drm_i915_private *dev_priv,
 static void chv_pipe_power_well_disable(struct drm_i915_private *dev_priv,
 					struct i915_power_well *power_well)
 {
-	WARN_ON_ONCE(power_well->id != CHV_DISP_PW_PIPE_A);
-
 	vlv_display_power_well_deinit(dev_priv);
 
 	chv_set_pipe_power_well(dev_priv, power_well, false);
