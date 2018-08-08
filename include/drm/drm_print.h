@@ -200,10 +200,15 @@ __printf(6, 7)
 void drm_dev_printk(const struct device *dev, const char *level,
 		    unsigned int category, const char *function_name,
 		    const char *prefix, const char *format, ...);
+#ifndef __linux__
+__printf(4, 5)
+void drm_printk(const char *level, unsigned int category,
+		const char *function_name, const char *format, ...);
+#else
 __printf(3, 4)
 void drm_printk(const char *level, unsigned int category,
 		const char *format, ...);
-
+#endif
 /* Macros to make printk easier */
 
 #define _DRM_PRINTK(once, level, fmt, ...)				\
@@ -235,9 +240,13 @@ void drm_printk(const char *level, unsigned int category,
 #define DRM_DEV_ERROR(dev, fmt, ...)					\
 	drm_dev_printk(dev, KERN_ERR, DRM_UT_NONE, __func__, " *ERROR*",\
 		       fmt, ##__VA_ARGS__)
-#define DRM_ERROR(fmt, ...)						\
+#ifdef __linux__
+#define DRM_ERROR(fmt, ...)					\
 	drm_printk(KERN_ERR, DRM_UT_NONE, fmt,	##__VA_ARGS__)
-
+#else
+#define DRM_ERROR(fmt, ...)					\
+	drm_printk(KERN_ERR, DRM_UT_NONE, __func__, fmt, ##__VA_ARGS__)
+#endif
 /**
  * Rate limited error output.  Like DRM_ERROR() but won't flood the log.
  *
@@ -323,6 +332,36 @@ void drm_printk(const char *level, unsigned int category,
 		drm_dev_printk(dev, KERN_DEBUG, DRM_UT_ ## level,	\
 			       __func__, "", fmt, ##args);		\
 })
+
+#ifndef __linux__
+#undef DRM_DEBUG
+#define DRM_DEBUG(fmt, ...)						\
+	drm_printk(KERN_DEBUG, DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
+
+#undef DRM_DEBUG_DRIVER
+#define DRM_DEBUG_DRIVER(fmt, ...)					\
+	drm_printk(KERN_DEBUG, DRM_UT_DRIVER, __func__, fmt, ##__VA_ARGS__)
+
+#undef DRM_DEBUG_KMS
+#define DRM_DEBUG_KMS(fmt, ...)						\
+	drm_printk(KERN_DEBUG, DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
+
+#undef DRM_DEBUG_PRIME
+#define DRM_DEBUG_PRIME(fmt, ...)					\
+	drm_printk(KERN_DEBUG, DRM_UT_PRIME, __func__, fmt, ##__VA_ARGS__)
+
+#undef DRM_DEBUG_ATOMIC
+#define DRM_DEBUG_ATOMIC(fmt, ...)					\
+	drm_printk(KERN_DEBUG, DRM_UT_ATOMIC, __func__, fmt, ##__VA_ARGS__)
+
+#undef DRM_DEBUG_VBL
+#define DRM_DEBUG_VBL(fmt, ...)						\
+	drm_printk(KERN_DEBUG, DRM_UT_VBL, __func__, fmt, ##__VA_ARGS__)
+
+#undef DRM_DEBUG_LEASE
+#define DRM_DEBUG_LEASE(fmt, ...)					\
+	drm_printk(KERN_DEBUG, DRM_UT_LEASE, __func__, fmt, ##__VA_ARGS__)
+#endif
 
 /**
  * Rate limited debug output. Like DRM_DEBUG() but won't flood the log.
