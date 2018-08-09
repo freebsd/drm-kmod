@@ -249,7 +249,6 @@ static void drm_sched_entity_kill_jobs_cb(struct dma_fence *f,
 /**
  * drm_sched_entity_flush - Flush a context entity
  *
- * @sched: scheduler instance
  * @entity: scheduler entity
  * @timeout: time to wait in for Q to become empty in jiffies.
  *
@@ -296,7 +295,6 @@ EXPORT_SYMBOL(drm_sched_entity_flush);
 /**
  * drm_sched_entity_cleanup - Destroy a context entity
  *
- * @sched: scheduler instance
  * @entity: scheduler entity
  *
  * This should be called after @drm_sched_entity_do_release. It goes over the
@@ -360,7 +358,6 @@ EXPORT_SYMBOL(drm_sched_entity_fini);
 /**
  * drm_sched_entity_fini - Destroy a context entity
  *
- * @sched: scheduler instance
  * @entity: scheduler entity
  *
  * Calls drm_sched_entity_do_release() and drm_sched_entity_cleanup()
@@ -723,7 +720,6 @@ EXPORT_SYMBOL(drm_sched_job_recovery);
  * drm_sched_job_init - init a scheduler job
  *
  * @job: scheduler job to init
- * @sched: scheduler instance
  * @entity: scheduler entity to use
  * @owner: job owner for debugging
  *
