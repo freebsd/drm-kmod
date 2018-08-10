@@ -22,6 +22,10 @@
  *
  */
 
+#ifndef __linux__
+#include <linux/module.h>
+#endif
+
 #include <linux/console.h>
 #include <linux/vgaarb.h>
 #include <linux/vga_switcheroo.h>
@@ -729,7 +733,6 @@ static int __init i915_init(void)
 
 #ifndef __linux__
 	i915_pci_driver.bsdclass = drm_devclass;
-	i915_pci_driver.name = "drmn";
 	return linux_pci_register_drm_driver(&i915_pci_driver);
 #else
 	return pci_register_driver(&i915_pci_driver);
@@ -747,11 +750,25 @@ static void __exit i915_exit(void)
 #endif
 }
 
+#ifdef __linux__
 module_init(i915_init);
 module_exit(i915_exit);
+#endif
 
 MODULE_AUTHOR("Tungsten Graphics, Inc.");
 MODULE_AUTHOR("Intel Corporation");
 
 MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_LICENSE("GPL and additional rights");
+
+/* BSD stuff */
+#ifndef __linux__
+LKPI_DRIVER_MODULE(i915kms, i915_init, i915_exit);
+LKPI_PNP_INFO(pci, i915kms, pciidlist);
+MODULE_DEPEND(i915kms, drmn, 2, 2, 2);
+MODULE_DEPEND(i915kms, agp, 1, 1, 1);
+MODULE_DEPEND(i915kms, linuxkpi, 1, 1, 1);
+MODULE_DEPEND(i915kms, linuxkpi_gplv2, 1, 1, 1);
+MODULE_DEPEND(i915kms, firmware, 1, 1, 1);
+MODULE_DEPEND(i915kms, debugfs, 1, 1, 1);
+#endif
