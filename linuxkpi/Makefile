@@ -20,7 +20,6 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_i2c.c		\
 	linux_interval_tree.c	\
 	linux_irq.c		\
-	linux_kernel.c		\
 	linux_llist.c		\
 	linux_mtrr.c		\
 	linux_notifier.c	\
