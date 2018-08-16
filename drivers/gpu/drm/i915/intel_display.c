@@ -15912,8 +15912,6 @@ intel_modeset_setup_hw_state(struct drm_device *dev,
 
 	intel_display_power_put(dev_priv, POWER_DOMAIN_INIT);
 
-	intel_power_domains_verify_state(dev_priv);
-
 	intel_fbc_init_pipe_state(dev_priv);
 }
 
