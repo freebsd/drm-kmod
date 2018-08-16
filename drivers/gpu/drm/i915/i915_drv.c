@@ -1385,6 +1385,7 @@ static void i915_driver_register(struct drm_i915_private *dev_priv)
 	if (INTEL_INFO(dev_priv)->num_pipes)
 		drm_kms_helper_poll_init(dev);
 
+	intel_power_domains_enable(dev_priv);
 	intel_runtime_pm_enable(dev_priv);
 }
 
@@ -1395,6 +1396,7 @@ static void i915_driver_register(struct drm_i915_private *dev_priv)
 static void i915_driver_unregister(struct drm_i915_private *dev_priv)
 {
 	intel_runtime_pm_disable(dev_priv);
+	intel_power_domains_disable(dev_priv);
 
 	intel_fbdev_unregister(dev_priv);
 	intel_audio_deinit(dev_priv);
@@ -1482,7 +1484,7 @@ int i915_driver_load(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (ret < 0)
 		goto out_pci_disable;
 
-	intel_runtime_pm_get(dev_priv);
+	disable_rpm_wakeref_asserts(dev_priv);
 
 	ret = i915_driver_init_mmio(dev_priv);
 	if (ret < 0)
@@ -1512,7 +1514,7 @@ int i915_driver_load(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	intel_init_ipc(dev_priv);
 
-	intel_runtime_pm_put(dev_priv);
+	enable_rpm_wakeref_asserts(dev_priv);
 
 	i915_welcome_messages(dev_priv);
 
@@ -1523,7 +1525,7 @@ out_cleanup_hw:
 out_cleanup_mmio:
 	i915_driver_cleanup_mmio(dev_priv);
 out_runtime_pm_put:
-	intel_runtime_pm_put(dev_priv);
+	enable_rpm_wakeref_asserts(dev_priv);
 	i915_driver_cleanup_early(dev_priv);
 out_pci_disable:
 	pci_disable_device(pdev);
@@ -1541,7 +1543,7 @@ void i915_driver_unload(struct drm_device *dev)
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 
-	intel_display_power_get(dev_priv, POWER_DOMAIN_INIT);
+	disable_rpm_wakeref_asserts(dev_priv);
 
 	i915_driver_unregister(dev_priv);
 
@@ -1573,7 +1575,8 @@ void i915_driver_unload(struct drm_device *dev)
 	i915_driver_cleanup_hw(dev_priv);
 	i915_driver_cleanup_mmio(dev_priv);
 
-	intel_display_power_put(dev_priv, POWER_DOMAIN_INIT);
+	enable_rpm_wakeref_asserts(dev_priv);
+
 	WARN_ON(atomic_read(&dev_priv->runtime_pm.wakeref_count));
 }
 
@@ -1683,7 +1686,7 @@ static int i915_drm_suspend(struct drm_device *dev)
 
 	/* We do a lot of poking in a lot of registers, make sure they work
 	 * properly. */
-	intel_display_set_init_power(dev_priv, true);
+	intel_power_domains_disable(dev_priv);
 
 	drm_kms_helper_poll_disable(dev);
 
@@ -1720,6 +1723,18 @@ static int i915_drm_suspend(struct drm_device *dev)
 	return 0;
 }
 
+static enum i915_drm_suspend_mode
+get_suspend_mode(struct drm_i915_private *dev_priv, bool hibernate)
+{
+	if (hibernate)
+		return I915_DRM_SUSPEND_HIBERNATE;
+
+	if (suspend_to_idle(dev_priv))
+		return I915_DRM_SUSPEND_IDLE;
+
+	return I915_DRM_SUSPEND_MEM;
+}
+
 static int i915_drm_suspend_late(struct drm_device *dev, bool hibernation)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
@@ -1730,21 +1745,10 @@ static int i915_drm_suspend_late(struct drm_device *dev, bool hibernation)
 
 	i915_gem_suspend_late(dev_priv);
 
-	intel_display_set_init_power(dev_priv, false);
 	intel_uncore_suspend(dev_priv);
 
-	/*
-	 * In case of firmware assisted context save/restore don't manually
-	 * deinit the power domains. This also means the CSR/DMC firmware will
-	 * stay active, it will power down any HW resources as required and
-	 * also enable deeper system power states that would be blocked if the
-	 * firmware was inactive.
-	 */
-	if (IS_GEN9_LP(dev_priv) || hibernation || !suspend_to_idle(dev_priv) ||
-	    dev_priv->csr.dmc_payload == NULL) {
-		intel_power_domains_suspend(dev_priv);
-		dev_priv->power_domains_suspended = true;
-	}
+	intel_power_domains_suspend(dev_priv,
+				    get_suspend_mode(dev_priv, hibernation));
 
 	ret = 0;
 	if (IS_GEN9_LP(dev_priv))
@@ -1756,10 +1760,7 @@ static int i915_drm_suspend_late(struct drm_device *dev, bool hibernation)
 
 	if (ret) {
 		DRM_ERROR("Suspend complete failed: %d\n", ret);
-		if (dev_priv->power_domains_suspended) {
-			intel_power_domains_init_hw(dev_priv, true);
-			dev_priv->power_domains_suspended = false;
-		}
+		intel_power_domains_resume(dev_priv);
 
 		goto out;
 	}
@@ -1876,6 +1877,8 @@ static int i915_drm_resume(struct drm_device *dev)
 
 	intel_opregion_notify_adapter(dev_priv, PCI_D0);
 
+	intel_power_domains_enable(dev_priv);
+
 	enable_rpm_wakeref_asserts(dev_priv);
 
 	return 0;
@@ -1910,7 +1913,7 @@ static int i915_drm_resume_early(struct drm_device *dev)
 	ret = pci_set_power_state(pdev, PCI_D0);
 	if (ret) {
 		DRM_ERROR("failed to set PCI D0 power state (%d)\n", ret);
-		goto out;
+		return ret;
 	}
 
 	/*
@@ -1926,10 +1929,8 @@ static int i915_drm_resume_early(struct drm_device *dev)
 	 * depend on the device enable refcount we can't anyway depend on them
 	 * disabling/enabling the device.
 	 */
-	if (pci_enable_device(pdev)) {
-		ret = -EIO;
-		goto out;
-	}
+	if (pci_enable_device(pdev))
+		return -EIO;
 
 	pci_set_master(pdev);
 
@@ -1952,17 +1953,11 @@ static int i915_drm_resume_early(struct drm_device *dev)
 
 	intel_uncore_sanitize(dev_priv);
 
-	if (dev_priv->power_domains_suspended)
-		intel_power_domains_init_hw(dev_priv, true);
-	else
-		intel_display_set_init_power(dev_priv, true);
+	intel_power_domains_resume(dev_priv);
 
 	intel_engines_sanitize(dev_priv);
 
 	enable_rpm_wakeref_asserts(dev_priv);
-
-out:
-	dev_priv->power_domains_suspended = false;
 
 	return ret;
 }
