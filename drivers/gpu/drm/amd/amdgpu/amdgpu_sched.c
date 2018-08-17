@@ -54,11 +54,6 @@ static int amdgpu_sched_process_priority_override(struct amdgpu_device *adev,
 						  enum drm_sched_priority priority)
 {
 	struct file *filp = fget(fd);
-#ifdef __linux__
-	struct pid *pid;
-#else
-	pid_t pid;
-#endif
 	struct drm_file *file;
 	struct amdgpu_fpriv *fpriv;
 	struct amdgpu_ctx *ctx;
@@ -67,20 +62,10 @@ static int amdgpu_sched_process_priority_override(struct amdgpu_device *adev,
 	if (!filp)
 		return -EINVAL;
 
-	pid = get_pid(((struct drm_file *)filp->private_data)->pid);
-
-	mutex_lock(&adev->ddev->filelist_mutex);
-	list_for_each_entry(file, &adev->ddev->filelist, lhead) {
-		if (file->pid != pid)
-			continue;
-
-		fpriv = file->driver_priv;
-		idr_for_each_entry(&fpriv->ctx_mgr.ctx_handles, ctx, id)
-				amdgpu_ctx_priority_override(ctx, priority);
-	}
-	mutex_unlock(&adev->ddev->filelist_mutex);
-
-	put_pid(pid);
+	file = filp->private_data;
+	fpriv = file->driver_priv;
+	idr_for_each_entry(&fpriv->ctx_mgr.ctx_handles, ctx, id)
+		amdgpu_ctx_priority_override(ctx, priority);
 
 	fput(filp);
 
