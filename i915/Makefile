@@ -77,11 +77,13 @@ SRCS=	\
 	intel_freebsd.c \
 	intel_frontbuffer.c \
 	intel_guc.c \
+	intel_guc_ads.c \
 	intel_guc_ct.c \
 	intel_guc_fw.c \
 	intel_guc_log.c \
 	intel_guc_submission.c \
 	intel_hangcheck.c \
+	intel_hdcp.c \
 	intel_hdmi.c \
 	intel_hotplug.c \
 	intel_huc.c \
@@ -110,6 +112,7 @@ SRCS=	\
 	intel_uc.c \
 	intel_uc_fw.c \
 	intel_uncore.c
+
 
 
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
@@ -225,5 +228,5 @@ CWARNFLAGS.i915_gem_tiling.c=	-Wno-tautological-pointer-compare -Wno-cast-qual
 CWARNFLAGS.i915_gem_timeline.c= -Wno-cast-qual
 CWARNFLAGS.i915_gem_userptr.c= -Wno-cast-qual
 CWARNFLAGS.i915_gpu_error.c= -Wno-cast-qual -Wno-unused-function
-CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides 
+CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides -Wno-unused-variable
 CWARNFLAGS.i915_sw_fence.c= -Wno-unused-function

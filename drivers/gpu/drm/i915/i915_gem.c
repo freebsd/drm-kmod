@@ -3482,12 +3482,15 @@ static void shrink_caches(struct drm_i915_private *i915)
 	 * filled slabs to prioritise allocating from the mostly full slabs,
 	 * with the aim of reducing fragmentation.
 	 */
+#ifdef __linux__
+	// BSDFIXME: Need this?
 	kmem_cache_shrink(i915->priorities);
 	kmem_cache_shrink(i915->dependencies);
 	kmem_cache_shrink(i915->requests);
 	kmem_cache_shrink(i915->luts);
 	kmem_cache_shrink(i915->vmas);
 	kmem_cache_shrink(i915->objects);
+#endif
 }
 
 struct sleep_rcu_work {

@@ -328,6 +328,28 @@ static inline bool i915_seqno_passed(u32 seq1, u32 seq2)
 	return (s32)(seq1 - seq2) >= 0;
 }
 
+// BSDFIXME: removed this at 4.17
+static inline bool
+__i915_gem_request_started(const struct drm_i915_gem_request *req, u32 seqno)
+{
+	GEM_BUG_ON(!seqno);
+	return i915_seqno_passed(intel_engine_get_seqno(req->engine),
+				 seqno - 1);
+}
+
+// BSDFIXME: removed this at 4.17
+static inline bool
+i915_gem_request_started(const struct drm_i915_gem_request *req)
+{
+	u32 seqno;
+
+	seqno = i915_gem_request_global_seqno(req);
+	if (!seqno)
+		return false;
+
+	return __i915_gem_request_started(req, seqno);
+}
+
 static inline bool
 __i915_gem_request_completed(const struct drm_i915_gem_request *req, u32 seqno)
 {
