@@ -864,7 +864,8 @@ intel_check_sprite_plane(struct intel_plane *plane,
 	uint32_t src_x, src_y, src_w, src_h;
 	struct drm_rect *src = &state->base.src;
 	struct drm_rect *dst = &state->base.dst;
-	struct drm_rect clip = {};
+	const struct drm_rect *clip = &state->clip;
+	int max_stride = INTEL_GEN(dev_priv) >= 9 ? 32768 : 16384;
 	int hscale, vscale;
 	int max_scale, min_scale;
 	bool can_scale;
