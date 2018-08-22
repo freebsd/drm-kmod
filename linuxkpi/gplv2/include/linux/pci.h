@@ -136,16 +136,14 @@ static inline void
 linux_pci_save_state(struct pci_dev *pdev)
 {
 
-	panic("implment me!!");
-	UNIMPLEMENTED();
+	pci_save_state(pdev->dev.bsddev);
 }
 
 static inline void
 linux_pci_restore_state(struct pci_dev *pdev)
 {
 
-	panic("implment me!!");
-	UNIMPLEMENTED();
+	pci_restore_state(pdev->dev.bsddev);
 }
 
 static inline void

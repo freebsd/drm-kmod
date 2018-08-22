@@ -55,6 +55,7 @@
 
 #ifndef __linux__
 #define pci_get_class linux_pci_get_class
+#define	pci_save_state linux_pci_save_state
 #define	resource linux_resource
 #endif
 
@@ -1651,7 +1652,7 @@ static int i915_drm_suspend(struct drm_device *dev)
 
 	drm_kms_helper_poll_disable(dev);
 
-	pci_save_state(pdev->dev.bsddev);
+	pci_save_state(pdev);
 
 	error = i915_gem_suspend(dev_priv);
 	if (error) {
