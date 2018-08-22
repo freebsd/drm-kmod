@@ -210,11 +210,12 @@ u64 drm_get_max_iomem(void)
 {
 	struct resource *tmp;
 	u64 max_iomem = 0;
-
+#ifdef __linux__
+	// BSDFIXME!!
 	for (tmp = iomem_resource.child; tmp; tmp = tmp->sibling) {
 		max_iomem = max(max_iomem,  tmp->end);
 	}
-
+#endif
 	return max_iomem;
 }
 EXPORT_SYMBOL(drm_get_max_iomem);
