@@ -2655,6 +2655,8 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
 
 	info = fb_helper->fbdev;
 	info->var.pixclock = 0;
+	/* don't leak any physical addresses to userspace */
+	info->flags |= FBINFO_HIDE_SMEM_START;
 
 #ifndef __linux__
 	info->fbio.fb_video_dev = device_get_parent(fb_helper->dev->dev->bsddev);
