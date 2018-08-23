@@ -48,4 +48,7 @@ memset_p(void **p, void *v, size_t n)
 	return memset((uintptr_t *)p, (uintptr_t)v, n);
 }
 
+// BSDFIXME!
+#define	idr_init_base(idr,base) idr_init(idr)
+
 #endif /* _LINUX_GPLV2_COMPILER_H_ */
