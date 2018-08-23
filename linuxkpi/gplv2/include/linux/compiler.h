@@ -7,6 +7,7 @@
 #include_next <linux/compiler.h>
 
 #include <sys/syslog.h>
+#include <linux/types.h>
 
 #ifndef PRINT_UNIMPLEMENTED
 #define PRINT_UNIMPLEMENTED 1
@@ -40,5 +41,11 @@
 #define	DODGY()		DODGY_ONCE()
 
 #define	unreachable()	__unreachable()
+
+static inline void *
+memset_p(void **p, void *v, size_t n)
+{
+	return memset((uintptr_t *)p, (uintptr_t)v, n);
+}
 
 #endif /* _LINUX_GPLV2_COMPILER_H_ */
