@@ -619,7 +619,7 @@ int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 #ifndef __linux__
 	// BSDFIXME
 	UNIMPLEMENTED();
-	return -ENODEV;
+	return 0;
 #else
 	u64 space_needed = roundup_pow_of_two(adev->mc.real_vram_size);
 	u32 rbar_size = order_base_2(((space_needed >> 20) | 1)) - 1;
