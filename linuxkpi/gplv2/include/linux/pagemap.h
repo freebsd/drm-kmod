@@ -9,6 +9,8 @@
 #include <linux/hardirq.h>
 #include <linux/mm.h>
 
+#define	mapping_gfp_mask(x) 0
+
 
 static inline int
 fault_in_multipages_readable(const char __user *uaddr, int size)

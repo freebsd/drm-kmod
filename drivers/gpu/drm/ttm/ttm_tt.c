@@ -479,8 +479,10 @@ static void ttm_tt_add_mapping(struct ttm_tt *ttm)
 	if (ttm->page_flags & TTM_PAGE_FLAG_SG)
 		return;
 
+#ifdef __linux__
 	for (i = 0; i < ttm->num_pages; ++i)
 		ttm->pages[i]->mapping = ttm->bdev->dev_mapping;
+#endif
 }
 
 int ttm_tt_populate(struct ttm_tt *ttm, struct ttm_operation_ctx *ctx)

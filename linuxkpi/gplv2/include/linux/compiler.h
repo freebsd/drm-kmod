@@ -1,13 +1,11 @@
 #ifndef _LINUX_GPLV2_COMPILER_H_
 #define _LINUX_GPLV2_COMPILER_H_
 
-/* Define before including compiler.h from base */
-#define	__LinuxKPI_version 40015
-
 #include_next <linux/compiler.h>
 
 #include <sys/syslog.h>
 #include <linux/types.h>
+#include <asm/atomic.h>
 
 #ifndef PRINT_UNIMPLEMENTED
 #define PRINT_UNIMPLEMENTED 1
@@ -49,6 +47,15 @@ memset_p(void **p, void *v, size_t n)
 }
 
 // BSDFIXME!
-#define	idr_init_base(idr,base) idr_init(idr)
+#define	idr_init_base(idr,base)	idr_init(idr)
+#define	atomic_fetch_inc(v)	atomic_fetch_add(1, (v))
+
+struct linux_kmem_cache;
+static inline int
+kmem_cache_shrink(struct linux_kmem_cache *c)
+{
+	UNIMPLEMENTED();
+	return 0;
+}
 
 #endif /* _LINUX_GPLV2_COMPILER_H_ */

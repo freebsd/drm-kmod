@@ -181,8 +181,8 @@ void drm_dbg(unsigned int category, const char *format, ...)
 }
 EXPORT_SYMBOL(drm_dbg);
 #else
-void drm_dbg(const char *level, unsigned int category,
-	const char *function_name, const char *format, ...)
+void drm_dbg(unsigned int category, const char *function_name,
+	     const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -229,9 +229,6 @@ void drm_err(const char *function_name, const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
-
-	if (category != DRM_UT_NONE && !(drm_debug & category))
-		return;
 
 	va_start(args, format);
 	vaf.fmt = format;

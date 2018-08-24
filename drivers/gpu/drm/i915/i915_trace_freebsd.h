@@ -30,7 +30,7 @@ trace_i915_ring_wait_end(struct intel_ring_buffer *ring)
 }
 
 static inline void
-trace_i915_gem_request_complete(struct intel_ring_buffer *ring, u32 seqno)
+trace_i915_request_complete(struct intel_ring_buffer *ring, u32 seqno)
 {
 	CTR2(KTR_DRM, "request_complete %s %d", ring->name, seqno);
 }
@@ -67,19 +67,19 @@ trace_i915_gem_object_pwrite(struct drm_i915_gem_object *obj, u64 offset, u64 si
 }
 #if 0
 static inline void
-trace_i915_gem_request_wait_end(struct intel_ring_buffer *ring, u32 seqno)
+trace_i915_request_wait_end(struct intel_ring_buffer *ring, u32 seqno)
 {
 	CTR2(KTR_DRM, "request_wait_end %s %d", ring->name, seqno);
 }
 
 static inline void
-trace_i915_gem_request_add(struct intel_ring_buffer *ring, u32 seqno)
+trace_i915_request_add(struct intel_ring_buffer *ring, u32 seqno)
 {
 	CTR2(KTR_DRM, "request_add %s %d", ring->name, seqno);
 }
 
 static inline void
-trace_i915_gem_request_retire(struct intel_ring_buffer *ring, u32 seqno)
+trace_i915_request_retire(struct intel_ring_buffer *ring, u32 seqno)
 {
 	CTR2(KTR_DRM, "retire_request_seqno_passed %s %d",
 		ring->name, seqno);
@@ -95,7 +95,7 @@ trace_i915_gem_object_change_domain(struct drm_i915_gem_object *obj, u32 old_rea
 
 #if 0
 static inline void
-trace_i915_gem_request_wait_begin(struct intel_ring_buffer *ring, u32 seqno)
+trace_i915_request_wait_begin(struct intel_ring_buffer *ring, u32 seqno)
 {
 	CTR2(KTR_DRM, "request_wait_begin %s %d", ring->name, seqno);
 }
@@ -175,47 +175,47 @@ trace_i915_context_free(void *ctx) {
 }
 
 static inline void
-trace_i915_gem_request_wait_begin(void *req, uint32_t flags) {
+trace_i915_request_wait_begin(void *req, uint32_t flags) {
 	CTR2(KTR_DRM, "request_wait_begin req %p flags %x", req, flags);
 }
 
 static inline void
-trace_i915_gem_request_wait_end(void *req) {
+trace_i915_request_wait_end(void *req) {
 	CTR1(KTR_DRM, "request_wait_end req %p", req);
 }
 
 static inline void
-trace_i915_gem_request_retire(void *req) {
+trace_i915_request_retire(void *req) {
 	CTR1(KTR_DRM, "request_retire req %p", req);
 }
 
 static inline void
-trace_i915_gem_request_notify(void *req) {
+trace_i915_request_notify(void *req) {
 	CTR1(KTR_DRM, "request_notify req %p", req);
 }
 
 static inline void
-trace_i915_gem_request_execute(void *req) {
+trace_i915_request_execute(void *req) {
 	CTR1(KTR_DRM, "request_execute req %p", req);
 }
 
 static inline void
-trace_i915_gem_request_submit(void *req) {
+trace_i915_request_submit(void *req) {
 	CTR1(KTR_DRM, "request_submit req %p", req);
 }
 
 static inline void
-trace_i915_gem_request_queue(struct drm_i915_gem_request *req, uint32_t flags) {
+trace_i915_request_queue(struct i915_request *req, uint32_t flags) {
 	CTR2(KTR_DRM, "request_queue req %p flags %x", req, flags);
 }
 
 static inline void
-trace_i915_gem_request_in(struct drm_i915_gem_request *req, uint32_t flags) {
+trace_i915_request_in(struct i915_request *req, uint32_t flags) {
 	CTR2(KTR_DRM, "request_in req %p flags %x", req, flags);
 }
 
 static inline void
-trace_i915_gem_request_out(struct drm_i915_gem_request *req) {
+trace_i915_request_out(struct i915_request *req) {
 	CTR1(KTR_DRM, "request_out req %p", req);
 }
 
@@ -262,9 +262,9 @@ trace_i915_pipe_update_end(void *crtc, u32 end_vbl_count, int scanline_end)
 }
 
 static inline void
-trace_i915_gem_request_add(void *req)
+trace_i915_request_add(void *req)
 {
-	CTR1(KTR_DRM, "gem_request_add req %p", req);
+	CTR1(KTR_DRM, "request_add req %p", req);
 }
 
 #define trace_i915_gem_ring_sync_to(to_req, from) \

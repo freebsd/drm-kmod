@@ -154,7 +154,8 @@ static void ilk_load_csc_matrix(struct drm_crtc_state *crtc_state)
 		return;
 	} else if (crtc_state->ctm) {
 		struct drm_color_ctm *ctm = crtc_state->ctm->data;
-		uint64_t input[9] = { 0, };
+		const u64 *input;
+		u64 temp[9];
 
 		if (limited_color_range)
 			input = ctm_mult_by_limited(temp, ctm->matrix);

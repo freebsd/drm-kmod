@@ -30,6 +30,12 @@
 
 #include "i915_drv.h"
 
+#ifndef __linux__
+#undef schedule
+// For {get,put}_cpu()
+#include <asm/smp.h>
+#endif
+
 static const char *i915_fence_get_driver_name(struct dma_fence *fence)
 {
 	return "i915";

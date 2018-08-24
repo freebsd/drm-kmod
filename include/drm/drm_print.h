@@ -307,6 +307,8 @@ void drm_err(const char *function_name, const char *format, ...);
  * @dev: device pointer
  * @fmt: printf() like format string.
  */
+#ifdef __linux__
+
 #define DRM_DEV_DEBUG(dev, fmt, ...)					\
 	drm_dev_dbg(dev, DRM_UT_CORE, fmt, ##__VA_ARGS__)
 #define DRM_DEBUG(fmt, ...)						\
@@ -340,6 +342,44 @@ void drm_err(const char *function_name, const char *format, ...);
 #define DRM_DEBUG_LEASE(fmt, ...)					\
 	drm_dbg(DRM_UT_LEASE, fmt, ##__VA_ARGS__)
 
+#else
+
+#define DRM_DEV_DEBUG(dev, fmt, ...)					\
+	drm_dev_dbg(dev, DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
+#define DRM_DEBUG(fmt, ...)						\
+	drm_dbg(DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEV_DEBUG_DRIVER(dev, fmt, ...)				\
+	drm_dev_dbg(dev, DRM_UT_DRIVER, __func__, fmt, ##__VA_ARGS__)
+#define DRM_DEBUG_DRIVER(fmt, ...)					\
+	drm_dbg(DRM_UT_DRIVER, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEV_DEBUG_KMS(dev, fmt, ...)				\
+	drm_dev_dbg(dev, DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
+#define DRM_DEBUG_KMS(fmt, ...)						\
+	drm_dbg(DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEV_DEBUG_PRIME(dev, fmt, ...)				\
+	drm_dev_dbg(dev, DRM_UT_PRIME, __func__, fmt, ##__VA_ARGS__)
+#define DRM_DEBUG_PRIME(fmt, ...)					\
+	drm_dbg(DRM_UT_PRIME, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEV_DEBUG_ATOMIC(dev, fmt, ...)				\
+	drm_dev_dbg(dev, DRM_UT_ATOMIC, __func__, fmt, ##__VA_ARGS__)
+#define DRM_DEBUG_ATOMIC(fmt, ...)					\
+	drm_dbg(DRM_UT_ATOMIC, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEV_DEBUG_VBL(dev, fmt, ...)				\
+	drm_dev_dbg(dev, DRM_UT_VBL, __func__, fmt, ##__VA_ARGS__)
+#define DRM_DEBUG_VBL(fmt, ...)						\
+	drm_dbg(DRM_UT_VBL, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEBUG_LEASE(fmt, ...)					\
+	drm_dbg(DRM_UT_LEASE, __func__, fmt, ##__VA_ARGS__)
+
+#endif
+
+#ifdef __linux__
 #define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, category, fmt, ...)	\
 ({									\
 	static DEFINE_RATELIMIT_STATE(_rs,				\
@@ -348,37 +388,17 @@ void drm_err(const char *function_name, const char *format, ...);
 	if (__ratelimit(&_rs))						\
 		drm_dev_dbg(dev, category, fmt, ##__VA_ARGS__);		\
 })
-
-#ifndef __linux__
-#undef DRM_DEBUG
-#define DRM_DEBUG(fmt, ...)						\
-	drm_printk(KERN_DEBUG, DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
-
-#undef DRM_DEBUG_DRIVER
-#define DRM_DEBUG_DRIVER(fmt, ...)					\
-	drm_printk(KERN_DEBUG, DRM_UT_DRIVER, __func__, fmt, ##__VA_ARGS__)
-
-#undef DRM_DEBUG_KMS
-#define DRM_DEBUG_KMS(fmt, ...)						\
-	drm_printk(KERN_DEBUG, DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
-
-#undef DRM_DEBUG_PRIME
-#define DRM_DEBUG_PRIME(fmt, ...)					\
-	drm_printk(KERN_DEBUG, DRM_UT_PRIME, __func__, fmt, ##__VA_ARGS__)
-
-#undef DRM_DEBUG_ATOMIC
-#define DRM_DEBUG_ATOMIC(fmt, ...)					\
-	drm_printk(KERN_DEBUG, DRM_UT_ATOMIC, __func__, fmt, ##__VA_ARGS__)
-
-#undef DRM_DEBUG_VBL
-#define DRM_DEBUG_VBL(fmt, ...)						\
-	drm_printk(KERN_DEBUG, DRM_UT_VBL, __func__, fmt, ##__VA_ARGS__)
-
-#undef DRM_DEBUG_LEASE
-#define DRM_DEBUG_LEASE(fmt, ...)					\
-	drm_printk(KERN_DEBUG, DRM_UT_LEASE, __func__, fmt, ##__VA_ARGS__)
+#else
+#define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, category, fmt, ...)	\
+({									\
+	static DEFINE_RATELIMIT_STATE(_rs,				\
+				      DEFAULT_RATELIMIT_INTERVAL,	\
+				      DEFAULT_RATELIMIT_BURST);		\
+	if (__ratelimit(&_rs))						\
+		drm_dev_dbg(dev, category, __func__, fmt, 		\
+		    ##__VA_ARGS__);			  		\
+})
 #endif
-
 /**
  * Rate limited debug output. Like DRM_DEBUG() but won't flood the log.
  *

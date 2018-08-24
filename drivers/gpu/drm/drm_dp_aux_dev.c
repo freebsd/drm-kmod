@@ -183,8 +183,11 @@ static ssize_t auxdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
 	iocb->ki_pos = pos;
 
 	if (atomic_dec_and_test(&aux_dev->usecount))
+#ifdef __linux__
 		wake_up_var(&aux_dev->usecount);
-
+#else
+		wake_up_atomic_t(&aux_dev->usecount);	
+#endif
 	return res;
 }
 
@@ -225,7 +228,11 @@ static ssize_t auxdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	iocb->ki_pos = pos;
 
 	if (atomic_dec_and_test(&aux_dev->usecount))
+#ifdef __linux__
 		wake_up_var(&aux_dev->usecount);
+#else
+		wake_up_atomic_t(&aux_dev->usecount);	
+#endif
 
 	return res;
 }
@@ -287,14 +294,10 @@ void drm_dp_aux_unregister_devnode(struct drm_dp_aux *aux)
 	mutex_unlock(&aux_idr_mutex);
 
 	atomic_dec(&aux_dev->usecount);
-#ifndef __linux__
-	// It's OK to ignore the callback as long as it only schedule()
-	// See wait.h in linuxkpi
-	/* wait_on_atomic_t(&aux_dev->usecount, TASK_UNINTERRUPTIBLE); */
-	// new in 4.17
+#ifdef __linux__
 	wait_var_event(&aux_dev->usecount, !atomic_read(&aux_dev->usecount));
 #else
-	wait_var_event(&aux_dev->usecount, !atomic_read(&aux_dev->usecount));
+	wait_on_atomic_t(&aux_dev->usecount, TASK_UNINTERRUPTIBLE);
 #endif
 
 	minor = aux_dev->index;

@@ -28,18 +28,18 @@ SRCS=	\
 	i915_gem_internal.c \
 	i915_gem_object.c \
 	i915_gem_render_state.c \
-	i915_gem_request.c \
 	i915_gem_stolen.c \
 	i915_gem_shrinker.c \
 	i915_gem_tiling.c \
 	i915_gem_timeline.c \
 	i915_gem_userptr.c \
 	i915_gpu_error.c \
+	i915_irq.c \
 	i915_memcpy.c \
 	i915_oa_hsw.c \
 	i915_params.c \
 	i915_pci.c \
-	i915_irq.c \
+	i915_request.c \
 	i915_suspend.c \
 	i915_sw_fence.c \
 	i915_syncmap.c \

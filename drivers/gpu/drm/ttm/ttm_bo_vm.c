@@ -339,7 +339,7 @@ retry:
 		continue;
 fail:
 		if (i == 0)
-			retval = VM_FAULT_OOM;
+			ret = VM_FAULT_OOM;
 		break;
 	}
 	VM_OBJECT_WUNLOCK(obj);

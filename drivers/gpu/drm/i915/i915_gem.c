@@ -3087,8 +3087,11 @@ i915_gem_reset_prepare_engine(struct intel_engine_cs *engine)
 	 * common case of recursively being called from set-wedged from inside
 	 * i915_reset.
 	 */
+#ifdef __linux__
+	/* Only disable has the same effect. We don't have ref count in lkpi. */
 	if (!atomic_read(&engine->execlists.tasklet.count))
 		tasklet_kill(&engine->execlists.tasklet);
+#endif
 	tasklet_disable(&engine->execlists.tasklet);
 
 	/*

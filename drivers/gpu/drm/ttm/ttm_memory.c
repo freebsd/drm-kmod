@@ -588,7 +588,12 @@ ttm_check_under_lowerlimit(struct ttm_mem_global *glob,
 	if (ctx->flags & TTM_OPT_FLAG_FORCE_ALLOC)
 		return false;
 
+#ifdef __linux__
 	available = get_nr_swap_pages() + si_mem_available();
+#else
+	// XXX: get_nr_swap_pages is not implemented
+	available = get_nr_swap_pages() + vm_free_count();
+#endif
 	available -= num_pages;
 	if (available < glob->lower_mem_limit)
 		return true;

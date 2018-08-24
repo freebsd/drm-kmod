@@ -358,7 +358,11 @@ static inline void __intel_breadcrumbs_finish(struct intel_breadcrumbs *b,
 	rb_erase(&wait->node, &b->waiters);
 	RB_CLEAR_NODE(&wait->node);
 
+#ifdef __linux__
 	if (wait->tsk->state != TASK_RUNNING)
+#else
+	if (atomic_read(&wait->tsk->state) != TASK_RUNNING)
+#endif
 		wake_up_process(wait->tsk); /* implicit smp_wmb() */
 }
 
@@ -684,7 +688,11 @@ static int intel_breadcrumbs_signaler(void *arg)
 
 		if (unlikely(do_schedule)) {
 			/* Before we sleep, check for a missed seqno */
+#ifdef __linux__
 			if (current->state & TASK_NORMAL &&
+#else
+			if (atomic_read(&current->state) & TASK_NORMAL &&
+#endif
 			    !list_empty(&b->signals) &&
 			    engine->irq_seqno_barrier &&
 			    test_and_clear_bit(ENGINE_IRQ_BREADCRUMB,

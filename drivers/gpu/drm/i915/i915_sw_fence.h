@@ -15,6 +15,10 @@
 #include <linux/notifier.h> /* for NOTIFY_DONE */
 #include <linux/wait.h>
 
+#ifndef __linux__
+#include <linux/lockdep.h>
+#endif
+
 struct completion;
 struct dma_fence;
 struct dma_fence_ops;

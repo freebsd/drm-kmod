@@ -88,7 +88,7 @@ static int ttm_agp_bind(struct ttm_tt *ttm, struct ttm_mem_reg *bo_mem)
 		struct page *page = ttm->pages[i];
 
 		if (!page)
-			page = ttm->dummy_read_page;
+			page = dummy_read_page;
 
 		agp_be->pages[i] = page;
 	}
