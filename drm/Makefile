@@ -24,6 +24,7 @@ SRCS=	ati_pcigart.c \
 	drm_debugfs_crc.c \
 	drm_dma.c \
 	drm_dp_aux_dev.c \
+	drm_dp_cec.c \
 	drm_dp_dual_mode_helper.c \
 	drm_dp_helper.c \
 	drm_dp_mst_topology.c \
