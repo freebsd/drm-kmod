@@ -20,17 +20,6 @@ page_count(vm_page_t page __unused)
 	return (1);
 }
 
-// XXX: Move to better place?
-static inline void *
-memset64(uint64_t *s, uint64_t v, size_t count)
-{
-	uint64_t *xs = s;
-
-	while (count--)
-		*xs++ = v;
-	return s;
-}
-
 int set_pages_array_wb(struct page **pages, int addrinarray);
 int set_pages_array_uc(struct page **pages, int addrinarray);
 int set_pages_array_wc(struct page **pages, int addrinarray);

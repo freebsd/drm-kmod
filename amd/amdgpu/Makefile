@@ -48,6 +48,7 @@ KMOD=	amdgpu
 	${SRCDIR}/display/dc/irq/dcn10 \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/modules \
+	${SRCDIR}/display/modules/color \
 	${SRCDIR}/display/modules/freesync \
 	${SRCDIR}/display/modules/inc \
 	${SRCDIR}/lib \
@@ -66,8 +67,10 @@ SRCS=	acp_hw.c
 SRCS+=	amdgpu_acpi.c \
 	amdgpu_afmt.c \
 	amdgpu_amdkfd.c \
+	amdgpu_amdkfd_fence.c \
 	amdgpu_amdkfd_gfx_v7.c \
 	amdgpu_amdkfd_gfx_v8.c \
+	amdgpu_amdkfd_gpuvm.c \
 	amdgpu_atombios.c \
 	amdgpu_atomfirmware.c \
 	amdgpu_atpx_handler.c \
@@ -81,6 +84,7 @@ SRCS+=	amdgpu_acpi.c \
 	amdgpu_debugfs.c \
 	amdgpu_device.c \
 	amdgpu_display.c \
+	amdgpu_dm_color.c \
 	amdgpu_dpm.c \
 	amdgpu_drv.c \
 	amdgpu_encoders.c \
@@ -102,7 +106,6 @@ SRCS+=	amdgpu_acpi.c \
 	amdgpu_object.c \
 	amdgpu_pll.c \
 	amdgpu_pm.c \
-	amdgpu_powerplay.c \
 	amdgpu_prime.c \
 	amdgpu_psp.c \
 	amdgpu_queue_mgr.c \
@@ -137,6 +140,7 @@ SRCS+=	amdgpu_acpi.c \
 	dce_v10_0.c \
 	dce_v11_0.c \
 	dce_virtual.c \
+	emu_soc.c \
 	gfx_v6_0.c \
 	gfx_v7_0.c \
 	gfx_v8_0.c \
@@ -179,6 +183,7 @@ SRCS+=	amdgpu_acpi.c \
 
 # display/*
 SRCS+=	amdgpu_dm.c \
+	amdgpu_dm_crc.c \
 	amdgpu_dm_helpers.c \
 	amdgpu_dm_irq.c \
 	amdgpu_dm_mst_types.c \
@@ -191,6 +196,7 @@ SRCS+=	amdgpu_dm.c \
 	bios_parser_helper.c \
 	bios_parser_interface.c \
 	bw_fixed.c \
+	color_gamma.c \
 	command_table.c \
 	command_table2.c \
 	command_table_helper.c \
@@ -231,7 +237,6 @@ SRCS+=	amdgpu_dm.c \
 	dce120_hw_sequencer.c \
 	dce120_resource.c \
 	dce120_timing_generator.c \
-	dce80_compressor.c \
 	dce80_hw_sequencer.c \
 	dce80_resource.c \
 	dce80_timing_generator.c \
@@ -265,8 +270,6 @@ SRCS+=	amdgpu_dm.c \
 	dcn_calc_math.c \
 	dcn_calcs.c \
 	display_mode_lib.c \
-	display_mode_vba.c \
-	display_rq_dlg_calc.c \
 	display_rq_dlg_helpers.c \
 	dml1_display_rq_dlg_calc.c \
 	dml_common_defs.c \
@@ -325,15 +328,11 @@ SRCS+=	chash.c
 # powerplay
 SRCS+=	amd_powerplay.c \
 	ci_smumgr.c \
-	cz_clockpowergating.c \
-	cz_hwmgr.c \
-	cz_smumgr.c \
 	fiji_smumgr.c \
 	hardwaremanager.c \
 	hwmgr.c \
 	iceland_smumgr.c \
 	polaris10_smumgr.c \
-	pp_acpi.c \
 	pp_overdriver.c \
 	pp_psm.c \
 	ppatomctrl.c \
@@ -341,13 +340,16 @@ SRCS+=	amd_powerplay.c \
 	pppcielanes.c \
 	process_pptables_v1_0.c \
 	processpptables.c \
-	rv_hwmgr.c \
-	rv_smumgr.c \
 	smu7_clockpowergating.c \
 	smu7_hwmgr.c \
 	smu7_powertune.c \
 	smu7_smumgr.c \
 	smu7_thermal.c \
+	smu8_hwmgr.c \
+	smu8_smumgr.c \
+	smu10_hwmgr.c \
+	smu10_smumgr.c \
+	smu_helper.c \
 	smumgr.c \
 	tonga_smumgr.c \
 	vega10_hwmgr.c \
@@ -355,7 +357,11 @@ SRCS+=	amd_powerplay.c \
 	vega10_processpptables.c \
 	vega10_reg_init.c \
 	vega10_smumgr.c \
-	vega10_thermal.c
+	vega10_thermal.c \
+	vega12_hwmgr.c \
+	vega12_processpptables.c \
+	vega12_smumgr.c \
+	vega12_thermal.c 
 
 
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
@@ -397,10 +403,8 @@ CFLAGS.dcn_calcs.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_auto.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_math.c= -msse -mstack-alignment=4 -Wno-tautological-compare
 
-CFLAGS.display_mode_vba.c= -msse -mstack-alignment=4
 CFLAGS.display_mode_lib.c= -msse -mstack-alignment=4
 CFLAGS.display_pipe_clocks.c= -msse -mstack-alignment=4
-CFLAGS.display_rq_dlg_calc.c= -msse -mstack-alignment=4
 CFLAGS.dml1_display_rq_dlg_calc.c= -msse -mstack-alignment=4
 CFLAGS.display_rq_dlg_helpers.c= -msse -mstack-alignment=4
 CFLAGS.soc_bounding_box.c= -msse -mstack-alignment=4
@@ -447,14 +451,13 @@ CWARNFLAGS.ci_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.cik.c=	-Wno-unused-const-variable
 CWARNFLAGS.conversion.c=-Wno-missing-prototypes
 CWARNFLAGS.cz_smc.c=	-Wno-missing-prototypes
-CWARNFLAGS.cz_clockpowergating.c=	-Wno-missing-prototypes -Wno-enum-conversion
-CWARNFLAGS.cz_hwmgr.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.dc.c=	-Wno-missing-prototypes
 CWARNFLAGS.dc_helper.c=	-Wno-missing-prototypes
 CWARNFLAGS.dc_hw_sequencer.c=	-Wno-missing-prototypes
-CWARNFLAGS.dc_link.c=	-Wno-enum-conversion 
+CWARNFLAGS.dc_link.c=	-Wno-enum-conversion -Wno-cast-qual
 CWARNFLAGS.dc_link_ddc.c=	-Wno-cast-qual -Wno-unused-const-variable
 CWARNFLAGS.dc_link_dp.c=	-Wno-cast-qual -Wno-enum-conversion
+CWARNFLAGS.dc_surface.c=	-Wno-int-conversion -Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.dce_virtual.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_v6_0.c=	 -Wno-unused-const-variable -Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.dce_v8_0.c=	-Wno-missing-prototypes
@@ -472,6 +475,7 @@ CWARNFLAGS.dce120_resource.c=	-Wno-missing-prototypes	-Wno-initializer-overrides
 CWARNFLAGS.dce120_timing_generator.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce80_resource.c=	-Wno-missing-prototypes	-Wno-initializer-overrides
 CWARNFLAGS.dce80_timing_generator.c=	-Wno-missing-prototypes
+CWARNFLAGS.dce80_hw_sequencer.c=	-Wno-unused-variable
 CWARNFLAGS.dce_calcs.c=		-Wno-cast-qual -Wno-parentheses-equality
 CWARNFLAGS.dce_clocks.c=	-Wno-enum-conversion
 CWARNFLAGS.dce_dmcu.c=		-Wno-missing-prototypes
@@ -514,20 +518,19 @@ CWARNFLAGS.polaris10_hwmgr.c=	-Wno-missing-prototypes -Wno-cast-qual -Wno-unused
 CWARNFLAGS.polaris10_powertune.c=	-Wno-missing-prototypes
 CWARNFLAGS.polaris10_smumgr.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.polaris10_thermal.c=	-Wno-missing-prototypes
-CWARNFLAGS.pp_acpi.c=	-Wno-missing-prototypes 
 CWARNFLAGS.ppatomctrl.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.ppatomfwctrl.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.processpptables.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized
 CWARNFLAGS.process_pptables_v1_0.c=	-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.psp_v3_1.c=	-Wno-cast-qual
 CWARNFLAGS.psp_v10_0.c=	-Wno-cast-qual
-CWARNFLAGS.rv_hwmgr.c=	-Wno-cast-qual
-CWARNFLAGS.rv_smumgr.c=	-Wno-cast-qual -Wno-missing-prototypes
 CWARNFLAGS.sdma_v3_0.c=		-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.sdma_v4_0.c=		-Wno-missing-prototypes -Wno-cast-qual -Wno-sometimes-uninitialized
 CWARNFLAGS.si.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu7_clockpowergating.c=		-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.smu7_hwmgr.c=		-Wno-missing-prototypes  -Wno-cast-qual
+CWARNFLAGS.smu8_hwmgr.c=		-Wno-missing-prototypes  -Wno-cast-qual
+CWARNFLAGS.smu10_hwmgr.c=		-Wno-missing-prototypes  -Wno-cast-qual	-Wno-initializer-overrides
 CWARNFLAGS.soc15.c=		-Wno-missing-prototypes
 CWARNFLAGS.tonga_clockpowergating.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.tonga_hwmgr.c=	-Wno-missing-prototypes -Wno-cast-qual -Wno-unused-const-variable
@@ -541,5 +544,9 @@ CWARNFLAGS.vega10_processpptables.c= -Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.vega10_reg_init.c= 	-Wno-cast-qual
 CWARNFLAGS.vega10_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.vega10_thermal.c=	-Wno-missing-prototypes
+CWARNFLAGS.vega12_hwmgr.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized -Wno-cast-qual
+CWARNFLAGS.vega12_processpptables.c= -Wno-missing-prototypes -Wno-cast-qual
+CWARNFLAGS.vega12_smumgr.c=	-Wno-missing-prototypes
+CWARNFLAGS.vega12_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.vi.c= -Wno-unused-const-variable
 CWARNFLAGS.uvd_v7_0.c=	-Wno-missing-prototypes

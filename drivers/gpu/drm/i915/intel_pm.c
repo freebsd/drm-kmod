@@ -31,6 +31,7 @@
 #include "intel_drv.h"
 #ifndef __linux__
 #include <machine/clock.h>
+#include <asm/atomic.h>
 #else
 #include "../../../platform/x86/intel_ips.h"
 #endif

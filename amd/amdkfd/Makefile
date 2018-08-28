@@ -64,7 +64,7 @@ CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
 
 CWARNFLAGS.kfd_chardev.c=	-Wno-format
 CWARNFLAGS.kfd_dbgdev.c=	-Wno-format
-CWARNFLAGS.kfd_device_queue_manager.c=	-Wno-format
+CWARNFLAGS.kfd_device_queue_manager.c=	-Wno-format -Wno-strict-prototypes -Wno-implicit-function-declaration
 CWARNFLAGS.kfd_doorbell.c=	-Wno-format
 CWARNFLAGS.kfd_packet_manager.c=	-Wno-format
 CWARNFLAGS.kfd_queue.c= -Wno-format

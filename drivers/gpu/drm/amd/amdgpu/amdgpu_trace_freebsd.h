@@ -35,6 +35,16 @@ trace_amdgpu_bo_list_set(void *a, void *b) {
 	CTR2(KTR_DRM, "amdgpu_bo_list_set %p %p", a, b);
 }
 
+static inline void
+trace_amdgpu_pasid_allocated(unsigned pasid) {
+	CTR1(KTR_DRM, "amdgpu_pasid_allocated %u", pasid);	
+}
+
+static inline void
+trace_amdgpu_pasid_freed(unsigned pasid) {
+	CTR1(KTR_DRM, "amdgpu_pasid_freed %u", pasid);	
+}
+
 #define	trace_amdgpu_vm_grab_id(vm, idx, job) \
         CTR3(KTR_DRM, "amdgpu_vm_grab_id %p %u %p", (vm), (idx), (job));
 

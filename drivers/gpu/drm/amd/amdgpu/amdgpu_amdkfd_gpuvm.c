@@ -81,12 +81,16 @@ static bool check_if_add_bo_to_vm(struct amdgpu_vm *avm,
  */
 void amdgpu_amdkfd_gpuvm_init_mem_limits(void)
 {
-	struct sysinfo si;
 	uint64_t mem;
+#ifdef __linux__
+	struct sysinfo si;
 
 	si_meminfo(&si);
 	mem = si.totalram - si.totalhigh;
 	mem *= si.mem_unit;
+#else
+	mem = physmem * PAGE_SIZE;
+#endif
 
 	spin_lock_init(&kfd_mem_limit.mem_limit_lock);
 	kfd_mem_limit.max_system_mem_limit = (mem >> 1) - (mem >> 3);

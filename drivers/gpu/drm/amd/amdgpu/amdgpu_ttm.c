@@ -1483,7 +1483,7 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 			       ((uint64_t)si.totalram * si.mem_unit * 3/4));
 #else
 		gtt_size = min(max((AMDGPU_DEFAULT_GTT_SIZE_MB << 20),
-			       adev->mc.mc_vram_size),
+			       adev->gmc.mc_vram_size),
 			       ((uint64_t)physmem * PAGE_SIZE * 3/4));
 #endif
 	}
@@ -2036,9 +2036,11 @@ static ssize_t amdgpu_iomem_read(struct file *f, char __user *buf,
 			return -EPERM;
 
 		p = pfn_to_page(pfn);
+#ifdef __linux__
+		// BSDFIXME OK to ignore??
 		if (p->mapping != adev->mman.bdev.dev_mapping)
 			return -EPERM;
-
+#endif
 		ptr = kmap(p);
 		r = copy_to_user(buf, ptr + off, bytes);
 		kunmap(p);
@@ -2080,9 +2082,11 @@ static ssize_t amdgpu_iomem_write(struct file *f, const char __user *buf,
 			return -EPERM;
 
 		p = pfn_to_page(pfn);
+#ifdef __linux__
+		// BSDFIXME OK to ignore??
 		if (p->mapping != adev->mman.bdev.dev_mapping)
 			return -EPERM;
-
+#endif
 		ptr = kmap(p);
 		r = copy_from_user(ptr + off, buf, bytes);
 		kunmap(p);

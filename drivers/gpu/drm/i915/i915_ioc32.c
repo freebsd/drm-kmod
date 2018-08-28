@@ -44,7 +44,7 @@ struct drm_i915_getparam32 {
 };
 
 #ifndef __linux__
-extern int i915_getparam(struct drm_device *dev, void *data,
+extern int i915_getparam_ioctl(struct drm_device *dev, void *data,
 			 struct drm_file *file_priv);
 #endif
 
@@ -77,7 +77,7 @@ static int compat_i915_getparam(struct file *file, unsigned int cmd,
 	req.param = req32.param;
 	req.value = (void *)(uintptr_t)req32.value;
 
-	return drm_ioctl_kernel(file, i915_getparam,
+	return drm_ioctl_kernel(file, i915_getparam_ioctl,
 			 &req, DRM_AUTH|DRM_RENDER_ALLOW);
 #endif
 }

@@ -980,8 +980,12 @@ static void __exit amdgpu_exit(void)
 	amdgpu_fence_slab_fini();
 }
 
+#ifdef __linux__
 module_init(amdgpu_init);
 module_exit(amdgpu_exit);
+#else
+LKPI_DRIVER_MODULE(amdgpu, amdgpu_init, amdgpu_exit);
+#endif
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESC);

@@ -23,7 +23,9 @@
 #include <linux/dma-fence.h>
 #include <linux/spinlock.h>
 #include <linux/atomic.h>
+#ifdef __linux__
 #include <linux/stacktrace.h>
+#endif
 #include <linux/sched.h>
 #include <linux/slab.h>
 #include <linux/sched/mm.h>

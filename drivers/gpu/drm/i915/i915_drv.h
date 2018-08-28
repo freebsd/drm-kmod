@@ -3707,10 +3707,12 @@ int intel_engine_cmd_parser(struct intel_engine_cs *engine,
 			    bool is_master);
 
 /* i915_perf.c */
+#ifdef CONFIG_I915_PERF // Not yet. i915_perf.c opens a can of worms...
 extern void i915_perf_init(struct drm_i915_private *dev_priv);
 extern void i915_perf_fini(struct drm_i915_private *dev_priv);
 extern void i915_perf_register(struct drm_i915_private *dev_priv);
 extern void i915_perf_unregister(struct drm_i915_private *dev_priv);
+#endif
 
 /* i915_suspend.c */
 extern int i915_save_state(struct drm_i915_private *dev_priv);

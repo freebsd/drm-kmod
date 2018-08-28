@@ -1769,11 +1769,6 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 	int error, rv;
 #endif
 
-#ifdef __notyet__
-/*
- * This is another example of the antique xf86-intel ddx passing in
- * bad values. Accomodate users still using 2.2 for now.
- */
 	if (args->flags & ~(I915_MMAP_WC)) {
 		DRM_DEBUG("Attempting to mmap with flag other than WC set\n");
 		return -EINVAL;
@@ -1782,7 +1777,6 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 		DRM_DEBUG("Attempting to mmap WC without pat\n");
 		return -ENODEV;
 	}
-#endif
 
 	obj = i915_gem_object_lookup(file, args->handle);
 	if (!obj)
@@ -3507,7 +3501,7 @@ static void shrink_caches(struct drm_i915_private *i915)
 	 * with the aim of reducing fragmentation.
 	 */
 #ifdef __linux__
-	// BSDFIXME: Need this?
+	// BSDFIXME: Implement this
 	kmem_cache_shrink(i915->priorities);
 	kmem_cache_shrink(i915->dependencies);
 	kmem_cache_shrink(i915->requests);

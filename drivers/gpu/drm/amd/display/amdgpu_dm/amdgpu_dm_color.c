@@ -23,9 +23,15 @@
  *
  */
 
+#ifndef __linux__
+/* For lower_32_bits() */
+#include <drm/drm_os_freebsd.h>
+#endif
+
 #include "amdgpu_mode.h"
 #include "amdgpu_dm.h"
 #include "modules/color/color_gamma.h"
+
 
 #define MAX_DRM_LUT_VALUE 0xFFFF
 

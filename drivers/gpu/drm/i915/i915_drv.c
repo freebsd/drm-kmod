@@ -1290,7 +1290,9 @@ static int i915_driver_init_hw(struct drm_i915_private *dev_priv)
 err_ggtt:
 	i915_ggtt_cleanup_hw(dev_priv);
 err_perf:
+#ifdef CONFIG_I915_PERF // Not yet. i915_perf.c opens a can of worms...
 	i915_perf_fini(dev_priv);
+#endif
 	return ret;
 }
 
