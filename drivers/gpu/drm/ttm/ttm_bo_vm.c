@@ -318,7 +318,7 @@ retry:
 				goto retry;
 		} else {
 			if (bo->mem.bus.is_iomem) {
-				pfn = bdev->driver->io_mem_pfn(bo, page_offset);
+				pfn = ttm_bo_io_mem_pfn(bo, page_offset);
 				page = PHYS_TO_VM_PAGE(IDX_TO_OFF(pfn));
 			} else {
 				page = ttm->pages[page_offset];
