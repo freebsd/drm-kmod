@@ -1412,6 +1412,7 @@ int radeon_device_init(struct radeon_device *rdev,
 		radeon_doorbell_init(rdev);
 
 #ifdef __linux__
+	// XXX: Disable until 4.17 - need fixes in base lkpi.
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		if (pci_resource_flags(rdev->pdev, i) & IORESOURCE_IO) {
@@ -1420,9 +1421,9 @@ int radeon_device_init(struct radeon_device *rdev,
 			break;
 		}
 	}
+#endif
 	if (rdev->rio_mem == NULL)
 		DRM_ERROR("Unable to find PCI I/O BAR\n");
-#endif
 
 	if (rdev->flags & RADEON_IS_PX)
 		radeon_device_handle_px_quirks(rdev);

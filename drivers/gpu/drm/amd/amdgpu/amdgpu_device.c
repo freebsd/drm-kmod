@@ -1874,14 +1874,15 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 #ifndef __linux__
 #define DEVICE_COUNT_RESOURCE 5
 #endif
+#ifdef __linux__
+	// XXX: Disable until 4.17 - need fixes in base lkpi.
 	/* io port mapping */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		if (pci_resource_flags(adev->pdev, i) & IORESOURCE_IO) {
 			adev->rio_mem_size = pci_resource_len(adev->pdev, i);
-#ifdef __linux__
 			adev->rio_mem = pci_iomap(adev->pdev, i,
 			    adev->rio_mem_size);
-#else
+/* #else */
 			struct resource *res;
 			int rid, type;
 
@@ -1897,10 +1898,10 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 
 			DRM_INFO("register rio base: 0x%08X\n", (uint32_t)adev->rio_mem);
 			DRM_INFO("register rio size: %u\n", (unsigned)adev->rio_mem_size);
-#endif
 			break;
 		}
 	}
+#endif
 	if (adev->rio_mem == NULL)
 		DRM_INFO("PCI I/O BAR is not found.\n");
 
