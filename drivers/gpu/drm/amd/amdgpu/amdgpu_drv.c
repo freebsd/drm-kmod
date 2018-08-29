@@ -130,16 +130,6 @@ int amdgpu_compute_multipipe = -1;
 int amdgpu_gpu_recovery = -1; /* auto */
 int amdgpu_emu_mode = 0;
 uint amdgpu_smu_memory_pool_size = 0;
-/* KFD parameters */
-int sched_policy = KFD_SCHED_POLICY_HWS;
-int hws_max_conc_proc = 8;
-int cwsr_enable = 1;
-int max_num_of_queues_per_device = KFD_MAX_NUM_OF_QUEUES_PER_DEVICE_DEFAULT;
-int send_sigterm;
-int debug_largebar;
-int ignore_crat;
-int noretry;
-int halt_if_hws_hang;
 
 /**
  * DOC: vramlimit (int)
@@ -547,12 +537,14 @@ MODULE_PARM_DESC(smu_memory_pool_size,
 		"0x1 = 256Mbyte, 0x2 = 512Mbyte, 0x4 = 1 Gbyte, 0x8 = 2GByte");
 module_param_named(smu_memory_pool_size, amdgpu_smu_memory_pool_size, uint, 0444);
 
+#ifdef CONFIG_HSA_AMD
 /**
  * DOC: sched_policy (int)
  * Set scheduling policy. Default is HWS(hardware scheduling) with over-subscription.
  * Setting 1 disables over-subscription. Setting 2 disables HWS and statically
  * assigns queues to HQDs.
  */
+int sched_policy = KFD_SCHED_POLICY_HWS;
 module_param(sched_policy, int, 0444);
 MODULE_PARM_DESC(sched_policy,
 	"Scheduling policy (0 = HWS (Default), 1 = HWS without over-subscription, 2 = Non-HWS (Used for debugging only)");
@@ -562,6 +554,7 @@ MODULE_PARM_DESC(sched_policy,
  * Maximum number of processes that HWS can schedule concurrently. The maximum is the
  * number of VMIDs assigned to the HWS, which is also the default.
  */
+int hws_max_conc_proc = 8;
 module_param(hws_max_conc_proc, int, 0444);
 MODULE_PARM_DESC(hws_max_conc_proc,
 	"Max # processes HWS can execute concurrently when sched_policy=0 (0 = no concurrency, #VMIDs for KFD = Maximum(default))");
@@ -572,6 +565,7 @@ MODULE_PARM_DESC(hws_max_conc_proc,
  * the middle of a compute wave. Default is 1 to enable this feature. Setting 0
  * disables it.
  */
+int cwsr_enable = 1;
 module_param(cwsr_enable, int, 0444);
 MODULE_PARM_DESC(cwsr_enable, "CWSR enable (0 = Off, 1 = On (Default))");
 
@@ -580,6 +574,7 @@ MODULE_PARM_DESC(cwsr_enable, "CWSR enable (0 = Off, 1 = On (Default))");
  * Maximum number of queues per device. Valid setting is between 1 and 4096. Default
  * is 4096.
  */
+int max_num_of_queues_per_device = KFD_MAX_NUM_OF_QUEUES_PER_DEVICE_DEFAULT;
 module_param(max_num_of_queues_per_device, int, 0444);
 MODULE_PARM_DESC(max_num_of_queues_per_device,
 	"Maximum number of supported queues per device (1 = Minimum, 4096 = default)");
@@ -589,6 +584,7 @@ MODULE_PARM_DESC(max_num_of_queues_per_device,
  * Send sigterm to HSA process on unhandled exceptions. Default is not to send sigterm
  * but just print errors on dmesg. Setting 1 enables sending sigterm.
  */
+int send_sigterm;
 module_param(send_sigterm, int, 0444);
 MODULE_PARM_DESC(send_sigterm,
 	"Send sigterm to HSA process on unhandled exception (0 = disable, 1 = enable)");
@@ -600,6 +596,7 @@ MODULE_PARM_DESC(send_sigterm,
  * size, usually 256MB.
  * Default value is 0, diabled.
  */
+int debug_largebar;
 module_param(debug_largebar, int, 0444);
 MODULE_PARM_DESC(debug_largebar,
 	"Debug large-bar flag used to simulate large-bar capability on non-large bar machine (0 = disable, 1 = enable)");
@@ -610,6 +607,7 @@ MODULE_PARM_DESC(debug_largebar,
  * table to get information about AMD APUs. This option can serve as a workaround on
  * systems with a broken CRAT table.
  */
+int ignore_crat;
 module_param(ignore_crat, int, 0444);
 MODULE_PARM_DESC(ignore_crat,
 	"Ignore CRAT table during KFD initialization (0 = use CRAT (default), 1 = ignore CRAT)");
@@ -620,6 +618,7 @@ MODULE_PARM_DESC(ignore_crat,
  * Setting 1 disables retry.
  * Retry is needed for recoverable page faults.
  */
+int noretry;
 module_param(noretry, int, 0644);
 MODULE_PARM_DESC(noretry,
 	"Set sh_mem_config.retry_disable on Vega10 (0 = retry enabled (default), 1 = retry disabled)");
@@ -629,8 +628,10 @@ MODULE_PARM_DESC(noretry,
  * Halt if HWS hang is detected. Default value, 0, disables the halt on hang.
  * Setting 1 enables halt on hang.
  */
+int halt_if_hws_hang;
 module_param(halt_if_hws_hang, int, 0644);
 MODULE_PARM_DESC(halt_if_hws_hang, "Halt if HWS hang is detected (0 = off (default), 1 = on)");
+#endif
 
 static const struct pci_device_id pciidlist[] = {
 #ifdef  CONFIG_DRM_AMDGPU_SI
