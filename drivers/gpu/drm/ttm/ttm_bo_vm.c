@@ -317,8 +317,7 @@ retry:
 				goto retry;
 		} else {
 			if (bo->mem.bus.is_iomem) {
-				pfn = OFF_TO_IDX(bo->mem.bus.base +
-				    bo->mem.bus.offset) + page_offset;
+				pfn = ttm_bo_io_mem_pfn(bo, page_offset);
 				page = PHYS_TO_VM_PAGE(IDX_TO_OFF(pfn));
 			} else {
 				page = ttm->pages[page_offset];
