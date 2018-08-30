@@ -4932,6 +4932,8 @@ void set_freesync_on_stream(struct amdgpu_display_manager *dm,
 	mod_freesync_build_vrr_infopacket(dm->freesync_module,
 					  new_stream,
 					  &vrr,
+					  packet_type_fs1,
+					  NULL,
 					  &vrr_infopacket);
 
 	new_crtc_state->adjust = vrr.adjust;
