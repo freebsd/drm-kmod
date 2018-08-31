@@ -2912,7 +2912,8 @@ static void intel_ddi_pre_enable_dp(struct intel_encoder *encoder,
 
 	icl_enable_phy_clock_gating(dig_port);
 
-	intel_ddi_enable_pipe_clock(crtc_state);
+	if (!is_mst)
+		intel_ddi_enable_pipe_clock(crtc_state);
 }
 
 static void intel_ddi_pre_enable_hdmi(struct intel_encoder *encoder,
