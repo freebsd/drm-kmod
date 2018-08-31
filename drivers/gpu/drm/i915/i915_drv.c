@@ -1166,6 +1166,21 @@ static enum dram_rank skl_get_dimm_rank(u8 size, u32 rank)
 	return I915_DRAM_RANK_INVALID;
 }
 
+static bool
+skl_is_16gb_dimm(enum dram_rank rank, u8 size, u8 width)
+{
+	if (rank == I915_DRAM_RANK_SINGLE && width == 8 && size == 16)
+		return true;
+	else if (rank == I915_DRAM_RANK_DUAL && width == 8 && size == 32)
+		return true;
+	else if (rank == SKL_DRAM_RANK_SINGLE && width == 16 && size == 8)
+		return true;
+	else if (rank == SKL_DRAM_RANK_DUAL && width == 16 && size == 16)
+		return true;
+
+	return false;
+}
+
 static int
 skl_dram_get_channel_info(struct dram_channel_info *ch, u32 val)
 {
@@ -1203,6 +1218,11 @@ skl_dram_get_channel_info(struct dram_channel_info *ch, u32 val)
 	else
 		ch->rank = I915_DRAM_RANK_SINGLE;
 
+	ch->is_16gb_dimm = skl_is_16gb_dimm(ch->l_info.rank, ch->l_info.size,
+					    ch->l_info.width) ||
+			   skl_is_16gb_dimm(ch->s_info.rank, ch->s_info.size,
+					    ch->s_info.width);
+
 	DRM_DEBUG_KMS("(size:width:rank) L(%dGB:X%d:%s) S(%dGB:X%d:%s)\n",
 		      ch->l_info.size, ch->l_info.width,
 		      ch->l_info.rank ? "dual" : "single",
@@ -1235,6 +1255,8 @@ skl_dram_get_channels_info(struct drm_i915_private *dev_priv)
 		return -EINVAL;
 	}
 
+	dram_info->valid_dimm = true;
+
 	/*
 	 * If any of the channel is single rank channel, worst case output
 	 * will be same as if single rank memory, so consider single rank
@@ -1250,6 +1272,10 @@ skl_dram_get_channels_info(struct drm_i915_private *dev_priv)
 		DRM_INFO("couldn't get memory rank information\n");
 		return -EINVAL;
 	}
+
+	if (ch0.is_16gb_dimm || ch1.is_16gb_dimm)
+		dram_info->is_16gb_dimm = true;
+
 	return 0;
 }
 
@@ -1276,6 +1302,7 @@ skl_get_dram_info(struct drm_i915_private *dev_priv)
 		return -EINVAL;
 	}
 
+	dram_info->valid_dimm = true;
 	dram_info->valid = true;
 	return 0;
 }
@@ -1374,6 +1401,8 @@ intel_get_dram_info(struct drm_i915_private *dev_priv)
 	int ret;
 
 	dram_info->valid = false;
+	dram_info->valid_dimm = false;
+	dram_info->is_16gb_dimm = false;
 	dram_info->rank = I915_DRAM_RANK_INVALID;
 	dram_info->bandwidth_kbps = 0;
 	dram_info->num_channels = 0;
@@ -1397,9 +1426,9 @@ intel_get_dram_info(struct drm_i915_private *dev_priv)
 		sprintf(bandwidth_str, "unknown");
 	DRM_DEBUG_KMS("DRAM bandwidth:%s, total-channels: %u\n",
 		      bandwidth_str, dram_info->num_channels);
-	DRM_DEBUG_KMS("DRAM rank: %s rank\n",
+	DRM_DEBUG_KMS("DRAM rank: %s rank 16GB-dimm:%s\n",
 		      (dram_info->rank == I915_DRAM_RANK_DUAL) ?
-		      "dual" : "single");
+		      "dual" : "single", yesno(dram_info->is_16gb_dimm));
 }
 
 /**

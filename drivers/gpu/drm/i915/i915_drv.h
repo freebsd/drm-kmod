@@ -1966,6 +1966,8 @@ struct drm_i915_private {
 
 	struct dram_info {
 		bool valid;
+		bool valid_dimm;
+		bool is_16gb_dimm;
 		u8 num_channels;
 		enum dram_rank {
 			I915_DRAM_RANK_INVALID = 0,
@@ -2194,6 +2196,7 @@ struct dram_channel_info {
 		enum dram_rank rank;
 	} l_info, s_info;
 	enum dram_rank rank;
+	bool is_16gb_dimm;
 };
 
 static inline struct drm_i915_private *to_i915(const struct drm_device *dev)
