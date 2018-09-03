@@ -1680,7 +1680,6 @@ struct drm_i915_private {
 	struct intel_engine_cs *engine_class[MAX_ENGINE_CLASS + 1]
 					    [MAX_ENGINE_INSTANCE + 1];
 
-	struct drm_dma_handle *status_page_dmah;
 #ifdef __linux__
 	struct resource mch_res;
 #else
