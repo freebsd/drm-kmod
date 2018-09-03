@@ -714,13 +714,14 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 	unsigned pinned = 0;
 	int r;
 
-#ifdef __notyet__
-	/* BSDFIXME: no userptr support yet */
+
 	if (!(gtt->userflags & AMDGPU_GEM_USERPTR_READONLY))
 		flags |= FOLL_WRITE;
 
 	down_read(&current->mm->mmap_sem);
-
+	printf("%s: Missing userptr support\n");
+#ifdef __notyet__
+	/* BSDFIXME: no userptr support yet */
 	if (gtt->userflags & AMDGPU_GEM_USERPTR_ANONONLY) {
 		/* check that we only use anonymous memory
 		   to prevent problems with writeback */
@@ -1419,10 +1420,10 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 	r = ttm_bo_device_init(&adev->mman.bdev,
 			       adev->mman.bo_global_ref.ref.object,
 			       &amdgpu_bo_driver,
-#ifndef __linux__
-			       NULL,
-#else
+#ifdef __linux__
 			       adev->ddev->anon_mapping,
+#else
+			       NULL, /* Dummy on BSD */
 #endif
 			       DRM_FILE_PAGE_OFFSET,
 			       adev->need_dma32);
