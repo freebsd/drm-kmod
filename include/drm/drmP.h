@@ -199,6 +199,8 @@ static inline bool drm_can_sleep(void)
 	return true;
 }
 
+#ifndef __linux__
+/* BSDFIXME: Confirm is this for freebsd only? */
 /* sysctl support (drm_sysctl.h) */
 extern int		drm_sysctl_init(struct drm_device *dev);
 extern int		drm_sysctl_cleanup(struct drm_device *dev);
@@ -216,4 +218,5 @@ extern int		drm_sysctl_cleanup(struct drm_device *dev);
 #endif
 
 #endif				/* __KERNEL__ */
+#endif
 #endif
