@@ -404,7 +404,7 @@ int drm_legacy_addmap_ioctl(struct drm_device *dev, void *data,
 
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
 	    !drm_core_check_feature(dev, DRIVER_LEGACY))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	err = drm_addmap_core(dev, map->offset, map->size, map->type,
 			      map->flags, &maplist);
@@ -450,7 +450,7 @@ int drm_legacy_getmap_ioctl(struct drm_device *dev, void *data,
 
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
 	    !drm_core_check_feature(dev, DRIVER_LEGACY))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	idx = map->offset;
 	if (idx < 0)
@@ -602,7 +602,7 @@ int drm_legacy_rmmap_ioctl(struct drm_device *dev, void *data,
 
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
 	    !drm_core_check_feature(dev, DRIVER_LEGACY))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	mutex_lock(&dev->struct_mutex);
 	list_for_each_entry(r_list, &dev->maplist, head) {
@@ -866,7 +866,7 @@ int drm_legacy_addbufs_pci(struct drm_device *dev,
 	struct drm_buf **temp_buflist;
 
 	if (!drm_core_check_feature(dev, DRIVER_PCI_DMA))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!dma)
 		return -EINVAL;
@@ -1070,7 +1070,7 @@ static int drm_legacy_addbufs_sg(struct drm_device *dev,
 	struct drm_buf **temp_buflist;
 
 	if (!drm_core_check_feature(dev, DRIVER_SG))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!dma)
 		return -EINVAL;
@@ -1227,10 +1227,10 @@ int drm_legacy_addbufs(struct drm_device *dev, void *data,
 	int ret;
 
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!drm_core_check_feature(dev, DRIVER_HAVE_DMA))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 #if IS_ENABLED(CONFIG_AGP)
 	if (request->flags & _DRM_AGP_BUFFER)
@@ -1273,10 +1273,10 @@ int __drm_legacy_infobufs(struct drm_device *dev,
 	int count;
 
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!drm_core_check_feature(dev, DRIVER_HAVE_DMA))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!dma)
 		return -EINVAL;
@@ -1358,10 +1358,10 @@ int drm_legacy_markbufs(struct drm_device *dev, void *data,
 	struct drm_buf_entry *entry;
 
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!drm_core_check_feature(dev, DRIVER_HAVE_DMA))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!dma)
 		return -EINVAL;
@@ -1406,10 +1406,10 @@ int drm_legacy_freebufs(struct drm_device *dev, void *data,
 	struct drm_buf *buf;
 
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!drm_core_check_feature(dev, DRIVER_HAVE_DMA))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!dma)
 		return -EINVAL;
@@ -1466,10 +1466,10 @@ int __drm_legacy_mapbufs(struct drm_device *dev, void *data, int *p,
 #endif
 
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!drm_core_check_feature(dev, DRIVER_HAVE_DMA))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (!dma)
 		return -EINVAL;
@@ -1557,7 +1557,7 @@ int drm_legacy_dma_ioctl(struct drm_device *dev, void *data,
 		  struct drm_file *file_priv)
 {
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	if (dev->driver->dma_ioctl)
 		return dev->driver->dma_ioctl(dev, data, file_priv);

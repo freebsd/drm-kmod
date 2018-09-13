@@ -579,7 +579,7 @@ drm_syncobj_create_ioctl(struct drm_device *dev, void *data,
 	struct drm_syncobj_create *args = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
-		return -ENODEV;
+		return -EOPNOTSUPP;
 
 	/* no valid flags yet */
 	if (args->flags & ~DRM_SYNCOBJ_CREATE_SIGNALED)
@@ -596,7 +596,7 @@ drm_syncobj_destroy_ioctl(struct drm_device *dev, void *data,
 	struct drm_syncobj_destroy *args = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
-		return -ENODEV;
+		return -EOPNOTSUPP;
 
 	/* make sure padding is empty */
 	if (args->pad)
@@ -611,7 +611,7 @@ drm_syncobj_handle_to_fd_ioctl(struct drm_device *dev, void *data,
 	struct drm_syncobj_handle *args = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
-		return -ENODEV;
+		return -EOPNOTSUPP;
 
 	if (args->pad)
 		return -EINVAL;
@@ -635,7 +635,7 @@ drm_syncobj_fd_to_handle_ioctl(struct drm_device *dev, void *data,
 	struct drm_syncobj_handle *args = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
-		return -ENODEV;
+		return -EOPNOTSUPP;
 
 	if (args->pad)
 		return -EINVAL;
@@ -930,7 +930,7 @@ drm_syncobj_wait_ioctl(struct drm_device *dev, void *data,
 	int ret = 0;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
-		return -ENODEV;
+		return -EOPNOTSUPP;
 
 	if (args->flags & ~(DRM_SYNCOBJ_WAIT_FLAGS_WAIT_ALL |
 			    DRM_SYNCOBJ_WAIT_FLAGS_WAIT_FOR_SUBMIT))
@@ -964,7 +964,7 @@ drm_syncobj_reset_ioctl(struct drm_device *dev, void *data,
 	int ret;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
-		return -ENODEV;
+		return -EOPNOTSUPP;
 
 	if (args->pad != 0)
 		return -EINVAL;
@@ -997,7 +997,7 @@ drm_syncobj_signal_ioctl(struct drm_device *dev, void *data,
 	int ret;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
-		return -ENODEV;
+		return -EOPNOTSUPP;
 
 	if (args->pad != 0)
 		return -EINVAL;

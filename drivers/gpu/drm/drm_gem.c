@@ -673,7 +673,7 @@ drm_gem_close_ioctl(struct drm_device *dev, void *data,
 	int ret;
 
 	if (!drm_core_check_feature(dev, DRIVER_GEM))
-		return -ENODEV;
+		return -EOPNOTSUPP;
 
 	ret = drm_gem_handle_delete(file_priv, args->handle);
 
@@ -700,7 +700,7 @@ drm_gem_flink_ioctl(struct drm_device *dev, void *data,
 	int ret;
 
 	if (!drm_core_check_feature(dev, DRIVER_GEM))
-		return -ENODEV;
+		return -EOPNOTSUPP;
 
 	obj = drm_gem_object_lookup(file_priv, args->handle);
 	if (obj == NULL)
@@ -751,7 +751,7 @@ drm_gem_open_ioctl(struct drm_device *dev, void *data,
 	u32 handle;
 
 	if (!drm_core_check_feature(dev, DRIVER_GEM))
-		return -ENODEV;
+		return -EOPNOTSUPP;
 
 	mutex_lock(&dev->object_name_lock);
 	obj = idr_find(&dev->object_name_idr, (int) args->name);

@@ -506,7 +506,7 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 
 	/* Can't lease without MODESET */
 	if (!drm_core_check_feature(dev, DRIVER_MODESET))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	/* Do not allow sub-leases */
 	if (lessor->lessor)
@@ -620,7 +620,7 @@ int drm_mode_list_lessees_ioctl(struct drm_device *dev,
 
 	/* Can't lease without MODESET */
 	if (!drm_core_check_feature(dev, DRIVER_MODESET))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	DRM_DEBUG_LEASE("List lessees for %d\n", lessor->lessee_id);
 
@@ -676,7 +676,7 @@ int drm_mode_get_lease_ioctl(struct drm_device *dev,
 
 	/* Can't lease without MODESET */
 	if (!drm_core_check_feature(dev, DRIVER_MODESET))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	DRM_DEBUG_LEASE("get lease for %d\n", lessee->lessee_id);
 
@@ -731,7 +731,7 @@ int drm_mode_revoke_lease_ioctl(struct drm_device *dev,
 
 	/* Can't lease without MODESET */
 	if (!drm_core_check_feature(dev, DRIVER_MODESET))
-		return -EINVAL;
+		return -EOPNOTSUPP;
 
 	mutex_lock(&dev->mode_config.idr_mutex);
 
