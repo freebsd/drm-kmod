@@ -49,6 +49,7 @@ SRCS=	\
 	i915_trace_points.c \
 	i915_vgpu.c \
 	i915_vma.c \
+	icl_dsi.c \
 	intel_acpi.c \
 	intel_atomic.c \
 	intel_atomic_plane.c \
