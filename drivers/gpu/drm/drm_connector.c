@@ -1284,6 +1284,37 @@ int drm_mode_create_scaling_mode_property(struct drm_device *dev)
 EXPORT_SYMBOL(drm_mode_create_scaling_mode_property);
 
 /**
+ * drm_connector_attach_vrr_capable_property - creates the
+ * vrr_capable property
+ * @connector: connector to create the vrr_capable property on.
+ *
+ * This is used by atomic drivers to add support for querying
+ * variable refresh rate capability for a connector.
+ *
+ * Returns:
+ * Zero on success, negative errono on failure.
+ */
+int drm_connector_attach_vrr_capable_property(
+	struct drm_connector *connector)
+{
+	struct drm_device *dev = connector->dev;
+	struct drm_property *prop;
+
+	if (!connector->vrr_capable_property) {
+		prop = drm_property_create_bool(dev, DRM_MODE_PROP_IMMUTABLE,
+			"vrr_capable");
+		if (!prop)
+			return -ENOMEM;
+
+		connector->vrr_capable_property = prop;
+		drm_object_attach_property(&connector->base, prop, 0);
+	}
+
+	return 0;
+}
+EXPORT_SYMBOL(drm_connector_attach_vrr_capable_property);
+
+/**
  * drm_connector_attach_scaling_mode_property - attach atomic scaling mode property
  * @connector: connector to attach scaling mode property on.
  * @scaling_mode_mask: or'ed mask of BIT(%DRM_MODE_SCALE_\*).
@@ -1612,38 +1643,22 @@ void drm_connector_set_link_status_property(struct drm_connector *connector,
 EXPORT_SYMBOL(drm_connector_set_link_status_property);
 
 /**
- * drm_connector_attach_max_bpc_property - attach "max bpc" property
- * @connector: connector to attach max bpc property on.
- * @min: The minimum bit depth supported by the connector.
- * @max: The maximum bit depth supported by the connector.
+ * drm_connector_set_vrr_capable_property - sets the variable refresh rate
+ * capable property for a connector
+ * @connector: drm connector
+ * @capable: True if the connector is variable refresh rate capable
  *
- * This is used to add support for limiting the bit depth on a connector.
- *
- * Returns:
- * Zero on success, negative errno on failure.
+ * Should be used by atomic drivers to update the indicated support for
+ * variable refresh rate over a connector.
  */
-int drm_connector_attach_max_bpc_property(struct drm_connector *connector,
-					  int min, int max)
+void drm_connector_set_vrr_capable_property(
+		struct drm_connector *connector, bool capable)
 {
-	struct drm_device *dev = connector->dev;
-	struct drm_property *prop;
-
-	prop = connector->max_bpc_property;
-	if (!prop) {
-		prop = drm_property_create_range(dev, 0, "max bpc", min, max);
-		if (!prop)
-			return -ENOMEM;
-
-		connector->max_bpc_property = prop;
-	}
-
-	drm_object_attach_property(&connector->base, prop, max);
-	connector->state->max_requested_bpc = max;
-	connector->state->max_bpc = max;
-
-	return 0;
+	drm_object_property_set_value(&connector->base,
+				      connector->vrr_capable_property,
+				      capable);
 }
-EXPORT_SYMBOL(drm_connector_attach_max_bpc_property);
+EXPORT_SYMBOL(drm_connector_set_vrr_capable_property);
 
 /**
  * drm_connector_init_panel_orientation_property -
