@@ -6166,10 +6166,6 @@ void intel_enable_ipc(struct drm_i915_private *dev_priv)
 	if (!HAS_IPC(dev_priv))
 		return;
 
-	/* Display WA #0477 WaDisableIPC: skl */
-	if (IS_SKYLAKE(dev_priv))
-		dev_priv->ipc_enabled = false;
-
 	/* Display WA #1141: SKL:all KBL:all CFL */
 	if ((IS_KABYLAKE(dev_priv) || IS_COFFEELAKE(dev_priv)) &&
 	    !dev_priv->dram_info.symmetric_memory)
