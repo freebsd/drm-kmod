@@ -6163,6 +6163,9 @@ void intel_enable_ipc(struct drm_i915_private *dev_priv)
 {
 	u32 val;
 
+	if (!HAS_IPC(dev_priv))
+		return;
+
 	/* Display WA #0477 WaDisableIPC: skl */
 	if (IS_SKYLAKE(dev_priv))
 		dev_priv->ipc_enabled = false;
@@ -6184,7 +6187,6 @@ void intel_enable_ipc(struct drm_i915_private *dev_priv)
 
 void intel_init_ipc(struct drm_i915_private *dev_priv)
 {
-	dev_priv->ipc_enabled = false;
 	if (!HAS_IPC(dev_priv))
 		return;
 
