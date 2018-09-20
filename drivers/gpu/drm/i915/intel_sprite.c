@@ -303,11 +303,12 @@ skl_plane_max_stride(struct intel_plane *plane,
 }
 
 static void
-skl_program_scaler(struct intel_plane *plane,
+skl_program_scaler(struct drm_i915_private *dev_priv,
+		   struct intel_plane *plane,
 		   const struct intel_crtc_state *crtc_state,
 		   const struct intel_plane_state *plane_state)
 {
-	struct drm_i915_private *dev_priv = to_i915(plane->base.dev);
+	enum plane_id plane_id = plane->id;
 	enum pipe pipe = plane->pipe;
 	int scaler_id = plane_state->scaler_id;
 	const struct intel_scaler *scaler =
@@ -318,41 +319,38 @@ skl_program_scaler(struct intel_plane *plane,
 	uint32_t crtc_h = drm_rect_height(&plane_state->base.dst);
 	u16 y_hphase, uv_rgb_hphase;
 	u16 y_vphase, uv_rgb_vphase;
-	int hscale, vscale;
 
-	hscale = drm_rect_calc_hscale(&plane_state->base.src,
-				      &plane_state->base.dst,
-				      0, INT_MAX);
-	vscale = drm_rect_calc_vscale(&plane_state->base.src,
-				      &plane_state->base.dst,
-				      0, INT_MAX);
+	/* Sizes are 0 based */
+	crtc_w--;
+	crtc_h--;
 
 	/* TODO: handle sub-pixel coordinates */
 	if (plane_state->base.fb->format->format == DRM_FORMAT_NV12) {
-		y_hphase = skl_scaler_calc_phase(1, hscale, false);
-		y_vphase = skl_scaler_calc_phase(1, vscale, false);
+		y_hphase = skl_scaler_calc_phase(1, false);
+		y_vphase = skl_scaler_calc_phase(1, false);
 
 		/* MPEG2 chroma siting convention */
-		uv_rgb_hphase = skl_scaler_calc_phase(2, hscale, true);
-		uv_rgb_vphase = skl_scaler_calc_phase(2, vscale, false);
+		uv_rgb_hphase = skl_scaler_calc_phase(2, true);
+		uv_rgb_vphase = skl_scaler_calc_phase(2, false);
 	} else {
 		/* not used */
 		y_hphase = 0;
 		y_vphase = 0;
 
-		uv_rgb_hphase = skl_scaler_calc_phase(1, hscale, false);
-		uv_rgb_vphase = skl_scaler_calc_phase(1, vscale, false);
+		uv_rgb_hphase = skl_scaler_calc_phase(1, false);
+		uv_rgb_vphase = skl_scaler_calc_phase(1, false);
 	}
 
 	I915_WRITE_FW(SKL_PS_CTRL(pipe, scaler_id),
-		      PS_SCALER_EN | PS_PLANE_SEL(plane->id) | scaler->mode);
+		      PS_SCALER_EN | PS_PLANE_SEL(plane_id) | scaler->mode);
 	I915_WRITE_FW(SKL_PS_PWR_GATE(pipe, scaler_id), 0);
 	I915_WRITE_FW(SKL_PS_VPHASE(pipe, scaler_id),
 		      PS_Y_PHASE(y_vphase) | PS_UV_RGB_PHASE(uv_rgb_vphase));
 	I915_WRITE_FW(SKL_PS_HPHASE(pipe, scaler_id),
 		      PS_Y_PHASE(y_hphase) | PS_UV_RGB_PHASE(uv_rgb_hphase));
 	I915_WRITE_FW(SKL_PS_WIN_POS(pipe, scaler_id), (crtc_x << 16) | crtc_y);
-	I915_WRITE_FW(SKL_PS_WIN_SZ(pipe, scaler_id), (crtc_w << 16) | crtc_h);
+	I915_WRITE_FW(SKL_PS_WIN_SZ(pipe, scaler_id),
+		      ((crtc_w + 1) << 16)|(crtc_h + 1));
 }
 
 void
@@ -402,7 +400,7 @@ skl_update_plane(struct intel_plane *plane,
 		      plane_state->color_plane[1].x);
 
 	if (plane_state->scaler_id >= 0) {
-		skl_program_scaler(plane, crtc_state, plane_state);
+		skl_program_scaler(dev_priv, plane, crtc_state, plane_state);
 
 		I915_WRITE_FW(PLANE_POS(pipe, plane_id), 0);
 	} else {
