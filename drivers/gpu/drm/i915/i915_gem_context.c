@@ -123,6 +123,8 @@ static void i915_gem_context_free(struct i915_gem_context *ctx)
 
 	i915_ppgtt_put(ctx->ppgtt);
 
+	kfree(ctx->jump_whitelist);
+
 	for (i = 0; i < I915_NUM_ENGINES; i++) {
 		struct intel_context *ce = &ctx->engine[i];
 
@@ -320,6 +322,9 @@ __create_hw_context(struct drm_i915_private *dev_priv,
 		ctx->ggtt_offset_bias = GUC_WOPCM_TOP;
 	else
 		ctx->ggtt_offset_bias = I915_GTT_PAGE_SIZE;
+
+	ctx->jump_whitelist = NULL;
+	ctx->jump_whitelist_cmds = 0;
 
 	return ctx;
 
