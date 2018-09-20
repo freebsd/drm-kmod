@@ -1139,6 +1139,11 @@ int ttm_page_alloc_init(struct ttm_mem_global *glob, unsigned max_pages)
 	unsigned order = 0;
 #endif
 
+/* Temporary fix until 4.17 start */
+#define	GFP_TRANSHUGE_LIGHT 0
+#define __GFP_KSWAPD_RECLAIM 0
+/* Temporary fix until 4.17 end */
+
 	WARN_ON(_manager);
 
 	pr_info("Initializing pool allocator\n");
