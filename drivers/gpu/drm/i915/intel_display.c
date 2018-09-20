@@ -12793,8 +12793,9 @@ static void intel_atomic_commit_tail(struct drm_atomic_state *state)
 	struct intel_atomic_state *intel_state = to_intel_atomic_state(state);
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
+	struct intel_crtc_state *new_intel_crtc_state, *old_intel_crtc_state;
 	struct drm_crtc *crtc;
-	struct intel_crtc_state *intel_cstate;
+	struct intel_crtc *intel_crtc;
 	u64 put_domains[I915_MAX_PIPES] = {};
 	int i;
 
@@ -12806,21 +12807,22 @@ static void intel_atomic_commit_tail(struct drm_atomic_state *state)
 		intel_display_power_get(dev_priv, POWER_DOMAIN_MODESET);
 
 	for_each_oldnew_crtc_in_state(state, crtc, old_crtc_state, new_crtc_state, i) {
-		struct intel_crtc *intel_crtc = to_intel_crtc(crtc);
+		old_intel_crtc_state = to_intel_crtc_state(old_crtc_state);
+		new_intel_crtc_state = to_intel_crtc_state(new_crtc_state);
+		intel_crtc = to_intel_crtc(crtc);
 
 		if (needs_modeset(new_crtc_state) ||
 		    to_intel_crtc_state(new_crtc_state)->update_pipe) {
 
-			put_domains[to_intel_crtc(crtc)->pipe] =
+			put_domains[intel_crtc->pipe] =
 				modeset_get_crtc_power_domains(crtc,
-					to_intel_crtc_state(new_crtc_state));
+					new_intel_crtc_state);
 		}
 
 		if (!needs_modeset(new_crtc_state))
 			continue;
 
-		intel_pre_plane_update(to_intel_crtc_state(old_crtc_state),
-				       to_intel_crtc_state(new_crtc_state));
+		intel_pre_plane_update(old_intel_crtc_state, new_intel_crtc_state);
 
 		if (old_crtc_state->active) {
 			intel_crtc_disable_planes(crtc, old_crtc_state->plane_mask);
@@ -12831,7 +12833,7 @@ static void intel_atomic_commit_tail(struct drm_atomic_state *state)
 			 */
 			intel_crtc_disable_pipe_crc(intel_crtc);
 
-			dev_priv->display.crtc_disable(to_intel_crtc_state(old_crtc_state), state);
+			dev_priv->display.crtc_disable(old_intel_crtc_state, state);
 			intel_crtc->active = false;
 			intel_fbc_disable(intel_crtc);
 			intel_disable_shared_dpll(intel_crtc);
@@ -12843,12 +12845,17 @@ static void intel_atomic_commit_tail(struct drm_atomic_state *state)
 			intel_check_cpu_fifo_underruns(dev_priv);
 			intel_check_pch_fifo_underruns(dev_priv);
 
-			/* FIXME unify this for all platforms */
-			if (!new_crtc_state->active &&
-			    !HAS_GMCH_DISPLAY(dev_priv) &&
-			    dev_priv->display.initial_watermarks)
-				dev_priv->display.initial_watermarks(intel_state,
-								     to_intel_crtc_state(new_crtc_state));
+			if (!new_crtc_state->active) {
+				/*
+				 * Make sure we don't call initial_watermarks
+				 * for ILK-style watermark updates.
+				 *
+				 * No clue what this is supposed to achieve.
+				 */
+				if (INTEL_GEN(dev_priv) >= 9)
+					dev_priv->display.initial_watermarks(intel_state,
+									     new_intel_crtc_state);
+			}
 		}
 	}
 
@@ -12907,11 +12914,11 @@ static void intel_atomic_commit_tail(struct drm_atomic_state *state)
 	 * TODO: Move this (and other cleanup) to an async worker eventually.
 	 */
 	for_each_new_crtc_in_state(state, crtc, new_crtc_state, i) {
-		intel_cstate = to_intel_crtc_state(new_crtc_state);
+		new_intel_crtc_state = to_intel_crtc_state(new_crtc_state);
 
 		if (dev_priv->display.optimize_watermarks)
 			dev_priv->display.optimize_watermarks(intel_state,
-							      intel_cstate);
+							      new_intel_crtc_state);
 	}
 
 	for_each_oldnew_crtc_in_state(state, crtc, old_crtc_state, new_crtc_state, i) {
