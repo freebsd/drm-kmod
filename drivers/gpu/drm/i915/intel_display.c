@@ -14088,7 +14088,7 @@ static void intel_crtc_init_scalers(struct intel_crtc *crtc,
 		struct intel_scaler *scaler = &scaler_state->scalers[i];
 
 		scaler->in_use = 0;
-		scaler->mode = PS_SCALER_MODE_DYN;
+		scaler->mode = 0;
 	}
 
 	scaler_state->scaler_id = -1;
