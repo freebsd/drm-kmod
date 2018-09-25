@@ -793,19 +793,8 @@ done:
 
 static void guc_dequeue(struct intel_engine_cs *engine)
 {
-	unsigned long flags;
-	bool submit;
-
-	local_irq_save(flags);
-
-	spin_lock(&engine->timeline.lock);
-	submit = __guc_dequeue(engine);
-	spin_unlock(&engine->timeline.lock);
-
-	if (submit)
+	if (__guc_dequeue(engine))
 		guc_submit(engine);
-
-	local_irq_restore(flags);
 }
 
 static void guc_submission_tasklet(unsigned long data)
@@ -814,6 +803,9 @@ static void guc_submission_tasklet(unsigned long data)
 	struct intel_engine_execlists * const execlists = &engine->execlists;
 	struct execlist_port *port = execlists->port;
 	struct i915_request *rq;
+	unsigned long flags;
+
+	spin_lock_irqsave(&engine->timeline.lock, flags);
 
 	rq = port_request(port);
 	while (rq && i915_request_completed(rq)) {
@@ -837,6 +829,8 @@ static void guc_submission_tasklet(unsigned long data)
 
 	if (!execlists_is_active(execlists, EXECLISTS_ACTIVE_PREEMPT))
 		guc_dequeue(engine);
+
+	spin_unlock_irqrestore(&engine->timeline.lock, flags);
 }
 
 static struct i915_request *
