@@ -674,8 +674,8 @@ static int vmw_driver_load(struct drm_device *dev, unsigned long chipset)
 	mutex_init(&dev_priv->binding_mutex);
 	mutex_init(&dev_priv->requested_layout_mutex);
 	mutex_init(&dev_priv->global_kms_state_mutex);
-	rwlock_init(&dev_priv->resource_lock);
 	ttm_lock_init(&dev_priv->reservation_sem);
+	spin_lock_init(&dev_priv->resource_lock);
 #ifdef __linux__
 	spin_lock_init(&dev_priv->hw_lock);
 #else
