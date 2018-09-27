@@ -30,6 +30,6 @@
 
 #define	LKPI_PNP_INFO(bus, name, table)					\
 	MODULE_PNP_INFO("U32:vendor;U32:device;",			\
-	    bus, name, table, sizeof(table[0]), nitems(table) - 1);
+	    bus, name, table, nitems(table) - 1);
 
 #endif /* _LINUX_GPLV2_MODULE_H_ */
