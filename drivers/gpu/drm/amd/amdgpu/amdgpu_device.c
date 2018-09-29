@@ -2668,6 +2668,7 @@ int amdgpu_device_suspend(struct drm_device *dev, bool suspend, bool fbcon)
 	if (dev->switch_power_state == DRM_SWITCH_POWER_OFF)
 		return 0;
 
+	adev->in_suspend = true;
 	drm_kms_helper_poll_disable(dev);
 
 	if (fbcon)
@@ -2857,6 +2858,8 @@ int amdgpu_device_resume(struct drm_device *dev, bool resume, bool fbcon)
 	dev->dev->power.disable_depth--;
 #endif
 #endif
+	adev->in_suspend = false;
+
 	return 0;
 }
 
