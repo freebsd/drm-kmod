@@ -349,15 +349,16 @@ int i915_gem_init_stolen(struct drm_i915_private *dev_priv)
 		return 0;
 	}
 
-	if (resource_size(&intel_graphics_stolen_res) == 0)
-		return 0;
-	dev_priv->dsm = intel_graphics_stolen_res;
-
 #ifndef __linux__
 	DRM_INFO("Got stolen memory base 0x%x, size 0x%x\n",
 	    intel_graphics_stolen_res.start,
 	    resource_size(&intel_graphics_stolen_res));
 #endif
+
+	if (resource_size(&intel_graphics_stolen_res) == 0)
+		return 0;
+	dev_priv->dsm = intel_graphics_stolen_res;
+
 
 	if (i915_adjust_stolen(dev_priv, &dev_priv->dsm))
 		return 0;
