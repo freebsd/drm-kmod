@@ -2058,14 +2058,6 @@ static int intel_sdvo_get_modes(struct drm_connector *connector)
 	return !list_empty(&connector->probed_modes);
 }
 
-static void intel_sdvo_destroy(struct drm_connector *connector)
-{
-	struct intel_sdvo_connector *intel_sdvo_connector = to_intel_sdvo_connector(connector);
-
-	drm_connector_cleanup(connector);
-	kfree(intel_sdvo_connector);
-}
-
 static int
 intel_sdvo_connector_atomic_get_property(struct drm_connector *connector,
 					 const struct drm_connector_state *state,
@@ -2235,7 +2227,7 @@ static const struct drm_connector_funcs intel_sdvo_connector_funcs = {
 	.atomic_set_property = intel_sdvo_connector_atomic_set_property,
 	.late_register = intel_sdvo_connector_register,
 	.early_unregister = intel_sdvo_connector_unregister,
-	.destroy = intel_sdvo_destroy,
+	.destroy = intel_connector_destroy,
 	.atomic_destroy_state = drm_atomic_helper_connector_destroy_state,
 	.atomic_duplicate_state = intel_sdvo_connector_duplicate_state,
 };
@@ -2590,7 +2582,7 @@ intel_sdvo_tv_init(struct intel_sdvo *intel_sdvo, int type)
 	return true;
 
 err:
-	intel_sdvo_destroy(connector);
+	intel_connector_destroy(connector);
 	return false;
 }
 
@@ -2682,7 +2674,7 @@ intel_sdvo_lvds_init(struct intel_sdvo *intel_sdvo, int device)
 	return true;
 
 err:
-	intel_sdvo_destroy(connector);
+	intel_connector_destroy(connector);
 	return false;
 }
 
@@ -2752,7 +2744,7 @@ static void intel_sdvo_output_cleanup(struct intel_sdvo *intel_sdvo)
 				 &dev->mode_config.connector_list, head) {
 		if (intel_attached_encoder(connector) == &intel_sdvo->base) {
 			drm_connector_unregister(connector);
-			intel_sdvo_destroy(connector);
+			intel_connector_destroy(connector);
 		}
 	}
 }
