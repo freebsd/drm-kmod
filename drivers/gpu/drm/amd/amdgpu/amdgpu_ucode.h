@@ -278,9 +278,8 @@ int amdgpu_ucode_validate(const struct linux_firmware *fw);
 void amdgpu_ucode_print_gpu_info_hdr(const struct common_firmware_header *hdr);
 bool amdgpu_ucode_hdr_version(union amdgpu_firmware_header *hdr,
 				uint16_t hdr_major, uint16_t hdr_minor);
-int amdgpu_ucode_init_bo(struct amdgpu_device *adev);
-int amdgpu_ucode_fini_bo(struct amdgpu_device *adev);
 
+int amdgpu_ucode_init_bo(struct amdgpu_device *adev);
 int amdgpu_ucode_create_bo(struct amdgpu_device *adev);
 void amdgpu_ucode_free_bo(struct amdgpu_device *adev);
 
