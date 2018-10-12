@@ -6662,8 +6662,9 @@ static int intel_crtc_compute_config(struct intel_crtc *crtc,
 		return -EINVAL;
 	}
 
-	if (pipe_config->output_format == INTEL_OUTPUT_FORMAT_YCBCR420 &&
-	    pipe_config->base.ctm) {
+	if ((pipe_config->output_format == INTEL_OUTPUT_FORMAT_YCBCR420 ||
+	     pipe_config->output_format == INTEL_OUTPUT_FORMAT_YCBCR444) &&
+	     pipe_config->base.ctm) {
 		/*
 		 * There is only one pipe CSC unit per pipe, and we need that
 		 * for output conversion from RGB->YCBCR. So if CTM is already
@@ -7890,6 +7891,8 @@ static void intel_get_crtc_ycbcr_config(struct intel_crtc *crtc,
 					output = INTEL_OUTPUT_FORMAT_INVALID;
 				else
 					output = INTEL_OUTPUT_FORMAT_YCBCR420;
+			} else {
+				output = INTEL_OUTPUT_FORMAT_YCBCR444;
 			}
 		}
 	}
@@ -8531,11 +8534,13 @@ static void haswell_set_pipemisc(const struct intel_crtc_state *crtc_state)
 		if (crtc_state->dither)
 			val |= PIPEMISC_DITHER_ENABLE | PIPEMISC_DITHER_TYPE_SP;
 
-		if (crtc_state->output_format == INTEL_OUTPUT_FORMAT_YCBCR420) {
+		if (crtc_state->output_format == INTEL_OUTPUT_FORMAT_YCBCR420 ||
+		    crtc_state->output_format == INTEL_OUTPUT_FORMAT_YCBCR444)
 			val |= PIPEMISC_OUTPUT_COLORSPACE_YUV;
+
+		if (crtc_state->output_format == INTEL_OUTPUT_FORMAT_YCBCR420)
 			val |= PIPEMISC_YUV420_ENABLE |
 				PIPEMISC_YUV420_MODE_FULL_BLEND;
-		}
 
 		I915_WRITE(PIPEMISC(intel_crtc->pipe), val);
 	}
@@ -11042,6 +11047,7 @@ static const char * const output_format_str[] = {
 	[INTEL_OUTPUT_FORMAT_INVALID] = "Invalid",
 	[INTEL_OUTPUT_FORMAT_RGB] = "RGB",
 	[INTEL_OUTPUT_FORMAT_YCBCR420] = "YCBCR4:2:0",
+	[INTEL_OUTPUT_FORMAT_YCBCR444] = "YCBCR4:4:4",
 };
 
 static const char *output_formats(enum intel_output_format format)
