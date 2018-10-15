@@ -1,5 +1,5 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-#if !defined(_RADEON_TRACE_H_) || defined(TRACE_HEADER_MULTI_READ)
+/* SPDX-License-Identifier: MIT */
+#if !defined(_RADEON_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
 #define _RADEON_TRACE_H_
 
 #include <linux/stringify.h>
