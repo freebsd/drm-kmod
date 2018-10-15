@@ -22,11 +22,6 @@
 
 // Naive (not per-cpu) relay channel impl
 
-#define irq_work_sync(x)
-#define irq_work_queue(x)
-#define init_irq_work(x, y)
-#define alloc_percpu(x) kmalloc(mp_ncpus*sizeof(x), GFP_KERNEL)
-
 
 struct irq_work {
 	

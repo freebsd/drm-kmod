@@ -72,5 +72,6 @@ static inline bool dma_fence_is_array(struct dma_fence *fence)
 	return fence->ops == &dma_fence_array_ops;
 }
 
+bool dma_fence_match_context(struct dma_fence *fence, u64 context);
 
 #endif /* __LINUX_DMA_FENCE_ARRAY_H */

@@ -76,8 +76,7 @@ memset_p(void **p, void *v, size_t n)
 #include <sys/types.h>
 #include <linux/math64.h>
 
-#define	idr_init_base(idr,base)	idr_init(idr)
-// The old style
+
 #define	atomic_fetch_inc(v)	(atomic_inc_return(v) - 1)
 
 static inline int
