@@ -98,7 +98,11 @@ drm_gem_init(struct drm_device *dev)
 	struct drm_vma_offset_manager *vma_offset_manager;
 
 	mutex_init(&dev->object_name_lock);
+#ifdef __linux__
 	idr_init_base(&dev->object_name_idr, 1);
+#else
+	idr_init(&dev->object_name_idr);
+#endif
 
 	vma_offset_manager = kzalloc(sizeof(*vma_offset_manager), GFP_KERNEL);
 	if (!vma_offset_manager) {
@@ -778,7 +782,11 @@ drm_gem_open_ioctl(struct drm_device *dev, void *data,
 void
 drm_gem_open(struct drm_device *dev, struct drm_file *file_private)
 {
+#ifdef __linux__
 	idr_init_base(&file_private->object_idr, 1);
+#else
+	idr_init(&file_private->object_idr);
+#endif
 	spin_lock_init(&file_private->table_lock);
 }
 

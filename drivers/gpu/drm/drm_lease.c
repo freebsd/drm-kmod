@@ -271,7 +271,7 @@ out_lessee:
  * the list of lessees.
  */
 void drm_lease_destroy(struct drm_master *master)
-{
+{	
 	struct drm_device *dev = master->dev;
 
 	mutex_lock(&dev->mode_config.idr_mutex);
@@ -553,16 +553,14 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 
 	/* Clone the lessor file to create a new file for us */
 	DRM_DEBUG_LEASE("Allocating lease file\n");
-#if __linux__
+#ifdef __linux__
 	path_get(&lessor_file->f_path);
 	lessee_file = alloc_file(&lessor_file->f_path,
 				 lessor_file->f_mode,
 				 fops_get(lessor_file->f_inode->i_fop));
 #else
 	// BSDFIXME!
-	// missing path_get
-	printf("%s: missing implementation!\n", __func__);
-	lessee_file = NULL;
+	panic("%s: missing implementation!\n", __func__);
 #endif       
 	if (IS_ERR(lessee_file)) {
 		ret = PTR_ERR(lessee_file);

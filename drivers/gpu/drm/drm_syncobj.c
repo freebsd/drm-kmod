@@ -546,7 +546,11 @@ err_put_fd:
 void
 drm_syncobj_open(struct drm_file *file_private)
 {
+#ifdef __linux__
 	idr_init_base(&file_private->syncobj_idr, 1);
+#else
+	idr_init(&file_private->syncobj_idr);
+#endif
 	spin_lock_init(&file_private->syncobj_table_lock);
 }
 

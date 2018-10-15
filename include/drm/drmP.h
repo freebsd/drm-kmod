@@ -99,6 +99,7 @@
 #include <linux/fs.h>
 #include <linux/gfp.h>
 #include <linux/pm.h>
+#include <linux/kernel.h>
 #include <linux/ktime.h>
 #include <linux/poll.h>
 #include <linux/ratelimit.h>
