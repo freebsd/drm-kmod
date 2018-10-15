@@ -1,5 +1,8 @@
 *.[oa]
 *.sh
+*.ko
+*.ko.debug
+*.ko.full
 TAGS
 patches
 patches.log
