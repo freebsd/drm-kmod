@@ -54,7 +54,7 @@ __FBSDID("$FreeBSD$");
 #endif
 
 static void *agp_remap(unsigned long offset, unsigned long size,
-		       struct drm_device * dev)
+		       struct drm_device *dev)
 {
 #ifdef __linux__
 	unsigned long i, num_pages =
@@ -109,7 +109,7 @@ static void *agp_remap(unsigned long offset, unsigned long size,
 
 /** Wrapper around agp_free_memory() */
 #ifdef __linux__
-void drm_free_agp(struct agp_memory * handle, int pages)
+void drm_free_agp(struct agp_memory *handle, int pages)
 #else
 void drm_free_agp(DRM_AGP_MEM * handle, int pages)
 #endif
@@ -129,7 +129,7 @@ void drm_free_agp(DRM_AGP_MEM * handle, int pages)
 
 /** Wrapper around agp_bind_memory() */
 #ifdef __linux__
-int drm_bind_agp(struct agp_memory * handle, unsigned int start)
+int drm_bind_agp(struct agp_memory *handle, unsigned int start)
 #else
 int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
 #endif
@@ -149,7 +149,7 @@ int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
 
 /** Wrapper around agp_unbind_memory() */
 #ifdef __linux__
-int drm_unbind_agp(struct agp_memory * handle)
+int drm_unbind_agp(struct agp_memory *handle)
 #else
 int drm_unbind_agp(DRM_AGP_MEM * handle)
 #endif
@@ -169,7 +169,7 @@ int drm_unbind_agp(DRM_AGP_MEM * handle)
 
 #else /*  CONFIG_AGP  */
 static inline void *agp_remap(unsigned long offset, unsigned long size,
-			      struct drm_device * dev)
+			      struct drm_device *dev)
 {
 	return NULL;
 }
