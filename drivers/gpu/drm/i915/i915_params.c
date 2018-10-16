@@ -193,11 +193,9 @@ static __always_inline void _print_param(struct drm_printer *p,
 		drm_printf(p, "i915.%s=%u\n", name, *(const unsigned int *)x);
 	else if (!__builtin_strcmp(type, "char *"))
 		drm_printf(p, "i915.%s=%s\n", name, *(const char **)x);
-#ifdef __linux__
-	// compile time assert fails
 	else
-		BUILD_BUG();
-#endif
+		WARN_ONCE(1, "no printer defined for param type %s (i915.%s)\n",
+		    type, name);
 }
 
 /**
