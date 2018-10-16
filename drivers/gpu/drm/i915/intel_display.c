@@ -5521,7 +5521,8 @@ static void intel_encoders_enable(struct drm_crtc *crtc,
 		if (conn_state->crtc != crtc)
 			continue;
 
-		encoder->enable(encoder, crtc_state, conn_state);
+		if (encoder->enable)
+			encoder->enable(encoder, crtc_state, conn_state);
 		intel_opregion_notify_encoder(encoder, true);
 	}
 }
@@ -5542,7 +5543,8 @@ static void intel_encoders_disable(struct drm_crtc *crtc,
 			continue;
 
 		intel_opregion_notify_encoder(encoder, false);
-		encoder->disable(encoder, old_crtc_state, old_conn_state);
+		if (encoder->disable)
+			encoder->disable(encoder, old_crtc_state, old_conn_state);
 	}
 }
 
@@ -15376,7 +15378,8 @@ static void intel_sanitize_encoder(struct intel_encoder *encoder)
 			DRM_DEBUG_KMS("[ENCODER:%d:%s] manually disabled\n",
 				      encoder->base.base.id,
 				      encoder->base.name);
-			encoder->disable(encoder, to_intel_crtc_state(crtc_state), connector->base.state);
+			if (encoder->disable)
+				encoder->disable(encoder, to_intel_crtc_state(crtc_state), connector->base.state);
 			if (encoder->post_disable)
 				encoder->post_disable(encoder, to_intel_crtc_state(crtc_state), connector->base.state);
 		}
