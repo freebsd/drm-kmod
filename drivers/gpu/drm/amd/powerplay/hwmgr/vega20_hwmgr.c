@@ -130,7 +130,7 @@ static void vega20_set_default_registry_data(struct pp_hwmgr *hwmgr)
 	data->registry_data.disable_auto_wattman = 1;
 	data->registry_data.auto_wattman_debug = 0;
 	data->registry_data.auto_wattman_sample_period = 100;
-	data->registry_data.fclk_gfxclk_ratio = 0;
+	data->registry_data.fclk_gfxclk_ratio = 0x3F6CCCCD;
 	data->registry_data.auto_wattman_threshold = 50;
 	data->registry_data.gfxoff_controlled_by_driver = 1;
 	data->gfxoff_allowed = false;
@@ -836,18 +836,6 @@ static int vega20_enable_all_smu_features(struct pp_hwmgr *hwmgr)
 			pr_info("[EnableAllSMUFeatures] feature %d is expected disabled!", i);
 #endif
 	}
-
-	return 0;
-}
-
-static int vega20_notify_smc_display_change(struct pp_hwmgr *hwmgr)
-{
-	struct vega20_hwmgr *data = (struct vega20_hwmgr *)(hwmgr->backend);
-
-	if (data->smu_features[GNLD_DPM_UCLK].enabled)
-		return smum_send_msg_to_smc_with_parameter(hwmgr,
-			PPSMC_MSG_SetUclkFastSwitch,
-			1);
 
 	return 0;
 }
@@ -1565,11 +1553,6 @@ static int vega20_enable_dpm_tasks(struct pp_hwmgr *hwmgr)
 	result = vega20_enable_all_smu_features(hwmgr);
 	PP_ASSERT_WITH_CODE(!result,
 			"[EnableDPMTasks] Failed to enable all smu features!",
-			return result);
-
-	result = vega20_notify_smc_display_change(hwmgr);
-	PP_ASSERT_WITH_CODE(!result,
-			"[EnableDPMTasks] Failed to notify smc display change!",
 			return result);
 
 	result = vega20_send_clock_ratio(hwmgr);
