@@ -2924,7 +2924,7 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 #ifndef __linux__
 		(void)data;
 		(void)err;
-		page = shmem_read_mapping_page(mapping, offset);
+		page = shmem_read_mapping_page(mapping, OFF_TO_IDX(offset));
 #else
 		err = pagecache_write_begin(obj->base.filp, mapping,
 					    offset, len, 0,
