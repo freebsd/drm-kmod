@@ -5774,7 +5774,7 @@ i915_gem_object_create_from_data(struct drm_i915_private *dev_priv,
 #else
 		(void)err;
 		(void)pgdata;
-		page = shmem_read_mapping_page(obj->base.filp->f_shmem, offset);
+		page = shmem_read_mapping_page(obj->base.filp->f_shmem, OFF_TO_IDX(offset));
 #endif
 
 		vaddr = kmap(page);
