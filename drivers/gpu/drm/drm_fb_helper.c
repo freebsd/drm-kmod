@@ -1002,7 +1002,6 @@ static void drm_fb_helper_dirty(struct fb_info *info, u32 x, u32 y,
 
 #ifdef __linux__
 // ifdef CONFIG_FB_DEFERRED_IO removed upstream
-// Does not compile, FreeBSD vm_page has no field lru
 
 /**
  * drm_fb_helper_deferred_io() - fbdev deferred_io callback function
@@ -1801,9 +1800,6 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 	int i;
 	struct drm_fb_helper_surface_size sizes;
 	int gamma_size = 0;
-#ifndef __linux__
-	struct vt_kms_softc *sc;
-#endif
 
 	memset(&sizes, 0, sizeof(struct drm_fb_helper_surface_size));
 	sizes.surface_depth = 24;

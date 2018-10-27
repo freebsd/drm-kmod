@@ -12,38 +12,6 @@ __FBSDID("$FreeBSD$");
 #include <sys/param.h>
 #include <sys/systm.h>
 
-#if 0
-
-struct vt_kms_softc {
-	struct drm_fb_helper	*fb_helper;
-	struct task		 fb_mode_task;
-};
-
-struct fb_info *
-framebuffer_alloc(size_t size, struct device *dev)
-{
-	struct fb_info *info;
-	struct vt_kms_softc *sc;
-
-	info = malloc(sizeof(*info), DRM_MEM_KMS, M_WAITOK | M_ZERO);
-
-	sc = malloc(sizeof(*sc), DRM_MEM_KMS, M_WAITOK | M_ZERO);
-	TASK_INIT(&sc->fb_mode_task, 0, vt_restore_fbdev_mode, sc);
-
-	info->fb_priv = sc;
-	info->debug_enter = &vt_kms_postswitch;
-
-	return (info);
-}
-
-void
-framebuffer_release(struct fb_info *info)
-{
-
-	free(info->fb_priv, DRM_MEM_KMS);
-	free(info, DRM_MEM_KMS);
-}
-#endif
 
 int
 fb_get_options(const char *connector_name, char **option)
