@@ -5033,11 +5033,11 @@ static void skylake_pfit_enable(const struct intel_crtc_state *crtc_state)
 		if (WARN_ON(crtc_state->scaler_state.scaler_id < 0))
 			return;
 
-		pfit_w = (crtc->config->pch_pfit.size >> 16) & 0xFFFF;
-		pfit_h = crtc->config->pch_pfit.size & 0xFFFF;
+		pfit_w = (crtc_state->pch_pfit.size >> 16) & 0xFFFF;
+		pfit_h = crtc_state->pch_pfit.size & 0xFFFF;
 
-		hscale = (crtc->config->pipe_src_w << 16) / pfit_w;
-		vscale = (crtc->config->pipe_src_h << 16) / pfit_h;
+		hscale = (crtc_state->pipe_src_w << 16) / pfit_w;
+		vscale = (crtc_state->pipe_src_h << 16) / pfit_h;
 
 		uv_rgb_hphase = skl_scaler_calc_phase(1, hscale, false);
 		uv_rgb_vphase = skl_scaler_calc_phase(1, vscale, false);
