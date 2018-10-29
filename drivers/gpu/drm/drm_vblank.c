@@ -79,10 +79,14 @@
 static bool
 drm_get_last_vbltimestamp(struct drm_device *dev, unsigned int pipe,
 			  ktime_t *tvblank, bool in_vblank_irq);
-
+#ifdef __linux__
 static unsigned int drm_timestamp_precision = 20;  /* Default to 20 usecs. */
-
 static int drm_vblank_offdelay = 5000;    /* Default to 5000 msecs. */
+#else
+/* These are used by drm_sysctl_freebsd.c */
+unsigned int drm_timestamp_precision = 20;  /* Default to 20 usecs. */
+int drm_vblank_offdelay = 5000;    /* Default to 5000 msecs. */
+#endif
 
 module_param_named(vblankoffdelay, drm_vblank_offdelay, int, 0600);
 module_param_named(timestamp_precision_usec, drm_timestamp_precision, int, 0600);
