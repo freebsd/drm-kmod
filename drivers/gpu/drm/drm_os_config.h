@@ -2,7 +2,9 @@
 #define DRM_OS_CONFIG_H_
 
 #define CONFIG_DEBUG_FS 1
+#ifdef __amd64__
 #define COMPAT_FREEBSD32 1
+#endif
 #ifdef COMPAT_FREEBSD32
 #define CONFIG_COMPAT 1
 #endif

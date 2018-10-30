@@ -1759,8 +1759,10 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 {
 	struct drm_i915_gem_mmap *args = data;
 	struct drm_i915_gem_object *obj;
+#ifdef __linux__
 	unsigned long addr;
-#ifndef __linux__
+#else
+	vm_offset_t addr;
 	vm_object_t vmobj;
 	struct proc *p;
 	vm_map_t map;
@@ -2367,7 +2369,7 @@ void __i915_gem_object_invalidate(struct drm_i915_gem_object *obj)
 #else
 	mapping = obj->base.filp->f_mapping,
 #endif
-	invalidate_mapping_pages(mapping, 0, (loff_t)-1);
+	invalidate_mapping_pages(mapping, 0, (pgoff_t)-1);
 }
 
 static void

@@ -40,7 +40,6 @@
 #include <drm/drmP.h>
 
 #include "drm_legacy.h"
-#define aper_size ai_aperture_size
 
 static struct drm_map_list *drm_find_matching_map(struct drm_device *dev,
 						  struct drm_local_map *map)
@@ -1457,13 +1456,14 @@ int __drm_legacy_mapbufs(struct drm_device *dev, void *data, int *p,
 {
 	struct drm_device_dma *dma = dev->dma;
 	int retcode = 0;
+#ifdef __linux__
 	unsigned long virtual;
-	int i;
-
-#ifndef __linux__
+#else
+	vm_offset_t virtual;
 	struct vmspace *vms;
 	vms = DRM_CURPROC->td_proc->p_vmspace;
 #endif
+	int i;
 
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
 		return -EINVAL;

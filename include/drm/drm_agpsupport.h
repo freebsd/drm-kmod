@@ -14,7 +14,7 @@ struct drm_device;
 struct drm_file;
 
 struct drm_agp_head {
-	DRM_AGP_KERN agp_info;
+	struct agp_kern_info agp_info;
 	struct list_head memory;
 	unsigned long mode;
 #ifdef __linux__

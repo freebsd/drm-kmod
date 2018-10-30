@@ -52,6 +52,7 @@
 #define	LINUXKPI_HAVE_DMAP
 #else
 #undef	LINUXKPI_HAVE_DMAP
+#include <sys/sf_buf.h>
 #endif
 
 extern u_int	cpu_feature;

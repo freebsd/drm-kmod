@@ -1,7 +1,11 @@
 #ifndef _ASM_X86_FPU_API_H
 #define _ASM_X86_FPU_API_H
 
+#ifdef __i386__
+#include <machine/npx.h>
+#else
 #include <machine/fpu.h>
+#endif
 
 #define	kernel_fpu_begin()			\
 	struct fpu_kern_ctx *__fpu_ctx;		\

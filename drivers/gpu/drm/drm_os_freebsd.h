@@ -67,7 +67,24 @@ do {								\
 	remove_wait_queue(&(queue), &entry);			\
 } while (0)
 
+#ifndef readq
+static inline uint64_t
+readq(const volatile void *addr)
+{
+	uint32_t vl = readl(addr);
+	uint32_t vh = readl(addr + 4);
 
+	return (vl | ((uint64_t)vh << 32));
+}
+#define	readq		readq
+static inline void
+writeq(uint64_t v, volatile void *addr)
+{
+	writel(v, addr);
+	writel(v >> 32, addr + 4);
+}
+#define	writeq		writeq
+#endif
 
 #define	DRM_WRITE8(map, offset, val)					\
 	*(volatile u_int8_t *)(((vm_offset_t)(map)->handle) +		\
@@ -102,7 +119,6 @@ do {								\
 #define	KTR_DRM		KTR_DEV
 #define	KTR_DRM_REG	KTR_SPARE3
 
-#define	DRM_AGP_KERN	struct agp_info
 #define	DRM_AGP_MEM	void
 
 #define	IS_ALIGNED(x, y)	(((x) & ((y) - 1)) == 0)
