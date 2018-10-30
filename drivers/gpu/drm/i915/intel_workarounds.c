@@ -1065,6 +1065,8 @@ static void cnl_whitelist_build(struct whitelist *w)
 
 static void icl_whitelist_build(struct whitelist *w)
 {
+	/* WaAllowUMDToModifyHalfSliceChicken7:icl */
+	whitelist_reg(w, GEN9_HALF_SLICE_CHICKEN7);
 }
 
 static struct whitelist *whitelist_build(struct intel_engine_cs *engine,
