@@ -2515,5 +2515,6 @@ void intel_hdmi_init(struct drm_i915_private *dev_priv,
 
 	intel_infoframe_init(intel_dig_port);
 
+	intel_dig_port->aux_ch = intel_aux_ch(dev_priv, port);
 	intel_hdmi_init_connector(intel_dig_port, intel_connector);
 }
