@@ -217,6 +217,13 @@ extern int		drm_sysctl_cleanup(struct drm_device *dev);
 #define DRM_ERR_RET(V) return V
 #endif
 
-#endif				/* __KERNEL__ */
 #endif
+#endif				/* __KERNEL__ */
+
+#if defined(CONFIG_DRM_DEBUG_SELFTEST_MODULE)
+#define EXPORT_SYMBOL_FOR_TESTS_ONLY(x) EXPORT_SYMBOL(x)
+#else
+#define EXPORT_SYMBOL_FOR_TESTS_ONLY(x)
+#endif
+
 #endif
