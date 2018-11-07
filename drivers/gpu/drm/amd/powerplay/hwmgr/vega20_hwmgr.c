@@ -840,6 +840,18 @@ static int vega20_enable_all_smu_features(struct pp_hwmgr *hwmgr)
 	return 0;
 }
 
+static int vega20_notify_smc_display_change(struct pp_hwmgr *hwmgr)
+{
+	struct vega20_hwmgr *data = (struct vega20_hwmgr *)(hwmgr->backend);
+
+	if (data->smu_features[GNLD_DPM_UCLK].enabled)
+		return smum_send_msg_to_smc_with_parameter(hwmgr,
+			PPSMC_MSG_SetUclkFastSwitch,
+			1);
+
+	return 0;
+}
+
 static int vega20_send_clock_ratio(struct pp_hwmgr *hwmgr)
 {
 	struct vega20_hwmgr *data =
@@ -1553,6 +1565,11 @@ static int vega20_enable_dpm_tasks(struct pp_hwmgr *hwmgr)
 	result = vega20_enable_all_smu_features(hwmgr);
 	PP_ASSERT_WITH_CODE(!result,
 			"[EnableDPMTasks] Failed to enable all smu features!",
+			return result);
+
+	result = vega20_notify_smc_display_change(hwmgr);
+	PP_ASSERT_WITH_CODE(!result,
+			"[EnableDPMTasks] Failed to notify smc display change!",
 			return result);
 
 	result = vega20_send_clock_ratio(hwmgr);
