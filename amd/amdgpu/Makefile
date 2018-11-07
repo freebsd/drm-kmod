@@ -378,9 +378,6 @@ SRCS+=	dcn_calc_auto.c \
 	dcn_calcs.c
 .endif
 
-# lib
-SRCS+=	chash.c
-
 # powerplay
 SRCS+=	amd_powerplay.c \
 	amdgpu_smu.c \
