@@ -11000,11 +11000,12 @@ static void intel_modeset_update_connector_atomic_state(struct drm_device *dev)
 }
 
 static int
-connected_sink_max_bpp(const struct drm_connector_state *conn_state,
-		       struct intel_crtc_state *pipe_config)
+compute_sink_pipe_bpp(const struct drm_connector_state *conn_state,
+		      struct intel_crtc_state *pipe_config)
 {
+	struct drm_connector *connector = conn_state->connector;
+	const struct drm_display_info *info = &connector->display_info;
 	int bpp;
-	struct drm_display_info *info = &conn_state->connector->display_info;
 
 	switch (conn_state->max_bpc) {
 	case 6 ... 7:
@@ -11024,12 +11025,15 @@ connected_sink_max_bpp(const struct drm_connector_state *conn_state,
 	}
 
 	if (bpp < pipe_config->pipe_bpp) {
-		DRM_DEBUG_KMS("Limiting display bpp to %d instead of Edid bpp "
-			      "%d, requested bpp %d, max platform bpp %d\n", bpp,
-			      3 * info->bpc, 3 * conn_state->max_requested_bpc,
+		DRM_DEBUG_KMS("[CONNECTOR:%d:%s] Limiting display bpp to %d instead of "
+			      "EDID bpp %d, requested bpp %d, max platform bpp %d\n",
+			      connector->base.id, connector->name,
+			      bpp, 3 * info->bpc, 3 * conn_state->max_requested_bpc,
 			      pipe_config->pipe_bpp);
+
 		pipe_config->pipe_bpp = bpp;
 	}
+
 	return 0;
 }
 
@@ -11038,7 +11042,7 @@ compute_baseline_pipe_bpp(struct intel_crtc *crtc,
 			  struct intel_crtc_state *pipe_config)
 {
 	struct drm_i915_private *dev_priv = to_i915(crtc->base.dev);
-	struct drm_atomic_state *state;
+	struct drm_atomic_state *state = pipe_config->base.state;
 	struct drm_connector *connector;
 	struct drm_connector_state *connector_state;
 	int bpp, i;
@@ -11051,21 +11055,21 @@ compute_baseline_pipe_bpp(struct intel_crtc *crtc,
 	else
 		bpp = 8*3;
 
-
 	pipe_config->pipe_bpp = bpp;
 
-	state = pipe_config->base.state;
-
-	/* Clamp display bpp to EDID value */
+	/* Clamp display bpp to connector max bpp */
 	for_each_new_connector_in_state(state, connector, connector_state, i) {
+		int ret;
+
 		if (connector_state->crtc != &crtc->base)
 			continue;
 
-		if (connected_sink_max_bpp(connector_state, pipe_config) < 0)
-			return -EINVAL;
+		ret = compute_sink_pipe_bpp(connector_state, pipe_config);
+		if (ret)
+			return ret;
 	}
 
-	return bpp;
+	return 0;
 }
 
 static void intel_dump_crtc_timings(const struct drm_display_mode *mode)
@@ -11390,10 +11394,12 @@ intel_modeset_pipe_config(struct drm_crtc *crtc,
 	      (DRM_MODE_FLAG_PVSYNC | DRM_MODE_FLAG_NVSYNC)))
 		pipe_config->base.adjusted_mode.flags |= DRM_MODE_FLAG_NVSYNC;
 
-	base_bpp = compute_baseline_pipe_bpp(to_intel_crtc(crtc),
-					     pipe_config);
-	if (base_bpp < 0)
-		return -EINVAL;
+	ret = compute_baseline_pipe_bpp(to_intel_crtc(crtc),
+					pipe_config);
+	if (ret)
+		return ret;
+
+	base_bpp = pipe_config->pipe_bpp;
 
 	/*
 	 * Determine the real pipe dimensions. Note that stereo modes can
