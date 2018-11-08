@@ -1887,7 +1887,6 @@ void i915_driver_unload(struct drm_device *dev)
 	i915_reset_error_state(dev_priv);
 
 	i915_gem_fini(dev_priv);
-	intel_fbc_cleanup_cfb(dev_priv);
 
 	intel_power_domains_fini_hw(dev_priv);
 
