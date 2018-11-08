@@ -431,25 +431,28 @@ void intel_hpd_irq_handler(struct drm_i915_private *dev_priv,
 	 */
 	for_each_intel_encoder(&dev_priv->drm, encoder) {
 		bool has_hpd_pulse = intel_encoder_has_hpd_pulse(encoder);
-		bool long_hpd = true;
+		enum port port = encoder->port;
+		bool long_hpd;
 
 		pin = encoder->hpd_pin;
 		if (!(BIT(pin) & pin_mask))
 			continue;
 
-		if (has_hpd_pulse) {
-			enum port port = encoder->port;
+		if (!has_hpd_pulse)
+			continue;
 
-			long_hpd = long_mask & BIT(pin);
+		long_hpd = long_mask & BIT(pin);
 
-			DRM_DEBUG_DRIVER("digital hpd port %c - %s\n", port_name(port),
-					 long_hpd ? "long" : "short");
-			queue_dig = true;
-			if (long_hpd)
-				dev_priv->hotplug.long_port_mask |= (1 << port);
-			else
-				dev_priv->hotplug.short_port_mask |= (1 << port);
+		DRM_DEBUG_DRIVER("digital hpd port %c - %s\n", port_name(port),
+				 long_hpd ? "long" : "short");
+		queue_dig = true;
 
+		if (long_hpd) {
+			long_hpd_pulse_mask |= BIT(pin);
+			dev_priv->hotplug.long_port_mask |= BIT(port);
+		} else {
+			short_hpd_pulse_mask |= BIT(pin);
+			dev_priv->hotplug.short_port_mask |= BIT(port);
 		}
 	}
 
