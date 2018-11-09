@@ -868,9 +868,9 @@ static void icl_gt_workarounds_init(struct drm_i915_private *i915)
 	/* Wa_220166154:icl
 	 * Formerly known as WaDisCtxReload
 	 */
-	wa_write_or(wal,
-		    GEN8_GAMW_ECO_DEV_RW_IA,
-		    GAMW_ECO_DEV_CTX_RELOAD_DISABLE);
+	I915_WRITE(GEN8_GAMW_ECO_DEV_RW_IA,
+		   I915_READ(GEN8_GAMW_ECO_DEV_RW_IA) |
+		   GAMW_ECO_DEV_CTX_RELOAD_DISABLE);
 
 	/* Wa_1405779004:icl (pre-prod) */
 	if (IS_ICL_REVID(i915, ICL_REVID_A0, ICL_REVID_A0))
