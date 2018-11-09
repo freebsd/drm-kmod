@@ -2361,6 +2361,7 @@ static const struct i915_power_well_desc skl_power_wells[] = {
 	{
 		.name = "power well 1",
 		/* Handled by the DMC firmware */
+		.always_on = true,
 		.domains = 0,
 		.ops = &hsw_power_well_ops,
 		.id = SKL_DISP_PW_1,
@@ -2373,6 +2374,7 @@ static const struct i915_power_well_desc skl_power_wells[] = {
 	{
 		.name = "MISC IO power well",
 		/* Handled by the DMC firmware */
+		.always_on = true,
 		.domains = 0,
 		.ops = &hsw_power_well_ops,
 		.id = SKL_DISP_PW_MISC_IO,
@@ -2452,6 +2454,8 @@ static const struct i915_power_well_desc bxt_power_wells[] = {
 	},
 	{
 		.name = "power well 1",
+		/* Handled by the DMC firmware */
+		.always_on = true,
 		.domains = 0,
 		.ops = &hsw_power_well_ops,
 		.id = SKL_DISP_PW_1,
@@ -2511,6 +2515,7 @@ static const struct i915_power_well_desc glk_power_wells[] = {
 	{
 		.name = "power well 1",
 		/* Handled by the DMC firmware */
+		.always_on = true,
 		.domains = 0,
 		.ops = &hsw_power_well_ops,
 		.id = SKL_DISP_PW_1,
@@ -2639,6 +2644,7 @@ static const struct i915_power_well_desc cnl_power_wells[] = {
 	{
 		.name = "power well 1",
 		/* Handled by the DMC firmware */
+		.always_on = true,
 		.domains = 0,
 		.ops = &hsw_power_well_ops,
 		.id = SKL_DISP_PW_1,
@@ -2806,6 +2812,7 @@ static const struct i915_power_well_desc icl_power_wells[] = {
 	{
 		.name = "power well 1",
 		/* Handled by the DMC firmware */
+		.always_on = true,
 		.domains = 0,
 		.ops = &hsw_power_well_ops,
 		.id = SKL_DISP_PW_1,
@@ -3936,14 +3943,6 @@ static void intel_power_domains_verify_state(struct drm_i915_private *dev_priv)
 		enum intel_display_power_domain domain;
 		int domains_count;
 		bool enabled;
-
-		/*
-		 * Power wells not belonging to any domain (like the MISC_IO
-		 * and PW1 power wells) are under FW control, so ignore them,
-		 * since their state can change asynchronously.
-		 */
-		if (!power_well->desc->domains)
-			continue;
 
 		enabled = power_well->desc->ops->is_enabled(dev_priv,
 							    power_well);
