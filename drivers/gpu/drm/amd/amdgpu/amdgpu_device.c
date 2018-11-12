@@ -57,6 +57,7 @@
 #include "amdgpu_vf_error.h"
 #include "amdgpu_amdkfd.h"
 #include "amdgpu_pm.h"
+#include "amdgpu_xgmi.h"
 
 #ifndef __linux__
 #define pci_save_state linux_pci_save_state
