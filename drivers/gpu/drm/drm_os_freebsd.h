@@ -72,7 +72,7 @@ static inline uint64_t
 readq(const volatile void *addr)
 {
 	uint32_t vl = readl(addr);
-	uint32_t vh = readl((unsigned char *)addr + 4);
+	uint32_t vh = readl(addr + 4);
 
 	return (vl | ((uint64_t)vh << 32));
 }
@@ -81,7 +81,7 @@ static inline void
 writeq(uint64_t v, volatile void *addr)
 {
 	writel(v, addr);
-	writel(v >> 32, (unsigned char *)addr + 4);
+	writel(v >> 32, addr + 4);
 }
 #define	writeq		writeq
 #endif
