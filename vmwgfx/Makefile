@@ -68,7 +68,7 @@ SRCS	+=			\
 
 .include <bsd.kmod.mk>
 
-CWARNFLAGS+= -Wno-expansion-to-defined
+CWARNFLAGS+= -Wno-expansion-to-defined -Wno-pointer-arith
 
 CWARNFLAGS.vmwgfx_blit.c= -Wno-cast-qual
 CWARNFLAGS.vmwgfx_execbuf.c= -Wno-cast-qual -Wno-sometimes-uninitialized
