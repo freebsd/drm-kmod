@@ -33,12 +33,13 @@ linux_compat_init(void *arg __unused)
 	boot_cpu_data.x86 = ((cpu_id & 0xf0000) >> 12) | ((cpu_id & 0xf0) >> 4);
 
 	hwmon_idap = &hwmon_ida;
-	/* Defined in $SYSDIR/dev/pci/pcivar.h */
-#ifdef PCI_EARLY_QUIRKS_INTEL_GRAPHICS_STOLEN
+#if __FreeBSD_version >= 1200086
+	/* Defined in $SYSDIR/x86/pci/pci_early_quirks.c */
 	intel_graphics_stolen_res = (struct linux_resource)
 	        DEFINE_RES_MEM(intel_graphics_stolen_base,
 	            intel_graphics_stolen_size);
 #else
+	printf("WARNING: This kernel is too old for proper function of i915kms.\n");
 	intel_graphics_stolen_res = (struct linux_resource)DEFINE_RES_MEM(0, 0);
 #endif
 }
