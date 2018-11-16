@@ -86,7 +86,7 @@ static inline void *
 devres_open_group(struct device *dev, void *id, gfp_t gfp)
 {
 	struct devres_group *grp;
-	unsigned long flags;
+	unsigned long flags __unused;
 
 	grp = kmalloc(sizeof(*grp), gfp);
 	if (unlikely(!grp))
@@ -129,7 +129,7 @@ static inline void
 devres_close_group(struct device *dev, void *id)
 {
 	struct devres_group *grp;
-	unsigned long flags;
+	unsigned long flags __unused;
 
 	spin_lock_irqsave(&dev->devres_lock, flags);
 

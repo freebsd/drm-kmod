@@ -93,7 +93,7 @@ mtrr_del(unsigned long offset, unsigned long size)
 int
 arch_phys_wc_add(unsigned long base, unsigned long size)
 {
-	int rc, rc2, id;
+	int rc, rc2 __unused, id;
 	struct mtrr_info *mi;
 
 	mi = malloc(sizeof(*mi), M_LKMTRR, M_WAITOK);

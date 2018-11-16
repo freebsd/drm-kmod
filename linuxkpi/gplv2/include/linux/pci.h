@@ -166,7 +166,8 @@ pcie_get_readrq(struct pci_dev *dev)
 {
 	u16 ctl;
 
-	pcie_capability_read_word(dev, PCI_EXP_DEVCTL, &ctl);
+	if (pcie_capability_read_word(dev, PCI_EXP_DEVCTL, &ctl))
+		return (-EINVAL);
 
 	return 128 << ((ctl & PCI_EXP_DEVCTL_READRQ) >> 12);
 }

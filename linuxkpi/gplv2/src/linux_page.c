@@ -48,13 +48,14 @@
 
 #include <asm/set_memory.h>
 
-#if defined(__amd64__) || defined(__aarch64__) || defined(__riscv__)
+#if defined(__LP64__)
 #define	LINUXKPI_HAVE_DMAP
 #else
 #undef	LINUXKPI_HAVE_DMAP
 #include <sys/sf_buf.h>
 #endif
 
+#if defined(__i386__) || defined(__amd64__)
 extern u_int	cpu_feature;
 extern u_int	cpu_stdext_feature;
 
@@ -68,6 +69,7 @@ __linux_clflushopt(u_long addr)
 	else
 		pmap_invalidate_cache();
 }
+#endif
 
 void *
 kmap(vm_page_t page)
@@ -170,7 +172,7 @@ set_pages_uc(vm_page_t page, int numpages)
 int
 set_memory_wc(unsigned long addr, int numpages)
 {
-	return (pmap_change_attr(addr, numpages, PAT_WRITE_COMBINING));
+	return (pmap_change_attr(addr, numpages, VM_MEMATTR_WRITE_COMBINING));
 }
 
 int
@@ -185,7 +187,7 @@ set_pages_wc(vm_page_t page, int numpages)
 int
 set_memory_wb(unsigned long addr, int numpages)
 {
-	return (pmap_change_attr(addr, numpages, PAT_WRITE_BACK));
+	return (pmap_change_attr(addr, numpages, VM_MEMATTR_WRITE_BACK));
 }
 
 int

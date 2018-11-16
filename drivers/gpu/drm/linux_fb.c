@@ -166,7 +166,7 @@ fb_ioctl(struct cdev *dev, u_long cmd, caddr_t data, int fflag,
 
 	case FBIO_BLANK:	/* blank display */
 		if (info->fbops->fb_blank != NULL)
-			error = info->fbops->fb_blank((int)data, info);
+			error = info->fbops->fb_blank((long)data, info);
 		break;
 
 	default:

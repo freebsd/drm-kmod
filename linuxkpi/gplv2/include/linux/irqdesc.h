@@ -47,8 +47,6 @@ irq_put_desc_unlock(struct irq_desc *desc, unsigned long flags)
 	spin_unlock_irqrestore(&desc->lock, flags);
 }
 
-extern struct idr irq_idr;
-
 static inline void
 generic_handle_irq_desc(struct irq_desc *desc)
 {

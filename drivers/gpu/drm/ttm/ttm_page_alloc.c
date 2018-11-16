@@ -226,7 +226,7 @@ static struct kobj_type ttm_pool_kobj_type = {
 
 static struct ttm_pool_manager *_manager;
 
-#ifndef CONFIG_X86
+#if !defined(CONFIG_X86) && !defined(__powerpc__)
 static int set_pages_wb(struct page *page, int numpages)
 {
 #if IS_ENABLED(CONFIG_AGP)

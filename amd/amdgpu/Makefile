@@ -1,6 +1,7 @@
 # $FreeBSD$
 
 SRCDIR=	${.CURDIR:H:H}/drivers/gpu/drm/amd
+DRM= ${.CURDIR:H:H}/drivers/gpu/drm
 
 KMOD=	amdgpu
 
@@ -55,7 +56,7 @@ KMOD=	amdgpu
 	${SRCDIR}/powerplay/hwmgr \
 	${SRCDIR}/powerplay/inc \
 	${SRCDIR}/powerplay/smumgr \
-	${SRCDIR}/scheduler
+	${DRM}/scheduler
 
 # acp
 SRCS=	acp_hw.c
@@ -63,14 +64,12 @@ SRCS=	acp_hw.c
 # amdgpu
 # amdgpu_acp.c \ # not yet - need i2s
 # amdgpu_mn.c \  # disabled
-SRCS+=	amdgpu_acpi.c \
-	amdgpu_afmt.c \
+SRCS+=	amdgpu_afmt.c \
 	amdgpu_amdkfd.c \
 	amdgpu_amdkfd_gfx_v7.c \
 	amdgpu_amdkfd_gfx_v8.c \
 	amdgpu_atombios.c \
 	amdgpu_atomfirmware.c \
-	amdgpu_atpx_handler.c \
 	amdgpu_benchmark.c \
 	amdgpu_bios.c \
 	amdgpu_bo_list.c \
@@ -176,6 +175,24 @@ SRCS+=	amdgpu_acpi.c \
 	vcn_v1_0.c \
 	vega10_ih.c \
 	vi.c
+.if ${MACHINE_CPUARCH} == "amd64"
+SRCS+= amdgpu_acpi.c \
+	amdgpu_atpx_handler.c \
+	dcn10_cm_common.c \
+	dcn10_dpp.c \
+	dcn10_dpp_cm.c \
+	dcn10_dpp_dscl.c \
+	dcn10_hubbub.c \
+	dcn10_hubp.c \
+	dcn10_hw_sequencer.c \
+	dcn10_ipp.c \
+	dcn10_mpc.c \
+	dcn10_opp.c \
+	dcn10_optc.c \
+	dcn10_resource.c \
+	dcn_calc_auto.c \
+	dcn_calcs.c
+.endif
 
 # display/*
 SRCS+=	amdgpu_dm.c \
@@ -249,21 +266,7 @@ SRCS+=	amdgpu_dm.c \
 	dce_scl_filters.c \
 	dce_stream_encoder.c \
 	dce_transform.c \
-	dcn10_cm_common.c \
-	dcn10_dpp.c \
-	dcn10_dpp_cm.c \
-	dcn10_dpp_dscl.c \
-	dcn10_hubbub.c \
-	dcn10_hubp.c \
-	dcn10_hw_sequencer.c \
-	dcn10_ipp.c \
-	dcn10_mpc.c \
-	dcn10_opp.c \
-	dcn10_optc.c \
-	dcn10_resource.c \
-	dcn_calc_auto.c \
 	dcn_calc_math.c \
-	dcn_calcs.c \
 	display_mode_lib.c \
 	display_mode_vba.c \
 	display_rq_dlg_calc.c \
@@ -379,11 +382,10 @@ CFLAGS+= -I${SRCDIR}/display/include
 CFLAGS+= -I${SRCDIR}/display/modules/inc
 CFLAGS+= -I${SRCDIR}/include
 CFLAGS+= -I${SRCDIR}/include/asic_reg
-CFLAGS+= -I${SRCDIR}/powerplay/eventmgr
 CFLAGS+= -I${SRCDIR}/powerplay/hwmgr
 CFLAGS+= -I${SRCDIR}/powerplay/inc
 CFLAGS+= -I${SRCDIR}/powerplay/smumgr
-CFLAGS+= -I${SRCDIR}/scheduler
+CFLAGS+= -I${DRM}/scheduler
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
@@ -393,6 +395,21 @@ SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.
 
 .include <bsd.kmod.mk>
 
+CFLAGS.gcc+= -Wno-redundant-decls -Wno-cast-qual -Wno-unused-but-set-variable
+.if ${MACHINE_CPUARCH} == "powerpc"
+CFLAGS.dcn_calcs.c= -maltivec -mhard-float -mfull-toc
+CFLAGS.dcn_calc_auto.c= -maltivec -mhard-float -mfull-toc
+CFLAGS.dcn_calc_math.c= -maltivec -mhard-float -mfull-toc
+
+CFLAGS.display_mode_vba.c= -maltivec -mhard-float -mfull-toc
+CFLAGS.display_mode_lib.c= -maltivec -mhard-float -mfull-toc
+CFLAGS.display_pipe_clocks.c= -maltivec -mhard-float -mfull-toc
+CFLAGS.display_rq_dlg_calc.c= -maltivec -mhard-float -mfull-toc
+CFLAGS.dml1_display_rq_dlg_calc.c= -maltivec -mhard-float -mfull-toc
+CFLAGS.display_rq_dlg_helpers.c= -maltivec -mhard-float -mfull-toc
+CFLAGS.soc_bounding_box.c= -maltivec -mhard-float -mfull-toc
+CFLAGS.dml_common_defs.c= -maltivec -mhard-float -mfull-toc
+.else
 CFLAGS.dcn_calcs.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_auto.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_math.c= -msse -mstack-alignment=4 -Wno-tautological-compare
@@ -405,7 +422,7 @@ CFLAGS.dml1_display_rq_dlg_calc.c= -msse -mstack-alignment=4
 CFLAGS.display_rq_dlg_helpers.c= -msse -mstack-alignment=4
 CFLAGS.soc_bounding_box.c= -msse -mstack-alignment=4
 CFLAGS.dml_common_defs.c= -msse -mstack-alignment=4
-
+.endif
 CWARNFLAGS+=	-Wno-pointer-arith -Wno-format
 CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
 CWARNFLAGS+=	-Wno-expansion-to-defined

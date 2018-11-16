@@ -5,13 +5,20 @@
 
 #include <linux/notifier.h>
 #include <linux/reboot.h>
-#include <linux/acpi.h>
 #include <linux/oom.h>
 #include <linux/shrinker.h>
 #include <linux/rcupdate.h>
 #include <linux/math64.h>
+#include <linux/kernel.h>
 
+#if defined(__amd64__) || defined(__i386__)
+#define X86
+#endif
+
+#ifdef X86
+#include <linux/acpi.h>
 #include <acpi/button.h>
+#endif
 
 #ifdef DIAGNOSTIC
 #define DIPRINTF printf
@@ -160,6 +167,7 @@ unregister_reboot_notifier(struct notifier_block *nb)
 	return (0);
 }
 
+#ifdef X86
 int
 acpi_lid_notifier_register(struct notifier_block *nb)
 {
@@ -187,6 +195,7 @@ unregister_acpi_notifier(struct notifier_block *nb)
 	WARN_NOT();
 	return (0);
 }
+#endif
 
 int
 register_oom_notifier(struct notifier_block *nb)
@@ -236,7 +245,7 @@ do_shrink_slab(struct shrink_control *shrinkctl, struct shrinker *shrinker,
 {
 	unsigned long delta, freed = 0;
 
-	long nr, new_nr;
+	long nr, new_nr __unused;
 	long total_scan, freeable;
 	int nid = shrinkctl->nid;
 	long batch_size = shrinker->batch ? shrinker->batch : SHRINK_BATCH;
