@@ -298,11 +298,11 @@ static int ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 		if (unlikely(++page_offset >= page_last))
 			break;
 	}
-	ret = VM_FAULT_NOPAGE;
 #else
 	vm_object_t obj;
 	vm_pindex_t pidx;
 
+	ret = VM_FAULT_NOPAGE;
 	obj = vma->vm_obj;
 	pidx = OFF_TO_IDX(address);
 	vma->vm_pfn_first = pidx;
