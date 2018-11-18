@@ -47,7 +47,7 @@ request_firmware(const struct linux_firmware **lkfwp, const char *name,
 			goto fail_mapped;
 		}
 	retry:
-		pause("fwwait", hz/4);
+		pause("fwwait", hz/2);
 		fw = firmware_get(name);
 		if (fw == NULL) {
 			device_printf(device->bsddev, "fail (%d) to get firmware "
@@ -58,7 +58,6 @@ request_firmware(const struct linux_firmware **lkfwp, const char *name,
 				    "firmware image with mapped name: %s\n",
 				    retries, name);
 				if (retries++ < 10) {
-					pause("fwwait", hz/4);
 					goto retry;
 				}
 			} else {
