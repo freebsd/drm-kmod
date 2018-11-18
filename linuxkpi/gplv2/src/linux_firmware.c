@@ -47,6 +47,7 @@ request_firmware(const struct linux_firmware **lkfwp, const char *name,
 			goto fail_mapped;
 		}
 	retry:
+		pause("fwwait", hz/4);
 		fw = firmware_get(name);
 		if (fw == NULL) {
 			device_printf(device->bsddev, "fail (%d) to get firmware "
