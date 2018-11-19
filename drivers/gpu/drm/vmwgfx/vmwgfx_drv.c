@@ -658,7 +658,7 @@ static int vmw_driver_load(struct drm_device *dev, unsigned long chipset)
 	spin_lock_init(&dev_priv->hw_lock);
 #else
 	/* spin_lock is sleepable on FreeBSD, this one needs to be MTX_SPIN */
-	spin_lock_init(&dev_priv->hw_lock);
+	spin_lock_init_spin(&dev_priv->hw_lock);
 #endif
 	spin_lock_init(&dev_priv->waiter_lock);
 	spin_lock_init(&dev_priv->cap_lock);

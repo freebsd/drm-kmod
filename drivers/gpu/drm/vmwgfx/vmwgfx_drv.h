@@ -441,7 +441,12 @@ struct vmw_private {
 	 * Framebuffer info.
 	 */
 
+#ifdef __linux__
+	void *fb_info;
+#else
+	/* fb_info collides with our macro definition of linux_fb_info */
 	void *fbinfo;
+#endif
 	enum vmw_display_unit_type active_display_unit;
 	struct vmw_legacy_display *ldu_priv;
 	struct vmw_overlay *overlay_priv;
@@ -599,10 +604,18 @@ static inline struct vmw_master *vmw_master(struct drm_master *master)
 static inline void vmw_write(struct vmw_private *dev_priv,
 			     unsigned int offset, uint32_t value)
 {
+#ifdef __linux__
 	spin_lock(&dev_priv->hw_lock);
+#else
+	spin_lock_spin(&dev_priv->hw_lock);
+#endif
 	outl(offset, dev_priv->io_start + VMWGFX_INDEX_PORT);
 	outl(value, dev_priv->io_start + VMWGFX_VALUE_PORT);
+#ifdef __linux__
 	spin_unlock(&dev_priv->hw_lock);
+#else
+	spin_unlock_spin(&dev_priv->hw_lock);
+#endif
 }
 
 static inline uint32_t vmw_read(struct vmw_private *dev_priv,
@@ -610,10 +623,18 @@ static inline uint32_t vmw_read(struct vmw_private *dev_priv,
 {
 	u32 val;
 
+#ifdef __linux__
 	spin_lock(&dev_priv->hw_lock);
+#else
+	spin_lock_spin(&dev_priv->hw_lock);
+#endif
 	outl(offset, dev_priv->io_start + VMWGFX_INDEX_PORT);
 	val = inl(dev_priv->io_start + VMWGFX_VALUE_PORT);
+#ifdef __linux__
 	spin_unlock(&dev_priv->hw_lock);
+#else
+	spin_unlock_spin(&dev_priv->hw_lock);
+#endif
 
 	return val;
 }
@@ -974,6 +995,7 @@ int vmw_kms_update_layout_ioctl(struct drm_device *dev, void *data,
 void vmw_kms_legacy_hotspot_clear(struct vmw_private *dev_priv);
 int vmw_kms_suspend(struct drm_device *dev);
 int vmw_kms_resume(struct drm_device *dev);
+void vmw_kms_lost_device(struct drm_device *dev);
 
 int vmw_dumb_create(struct drm_file *file_priv,
 		    struct drm_device *dev,

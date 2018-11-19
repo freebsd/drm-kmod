@@ -8,6 +8,7 @@ KMOD=	vmwgfx
 SRCS=	\
 	vmwgfx_binding.c \
 	vmwgfx_buffer.c \
+	vmwgfx_blit.c \
 	vmwgfx_cmdbuf_res.c \
 	vmwgfx_cmdbuf.c \
 	vmwgfx_context.c \

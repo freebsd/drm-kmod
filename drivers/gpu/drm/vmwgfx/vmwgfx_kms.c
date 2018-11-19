@@ -213,7 +213,11 @@ void vmw_kms_cursor_snoop(struct vmw_surface *srf,
 		/* Image is unsigned pointer. */
 		for (i = 0; i < box->h; i++)
 			memcpy(srf->snooper.image + i * 64,
+#ifdef __linux__
+			       virtual + i * cmd->dma.guest.pitch,
+#else
 			       ((char*)virtual) + i * cmd->dma.guest.pitch,
+#endif
 			       box->w * 4);
 	}
 
@@ -2913,4 +2917,14 @@ int vmw_kms_resume(struct drm_device *dev)
 	dev_priv->suspend_state = NULL;
 
 	return ret;
+}
+
+/**
+ * vmw_kms_lost_device - Notify kms that modesetting capabilities will be lost
+ *
+ * @dev: Pointer to the drm device
+ */
+void vmw_kms_lost_device(struct drm_device *dev)
+{
+	drm_atomic_helper_shutdown(dev);
 }
