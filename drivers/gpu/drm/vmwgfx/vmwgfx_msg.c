@@ -415,7 +415,6 @@ int vmw_host_log(const char *log)
 
 	vmw_close_channel(&channel);
 	kfree(msg);
-	DRM_ERROR("Failed to send log\n");
 
 	return 0;
 

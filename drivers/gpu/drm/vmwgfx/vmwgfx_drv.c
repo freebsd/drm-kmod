@@ -656,7 +656,7 @@ static int vmw_driver_load(struct drm_device *dev, unsigned long chipset)
 	spin_lock_init(&dev_priv->hw_lock);
 #else
 	/* spin_lock is sleepable on FreeBSD, this one needs to be MTX_SPIN */
-	spin_lock_init(&dev_priv->hw_lock);
+	spin_lock_init_spin(&dev_priv->hw_lock);
 #endif
 	spin_lock_init(&dev_priv->waiter_lock);
 	spin_lock_init(&dev_priv->cap_lock);
@@ -929,7 +929,7 @@ static int vmw_driver_load(struct drm_device *dev, unsigned long chipset)
 	if (dev_priv->enable_fb) {
 		vmw_fifo_resource_inc(dev_priv);
 		vmw_svga_enable(dev_priv);
-		vmw_fb_init(dev_priv);
+		/* vmw_fb_init(dev_priv); */
 	}
 
 	dev_priv->pm_nb.notifier_call = vmwgfx_pm_notifier;
