@@ -799,6 +799,13 @@ long drm_ioctl(struct file *filp,
 	if (drm_dev_is_unplugged(dev))
 		return -ENODEV;
 
+#ifndef __linux__
+	if (IOCGROUP(cmd) != DRM_IOCTL_BASE) {
+		DRM_DEBUG("bad ioctl group 0x%x\n", (int)IOCGROUP(cmd));
+		return -EINVAL;
+	}
+#endif
+
 	is_driver_ioctl = nr >= DRM_COMMAND_BASE && nr < DRM_COMMAND_END;
 
 	if (is_driver_ioctl) {
