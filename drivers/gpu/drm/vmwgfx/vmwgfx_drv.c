@@ -929,7 +929,7 @@ static int vmw_driver_load(struct drm_device *dev, unsigned long chipset)
 	if (dev_priv->enable_fb) {
 		vmw_fifo_resource_inc(dev_priv);
 		vmw_svga_enable(dev_priv);
-		/* vmw_fb_init(dev_priv); */
+		vmw_fb_init(dev_priv);
 	}
 
 	dev_priv->pm_nb.notifier_call = vmwgfx_pm_notifier;

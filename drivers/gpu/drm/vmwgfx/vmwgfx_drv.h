@@ -1293,4 +1293,9 @@ static inline void vmw_mmio_write(u32 value, u32 *addr)
  */
 extern int vmw_host_log(const char *log);
 
+struct vmw_fb_par;
+extern void vmw_fb_dirty_mark(struct vmw_fb_par *par,
+    unsigned x1, unsigned y1,
+    unsigned width, unsigned height);
+
 #endif
