@@ -45,7 +45,7 @@
 #else
 #define	register_framebuffer   linux_register_framebuffer
 #define	unregister_framebuffer linux_unregister_framebuffer
-#endif /* VMW_FB */
+#endif
 #define HZ_VM 100
 #define VMW_DIRTY_DELAY (HZ_VM / 30)
 #else
