@@ -17,6 +17,7 @@ SRCS=	\
 	vmwgfx_drv.c \
 	vmwgfx_execbuf.c \
 	vmwgfx_fb.c \
+	vmwgfx_fb_freebsd.c \
 	vmwgfx_fence.c \
 	vmwgfx_fifo.c \
 	vmwgfx_gmr.c \
@@ -59,7 +60,10 @@ SRCS	+=			\
 	opt_acpi.h		\
 	opt_compat.h		\
 	opt_drm.h		\
+	opt_platform.h		\
+	opt_splash.h		\
 	opt_syscons.h		\
+	opt_teken.h		\
 	acpi_if.h		\
 	bus_if.h		\
 	fb_if.h			\

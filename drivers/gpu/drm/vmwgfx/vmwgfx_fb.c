@@ -35,9 +35,17 @@
 #include <drm/ttm/ttm_placement.h>
 
 #ifndef __linux__
+#include <dev/vt/vt.h>
+#include "vmwgfx_fb_freebsd.h"
 #define	fb_info linux_fb_info
-#define	register_framebuffer linux_register_framebuffer
+#if 1
+#define	framebuffer_alloc vmw_framebuffer_alloc
+#define	register_framebuffer   vmw_register_framebuffer
+#define	unregister_framebuffer vmw_unregister_framebuffer
+#else
+#define	register_framebuffer   linux_register_framebuffer
 #define	unregister_framebuffer linux_unregister_framebuffer
+#endif /* VMW_FB */
 #define HZ_VM 100
 #define VMW_DIRTY_DELAY (HZ_VM / 30)
 #else
@@ -273,7 +281,7 @@ out_unlock:
 	mutex_unlock(&par->bo_mutex);
 }
 
-static void vmw_fb_dirty_mark(struct vmw_fb_par *par,
+void vmw_fb_dirty_mark(struct vmw_fb_par *par,
 			      unsigned x1, unsigned y1,
 			      unsigned width, unsigned height)
 {

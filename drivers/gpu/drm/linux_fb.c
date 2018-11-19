@@ -30,7 +30,7 @@ extern void vt_fb_detach(struct fb_info *info);
 
 int skip_ddb;
 
-static void
+void
 fb_info_print(struct fb_info *t)
 {
 	printf("start FB_INFO:\n");
