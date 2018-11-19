@@ -248,7 +248,7 @@ retry:
 	}
 }
 
-#if defined(__i386__) || defined(__amd64__)
+#if defined(__i386__) || defined(__amd64__) || defined(__powerpc__)
 int
 set_pages_array_wb(struct page **pages, int addrinarray)
 {
