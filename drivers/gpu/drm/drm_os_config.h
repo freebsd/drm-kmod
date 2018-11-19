@@ -31,12 +31,29 @@
 // For platforms with SSE4.1 (needed for GuC)
 #define CONFIG_AS_MOVNTDQA
 #endif
+
+#ifdef __powerpc64__
+#define CONFIG_PPC64	1
+#define CONFIG_64BIT	1
+#define AIM		1
+#define CONFIG_PCI 1
+#undef CONFIG_ACPI
+#undef CONFIG_ACPI_SLEEP
+#undef CONFIG_DRM_I915_KMS
+#undef CONFIG_INTEL_IOMMU
+#undef CONFIG_AS_MOVNTDQA
+#endif
+
+
+
 #ifdef _KERNEL
 #define	__KERNEL__
 #endif
 
-
+#if !defined(__powerpc__)
 #define	CONFIG_AGP	1
+#endif
+
 #define	CONFIG_MTRR	1
 
 #define	CONFIG_FB	1
@@ -106,7 +123,9 @@
 
 // Enable new amd display controller
 #define	CONFIG_DRM_AMD_DC 1
+#ifdef __amd64__
 #define	CONFIG_DRM_AMD_DC_DCN1_0 1
+#endif
 
 // Frame buffer compression on AMD DC
 #define	CONFIG_DRM_AMD_DC_FBC 1

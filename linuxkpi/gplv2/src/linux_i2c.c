@@ -88,8 +88,9 @@ __FBSDID("$FreeBSD$");
 
 #include <linux/idr.h>
 
-
+#if defined(__i386__) || defined(__amd64__)
 #include <linux/acpi.h>
+#endif
 #include <linux/device.h>
 #include <linux/module.h>
 #include <linux/spinlock.h>
@@ -616,13 +617,14 @@ i2c_check_addr_busy(struct i2c_adapter *adapter, int addr)
 static void i2c_dev_set_name(struct i2c_adapter *adap,
 			     struct i2c_client *client)
 {
+#if defined(__i386__) || defined(__amd64__)
 	struct acpi_device *adev = ACPI_COMPANION(&client->dev);
 
 	if (adev) {
 		dev_set_name(&client->dev, "i2c-%s", acpi_dev_name(adev));
 		return;
 	}
-
+#endif
 	dev_set_name(&client->dev, "%d-%04x", i2c_adapter_id(adap),
 		     i2c_encode_flags_to_addr(client));
 }

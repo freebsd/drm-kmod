@@ -351,7 +351,7 @@ void radeon_uvd_free_handles(struct radeon_device *rdev, struct drm_file *filp)
 	}
 }
 
-static int radeon_uvd_cs_msg_decode(uint32_t *msg, unsigned buf_sizes[])
+static int radeon_uvd_cs_msg_decode(volatile uint32_t *msg, unsigned buf_sizes[])
 {
 	unsigned stream_type = msg[4];
 	unsigned width = msg[6];
@@ -465,7 +465,7 @@ static int radeon_uvd_validate_codec(struct radeon_cs_parser *p,
 static int radeon_uvd_cs_msg(struct radeon_cs_parser *p, struct radeon_bo *bo,
 			     unsigned offset, unsigned buf_sizes[])
 {
-	int32_t *msg, msg_type, handle;
+	volatile int32_t *msg, msg_type, handle;
 	unsigned img_size = 0;
 	struct dma_fence *f;
 	void *ptr;
@@ -781,7 +781,7 @@ int radeon_uvd_get_create_msg(struct radeon_device *rdev, int ring,
 	uint64_t offs = radeon_bo_size(rdev->uvd.vcpu_bo) -
 		RADEON_GPU_PAGE_SIZE;
 
-	uint32_t *msg = rdev->uvd.cpu_addr + offs;
+	volatile uint32_t *msg = rdev->uvd.cpu_addr + offs;
 	uint64_t addr = rdev->uvd.gpu_addr + offs;
 
 	int r, i;
@@ -817,7 +817,7 @@ int radeon_uvd_get_destroy_msg(struct radeon_device *rdev, int ring,
 	uint64_t offs = radeon_bo_size(rdev->uvd.vcpu_bo) -
 		RADEON_GPU_PAGE_SIZE;
 
-	uint32_t *msg = rdev->uvd.cpu_addr + offs;
+	volatile uint32_t *msg = rdev->uvd.cpu_addr + offs;
 	uint64_t addr = rdev->uvd.gpu_addr + offs;
 
 	int r, i;

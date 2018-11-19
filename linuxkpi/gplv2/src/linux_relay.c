@@ -444,11 +444,11 @@ extern int relay_late_setup_files(struct rchan *chan,
 								  struct dentry *parent) {
 	printf("%s: With base filename: %s\n", __func__, base_filename);
 	int err = 0;
-	unsigned long flags;
+	unsigned long flags __unused;
 	struct dentry *dentry;
 	struct rchan_buf *buf;
 	unsigned int i, curr_cpu;
-	struct rchan_percpu_buf_dispatcher disp;
+	struct rchan_percpu_buf_dispatcher disp __unused;
 
 	if (!chan || !base_filename) {
 		printf("%s: ERROR: chan or base_filename not set!\n", __func__);
