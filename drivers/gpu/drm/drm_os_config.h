@@ -130,4 +130,7 @@
 // Frame buffer compression on AMD DC
 #define	CONFIG_DRM_AMD_DC_FBC 1
 
+// KMS framebuffer on VMware
+#define	CONFIG_DRM_VMWGFX_FBCON 1
+
 #endif
