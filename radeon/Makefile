@@ -41,11 +41,9 @@ SRCS=	atom.c \
 	r600_dma.c \
 	r600_dpm.c \
 	r600_hdmi.c \
-	radeon_acpi.c \
 	radeon_agp.c \
 	radeon_asic.c \
 	radeon_atombios.c \
-	radeon_atpx_handler.c \
 	radeon_audio.c \
 	radeon_benchmark.c \
 	radeon_bios.c \
@@ -114,6 +112,12 @@ SRCS=	atom.c \
 	vce_v1_0.c \
 	vce_v2_0.c
 
+.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386"
+SRCS+=  opt_acpi.h \
+	radeon_acpi.c \
+	radeon_atpx_handler.c
+.endif
+
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
@@ -126,9 +130,11 @@ CFLAGS+= -I${SRCDIR:H}/amd/include
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
+CFLAGS.gcc+= -Wno-redundant-decls -Wno-cast-qual -Wno-unused-but-set-variable \
+	-Wno-maybe-uninitialized
 
 SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
-	opt_vm.h opt_compat.h opt_syscons.h opt_acpi.h
+	opt_vm.h opt_compat.h opt_syscons.h
 
 .include <bsd.kmod.mk>
 

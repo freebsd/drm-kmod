@@ -3,7 +3,6 @@
 KMOD=	linuxkpi_gplv2
 
 SRCS=	linux_kmod_gplv2.c	\
-	linux_acpi.c		\
 	linux_anon_inodefs.c 	\
 	linux_anon_inodes.c 	\
 	linux_async.c		\
@@ -29,15 +28,21 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_reservation.c	\
 	linux_seq_file.c	\
 	linux_sort.c		\
-	linux_sync_file.c	\
-	linux_video.c
+	linux_sync_file.c
 
-SRCS+=	opt_acpi.h
+
+.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386"
+SRCS+=	linux_acpi.c	\
+	linux_video.c 	\
+	opt_acpi.h
+.endif
 
 SRCS+=	bus_if.h		\
 	device_if.h		\
 	pci_if.h		\
 	vnode_if.h
+
+
 
 CFLAGS+= -include ${.CURDIR:H}/drivers/gpu/drm/drm_os_config.h
 CFLAGS+= -I${.CURDIR:H}/include
@@ -45,7 +50,9 @@ CFLAGS+= -I${.CURDIR}/dummy/include
 CFLAGS+= -I${.CURDIR}/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
+CFLAGS.gcc+= -Wno-cast-qual
 
 .include <bsd.kmod.mk>
 CWARNFLAGS+=	-Wno-pointer-arith
 CWARNFLAGS.linux_acpi.c=       -Wno-cast-qual
+

@@ -18,7 +18,7 @@ dma_fence_context_alloc(unsigned num)
 int
 dma_fence_get_status(struct dma_fence *fence)
 {
-	unsigned long flags;
+	unsigned long flags __unused;
 	int status;
 
 	spin_lock_irqsave(fence->lock, flags);

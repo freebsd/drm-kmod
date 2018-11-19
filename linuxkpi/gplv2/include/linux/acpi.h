@@ -17,7 +17,7 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-
+#if defined(__i386__) || defined(__amd64__)
 #ifndef _LINUX_GPLV2_ACPI_H_
 #define _LINUX_GPLV2_ACPI_H_
 
@@ -71,3 +71,4 @@ struct pci_dev *acpi_get_pci_dev(acpi_handle handle);
 int acpi_bus_get_device(acpi_handle handle, struct acpi_device **device);
 
 #endif /* _LINUX_GPLV2_ACPI_H_ */
+#endif /* x86 */

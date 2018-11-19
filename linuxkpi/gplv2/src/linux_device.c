@@ -58,7 +58,7 @@ void
 devres_add(struct device *dev, void *res)
 {
 	struct devres *dr = container_of(res, struct devres, data);
-	unsigned long flags;
+	unsigned long flags __unused;
 
 	spin_lock_irqsave(&dev->devres_lock, flags);
 	dr_list_insert(dev, &dr->node);
@@ -70,7 +70,7 @@ devres_remove(struct device *dev, dr_release_t release,
 	      dr_match_t match, void *match_data)
 {
 	struct devres *dr;
-	unsigned long flags;
+	unsigned long flags __unused;
 
 	spin_lock_irqsave(&dev->devres_lock, flags);
 	dr = dr_list_lookup(dev, release, match, match_data);

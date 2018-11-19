@@ -15,7 +15,7 @@
 
 #include <asm/processor.h>
 
-#if defined(__i386__) || defined(__amd64__)
+#if defined(__i386__) || defined(__amd64__) || defined(__powerpc__)
 #define NR_IRQS	512 /* XXX need correct value */
 #else
 #error "NR_IRQS not defined"
