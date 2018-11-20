@@ -44,6 +44,7 @@ SRCS=	\
 	i915_suspend.c \
 	i915_sw_fence.c \
 	i915_syncmap.c \
+	i915_timeline.c \
 	i915_trace_points.c \
 	i915_vgpu.c \
 	i915_vma.c \
