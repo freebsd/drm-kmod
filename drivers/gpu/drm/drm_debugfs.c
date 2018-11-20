@@ -152,8 +152,7 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 
 	/* NOTE Linux<->FreeBSD: Mesa needs the hw.dri sysctl tree. */
 #ifndef __linux__
-	if (minor->type != DRM_MINOR_CONTROL &&
-	    minor->type != DRM_MINOR_RENDER)
+	if (minor->type != DRM_MINOR_RENDER)
 		drm_sysctl_init(minor->dev);
 #endif
 
