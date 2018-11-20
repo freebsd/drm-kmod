@@ -114,8 +114,8 @@ SRCS=	\
 	intel_uc.c \
 	intel_uc_fw.c \
 	intel_uncore.c \
-	intel_wopcm.c
-
+	intel_wopcm.c \
+	intel_workarounds.c
 
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
 # intel_lpe_audio.c   # Need platform and irq_chip support
