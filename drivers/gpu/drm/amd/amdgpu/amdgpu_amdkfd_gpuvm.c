@@ -961,8 +961,12 @@ static int init_kfd_vm(struct amdgpu_vm *vm, void **process_info,
 			ret = -ENOMEM;
 			goto create_evict_fence_fail;
 		}
-
+#ifdef __linux__
 		info->pid = get_task_pid(current->group_leader, PIDTYPE_PID);
+#else
+		/* BSDFIXME: group leader? */
+		panic("Missing implementation");
+#endif
 		atomic_set(&info->evicted_bos, 0);
 		INIT_DELAYED_WORK(&info->restore_userptr_work,
 				  amdgpu_amdkfd_restore_userptr_worker);

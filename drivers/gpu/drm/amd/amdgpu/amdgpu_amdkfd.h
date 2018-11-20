@@ -101,7 +101,11 @@ struct amdkfd_process_info {
 	/* MMU-notifier related fields */
 	atomic_t evicted_bos;
 	struct delayed_work restore_userptr_work;
+#ifdef __linux__
 	struct pid *pid;
+#else
+	pid_t pid;
+#endif
 };
 
 int amdgpu_amdkfd_init(void);

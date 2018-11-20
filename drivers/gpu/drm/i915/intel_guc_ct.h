@@ -28,6 +28,10 @@ struct intel_guc;
 struct i915_vma;
 
 #include "intel_guc_fwif.h"
+#ifndef __linux__
+#include <linux/list.h>
+#include <linux/workqueue.h>
+#endif
 
 /**
  * DOC: Command Transport (CT).

@@ -754,7 +754,7 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 		else
 			r = get_user_pages_remote(gtt->usertask,
 					mm, userptr, num_pages,
-					flags, p, NULL, NULL);
+					flags, p, NULL);
 
 		spin_lock(&gtt->guptasklock);
 		list_del(&guptask.list);
@@ -1101,7 +1101,12 @@ int amdgpu_ttm_tt_set_userptr(struct ttm_tt *ttm, uint64_t addr,
 
 	if (gtt->usertask)
 		put_task_struct(gtt->usertask);
+#ifdef __linux__
 	gtt->usertask = current->group_leader;
+#else
+	/* BSDFIXME: group leader? */
+	panic("Missing implementation");
+#endif
 	get_task_struct(gtt->usertask);
 
 	spin_lock_init(&gtt->guptasklock);
