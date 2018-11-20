@@ -80,4 +80,5 @@ CWARNFLAGS.vmwgfx_execbuf.c= -Wno-cast-qual -Wno-sometimes-uninitialized
 CWARNFLAGS.vmwgfx_irq.c= -Wno-uninitialized
 CWARNFLAGS.vmwgfx_kms.c= -Wno-missing-prototypes
 CWARNFLAGS.vmwgfx_msg.c= -Wno-missing-prototypes
+CWARNFLAGS.vmwgfx_overlay.c= -Wno-unused-function
 CWARNFLAGS.vmwgfx_stdu.c= -Wno-cast-qual

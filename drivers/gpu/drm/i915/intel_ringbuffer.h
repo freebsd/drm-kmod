@@ -4,6 +4,11 @@
 
 #include <linux/hashtable.h>
 
+#ifndef __linux__
+/* For tasklet_struct */
+#include <linux/interrupt.h>
+#endif
+
 #include "i915_gem_batch_pool.h"
 #include "i915_gem_timeline.h"
 

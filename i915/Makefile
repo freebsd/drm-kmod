@@ -113,8 +113,8 @@ SRCS=	\
 	intel_tv.c \
 	intel_uc.c \
 	intel_uc_fw.c \
-	intel_uncore.c
-
+	intel_uncore.c \
+	intel_wopcm.c
 
 
 # i915_perf.c         # This one opens a can of worms. Hold off for now.

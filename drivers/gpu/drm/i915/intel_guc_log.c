@@ -27,6 +27,10 @@
 #include "intel_guc_log.h"
 #include "i915_drv.h"
 
+#ifndef __linux__
+bool intel_guc_log_relay_enabled(const struct intel_guc_log *log);
+#endif
+
 static void guc_log_capture_logs(struct intel_guc_log *log);
 
 /**
@@ -237,10 +241,16 @@ static void guc_read_update_log_buffer(struct intel_guc_log *log)
 	bool new_overflow;
 
 	mutex_lock(&log->relay.lock);
-
+#ifdef __linux__
+	/* BSDFIXME: bsd 'log' doesn't like this.. */
 	if (WARN_ON(!intel_guc_log_relay_enabled(log)))
 		goto out_unlock;
-
+#else
+	if (!intel_guc_log_relay_enabled(log)) {
+		DRM_WARN("guc log relay not enabled");
+		goto out_unlock;
+	}
+#endif
 	/* Get the pointer to shared GuC log buffer */
 	log_buf_state = src_data = log->relay.buf_addr;
 

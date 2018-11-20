@@ -2897,8 +2897,8 @@ static void i915_reset_device(struct drm_i915_private *dev_priv,
 {
 	struct wedge_me w;
 	DRM_DEBUG_DRIVER("resetting chip\n");
-#ifdef __linux__
 	struct i915_gpu_error *error = &dev_priv->gpu_error;
+#ifdef __linux__
 	struct kobject *kobj = &dev_priv->drm.primary->kdev->kobj;
 	char *error_event[] = { I915_ERROR_UEVENT "=1", NULL };
 	char *reset_event[] = { I915_RESET_UEVENT "=1", NULL };
