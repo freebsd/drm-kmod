@@ -28,10 +28,11 @@
  */
 
 #ifdef __linux__
-#include <generated/utsrelease.h>
+#include <linux/utsname.h>
 #else
 #define UTS_RELEASE "FreeBSD 11 prerelease"
 #endif
+
 #include <linux/stop_machine.h>
 #include <linux/zlib.h>
 #include <drm/drm_print.h>
@@ -657,7 +658,7 @@ int i915_error_state_to_str(struct drm_i915_error_state_buf *m,
 
 	if (*error->error_msg)
 		err_printf(m, "%s\n", error->error_msg);
-	err_printf(m, "Kernel: " UTS_RELEASE "\n");
+	err_printf(m, "Kernel: %s\n", init_utsname()->release);
 	ts = ktime_to_timespec64(error->time);
 	err_printf(m, "Time: %lld s %ld us\n",
 		   (s64)ts.tv_sec, ts.tv_nsec / NSEC_PER_USEC);
