@@ -133,7 +133,4 @@
 // KMS framebuffer on VMware
 #define	CONFIG_DRM_VMWGFX_FBCON 1
 
-// This is expected if we're going to build amdkfd.c
-#define	CONFIG_HSA_AMD 1
-
 #endif

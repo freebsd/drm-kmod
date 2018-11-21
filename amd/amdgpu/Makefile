@@ -65,13 +65,18 @@ SRCS=	acp_hw.c
 # amdgpu
 # amdgpu_acp.c \ # not yet - need i2s
 # amdgpu_mn.c \  # disabled
+
+# These should only be included if we set CONFIG_HSA_AMD
+# amdgpu_amdkfd_fence.c \
+# amdgpu_amdkfd_gfx_v8.c \
+# amdgpu_amdkfd_gfx_v9.c \
+# amdgpu_amdkfd_gpuvm.c \
+
+# This one for CONFIG_DRM_AMDGPU_CIK & CONFIG_HSA_AMD
+# amdgpu_amdkfd_gfx_v7.c \
+
 SRCS+=	amdgpu_afmt.c \
 	amdgpu_amdkfd.c \
-	amdgpu_amdkfd_fence.c \
-	amdgpu_amdkfd_gfx_v7.c \
-	amdgpu_amdkfd_gfx_v8.c \
-	amdgpu_amdkfd_gfx_v9.c \
-	amdgpu_amdkfd_gpuvm.c \
 	amdgpu_atombios.c \
 	amdgpu_atomfirmware.c \
 	amdgpu_benchmark.c \
@@ -141,6 +146,7 @@ SRCS+=	amdgpu_afmt.c \
 	dce_v11_0.c \
 	dce_virtual.c \
 	df_v1_7.c \
+	df_v3_6.c \
 	emu_soc.c \
 	gfx_v6_0.c \
 	gfx_v7_0.c \
@@ -192,6 +198,7 @@ SRCS+= amdgpu_acpi.c \
 	dcn10_hubp.c \
 	dcn10_hw_sequencer.c \
 	dcn10_ipp.c \
+	dcn10_link_encoder.c \
 	dcn10_mpc.c \
 	dcn10_opp.c \
 	dcn10_optc.c \
@@ -366,8 +373,9 @@ SRCS+=	amd_powerplay.c \
 	vega12_hwmgr.c \
 	vega12_processpptables.c \
 	vega12_smumgr.c \
-	vega12_thermal.c
-
+	vega12_thermal.c \
+	vega20_reg_init.c \
+	vegam_smumgr.c
 
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
@@ -579,5 +587,6 @@ CWARNFLAGS.vega12_hwmgr.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized
 CWARNFLAGS.vega12_processpptables.c= -Wno-missing-prototypes
 CWARNFLAGS.vega12_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.vega12_thermal.c=	-Wno-missing-prototypes
+CWARNFLAGS.vegam_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.vi.c= -Wno-unused-const-variable
 CWARNFLAGS.uvd_v7_0.c=	-Wno-missing-prototypes
