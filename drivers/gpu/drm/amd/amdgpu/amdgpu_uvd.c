@@ -1144,8 +1144,13 @@ int amdgpu_uvd_get_destroy_msg(struct amdgpu_ring *ring, uint32_t handle,
 
 static void amdgpu_uvd_idle_work_handler(struct work_struct *work)
 {
+#ifdef __linux__
 	struct amdgpu_device *adev =
 		container_of(work, struct amdgpu_device, uvd.inst->idle_work.work);
+#else
+	struct amdgpu_device *adev =
+		container_of(work, struct amdgpu_device, uvd.inst[0].idle_work.work);
+#endif
 	unsigned fences = 0, i, j;
 
 	for (i = 0; i < adev->uvd.num_uvd_inst; ++i) {

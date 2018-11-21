@@ -281,7 +281,6 @@ SRCS+=	amdgpu_dm.c \
 	dml_common_defs.c \
 	engine_base.c \
 	fixpt31_32.c \
-	fixpt32_32.c \
 	freesync.c \
 	gpio_base.c \
 	gpio_service.c \
