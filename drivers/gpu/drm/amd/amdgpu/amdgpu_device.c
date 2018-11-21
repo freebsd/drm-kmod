@@ -2400,22 +2400,6 @@ fence_driver_init:
 	if (r)
 		DRM_ERROR("ib ring test failed (%d).\n", r);
 
-#ifndef __linux__
-	r = vm_phys_fictitious_reg_range(adev->gmc.aper_base,
-	    adev->gmc.aper_base + adev->gmc.visible_vram_size,
-	    VM_MEMATTR_WRITE_COMBINING);
-	if (r != 0) {
-		DRM_ERROR(
-		    "failed to register fictitious range 0x%jx-0x%jx (%d).\n",
-		    (uintmax_t)adev->gmc.aper_base,
-		    (uintmax_t)adev->gmc.aper_base + adev->gmc.visible_vram_size,
-		    r);
-		return -r;
-	}
-	DRM_INFO("registered fictitious range 0x%jx-0x%jx\n",
-	    (uintmax_t)adev->gmc.aper_base,
-	    (uintmax_t)adev->gmc.aper_base + adev->gmc.visible_vram_size);
-#endif
 	if (amdgpu_sriov_vf(adev))
 		amdgpu_virt_init_data_exchange(adev);
 
