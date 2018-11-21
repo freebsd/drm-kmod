@@ -524,6 +524,7 @@ CWARNFLAGS.fiji_clockpowergating.c= -Wno-enum-conversion
 CWARNFLAGS.fiji_hwmgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.fiji_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.fiji_thermal.c=	-Wno-missing-prototypes
+CWARNFLAGS.fixpt31_32.c=	-Wno-incompatible-pointer-types
 CWARNFLAGS.gmc_v6_0.c=	-Wno-unused-const-variable
 CWARNFLAGS.gfx_v6_0.c=	 -Wno-unused-const-variable
 CWARNFLAGS.gfx_v7_0.c=	-Wno-missing-prototypes
