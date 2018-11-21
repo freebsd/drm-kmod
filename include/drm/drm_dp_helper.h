@@ -813,6 +813,11 @@
 #define DP_RECEIVER_ALPM_STATUS		    0x200b  /* eDP 1.4 */
 # define DP_ALPM_LOCK_TIMEOUT_ERROR	    (1 << 0)
 
+#define DP_LANE0_1_STATUS_ESI                  0x200c /* status same as 0x202 */
+#define DP_LANE2_3_STATUS_ESI                  0x200d /* status same as 0x203 */
+#define DP_LANE_ALIGN_STATUS_UPDATED_ESI       0x200e /* status same as 0x204 */
+#define DP_SINK_STATUS_ESI                     0x200f /* status same as 0x205 */
+
 #define DP_DP13_DPCD_REV                    0x2200
 #define DP_DP13_MAX_LINK_RATE               0x2201
 

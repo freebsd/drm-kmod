@@ -120,4 +120,7 @@ static inline uint64_t mul_u64_u32_div(uint64_t a, uint32_t mul, uint32_t diviso
 	return rl.ll;
 }
 
+// Naive impl...
+#define	array_size(a,b) ((a) * (b))
+
 #endif /* _LINUX_GPLV2_COMPILER_H_ */
