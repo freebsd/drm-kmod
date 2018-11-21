@@ -926,7 +926,9 @@ static void amdgpu_device_check_vm_size(struct amdgpu_device *adev)
 
 static void amdgpu_device_check_smu_prv_buffer_size(struct amdgpu_device *adev)
 {
+#ifdef __linux__
 	struct sysinfo si;
+#endif
 	bool is_os_64 = (sizeof(void *) == 8) ? true : false;
 	uint64_t total_memory;
 	uint64_t dram_size_seven_GB = 0x1B8000000;
@@ -939,8 +941,12 @@ static void amdgpu_device_check_smu_prv_buffer_size(struct amdgpu_device *adev)
 		DRM_WARN("Not 64-bit OS, feature not supported\n");
 		goto def_value;
 	}
+#ifdef __linux__
 	si_meminfo(&si);
 	total_memory = (uint64_t)si.totalram * si.mem_unit;
+#else
+	total_memory = physmem * PAGE_SIZE;
+#endif
 
 	if ((amdgpu_smu_memory_pool_size == 1) ||
 		(amdgpu_smu_memory_pool_size == 2)) {
