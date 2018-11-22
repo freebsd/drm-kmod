@@ -82,14 +82,24 @@ void i915_gem_unpark(struct drm_i915_private *i915);
 
 static inline void __tasklet_disable_sync_once(struct tasklet_struct *t)
 {
+#ifdef __linux__
+	// BSD impl don't have count
+	// tasklet_disable includes tasklet_unlock_wait
 	if (atomic_inc_return(&t->count) == 1)
 		tasklet_unlock_wait(t);
+#else
+	tasklet_disable(t);
+#endif
 }
 
 static inline void __tasklet_enable_sync_once(struct tasklet_struct *t)
 {
+#ifdef __linux__
 	if (atomic_dec_return(&t->count) == 0)
 		tasklet_kill(t);
+#else
+	tasklet_enable(t);
+#endif
 }
 
 #endif /* __I915_GEM_H__ */
