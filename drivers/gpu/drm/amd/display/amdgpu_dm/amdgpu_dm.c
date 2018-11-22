@@ -992,45 +992,6 @@ const struct amdgpu_ip_block_version dm_ip_block =
 };
 
 
-static struct drm_atomic_state *
-dm_atomic_state_alloc(struct drm_device *dev)
-{
-	struct dm_atomic_state *state = kzalloc(sizeof(*state), GFP_KERNEL);
-
-	if (!state)
-		return NULL;
-
-	if (drm_atomic_state_init(dev, &state->base) < 0)
-		goto fail;
-
-	return &state->base;
-
-fail:
-	kfree(state);
-	return NULL;
-}
-
-static void
-dm_atomic_state_clear(struct drm_atomic_state *state)
-{
-	struct dm_atomic_state *dm_state = to_dm_atomic_state(state);
-
-	if (dm_state->context) {
-		dc_release_state(dm_state->context);
-		dm_state->context = NULL;
-	}
-
-	drm_atomic_state_default_clear(state);
-}
-
-static void
-dm_atomic_state_alloc_free(struct drm_atomic_state *state)
-{
-	struct dm_atomic_state *dm_state = to_dm_atomic_state(state);
-	drm_atomic_state_default_release(state);
-	kfree(dm_state);
-}
-
 /**
  * DOC: atomic
  *
@@ -1042,9 +1003,6 @@ static const struct drm_mode_config_funcs amdgpu_dm_mode_funcs = {
 	.output_poll_changed = drm_fb_helper_output_poll_changed,
 	.atomic_check = amdgpu_dm_atomic_check,
 	.atomic_commit = amdgpu_dm_atomic_commit,
-	.atomic_state_alloc = dm_atomic_state_alloc,
-	.atomic_state_clear = dm_atomic_state_clear,
-	.atomic_state_free = dm_atomic_state_alloc_free
 };
 
 static struct drm_mode_config_helper_funcs amdgpu_dm_mode_config_helperfuncs = {
@@ -1566,8 +1524,117 @@ static int dcn10_register_irq_handlers(struct amdgpu_device *adev)
 }
 #endif
 
+/*
+ * Acquires the lock for the atomic state object and returns
+ * the new atomic state.
+ *
+ * This should only be called during atomic check.
+ */
+static int dm_atomic_get_state(struct drm_atomic_state *state,
+			       struct dm_atomic_state **dm_state)
+{
+	struct drm_device *dev = state->dev;
+	struct amdgpu_device *adev = dev->dev_private;
+	struct amdgpu_display_manager *dm = &adev->dm;
+	struct drm_private_state *priv_state;
+	int ret;
+
+	if (*dm_state)
+		return 0;
+
+	ret = drm_modeset_lock(&dm->atomic_obj_lock, state->acquire_ctx);
+	if (ret)
+		return ret;
+
+	priv_state = drm_atomic_get_private_obj_state(state, &dm->atomic_obj);
+	if (IS_ERR(priv_state))
+		return PTR_ERR(priv_state);
+
+	*dm_state = to_dm_atomic_state(priv_state);
+
+	return 0;
+}
+
+struct dm_atomic_state *
+dm_atomic_get_new_state(struct drm_atomic_state *state)
+{
+	struct drm_device *dev = state->dev;
+	struct amdgpu_device *adev = dev->dev_private;
+	struct amdgpu_display_manager *dm = &adev->dm;
+	struct drm_private_obj *obj;
+	struct drm_private_state *new_obj_state;
+	int i;
+
+	for_each_new_private_obj_in_state(state, obj, new_obj_state, i) {
+		if (obj->funcs == dm->atomic_obj.funcs)
+			return to_dm_atomic_state(new_obj_state);
+	}
+
+	return NULL;
+}
+
+struct dm_atomic_state *
+dm_atomic_get_old_state(struct drm_atomic_state *state)
+{
+	struct drm_device *dev = state->dev;
+	struct amdgpu_device *adev = dev->dev_private;
+	struct amdgpu_display_manager *dm = &adev->dm;
+	struct drm_private_obj *obj;
+	struct drm_private_state *old_obj_state;
+	int i;
+
+	for_each_old_private_obj_in_state(state, obj, old_obj_state, i) {
+		if (obj->funcs == dm->atomic_obj.funcs)
+			return to_dm_atomic_state(old_obj_state);
+	}
+
+	return NULL;
+}
+
+static struct drm_private_state *
+dm_atomic_duplicate_state(struct drm_private_obj *obj)
+{
+	struct dm_atomic_state *old_state, *new_state;
+
+	new_state = kzalloc(sizeof(*new_state), GFP_KERNEL);
+	if (!new_state)
+		return NULL;
+
+	__drm_atomic_helper_private_obj_duplicate_state(obj, &new_state->base);
+
+	new_state->context = dc_create_state();
+	if (!new_state->context) {
+		kfree(new_state);
+		return NULL;
+	}
+
+	old_state = to_dm_atomic_state(obj->state);
+	if (old_state && old_state->context)
+		dc_resource_state_copy_construct(old_state->context,
+						 new_state->context);
+
+	return &new_state->base;
+}
+
+static void dm_atomic_destroy_state(struct drm_private_obj *obj,
+				    struct drm_private_state *state)
+{
+	struct dm_atomic_state *dm_state = to_dm_atomic_state(state);
+
+	if (dm_state && dm_state->context)
+		dc_release_state(dm_state->context);
+
+	kfree(dm_state);
+}
+
+static struct drm_private_state_funcs dm_atomic_state_funcs = {
+	.atomic_duplicate_state = dm_atomic_duplicate_state,
+	.atomic_destroy_state = dm_atomic_destroy_state,
+};
+
 static int amdgpu_dm_mode_config_init(struct amdgpu_device *adev)
 {
+	struct dm_atomic_state *state;
 	int r;
 
 	adev->mode_info.mode_config_initialized = true;
@@ -1584,6 +1651,24 @@ static int amdgpu_dm_mode_config_init(struct amdgpu_device *adev)
 	adev->ddev->mode_config.async_page_flip = true;
 
 	adev->ddev->mode_config.fb_base = adev->gmc.aper_base;
+
+	drm_modeset_lock_init(&adev->dm.atomic_obj_lock);
+
+	state = kzalloc(sizeof(*state), GFP_KERNEL);
+	if (!state)
+		return -ENOMEM;
+
+	state->context = dc_create_state();
+	if (!state->context) {
+		kfree(state);
+		return -ENOMEM;
+	}
+
+	dc_resource_state_copy_construct_current(adev->dm.dc, state->context);
+
+	drm_atomic_private_obj_init(&adev->dm.atomic_obj,
+				    &state->base,
+				    &dm_atomic_state_funcs);
 
 	r = amdgpu_display_modeset_create_props(adev);
 	if (r)
@@ -1908,6 +1993,7 @@ fail:
 static void amdgpu_dm_destroy_drm_device(struct amdgpu_display_manager *dm)
 {
 	drm_mode_config_cleanup(dm->ddev);
+	drm_atomic_private_obj_fini(&dm->atomic_obj);
 	return;
 }
 
@@ -4353,6 +4439,20 @@ static void prepare_flip_isr(struct amdgpu_crtc *acrtc)
 						 acrtc->crtc_id);
 }
 
+struct dc_stream_status *dc_state_get_stream_status(
+	struct dc_state *state,
+	struct dc_stream_state *stream)
+{
+	uint8_t i;
+
+	for (i = 0; i < state->stream_count; i++) {
+		if (stream == state->streams[i])
+			return &state->stream_status[i];
+	}
+
+	return NULL;
+}
+
 /*
  * Executes flip
  *
@@ -4562,6 +4662,7 @@ static bool commit_planes_to_stream(
 }
 
 static void amdgpu_dm_commit_planes(struct drm_atomic_state *state,
+				    struct dc_state *dc_state,
 				    struct drm_device *dev,
 				    struct amdgpu_display_manager *dm,
 				    struct drm_crtc *pcrtc,
@@ -4578,7 +4679,6 @@ static void amdgpu_dm_commit_planes(struct drm_atomic_state *state,
 	struct dm_crtc_state *acrtc_state = to_dm_crtc_state(new_pcrtc_state);
 	struct dm_crtc_state *dm_old_crtc_state =
 			to_dm_crtc_state(drm_atomic_get_old_crtc_state(state, pcrtc));
-	struct dm_atomic_state *dm_state = to_dm_atomic_state(state);
 	int planes_count = 0;
 	unsigned long flags;
 
@@ -4639,7 +4739,7 @@ static void amdgpu_dm_commit_planes(struct drm_atomic_state *state,
 				crtc,
 				fb,
 				(uint32_t)drm_crtc_vblank_count(crtc) + *wait_for_vblank,
-				dm_state->context);
+				dc_state);
 		}
 
 	}
@@ -4665,7 +4765,7 @@ static void amdgpu_dm_commit_planes(struct drm_atomic_state *state,
 							planes_count,
 							acrtc_state,
 							dm_old_crtc_state,
-							dm_state->context))
+							dc_state))
 			dm_error("%s: Failed to attach plane!\n", __func__);
 	} else {
 		/*TODO BUG Here should go disable planes on CRTC. */
@@ -4733,6 +4833,7 @@ static void amdgpu_dm_atomic_commit_tail(struct drm_atomic_state *state)
 	struct amdgpu_device *adev = dev->dev_private;
 	struct amdgpu_display_manager *dm = &adev->dm;
 	struct dm_atomic_state *dm_state;
+	struct dc_state *dc_state = NULL, *dc_state_temp = NULL;
 	uint32_t i, j;
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
@@ -4745,7 +4846,16 @@ static void amdgpu_dm_atomic_commit_tail(struct drm_atomic_state *state)
 
 	drm_atomic_helper_update_legacy_modeset_state(dev, state);
 
-	dm_state = to_dm_atomic_state(state);
+	dm_state = dm_atomic_get_new_state(state);
+	if (dm_state && dm_state->context) {
+		dc_state = dm_state->context;
+	} else {
+		/* No state changes, retain current state. */
+		dc_state_temp = dc_create_state();
+		ASSERT(dc_state_temp);
+		dc_state = dc_state_temp;
+		dc_resource_state_copy_construct_current(dm->dc, dc_state);
+	}
 
 	/* update changed items */
 	for_each_oldnew_crtc_in_state(state, crtc, old_crtc_state, new_crtc_state, i) {
@@ -4818,9 +4928,9 @@ static void amdgpu_dm_atomic_commit_tail(struct drm_atomic_state *state)
 		}
 	} /* for_each_crtc_in_state() */
 
-	if (dm_state->context) {
-		dm_enable_per_frame_crtc_master_sync(dm_state->context);
-		WARN_ON(!dc_commit_state(dm->dc, dm_state->context));
+	if (dc_state) {
+		dm_enable_per_frame_crtc_master_sync(dc_state);
+		WARN_ON(!dc_commit_state(dm->dc, dc_state));
 	}
 
 	for_each_new_crtc_in_state(state, crtc, new_crtc_state, i) {
@@ -4831,6 +4941,10 @@ static void amdgpu_dm_atomic_commit_tail(struct drm_atomic_state *state)
 		if (dm_new_crtc_state->stream != NULL) {
 			const struct dc_stream_status *status =
 					dc_stream_get_status(dm_new_crtc_state->stream);
+
+			if (!status)
+				status = dc_state_get_stream_status(dc_state,
+								    dm_new_crtc_state->stream);
 
 			if (!status)
 				DC_ERR("got no status for stream %p on acrtc%p\n", dm_new_crtc_state->stream, acrtc);
@@ -4918,7 +5032,8 @@ static void amdgpu_dm_atomic_commit_tail(struct drm_atomic_state *state)
 		dm_new_crtc_state = to_dm_crtc_state(new_crtc_state);
 
 		if (dm_new_crtc_state->stream)
-			amdgpu_dm_commit_planes(state, dev, dm, crtc, &wait_for_vblank);
+			amdgpu_dm_commit_planes(state, dc_state, dev,
+						dm, crtc, &wait_for_vblank);
 	}
 
 
@@ -4958,6 +5073,9 @@ static void amdgpu_dm_atomic_commit_tail(struct drm_atomic_state *state)
 	for (i = 0; i < crtc_disable_count; i++)
 		pm_runtime_put_autosuspend(dev->dev);
 	pm_runtime_mark_last_busy(dev->dev);
+
+	if (dc_state_temp)
+		dc_release_state(dc_state_temp);
 }
 
 
@@ -5144,11 +5262,11 @@ static int dm_update_crtcs_state(struct amdgpu_display_manager *dm,
 				 bool enable,
 				 bool *lock_and_validation_needed)
 {
+	struct dm_atomic_state *dm_state = NULL;
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
 	int i;
 	struct dm_crtc_state *dm_old_crtc_state, *dm_new_crtc_state;
-	struct dm_atomic_state *dm_state = to_dm_atomic_state(state);
 	struct dc_stream_state *new_stream;
 	int ret = 0;
 
@@ -5249,6 +5367,10 @@ static int dm_update_crtcs_state(struct amdgpu_display_manager *dm,
 			if (!dm_old_crtc_state->stream)
 				goto next_crtc;
 
+			ret = dm_atomic_get_state(state, &dm_state);
+			if (ret)
+				goto fail;
+
 			DRM_DEBUG_DRIVER("Disabling DRM crtc: %d\n",
 					crtc->base.id);
 
@@ -5282,6 +5404,10 @@ static int dm_update_crtcs_state(struct amdgpu_display_manager *dm,
 					     dm_old_crtc_state->stream)) {
 
 				WARN_ON(dm_new_crtc_state->stream);
+
+				ret = dm_atomic_get_state(state, &dm_state);
+				if (ret)
+					goto fail;
 
 				dm_new_crtc_state->stream = new_stream;
 
@@ -5357,12 +5483,13 @@ static int dm_update_planes_state(struct dc *dc,
 				  bool enable,
 				  bool *lock_and_validation_needed)
 {
+
+	struct dm_atomic_state *dm_state = NULL;
 	struct drm_crtc *new_plane_crtc, *old_plane_crtc;
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
 	struct drm_plane *plane;
 	struct drm_plane_state *old_plane_state, *new_plane_state;
 	struct dm_crtc_state *dm_new_crtc_state, *dm_old_crtc_state;
-	struct dm_atomic_state *dm_state = to_dm_atomic_state(state);
 	struct dm_plane_state *dm_new_plane_state, *dm_old_plane_state;
 	int i ;
 	/* TODO return page_flip_needed() function */
@@ -5399,6 +5526,10 @@ static int dm_update_planes_state(struct dc *dc,
 
 			DRM_DEBUG_ATOMIC("Disabling DRM plane: %d on DRM crtc %d\n",
 					plane->base.id, old_plane_crtc->base.id);
+
+			ret = dm_atomic_get_state(state, &dm_state);
+			if (ret)
+				return ret;
 
 			if (!dc_remove_plane_from_context(
 					dc,
@@ -5454,6 +5585,12 @@ static int dm_update_planes_state(struct dc *dc,
 				return ret;
 			}
 
+			ret = dm_atomic_get_state(state, &dm_state);
+			if (ret) {
+				dc_plane_state_release(dc_new_plane_state);
+				return ret;
+			}
+
 			/*
 			 * Any atomic check errors that occur after this will
 			 * not need a release. The plane state will be attached
@@ -5485,11 +5622,14 @@ static int dm_update_planes_state(struct dc *dc,
 
 	return ret;
 }
-enum surface_update_type dm_determine_update_type_for_commit(struct dc *dc, struct drm_atomic_state *state)
+
+static int
+dm_determine_update_type_for_commit(struct dc *dc,
+				    struct drm_atomic_state *state,
+				    enum surface_update_type *out_type)
 {
-
-
-	int i, j, num_plane;
+	struct dm_atomic_state *dm_state = NULL, *old_dm_state = NULL;
+	int i, j, num_plane, ret = 0;
 	struct drm_plane_state *old_plane_state, *new_plane_state;
 	struct dm_plane_state *new_dm_plane_state, *old_dm_plane_state;
 	struct drm_crtc *new_plane_crtc, *old_plane_crtc;
@@ -5509,7 +5649,7 @@ enum surface_update_type dm_determine_update_type_for_commit(struct dc *dc, stru
 		DRM_ERROR("Plane or surface update failed to allocate");
 		/* Set type to FULL to avoid crashing in DC*/
 		update_type = UPDATE_TYPE_FULL;
-		goto ret;
+		goto cleanup;
 	}
 
 	for_each_oldnew_crtc_in_state(state, crtc, old_crtc_state, new_crtc_state, i) {
@@ -5563,27 +5703,40 @@ enum surface_update_type dm_determine_update_type_for_commit(struct dc *dc, stru
 			}
 
 			if (num_plane > 0) {
-				status = dc_stream_get_status(new_dm_crtc_state->stream);
+				ret = dm_atomic_get_state(state, &dm_state);
+				if (ret)
+					goto cleanup;
+
+				old_dm_state = dm_atomic_get_old_state(state);
+				if (!old_dm_state) {
+					ret = -EINVAL;
+					goto cleanup;
+				}
+
+				status = dc_state_get_stream_status(old_dm_state->context,
+								    new_dm_crtc_state->stream);
+
 				update_type = dc_check_update_surfaces_for_stream(dc, updates, num_plane,
 										  &stream_update, status);
 
 				if (update_type > UPDATE_TYPE_MED) {
 					update_type = UPDATE_TYPE_FULL;
-					goto ret;
+					goto cleanup;
 				}
 			}
 
 		} else if (!new_dm_crtc_state->stream && old_dm_crtc_state->stream) {
 			update_type = UPDATE_TYPE_FULL;
-			goto ret;
+			goto cleanup;
 		}
 	}
 
-ret:
+cleanup:
 	kfree(updates);
 	kfree(surface);
 
-	return update_type;
+	*out_type = update_type;
+	return ret;
 }
 
 /**
@@ -5615,8 +5768,8 @@ static int amdgpu_dm_atomic_check(struct drm_device *dev,
 				  struct drm_atomic_state *state)
 {
 	struct amdgpu_device *adev = dev->dev_private;
+	struct dm_atomic_state *dm_state = NULL;
 	struct dc *dc = adev->dm.dc;
-	struct dm_atomic_state *dm_state = to_dm_atomic_state(state);
 	struct drm_connector *connector;
 	struct drm_connector_state *old_con_state, *new_con_state;
 	struct drm_crtc *crtc;
@@ -5656,10 +5809,6 @@ static int amdgpu_dm_atomic_check(struct drm_device *dev,
 		if (ret)
 			goto fail;
 	}
-
-	dm_state->context = dc_create_state();
-	ASSERT(dm_state->context);
-	dc_resource_state_copy_construct_current(dc, dm_state->context);
 
 	/* Remove exiting planes if they are modified */
 	ret = dm_update_planes_state(dc, state, false, &lock_and_validation_needed);
@@ -5713,7 +5862,9 @@ static int amdgpu_dm_atomic_check(struct drm_device *dev,
 		lock_and_validation_needed = true;
 	}
 
-	update_type = dm_determine_update_type_for_commit(dc, state);
+	ret = dm_determine_update_type_for_commit(dc, state, &update_type);
+	if (ret)
+		goto fail;
 
 	if (overall_update_type < update_type)
 		overall_update_type = update_type;
@@ -5731,6 +5882,9 @@ static int amdgpu_dm_atomic_check(struct drm_device *dev,
 
 
 	if (overall_update_type > UPDATE_TYPE_FAST) {
+		ret = dm_atomic_get_state(state, &dm_state);
+		if (ret)
+			goto fail;
 
 		ret = do_aquire_global_lock(dev, state);
 		if (ret)
