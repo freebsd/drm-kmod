@@ -143,11 +143,11 @@ static void wait_for_fbc_state_changed(
 	struct dce110_compressor *cp110,
 	bool enabled)
 {
-	uint16_t counter = 0;
+	uint8_t counter = 0;
 	uint32_t addr = mmFBC_STATUS;
 	uint32_t value;
 
-	while (counter < 1000) {
+	while (counter < 10) {
 		value = dm_read_reg(cp110->base.ctx, addr);
 		if (get_reg_field_value(
 			value,
