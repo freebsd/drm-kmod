@@ -114,6 +114,7 @@
 #include <linux/dma-fence.h>
 #include <linux/module.h>
 #include <linux/refcount.h>
+#include <linux/sizes.h>
 
 #include <drm/drm_hashtab.h>
 #ifdef __linux__
