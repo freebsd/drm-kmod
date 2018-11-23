@@ -457,15 +457,14 @@ static int vmw_fb_compute_depth(struct fb_var_screeninfo *var,
 static int vmwgfx_set_config_internal(struct drm_mode_set *set)
 {
 	struct drm_crtc *crtc = set->crtc;
-	struct drm_modeset_acquire_ctx *ctx;
-	struct drm_device *dev = set->crtc->dev;
+	struct drm_device * __unused dev = set->crtc->dev;
 	struct drm_modeset_acquire_ctx ctx;
 	int ret;
 
 	drm_modeset_acquire_init(&ctx, 0);
 
 restart:
-	ret = crtc->funcs->set_config(set, ctx);
+	ret = crtc->funcs->set_config(set, &ctx);
 
 	if (ret == -EDEADLK) {
 		drm_modeset_backoff(&ctx);
