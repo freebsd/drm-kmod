@@ -88,7 +88,7 @@ static const uint32_t skl_primary_formats[] = {
 	DRM_FORMAT_VYUY,
 };
 
-static const uint32_t skl_pri_planar_formats[] = {
+static const uint32_t __unused skl_pri_planar_formats[] = {
 	DRM_FORMAT_C8,
 	DRM_FORMAT_RGB565,
 	DRM_FORMAT_XRGB8888,
