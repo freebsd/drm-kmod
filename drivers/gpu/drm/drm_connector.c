@@ -291,7 +291,7 @@ out_put:
 EXPORT_SYMBOL(drm_connector_init);
 
 /**
- * drm_mode_connector_attach_encoder - attach a connector to an encoder
+ * drm_connector_attach_encoder - attach a connector to an encoder
  * @connector: connector to attach
  * @encoder: encoder to attach @connector to
  *
@@ -302,7 +302,7 @@ EXPORT_SYMBOL(drm_connector_init);
  * Returns:
  * Zero on success, negative errno on failure.
  */
-int drm_mode_connector_attach_encoder(struct drm_connector *connector,
+int drm_connector_attach_encoder(struct drm_connector *connector,
 				      struct drm_encoder *encoder)
 {
 	int i;
@@ -329,7 +329,7 @@ int drm_mode_connector_attach_encoder(struct drm_connector *connector,
 	}
 	return -ENOMEM;
 }
-EXPORT_SYMBOL(drm_mode_connector_attach_encoder);
+EXPORT_SYMBOL(drm_connector_attach_encoder);
 
 static void drm_mode_remove(struct drm_connector *connector,
 			    struct drm_display_mode *mode)

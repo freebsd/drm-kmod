@@ -77,6 +77,7 @@ SRCS=	ati_pcigart.c \
 	drm_vblank.c \
 	drm_vm.c \
 	drm_vma_manager.c \
+	drm_writeback.c \
 	linux_fb.c \
 	tainted_linux_fb.c \
 	linux_hdmi.c \

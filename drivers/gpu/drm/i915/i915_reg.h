@@ -168,7 +168,8 @@ static inline bool i915_mmio_reg_valid(i915_reg_t reg)
 				 "Incorrect value for mask");		   \
 	__MASKED_FIELD(mask, value); })
 #else
-#define _MASKED_FIELD(mask, value) ({ (mask) << 16 | (value); })
+#define __MASKED_FIELD(mask, value) ({ (mask) << 16 | (value); })
+#define _MASKED_FIELD(mask, value) __MASKED_FIELD(mask, value)
 #endif
 #define _MASKED_BIT_ENABLE(a)	({ typeof(a) _a = (a); _MASKED_FIELD(_a, _a); })
 #define _MASKED_BIT_DISABLE(a)	(_MASKED_FIELD((a), 0))

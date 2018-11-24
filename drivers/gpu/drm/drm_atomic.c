@@ -1948,7 +1948,7 @@ int drm_atomic_check_only(struct drm_atomic_state *state)
 		}
 	}
 
-	if (config->funcs->atomic_check)
+	if (config->funcs->atomic_check) {
 		ret = config->funcs->atomic_check(state->dev, state);
 
 		if (ret) {
