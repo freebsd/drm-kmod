@@ -7,13 +7,12 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/vmwgfx
 KMOD=	vmwgfx
 SRCS=	\
 	vmwgfx_binding.c \
-	vmwgfx_buffer.c \
 	vmwgfx_blit.c \
+	vmwgfx_bo.c \
 	vmwgfx_cmdbuf_res.c \
 	vmwgfx_cmdbuf.c \
 	vmwgfx_context.c \
 	vmwgfx_cotable.c \
-	vmwgfx_dmabuf.c \
 	vmwgfx_drv.c \
 	vmwgfx_execbuf.c \
 	vmwgfx_fb.c \
@@ -38,6 +37,7 @@ SRCS=	\
 	vmwgfx_so.c \
 	vmwgfx_stdu.c \
 	vmwgfx_surface.c \
+	vmwgfx_ttm_buffer.c \
 	vmwgfx_ttm_glue.c \
 	vmwgfx_va.c
 
