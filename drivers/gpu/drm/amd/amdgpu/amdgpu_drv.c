@@ -878,7 +878,10 @@ static int amdgpu_flush(struct file *f, fl_owner_t id)
 static const struct file_operations amdgpu_driver_kms_fops = {
 	.owner = THIS_MODULE,
 	.open = drm_open,
+#ifdef __linux__
+	/* BSDFIXME: Not supported in lkpi */
 	.flush = amdgpu_flush,
+#endif
 	.release = drm_release,
 	.unlocked_ioctl = amdgpu_drm_ioctl,
 	.mmap = amdgpu_mmap,
