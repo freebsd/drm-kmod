@@ -1221,7 +1221,11 @@ static void notify_ring(struct intel_engine_cs *engine)
 		i915_request_put(rq);
 	}
 
+#ifdef __linux__
 	if (tsk && tsk->state & TASK_NORMAL)
+#else
+	if (tsk && get_task_state(tsk) & TASK_NORMAL)
+#endif
 		wake_up_process(tsk);
 
 	rcu_read_unlock();
