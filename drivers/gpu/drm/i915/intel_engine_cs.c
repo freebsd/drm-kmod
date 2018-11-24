@@ -1240,6 +1240,7 @@ static void print_request(struct drm_printer *m,
 #ifdef __linux__
 static void hexdump(struct drm_printer *m, const void *buf, size_t len)
 #else
+#define	hexdump linux_hexdump
 static void linux_hexdump(struct drm_printer *m, const void *buf, size_t len)
 #endif
 {
