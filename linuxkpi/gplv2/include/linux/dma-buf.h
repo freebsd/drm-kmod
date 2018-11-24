@@ -61,8 +61,7 @@ struct dma_buf_export_info {
 					 .owner = THIS_MODULE }
 
 struct dma_buf_ops {
-	int (*attach)(struct dma_buf *, struct device *,
-			struct dma_buf_attachment *);
+	int (*attach)(struct dma_buf *, struct dma_buf_attachment *);
 
 	void (*detach)(struct dma_buf *, struct dma_buf_attachment *);
 

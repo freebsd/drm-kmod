@@ -275,7 +275,7 @@ dma_buf_attach(struct dma_buf *db, struct device *dev)
 	
 	sx_xlock(&db->lock.sx);
 	if (db->ops->attach) {
-		if ((rc = db->ops->attach(db, dev, dba)) != 0) {
+		if ((rc = db->ops->attach(db, dba)) != 0) {
 			sx_xunlock(&db->lock.sx);
 			free(dba, M_DMABUF);
 			return (ERR_PTR(rc));
