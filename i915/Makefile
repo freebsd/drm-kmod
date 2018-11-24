@@ -188,6 +188,7 @@ CWARNFLAGS.dvo_ns2501.c=	-Wno-cast-qual
 CWARNFLAGS.dvo_sil164.c=	-Wno-cast-qual
 CWARNFLAGS.dvo_tfp410.c=	-Wno-cast-qual
 
+CWARNFLAGS.intel_acpi.c=	-Wno-incompatible-pointer-types
 CWARNFLAGS.intel_audio.c=	-Wno-cast-qual
 CWARNFLAGS.intel_bios.c=	-Wno-cast-qual
 CWARNFLAGS.intel_color.c=	-Wno-missing-prototypes
