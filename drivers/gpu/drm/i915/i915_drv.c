@@ -1282,8 +1282,10 @@ static int i915_driver_init_hw(struct drm_i915_private *dev_priv)
 	return 0;
 
 err_msi:
+#ifdef __linux__
 	if (pdev->msi_enabled)
 		pci_disable_msi(pdev);
+#endif
 	pm_qos_remove_request(&dev_priv->pm_qos);
 err_ggtt:
 	i915_ggtt_cleanup_hw(dev_priv);

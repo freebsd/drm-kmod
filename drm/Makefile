@@ -14,6 +14,7 @@ SRCS=	ati_pcigart.c \
 	drm_bufs.c \
 	drm_bridge.c \
 	drm_cache.c \
+	drm_client.c \
 	drm_color_mgmt.c \
 	drm_connector.c \
 	drm_context.c \

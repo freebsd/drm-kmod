@@ -640,7 +640,9 @@ struct linux_fb_info {
 	struct mutex bl_curve_mutex;	
 	u8 bl_curve[FB_BACKLIGHT_LEVELS];
 #endif
-#ifdef CONFIG_FB_DEFERRED_IO
+
+#ifdef __linux__
+	/* Not used on FreeBSD */
 	struct delayed_work deferred_work;
 	struct fb_deferred_io *fbdefio;
 #endif
@@ -652,7 +654,10 @@ struct linux_fb_info {
 #ifdef CONFIG_FB_TILEBLITTING
 	struct fb_tile_ops *tileops;    /* Tile Blitting */
 #endif
-	char __iomem *screen_base;	/* Virtual address */
+	union {
+		char __iomem *screen_base;	/* Virtual address */
+		char *screen_buffer;
+	};
 	unsigned long screen_size;	/* Amount of ioremapped VRAM or 0 */ 
 	void *pseudo_palette;		/* Fake palette of 16 colors */ 
 #define FBINFO_STATE_RUNNING	0

@@ -3012,12 +3012,13 @@ static void drm_fbdev_fb_destroy(struct fb_info *info)
 	struct fb_ops *fbops = NULL;
 	void *shadow = NULL;
 
+#ifdef __linux__
 	if (fbi->fbdefio) {
 		fb_deferred_io_cleanup(fbi);
 		shadow = fbi->screen_buffer;
 		fbops = fbi->fbops;
 	}
-
+#endif
 	drm_fb_helper_fini(fb_helper);
 
 	if (shadow) {
@@ -3061,10 +3062,12 @@ static struct fb_ops drm_fbdev_fb_ops = {
 	.fb_imageblit	= drm_fb_helper_sys_imageblit,
 };
 
+#ifdef __linux__
 static struct fb_deferred_io drm_fbdev_defio = {
 	.delay		= HZ / 20,
 	.deferred_io	= drm_fb_helper_deferred_io,
 };
+#endif
 
 /**
  * drm_fb_helper_generic_probe - Generic fbdev emulation probe helper
@@ -3139,9 +3142,11 @@ int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
 		*fbops = *fbi->fbops;
 		fbi->fbops = fbops;
 		fbi->screen_buffer = shadow;
+#ifdef __linux__
 		fbi->fbdefio = &drm_fbdev_defio;
 
 		fb_deferred_io_init(fbi);
+#endif
 	}
 
 	return 0;
