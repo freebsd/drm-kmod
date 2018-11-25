@@ -68,10 +68,8 @@ SRCS=	\
 	intel_dp_mst.c \
 	intel_dpio_phy.c \
 	intel_dpll_mgr.c \
-	intel_dsi.c \
 	intel_dsi_dcs_backlight.c \
 	intel_dsi_vbt.c \
-	intel_dsi_pll.c \
 	intel_dvo.c \
 	intel_fbc.c \
 	intel_engine_cs.c \
@@ -117,7 +115,9 @@ SRCS=	\
 	intel_uc_fw.c \
 	intel_uncore.c \
 	intel_wopcm.c \
-	intel_workarounds.c
+	intel_workarounds.c \
+	vlv_dsi.c \
+	vlv_dsi_pll.c
 
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
 # intel_lpe_audio.c   # Need platform and irq_chip support

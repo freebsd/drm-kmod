@@ -485,8 +485,9 @@ static void intel_engine_init_execlist(struct intel_engine_cs *engine)
 void intel_engine_setup_common(struct intel_engine_cs *engine)
 {
 	i915_timeline_init(engine->i915, &engine->timeline, engine->name);
+#ifdef __linux__
 	lockdep_set_subclass(&engine->timeline.lock, TIMELINE_ENGINE);
-
+#endif
 	intel_engine_init_execlist(engine);
 	intel_engine_init_hangcheck(engine);
 	intel_engine_init_batch_pool(engine);
