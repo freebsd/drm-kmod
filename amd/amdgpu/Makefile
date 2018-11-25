@@ -329,7 +329,6 @@ SRCS+=	amdgpu_dm.c \
 	irq_service_dcn10.c \
 	log_helpers.c \
 	logger.c \
-	soc_bounding_box.c \
 	vector.c \
 	virtual_link_encoder.c \
 	virtual_stream_encoder.c
@@ -481,7 +480,7 @@ CWARNFLAGS.amd_powerplay.c=	-Wno-missing-prototypes
 CWARNFLAGS.atombios.c=
 CWARNFLAGS.atombios_crtc.c=	-Wno-missing-prototypes
 CWARNFLAGS.atombios_i2c.c=	-Wno-missing-prototypes
-CWARNFLAGS.bios_parser.c=	-Wno-initializer-overrides
+CWARNFLAGS.bios_parser.c=	-Wno-initializer-overrides -Wno-missing-prototypes
 CWARNFLAGS.ci_dpm.c=	-Wno-unused-const-variable
 CWARNFLAGS.ci_smc_pp.c=	-Wno-missing-prototypes
 CWARNFLAGS.ci_smumgr.c=	-Wno-missing-prototypes
