@@ -161,7 +161,6 @@ i915_locks_destroy(struct drm_i915_private *dev_priv)
 	spin_lock_destroy(&dev_priv->uncore.lock);
 	spin_lock_destroy(&dev_priv->mm.object_stat_lock);
 	mutex_destroy(&dev_priv->sb_lock);
-	mutex_destroy(&dev_priv->modeset_restore_lock);
 	mutex_destroy(&dev_priv->av_mutex);
 }
 
