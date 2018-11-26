@@ -526,7 +526,10 @@ void drm_sched_entity_push_job(struct drm_sched_job *sched_job,
 
 	trace_drm_sched_job(sched_job, entity);
 
+#ifdef __linux__
+	/* BSDFIXME: No group_leader */
 	WRITE_ONCE(entity->last_user, current->group_leader);
+#endif
 	first = spsc_queue_push(&entity->job_queue, &sched_job->queue_node);
 
 	/* first job wakes up scheduler */

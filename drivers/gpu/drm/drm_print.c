@@ -124,7 +124,11 @@ EXPORT_SYMBOL(__drm_printfn_coredump);
 
 void __drm_puts_seq_file(struct drm_printer *p, const char *str)
 {
+#ifndef __linux__
+	seq_puts((struct seq_file *)(p->arg), str);
+#else
 	seq_puts(p->arg, str);
+#endif
 }
 EXPORT_SYMBOL(__drm_puts_seq_file);
 
