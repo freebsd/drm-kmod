@@ -31,6 +31,12 @@ trace_amdgpu_bo_create(void *bo)
 }
 
 static inline void
+trace_amdgpu_bo_move(struct amdgpu_bo* bo, uint32_t new, uint32_t old)
+{
+	CTR3(KTR_DRM, "amdgpu_bo_move %p %u %u", bo, new, old);
+}
+
+static inline void
 trace_amdgpu_bo_list_set(void *a, void *b) {
 	CTR2(KTR_DRM, "amdgpu_bo_list_set %p %p", a, b);
 }
@@ -71,6 +77,17 @@ trace_amdgpu_vm_bo_update(struct amdgpu_bo_va_mapping * mapping){
 static inline void
 trace_amdgpu_vm_set_page(uint64_t pe, uint64_t addr, unsigned count, uint32_t incr, uint32_t flags){
 	CTR5(KTR_DRM, "amdgpu_vm_set_page %x %x %u %u %x", pe, addr, count, incr, flags);
+}
+
+static inline void
+trace_amdgpu_vm_bo_cs(struct amdgpu_bo_va_mapping * mapping){
+	CTR1(KTR_DRM, "amdgpu_vm_bo_cs %p", mapping);
+}
+
+static inline int
+trace_amdgpu_vm_bo_cs_enabled(void){
+	CTR0(KTR_DRM, "amdgpu_vm_bo_cs_enabled");
+	return (0);
 }
 
 static inline int

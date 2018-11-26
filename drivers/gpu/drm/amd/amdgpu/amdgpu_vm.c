@@ -3031,9 +3031,12 @@ void amdgpu_vm_set_task_info(struct amdgpu_vm *vm)
 		vm->task_info.pid = current->pid;
 		get_task_comm(vm->task_info.task_name, current);
 
+#ifdef __linux__
+		/* BSDFIXME: group_leader?? */
 		if (current->group_leader->mm == current->mm) {
 			vm->task_info.tgid = current->group_leader->pid;
 			get_task_comm(vm->task_info.process_name, current->group_leader);
 		}
+#endif
 	}
 }

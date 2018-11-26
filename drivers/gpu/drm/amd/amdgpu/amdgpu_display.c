@@ -157,7 +157,6 @@ int amdgpu_display_crtc_page_flip_target(struct drm_crtc *crtc,
 	struct amdgpu_bo *new_abo;
 	unsigned long flags;
 	u64 tiling_flags;
-	u64 base;
 	int i, r;
 
 	work = kzalloc(sizeof *work, GFP_KERNEL);

@@ -1688,7 +1688,7 @@ static int amdgpu_ttm_fw_reserve_vram_init(struct amdgpu_device *adev)
 			AMDGPU_GEM_DOMAIN_VRAM,
 			adev->fw_vram_usage.start_offset,
 			(adev->fw_vram_usage.start_offset +
-			adev->fw_vram_usage.size), NULL);
+			adev->fw_vram_usage.size));
 		if (r)
 			goto error_pin;
 		r = amdgpu_bo_kmap(adev->fw_vram_usage.reserved_bo,
@@ -1799,18 +1799,12 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 	/* Compute GTT size, either bsaed on 3/4th the size of RAM size
 	 * or whatever the user passed on module init */
 	if (amdgpu_gtt_size == -1) {
-#ifdef __linux__
 		struct sysinfo si;
 
 		si_meminfo(&si);
 		gtt_size = min(max((AMDGPU_DEFAULT_GTT_SIZE_MB << 20),
 			       adev->gmc.mc_vram_size),
 			       ((uint64_t)si.totalram * si.mem_unit * 3/4));
-#else
-		gtt_size = min(max((AMDGPU_DEFAULT_GTT_SIZE_MB << 20),
-			       adev->gmc.mc_vram_size),
-			       ((uint64_t)physmem * PAGE_SIZE * 3/4));
-#endif
 	}
 	else
 		gtt_size = (uint64_t)amdgpu_gtt_size << 20;
