@@ -2,7 +2,7 @@
 
 .if ${MACHINE_CPUARCH} == "amd64" 
 _amdgpu=	amdgpu
-_amdkfd=	amdkfd
+# _amdkfd=	amdkfd
 .endif
 
 .if ${MACHINE_ARCH} == "powerpc64"
