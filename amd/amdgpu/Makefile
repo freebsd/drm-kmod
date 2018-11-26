@@ -328,7 +328,6 @@ SRCS+=	amdgpu_dm.c \
 	irq_service_dce80.c \
 	irq_service_dcn10.c \
 	log_helpers.c \
-	logger.c \
 	vector.c \
 	virtual_link_encoder.c \
 	virtual_stream_encoder.c
