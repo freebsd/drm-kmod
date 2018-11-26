@@ -90,6 +90,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_device.c \
 	amdgpu_display.c \
 	amdgpu_dm_color.c \
+	amdgpu_dm_debugfs.c \
 	amdgpu_dpm.c \
 	amdgpu_drv.c \
 	amdgpu_encoders.c \
@@ -214,6 +215,7 @@ SRCS+=	amdgpu_dm.c \
 	amdgpu_dm_helpers.c \
 	amdgpu_dm_irq.c \
 	amdgpu_dm_mst_types.c \
+	amdgpu_dm_pp_smu.c \
 	amdgpu_dm_services.c \
 	aux_engine.c \
 	aux_engine_dce110.c \
@@ -269,6 +271,7 @@ SRCS+=	amdgpu_dm.c \
 	dce80_timing_generator.c \
 	dce_abm.c \
 	dce_audio.c \
+	dce_aux.c \
 	dce_calcs.c \
 	dce_clock_source.c \
 	dce_clocks.c \
@@ -357,6 +360,7 @@ SRCS+=	amd_powerplay.c \
 	smu7_thermal.c \
 	smu8_hwmgr.c \
 	smu8_smumgr.c \
+	smu9_smumgr.c \
 	smu10_hwmgr.c \
 	smu10_smumgr.c \
 	smu_helper.c \
@@ -459,8 +463,9 @@ CWARNFLAGS.amdgpu_connectors.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_cs.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ctx.c=
 CWARNFLAGS.amdgpu_debugfs.c=
-CWARNFLAGS.amdgpu_device.c=	  -Wno-missing-prototypes -Wno-enum-conversion
-CWARNFLAGS.amdgpu_dm.c=		 -Wno-missing-prototypes -Wno-pointer-bool-conversion
+CWARNFLAGS.amdgpu_device.c=	-Wno-missing-prototypes -Wno-enum-conversion
+CWARNFLAGS.amdgpu_dm.c=		-Wno-missing-prototypes -Wno-pointer-bool-conversion
+CWARNFLAGS.amdgpu_dm_pp_smu.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.amdgpu_dm_helpers.c= -Wno-missing-braces
 CWARNFLAGS.amdgpu_display.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_gfx.c=	-Wno-missing-prototypes
@@ -479,6 +484,7 @@ CWARNFLAGS.amd_powerplay.c=	-Wno-missing-prototypes
 CWARNFLAGS.atombios.c=
 CWARNFLAGS.atombios_crtc.c=	-Wno-missing-prototypes
 CWARNFLAGS.atombios_i2c.c=	-Wno-missing-prototypes
+CWARNFLAGS.aux_engine_dce110.c=	-Wno-enum-conversion
 CWARNFLAGS.bios_parser.c=	-Wno-initializer-overrides -Wno-missing-prototypes
 CWARNFLAGS.ci_dpm.c=	-Wno-unused-const-variable
 CWARNFLAGS.ci_smc_pp.c=	-Wno-missing-prototypes
@@ -495,7 +501,8 @@ CWARNFLAGS.dc_link_dp.c=	-Wno-enum-conversion
 CWARNFLAGS.dc_resource.c=	-Wno-missing-braces
 CWARNFLAGS.dc_surface.c=	-Wno-int-conversion -Wno-missing-prototypes
 CWARNFLAGS.dce_virtual.c=	-Wno-missing-prototypes
-CWARNFLAGS.dce_v6_0.c=	 -Wno-unused-const-variable -Wno-missing-prototypes
+CWARNFLAGS.dce_aux.c=	-Wno-enum-conversion -Wno-missing-prototypes
+CWARNFLAGS.dce_v6_0.c=	-Wno-unused-const-variable -Wno-missing-prototypes
 CWARNFLAGS.dce_v8_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_v10_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_v11_0.c=	-Wno-missing-prototypes
@@ -531,6 +538,8 @@ CWARNFLAGS.fiji_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.fiji_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.fixpt31_32.c=	-Wno-incompatible-pointer-types
 CWARNFLAGS.gmc_v6_0.c=	-Wno-unused-const-variable
+CWARNFLAGS.gmc_v8_0.c=	-Wno-missing-braces
+CWARNFLAGS.gmc_v9_0.c=	-Wno-missing-braces
 CWARNFLAGS.gfx_v6_0.c=	 -Wno-unused-const-variable
 CWARNFLAGS.gfx_v7_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.gfx_v8_0.c=	-Wno-missing-prototypes
@@ -565,9 +574,10 @@ CWARNFLAGS.sdma_v3_0.c=		-Wno-missing-prototypes
 CWARNFLAGS.sdma_v4_0.c=		-Wno-missing-prototypes  -Wno-sometimes-uninitialized
 CWARNFLAGS.si.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu7_clockpowergating.c=		-Wno-missing-prototypes -Wno-enum-conversion
-CWARNFLAGS.smu7_hwmgr.c=		-Wno-missing-prototypes
-CWARNFLAGS.smu8_hwmgr.c=		-Wno-missing-prototypes
-CWARNFLAGS.smu10_hwmgr.c=		-Wno-missing-prototypes  	-Wno-initializer-overrides
+CWARNFLAGS.smu7_hwmgr.c=	-Wno-missing-prototypes
+CWARNFLAGS.smu8_hwmgr.c=	-Wno-missing-prototypes
+CWARNFLAGS.smu9_smumgr.c=	-Wno-missing-prototypes
+CWARNFLAGS.smu10_hwmgr.c=	-Wno-missing-prototypes  	-Wno-initializer-overrides
 CWARNFLAGS.soc15.c=		-Wno-missing-prototypes
 CWARNFLAGS.tonga_clockpowergating.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.tonga_hwmgr.c=	-Wno-missing-prototypes  -Wno-unused-const-variable
