@@ -150,6 +150,17 @@ static inline const char *port_identifier(enum port port)
 	}
 }
 
+enum tc_port {
+	PORT_TC_NONE = -1,
+
+	PORT_TC1 = 0,
+	PORT_TC2,
+	PORT_TC3,
+	PORT_TC4,
+
+	I915_MAX_TC_PORTS
+};
+
 enum dpio_channel {
 	DPIO_CH0,
 	DPIO_CH1
