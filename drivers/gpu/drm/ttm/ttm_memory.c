@@ -307,25 +307,17 @@ static void ttm_shrink_work(struct work_struct *work)
 }
 
 static int ttm_mem_init_kernel_zone(struct ttm_mem_global *glob,
-#ifdef __linux__
 				    const struct sysinfo *si)
-#else
-				    uint64_t mem)
-#endif
 {
 	struct ttm_mem_zone *zone = kzalloc(sizeof(*zone), GFP_KERNEL);
-#ifdef __linux__
 	uint64_t mem;
-#endif
 	int ret;
 
 	if (unlikely(!zone))
 		return -ENOMEM;
 
-#ifdef __linux__
 	mem = si->totalram - si->totalhigh;
 	mem *= si->mem_unit;
-#endif
 
 	zone->name = "kernel";
 	zone->zone_mem = mem;
@@ -383,25 +375,17 @@ static int ttm_mem_init_highmem_zone(struct ttm_mem_global *glob,
 }
 #else
 static int ttm_mem_init_dma32_zone(struct ttm_mem_global *glob,
-#ifdef __linux__
 				   const struct sysinfo *si)
-#else
-				   uint64_t mem)
-#endif
 {
 	struct ttm_mem_zone *zone = kzalloc(sizeof(*zone), GFP_KERNEL);
-#ifdef __linux__
 	uint64_t mem;
-#endif
 	int ret;
 
 	if (unlikely(!zone))
 		return -ENOMEM;
 
-#ifdef __linux__
 	mem = si->totalram;
 	mem *= si->mem_unit;
-#endif
 
 	/**
 	 * No special dma32 zone needed.
@@ -440,11 +424,7 @@ static int ttm_mem_init_dma32_zone(struct ttm_mem_global *glob,
 
 int ttm_mem_global_init(struct ttm_mem_global *glob)
 {
-#ifdef __linux__
 	struct sysinfo si;
-#else
-	u_int64_t mem;
-#endif
 	int ret;
 	int i;
 	struct ttm_mem_zone *zone;
@@ -459,19 +439,11 @@ int ttm_mem_global_init(struct ttm_mem_global *glob)
 		return ret;
 	}
 
-#ifdef __linux__
 	si_meminfo(&si);
-#else
-	mem = physmem * PAGE_SIZE;
-#endif
 
 	/* set it as 0 by default to keep original behavior of OOM */
 	glob->lower_mem_limit = 0;
-#ifdef __linux__
 	ret = ttm_mem_init_kernel_zone(glob, &si);
-#else
-	ret = ttm_mem_init_kernel_zone(glob, mem);
-#endif
 	if (unlikely(ret != 0))
 		goto out_no_zone;
 #ifdef CONFIG_HIGHMEM /* Not on FreeBSD */
@@ -479,11 +451,7 @@ int ttm_mem_global_init(struct ttm_mem_global *glob)
 	if (unlikely(ret != 0))
 		goto out_no_zone;
 #else
-#ifdef __linux__
 	ret = ttm_mem_init_dma32_zone(glob, &si);
-#else
-	ret = ttm_mem_init_dma32_zone(glob, mem);
-#endif
 	if (unlikely(ret != 0))
 		goto out_no_zone;
 #endif
