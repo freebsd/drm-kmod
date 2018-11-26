@@ -149,8 +149,7 @@ int amdgpu_gart_table_vram_pin(struct amdgpu_device *adev)
 	r = amdgpu_bo_reserve(adev->gart.robj, false);
 	if (unlikely(r != 0))
 		return r;
-	r = amdgpu_bo_pin(adev->gart.robj,
-				AMDGPU_GEM_DOMAIN_VRAM, &gpu_addr);
+	r = amdgpu_bo_pin(adev->gart.robj, AMDGPU_GEM_DOMAIN_VRAM);
 	if (r) {
 		amdgpu_bo_unreserve(adev->gart.robj);
 		return r;
