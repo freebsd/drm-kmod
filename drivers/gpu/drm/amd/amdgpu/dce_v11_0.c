@@ -1899,9 +1899,7 @@ static int dce_v11_0_crtc_do_set_base(struct drm_crtc *crtc,
 	if (unlikely(r != 0))
 		return r;
 
-	if (atomic) {
-		fb_location = amdgpu_bo_gpu_offset(abo);
-	} else {
+	if (!atomic) {
 		r = amdgpu_bo_pin(abo, AMDGPU_GEM_DOMAIN_VRAM);
 		if (unlikely(r != 0)) {
 			amdgpu_bo_unreserve(abo);

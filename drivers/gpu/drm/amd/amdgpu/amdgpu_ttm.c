@@ -823,23 +823,24 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 
 	down_read(&mm->mmap_sem);
 
-#ifdef __notyet__
-	/* BSDFIXME: no userptr support yet */
 	if (gtt->userflags & AMDGPU_GEM_USERPTR_ANONONLY) {
+		/* BSDFIXME: no userptr support yet */
+		panic("Missing implementation");
 		/*
 		 * check that we only use anonymous memory to prevent problems
 		 * with writeback
 		 */
+#ifdef __linux__
 		unsigned long end = gtt->userptr + ttm->num_pages * PAGE_SIZE;
 		struct vm_area_struct *vma;
-
+		/* BSDFIXME: Missing impl */
 		vma = find_vma(mm, gtt->userptr);
 		if (!vma || vma->vm_file || vma->vm_end < end) {
 			up_read(&mm->mmap_sem);
 			return -EPERM;
 		}
-	}
 #endif
+	}
 
 	/* loop enough times using contiguous pages of memory */
 	do {

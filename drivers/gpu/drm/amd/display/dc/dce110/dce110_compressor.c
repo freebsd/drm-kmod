@@ -147,7 +147,7 @@ static void wait_for_fbc_state_changed(
 	uint32_t addr = mmFBC_STATUS;
 	uint32_t value;
 
-	while (counter < 10) {
+	while (counter < 1000) {
 		value = dm_read_reg(cp110->base.ctx, addr);
 		if (get_reg_field_value(
 			value,
@@ -164,6 +164,8 @@ static void wait_for_fbc_state_changed(
 	} else {
 		DC_LOG_SYNC("FBC status changed to %d", enabled);
 	}
+
+
 }
 
 void dce110_compressor_power_up_fbc(struct compressor *compressor)

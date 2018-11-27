@@ -80,7 +80,7 @@ struct amdgpu_fence_driver {
 	struct timer_list		fallback_timer;
 	unsigned			num_fences_mask;
 	spinlock_t			lock;
-	struct dma_fence			**fences;
+	struct dma_fence		**fences;
 };
 
 int amdgpu_fence_driver_init(struct amdgpu_device *adev);
@@ -178,13 +178,7 @@ struct amdgpu_ring {
 	struct list_head		lru_list;
 
 	struct amdgpu_bo	*ring_obj;
-// XXX: Get conversion compiler errors in a lot of files, all pointing to code at amdgpu.h:1605.
-//	Best approach for fix?
-#ifndef __linux__
-    uint32_t	*ring;
-#else
 	volatile uint32_t	*ring;
-#endif
 	unsigned		rptr_offs;
 	u64			wptr;
 	u64			wptr_old;

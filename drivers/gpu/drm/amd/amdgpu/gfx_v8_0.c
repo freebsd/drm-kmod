@@ -4006,7 +4006,7 @@ static void gfx_v8_0_parse_ind_reg_list(int *register_list_format,
 				int max_indices,
 				int *ind_start_offsets,
 				int *offset_count,
-				int max_off)
+				int max_offset)
 {
 	int indices;
 	bool new_entry = true;
@@ -4017,7 +4017,7 @@ static void gfx_v8_0_parse_ind_reg_list(int *register_list_format,
 			new_entry = false;
 			ind_start_offsets[*offset_count] = ind_offset;
 			*offset_count = *offset_count + 1;
-			BUG_ON(*offset_count >= max_off);
+			BUG_ON(*offset_count >= max_offset);
 		}
 
 		if (register_list_format[ind_offset] == 0xFFFFFFFF) {

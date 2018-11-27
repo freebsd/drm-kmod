@@ -853,7 +853,6 @@ void amdgpu_bo_unref(struct amdgpu_bo **bo)
  * @domain: domain to be pinned to
  * @min_offset: the start of requested address range
  * @max_offset: the end of requested address range
- * @gpu_addr: GPU offset of the &amdgpu_bo buffer object
  *
  * Pins the buffer object according to requested domain and address range. If
  * the memory is unbound gart memory, binds the pages into gart table. Adjusts
@@ -957,7 +956,6 @@ error:
  * amdgpu_bo_pin - pin an &amdgpu_bo buffer object
  * @bo: &amdgpu_bo buffer object to be pinned
  * @domain: domain to be pinned to
- * @gpu_addr: GPU offset of the &amdgpu_bo buffer object
  *
  * A simple wrapper to amdgpu_bo_pin_restricted().
  * Provides a simpler API for buffers that do not have any strict restrictions

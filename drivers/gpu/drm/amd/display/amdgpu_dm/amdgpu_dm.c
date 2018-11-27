@@ -4836,7 +4836,7 @@ static int dm_update_crtcs_state(struct dc *dc,
 		if (aconnector && enable) {
 			// Make sure fake sink is created in plug-in scenario
 			drm_new_conn_state = drm_atomic_get_new_connector_state(state,
-								    &aconnector->base);
+ 								    &aconnector->base);
 			drm_old_conn_state = drm_atomic_get_old_connector_state(state,
 								    &aconnector->base);
 

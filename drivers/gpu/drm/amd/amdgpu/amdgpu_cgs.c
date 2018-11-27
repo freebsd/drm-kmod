@@ -30,9 +30,6 @@
 #include "atom.h"
 #include "amdgpu_ucode.h"
 
-#undef min_offset
-#undef max_offset
-
 struct amdgpu_cgs_device {
 	struct cgs_device base;
 	struct amdgpu_device *adev;
@@ -481,6 +478,3 @@ void amdgpu_cgs_destroy_device(struct cgs_device *cgs_device)
 {
 	kfree(cgs_device);
 }
-
-#define min_offset header.start
-#define max_offset header.end
