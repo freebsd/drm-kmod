@@ -3243,6 +3243,7 @@ amdgpu_dm_connector_atomic_duplicate_state(struct drm_connector *connector)
 
 	new_state->freesync_capable = state->freesync_capable;
 	new_state->abm_level = state->abm_level;
+	new_state->max_bpc = state->max_bpc;
 
 	return &new_state->base;
 }
