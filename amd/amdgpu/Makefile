@@ -383,6 +383,7 @@ SRCS+=	chash.c
 
 # powerplay
 SRCS+=	amd_powerplay.c \
+	amdgpu_smu.c \
 	common_baco.c \
 	ci_smumgr.c \
 	fiji_smumgr.c \
@@ -526,6 +527,7 @@ CWARNFLAGS.amdgpu_pll.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_pm.c=		-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.amdgpu_ring.c=
 CWARNFLAGS.amdgpu_sched.c=	-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_smu.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ttm.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ucode.c=	-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.amdgpu_vm.c=		-Wno-missing-prototypes

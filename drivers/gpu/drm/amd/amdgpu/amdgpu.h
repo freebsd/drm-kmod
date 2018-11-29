@@ -83,6 +83,7 @@
 #include "amdgpu_gem.h"
 #include "amdgpu_doorbell.h"
 #include "amdgpu_amdkfd.h"
+#include "amdgpu_smu.h"
 
 #define firmware linux_firmware
 #define MAX_GPU_INSTANCE		16
@@ -847,6 +848,9 @@ struct amdgpu_device {
 	/* powerplay */
 	struct amd_powerplay		powerplay;
 	bool				pp_force_state_enabled;
+
+	/* smu */
+	struct smu_context		smu;
 
 	/* dpm */
 	struct amdgpu_pm		pm;
