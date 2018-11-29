@@ -902,9 +902,9 @@ static void icl_gt_workarounds_init(struct drm_i915_private *i915)
 			    MSCUNIT_CLKGATE_DIS);
 
 	/* Wa_1406680159:icl */
-	wa_write_or(wal,
-		    SUBSLICE_UNIT_LEVEL_CLKGATE,
-		    GWUNIT_CLKGATE_DIS);
+	I915_WRITE(SUBSLICE_UNIT_LEVEL_CLKGATE,
+		   I915_READ(SUBSLICE_UNIT_LEVEL_CLKGATE) |
+		   GWUNIT_CLKGATE_DIS);
 
 	/* Wa_1406838659:icl (pre-prod) */
 	if (IS_ICL_REVID(i915, ICL_REVID_A0, ICL_REVID_B0))
