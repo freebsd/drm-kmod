@@ -84,8 +84,9 @@
 #define GEN2_FEATURES \
 	GEN(2), \
 	.num_pipes = 1, \
-	.has_overlay = 1, .overlay_needs_physical = 1, \
-	.has_gmch_display = 1, \
+	.display.has_overlay = 1, \
+	.display.overlay_needs_physical = 1, \
+	.display.has_gmch_display = 1, \
 	.hws_needs_physical = 1, \
 	.unfenced_needs_alignment = 1, \
 	.ring_mask = RENDER_RING, \
@@ -98,7 +99,8 @@
 static const struct intel_device_info intel_i830_info = {
 	GEN2_FEATURES,
 	PLATFORM(INTEL_I830),
-	.is_mobile = 1, .cursor_needs_physical = 1,
+	.is_mobile = 1,
+	.display.cursor_needs_physical = 1,
 	.num_pipes = 2, /* legal, last one wins */
 };
 
@@ -112,8 +114,8 @@ static const struct intel_device_info intel_i85x_info = {
 	PLATFORM(INTEL_I85X),
 	.is_mobile = 1,
 	.num_pipes = 2, /* legal, last one wins */
-	.cursor_needs_physical = 1,
-	.has_fbc = 1,
+	.display.cursor_needs_physical = 1,
+	.display.has_fbc = 1,
 };
 
 static const struct intel_device_info intel_i865g_info = {
@@ -124,7 +126,7 @@ static const struct intel_device_info intel_i865g_info = {
 #define GEN3_FEATURES \
 	GEN(3), \
 	.num_pipes = 2, \
-	.has_gmch_display = 1, \
+	.display.has_gmch_display = 1, \
 	.ring_mask = RENDER_RING, \
 	.has_snoop = true, \
 	.has_coherent_ggtt = true, \
@@ -136,8 +138,9 @@ static const struct intel_device_info intel_i915g_info = {
 	GEN3_FEATURES,
 	PLATFORM(INTEL_I915G),
 	.has_coherent_ggtt = false,
-	.cursor_needs_physical = 1,
-	.has_overlay = 1, .overlay_needs_physical = 1,
+	.display.cursor_needs_physical = 1,
+	.display.has_overlay = 1,
+	.display.overlay_needs_physical = 1,
 	.hws_needs_physical = 1,
 	.unfenced_needs_alignment = 1,
 };
@@ -146,10 +149,11 @@ static const struct intel_device_info intel_i915gm_info = {
 	GEN3_FEATURES,
 	PLATFORM(INTEL_I915GM),
 	.is_mobile = 1,
-	.cursor_needs_physical = 1,
-	.has_overlay = 1, .overlay_needs_physical = 1,
-	.supports_tv = 1,
-	.has_fbc = 1,
+	.display.cursor_needs_physical = 1,
+	.display.has_overlay = 1,
+	.display.overlay_needs_physical = 1,
+	.display.supports_tv = 1,
+	.display.has_fbc = 1,
 	.hws_needs_physical = 1,
 	.unfenced_needs_alignment = 1,
 };
@@ -157,8 +161,10 @@ static const struct intel_device_info intel_i915gm_info = {
 static const struct intel_device_info intel_i945g_info = {
 	GEN3_FEATURES,
 	PLATFORM(INTEL_I945G),
-	.has_hotplug = 1, .cursor_needs_physical = 1,
-	.has_overlay = 1, .overlay_needs_physical = 1,
+	.display.has_hotplug = 1,
+	.display.cursor_needs_physical = 1,
+	.display.has_overlay = 1,
+	.display.overlay_needs_physical = 1,
 	.hws_needs_physical = 1,
 	.unfenced_needs_alignment = 1,
 };
@@ -167,10 +173,12 @@ static const struct intel_device_info intel_i945gm_info = {
 	GEN3_FEATURES,
 	PLATFORM(INTEL_I945GM),
 	.is_mobile = 1,
-	.has_hotplug = 1, .cursor_needs_physical = 1,
-	.has_overlay = 1, .overlay_needs_physical = 1,
-	.supports_tv = 1,
-	.has_fbc = 1,
+	.display.has_hotplug = 1,
+	.display.cursor_needs_physical = 1,
+	.display.has_overlay = 1,
+	.display.overlay_needs_physical = 1,
+	.display.supports_tv = 1,
+	.display.has_fbc = 1,
 	.hws_needs_physical = 1,
 	.unfenced_needs_alignment = 1,
 };
@@ -178,23 +186,23 @@ static const struct intel_device_info intel_i945gm_info = {
 static const struct intel_device_info intel_g33_info = {
 	GEN3_FEATURES,
 	PLATFORM(INTEL_G33),
-	.has_hotplug = 1,
-	.has_overlay = 1,
+	.display.has_hotplug = 1,
+	.display.has_overlay = 1,
 };
 
 static const struct intel_device_info intel_pineview_info = {
 	GEN3_FEATURES,
 	PLATFORM(INTEL_PINEVIEW),
 	.is_mobile = 1,
-	.has_hotplug = 1,
-	.has_overlay = 1,
+	.display.has_hotplug = 1,
+	.display.has_overlay = 1,
 };
 
 #define GEN4_FEATURES \
 	GEN(4), \
 	.num_pipes = 2, \
-	.has_hotplug = 1, \
-	.has_gmch_display = 1, \
+	.display.has_hotplug = 1, \
+	.display.has_gmch_display = 1, \
 	.ring_mask = RENDER_RING, \
 	.has_snoop = true, \
 	.has_coherent_ggtt = true, \
@@ -205,7 +213,7 @@ static const struct intel_device_info intel_pineview_info = {
 static const struct intel_device_info intel_i965g_info = {
 	GEN4_FEATURES,
 	PLATFORM(INTEL_I965G),
-	.has_overlay = 1,
+	.display.has_overlay = 1,
 	.hws_needs_physical = 1,
 	.has_snoop = false,
 };
@@ -213,9 +221,10 @@ static const struct intel_device_info intel_i965g_info = {
 static const struct intel_device_info intel_i965gm_info = {
 	GEN4_FEATURES,
 	PLATFORM(INTEL_I965GM),
-	.is_mobile = 1, .has_fbc = 1,
-	.has_overlay = 1,
-	.supports_tv = 1,
+	.is_mobile = 1,
+	.display.has_fbc = 1,
+	.display.has_overlay = 1,
+	.display.supports_tv = 1,
 	.hws_needs_physical = 1,
 	.has_snoop = false,
 };
@@ -229,15 +238,16 @@ static const struct intel_device_info intel_g45_info = {
 static const struct intel_device_info intel_gm45_info = {
 	GEN4_FEATURES,
 	PLATFORM(INTEL_GM45),
-	.is_mobile = 1, .has_fbc = 1,
-	.supports_tv = 1,
+	.is_mobile = 1,
+	.display.has_fbc = 1,
+	.display.supports_tv = 1,
 	.ring_mask = RENDER_RING | BSD_RING,
 };
 
 #define GEN5_FEATURES \
 	GEN(5), \
 	.num_pipes = 2, \
-	.has_hotplug = 1, \
+	.display.has_hotplug = 1, \
 	.ring_mask = RENDER_RING | BSD_RING, \
 	.has_snoop = true, \
 	.has_coherent_ggtt = true, \
@@ -255,14 +265,15 @@ static const struct intel_device_info intel_ironlake_d_info = {
 static const struct intel_device_info intel_ironlake_m_info = {
 	GEN5_FEATURES,
 	PLATFORM(INTEL_IRONLAKE),
-	.is_mobile = 1, .has_fbc = 1,
+	.is_mobile = 1,
+	.display.has_fbc = 1,
 };
 
 #define GEN6_FEATURES \
 	GEN(6), \
 	.num_pipes = 2, \
-	.has_hotplug = 1, \
-	.has_fbc = 1, \
+	.display.has_hotplug = 1, \
+	.display.has_fbc = 1, \
 	.ring_mask = RENDER_RING | BSD_RING | BLT_RING, \
 	.has_coherent_ggtt = true, \
 	.has_llc = 1, \
@@ -306,8 +317,8 @@ static const struct intel_device_info intel_sandybridge_m_gt2_info = {
 #define GEN7_FEATURES  \
 	GEN(7), \
 	.num_pipes = 3, \
-	.has_hotplug = 1, \
-	.has_fbc = 1, \
+	.display.has_hotplug = 1, \
+	.display.has_fbc = 1, \
 	.ring_mask = RENDER_RING | BSD_RING | BLT_RING, \
 	.has_coherent_ggtt = true, \
 	.has_llc = 1, \
@@ -364,8 +375,8 @@ static const struct intel_device_info intel_valleyview_info = {
 	.num_pipes = 2,
 	.has_runtime_pm = 1,
 	.has_rc6 = 1,
-	.has_gmch_display = 1,
-	.has_hotplug = 1,
+	.display.has_gmch_display = 1,
+	.display.has_hotplug = 1,
 	.ppgtt = INTEL_PPGTT_FULL,
 	.has_snoop = true,
 	.has_coherent_ggtt = false,
@@ -379,10 +390,10 @@ static const struct intel_device_info intel_valleyview_info = {
 #define G75_FEATURES  \
 	GEN7_FEATURES, \
 	.ring_mask = RENDER_RING | BSD_RING | BLT_RING | VEBOX_RING, \
-	.has_ddi = 1, \
+	.display.has_ddi = 1, \
 	.has_fpga_dbg = 1, \
-	.has_psr = 1, \
-	.has_dp_mst = 1, \
+	.display.has_psr = 1, \
+	.display.has_dp_mst = 1, \
 	.has_rc6p = 0 /* RC6p removed-by HSW */, \
 	.has_runtime_pm = 1
 
@@ -449,14 +460,14 @@ static const struct intel_device_info intel_cherryview_info = {
 	PLATFORM(INTEL_CHERRYVIEW),
 	GEN(8),
 	.num_pipes = 3,
-	.has_hotplug = 1,
+	.display.has_hotplug = 1,
 	.is_lp = 1,
 	.ring_mask = RENDER_RING | BSD_RING | BLT_RING | VEBOX_RING,
 	.has_64bit_reloc = 1,
 	.has_runtime_pm = 1,
 	.has_rc6 = 1,
 	.has_logical_ring_contexts = 1,
-	.has_gmch_display = 1,
+	.display.has_gmch_display = 1,
 	.ppgtt = INTEL_PPGTT_FULL,
 	.has_reset_engine = 1,
 	.has_snoop = true,
@@ -478,15 +489,15 @@ static const struct intel_device_info intel_cherryview_info = {
 	GEN(9), \
 	GEN9_DEFAULT_PAGE_SIZES, \
 	.has_logical_ring_preemption = 1, \
-	.has_csr = 1, \
+	.display.has_csr = 1, \
 	.has_guc = 1, \
-	.has_ipc = 1, \
+	.display.has_ipc = 1, \
 	.ddb_size = 896
 
 #define SKL_PLATFORM \
 	GEN9_FEATURES, \
 	/* Display WA #0477 WaDisableIPC: skl */ \
-	.has_ipc = 0, \
+	.display.has_ipc = 0, \
 	PLATFORM(INTEL_SKYLAKE)
 
 static const struct intel_device_info intel_skylake_gt1_info = {
@@ -517,19 +528,19 @@ static const struct intel_device_info intel_skylake_gt4_info = {
 #define GEN9_LP_FEATURES \
 	GEN(9), \
 	.is_lp = 1, \
-	.has_hotplug = 1, \
+	.display.has_hotplug = 1, \
 	.ring_mask = RENDER_RING | BSD_RING | BLT_RING | VEBOX_RING, \
 	.num_pipes = 3, \
 	.has_64bit_reloc = 1, \
-	.has_ddi = 1, \
+	.display.has_ddi = 1, \
 	.has_fpga_dbg = 1, \
-	.has_fbc = 1, \
-	.has_psr = 1, \
+	.display.has_fbc = 1, \
+	.display.has_psr = 1, \
 	.has_runtime_pm = 1, \
 	.has_pooled_eu = 0, \
-	.has_csr = 1, \
+	.display.has_csr = 1, \
 	.has_rc6 = 1, \
-	.has_dp_mst = 1, \
+	.display.has_dp_mst = 1, \
 	.has_logical_ring_contexts = 1, \
 	.has_logical_ring_preemption = 1, \
 	.has_guc = 1, \
@@ -537,7 +548,7 @@ static const struct intel_device_info intel_skylake_gt4_info = {
 	.has_reset_engine = 1, \
 	.has_snoop = true, \
 	.has_coherent_ggtt = false, \
-	.has_ipc = 1, \
+	.display.has_ipc = 1, \
 	GEN9_DEFAULT_PAGE_SIZES, \
 	GEN_DEFAULT_PIPEOFFSETS, \
 	IVB_CURSOR_OFFSETS, \
