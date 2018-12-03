@@ -32,7 +32,7 @@
 #endif
 
 #if defined(__linux__) && defined(CONFIG_SMP)
-#define task_asleep(tsk) ((tsk)->state & TASK_NORMAL && !(tsk)->on_cpu)
+#define task_asleep(tsk) ((tsk)->state & TASK_NORMAL && !(tsk)->on_rq)
 #else
 #define task_asleep(tsk) (atomic_read(&(tsk)->state) & TASK_NORMAL)
 #endif
