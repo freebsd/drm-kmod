@@ -53,6 +53,7 @@
 #include "i915_vgpu.h"
 #include "intel_drv.h"
 #include "intel_uc.h"
+#include "intel_workarounds.h"
 
 #ifndef __linux__
 #define pci_get_class linux_pci_get_class
