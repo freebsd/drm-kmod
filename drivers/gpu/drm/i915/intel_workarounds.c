@@ -656,6 +656,17 @@ static void gen9_gt_workarounds_init(struct drm_i915_private *i915)
 {
 	struct i915_wa_list *wal = &i915->gt_wa_list;
 
+	/* WaContextSwitchWithConcurrentTLBInvalidate:skl,bxt,kbl,glk,cfl */
+	wa_masked_en(wal,
+		     GEN9_CSFE_CHICKEN1_RCS,
+		     GEN9_PREEMPT_GPGPU_SYNC_SWITCH_DISABLE);
+
+
+	/* WaEnableLbsSlaRetryTimerDecrement:skl,bxt,kbl,glk,cfl */
+	wa_write_or(wal,
+		    BDW_SCRATCH1,
+		    GEN9_LBS_SLA_RETRY_TIMER_DECREMENT_ENABLE);
+
 	/* WaDisableKillLogic:bxt,skl,kbl */
 	if (!IS_COFFEELAKE(i915))
 		wa_write_or(wal,
@@ -677,6 +688,24 @@ static void gen9_gt_workarounds_init(struct drm_i915_private *i915)
 	wa_write_or(wal,
 		    GAM_ECOCHK,
 		    BDW_DISABLE_HDC_INVALIDATION);
+
+	/* WaProgramL3SqcReg1DefaultForPerf:bxt,glk */
+	if (IS_GEN9_LP(i915))
+		wa_write_masked_or(wal,
+				   GEN8_L3SQCREG1,
+				   L3_PRIO_CREDITS_MASK,
+				   L3_GENERAL_PRIO_CREDITS(62) |
+				   L3_HIGH_PRIO_CREDITS(2));
+
+	/* WaOCLCoherentLineFlush:skl,bxt,kbl,cfl */
+	wa_write_or(wal,
+		    GEN8_L3SQCREG4,
+		    GEN8_LQSC_FLUSH_COHERENT_LINES);
+
+	/* WaEnablePreemptionGranularityControlByUMD:skl,bxt,kbl,cfl,[cnl] */
+	wa_masked_en(wal,
+		     GEN7_FF_SLICE_CS_CHICKEN1,
+		     GEN9_FFSC_PERCTX_PREEMPT_CTRL);
 }
 
 static void skl_gt_workarounds_init(struct drm_i915_private *i915)
@@ -684,6 +713,11 @@ static void skl_gt_workarounds_init(struct drm_i915_private *i915)
 	struct i915_wa_list *wal = &i915->gt_wa_list;
 
 	gen9_gt_workarounds_init(i915);
+
+	/* WaEnableGapsTsvCreditFix:skl */
+	wa_write_or(wal,
+		    GEN8_GARBCNTL,
+		    GEN9_GAPS_TSV_CREDIT_DISABLE);
 
 	/* WaDisableGafsUnitClkGating:skl */
 	wa_write_or(wal,
@@ -703,6 +737,11 @@ static void bxt_gt_workarounds_init(struct drm_i915_private *i915)
 
 	gen9_gt_workarounds_init(i915);
 
+	/* WaDisablePooledEuLoadBalancingFix:bxt */
+	wa_masked_en(wal,
+		     FF_SLICE_CS_CHICKEN2,
+		     GEN9_POOLED_EU_LOAD_BALANCING_FIX_DISABLE);
+
 	/* WaInPlaceDecompressionHang:bxt */
 	wa_write_or(wal,
 		    GEN9_GAMT_ECO_REG_RW_IA,
@@ -714,6 +753,11 @@ static void kbl_gt_workarounds_init(struct drm_i915_private *i915)
 	struct i915_wa_list *wal = &i915->gt_wa_list;
 
 	gen9_gt_workarounds_init(i915);
+
+	/* WaEnableGapsTsvCreditFix:kbl */
+	wa_write_or(wal,
+		    GEN8_GARBCNTL,
+		    GEN9_GAPS_TSV_CREDIT_DISABLE);
 
 	/* WaDisableDynamicCreditSharing:kbl */
 	if (IS_KBL_REVID(i915, 0, KBL_REVID_B0))
@@ -730,6 +774,21 @@ static void kbl_gt_workarounds_init(struct drm_i915_private *i915)
 	wa_write_or(wal,
 		    GEN9_GAMT_ECO_REG_RW_IA,
 		    GAMT_ECO_ENABLE_IN_PLACE_DECOMPRESS);
+
+	/* WaKBLVECSSemaphoreWaitPoll:kbl */
+	if (IS_KBL_REVID(i915, KBL_REVID_A0, KBL_REVID_E0)) {
+		struct intel_engine_cs *engine;
+		unsigned int tmp;
+
+		for_each_engine(engine, i915, tmp) {
+			if (engine->id == RCS)
+				continue;
+
+			wa_write(wal,
+				 RING_SEMA_WAIT_POLL(engine->mmio_base),
+				 1);
+		}
+	}
 }
 
 static void glk_gt_workarounds_init(struct drm_i915_private *i915)
@@ -742,6 +801,11 @@ static void cfl_gt_workarounds_init(struct drm_i915_private *i915)
 	struct i915_wa_list *wal = &i915->gt_wa_list;
 
 	gen9_gt_workarounds_init(i915);
+
+	/* WaEnableGapsTsvCreditFix:cfl */
+	wa_write_or(wal,
+		    GEN8_GARBCNTL,
+		    GEN9_GAPS_TSV_CREDIT_DISABLE);
 
 	/* WaDisableGafsUnitClkGating:cfl */
 	wa_write_or(wal,
@@ -833,6 +897,11 @@ static void cnl_gt_workarounds_init(struct drm_i915_private *i915)
 	wa_write_or(wal,
 		    GEN9_GAMT_ECO_REG_RW_IA,
 		    GAMT_ECO_ENABLE_IN_PLACE_DECOMPRESS);
+
+	/* WaEnablePreemptionGranularityControlByUMD:cnl */
+	wa_masked_en(wal,
+		     GEN7_FF_SLICE_CS_CHICKEN1,
+		     GEN9_FFSC_PERCTX_PREEMPT_CTRL);
 }
 
 static void icl_gt_workarounds_init(struct drm_i915_private *i915)
@@ -841,59 +910,67 @@ static void icl_gt_workarounds_init(struct drm_i915_private *i915)
 
 	wa_init_mcr(i915);
 
+	/* This is not an Wa. Enable for better image quality */
+	wa_masked_en(wal,
+		     _3D_CHICKEN3,
+		     _3D_CHICKEN3_AA_LINE_QUALITY_FIX_ENABLE);
+
 	/* WaInPlaceDecompressionHang:icl */
-	I915_WRITE(GEN9_GAMT_ECO_REG_RW_IA,
-		   I915_READ(GEN9_GAMT_ECO_REG_RW_IA) |
-		   GAMT_ECO_ENABLE_IN_PLACE_DECOMPRESS);
+	wa_write_or(wal,
+		    GEN9_GAMT_ECO_REG_RW_IA,
+		    GAMT_ECO_ENABLE_IN_PLACE_DECOMPRESS);
 
 	/* WaPipelineFlushCoherentLines:icl */
-	I915_WRITE(GEN8_L3SQCREG4,
-		   I915_READ(GEN8_L3SQCREG4) |
-		   GEN8_LQSC_FLUSH_COHERENT_LINES);
+	wa_write_or(wal,
+		    GEN8_L3SQCREG4,
+		    GEN8_LQSC_FLUSH_COHERENT_LINES);
 
 	/* Wa_1405543622:icl
 	 * Formerly known as WaGAPZPriorityScheme
 	 */
-	I915_WRITE(GEN8_GARBCNTL,
-		   I915_READ(GEN8_GARBCNTL) |
-		   GEN11_ARBITRATION_PRIO_ORDER_MASK);
+	wa_write_or(wal,
+		    GEN8_GARBCNTL,
+		    GEN11_ARBITRATION_PRIO_ORDER_MASK);
 
 	/* Wa_1604223664:icl
 	 * Formerly known as WaL3BankAddressHashing
 	 */
-	I915_WRITE(GEN8_GARBCNTL,
-		   (I915_READ(GEN8_GARBCNTL) & ~GEN11_HASH_CTRL_EXCL_MASK) |
-		   GEN11_HASH_CTRL_EXCL_BIT0);
-	I915_WRITE(GEN11_GLBLINVL,
-		   (I915_READ(GEN11_GLBLINVL) & ~GEN11_BANK_HASH_ADDR_EXCL_MASK) |
-		   GEN11_BANK_HASH_ADDR_EXCL_BIT0);
+	wa_write_masked_or(wal,
+			   GEN8_GARBCNTL,
+			   GEN11_HASH_CTRL_EXCL_MASK,
+			   GEN11_HASH_CTRL_EXCL_BIT0);
+	wa_write_masked_or(wal,
+			   GEN11_GLBLINVL,
+			   GEN11_BANK_HASH_ADDR_EXCL_MASK,
+			   GEN11_BANK_HASH_ADDR_EXCL_BIT0);
 
 	/* WaModifyGamTlbPartitioning:icl */
-	I915_WRITE(GEN11_GACB_PERF_CTRL,
-		   (I915_READ(GEN11_GACB_PERF_CTRL) & ~GEN11_HASH_CTRL_MASK) |
-		   GEN11_HASH_CTRL_BIT0 | GEN11_HASH_CTRL_BIT4);
+	wa_write_masked_or(wal,
+			   GEN11_GACB_PERF_CTRL,
+			   GEN11_HASH_CTRL_MASK,
+			   GEN11_HASH_CTRL_BIT0 | GEN11_HASH_CTRL_BIT4);
 
 	/* Wa_1405733216:icl
 	 * Formerly known as WaDisableCleanEvicts
 	 */
-	I915_WRITE(GEN8_L3SQCREG4,
-		   I915_READ(GEN8_L3SQCREG4) |
-		   GEN11_LQSC_CLEAN_EVICT_DISABLE);
+	wa_write_or(wal,
+		    GEN8_L3SQCREG4,
+		    GEN11_LQSC_CLEAN_EVICT_DISABLE);
 
 	/* Wa_1405766107:icl
 	 * Formerly known as WaCL2SFHalfMaxAlloc
 	 */
-	I915_WRITE(GEN11_LSN_UNSLCVC,
-		   I915_READ(GEN11_LSN_UNSLCVC) |
-		   GEN11_LSN_UNSLCVC_GAFS_HALF_SF_MAXALLOC |
-		   GEN11_LSN_UNSLCVC_GAFS_HALF_CL2_MAXALLOC);
+	wa_write_or(wal,
+		    GEN11_LSN_UNSLCVC,
+		    GEN11_LSN_UNSLCVC_GAFS_HALF_SF_MAXALLOC |
+		    GEN11_LSN_UNSLCVC_GAFS_HALF_CL2_MAXALLOC);
 
 	/* Wa_220166154:icl
 	 * Formerly known as WaDisCtxReload
 	 */
-	I915_WRITE(GEN8_GAMW_ECO_DEV_RW_IA,
-		   I915_READ(GEN8_GAMW_ECO_DEV_RW_IA) |
-		   GAMW_ECO_DEV_CTX_RELOAD_DISABLE);
+	wa_write_or(wal,
+		    GEN8_GAMW_ECO_DEV_RW_IA,
+		    GAMW_ECO_DEV_CTX_RELOAD_DISABLE);
 
 	/* Wa_1405779004:icl (pre-prod) */
 	if (IS_ICL_REVID(i915, ICL_REVID_A0, ICL_REVID_A0))
@@ -902,9 +979,9 @@ static void icl_gt_workarounds_init(struct drm_i915_private *i915)
 			    MSCUNIT_CLKGATE_DIS);
 
 	/* Wa_1406680159:icl */
-	I915_WRITE(SUBSLICE_UNIT_LEVEL_CLKGATE,
-		   I915_READ(SUBSLICE_UNIT_LEVEL_CLKGATE) |
-		   GWUNIT_CLKGATE_DIS);
+	wa_write_or(wal,
+		    SUBSLICE_UNIT_LEVEL_CLKGATE,
+		    GWUNIT_CLKGATE_DIS);
 
 	/* Wa_1406838659:icl (pre-prod) */
 	if (IS_ICL_REVID(i915, ICL_REVID_A0, ICL_REVID_B0))
@@ -912,19 +989,26 @@ static void icl_gt_workarounds_init(struct drm_i915_private *i915)
 			    INF_UNIT_LEVEL_CLKGATE,
 			    CGPSF_CLKGATE_DIS);
 
+	/* WaForwardProgressSoftReset:icl */
+	wa_write_or(wal,
+		    GEN10_SCRATCH_LNCF2,
+		    PMFLUSHDONE_LNICRSDROP |
+		    PMFLUSH_GAPL3UNBLOCK |
+		    PMFLUSHDONE_LNEBLK);
+
 	/* Wa_1406463099:icl
 	 * Formerly known as WaGamTlbPendError
 	 */
-	I915_WRITE(GAMT_CHKN_BIT_REG,
-		   I915_READ(GAMT_CHKN_BIT_REG) |
-		   GAMT_CHKN_DISABLE_L3_COH_PIPE);
+	wa_write_or(wal,
+		    GAMT_CHKN_BIT_REG,
+		    GAMT_CHKN_DISABLE_L3_COH_PIPE);
 
 	/* Wa_1406609255:icl (pre-prod) */
-	if (IS_ICL_REVID(dev_priv, ICL_REVID_A0, ICL_REVID_B0))
-		I915_WRITE(GEN7_SARCHKMD,
-			   I915_READ(GEN7_SARCHKMD) |
-			   GEN7_DISABLE_DEMAND_PREFETCH |
-			   GEN7_DISABLE_SAMPLER_PREFETCH);
+	if (IS_ICL_REVID(i915, ICL_REVID_A0, ICL_REVID_B0))
+		wa_write_or(wal,
+			    GEN7_SARCHKMD,
+			    GEN7_DISABLE_DEMAND_PREFETCH |
+			    GEN7_DISABLE_SAMPLER_PREFETCH);
 }
 
 void intel_gt_init_workarounds(struct drm_i915_private *i915)

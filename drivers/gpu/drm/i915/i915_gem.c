@@ -5442,7 +5442,7 @@ int i915_gem_init_hw(struct drm_i915_private *dev_priv)
 		I915_WRITE(MI_PREDICATE_RESULT_2, IS_HSW_GT3(dev_priv) ?
 			   LOWER_SLICE_ENABLED : LOWER_SLICE_DISABLED);
 
-	intel_gt_workarounds_apply(dev_priv);
+	intel_gt_apply_workarounds(dev_priv);
 
 	i915_gem_init_swizzling(dev_priv);
 
