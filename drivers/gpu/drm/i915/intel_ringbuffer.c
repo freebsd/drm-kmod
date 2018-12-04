@@ -159,8 +159,7 @@ gen4_render_ring_flush(struct i915_request *rq, u32 mode)
 	 */
 	if (mode & EMIT_INVALIDATE) {
 		*cs++ = GFX_OP_PIPE_CONTROL(4) | PIPE_CONTROL_QW_WRITE;
-		*cs++ = i915_ggtt_offset(rq->engine->scratch) |
-			PIPE_CONTROL_GLOBAL_GTT;
+		*cs++ = i915_scratch_offset(rq->i915) | PIPE_CONTROL_GLOBAL_GTT;
 		*cs++ = 0;
 		*cs++ = 0;
 
@@ -168,8 +167,7 @@ gen4_render_ring_flush(struct i915_request *rq, u32 mode)
 			*cs++ = MI_FLUSH;
 
 		*cs++ = GFX_OP_PIPE_CONTROL(4) | PIPE_CONTROL_QW_WRITE;
-		*cs++ = i915_ggtt_offset(rq->engine->scratch) |
-			PIPE_CONTROL_GLOBAL_GTT;
+		*cs++ = i915_scratch_offset(rq->i915) | PIPE_CONTROL_GLOBAL_GTT;
 		*cs++ = 0;
 		*cs++ = 0;
 	}

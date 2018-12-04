@@ -444,7 +444,6 @@ struct intel_engine_cs {
 	struct i915_wa_list ctx_wa_list;
 	struct i915_wa_list wa_list;
 	struct i915_wa_list whitelist;
-	struct i915_vma *scratch;
 
 	u32             irq_keep_mask; /* always keep these interrupts */
 	u32		irq_enable_mask; /* bitmask to enable ring interrupt */
