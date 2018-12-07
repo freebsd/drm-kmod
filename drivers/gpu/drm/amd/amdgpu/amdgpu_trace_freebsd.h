@@ -127,6 +127,11 @@ trace_amdgpu_ttm_tt_unpopulate(struct amdgpu_device *adev, uint64_t dma_address,
 	    adev, dma_address, phys_address);
 }
 
+static inline void
+trace_amdgpu_ib_pipe_sync(struct amdgpu_job *job, struct dma_fence *fence){
+	CTR2(KTR_DRM, "amdgpu_ib_pipe_sync %p, fence %p", job, fence);
+}
+
 #define trace_amdgpu_mm_rreg(dev, reg, ret)	\
 	CTR3(KTR_DRM, "amdgpu_mm_rreg %p %x %d", (dev), (reg), (ret))
 

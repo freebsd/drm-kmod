@@ -1363,19 +1363,13 @@ static void intel_engine_print_registers(const struct intel_engine_cs *engine,
 		write = READ_ONCE(*execlists->csb_write);
 
 #ifdef __linux__
+		/* BSDFIXME: We don't have a tasklet.state or tasklet.count */
 		drm_printf(m, "\tExeclist CSB read %d, write %d [mmio:%d], tasklet queued? %s (%s)\n",
 			   read, write,
 			   GEN8_CSB_WRITE_PTR(I915_READ(RING_CONTEXT_STATUS_PTR(engine))),
 			   yesno(test_bit(TASKLET_STATE_SCHED,
 					  &engine->execlists.tasklet.state)),
 			   enableddisabled(!atomic_read(&engine->execlists.tasklet.count)));
-#else
-		/* BSDFIXME: We don't have a tasklet.state */
-		drm_printf(m, "\tExeclist CSB read %d, write %d [mmio:%d], tasklet enabled? %s (%s)\n",
-			   read, write,
-			   GEN8_CSB_WRITE_PTR(I915_READ(RING_CONTEXT_STATUS_PTR(engine))),
-			   yesno(tasklet_is_enabled(&engine->execlists.tasklet)),
-			   enableddisabled(!atomic_read(&engine->execlists.tasklet.count)));		
 #endif
 		if (read >= GEN8_CSB_ENTRIES)
 			read = 0;
