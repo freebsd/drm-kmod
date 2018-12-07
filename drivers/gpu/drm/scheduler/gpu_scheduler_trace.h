@@ -26,18 +26,25 @@
 
 #include <drm/drmP.h>
 
+#ifndef __linux__
 
 static inline void
-trace_drm_sched_job(void *sched_job, void *entity){
+trace_drm_sched_job(void *sched_job, void *entity) {
 	CTR2(KTR_DRM, "drm_sched_job %p, entity %p", sched_job, entity);
 }
 
 static inline void
-trace_drm_sched_process_job(void *s_fence){
+trace_drm_sched_job_wait_dep(struct drm_sched_job *job, struct dma_fence *fence) {
+	CTR2(KTR_DRM, "drm_process_wait_job %p fence %p", job, fence);
+}
+
+static inline void
+trace_drm_sched_process_job(void *s_fence) {
 	CTR1(KTR_DRM, "drm_process_sched_job %p", s_fence);
 }
 
-#ifdef __linux__
+#else
+
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM gpu_scheduler
 #define TRACE_INCLUDE_FILE gpu_scheduler_trace
@@ -81,7 +88,6 @@ TRACE_EVENT(drm_sched_process_job,
 		    ),
 	    TP_printk("fence=%p signaled", __entry->fence)
 );
-#endif /* __linux__ */
 
 TRACE_EVENT(drm_sched_job_wait_dep,
 	    TP_PROTO(struct drm_sched_job *sched_job, struct dma_fence *fence),
@@ -107,6 +113,7 @@ TRACE_EVENT(drm_sched_job_wait_dep,
 		      __entry->seqno)
 );
 
+#endif /* __linux__ */
 #endif
 
 #ifdef __linux__
