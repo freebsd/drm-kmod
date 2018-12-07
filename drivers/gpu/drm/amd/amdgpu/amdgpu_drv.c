@@ -39,7 +39,6 @@
 #include "amdgpu_gem.h"
 
 #include "amdgpu_amdkfd.h"
-#include "kfd_priv.h"
 
 #define pci_restore_state linux_pci_restore_state
 #define pci_save_state	  linux_pci_save_state

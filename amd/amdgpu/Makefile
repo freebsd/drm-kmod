@@ -100,6 +100,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_gart.c \
 	amdgpu_gem.c \
 	amdgpu_gfx.c \
+	amdgpu_gmc.c \
 	amdgpu_gtt_mgr.c \
 	amdgpu_i2c.c \
 	amdgpu_ib.c \
@@ -200,6 +201,7 @@ SRCS+= amdgpu_acpi.c \
 	dcn10_hubbub.c \
 	dcn10_hubp.c \
 	dcn10_hw_sequencer.c \
+	dcn10_hw_sequencer_debug.c \
 	dcn10_ipp.c \
 	dcn10_link_encoder.c \
 	dcn10_mpc.c \
@@ -279,6 +281,9 @@ SRCS+=	amdgpu_dm.c \
 	dce_clocks.c \
 	dce_dmcu.c \
 	dce_hwseq.c \
+	dce_i2c.c \
+	dce_i2c_hw.c \
+	dce_i2c_sw.c \
 	dce_ipp.c \
 	dce_link_encoder.c \
 	dce_mem_input.c \
@@ -529,10 +534,13 @@ CWARNFLAGS.dce80_hw_sequencer.c=	-Wno-unused-variable
 CWARNFLAGS.dce_calcs.c=		 -Wno-parentheses-equality
 CWARNFLAGS.dce_clocks.c=	-Wno-enum-conversion
 CWARNFLAGS.dce_dmcu.c=		-Wno-missing-prototypes
+CWARNFLAGS.dce_i2c_hw.c=	-Wno-missing-prototypes
+CWARNFLAGS.dce_i2c_sw.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_transform.c=	-Wno-enum-conversion
 CWARNFLAGS.dcn10_dpp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp_dscl.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn10_hw_sequencer.c=-Wno-missing-prototypes -Wno-missing-braces
+CWARNFLAGS.dcn10_hw_sequencer_debug.c= -Wno-missing-braces
 CWARNFLAGS.dcn10_opp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_optc.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn10_resource.c=	-Wno-missing-prototypes	-Wno-initializer-overrides

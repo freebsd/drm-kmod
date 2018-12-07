@@ -98,6 +98,12 @@ enum kgd_engine_type {
 	KGD_ENGINE_MAX
 };
 
+enum kfd_sched_policy {
+	KFD_SCHED_POLICY_HWS = 0,
+	KFD_SCHED_POLICY_HWS_NO_OVERSUBSCRIPTION,
+	KFD_SCHED_POLICY_NO_HWS
+};
+
 struct kgd2kfd_shared_resources {
 	/* Bit n == 1 means VMID n is available for KFD. */
 	unsigned int compute_vmid_bitmap;
@@ -153,6 +159,7 @@ struct tile_config {
 	uint32_t num_ranks;
 };
 
+#define KFD_MAX_NUM_OF_QUEUES_PER_DEVICE_DEFAULT 4096
 
 /*
  * Allocation flag domains
