@@ -44,8 +44,8 @@ int request_firmware_nowait(
 	struct module *module, bool uevent,
 	const char *name, struct device *device, gfp_t gfp, void *context,
 	void (*cont)(const struct linux_firmware *fw, void *context));
-int request_firmware_direct(const struct linux_firmware **fw, const char *name,
-			    struct device *device);
+
+#define	request_firmware_direct(f,n,d) request_firmware(f,n,d)
 
 void release_firmware(const struct linux_firmware *fw);
 #define firmware linux_firmware

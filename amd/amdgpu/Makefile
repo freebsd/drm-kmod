@@ -131,6 +131,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_virt.c \
 	amdgpu_vm.c \
 	amdgpu_vram_mgr.c \
+	amdgpu_xgmi.c \
 	atom.c \
 	atombios_crtc.c \
 	atombios_dp.c \
@@ -155,6 +156,7 @@ SRCS+=	amdgpu_afmt.c \
 	gfx_v8_0.c \
 	gfx_v9_0.c \
 	gfxhub_v1_0.c \
+	gfxhub_v1_1.c \
 	gmc_v6_0.c \
 	gmc_v7_0.c \
 	gmc_v8_0.c \

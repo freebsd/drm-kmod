@@ -1798,7 +1798,7 @@ int i915_driver_load(struct pci_dev *pdev, const struct pci_device_id *ent)
 		ret = drm_dev_init(&dev_priv->drm, &driver, &pdev->dev);
 	if (ret) {
 		DRM_DEV_ERROR(&pdev->dev, "allocation failed\n");
-		goto out_free;
+		/* goto out_free; */
 	}
 
 	dev_priv->drm.pdev = pdev;

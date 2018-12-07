@@ -68,7 +68,6 @@ struct vm_area_struct;
 
 #define FB_ACCELF_TEXT		1	/* (OBSOLETE) see fb_info.flags and vc_mode */
 
-
 #define FB_MODE_IS_UNKNOWN	0
 #define FB_MODE_IS_DETAILED	1
 #define FB_MODE_IS_STANDARD	2
@@ -608,7 +607,7 @@ struct fb_ops {
 
 /* report to the VT layer that this fb driver can accept forced console
    output like oopses */
-#define FBINFO_CAN_FORCE_OUTPUT     0x200000
+#define	FBINFO_HIDE_SMEM_START  0x200000
 
 struct linux_fb_info {
 	atomic_t count;
