@@ -149,8 +149,8 @@
 #include <uapi/drm/drm_sarea.h>
 #include <drm/drm_vma_manager.h>
 #include <linux/atomic.h>
+#include <asm/processor.h>
 
-#define smp_wmb() wmb()
 #include <drm/drm_drv.h>
 #include <drm/drm_prime.h>
 #include <drm/drm_print.h>
