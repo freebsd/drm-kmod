@@ -9,6 +9,7 @@ SRCS=	ati_pcigart.c \
 	drm_agpsupport.c \
 	drm_atomic.c \
 	drm_atomic_helper.c \
+	drm_atomic_uapi.c \
 	drm_auth.c \
 	drm_blend.c \
 	drm_bufs.c \
@@ -24,7 +25,6 @@ SRCS=	ati_pcigart.c \
 	drm_debugfs_crc.c \
 	drm_dma.c \
 	drm_dp_aux_dev.c \
-	drm_dp_cec.c \
 	drm_dp_dual_mode_helper.c \
 	drm_dp_helper.c \
 	drm_dp_mst_topology.c \
@@ -96,6 +96,9 @@ SRCS=	ati_pcigart.c \
 	ttm_page_alloc.c \
 	ttm_page_alloc_dma.c \
 	ttm_bo_vm.c
+
+# Skip for now...
+#	drm_dp_cec.c
 
 # drm scheduler (moved from amdgpu)
 SRCS+=	sched_main.c \

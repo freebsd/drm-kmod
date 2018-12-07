@@ -13,6 +13,7 @@
 #include <linux/printk.h>
 #include <linux/rcupdate.h>
 #include <linux/kernel.h>
+#include <linux/compiler.h>
 
 #include <linux/compat.h>
 #include <linux/ktime.h>

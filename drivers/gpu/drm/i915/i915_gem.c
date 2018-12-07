@@ -49,6 +49,7 @@
 
 #ifndef __linux__
 #define	resource linux_resource
+#define	totalram_pages physmem
 #endif
 
 static void i915_gem_flush_free_objects(struct drm_i915_private *i915);

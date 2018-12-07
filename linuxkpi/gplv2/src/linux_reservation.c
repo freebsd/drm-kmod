@@ -34,6 +34,7 @@
 
 #include <linux/reservation.h>
 #include <linux/export.h>
+#include <linux/lockdep.h>
 
 /**
  * DOC: Reservation Object Overview

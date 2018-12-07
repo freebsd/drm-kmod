@@ -27,6 +27,22 @@
 
 #include <drm/drm_util.h>
 
+enum i915_gpio {
+	GPIOA,
+	GPIOB,
+	GPIOC,
+	GPIOD,
+	GPIOE,
+	GPIOF,
+	GPIOG,
+	GPIOH,
+	__GPIOI_UNUSED,
+	GPIOJ,
+	GPIOK,
+	GPIOL,
+	GPIOM,
+};
+
 enum pipe {
 	INVALID_PIPE = -1,
 

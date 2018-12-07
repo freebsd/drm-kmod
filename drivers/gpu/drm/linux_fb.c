@@ -369,6 +369,32 @@ remove_conflicting_framebuffers(struct apertures_struct *a,
 	return (0);
 }
 
+int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, int res_id, const char *name)
+{
+	struct apertures_struct *ap;
+	bool primary = false;
+	int err;
+
+	ap = alloc_apertures(1);
+	if (!ap)
+		return -ENOMEM;
+
+	ap->ranges[0].base = pci_resource_start(pdev, res_id);
+	ap->ranges[0].size = pci_resource_len(pdev, res_id);
+#ifdef CONFIG_X86
+#ifndef __linux__
+	/* BSDFIXME: Check primary! */
+	primary = false;
+#else
+	primary = pdev->resource[PCI_ROM_RESOURCE].flags &
+					IORESOURCE_ROM_SHADOW;
+#endif
+#endif
+	__remove_conflicting(ap, name, primary);
+	kfree(ap);
+	return err;
+}
+
 static int
 is_primary(struct linux_fb_info *info)
 {
