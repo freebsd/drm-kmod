@@ -97,8 +97,9 @@ SRCS=	ati_pcigart.c \
 	ttm_bo_vm.c
 
 # drm scheduler (moved from amdgpu)
-SRCS+=	gpu_scheduler.c \
-	sched_fence.c
+SRCS+=	sched_main.c \
+	sched_fence.c \
+	sched_entity.c
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
