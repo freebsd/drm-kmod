@@ -114,7 +114,6 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_pm.c \
 	amdgpu_prime.c \
 	amdgpu_psp.c \
-	amdgpu_queue_mgr.c \
 	amdgpu_ring.c \
 	amdgpu_sa.c \
 	amdgpu_sdma.c \
@@ -167,8 +166,10 @@ SRCS+=	amdgpu_afmt.c \
 	mxgpu_vi.c \
 	nbio_v6_1.c \
 	nbio_v7_0.c \
+	nbio_v7_4.c \
 	psp_v3_1.c \
 	psp_v10_0.c \
+	psp_v11_0.c \
 	sdma_v2_4.c \
 	sdma_v3_0.c \
 	sdma_v4_0.c \
@@ -377,7 +378,12 @@ SRCS+=	amd_powerplay.c \
 	vega12_processpptables.c \
 	vega12_smumgr.c \
 	vega12_thermal.c \
+	vega20_hwmgr.c \
+	vega20_powertune.c \
+	vega20_processpptables.c \
 	vega20_reg_init.c \
+	vega20_smumgr.c \
+	vega20_thermal.c \
 	vegam_smumgr.c
 
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
@@ -596,6 +602,7 @@ CWARNFLAGS.vega12_hwmgr.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized
 CWARNFLAGS.vega12_processpptables.c= -Wno-missing-prototypes
 CWARNFLAGS.vega12_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.vega12_thermal.c=	-Wno-missing-prototypes
+CWARNFLAGS.vega20_hwmgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.vegam_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.vi.c= -Wno-unused-const-variable
 CWARNFLAGS.uvd_v7_0.c=	-Wno-missing-prototypes
