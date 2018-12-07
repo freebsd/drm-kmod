@@ -117,6 +117,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_queue_mgr.c \
 	amdgpu_ring.c \
 	amdgpu_sa.c \
+	amdgpu_sdma.c \
 	amdgpu_sched.c \
 	amdgpu_sync.c \
 	amdgpu_test.c \
