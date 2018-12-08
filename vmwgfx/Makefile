@@ -6,6 +6,8 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/vmwgfx
 
 KMOD=	vmwgfx
 SRCS=	\
+	ttm_lock.c \
+	ttm_object.c \
 	vmwgfx_binding.c \
 	vmwgfx_blit.c \
 	vmwgfx_bo.c \
@@ -39,7 +41,8 @@ SRCS=	\
 	vmwgfx_surface.c \
 	vmwgfx_ttm_buffer.c \
 	vmwgfx_ttm_glue.c \
-	vmwgfx_va.c
+	vmwgfx_va.c \
+	vmwgfx_validation.c
 
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
@@ -74,6 +77,8 @@ SRCS	+=			\
 .include <bsd.kmod.mk>
 
 CWARNFLAGS+= -Wno-expansion-to-defined -Wno-pointer-arith
+
+CWARNFLAGS.ttm_object.c= -Wno-incompatible-pointer-types
 
 CWARNFLAGS.vmwgfx_blit.c= -Wno-cast-qual
 CWARNFLAGS.vmwgfx_execbuf.c= -Wno-cast-qual -Wno-sometimes-uninitialized

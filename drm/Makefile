@@ -84,8 +84,6 @@ SRCS=	ati_pcigart.c \
 	tainted_linux_fb.c \
 	linux_hdmi.c \
 	ttm_agp_backend.c \
-	ttm_lock.c \
-	ttm_object.c \
 	ttm_tt.c \
 	ttm_bo_util.c \
 	ttm_bo.c \

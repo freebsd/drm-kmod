@@ -109,7 +109,14 @@ void *vmw_validation_mem_alloc(struct vmw_validation_context *ctx,
 		if (!page)
 			return NULL;
 
+#ifdef __linux__
 		list_add_tail(&page->lru, &ctx->page_list);
+#else
+		vm_page_lock(page);
+		vm_page_wire(page);
+		vm_page_unlock(page);
+		TAILQ_INSERT_TAIL(&ctx->page_list, page, plinks.q);
+#endif
 		ctx->page_address = page_address(page);
 		ctx->mem_size_left = PAGE_SIZE;
 	}
@@ -130,13 +137,22 @@ void *vmw_validation_mem_alloc(struct vmw_validation_context *ctx,
  */
 static void vmw_validation_mem_free(struct vmw_validation_context *ctx)
 {
-	struct page *entry, *next;
 
+#ifdef __linux__
+	struct page *entry, *next;
 	list_for_each_entry_safe(entry, next, &ctx->page_list, lru) {
 		list_del_init(&entry->lru);
 		__free_page(entry);
 	}
-
+#else
+	struct page *entry;
+	TAILQ_FOREACH(entry, &ctx->page_list, plinks.q) {
+		vm_page_lock(entry);
+		vm_page_unwire(entry, PQ_NONE);
+		vm_page_unlock(entry);
+		__free_page(entry);
+	}
+#endif
 	ctx->mem_size_left = 0;
 }
 

@@ -48,6 +48,7 @@
 #include <linux/dma-buf.h>
 
 #ifndef __linux__
+#include <linux/xarray.h>
 #define	resource linux_resource
 #define	totalram_pages physmem
 #endif

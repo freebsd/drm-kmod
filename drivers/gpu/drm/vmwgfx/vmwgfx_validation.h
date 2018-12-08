@@ -53,7 +53,11 @@ struct vmw_validation_context {
 	struct list_head resource_list;
 	struct list_head resource_ctx_list;
 	struct list_head bo_list;
-	struct list_head page_list;
+#ifdef __linux__
+	struct list_head	page_list;
+#else
+	struct pglist		page_list;
+#endif
 	struct ww_acquire_ctx ticket;
 	struct mutex *res_mutex;
 	unsigned int merge_dups;
@@ -76,6 +80,8 @@ struct vmw_fence_obj;
  * is known to be very small
  */
 #endif
+
+#ifdef __linux__
 #define DECLARE_VAL_CONTEXT(_name, _ht, _merge_dups)			\
 	struct vmw_validation_context _name =				\
 	{ .ht = _ht,							\
@@ -87,6 +93,36 @@ struct vmw_fence_obj;
 	  .merge_dups = _merge_dups,					\
 	  .mem_size_left = 0,						\
 	}
+#else
+/* #define	VMWGFX_TAILQ_INIT(_q) ({		\ */
+/* 			TAILQ_INIT(&_q);	\ */
+/* 			_q;			\ */
+/* 		}) */
+#define	LIST_HEAD_INIT(n) LINUX_LIST_HEAD_INIT(n)
+#define DECLARE_VAL_CONTEXT(_name, _ht, _merge_dups)			\
+	struct vmw_validation_context _name;				\
+	(_name).ht = _ht;						\
+	(_name).res_mutex = NULL;					\
+	(_name).merge_dups = _merge_dups;				\
+	(_name).mem_size_left = 0;					\
+	INIT_LIST_HEAD(&(_name).resource_list);				\
+	INIT_LIST_HEAD(&(_name).resource_ctx_list);			\
+	INIT_LIST_HEAD(&(_name).bo_list);				\
+	TAILQ_INIT(&(_name).page_list);
+/* #define DECLARE_VAL_CONTEXT(_name, _ht, _merge_dups) ({			\ */
+/* 	struct vmw_validation_context _name =				\ */
+/* 	{ .ht = _ht,							\ */
+/* 	  .resource_list = LINUX_LIST_HEAD_INIT((_name).resource_list),	\ */
+/* 	  .resource_ctx_list = LINUX_LIST_HEAD_INIT((_name).resource_ctx_list), \ */
+/* 	  .bo_list = LINUX_LIST_HEAD_INIT((_name).bo_list),			\ */
+/* 	  .res_mutex = NULL,						\ */
+/* 	  .merge_dups = _merge_dups,					\ */
+/* 	  .mem_size_left = 0,						\ */
+/* 	};								\ */
+/* 	TAILQ_INIT(&(_name).page_list);					\ */
+/* 	_name;								\ */
+/* 	}) */
+#endif
 
 /**
  * vmw_validation_has_bos - return whether the validation context has
