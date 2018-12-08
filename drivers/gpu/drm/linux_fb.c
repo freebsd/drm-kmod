@@ -375,7 +375,6 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, int res_id,
 {
 	struct apertures_struct *ap;
 	bool primary = false;
-	int err;
 
 	ap = alloc_apertures(1);
 	if (!ap)
@@ -396,7 +395,7 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, int res_id,
 	__remove_conflicting(ap, name, primary);
 	sx_xunlock(&linux_fb_mtx);
 	kfree(ap);
-	return err;
+	return (0);
 }
 
 static int
