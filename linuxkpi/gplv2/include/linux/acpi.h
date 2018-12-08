@@ -56,6 +56,8 @@ static inline acpi_handle acpi_device_handle(struct acpi_device *adev)
 #define ACPI_VIDEO_OUTPUT_SWITCHING_DMI_VENDOR		0x0400
 #define ACPI_VIDEO_OUTPUT_SWITCHING_DMI_VIDEO		0x0800
 
+#define	ACPI_VIDEO_NOTIFY_PROBE			0x81
+
 extern long acpi_is_video_device(acpi_handle handle);
 
 static inline const char *acpi_dev_name(struct acpi_device *adev)
