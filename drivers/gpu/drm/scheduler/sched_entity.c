@@ -159,6 +159,15 @@ long drm_sched_entity_flush(struct drm_sched_entity *entity, long timeout)
 	long ret = timeout;
 
 	sched = entity->rq->sched;
+
+	if (!sched) {
+		/*
+		 * BSDFIXME: When running glmark2, sched is null two times
+		 * whenever the program switches scenes
+		 */
+		DRM_ERROR("==========> BUG: entity->rq->sched is NULL\n");
+		return ret;
+	}
 	/**
 	 * The client will not queue more IBs during this fini, consume existing
 	 * queued IBs or discard them on SIGKILL
