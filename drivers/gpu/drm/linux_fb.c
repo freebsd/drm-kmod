@@ -369,7 +369,9 @@ remove_conflicting_framebuffers(struct apertures_struct *a,
 	return (0);
 }
 
-int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, int res_id, const char *name)
+int
+remove_conflicting_pci_framebuffers(struct pci_dev *pdev, int res_id,
+				    const char *name)
 {
 	struct apertures_struct *ap;
 	bool primary = false;
@@ -390,7 +392,9 @@ int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, int res_id, const 
 					IORESOURCE_ROM_SHADOW;
 #endif
 #endif
+	sx_xlock(&linux_fb_mtx);
 	__remove_conflicting(ap, name, primary);
+	sx_xunlock(&linux_fb_mtx);
 	kfree(ap);
 	return err;
 }
