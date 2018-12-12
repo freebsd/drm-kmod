@@ -104,10 +104,24 @@ void *vmw_validation_mem_alloc(struct vmw_validation_context *ctx,
 		return NULL;
 
 	if (ctx->mem_size_left < size) {
-		struct page *page = alloc_page(GFP_KERNEL | __GFP_ZERO);
+		struct page *page;
 
+		if (ctx->vm && ctx->vm_size_left < PAGE_SIZE) {
+			int ret = ctx->vm->reserve_mem(ctx->vm, ctx->vm->gran);
+
+			if (ret)
+				return NULL;
+
+			ctx->vm_size_left += ctx->vm->gran;
+			ctx->total_mem += ctx->vm->gran;
+		}
+
+		page = alloc_page(GFP_KERNEL | __GFP_ZERO);
 		if (!page)
 			return NULL;
+
+		if (ctx->vm)
+			ctx->vm_size_left -= PAGE_SIZE;
 
 #ifdef __linux__
 		list_add_tail(&page->lru, &ctx->page_list);
@@ -154,6 +168,11 @@ static void vmw_validation_mem_free(struct vmw_validation_context *ctx)
 	}
 #endif
 	ctx->mem_size_left = 0;
+	if (ctx->vm && ctx->total_mem) {
+		ctx->vm->unreserve_mem(ctx->vm, ctx->total_mem);
+		ctx->total_mem = 0;
+		ctx->vm_size_left = 0;
+	}
 }
 
 /**
