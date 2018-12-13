@@ -61,18 +61,12 @@ int amdgpu_amdkfd_init(void)
 
 void amdgpu_amdkfd_fini(void)
 {
-#ifdef __linux__
-	if (kgd2kfd)
-		kgd2kfd->exit();
-#endif
+	kgd2kfd_exit();
 }
 
 void amdgpu_amdkfd_device_probe(struct amdgpu_device *adev)
 {
 	const struct kfd2kgd_calls *kfd2kgd;
-
-	if (!kgd2kfd)
-		return;
 
 	switch (adev->asic_type) {
 #ifdef CONFIG_DRM_AMDGPU_CIK
@@ -100,8 +94,8 @@ void amdgpu_amdkfd_device_probe(struct amdgpu_device *adev)
 		return;
 	}
 
-	adev->kfd.dev = kgd2kfd->probe((struct kgd_dev *)adev,
-				       adev->pdev, kfd2kgd);
+	adev->kfd.dev = kgd2kfd_probe((struct kgd_dev *)adev,
+				      adev->pdev, kfd2kgd);
 
 	if (adev->kfd.dev)
 		amdgpu_amdkfd_total_mem_size += adev->gmc.real_vram_size;
@@ -184,7 +178,7 @@ void amdgpu_amdkfd_device_init(struct amdgpu_device *adev)
 				&gpu_resources.doorbell_start_offset);
 
 		if (adev->asic_type < CHIP_VEGA10) {
-			kgd2kfd->device_init(adev->kfd.dev, &gpu_resources);
+			kgd2kfd_device_init(adev->kfd.dev, &gpu_resources);
 			return;
 		}
 
@@ -213,14 +207,14 @@ void amdgpu_amdkfd_device_init(struct amdgpu_device *adev)
 		gpu_resources.reserved_doorbell_mask = 0x1e0;
 		gpu_resources.reserved_doorbell_val  = 0x0e0;
 
-		kgd2kfd->device_init(adev->kfd.dev, &gpu_resources);
+		kgd2kfd_device_init(adev->kfd.dev, &gpu_resources);
 	}
 }
 
 void amdgpu_amdkfd_device_fini(struct amdgpu_device *adev)
 {
 	if (adev->kfd.dev) {
-		kgd2kfd->device_exit(adev->kfd.dev);
+		kgd2kfd_device_exit(adev->kfd.dev);
 		adev->kfd.dev = NULL;
 	}
 }
@@ -229,13 +223,13 @@ void amdgpu_amdkfd_interrupt(struct amdgpu_device *adev,
 		const void *ih_ring_entry)
 {
 	if (adev->kfd.dev)
-		kgd2kfd->interrupt(adev->kfd.dev, ih_ring_entry);
+		kgd2kfd_interrupt(adev->kfd.dev, ih_ring_entry);
 }
 
 void amdgpu_amdkfd_suspend(struct amdgpu_device *adev)
 {
 	if (adev->kfd.dev)
-		kgd2kfd->suspend(adev->kfd.dev);
+		kgd2kfd_suspend(adev->kfd.dev);
 }
 
 int amdgpu_amdkfd_resume(struct amdgpu_device *adev)
@@ -243,7 +237,7 @@ int amdgpu_amdkfd_resume(struct amdgpu_device *adev)
 	int r = 0;
 
 	if (adev->kfd.dev)
-		r = kgd2kfd->resume(adev->kfd.dev);
+		r = kgd2kfd_resume(adev->kfd.dev);
 
 	return r;
 }
@@ -253,7 +247,7 @@ int amdgpu_amdkfd_pre_reset(struct amdgpu_device *adev)
 	int r = 0;
 
 	if (adev->kfd.dev)
-		r = kgd2kfd->pre_reset(adev->kfd.dev);
+		r = kgd2kfd_pre_reset(adev->kfd.dev);
 
 	return r;
 }
@@ -263,7 +257,7 @@ int amdgpu_amdkfd_post_reset(struct amdgpu_device *adev)
 	int r = 0;
 
 	if (adev->kfd.dev)
-		r = kgd2kfd->post_reset(adev->kfd.dev);
+		r = kgd2kfd_post_reset(adev->kfd.dev);
 
 	return r;
 }
