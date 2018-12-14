@@ -59,6 +59,74 @@ static int smu_early_init(void *handle)
 	return 0;
 }
 
+int smu_get_atom_data_table(struct smu_context *smu, uint32_t table,
+			    uint16_t *size, uint8_t *frev, uint8_t *crev,
+			    uint8_t **addr)
+{
+	struct amdgpu_device *adev = smu->adev;
+	uint16_t data_start;
+
+	if (!amdgpu_atom_parse_data_header(adev->mode_info.atom_context, table,
+					   size, frev, crev, &data_start))
+		return -EINVAL;
+
+	*addr = (uint8_t *)adev->mode_info.atom_context->bios + data_start;
+
+	return 0;
+}
+
+static int smu_initialize_pptable(struct smu_context *smu)
+{
+	/* TODO */
+	return 0;
+}
+
+static int smu_smc_table_sw_init(struct smu_context *smu)
+{
+	int ret;
+
+	ret = smu_initialize_pptable(smu);
+	if (ret) {
+		pr_err("Failed to init smu_initialize_pptable!\n");
+		return ret;
+	}
+
+	/**
+	 * Create smu_table structure, and init smc tables such as
+	 * TABLE_PPTABLE, TABLE_WATERMARKS, TABLE_SMU_METRICS, and etc.
+	 */
+	ret = smu_init_smc_tables(smu);
+	if (ret) {
+		pr_err("Failed to init smc tables!\n");
+		return ret;
+	}
+
+	/**
+	 * Create smu_power_context structure, and allocate smu_dpm_context and
+	 * context size to fill the smu_power_context data.
+	 */
+	ret = smu_init_power(smu);
+	if (ret) {
+		pr_err("Failed to init smu_init_power!\n");
+		return ret;
+	}
+
+	return 0;
+}
+
+static int smu_smc_table_sw_fini(struct smu_context *smu)
+{
+	int ret;
+
+	ret = smu_fini_smc_tables(smu);
+	if (ret) {
+		pr_err("Failed to smu_fini_smc_tables!\n");
+		return ret;
+	}
+
+	return 0;
+}
+
 static int smu_sw_init(void *handle)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -80,9 +148,17 @@ static int smu_sw_init(void *handle)
 static int smu_sw_fini(void *handle)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
+	struct smu_context *smu = &adev->smu;
+	int ret;
 
 	if (adev->asic_type < CHIP_VEGA20)
 		return -EINVAL;
+
+	ret = smu_smc_table_sw_fini(smu);
+	if (ret) {
+		pr_err("Failed to sw fini smc table!\n");
+		return ret;
+	}
 
 	return 0;
 }
