@@ -317,12 +317,14 @@ void drm_sysfs_connector_remove(struct drm_connector *connector)
 
 void drm_sysfs_lease_event(struct drm_device *dev)
 {
+#ifdef __linux__
 	char *event_string = "LEASE=1";
 	char *envp[] = { event_string, NULL };
 
 	DRM_DEBUG("generating lease event\n");
 
 	kobject_uevent_env(&dev->primary->kdev->kobj, KOBJ_CHANGE, envp);
+#endif
 }
 
 /**
