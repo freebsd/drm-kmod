@@ -159,7 +159,10 @@ dma_fence_signal_locked(struct dma_fence *fence)
 
 	list_for_each_entry_safe(cur, tmp, &fence->cb_list, node) {
 		list_del_init(&cur->node);
+		/* Need to unlock since cur->func() can sleep */
+		spin_unlock(fence->lock);
 		cur->func(fence, cur);
+		spin_lock(fence->lock);
 	}
 	return ret;
 }
@@ -184,7 +187,10 @@ dma_fence_signal(struct dma_fence *fence)
 		spin_lock_irqsave(fence->lock, flags);
 		list_for_each_entry_safe(cur, tmp, &fence->cb_list, node) {
 			list_del_init(&cur->node);
+			/* Need to unlock since cur->func() can sleep */
+			spin_unlock(fence->lock);
 			cur->func(fence, cur);
+			spin_lock(fence->lock);
 		}
 		spin_unlock_irqrestore(fence->lock, flags);
 	}
