@@ -237,6 +237,96 @@ static int smu_smc_table_hw_init(struct smu_context *smu)
 	if (ret)
 		return ret;
 
+	/* get boot_values from vbios to set revision, gfxclk, and etc. */
+	ret = smu_get_vbios_bootup_values(smu);
+	if (ret)
+		return ret;
+
+	ret = smu_get_clk_info_from_vbios(smu);
+	if (ret)
+		return ret;
+
+	/*
+	 * check if the format_revision in vbios is up to pptable header
+	 * version, and the structure size is not 0.
+	 */
+	ret = smu_get_clk_info_from_vbios(smu);
+	if (ret)
+		return ret;
+
+	ret = smu_check_pptable(smu);
+	if (ret)
+		return ret;
+
+	/*
+	 * allocate vram bos to store smc table contents.
+	 */
+	ret = smu_init_fb_allocations(smu);
+	if (ret)
+		return ret;
+
+	/*
+	 * Parse pptable format and fill PPTable_t smc_pptable to
+	 * smu_table_context structure. And read the smc_dpm_table from vbios,
+	 * then fill it into smc_pptable.
+	 */
+	ret = smu_parse_pptable(smu);
+	if (ret)
+		return ret;
+
+	/*
+	 * Set initialized values (get from vbios) to dpm tables context such as
+	 * gfxclk, memclk, dcefclk, and etc. And enable the DPM feature for each
+	 * type of clks.
+	 */
+	ret = smu_populate_smc_pptable(smu);
+	if (ret)
+		return ret;
+
+	/*
+	 * Send msg GetDriverIfVersion to check if the return value is equal
+	 * with DRIVER_IF_VERSION of smc header.
+	 */
+	ret = smu_check_fw_version(smu);
+	if (ret)
+		return ret;
+
+	/*
+	 * Copy pptable bo in the vram to smc with SMU MSGs such as
+	 * SetDriverDramAddr and TransferTableDram2Smu.
+	 */
+	ret = smu_write_pptable(smu);
+	if (ret)
+		return ret;
+
+	/*
+	 * Set min deep sleep dce fclk with bootup value from vbios via
+	 * SetMinDeepSleepDcefclk MSG.
+	 */
+	ret = smu_set_min_dcef_deep_sleep(smu);
+	if (ret)
+		return ret;
+
+	/*
+	 * Set PMSTATUSLOG table bo address with SetToolsDramAddr MSG for tools.
+	 */
+	ret = smu_set_tool_table_location(smu);
+
+	return ret;
+}
+
+/**
+ * smu_alloc_memory_pool - allocate memory pool in the system memory
+ *
+ * @smu: amdgpu_device pointer
+ *
+ * This memory pool will be used for SMC use and msg SetSystemVirtualDramAddr
+ * and DramLogSetDramAddr can notify it changed.
+ *
+ * Returns 0 on success, error on failure.
+ */
+static int smu_alloc_memory_pool(struct smu_context *smu)
+{
 	return 0;
 }
 

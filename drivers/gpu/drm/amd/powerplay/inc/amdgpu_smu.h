@@ -97,6 +97,22 @@ struct smu_funcs
 	int (*load_microcode)(struct smu_context *smu);
 	int (*check_fw_status)(struct smu_context *smu);
 	int (*read_pptable_from_vbios)(struct smu_context *smu);
+	int (*get_vbios_bootup_values)(struct smu_context *smu);
+	int (*get_clk_info_from_vbios)(struct smu_context *smu);
+	int (*check_pptable)(struct smu_context *smu);
+	int (*parse_pptable)(struct smu_context *smu);
+	int (*populate_smc_pptable)(struct smu_context *smu);
+	int (*check_fw_version)(struct smu_context *smu);
+	int (*write_pptable)(struct smu_context *smu);
+	int (*set_min_dcef_deep_sleep)(struct smu_context *smu);
+	int (*set_tool_table_location)(struct smu_context *smu);
+	int (*notify_memory_pool_location)(struct smu_context *smu);
+	int (*write_watermarks_table)(struct smu_context *smu);
+	int (*set_last_dcef_min_deep_sleep_clk)(struct smu_context *smu);
+	int (*system_features_control)(struct smu_context *smu, bool en);
+	int (*send_smc_msg)(struct smu_context *smu, uint16_t msg);
+	int (*send_smc_msg_with_param)(struct smu_context *smu, uint16_t msg, uint32_t param);
+
 };
 
 #define smu_init_microcode(smu) \
@@ -115,6 +131,40 @@ struct smu_funcs
 	((smu)->funcs->check_fw_status ? (smu)->funcs->check_fw_status((smu)) : 0)
 #define smu_read_pptable_from_vbios(smu) \
 	((smu)->funcs->read_pptable_from_vbios ? (smu)->funcs->read_pptable_from_vbios((smu)) : 0)
+#define smu_get_vbios_bootup_values(smu) \
+	((smu)->funcs->get_vbios_bootup_values ? (smu)->funcs->get_vbios_bootup_values((smu)) : 0)
+#define smu_get_clk_info_from_vbios(smu) \
+	((smu)->funcs->get_clk_info_from_vbios ? (smu)->funcs->get_clk_info_from_vbios((smu)) : 0)
+#define smu_check_pptable(smu) \
+	((smu)->funcs->check_pptable ? (smu)->funcs->check_pptable((smu)) : 0)
+#define smu_parse_pptable(smu) \
+	((smu)->funcs->parse_pptable ? (smu)->funcs->parse_pptable((smu)) : 0)
+#define smu_populate_smc_pptable(smu) \
+	((smu)->funcs->populate_smc_pptable ? (smu)->funcs->populate_smc_pptable((smu)) : 0)
+#define smu_check_fw_version(smu) \
+	((smu)->funcs->check_fw_version ? (smu)->funcs->check_fw_version((smu)) : 0)
+#define smu_write_pptable(smu) \
+	((smu)->funcs->write_pptable ? (smu)->funcs->write_pptable((smu)) : 0)
+#define smu_set_min_dcef_deep_sleep(smu) \
+	((smu)->funcs->set_min_dcef_deep_sleep ? (smu)->funcs->set_min_dcef_deep_sleep((smu)) : 0)
+#define smu_set_tool_table_location(smu) \
+	((smu)->funcs->set_tool_table_location ? (smu)->funcs->set_tool_table_location((smu)) : 0)
+#define smu_notify_memory_pool_location(smu) \
+	((smu)->funcs->notify_memory_pool_location ? (smu)->funcs->notify_memory_pool_location((smu)) : 0)
+#define smu_write_watermarks_table(smu) \
+	((smu)->funcs->write_watermarks_table ? (smu)->funcs->write_watermarks_table((smu)) : 0)
+#define smu_set_last_dcef_min_deep_sleep_clk(smu) \
+	((smu)->funcs->set_last_dcef_min_deep_sleep_clk ? (smu)->funcs->set_last_dcef_min_deep_sleep_clk((smu)) : 0)
+#define smu_system_features_control(smu, en) \
+	((smu)->funcs->system_features_control ? (smu)->funcs->system_features_control((smu), (en)) : 0)
+#define smu_send_smc_msg(smu, msg) \
+	((smu)->funcs->send_smc_msg? (smu)->funcs->send_smc_msg((smu), (msg)) : 0)
+#define smu_send_smc_msg_with_param(smu, msg, param) \
+	((smu)->funcs->send_smc_msg_with_param? (smu)->funcs->send_smc_msg_with_param((smu), (msg), (param)) : 0)
+
+extern int smu_get_atom_data_table(struct smu_context *smu, uint32_t table,
+				   uint16_t *size, uint8_t *frev, uint8_t *crev,
+				   uint8_t **addr);
 
 extern const struct amd_ip_funcs smu_ip_funcs;
 

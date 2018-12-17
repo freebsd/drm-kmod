@@ -27,6 +27,101 @@
 #include "atomfirmware.h"
 #include "amdgpu_atomfirmware.h"
 #include "smu_v11_0.h"
+#include "smu_v11_0_ppsmc.h"
+#include "smu11_driver_if.h"
+#include "soc15_common.h"
+#include "atom.h"
+
+#include "asic_reg/thm/thm_11_0_2_offset.h"
+#include "asic_reg/thm/thm_11_0_2_sh_mask.h"
+#include "asic_reg/mp/mp_9_0_offset.h"
+#include "asic_reg/mp/mp_9_0_sh_mask.h"
+#include "asic_reg/nbio/nbio_7_4_offset.h"
+
+MODULE_FIRMWARE("amdgpu/vega20_smc.bin");
+
+static int smu_v11_0_send_msg_without_waiting(struct smu_context *smu,
+					      uint16_t msg)
+{
+	struct amdgpu_device *adev = smu->adev;
+	WREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_66, msg);
+	return 0;
+}
+
+static int smu_v11_0_read_arg(struct smu_context *smu, uint32_t *arg)
+{
+	struct amdgpu_device *adev = smu->adev;
+
+	*arg = RREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_82);
+	return 0;
+}
+
+static int smu_v11_0_wait_for_response(struct smu_context *smu)
+{
+	struct amdgpu_device *adev = smu->adev;
+	uint32_t cur_value, i;
+
+	for (i = 0; i < adev->usec_timeout; i++) {
+		cur_value = RREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_90);
+		if ((cur_value & MP1_C2PMSG_90__CONTENT_MASK) != 0)
+			break;
+		udelay(1);
+	}
+
+	/* timeout means wrong logic */
+	if (i == adev->usec_timeout)
+		return -ETIME;
+
+	return RREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_90) ==  PPSMC_Result_OK ? 0:-EIO;
+}
+
+static int smu_v11_0_send_msg(struct smu_context *smu, uint16_t msg)
+{
+	struct amdgpu_device *adev = smu->adev;
+	int ret = 0;
+
+	smu_v11_0_wait_for_response(smu);
+
+	WREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_90, 0);
+
+	smu_v11_0_send_msg_without_waiting(smu, msg);
+
+	ret = smu_v11_0_wait_for_response(smu);
+
+	if (ret)
+		pr_err("Failed to send message 0x%x, response 0x%x\n", msg,
+		       ret);
+
+	return ret;
+
+}
+
+static int
+smu_v11_0_send_msg_with_param(struct smu_context *smu, uint16_t msg,
+			      uint32_t param)
+{
+
+	struct amdgpu_device *adev = smu->adev;
+	int ret = 0;
+
+	ret = smu_v11_0_wait_for_response(smu);
+	if (ret)
+		pr_err("Failed to send message 0x%x, response 0x%x\n", msg,
+		       ret);
+
+	WREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_90, 0);
+
+	WREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_82, param);
+
+	smu_v11_0_send_msg_without_waiting(smu, msg);
+
+	ret = smu_v11_0_wait_for_response(smu);
+	if (ret)
+		pr_err("Failed to send message 0x%x, response 0x%x\n", msg,
+		       ret);
+
+	return ret;
+}
 
 static int smu_v11_0_init_microcode(struct smu_context *smu)
 {
@@ -234,6 +329,43 @@ int smu_v11_0_get_vbios_bootup_values(struct smu_context *smu)
 	return 0;
 }
 
+static int smu_v11_0_get_clk_info_from_vbios(struct smu_context *smu)
+{
+	int ret, index;
+	struct amdgpu_device *adev = smu->adev;
+	struct atom_get_smu_clock_info_parameters_v3_1 input = {0};
+	struct atom_get_smu_clock_info_output_parameters_v3_1 *output;
+
+	input.clk_id = SMU11_SYSPLL0_SOCCLK_ID;
+	input.command = GET_SMU_CLOCK_INFO_V3_1_GET_CLOCK_FREQ;
+	index = get_index_into_master_table(atom_master_list_of_command_functions_v2_1,
+					    getsmuclockinfo);
+
+	ret = amdgpu_atom_execute_table(adev->mode_info.atom_context, index,
+					(uint32_t *)&input);
+	if (ret)
+		return -EINVAL;
+
+	output = (struct atom_get_smu_clock_info_output_parameters_v3_1 *)&input;
+	smu->smu_table.boot_values.socclk = le32_to_cpu(output->atom_smu_outputclkfreq.smu_clock_freq_hz) / 10000;
+
+	memset(&input, 0, sizeof(input));
+	input.clk_id = SMU11_SYSPLL0_DCEFCLK_ID;
+	input.command = GET_SMU_CLOCK_INFO_V3_1_GET_CLOCK_FREQ;
+	index = get_index_into_master_table(atom_master_list_of_command_functions_v2_1,
+					    getsmuclockinfo);
+
+	ret = amdgpu_atom_execute_table(adev->mode_info.atom_context, index,
+					(uint32_t *)&input);
+	if (ret)
+		return -EINVAL;
+
+	output = (struct atom_get_smu_clock_info_output_parameters_v3_1 *)&input;
+	smu->smu_table.boot_values.dcefclk = le32_to_cpu(output->atom_smu_outputclkfreq.smu_clock_freq_hz) / 10000;
+
+	return 0;
+}
+
 static const struct smu_funcs smu_v11_0_funcs = {
 	.init_microcode = smu_v11_0_init_microcode,
 	.load_microcode = smu_v11_0_load_microcode,
@@ -247,6 +379,7 @@ static const struct smu_funcs smu_v11_0_funcs = {
 	.init_power = smu_v11_0_init_power,
 	.fini_power = smu_v11_0_fini_power,
 	.get_vbios_bootup_values = smu_v11_0_get_vbios_bootup_values,
+	.get_clk_info_from_vbios = smu_v11_0_get_clk_info_from_vbios,
 };
 
 void smu_v11_0_set_smu_funcs(struct smu_context *smu)
