@@ -428,6 +428,215 @@ static int smu_v11_0_parse_pptable(struct smu_context *smu)
 		return -ENOMEM;
 
 	ret = smu_store_powerplay_table(smu);
+	if (ret)
+		return -EINVAL;
+
+	ret = smu_append_powerplay_table(smu);
+
+	return ret;
+}
+
+static int smu_v11_0_populate_smc_pptable(struct smu_context *smu)
+{
+	int ret;
+
+	ret = smu_set_default_dpm_table(smu);
+
+	return ret;
+}
+
+static int smu_v11_0_copy_table_to_smc(struct smu_context *smu,
+				       uint32_t table_id)
+{
+	struct smu_table_context *table_context = &smu->smu_table;
+	struct smu_table *driver_pptable = &smu->smu_table.tables[table_id];
+	int ret = 0;
+
+	if (table_id >= TABLE_COUNT) {
+		pr_err("Invalid SMU Table ID for smu11!");
+		return -EINVAL;
+	}
+
+	if (!driver_pptable->cpu_addr) {
+		pr_err("Invalid virtual address for smu11!");
+		return -EINVAL;
+	}
+	if (!driver_pptable->mc_address) {
+		pr_err("Invalid MC address for smu11!");
+		return -EINVAL;
+	}
+	if (!driver_pptable->size) {
+		pr_err("Invalid SMU Table size for smu11!");
+		return -EINVAL;
+	}
+
+	memcpy(driver_pptable->cpu_addr, table_context->driver_pptable,
+	       driver_pptable->size);
+
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_SetDriverDramAddrHigh,
+			upper_32_bits(driver_pptable->mc_address));
+	if (ret) {
+		pr_err("[CopyTableToSMC] Attempt to Set Dram Addr High Failed!");
+		return ret;
+	}
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_SetDriverDramAddrLow,
+			lower_32_bits(driver_pptable->mc_address));
+	if (ret) {
+		pr_err("[CopyTableToSMC] Attempt to Set Dram Addr Low Failed!");
+		return ret;
+	}
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_TransferTableDram2Smu,
+					  table_id);
+	if (ret) {
+		pr_err("[CopyTableToSMC] Attempt to Transfer Table To SMU Failed!");
+		return ret;
+	}
+
+	return 0;
+}
+
+static int smu_v11_0_write_pptable(struct smu_context *smu)
+{
+	int ret = 0;
+
+	ret = smu_v11_0_copy_table_to_smc(smu, TABLE_PPTABLE);
+
+	return ret;
+}
+
+static int smu_v11_0_set_min_dcef_deep_sleep(struct smu_context *smu)
+{
+	int ret = 0;
+	struct smu_table_context *table_context = &smu->smu_table;
+
+	if (!table_context)
+		return -EINVAL;
+
+	ret = smu_send_smc_msg_with_param(smu,
+					  SMU_MSG_SetMinDeepSleepDcefclk,
+					  table_context->boot_values.dcefclk / 100);
+	if (ret)
+		pr_err("SMU11 attempt to set divider for DCEFCLK Failed!");
+
+	return ret;
+}
+
+static int smu_v11_0_set_tool_table_location(struct smu_context *smu)
+{
+	int ret = 0;
+	struct smu_table *tool_table = &smu->smu_table.tables[TABLE_PMSTATUSLOG];
+
+	if (tool_table->mc_address) {
+		ret = smu_send_smc_msg_with_param(smu,
+				SMU_MSG_SetToolsDramAddrHigh,
+				upper_32_bits(tool_table->mc_address));
+		if (!ret)
+			ret = smu_send_smc_msg_with_param(smu,
+				SMU_MSG_SetToolsDramAddrLow,
+				lower_32_bits(tool_table->mc_address));
+	}
+
+	return ret;
+}
+
+static int smu_v11_0_init_display(struct smu_context *smu)
+{
+	int ret = 0;
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_NumOfDisplays, 0);
+	return ret;
+}
+
+static int smu_v11_0_set_allowed_mask(struct smu_context *smu)
+{
+	struct smu_feature *feature = &smu->smu_feature;
+	int ret = 0;
+	uint32_t feature_mask[2];
+
+	if (bitmap_empty(feature->allowed, SMU_FEATURE_MAX) || feature->feature_num < 64)
+		return -EINVAL;
+
+	bitmap_copy((unsigned long *)feature_mask, feature->allowed, 64);
+
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_SetAllowedFeaturesMaskHigh,
+					  feature_mask[1]);
+	if (ret)
+		return ret;
+
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_SetAllowedFeaturesMaskLow,
+					  feature_mask[0]);
+	if (ret)
+		return ret;
+
+	return ret;
+}
+
+static int smu_v11_0_get_enabled_mask(struct smu_context *smu,
+				      uint32_t *feature_mask, uint32_t num)
+{
+	uint32_t feature_mask_high = 0, feature_mask_low = 0;
+	int ret = 0;
+
+	if (!feature_mask || num < 2)
+		return -EINVAL;
+
+	ret = smu_send_smc_msg(smu, SMU_MSG_GetEnabledSmuFeaturesHigh);
+	if (ret)
+		return ret;
+	ret = smu_read_smc_arg(smu, &feature_mask_high);
+	if (ret)
+		return ret;
+
+	ret = smu_send_smc_msg(smu, SMU_MSG_GetEnabledSmuFeaturesLow);
+	if (ret)
+		return ret;
+	ret = smu_read_smc_arg(smu, &feature_mask_low);
+	if (ret)
+		return ret;
+
+	feature_mask[0] = feature_mask_low;
+	feature_mask[1] = feature_mask_high;
+
+	return ret;
+}
+
+static int smu_v11_0_enable_all_mask(struct smu_context *smu)
+{
+	struct smu_feature *feature = &smu->smu_feature;
+	uint32_t feature_mask[2];
+	int ret = 0;
+
+	ret = smu_send_smc_msg(smu, SMU_MSG_EnableAllSmuFeatures);
+	if (ret)
+		return ret;
+	ret = smu_feature_get_enabled_mask(smu, feature_mask, 2);
+	if (ret)
+		return ret;
+
+	bitmap_copy(feature->enabled, (unsigned long *)&feature_mask,
+		    feature->feature_num);
+	bitmap_copy(feature->supported, (unsigned long *)&feature_mask,
+		    feature->feature_num);
+
+	return ret;
+}
+
+static int smu_v11_0_disable_all_mask(struct smu_context *smu)
+{
+	struct smu_feature *feature = &smu->smu_feature;
+	uint32_t feature_mask[2];
+	int ret = 0;
+
+	ret = smu_send_smc_msg(smu, SMU_MSG_DisableAllSmuFeatures);
+	if (ret)
+		return ret;
+	ret = smu_feature_get_enabled_mask(smu, feature_mask, 2);
+	if (ret)
+		return ret;
+
+	bitmap_copy(feature->enabled, (unsigned long *)&feature_mask,
+		    feature->feature_num);
+	bitmap_copy(feature->supported, (unsigned long *)&feature_mask,
+		    feature->feature_num);
 
 	return ret;
 }
