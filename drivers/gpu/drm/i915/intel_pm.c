@@ -4376,8 +4376,8 @@ skl_allocate_pipe_ddb(struct intel_crtc_state *cstate,
 				continue;
 
 			wm = &cstate->wm.skl.optimal.planes[plane_id];
-			blocks += wm->wm[level].plane_res_b;
-			blocks += wm->uv_wm[level].plane_res_b;
+			blocks += wm->wm[level].plane_res_b + 1;
+			blocks += wm->uv_wm[level].plane_res_b + 1;
 		}
 
 		if (blocks < alloc_size) {
@@ -4418,7 +4418,7 @@ skl_allocate_pipe_ddb(struct intel_crtc_state *cstate,
 		extra = min_t(u16, alloc_size,
 			      DIV64_U64_ROUND_UP(alloc_size * rate,
 						 total_data_rate));
-		total[plane_id] = wm->wm[level].plane_res_b + extra;
+		total[plane_id] = wm->wm[level].plane_res_b + 1 + extra;
 		alloc_size -= extra;
 		total_data_rate -= rate;
 
@@ -4429,7 +4429,7 @@ skl_allocate_pipe_ddb(struct intel_crtc_state *cstate,
 		extra = min_t(u16, alloc_size,
 			      DIV64_U64_ROUND_UP(alloc_size * rate,
 						 total_data_rate));
-		uv_total[plane_id] = wm->uv_wm[level].plane_res_b + extra;
+		uv_total[plane_id] = wm->uv_wm[level].plane_res_b + 1 + extra;
 		alloc_size -= extra;
 		total_data_rate -= rate;
 	}
@@ -4482,7 +4482,7 @@ skl_allocate_pipe_ddb(struct intel_crtc_state *cstate,
 	 */
 	for_each_plane_id_on_crtc(intel_crtc, plane_id) {
 		wm = &cstate->wm.skl.optimal.planes[plane_id];
-		if (wm->trans_wm.plane_res_b > total[plane_id])
+		if (wm->trans_wm.plane_res_b >= total[plane_id])
 			memset(&wm->trans_wm, 0, sizeof(wm->trans_wm));
 	}
 
