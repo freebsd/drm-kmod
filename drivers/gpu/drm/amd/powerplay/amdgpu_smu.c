@@ -296,6 +296,11 @@ static int smu_smc_table_hw_init(struct smu_context *smu)
 	if (ret)
 		return ret;
 
+	/* issue RunAfllBtc msg */
+	ret = smu_run_afll_btc(smu);
+	if (ret)
+		return ret;
+
 	/*
 	 * Set min deep sleep dce fclk with bootup value from vbios via
 	 * SetMinDeepSleepDcefclk MSG.

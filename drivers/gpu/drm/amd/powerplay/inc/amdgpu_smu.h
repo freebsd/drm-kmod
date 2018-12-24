@@ -102,6 +102,10 @@ struct smu_context
 
 struct pptable_funcs {
 	int (*store_powerplay_table)(struct smu_context *smu);
+	int (*check_powerplay_table)(struct smu_context *smu);
+	int (*append_powerplay_table)(struct smu_context *smu);
+	int (*get_smu_msg_index)(struct smu_context *smu, uint32_t index);
+	int (*run_afll_btc)(struct smu_context *smu);
 };
 
 struct smu_funcs
@@ -180,6 +184,15 @@ struct smu_funcs
 	((smu)->funcs->send_smc_msg_with_param? (smu)->funcs->send_smc_msg_with_param((smu), (msg), (param)) : 0)
 #define smu_store_powerplay_table(smu) \
 	((smu)->ppt_funcs->store_powerplay_table ? (smu)->ppt_funcs->store_powerplay_table((smu)) : 0)
+#define smu_check_powerplay_table(smu) \
+	((smu)->ppt_funcs->check_powerplay_table ? (smu)->ppt_funcs->check_powerplay_table((smu)) : 0)
+#define smu_append_powerplay_table(smu) \
+	((smu)->ppt_funcs->append_powerplay_table ? (smu)->ppt_funcs->append_powerplay_table((smu)) : 0)
+
+#define smu_msg_get_index(smu, msg) \
+	((smu)->ppt_funcs? ((smu)->ppt_funcs->get_smu_msg_index? (smu)->ppt_funcs->get_smu_msg_index((smu), (msg)) : -EINVAL) : -EINVAL)
+#define smu_run_afll_btc(smu) \
+	((smu)->ppt_funcs? ((smu)->ppt_funcs->run_afll_btc? (smu)->ppt_funcs->run_afll_btc((smu)) : 0) : 0)
 
 extern int smu_get_atom_data_table(struct smu_context *smu, uint32_t table,
 				   uint16_t *size, uint8_t *frev, uint8_t *crev,
