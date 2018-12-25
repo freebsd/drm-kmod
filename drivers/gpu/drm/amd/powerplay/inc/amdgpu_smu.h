@@ -102,6 +102,9 @@ struct smu_context
 
 	uint32_t pstate_sclk;
 	uint32_t pstate_mclk;
+
+	uint32_t power_limit;
+	uint32_t default_power_limit;
 };
 
 struct pptable_funcs {
@@ -147,7 +150,7 @@ struct smu_funcs
 	int (*enable_all_mask)(struct smu_context *smu);
 	int (*disable_all_mask)(struct smu_context *smu);
 	int (*notify_display_change)(struct smu_context *smu);
-
+	int (*get_power_limit)(struct smu_context *smu);
 };
 
 #define smu_init_microcode(smu) \
@@ -222,6 +225,8 @@ struct smu_funcs
 	((smu)->ppt_funcs->set_default_dpm_table ? (smu)->ppt_funcs->set_default_dpm_table((smu)) : 0)
 #define smu_populate_umd_state_clk(smu) \
 	((smu)->ppt_funcs->populate_umd_state_clk ? (smu)->ppt_funcs->populate_umd_state_clk((smu)) : 0)
+#define smu_get_power_limit(smu) \
+	((smu)->funcs->get_power_limit? (smu)->funcs->get_power_limit((smu)) : 0)
 
 #define smu_msg_get_index(smu, msg) \
 	((smu)->ppt_funcs? ((smu)->ppt_funcs->get_smu_msg_index? (smu)->ppt_funcs->get_smu_msg_index((smu), (msg)) : -EINVAL) : -EINVAL)
