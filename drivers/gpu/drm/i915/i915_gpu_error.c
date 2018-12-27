@@ -1842,20 +1842,9 @@ static void capture_gen_state(struct i915_gpu_state *error)
 	error->driver_caps = i915->caps;
 }
 
-static __always_inline void dup_param(const char *type, void *x)
-{
-	if (!__builtin_strcmp(type, "char *"))
-		*(void **)x = kstrdup(*(void **)x, GFP_ATOMIC);
-}
-
 static void capture_params(struct i915_gpu_state *error)
 {
-	error->params = i915_modparams;
-#ifdef __linux__ /* assert panic in strlen here */
-#define DUP(T, x, ...) dup_param(#T, &error->params.x);
-	I915_PARAMS_FOR_EACH(DUP);
-#undef DUP
-#endif
+	i915_params_copy(&error->params, &i915_modparams);
 }
 
 static unsigned long capture_find_epoch(const struct i915_gpu_state *error)
