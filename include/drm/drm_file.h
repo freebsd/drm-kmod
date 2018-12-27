@@ -32,8 +32,8 @@
 
 #include <linux/types.h>
 #include <linux/completion.h>
-#ifdef __FreeBSD__
 #include <linux/idr.h>
+#ifdef __FreeBSD__
 #include <linux/file.h>
 #endif
 
