@@ -4,6 +4,9 @@
 #ifndef _DRM_INTEL_GTT_H
 #define	_DRM_INTEL_GTT_H
 
+#include <linux/agp_backend.h>
+#include <linux/kernel.h>
+
 #ifdef __FreeBSD__
 struct agp_bridge_data;
 struct intel_gtt;
