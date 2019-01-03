@@ -332,6 +332,15 @@ void drm_sysfs_hotplug_event(struct drm_device *dev)
 	DRM_DEBUG("generating hotplug event\n");
 
 	kobject_uevent_env(&dev->primary->kdev->kobj, KOBJ_CHANGE, envp);
+#else
+	struct sbuf *sb = sbuf_new_auto();
+
+	DRM_DEBUG("generating hotplug event\n");
+
+	sbuf_printf(sb, "cdev=dri/%s", dev_name(dev->primary->kdev));
+	sbuf_finish(sb);
+	devctl_notify("DRM", "CONNECTOR", "HOTPLUG", sbuf_data(sb));
+	sbuf_delete(sb);
 #endif
 }
 EXPORT_SYMBOL(drm_sysfs_hotplug_event);
