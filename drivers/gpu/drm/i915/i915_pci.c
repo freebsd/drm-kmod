@@ -87,6 +87,7 @@
 	.display.has_overlay = 1, \
 	.display.overlay_needs_physical = 1, \
 	.display.has_gmch_display = 1, \
+	.gpu_reset_clobbers_display = true, \
 	.hws_needs_physical = 1, \
 	.unfenced_needs_alignment = 1, \
 	.ring_mask = RENDER_RING, \
@@ -127,6 +128,7 @@ static const struct intel_device_info intel_i865g_info = {
 	GEN(3), \
 	.num_pipes = 2, \
 	.display.has_gmch_display = 1, \
+	.gpu_reset_clobbers_display = true, \
 	.ring_mask = RENDER_RING, \
 	.has_snoop = true, \
 	.has_coherent_ggtt = true, \
@@ -203,6 +205,7 @@ static const struct intel_device_info intel_pineview_info = {
 	.num_pipes = 2, \
 	.display.has_hotplug = 1, \
 	.display.has_gmch_display = 1, \
+	.gpu_reset_clobbers_display = true, \
 	.ring_mask = RENDER_RING, \
 	.has_snoop = true, \
 	.has_coherent_ggtt = true, \
@@ -233,6 +236,7 @@ static const struct intel_device_info intel_g45_info = {
 	GEN4_FEATURES,
 	PLATFORM(INTEL_G45),
 	.ring_mask = RENDER_RING | BSD_RING,
+	.gpu_reset_clobbers_display = false,
 };
 
 static const struct intel_device_info intel_gm45_info = {
@@ -242,6 +246,7 @@ static const struct intel_device_info intel_gm45_info = {
 	.display.has_fbc = 1,
 	.display.supports_tv = 1,
 	.ring_mask = RENDER_RING | BSD_RING,
+	.gpu_reset_clobbers_display = false,
 };
 
 #define GEN5_FEATURES \
