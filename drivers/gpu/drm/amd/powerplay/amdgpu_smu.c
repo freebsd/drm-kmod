@@ -27,6 +27,100 @@
 #include "amdgpu_smu.h"
 #include "soc15_common.h"
 #include "smu_v11_0.h"
+#include "atom.h"
+
+int smu_update_table(struct smu_context *smu, uint32_t table_id,
+		     void *table_data, bool drv2smu)
+{
+	struct smu_table_context *smu_table = &smu->smu_table;
+	struct smu_table *table = NULL;
+	int ret = 0;
+
+	if (!table_data || table_id >= smu_table->table_count)
+		return -EINVAL;
+
+	table = &smu_table->tables[table_id];
+
+	if (drv2smu)
+		memcpy(table->cpu_addr, table_data, table->size);
+
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_SetDriverDramAddrHigh,
+					  upper_32_bits(table->mc_address));
+	if (ret)
+		return ret;
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_SetDriverDramAddrLow,
+					  lower_32_bits(table->mc_address));
+	if (ret)
+		return ret;
+	ret = smu_send_smc_msg_with_param(smu, drv2smu ?
+					  SMU_MSG_TransferTableDram2Smu :
+					  SMU_MSG_TransferTableSmu2Dram,
+					  table_id);
+	if (ret)
+		return ret;
+
+	if (!drv2smu)
+		memcpy(table_data, table->cpu_addr, table->size);
+
+	return ret;
+}
+
+int smu_feature_init_dpm(struct smu_context *smu)
+{
+	struct smu_feature *feature = &smu->smu_feature;
+	int ret = 0;
+	uint32_t unallowed_feature_mask[SMU_FEATURE_MAX/32];
+
+	bitmap_fill(feature->allowed, SMU_FEATURE_MAX);
+
+	ret = smu_get_unallowed_feature_mask(smu, unallowed_feature_mask,
+					     SMU_FEATURE_MAX/32);
+	if (ret)
+		return ret;
+
+	bitmap_andnot(feature->allowed, feature->allowed,
+		      (unsigned long *)unallowed_feature_mask,
+		      feature->feature_num);
+
+	return ret;
+}
+
+int smu_feature_is_enabled(struct smu_context *smu, int feature_id)
+{
+	struct smu_feature *feature = &smu->smu_feature;
+	WARN_ON(feature_id > feature->feature_num);
+	return test_bit(feature_id, feature->enabled);
+}
+
+int smu_feature_set_enabled(struct smu_context *smu, int feature_id, bool enable)
+{
+	struct smu_feature *feature = &smu->smu_feature;
+	WARN_ON(feature_id > feature->feature_num);
+	if (enable)
+		test_and_set_bit(feature_id, feature->enabled);
+	else
+		test_and_clear_bit(feature_id, feature->enabled);
+	return 0;
+}
+
+int smu_feature_is_supported(struct smu_context *smu, int feature_id)
+{
+	struct smu_feature *feature = &smu->smu_feature;
+	WARN_ON(feature_id > feature->feature_num);
+	return test_bit(feature_id, feature->supported);
+}
+
+int smu_feature_set_supported(struct smu_context *smu, int feature_id,
+			      bool enable)
+{
+	struct smu_feature *feature = &smu->smu_feature;
+	WARN_ON(feature_id > feature->feature_num);
+	if (enable)
+		test_and_set_bit(feature_id, feature->supported);
+	else
+		test_and_clear_bit(feature_id, feature->supported);
+	return 0;
+}
 
 static int smu_set_funcs(struct amdgpu_device *adev)
 {

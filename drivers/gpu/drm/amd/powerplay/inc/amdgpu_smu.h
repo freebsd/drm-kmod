@@ -178,6 +178,16 @@ struct smu_power_context {
 	uint32_t power_context_size;
 };
 
+#define SMU_FEATURE_MAX (64)
+struct smu_feature
+{
+        uint32_t feature_num;
+        DECLARE_BITMAP(supported, SMU_FEATURE_MAX);
+        DECLARE_BITMAP(allowed, SMU_FEATURE_MAX);
+        DECLARE_BITMAP(enabled, SMU_FEATURE_MAX);
+        struct mutex mutex;
+};
+
 struct smu_context
 {
 	struct amdgpu_device            *adev;
@@ -344,5 +354,8 @@ extern int smu_get_atom_data_table(struct smu_context *smu, uint32_t table,
 extern const struct amd_ip_funcs smu_ip_funcs;
 
 extern const struct amdgpu_ip_block_version smu_v11_0_ip_block;
+
+int smu_update_table(struct smu_context *smu, uint32_t table_id,
+		     void *table_data, bool drv2smu);
 
 #endif
