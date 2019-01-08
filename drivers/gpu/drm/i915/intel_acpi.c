@@ -6,7 +6,6 @@
  */
 #include <linux/pci.h>
 #include <linux/acpi.h>
-#include <drm/drmP.h>
 #include "i915_drv.h"
 
 #define pci_get_class linux_pci_get_class
