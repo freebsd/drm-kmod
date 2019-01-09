@@ -483,6 +483,43 @@ submit_notify(struct i915_sw_fence *fence, enum i915_sw_fence_notify state)
 	return NOTIFY_DONE;
 }
 
+static void ring_retire_requests(struct intel_ring *ring)
+{
+	struct i915_request *rq, *rn;
+
+	list_for_each_entry_safe(rq, rn, &ring->request_list, ring_link) {
+		if (!i915_request_completed(rq))
+			break;
+
+		i915_request_retire(rq);
+	}
+}
+
+static noinline struct i915_request *
+i915_request_alloc_slow(struct intel_context *ce)
+{
+	struct intel_ring *ring = ce->ring;
+	struct i915_request *rq;
+
+	if (list_empty(&ring->request_list))
+		goto out;
+
+	/* Ratelimit ourselves to prevent oom from malicious clients */
+	rq = list_last_entry(&ring->request_list, typeof(*rq), ring_link);
+#ifdef __linux__
+	cond_synchronize_rcu(rq->rcustate);
+#elif defined(__FreeBSD__)
+	/* BSDFIXME: OK to always synchronize here? */
+	synchronize_rcu();
+#endif
+
+	/* Retire our old requests in the hope that we free some */
+	ring_retire_requests(ring);
+
+out:
+	return kmem_cache_alloc(ce->gem_context->i915->requests, GFP_KERNEL);
+}
+
 /**
  * i915_request_alloc - allocate a request structure
  *
@@ -565,20 +602,7 @@ i915_request_alloc(struct intel_engine_cs *engine, struct i915_gem_context *ctx)
 	rq = kmem_cache_alloc(i915->requests,
 			      GFP_KERNEL | __GFP_RETRY_MAYFAIL | __GFP_NOWARN);
 	if (unlikely(!rq)) {
-		i915_retire_requests(i915);
-
-		/* Ratelimit ourselves to prevent oom from malicious clients */
-		rq = i915_gem_active_raw(&ce->ring->timeline->last_request,
-					 &i915->drm.struct_mutex);
-		if (rq)
-#ifdef __linux__
-			cond_synchronize_rcu(rq->rcustate);
-#elif defined(__FreeBSD__)
-			/* BSDFIXME: OK to always synchronize here? */
-			synchronize_rcu();
-#endif
-
-		rq = kmem_cache_alloc(i915->requests, GFP_KERNEL);
+		rq = i915_request_alloc_slow(ce);
 		if (!rq) {
 			ret = -ENOMEM;
 			goto err_unreserve;
@@ -1229,19 +1253,6 @@ complete:
 	trace_i915_request_wait_end(rq);
 
 	return timeout;
-}
-
-static void ring_retire_requests(struct intel_ring *ring)
-{
-	struct i915_request *request, *next;
-
-	list_for_each_entry_safe(request, next,
-				 &ring->request_list, ring_link) {
-		if (!i915_request_completed(request))
-			break;
-
-		i915_request_retire(request);
-	}
 }
 
 void i915_retire_requests(struct drm_i915_private *i915)
