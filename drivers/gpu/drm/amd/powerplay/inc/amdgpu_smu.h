@@ -357,5 +357,6 @@ extern const struct amdgpu_ip_block_version smu_v11_0_ip_block;
 
 int smu_update_table(struct smu_context *smu, uint32_t table_id,
 		     void *table_data, bool drv2smu);
+bool is_support_sw_smu(struct amdgpu_device *adev);
 
 #endif
