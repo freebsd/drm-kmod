@@ -120,11 +120,8 @@ int i915_query_ioctl(struct drm_device *dev, void *data, struct drm_file *file)
 
 		ret = -EINVAL;
 		if (func_idx < ARRAY_SIZE(i915_query_funcs)) {
-#ifdef __linux__
-			// BSDFIXME: prevent out of bounds
 			func_idx = array_index_nospec(func_idx,
 						      ARRAY_SIZE(i915_query_funcs));
-#endif
 			ret = i915_query_funcs[func_idx](dev_priv, &item);
 		}
 

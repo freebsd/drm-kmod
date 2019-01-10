@@ -120,7 +120,26 @@ static inline uint64_t mul_u64_u32_div(uint64_t a, uint32_t mul, uint32_t diviso
 	return rl.ll;
 }
 
-// Naive impl...
+/* Naive impl... */
 #define	array_size(a,b) ((a) * (b))
+
+/* Copied from Linux */
+static inline unsigned long array_index_mask_nospec(unsigned long index,
+						    unsigned long size)
+{
+	return ~(long)(index | (size - 1UL - index)) >> (BITS_PER_LONG - 1);
+}
+/* Copied from Linux */
+#define array_index_nospec(index, size)					\
+({									\
+	typeof(index) _i = (index);					\
+	typeof(size) _s = (size);					\
+	unsigned long _mask = array_index_mask_nospec(_i, _s);		\
+									\
+	BUILD_BUG_ON(sizeof(_i) > sizeof(long));			\
+	BUILD_BUG_ON(sizeof(_s) > sizeof(long));			\
+									\
+	(typeof(_i)) (_i & _mask);					\
+})
 
 #endif /* _LINUX_GPLV2_COMPILER_H_ */
