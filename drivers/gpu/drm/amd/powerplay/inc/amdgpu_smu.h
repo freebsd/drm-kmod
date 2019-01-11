@@ -158,6 +158,7 @@ struct smu_table_context
 {
 	void				*power_play_table;
 	uint32_t			power_play_table_size;
+	void				*hardcode_pptable;
 
 	void				*max_sustainable_clocks;
 	struct smu_bios_boot_up_values	boot_values;
@@ -363,5 +364,8 @@ extern const struct amdgpu_ip_block_version smu_v11_0_ip_block;
 int smu_update_table(struct smu_context *smu, uint32_t table_id,
 		     void *table_data, bool drv2smu);
 bool is_support_sw_smu(struct amdgpu_device *adev);
+int smu_reset(struct smu_context *smu);
+int smu_sys_get_pp_table(struct smu_context *smu, void **table);
+int smu_sys_set_pp_table(struct smu_context *smu,  void *buf, size_t size);
 
 #endif
