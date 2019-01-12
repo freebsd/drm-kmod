@@ -183,19 +183,12 @@ struct dma_buf_attachment;
 struct pci_dev;
 struct pci_controller;
 
-/* returns true if currently okay to sleep */
-static inline bool drm_can_sleep(void)
-{
-	if (in_atomic() || in_dbg_master() || irqs_disabled() || cold)
-		return false;
-	return true;
-}
-
-#ifndef __linux__
+#ifdef __FreeBSD__
 /* BSDFIXME: Confirm is this for freebsd only? */
 /* sysctl support (drm_sysctl.h) */
 extern int		drm_sysctl_init(struct drm_device *dev);
 extern int		drm_sysctl_cleanup(struct drm_device *dev);
+#endif
 
 /* helper for handling conditionals in various for_each macros */
 #define for_each_if(condition) if (!(condition)) {} else
@@ -210,7 +203,6 @@ extern int		drm_sysctl_cleanup(struct drm_device *dev);
 #endif
 
 #endif
-#endif				/* __KERNEL__ */
 
 #if defined(CONFIG_DRM_DEBUG_SELFTEST_MODULE)
 #define EXPORT_SYMBOL_FOR_TESTS_ONLY(x) EXPORT_SYMBOL(x)

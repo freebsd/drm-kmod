@@ -243,7 +243,6 @@ static inline int vga_switcheroo_get_client_state(struct pci_dev *pdev) { return
 
 #define pci_get_power_state pci_get_powerstate
 
-#define in_dbg_master() (kdb_active)
 #define do_gettimeofday microtime
 #define acpi_video_register()
 #define acpi_video_unregister()
