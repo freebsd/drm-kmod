@@ -42,6 +42,16 @@
 #define in_dbg_master() (kdb_active)
 #endif
 
+/*
+ * Use EXPORT_SYMBOL_FOR_TESTS_ONLY() for functions that shall
+ * only be visible for drmselftests.
+ */
+#if defined(CONFIG_DRM_DEBUG_SELFTEST_MODULE)
+#define EXPORT_SYMBOL_FOR_TESTS_ONLY(x) EXPORT_SYMBOL(x)
+#else
+#define EXPORT_SYMBOL_FOR_TESTS_ONLY(x)
+#endif
+
 /**
  * for_each_if - helper for handling conditionals in various for_each macros
  * @condition: The condition to check

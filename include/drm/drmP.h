@@ -190,24 +190,12 @@ extern int		drm_sysctl_init(struct drm_device *dev);
 extern int		drm_sysctl_cleanup(struct drm_device *dev);
 #endif
 
-/* helper for handling conditionals in various for_each macros */
-#define for_each_if(condition) if (!(condition)) {} else
+/*
+ * NOTE: drmP.h is obsolete - do NOT add anything to this file
+ *
+ * Do not include drmP.h in new files.
+ * Work is ongoing to remove drmP.h includes from existing files
+ */
 
-#ifdef ENABLE_DRM_ERR_RET
-#define DRM_ERR_RET(V) do {						\
-	printf("%s:%d ret %d\n", __FUNCTION__, __LINE__, V);		\
-	return V;							\
-} while (0)
-#else
-#define DRM_ERR_RET(V) return V
-#endif
-
-#endif
-
-#if defined(CONFIG_DRM_DEBUG_SELFTEST_MODULE)
-#define EXPORT_SYMBOL_FOR_TESTS_ONLY(x) EXPORT_SYMBOL(x)
-#else
-#define EXPORT_SYMBOL_FOR_TESTS_ONLY(x)
-#endif
-
+#endif /* __KERNEL__ */
 #endif
