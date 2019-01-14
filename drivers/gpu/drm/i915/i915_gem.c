@@ -144,6 +144,8 @@ int i915_mutex_lock_interruptible(struct drm_device *dev)
 
 static u32 __i915_gem_park(struct drm_i915_private *i915)
 {
+	intel_wakeref_t wakeref;
+
 	GEM_TRACE("\n");
 
 	lockdep_assert_held(&i915->drm.struct_mutex);
@@ -174,14 +176,15 @@ static u32 __i915_gem_park(struct drm_i915_private *i915)
 	i915_pmu_gt_parked(i915);
 	i915_vma_parked(i915);
 
-	i915->gt.awake = false;
+	wakeref = fetch_and_zero(&i915->gt.awake);
+	GEM_BUG_ON(!wakeref);
 
 	if (INTEL_GEN(i915) >= 6)
 		gen6_rps_idle(i915);
 
 	intel_display_power_put(i915, POWER_DOMAIN_GT_IRQ);
 
-	intel_runtime_pm_put_unchecked(i915);
+	intel_runtime_pm_put(i915, wakeref);
 
 	return i915->gt.epoch;
 }
@@ -210,7 +213,8 @@ void i915_gem_unpark(struct drm_i915_private *i915)
 	if (i915->gt.awake)
 		return;
 
-	intel_runtime_pm_get_noresume(i915);
+	i915->gt.awake = intel_runtime_pm_get_noresume(i915);
+	GEM_BUG_ON(!i915->gt.awake);
 
 	/*
 	 * It seems that the DMC likes to transition between the DC states a lot
@@ -225,7 +229,6 @@ void i915_gem_unpark(struct drm_i915_private *i915)
 	 */
 	intel_display_power_get(i915, POWER_DOMAIN_GT_IRQ);
 
-	i915->gt.awake = true;
 	if (unlikely(++i915->gt.epoch == 0)) /* keep 0 as invalid */
 		i915->gt.epoch = 1;
 
