@@ -3314,6 +3314,7 @@ void i915_handle_error(struct drm_i915_private *dev_priv,
 		       const char *fmt, ...)
 {
 	struct intel_engine_cs *engine;
+	intel_wakeref_t wakeref;
 	unsigned int tmp;
 	char error_msg[80];
 	char *msg = NULL;
@@ -3340,7 +3341,7 @@ void i915_handle_error(struct drm_i915_private *dev_priv,
 	 * isn't the case at least when we get here by doing a
 	 * simulated reset via debugfs, so get an RPM reference.
 	 */
-	intel_runtime_pm_get(dev_priv);
+	wakeref = intel_runtime_pm_get(dev_priv);
 
 	engine_mask &= INTEL_INFO(dev_priv)->ring_mask;
 
@@ -3402,7 +3403,7 @@ void i915_handle_error(struct drm_i915_private *dev_priv,
 	wake_up_all(&dev_priv->gpu_error.reset_queue);
 
 out:
-	intel_runtime_pm_put_unchecked(dev_priv);
+	intel_runtime_pm_put(dev_priv, wakeref);
 }
 
 /* Called from drm generic code, passed 'crtc' which
