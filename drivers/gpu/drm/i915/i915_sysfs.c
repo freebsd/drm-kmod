@@ -47,11 +47,12 @@ static inline struct drm_i915_private *kdev_minor_to_i915(struct device *kdev)
 static u32 calc_residency(struct drm_i915_private *dev_priv,
 			  i915_reg_t reg)
 {
+	intel_wakeref_t wakeref;
 	u64 res;
 
-	intel_runtime_pm_get(dev_priv);
+	wakeref = intel_runtime_pm_get(dev_priv);
 	res = intel_rc6_residency_us(dev_priv, reg);
-	intel_runtime_pm_put_unchecked(dev_priv);
+	intel_runtime_pm_put(dev_priv, wakeref);
 
 	return DIV_ROUND_CLOSEST_ULL(res, 1000);
 }
@@ -266,9 +267,10 @@ static ssize_t gt_act_freq_mhz_show(struct device *kdev,
 				    struct device_attribute *attr, char *buf)
 {
 	struct drm_i915_private *dev_priv = kdev_minor_to_i915(kdev);
+	intel_wakeref_t wakeref;
 	int ret;
 
-	intel_runtime_pm_get(dev_priv);
+	wakeref = intel_runtime_pm_get(dev_priv);
 
 	mutex_lock(&dev_priv->pcu_lock);
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv)) {
@@ -282,7 +284,7 @@ static ssize_t gt_act_freq_mhz_show(struct device *kdev,
 	}
 	mutex_unlock(&dev_priv->pcu_lock);
 
-	intel_runtime_pm_put_unchecked(dev_priv);
+	intel_runtime_pm_put(dev_priv, wakeref);
 
 	return snprintf(buf, PAGE_SIZE, "%d\n", ret);
 }
@@ -362,6 +364,7 @@ static ssize_t gt_max_freq_mhz_store(struct device *kdev,
 {
 	struct drm_i915_private *dev_priv = kdev_minor_to_i915(kdev);
 	struct intel_rps *rps = &dev_priv->gt_pm.rps;
+	intel_wakeref_t wakeref;
 	u32 val;
 	ssize_t ret;
 
@@ -369,7 +372,7 @@ static ssize_t gt_max_freq_mhz_store(struct device *kdev,
 	if (ret)
 		return ret;
 
-	intel_runtime_pm_get(dev_priv);
+	wakeref = intel_runtime_pm_get(dev_priv);
 
 	mutex_lock(&dev_priv->pcu_lock);
 
@@ -379,7 +382,7 @@ static ssize_t gt_max_freq_mhz_store(struct device *kdev,
 	    val > rps->max_freq ||
 	    val < rps->min_freq_softlimit) {
 		mutex_unlock(&dev_priv->pcu_lock);
-		intel_runtime_pm_put_unchecked(dev_priv);
+		intel_runtime_pm_put(dev_priv, wakeref);
 		return -EINVAL;
 	}
 
@@ -400,7 +403,7 @@ static ssize_t gt_max_freq_mhz_store(struct device *kdev,
 
 	mutex_unlock(&dev_priv->pcu_lock);
 
-	intel_runtime_pm_put_unchecked(dev_priv);
+	intel_runtime_pm_put(dev_priv, wakeref);
 
 	return ret ?: count;
 }
@@ -420,6 +423,7 @@ static ssize_t gt_min_freq_mhz_store(struct device *kdev,
 {
 	struct drm_i915_private *dev_priv = kdev_minor_to_i915(kdev);
 	struct intel_rps *rps = &dev_priv->gt_pm.rps;
+	intel_wakeref_t wakeref;
 	u32 val;
 	ssize_t ret;
 
@@ -427,7 +431,7 @@ static ssize_t gt_min_freq_mhz_store(struct device *kdev,
 	if (ret)
 		return ret;
 
-	intel_runtime_pm_get(dev_priv);
+	wakeref = intel_runtime_pm_get(dev_priv);
 
 	mutex_lock(&dev_priv->pcu_lock);
 
@@ -437,7 +441,7 @@ static ssize_t gt_min_freq_mhz_store(struct device *kdev,
 	    val > rps->max_freq ||
 	    val > rps->max_freq_softlimit) {
 		mutex_unlock(&dev_priv->pcu_lock);
-		intel_runtime_pm_put_unchecked(dev_priv);
+		intel_runtime_pm_put(dev_priv, wakeref);
 		return -EINVAL;
 	}
 
@@ -454,7 +458,7 @@ static ssize_t gt_min_freq_mhz_store(struct device *kdev,
 
 	mutex_unlock(&dev_priv->pcu_lock);
 
-	intel_runtime_pm_put_unchecked(dev_priv);
+	intel_runtime_pm_put(dev_priv, wakeref);
 
 	return ret ?: count;
 }
