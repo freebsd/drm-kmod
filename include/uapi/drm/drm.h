@@ -50,6 +50,9 @@ typedef unsigned int drm_handle_t;
 
 #else /* One of the BSDs */
 
+#ifndef __FreeBSD__
+#include <stdint.h>
+#endif
 #include <sys/ioccom.h>
 #include <sys/types.h>
 #ifdef __linux__
