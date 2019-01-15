@@ -1704,9 +1704,9 @@ intel_hdmi_ycbcr420_config(struct drm_connector *connector,
 	return true;
 }
 
-bool intel_hdmi_compute_config(struct intel_encoder *encoder,
-			       struct intel_crtc_state *pipe_config,
-			       struct drm_connector_state *conn_state)
+int intel_hdmi_compute_config(struct intel_encoder *encoder,
+			      struct intel_crtc_state *pipe_config,
+			      struct drm_connector_state *conn_state)
 {
 	struct intel_hdmi *intel_hdmi = enc_to_intel_hdmi(&encoder->base);
 	struct drm_i915_private *dev_priv = to_i915(encoder->base.dev);
@@ -1722,7 +1722,7 @@ bool intel_hdmi_compute_config(struct intel_encoder *encoder,
 	bool force_dvi = intel_conn_state->force_audio == HDMI_AUDIO_OFF_DVI;
 
 	if (adjusted_mode->flags & DRM_MODE_FLAG_DBLSCAN)
-		return false;
+		return -EINVAL;
 
 	pipe_config->output_format = INTEL_OUTPUT_FORMAT_RGB;
 	pipe_config->has_hdmi_sink = !force_dvi && intel_hdmi->has_hdmi_sink;
@@ -1753,7 +1753,7 @@ bool intel_hdmi_compute_config(struct intel_encoder *encoder,
 						&clock_12bpc, &clock_10bpc,
 						&clock_8bpc)) {
 			DRM_ERROR("Can't support YCBCR420 output\n");
-			return false;
+			return -EINVAL;
 		}
 	}
 
@@ -1803,7 +1803,7 @@ bool intel_hdmi_compute_config(struct intel_encoder *encoder,
 	if (hdmi_port_clock_valid(intel_hdmi, pipe_config->port_clock,
 				  false, force_dvi) != MODE_OK) {
 		DRM_DEBUG_KMS("unsupported HDMI clock, rejecting mode\n");
-		return false;
+		return -EINVAL;
 	}
 
 	/* Set user selected PAR to incoming mode's member */
@@ -1822,7 +1822,7 @@ bool intel_hdmi_compute_config(struct intel_encoder *encoder,
 		}
 	}
 
-	return true;
+	return 0;
 }
 
 static void
