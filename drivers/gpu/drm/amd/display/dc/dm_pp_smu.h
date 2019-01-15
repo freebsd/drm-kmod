@@ -30,6 +30,10 @@
  * interface to PPLIB/SMU to setup clocks and pstate requirements on SoC
  */
 
+#ifdef __linux__
+typedef bool BOOLEAN;
+#endif
+
 enum pp_smu_ver {
 	/*
 	 * PP_SMU_INTERFACE_X should be interpreted as the interface defined
