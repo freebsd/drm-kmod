@@ -39,6 +39,7 @@ SRCS=	\
 	i915_pci.c \
 	i915_query.c \
 	i915_request.c \
+	i915_reset.c \
 	i915_scheduler.c \
 	i915_suspend.c \
 	i915_sw_fence.c \

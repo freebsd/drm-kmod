@@ -29,6 +29,7 @@
 #include <linux/sched/signal.h>
 
 #include "i915_drv.h"
+#include "i915_reset.h"
 
 #ifdef __FreeBSD__
 #undef schedule
