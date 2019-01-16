@@ -1023,7 +1023,7 @@ static int smu_v11_0_read_sensor(struct smu_context *smu,
 		*size = 4;
 		break;
 	default:
-		ret = -EINVAL;
+		ret = smu_common_read_sensor(smu, sensor, data, size);
 		break;
 	}
 
