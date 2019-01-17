@@ -31,6 +31,8 @@
 #include <linux/vga_switcheroo.h>
 #include <linux/pci.h>
 
+#include <drm/drm_drv.h>
+
 #include "i915_drv.h"
 #include "i915_selftest.h"
 
