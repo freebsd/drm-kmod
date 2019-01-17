@@ -141,6 +141,7 @@ enum DC_FEATURE_MASK {
 	DC_FBC_MASK = 0x1,
 };
 
+enum amd_dpm_forced_level;
 /**
  * struct amd_ip_funcs - general hooks for managing amdgpu IP Blocks
  */
@@ -190,6 +191,8 @@ struct amd_ip_funcs {
 				     enum amd_powergating_state state);
 	/** @get_clockgating_state: get current clockgating status */
 	void (*get_clockgating_state)(void *handle, u32 *flags);
+	/** @enable_umd_pstate: enable UMD powerstate */
+	int (*enable_umd_pstate)(void *handle, enum amd_dpm_forced_level *level);
 };
 
 
