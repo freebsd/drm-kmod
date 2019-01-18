@@ -776,6 +776,9 @@ static int vega20_print_clk_levels(struct smu_context *smu,
 				? "*" : "");
 		break;
 
+	case PP_PCIE:
+		break;
+
 	case OD_SCLK:
 		if (od8_settings->od8_settings_array[OD8_SETTING_GFXCLK_FMIN].feature_id &&
 		    od8_settings->od8_settings_array[OD8_SETTING_GFXCLK_FMAX].feature_id) {
@@ -1015,6 +1018,9 @@ static int vega20_force_clk_levels(struct smu_context *smu,
 			return ret;
 		}
 
+		break;
+
+	case PP_PCIE:
 		break;
 
 	default:
