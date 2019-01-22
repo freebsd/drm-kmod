@@ -1771,7 +1771,7 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 	}
 
 	r = amdgpu_bo_create_kernel(adev, adev->gds.mem.gfx_partition_size,
-				    PAGE_SIZE, AMDGPU_GEM_DOMAIN_GDS,
+				    4, AMDGPU_GEM_DOMAIN_GDS,
 				    &adev->gds.gds_gfx_bo, NULL, NULL);
 	if (r)
 		return r;
@@ -1784,7 +1784,7 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 	}
 
 	r = amdgpu_bo_create_kernel(adev, adev->gds.gws.gfx_partition_size,
-				    PAGE_SIZE, AMDGPU_GEM_DOMAIN_GWS,
+				    1, AMDGPU_GEM_DOMAIN_GWS,
 				    &adev->gds.gws_gfx_bo, NULL, NULL);
 	if (r)
 		return r;
@@ -1797,7 +1797,7 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 	}
 
 	r = amdgpu_bo_create_kernel(adev, adev->gds.oa.gfx_partition_size,
-				    PAGE_SIZE, AMDGPU_GEM_DOMAIN_OA,
+				    1, AMDGPU_GEM_DOMAIN_OA,
 				    &adev->gds.oa_gfx_bo, NULL, NULL);
 	if (r)
 		return r;
