@@ -712,6 +712,8 @@ static int smu_hw_init(void *handle)
 
 	mutex_unlock(&smu->mutex);
 
+	adev->pm.dpm_enabled = true;
+
 	pr_info("SMU is initialized successfully!\n");
 
 	return 0;
