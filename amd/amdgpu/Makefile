@@ -181,6 +181,7 @@ SRCS+=	amdgpu_afmt.c \
 	iceland_ih.c \
 	kv_dpm.c \
 	kv_smc.c \
+	mes_v10_1.c \
 	mmhub_v1_0.c \
 	mmhub_v2_0.c \
 	mxgpu_ai.c \
@@ -653,6 +654,7 @@ CWARNFLAGS.iceland_hwmgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.iceland_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.iceland_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.kv_dpm.c=	-Wno-unused-const-variable
+CWARNFLAGS.mes_v10_1.c=	-Wno-unused-const-variable
 CWARNFLAGS.mxgpu_vi.c=	-Wno-enum-conversion
 CWARNFLAGS.polaris10_clockpowergating.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.polaris10_hwmgr.c=	-Wno-missing-prototypes  -Wno-unused-const-variable
