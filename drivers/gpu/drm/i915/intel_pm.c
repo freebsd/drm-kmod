@@ -26,8 +26,13 @@
  */
 
 #include <linux/cpufreq.h>
+#include <linux/module.h>
 #include <linux/pm_runtime.h>
+
+#include <drm/drm_atomic_helper.h>
+#include <drm/drm_fourcc.h>
 #include <drm/drm_plane_helper.h>
+
 #include "i915_drv.h"
 #include "intel_drv.h"
 #ifdef __FreeBSD__
@@ -36,8 +41,6 @@
 #else
 #include "../../../platform/x86/intel_ips.h"
 #endif
-#include <linux/module.h>
-#include <drm/drm_atomic_helper.h>
 
 /**
  * DOC: RC6
