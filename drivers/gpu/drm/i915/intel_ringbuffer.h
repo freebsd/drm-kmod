@@ -208,6 +208,7 @@ struct i915_priolist {
 
 struct st_preempt_hang {
 	struct completion completion;
+	unsigned int count;
 	bool inject_hang;
 };
 
