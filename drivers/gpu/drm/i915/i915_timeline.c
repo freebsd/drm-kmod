@@ -77,7 +77,11 @@ hwsp_alloc(struct i915_timeline *timeline, unsigned int *cacheline)
 	}
 
 	GEM_BUG_ON(!hwsp->free_bitmap);
+#ifdef __linux__
 	*cacheline = __ffs64(hwsp->free_bitmap);
+#elif defined(__FreeBSD__)
+	*cacheline = __builtin_ffsll(hwsp->free_bitmap) - 1;
+#endif
 	hwsp->free_bitmap &= ~BIT_ULL(*cacheline);
 	if (!hwsp->free_bitmap)
 		list_del(&hwsp->free_link);
