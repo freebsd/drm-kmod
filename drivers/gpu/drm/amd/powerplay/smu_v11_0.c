@@ -110,7 +110,7 @@ static int smu_v11_0_send_msg(struct smu_context *smu, uint16_t msg)
 	ret = smu_v11_0_wait_for_response(smu);
 
 	if (ret)
-		pr_err("Failed to send message 0x%x, response 0x%x\n", msg,
+		pr_err("Failed to send message 0x%x, response 0x%x\n", index,
 		       ret);
 
 	return ret;
@@ -127,8 +127,8 @@ smu_v11_0_send_msg_with_param(struct smu_context *smu, uint16_t msg,
 
 	ret = smu_v11_0_wait_for_response(smu);
 	if (ret)
-		pr_err("Failed to send message 0x%x, response 0x%x\n", msg,
-		       ret);
+		pr_err("Failed to send message 0x%x, response 0x%x, param 0x%x\n",
+		       index, ret, param);
 
 	WREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_90, 0);
 
@@ -138,8 +138,8 @@ smu_v11_0_send_msg_with_param(struct smu_context *smu, uint16_t msg,
 
 	ret = smu_v11_0_wait_for_response(smu);
 	if (ret)
-		pr_err("Failed to send message 0x%x, response 0x%x\n", msg,
-		       ret);
+		pr_err("Failed to send message 0x%x, response 0x%x param 0x%x\n",
+		       index, ret, param);
 
 	return ret;
 }
