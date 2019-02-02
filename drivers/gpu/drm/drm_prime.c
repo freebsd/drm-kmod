@@ -513,6 +513,7 @@ struct dma_buf *drm_gem_prime_export(struct drm_device *dev,
 		.size = obj->size,
 		.flags = flags,
 		.priv = obj,
+		.resv = obj->resv,
 	};
 
 	if (dev->driver->gem_prime_res_obj)
