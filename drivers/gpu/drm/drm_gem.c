@@ -655,7 +655,7 @@ EXPORT_SYMBOL(drm_gem_put_pages);
 #endif
 
 /**
- * drm_gem_object_lookup - look up a GEM object from it's handle
+ * drm_gem_object_lookup - look up a GEM object from its handle
  * @filp: DRM file private date
  * @handle: userspace handle
  *
