@@ -12,6 +12,7 @@ SRCS=	\
 	dvo_ns2501.c \
 	dvo_sil164.c \
 	dvo_tfp410.c \
+	i915_active.c \
 	i915_cmd_parser.c \
 	i915_drv.c \
 	i915_gem.c \
