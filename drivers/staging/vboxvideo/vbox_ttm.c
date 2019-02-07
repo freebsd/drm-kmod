@@ -160,7 +160,7 @@ int vbox_mm_init(struct vbox_private *vbox)
 #else
 	    			 NULL,
 #endif
-				 DRM_FILE_PAGE_OFFSET, true);
+				 true);
 	if (ret) {
 		DRM_ERROR("Error initialising bo driver; %d\n", ret);
 		return ret;

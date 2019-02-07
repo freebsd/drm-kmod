@@ -1627,7 +1627,6 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 #elif defined(__FreeBSD__)
 			       NULL, /* Dummy on BSD */
 #endif
-			       DRM_FILE_PAGE_OFFSET,
 			       adev->need_dma32);
 	if (r) {
 		DRM_ERROR("failed initializing buffer object driver(%d).\n", r);
