@@ -113,12 +113,8 @@
 #include <linux/math64.h>
 #include <linux/dma-fence.h>
 #include <linux/module.h>
-#include <linux/refcount.h>
-#include <linux/sizes.h>
-
-#include <drm/drm_hashtab.h>
+#include <linux/mman.h>
 #ifdef __linux__
-#include <asm/mman.h>
 #include <asm/pgalloc.h>
 #endif
 #include <linux/uaccess.h>
