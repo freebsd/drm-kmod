@@ -1143,6 +1143,11 @@ static void i915_reset_device(struct drm_i915_private *i915,
 	i915_wedge_on_timeout(&w, i915, 5 * HZ) {
 		intel_prepare_reset(i915);
 
+		/* Flush everyone using a resource about to be clobbered */
+#ifdef __linux__
+		synchronize_srcu_expedited(&error->reset_backoff_srcu);
+#endif
+
 		mutex_lock(&error->wedge_mutex);
 		i915_reset(i915, engine_mask, reason);
 		mutex_unlock(&error->wedge_mutex);
