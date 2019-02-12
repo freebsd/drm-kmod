@@ -2052,6 +2052,14 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	if (ret)
 		goto err_unpin;
 
+#ifdef __freebsd_notyet__
+	srcu = i915_reset_trylock(dev_priv);
+	if (srcu < 0) {
+		ret = srcu;
+		goto err_fence;
+	}
+#endif
+
 	/* Finally, remap it using the new GTT offset */
 	ret = remap_io_mapping(area,
 			       area->vm_start + (vma->ggtt_view.partial.offset << PAGE_SHIFT),
@@ -2059,7 +2067,7 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 			       min_t(u64, vma->size, area->vm_end - area->vm_start),
 			       &ggtt->iomap);
 	if (ret)
-		goto err_fence;
+		goto err_reset;
 
 	/* Mark as being mmapped into userspace for later revocation */
 	assert_rpm_wakelock_held(dev_priv);
@@ -2069,8 +2077,12 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 
 	i915_vma_set_ggtt_write(vma);
 
-err_fence:
+err_reset:
+#ifdef __freebsd_notyet__
+	i915_reset_unlock(dev_priv, srcu);
+rr_fence:
 	i915_vma_unpin_fence(vma);
+#endif
 err_unpin:
 	__i915_vma_unpin(vma);
 err_unlock:
