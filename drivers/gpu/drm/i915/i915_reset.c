@@ -1305,6 +1305,41 @@ out:
 	intel_runtime_pm_put(i915, wakeref);
 }
 
+#ifdef __freebsd_notyet__
+int i915_reset_trylock(struct drm_i915_private *i915)
+{
+	struct i915_gpu_error *error = &i915->gpu_error;
+	int srcu;
+
+	might_lock(&error->reset_backoff_srcu);
+	might_sleep();
+
+	rcu_read_lock();
+	while (test_bit(I915_RESET_BACKOFF, &error->flags)) {
+		rcu_read_unlock();
+
+		if (wait_event_interruptible(error->reset_queue,
+					     !test_bit(I915_RESET_BACKOFF,
+						       &error->flags)))
+			return -EINTR;
+
+		rcu_read_lock();
+	}
+	srcu = srcu_read_lock(&error->reset_backoff_srcu);
+	rcu_read_unlock();
+
+	return srcu;
+}
+
+void i915_reset_unlock(struct drm_i915_private *i915, int tag)
+__releases(&i915->gpu_error.reset_backoff_srcu)
+{
+	struct i915_gpu_error *error = &i915->gpu_error;
+
+	srcu_read_unlock(&error->reset_backoff_srcu, tag);
+}
+#endif
+
 bool i915_reset_flush(struct drm_i915_private *i915)
 {
 	int err;
