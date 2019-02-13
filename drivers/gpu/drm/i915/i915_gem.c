@@ -474,8 +474,7 @@ int i915_gem_object_unbind(struct drm_i915_gem_object *obj)
 static long
 i915_gem_object_wait_fence(struct dma_fence *fence,
 			   unsigned int flags,
-			   long timeout,
-			   struct intel_rps_client *rps_client)
+			   long timeout)
 {
 	struct i915_request *rq;
 
@@ -493,27 +492,6 @@ i915_gem_object_wait_fence(struct dma_fence *fence,
 	if (i915_request_completed(rq))
 		goto out;
 
-	/*
-	 * This client is about to stall waiting for the GPU. In many cases
-	 * this is undesirable and limits the throughput of the system, as
-	 * many clients cannot continue processing user input/output whilst
-	 * blocked. RPS autotuning may take tens of milliseconds to respond
-	 * to the GPU load and thus incurs additional latency for the client.
-	 * We can circumvent that by promoting the GPU frequency to maximum
-	 * before we wait. This makes the GPU throttle up much more quickly
-	 * (good for benchmarks and user experience, e.g. window animations),
-	 * but at a cost of spending more power processing the workload
-	 * (bad for battery). Not all clients even want their results
-	 * immediately and for them we should just let the GPU select its own
-	 * frequency to maximise efficiency. To prevent a single client from
-	 * forcing the clocks too high for the whole system, we only allow
-	 * each client to waitboost once in a busy period.
-	 */
-	if (rps_client && !i915_request_started(rq)) {
-		if (INTEL_GEN(rq->i915) >= 6)
-			gen6_rps_boost(rq, rps_client);
-	}
-
 	timeout = i915_request_wait(rq, flags, timeout);
 
 out:
@@ -526,8 +504,7 @@ out:
 static long
 i915_gem_object_wait_reservation(struct reservation_object *resv,
 				 unsigned int flags,
-				 long timeout,
-				 struct intel_rps_client *rps_client)
+				 long timeout)
 {
 	unsigned int seq = __read_seqcount_begin(&resv->seq);
 	struct dma_fence *excl;
@@ -545,8 +522,7 @@ i915_gem_object_wait_reservation(struct reservation_object *resv,
 
 		for (i = 0; i < count; i++) {
 			timeout = i915_gem_object_wait_fence(shared[i],
-							     flags, timeout,
-							     rps_client);
+							     flags, timeout);
 			if (timeout < 0)
 				break;
 
@@ -572,8 +548,7 @@ i915_gem_object_wait_reservation(struct reservation_object *resv,
 	}
 
 	if (excl && timeout >= 0)
-		timeout = i915_gem_object_wait_fence(excl, flags, timeout,
-						     rps_client);
+		timeout = i915_gem_object_wait_fence(excl, flags, timeout);
 
 	dma_fence_put(excl);
 
@@ -670,28 +645,17 @@ i915_gem_object_wait_priority(struct drm_i915_gem_object *obj,
  * @obj: i915 gem object
  * @flags: how to wait (under a lock, for all rendering or just for writes etc)
  * @timeout: how long to wait
- * @rps_client: client (user process) to charge for any waitboosting
  */
 int
 i915_gem_object_wait(struct drm_i915_gem_object *obj,
 		     unsigned int flags,
-		     long timeout,
-		     struct intel_rps_client *rps_client)
+		     long timeout)
 {
 	might_sleep();
 	GEM_BUG_ON(timeout < 0);
 
-	timeout = i915_gem_object_wait_reservation(obj->resv,
-						   flags, timeout,
-						   rps_client);
+	timeout = i915_gem_object_wait_reservation(obj->resv, flags, timeout);
 	return timeout < 0 ? timeout : 0;
-}
-
-static struct intel_rps_client *to_rps_client(struct drm_file *file)
-{
-	struct drm_i915_file_private *fpriv = file->driver_priv;
-
-	return &fpriv->rps_client;
 }
 
 static int
@@ -899,8 +863,7 @@ int i915_gem_obj_prepare_shmem_read(struct drm_i915_gem_object *obj,
 	ret = i915_gem_object_wait(obj,
 				   I915_WAIT_INTERRUPTIBLE |
 				   I915_WAIT_LOCKED,
-				   MAX_SCHEDULE_TIMEOUT,
-				   NULL);
+				   MAX_SCHEDULE_TIMEOUT);
 	if (ret)
 		return ret;
 
@@ -952,8 +915,7 @@ int i915_gem_obj_prepare_shmem_write(struct drm_i915_gem_object *obj,
 				   I915_WAIT_INTERRUPTIBLE |
 				   I915_WAIT_LOCKED |
 				   I915_WAIT_ALL,
-				   MAX_SCHEDULE_TIMEOUT,
-				   NULL);
+				   MAX_SCHEDULE_TIMEOUT);
 	if (ret)
 		return ret;
 
@@ -1215,8 +1177,7 @@ i915_gem_pread_ioctl(struct drm_device *dev, void *data,
 
 	ret = i915_gem_object_wait(obj,
 				   I915_WAIT_INTERRUPTIBLE,
-				   MAX_SCHEDULE_TIMEOUT,
-				   to_rps_client(file));
+				   MAX_SCHEDULE_TIMEOUT);
 	if (ret)
 		goto out;
 
@@ -1515,8 +1476,7 @@ i915_gem_pwrite_ioctl(struct drm_device *dev, void *data,
 	ret = i915_gem_object_wait(obj,
 				   I915_WAIT_INTERRUPTIBLE |
 				   I915_WAIT_ALL,
-				   MAX_SCHEDULE_TIMEOUT,
-				   to_rps_client(file));
+				   MAX_SCHEDULE_TIMEOUT);
 	if (ret)
 		goto err;
 
@@ -1614,8 +1574,7 @@ i915_gem_set_domain_ioctl(struct drm_device *dev, void *data,
 				   I915_WAIT_INTERRUPTIBLE |
 				   I915_WAIT_PRIORITY |
 				   (write_domain ? I915_WAIT_ALL : 0),
-				   MAX_SCHEDULE_TIMEOUT,
-				   to_rps_client(file));
+				   MAX_SCHEDULE_TIMEOUT);
 	if (err)
 		goto out;
 
@@ -1989,8 +1948,7 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	 */
 	ret = i915_gem_object_wait(obj,
 				   I915_WAIT_INTERRUPTIBLE,
-				   MAX_SCHEDULE_TIMEOUT,
-				   NULL);
+				   MAX_SCHEDULE_TIMEOUT);
 	if (ret)
 		goto err;
 
@@ -3377,8 +3335,7 @@ i915_gem_wait_ioctl(struct drm_device *dev, void *data, struct drm_file *file)
 				   I915_WAIT_INTERRUPTIBLE |
 				   I915_WAIT_PRIORITY |
 				   I915_WAIT_ALL,
-				   to_wait_timeout(args->timeout_ns),
-				   to_rps_client(file));
+				   to_wait_timeout(args->timeout_ns));
 
 	if (args->timeout_ns > 0) {
 		args->timeout_ns -= ktime_to_ns(ktime_sub(ktime_get(), start));
@@ -3447,7 +3404,7 @@ wait_for_timelines(struct drm_i915_private *i915,
 		 * stalls, so allow the gpu to boost to maximum clocks.
 		 */
 		if (flags & I915_WAIT_FOR_IDLE_BOOST)
-			gen6_rps_boost(rq, NULL);
+			gen6_rps_boost(rq);
 
 		timeout = i915_request_wait(rq, flags, timeout);
 		i915_request_put(rq);
@@ -3542,8 +3499,7 @@ i915_gem_object_set_to_wc_domain(struct drm_i915_gem_object *obj, bool write)
 				   I915_WAIT_INTERRUPTIBLE |
 				   I915_WAIT_LOCKED |
 				   (write ? I915_WAIT_ALL : 0),
-				   MAX_SCHEDULE_TIMEOUT,
-				   NULL);
+				   MAX_SCHEDULE_TIMEOUT);
 	if (ret)
 		return ret;
 
@@ -3605,8 +3561,7 @@ i915_gem_object_set_to_gtt_domain(struct drm_i915_gem_object *obj, bool write)
 				   I915_WAIT_INTERRUPTIBLE |
 				   I915_WAIT_LOCKED |
 				   (write ? I915_WAIT_ALL : 0),
-				   MAX_SCHEDULE_TIMEOUT,
-				   NULL);
+				   MAX_SCHEDULE_TIMEOUT);
 	if (ret)
 		return ret;
 
@@ -3721,8 +3676,7 @@ restart:
 					   I915_WAIT_INTERRUPTIBLE |
 					   I915_WAIT_LOCKED |
 					   I915_WAIT_ALL,
-					   MAX_SCHEDULE_TIMEOUT,
-					   NULL);
+					   MAX_SCHEDULE_TIMEOUT);
 		if (ret)
 			return ret;
 
@@ -3860,8 +3814,7 @@ int i915_gem_set_caching_ioctl(struct drm_device *dev, void *data,
 
 	ret = i915_gem_object_wait(obj,
 				   I915_WAIT_INTERRUPTIBLE,
-				   MAX_SCHEDULE_TIMEOUT,
-				   to_rps_client(file));
+				   MAX_SCHEDULE_TIMEOUT);
 	if (ret)
 		goto out;
 
@@ -3987,8 +3940,7 @@ i915_gem_object_set_to_cpu_domain(struct drm_i915_gem_object *obj, bool write)
 				   I915_WAIT_INTERRUPTIBLE |
 				   I915_WAIT_LOCKED |
 				   (write ? I915_WAIT_ALL : 0),
-				   MAX_SCHEDULE_TIMEOUT,
-				   NULL);
+				   MAX_SCHEDULE_TIMEOUT);
 	if (ret)
 		return ret;
 

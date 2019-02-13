@@ -225,10 +225,6 @@ struct drm_i915_file_private {
 	} mm;
 	struct idr context_idr;
 
-	struct intel_rps_client {
-		atomic_t boosts;
-	} rps_client;
-
 	unsigned int bsd_engine;
 
 /*
@@ -3094,8 +3090,7 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf);
 #endif
 int i915_gem_object_wait(struct drm_i915_gem_object *obj,
 			 unsigned int flags,
-			 long timeout,
-			 struct intel_rps_client *rps);
+			 long timeout);
 int i915_gem_object_wait_priority(struct drm_i915_gem_object *obj,
 				  unsigned int flags,
 				  const struct i915_sched_attr *attr);
