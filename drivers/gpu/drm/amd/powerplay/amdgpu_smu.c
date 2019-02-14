@@ -523,58 +523,69 @@ static int smu_fini_fb_allocations(struct smu_context *smu)
 	return 0;
 }
 
-static int smu_smc_table_hw_init(struct smu_context *smu)
+static int smu_smc_table_hw_init(struct smu_context *smu,
+				 bool initialize)
 {
 	int ret;
 
-	ret = smu_read_pptable_from_vbios(smu);
+	ret = smu_init_display(smu);
 	if (ret)
 		return ret;
 
-	/* get boot_values from vbios to set revision, gfxclk, and etc. */
-	ret = smu_get_vbios_bootup_values(smu);
+	ret = smu_feature_set_allowed_mask(smu);
 	if (ret)
 		return ret;
 
-	ret = smu_get_clk_info_from_vbios(smu);
-	if (ret)
-		return ret;
+	if (initialize) {
+		ret = smu_read_pptable_from_vbios(smu);
+		if (ret)
+			return ret;
 
-	/*
-	 * check if the format_revision in vbios is up to pptable header
-	 * version, and the structure size is not 0.
-	 */
-	ret = smu_get_clk_info_from_vbios(smu);
-	if (ret)
-		return ret;
+		/* get boot_values from vbios to set revision, gfxclk, and etc. */
+		ret = smu_get_vbios_bootup_values(smu);
+		if (ret)
+			return ret;
 
-	ret = smu_check_pptable(smu);
-	if (ret)
-		return ret;
+		ret = smu_get_clk_info_from_vbios(smu);
+		if (ret)
+			return ret;
 
-	/*
-	 * allocate vram bos to store smc table contents.
-	 */
-	ret = smu_init_fb_allocations(smu);
-	if (ret)
-		return ret;
+		/*
+		 * check if the format_revision in vbios is up to pptable header
+		 * version, and the structure size is not 0.
+		 */
+		ret = smu_get_clk_info_from_vbios(smu);
+		if (ret)
+			return ret;
 
-	/*
-	 * Parse pptable format and fill PPTable_t smc_pptable to
-	 * smu_table_context structure. And read the smc_dpm_table from vbios,
-	 * then fill it into smc_pptable.
-	 */
-	ret = smu_parse_pptable(smu);
-	if (ret)
-		return ret;
+		ret = smu_check_pptable(smu);
+		if (ret)
+			return ret;
 
-	/*
-	 * Send msg GetDriverIfVersion to check if the return value is equal
-	 * with DRIVER_IF_VERSION of smc header.
-	 */
-	ret = smu_check_fw_version(smu);
-	if (ret)
-		return ret;
+		/*
+		 * allocate vram bos to store smc table contents.
+		 */
+		ret = smu_init_fb_allocations(smu);
+		if (ret)
+			return ret;
+
+		/*
+		 * Parse pptable format and fill PPTable_t smc_pptable to
+		 * smu_table_context structure. And read the smc_dpm_table from vbios,
+		 * then fill it into smc_pptable.
+		 */
+		ret = smu_parse_pptable(smu);
+		if (ret)
+			return ret;
+
+		/*
+		 * Send msg GetDriverIfVersion to check if the return value is equal
+		 * with DRIVER_IF_VERSION of smc header.
+		 */
+		ret = smu_check_fw_version(smu);
+		if (ret)
+			return ret;
+	}
 
 	/*
 	 * Copy pptable bo in the vram to smc with SMU MSGs such as
@@ -610,25 +621,29 @@ static int smu_smc_table_hw_init(struct smu_context *smu)
 	 * gfxclk, memclk, dcefclk, and etc. And enable the DPM feature for each
 	 * type of clks.
 	 */
-	ret = smu_populate_smc_pptable(smu);
+	if (initialize) {
+		ret = smu_populate_smc_pptable(smu);
+		if (ret)
+			return ret;
+
+		ret = smu_init_max_sustainable_clocks(smu);
+		if (ret)
+			return ret;
+	}
+
+	ret = smu_set_od8_default_settings(smu, initialize);
 	if (ret)
 		return ret;
 
-	ret = smu_init_max_sustainable_clocks(smu);
-	if (ret)
-		return ret;
+	if (initialize) {
+		ret = smu_populate_umd_state_clk(smu);
+		if (ret)
+			return ret;
 
-	ret = smu_set_od8_default_settings(smu);
-	if (ret)
-		return ret;
-
-	ret = smu_populate_umd_state_clk(smu);
-	if (ret)
-		return ret;
-
-	ret = smu_get_power_limit(smu, &smu->default_power_limit, false);
-	if (ret)
-		return ret;
+		ret = smu_get_power_limit(smu, &smu->default_power_limit, false);
+		if (ret)
+			return ret;
+	}
 
 	/*
 	 * Set PMSTATUSLOG table bo address with SetToolsDramAddr MSG for tools.
@@ -700,6 +715,7 @@ static int smu_free_memory_pool(struct smu_context *smu)
 
 	return ret;
 }
+
 static int smu_hw_init(void *handle)
 {
 	int ret;
@@ -723,7 +739,11 @@ static int smu_hw_init(void *handle)
 
 	mutex_lock(&smu->mutex);
 
-	ret = smu_smc_table_hw_init(smu);
+	ret = smu_feature_init_dpm(smu);
+	if (ret)
+		goto failed;
+
+	ret = smu_smc_table_hw_init(smu, true);
 	if (ret)
 		goto failed;
 
@@ -804,10 +824,18 @@ int smu_reset(struct smu_context *smu)
 
 static int smu_suspend(void *handle)
 {
+	int ret;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
+	struct smu_context *smu = &adev->smu;
 
 	if (!is_support_sw_smu(adev))
 		return -EINVAL;
+
+	ret = smu_feature_disable_all(smu);
+	if (ret)
+		return ret;
+
+	smu->watermarks_bitmap &= ~(WATERMARKS_LOADED);
 
 	return 0;
 }
@@ -821,9 +849,17 @@ static int smu_resume(void *handle)
 	if (!is_support_sw_smu(adev))
 		return -EINVAL;
 
+	pr_info("SMU is resuming...\n");
+
 	mutex_lock(&smu->mutex);
 
-	/* TODO */
+	ret = smu_smc_table_hw_init(smu, false);
+	if (ret)
+		goto failed;
+
+	ret = smu_start_thermal_control(smu);
+	if (ret)
+		goto failed;
 
 	mutex_unlock(&smu->mutex);
 
