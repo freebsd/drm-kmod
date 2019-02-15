@@ -504,6 +504,7 @@ SRCS+=	amd_powerplay.c \
 	smu_v12_0.c \
 	smu_helper.c \
 	smumgr.c \
+	tonga_baco.c \
 	tonga_smumgr.c \
 	vega10_baco.c \
 	vega10_hwmgr.c \
