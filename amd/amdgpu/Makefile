@@ -404,6 +404,7 @@ SRCS+=	amd_powerplay.c \
 	smu7_thermal.c \
 	smu8_hwmgr.c \
 	smu8_smumgr.c \
+	smu9_baco.c \
 	smu9_smumgr.c \
 	smu10_hwmgr.c \
 	smu10_smumgr.c \
