@@ -476,6 +476,7 @@ SRCS+=	amd_powerplay.c \
 	common_baco.c \
 	ci_smumgr.c \
 	fiji_smumgr.c \
+	fiji_baco.c \
 	hardwaremanager.c \
 	hwmgr.c \
 	iceland_smumgr.c \
