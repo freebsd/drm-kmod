@@ -492,6 +492,7 @@ SRCS+=	amd_powerplay.c \
 	pppcielanes.c \
 	process_pptables_v1_0.c \
 	processpptables.c \
+	smu7_baco.c \
 	smu7_clockpowergating.c \
 	smu7_hwmgr.c \
 	smu7_powertune.c \
