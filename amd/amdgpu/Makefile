@@ -475,6 +475,7 @@ SRCS+=	amd_powerplay.c \
 	arcturus_ppt.c \
 	common_baco.c \
 	ci_smumgr.c \
+	ci_baco.c \
 	fiji_smumgr.c \
 	fiji_baco.c \
 	hardwaremanager.c \
