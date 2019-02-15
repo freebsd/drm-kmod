@@ -482,6 +482,7 @@ SRCS+=	amd_powerplay.c \
 	navi10_ppt.c \
 	renoir_ppt.c \
 	polaris10_smumgr.c \
+	polaris_baco.c \
 	pp_overdriver.c \
 	pp_psm.c \
 	ppatomctrl.c \
