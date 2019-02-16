@@ -197,6 +197,7 @@ CWARNFLAGS.intel_engine_cs.c= -Wno-cast-qual
 CWARNFLAGS.intel_fbdev.c=	-Wno-initializer-overrides
 CWARNFLAGS.intel_guc_ct.c=	-Wno-address-of-packed-member # probably false positive
 CWARNFLAGS.intel_guc_submission.c= -Wno-cast-qual -Wno-unused-function
+CWARNFLAGS.intel_hdcp.c=	-Wno-missing-prototypes
 CWARNFLAGS.intel_hdmi.c=	-Wno-enum-conversion
 CWARNFLAGS.intel_hotplug.c=	-Wno-missing-prototypes
 CWARNFLAGS.intel_lrc.c=		-Wno-cast-qual -Wno-unused-variable
