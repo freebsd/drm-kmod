@@ -9317,6 +9317,8 @@ static bool ironlake_get_pipe_config(struct intel_crtc *crtc,
 	pipe_config->gamma_mode = (tmp & PIPECONF_GAMMA_MODE_MASK_ILK) >>
 		PIPECONF_GAMMA_MODE_SHIFT;
 
+	pipe_config->csc_mode = I915_READ(PIPE_CSC_MODE(crtc->pipe));
+
 	i9xx_get_pipe_color_config(pipe_config);
 
 	if (I915_READ(PCH_TRANSCONF(crtc->pipe)) & TRANS_ENABLE) {
@@ -9951,6 +9953,8 @@ static bool haswell_get_pipe_config(struct intel_crtc *crtc,
 	intel_get_crtc_ycbcr_config(crtc, pipe_config);
 
 	pipe_config->gamma_mode = I915_READ(GAMMA_MODE(crtc->pipe));
+
+	pipe_config->csc_mode = I915_READ(PIPE_CSC_MODE(crtc->pipe));
 
 	if (INTEL_GEN(dev_priv) >= 9) {
 		u32 tmp = I915_READ(SKL_BOTTOM_COLOR(crtc->pipe));
@@ -12270,6 +12274,7 @@ intel_pipe_config_compare(struct drm_i915_private *dev_priv,
 		PIPE_CONF_CHECK_CLOCK_FUZZY(pixel_rate);
 
 		PIPE_CONF_CHECK_X(gamma_mode);
+		PIPE_CONF_CHECK_X(csc_mode);
 		PIPE_CONF_CHECK_BOOL(gamma_enable);
 		PIPE_CONF_CHECK_BOOL(csc_enable);
 	}
