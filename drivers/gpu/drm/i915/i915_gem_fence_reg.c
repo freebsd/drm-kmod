@@ -270,8 +270,8 @@ static int fence_update(struct drm_i915_fence_reg *fence,
 		return 0;
 	}
 
+	WRITE_ONCE(fence->vma, vma);
 	fence_write(fence, vma);
-	fence->vma = vma;
 
 	if (vma) {
 		vma->fence = fence;
