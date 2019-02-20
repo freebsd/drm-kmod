@@ -647,7 +647,10 @@ static void reset_prepare(struct drm_i915_private *i915)
 	for_each_engine(engine, i915, id)
 		reset_prepare_engine(engine);
 
-	intel_uc_sanitize(i915);
+	intel_uc_reset_prepare(i915);
+#ifdef __freebsd_notyet__
+	revoke_mmaps(i915);
+#endif
 }
 
 static int gt_reset(struct drm_i915_private *i915, unsigned int stalled_mask)
