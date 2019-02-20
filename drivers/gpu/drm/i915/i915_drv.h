@@ -3045,17 +3045,17 @@ i915_gem_find_active_request(struct intel_engine_cs *engine);
 
 static inline bool i915_reset_backoff(struct i915_gpu_error *error)
 {
-	return unlikely(test_bit(I915_RESET_BACKOFF, &error->flags));
+       return unlikely(test_bit(I915_RESET_BACKOFF, &error->flags));
 }
 
-static inline bool i915_terminally_wedged(struct i915_gpu_error *error)
+static inline bool __i915_wedged(struct i915_gpu_error *error)
 {
 	return unlikely(test_bit(I915_WEDGED, &error->flags));
 }
 
-static inline bool i915_reset_backoff_or_wedged(struct i915_gpu_error *error)
+static inline bool i915_reset_failed(struct drm_i915_private *i915)
 {
-	return i915_reset_backoff(error) | i915_terminally_wedged(error);
+	return __i915_wedged(&i915->gpu_error);
 }
 
 static inline u32 i915_reset_count(struct i915_gpu_error *error)
