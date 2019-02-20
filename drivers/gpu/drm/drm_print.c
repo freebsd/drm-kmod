@@ -362,3 +362,33 @@ void drm_err(const char *function_name, const char *format, ...)
 	va_end(args);
 }
 #endif
+
+#ifdef CONFIG_DEBUGSFS
+/**
+ * drm_print_regset32 - print the contents of registers to a
+ * &drm_printer stream.
+ *
+ * @p: the &drm printer
+ * @regset: the list of registers to print.
+ *
+ * Often in driver debug, it's useful to be able to either capture the
+ * contents of registers in the steady state using debugfs or at
+ * specific points during operation.  This lets the driver have a
+ * single list of registers for both.
+ */
+void drm_print_regset32(struct drm_printer *p, struct debugfs_regset32 *regset)
+{
+	int namelen = 0;
+	int i;
+
+	for (i = 0; i < regset->nregs; i++)
+		namelen = max(namelen, (int)strlen(regset->regs[i].name));
+
+	for (i = 0; i < regset->nregs; i++) {
+		drm_printf(p, "%*s = 0x%08x\n",
+			   namelen, regset->regs[i].name,
+			   readl(regset->base + regset->regs[i].offset));
+	}
+}
+EXPORT_SYMBOL(drm_print_regset32);
+#endif
