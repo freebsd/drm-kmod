@@ -1880,6 +1880,7 @@ error_free:
  * @vm: requested vm
  * @mapping: mapped range and flags to use for the update
  * @flags: HW flags for the mapping
+ * @bo_adev: amdgpu_device pointer that bo actually been allocated
  * @nodes: array of drm_mm_nodes with the MC addresses
  * @fence: optional resulting fence
  *
@@ -1895,6 +1896,7 @@ static int amdgpu_vm_bo_split_mapping(struct amdgpu_device *adev,
 				      struct amdgpu_vm *vm,
 				      struct amdgpu_bo_va_mapping *mapping,
 				      uint64_t flags,
+				      struct amdgpu_device *bo_adev,
 				      struct drm_mm_node *nodes,
 				      struct dma_fence **fence)
 {
@@ -1969,7 +1971,7 @@ static int amdgpu_vm_bo_split_mapping(struct amdgpu_device *adev,
 			}
 
 		} else if (flags & AMDGPU_PTE_VALID) {
-			addr += adev->vm_manager.vram_base_offset;
+			addr += bo_adev->vm_manager.vram_base_offset;
 			addr += pfn << PAGE_SHIFT;
 		}
 
@@ -2016,6 +2018,7 @@ int amdgpu_vm_bo_update(struct amdgpu_device *adev,
 	struct drm_mm_node *nodes;
 	struct dma_fence *exclusive, **last_update;
 	uint64_t flags;
+	struct amdgpu_device *bo_adev = adev;
 	int r;
 
 	if (clear || !bo) {
@@ -2034,10 +2037,12 @@ int amdgpu_vm_bo_update(struct amdgpu_device *adev,
 		exclusive = reservation_object_get_excl(bo->tbo.resv);
 	}
 
-	if (bo)
+	if (bo) {
 		flags = amdgpu_ttm_tt_pte_flags(adev, bo->tbo.ttm, mem);
-	else
+		bo_adev = amdgpu_ttm_adev(bo->tbo.bdev);
+	} else {
 		flags = 0x0;
+	}
 
 	if (clear || (bo && bo->tbo.resv == vm->root.base.bo->tbo.resv))
 		last_update = &vm->last_update;
@@ -2054,7 +2059,7 @@ int amdgpu_vm_bo_update(struct amdgpu_device *adev,
 
 	list_for_each_entry(mapping, &bo_va->invalids, list) {
 		r = amdgpu_vm_bo_split_mapping(adev, exclusive, pages_addr, vm,
-					       mapping, flags, nodes,
+					       mapping, flags, bo_adev, nodes,
 					       last_update);
 		if (r)
 			return r;
