@@ -122,6 +122,7 @@ static ssize_t ttm_bo_global_show(struct kobject *kobj,
 				  struct attribute *attr,
 				  char *buffer)
 {
+	printf("%s: START kobj = %p\n", __func__, kobj);
 	struct ttm_bo_global *glob =
 		container_of(kobj, struct ttm_bo_global, kobj);
 
@@ -1529,6 +1530,7 @@ EXPORT_SYMBOL(ttm_bo_init_mm);
 
 static void ttm_bo_global_kobj_release(struct kobject *kobj)
 {
+	printf("%s: START kobj = %p\n", __func__, kobj);
 	struct ttm_bo_global *glob =
 		container_of(kobj, struct ttm_bo_global, kobj);
 
