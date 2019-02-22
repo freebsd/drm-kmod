@@ -25,6 +25,13 @@
  *
  */
 
+
+/* 
+ * BSD: This file is excluded from build if this macro is not defined. 
+ * We can't do that so disable it here.
+ */
+#ifdef CONFIG_DRM_DP_AUX_CHARDEV
+
 #include <linux/device.h>
 #include <linux/fs.h>
 #include <linux/slab.h>
@@ -369,6 +376,11 @@ out:
 
 void drm_dp_aux_dev_exit(void)
 {
-	unregister_chrdev(drm_dev_major, "aux");
-	class_destroy(drm_dp_aux_dev_class);
+	if (drm_dp_aux_dev_class) {
+		unregister_chrdev(drm_dev_major, "aux");
+		class_destroy(drm_dp_aux_dev_class);
+		drm_dp_aux_dev_class = NULL;
+	}
 }
+
+#endif /* CONFIG_DRM_DP_AUX_CHARDEV */

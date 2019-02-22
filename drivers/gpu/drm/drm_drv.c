@@ -985,6 +985,7 @@ static const struct file_operations drm_stub_fops = {
 
 static void drm_core_exit(void)
 {
+
 	unregister_chrdev(DRM_MAJOR, "drm");
 	debugfs_remove(drm_debugfs_root);
 	drm_sysfs_destroy();
@@ -1030,5 +1031,5 @@ error:
 	return ret;
 }
 
-module_init(drm_core_init);
-module_exit(drm_core_exit);
+module_init_order(drm_core_init, SI_ORDER_FIRST);
+module_exit_order(drm_core_exit, SI_ORDER_FIRST);

@@ -10,7 +10,7 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/errno.h>
-#include <linux/byteorder/generic.h>
+/* #include <linux/byteorder/generic.h> */
 #include <drm/drm_dp_helper.h>
 #include <drm/drm_dsc.h>
 

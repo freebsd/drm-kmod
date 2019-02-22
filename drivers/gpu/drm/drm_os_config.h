@@ -64,7 +64,7 @@
 
 // Do we need this? Need to replace {read,write}_iter
 // impl in drm_dp_aux_dev.c
-#define CONFIG_DRM_DP_AUX_CHARDEV 1
+/* #define CONFIG_DRM_DP_AUX_CHARDEV 1 */
 
 #define CONFIG_SMP 1
 

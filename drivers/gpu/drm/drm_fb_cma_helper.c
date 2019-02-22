@@ -17,6 +17,8 @@
  * GNU General Public License for more details.
  */
 
+#ifdef CONFIG_DRM_KMS_CMA_HELPER
+
 #include <drm/drmP.h>
 #include <drm/drm_client.h>
 #include <drm/drm_fb_helper.h>
@@ -237,3 +239,5 @@ void drm_fbdev_cma_hotplug_event(struct drm_fbdev_cma *fbdev_cma)
 		drm_fb_helper_hotplug_event(&fbdev_cma->fb_helper);
 }
 EXPORT_SYMBOL_GPL(drm_fbdev_cma_hotplug_event);
+
+#endif /*CONFIG_DRM_KMS_CMA_HELPER */
