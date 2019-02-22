@@ -73,6 +73,7 @@ struct dma_fence_ops {
 
 u64 dma_fence_context_alloc(unsigned num);
 int dma_fence_get_status(struct dma_fence *fence);
+struct dma_fence *dma_fence_get_stub(void);
 
 
 static inline void

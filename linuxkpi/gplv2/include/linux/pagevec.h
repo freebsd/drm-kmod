@@ -63,4 +63,19 @@ static inline void pagevec_release(struct pagevec *pvec)
 		__pagevec_release(pvec);
 }
 
+static inline void
+check_move_unevictable_pages(struct pagevec *pvec)
+{
+
+	UNIMPLEMENTED();
+}
+
+static inline void
+mapping_clear_unevictable(vm_object_t mapping)
+{
+
+	UNIMPLEMENTED();
+}
+
+
 #endif /* _LINUX_PAGEVEC_H */

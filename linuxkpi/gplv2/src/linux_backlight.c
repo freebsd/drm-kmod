@@ -574,12 +574,9 @@ struct backlight_device *of_find_backlight_by_node(struct device_node *node)
 EXPORT_SYMBOL(of_find_backlight_by_node);
 #endif
 
-static void __exit backlight_class_exit(void)
-{
-	class_destroy(backlight_class);
-}
 
-static int __init backlight_class_init(void)
+static int __init
+backlight_class_init(void)
 {
 	backlight_class = class_create(THIS_MODULE, "backlight");
 	if (IS_ERR(backlight_class)) {
@@ -597,6 +594,12 @@ static int __init backlight_class_init(void)
 	BLOCKING_INIT_NOTIFIER_HEAD(&backlight_notifier);
 
 	return 0;
+}
+
+static void __exit
+backlight_class_exit(void)
+{
+	class_destroy(backlight_class);
 }
 
 /*

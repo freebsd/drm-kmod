@@ -120,6 +120,16 @@ linux_i2c_init(void *arg __unused)
 }
 SYSINIT(linux_i2c, SI_SUB_VFS, SI_ORDER_ANY, linux_i2c_init, NULL);
 
+static void
+linux_i2c_exit(void)
+{
+	if (i2c_class) {
+		class_destroy(i2c_class);
+		i2c_class = NULL;
+	}
+}
+SYSUNINIT(linux_i2c_exit, SI_SUB_VFS, SI_ORDER_ANY, linux_i2c_exit, NULL);
+
 
 #define UDELAY(x) udelay((x))
 

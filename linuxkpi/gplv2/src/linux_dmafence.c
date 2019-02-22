@@ -2,8 +2,20 @@
 #include <linux/dma-fence-array.h>
 #include <asm/atomic64.h>
 
-static atomic64_t dma_fence_context_counter = ATOMIC64_INIT(0);
+static atomic64_t dma_fence_context_counter = ATOMIC64_INIT(1);
 
+static DEFINE_SPINLOCK(dma_fence_stub_lock);
+static struct dma_fence dma_fence_stub;
+
+static const char *dma_fence_stub_get_name(struct dma_fence *fence)
+{
+        return "stub";
+}
+
+static const struct dma_fence_ops dma_fence_stub_ops = {
+	.get_driver_name = dma_fence_stub_get_name,
+	.get_timeline_name = dma_fence_stub_get_name,
+};
 
 /*
  * dma-fence.h
@@ -28,6 +40,21 @@ dma_fence_get_status(struct dma_fence *fence)
 	return (status);
 }
 
+struct dma_fence *
+dma_fence_get_stub(void)
+{
+	spin_lock(&dma_fence_stub_lock);
+	if (!dma_fence_stub.ops) {
+		dma_fence_init(&dma_fence_stub,
+		    &dma_fence_stub_ops,
+		    &dma_fence_stub_lock,
+		    0, 0);
+		dma_fence_signal_locked(&dma_fence_stub);
+	}
+	spin_unlock(&dma_fence_stub_lock);
+
+	return dma_fence_get(&dma_fence_stub);
+}
 
 /*
  * dma-fence-array.h

@@ -44,6 +44,7 @@
 #include <linux/bitops.h>
 
 // XXX: Move to better place?
+
 static inline void *
 memset32(uint32_t *s, uint32_t v, size_t count)
 {

@@ -423,7 +423,58 @@ dma_buf_unmap_attachment(struct dma_buf_attachment *dba,
 	dba->dmabuf->ops->unmap_dma_buf(dba, sg_table, dir);
 }
 
+void *
+dma_buf_vmap(struct dma_buf *dmabuf)
+{
+	void *ptr;
 
+	if (WARN_ON(!dmabuf))
+		return NULL;
+
+	if (!dmabuf->ops->vmap)
+		return NULL;
+
+	mutex_lock(&dmabuf->lock);
+	if (dmabuf->vmapping_counter) {
+		dmabuf->vmapping_counter++;
+		BUG_ON(!dmabuf->vmap_ptr);
+		ptr = dmabuf->vmap_ptr;
+		goto out_unlock;
+	}
+
+	BUG_ON(dmabuf->vmap_ptr);
+
+	ptr = dmabuf->ops->vmap(dmabuf);
+	if (WARN_ON_ONCE(IS_ERR(ptr)))
+		ptr = NULL;
+	if (!ptr)
+		goto out_unlock;
+
+	dmabuf->vmap_ptr = ptr;
+	dmabuf->vmapping_counter = 1;
+
+out_unlock:
+	mutex_unlock(&dmabuf->lock);
+	return ptr;
+}
+
+void dma_buf_vunmap(struct dma_buf *dmabuf, void *vaddr)
+{
+	if (WARN_ON(!dmabuf))
+		return;
+
+	BUG_ON(!dmabuf->vmap_ptr);
+	BUG_ON(dmabuf->vmapping_counter == 0);
+	BUG_ON(dmabuf->vmap_ptr != vaddr);
+
+	mutex_lock(&dmabuf->lock);
+	if (--dmabuf->vmapping_counter == 0) {
+		if (dmabuf->ops->vunmap)
+			dmabuf->ops->vunmap(dmabuf, vaddr);
+		dmabuf->vmap_ptr = NULL;
+	}
+	mutex_unlock(&dmabuf->lock);
+}
 
 static void
 dma_buf_init(void *arg __unused)

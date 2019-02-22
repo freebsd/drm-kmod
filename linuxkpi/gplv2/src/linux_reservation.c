@@ -67,35 +67,70 @@ EXPORT_SYMBOL(reservation_seqcount_string);
  * RETURNS
  * Zero for success, or -errno
  */
-int reservation_object_reserve_shared(struct reservation_object *obj)
+int reservation_object_reserve_shared(struct reservation_object *obj,
+    unsigned int num_fences)
 {
-	struct reservation_object_list *fobj, *old;
-	u32 max;
+	struct reservation_object_list *old, *new;
+	unsigned int i, j, k, max;
 
 	old = reservation_object_get_list(obj);
 
 	if (old && old->shared_max) {
-		if (old->shared_count < old->shared_max) {
-			/* perform an in-place update */
-			kfree(obj->staged);
-			obj->staged = NULL;
+		if ((old->shared_count + num_fences) <= old->shared_max)
 			return 0;
-		} else
-			max = old->shared_max * 2;
-	} else
+		else
+			max = max(old->shared_count + num_fences,
+				  old->shared_max * 2);
+	} else {
 		max = 4;
+	}
 
-	/*
-	 * resize obj->staged or allocate if it doesn't exist,
-	 * noop if already correct size
-	 */
-	fobj = krealloc(obj->staged, offsetof(typeof(*fobj), shared[max]),
-			GFP_KERNEL);
-	if (!fobj)
+	new = kmalloc(offsetof(typeof(*new), shared[max]), GFP_KERNEL);
+	if (!new)
 		return -ENOMEM;
 
-	obj->staged = fobj;
-	fobj->shared_max = max;
+	/*
+	 * no need to bump fence refcounts, rcu_read access
+	 * requires the use of kref_get_unless_zero, and the
+	 * references from the old struct are carried over to
+	 * the new.
+	 */
+	for (i = 0, j = 0, k = max; i < (old ? old->shared_count : 0); ++i) {
+		struct dma_fence *fence;
+
+		fence = rcu_dereference_protected(old->shared[i],
+						  reservation_object_held(obj));
+		if (dma_fence_is_signaled(fence))
+			RCU_INIT_POINTER(new->shared[--k], fence);
+		else
+			RCU_INIT_POINTER(new->shared[j++], fence);
+	}
+	new->shared_count = j;
+	new->shared_max = max;
+
+	preempt_disable();
+	write_seqcount_begin(&obj->seq);
+	/*
+	 * RCU_INIT_POINTER can be used here,
+	 * seqcount provides the necessary barriers
+	 */
+	RCU_INIT_POINTER(obj->fence, new);
+	write_seqcount_end(&obj->seq);
+	preempt_enable();
+
+	if (!old)
+		return 0;
+
+	/* Drop the references to the signaled fences */
+	for (i = k; i < new->shared_max; ++i) {
+		struct dma_fence *fence;
+
+		fence = rcu_dereference_protected(new->shared[i],
+						  reservation_object_held(obj));
+		dma_fence_put(fence);
+	}
+	kfree_rcu(old, rcu);
+
 	return 0;
 }
 EXPORT_SYMBOL(reservation_object_reserve_shared);

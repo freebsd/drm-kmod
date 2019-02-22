@@ -99,7 +99,7 @@ struct dma_buf_ops {
 #undef file
 struct dma_buf {
 	size_t size;
-	struct file *linux_file;
+	struct file *linux_file; /* Native struct file, not struct linux_file */
 	struct list_head attachments;
 	const struct dma_buf_ops *ops;
 	/* mutex to serialize list manipulation, attach/detach and vmap/unmap */
@@ -146,4 +146,7 @@ struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *,
 					enum dma_data_direction);
 void dma_buf_unmap_attachment(struct dma_buf_attachment *, struct sg_table *,
 				enum dma_data_direction);
+void *dma_buf_vmap(struct dma_buf *);
+void dma_buf_vunmap(struct dma_buf *, void *vaddr);
+
 #endif /* _LINUX_GPLV2_DMA_BUF_H_ */
