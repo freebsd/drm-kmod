@@ -9,6 +9,7 @@ SRCS=	ati_pcigart.c \
 	drm_agpsupport.c \
 	drm_atomic.c \
 	drm_atomic_helper.c \
+	drm_atomic_state_helper.c \
 	drm_atomic_uapi.c \
 	drm_auth.c \
 	drm_blend.c \
@@ -21,6 +22,7 @@ SRCS=	ati_pcigart.c \
 	drm_context.c \
 	drm_crtc.c \
 	drm_crtc_helper.c \
+	drm_damage_helper.c \
 	drm_debugfs.c \
 	drm_debugfs_crc.c \
 	drm_dma.c \
@@ -29,6 +31,7 @@ SRCS=	ati_pcigart.c \
 	drm_dp_helper.c \
 	drm_dp_mst_topology.c \
 	drm_drv.c \
+	drm_dsc.c \
 	drm_dumb_buffers.c \
 	drm_edid.c \
 	drm_edid_load.c \
@@ -43,7 +46,6 @@ SRCS=	ati_pcigart.c \
 	drm_gem.c \
 	drm_gem_cma_helper.c \
 	drm_gem_framebuffer_helper.c \
-	drm_global.c \
 	drm_hashtab.c \
 	drm_ioc32.c \
 	drm_ioctl.c \
