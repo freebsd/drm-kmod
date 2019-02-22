@@ -558,10 +558,13 @@ static void vmw_get_initial_size(struct vmw_private *dev_priv)
  */
 static bool vmw_assume_iommu(struct drm_device *dev)
 {
+#ifdef __linux__
 	const struct dma_map_ops *ops = get_dma_ops(dev->dev);
 
 	return !dma_is_direct(ops) && ops &&
 		ops->map_page != dma_direct_map_page;
+#endif
+	return false;
 }
 
 /**
@@ -591,8 +594,10 @@ static int vmw_dma_select_mode(struct vmw_private *dev_priv)
 		dev_priv->map_mode = vmw_dma_map_populate;
 	else if (!vmw_force_iommu)
 		dev_priv->map_mode = vmw_dma_phys;
+#ifdef CONFIG_SWIOTLB
 	else if (IS_ENABLED(CONFIG_SWIOTLB) && swiotlb_nr_tbl())
 		dev_priv->map_mode = vmw_dma_alloc_coherent;
+#endif
 	else
 		dev_priv->map_mode = vmw_dma_map_populate;
 
