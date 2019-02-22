@@ -932,6 +932,7 @@ static int i915_audio_component_bind(struct device *i915_kdev,
 	if (WARN_ON(acomp->base.ops || acomp->base.dev))
 		return -EEXIST;
 
+	/* BSDFIXME: device_link missing implementation */
 	if (WARN_ON(!device_link_add(hda_kdev, i915_kdev, DL_FLAG_STATELESS)))
 		return -ENOMEM;
 
@@ -959,6 +960,7 @@ static void i915_audio_component_unbind(struct device *i915_kdev,
 	dev_priv->audio_component = NULL;
 	drm_modeset_unlock_all(&dev_priv->drm);
 
+	/* BSDFIXME: device_link missing implementation */
 	device_link_remove(hda_kdev, i915_kdev);
 }
 

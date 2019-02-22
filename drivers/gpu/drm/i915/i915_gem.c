@@ -50,7 +50,7 @@
 #ifndef __linux__
 #include <linux/xarray.h>
 #define	resource linux_resource
-#define	totalram_pages physmem
+static inline unsigned long totalram_pages() { return physmem; }
 #endif
 
 static void i915_gem_flush_free_objects(struct drm_i915_private *i915);
@@ -2489,6 +2489,7 @@ void __i915_gem_object_invalidate(struct drm_i915_gem_object *obj)
  */
 static void check_release_pagevec(struct pagevec *pvec)
 {
+	/* BSDFIXME: Missing impl */
 	check_move_unevictable_pages(pvec);
 	__pagevec_release(pvec);
 	cond_resched();
@@ -2508,9 +2509,9 @@ i915_gem_object_put_pages_gtt(struct drm_i915_gem_object *obj,
 
 	if (i915_gem_object_needs_bit17_swizzle(obj))
 		i915_gem_object_save_bit_17_swizzle(obj, pages);
-
+#ifdef __linux__
 	mapping_clear_unevictable(file_inode(obj->base.filp)->i_mapping);
-
+#endif
 	pagevec_init(&pvec);
 	for_each_sgt_page(page, sgt_iter, pages) {
 		if (obj->mm.dirty)

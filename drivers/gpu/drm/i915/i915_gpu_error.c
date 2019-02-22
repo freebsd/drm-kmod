@@ -29,16 +29,15 @@
 
 #ifdef __linux__
 #include <linux/utsname.h>
+#include <linux/nmi.h>
 #else
 #define UTS_RELEASE "FreeBSD 11 prerelease"
 #endif
 
 #include <linux/ascii85.h>
-#include <linux/nmi.h>
 #include <linux/scatterlist.h>
 
 #include <linux/stop_machine.h>
-#include <linux/utsname.h>
 #include <linux/zlib.h>
 
 #include <drm/drm_print.h>
@@ -91,9 +90,13 @@ static void __sg_set_buf(struct scatterlist *sg,
 			 void *addr, unsigned int len, loff_t it)
 {
 	sg->page_link = (unsigned long)virt_to_page(addr);
+#ifdef __linux__
 	sg->offset = offset_in_page(addr);
-	sg->length = len;
-	sg->dma_address = it;
+#else
+	sg->offset = offset_in_page((unsigned long)addr);
+#endif
+	sg_dma_len(sg) = len;
+	sg_dma_address(sg) = it;
 }
 
 static bool __i915_error_grow(struct drm_i915_error_state_buf *e, size_t len)
@@ -671,7 +674,9 @@ static void __err_print_to_sgl(struct drm_i915_error_state_buf *m,
 
 	if (*error->error_msg)
 		err_printf(m, "%s\n", error->error_msg);
+#ifdef __linux__
 	err_printf(m, "Kernel: %s\n", init_utsname()->release);
+#endif
 	ts = ktime_to_timespec64(error->time);
 	err_printf(m, "Time: %lld s %ld us\n",
 		   (s64)ts.tv_sec, ts.tv_nsec / NSEC_PER_USEC);
@@ -909,12 +914,12 @@ ssize_t i915_gpu_state_copy_to_buffer(struct i915_gpu_state *error,
 		return err;
 
 	sg = READ_ONCE(error->fit);
-	if (!sg || off < sg->dma_address)
+	if (!sg || off < sg_dma_address(sg))
 		sg = error->sgl;
 	if (!sg)
 		return 0;
 
-	pos = sg->dma_address;
+	pos = sg_dma_address(sg);
 	count = 0;
 	do {
 		size_t len, start;
@@ -924,7 +929,7 @@ ssize_t i915_gpu_state_copy_to_buffer(struct i915_gpu_state *error,
 			GEM_BUG_ON(sg_is_chain(sg));
 		}
 
-		len = sg->length;
+		len = sg_dma_len(sg);
 		if (pos + len <= off) {
 			pos += len;
 			continue;
@@ -939,7 +944,7 @@ ssize_t i915_gpu_state_copy_to_buffer(struct i915_gpu_state *error,
 		}
 
 		len = min(len, rem);
-		GEM_BUG_ON(!len || len > sg->length);
+		GEM_BUG_ON(!len || len > sg_dma_address(sg));
 
 		memcpy(buf, page_address(sg_page(sg)) + start, len);
 

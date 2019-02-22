@@ -42,6 +42,7 @@ SRCS=	\
 	i915_pci.c \
 	i915_query.c \
 	i915_request.c \
+	i915_scheduler.c \
 	i915_suspend.c \
 	i915_sw_fence.c \
 	i915_syncmap.c \
@@ -58,6 +59,8 @@ SRCS=	\
 	intel_breadcrumbs.c \
 	intel_cdclk.c \
 	intel_color.c \
+	intel_combo_phy.c \
+	intel_connector.c \
 	intel_crt.c \
 	intel_csr.c \
 	intel_ddi.c \
@@ -69,6 +72,7 @@ SRCS=	\
 	intel_dp_mst.c \
 	intel_dpio_phy.c \
 	intel_dpll_mgr.c \
+	intel_dsi.c \
 	intel_dsi_dcs_backlight.c \
 	intel_dsi_vbt.c \
 	intel_dvo.c \
@@ -94,7 +98,6 @@ SRCS=	\
 	intel_lrc.c \
 	intel_lspcon.c \
 	intel_lvds.c \
-	intel_modes.c \
 	intel_mocs.c \
 	intel_opregion.c \
 	intel_overlay.c \
@@ -102,6 +105,7 @@ SRCS=	\
 	intel_pipe_crc.c \
 	intel_pm.c \
 	intel_psr.c \
+	intel_quirks.c \
 	intel_renderstate_gen6.c \
 	intel_renderstate_gen7.c \
 	intel_renderstate_gen8.c \
@@ -115,6 +119,7 @@ SRCS=	\
 	intel_uc.c \
 	intel_uc_fw.c \
 	intel_uncore.c \
+	intel_vdsc.c \
 	intel_wopcm.c \
 	intel_workarounds.c \
 	vlv_dsi.c \
