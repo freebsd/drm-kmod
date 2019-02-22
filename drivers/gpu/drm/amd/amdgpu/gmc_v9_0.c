@@ -738,8 +738,16 @@ static int gmc_v9_0_allocate_vm_inv_eng(struct amdgpu_device *adev)
 		}
 
 		ring->vm_inv_eng = inv_eng - 1;
+#ifdef __linux__
+		/* BSDFIXME: Needs impl! */
 		change_bit(inv_eng - 1, (unsigned long *)(&vm_inv_engs[vmhub]));
-
+#else
+		if (test_bit(inv_eng - 1, (unsigned long *)(&vm_inv_engs[vmhub]))) {
+			clear_bit(inv_eng - 1, (unsigned long *)(&vm_inv_engs[vmhub]));
+		} else {
+			set_bit(inv_eng - 1, (unsigned long *)(&vm_inv_engs[vmhub]));
+		}
+#endif
 		dev_info(adev->dev, "ring %s uses VM inv eng %u on hub %u\n",
 			 ring->name, ring->vm_inv_eng, ring->funcs->vmhub);
 	}

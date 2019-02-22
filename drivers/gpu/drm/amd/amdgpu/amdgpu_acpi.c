@@ -326,8 +326,8 @@ static int amdgpu_atif_query_backlight_caps(struct amdgpu_atif *atif)
 	arguments.size = sizeof(arguments);
 	arguments.requested_display = ATIF_QBTC_REQUEST_LCD1;
 
-	params.length = sizeof(arguments);
-	params.pointer = (void *)&arguments;
+	params.Length = sizeof(arguments);
+	params.Pointer = (void *)&arguments;
 
 	info = amdgpu_atif_call(atif,
 		ATIF_FUNCTION_QUERY_BRIGHTNESS_TRANSFER_CHARACTERISTICS,
@@ -337,7 +337,7 @@ static int amdgpu_atif_query_backlight_caps(struct amdgpu_atif *atif)
 		goto out;
 	}
 
-	size = *(u16 *) info->buffer.pointer;
+	size = *(u16 *) info->Buffer.Pointer;
 	if (size < 10) {
 		err = -EINVAL;
 		goto out;
@@ -345,7 +345,7 @@ static int amdgpu_atif_query_backlight_caps(struct amdgpu_atif *atif)
 
 	memset(&characteristics, 0, sizeof(characteristics));
 	size = min(sizeof(characteristics), size);
-	memcpy(&characteristics, info->buffer.pointer, size);
+	memcpy(&characteristics, info->Buffer.Pointer, size);
 
 	atif->backlight_caps.caps_valid = true;
 	atif->backlight_caps.min_input_signal =

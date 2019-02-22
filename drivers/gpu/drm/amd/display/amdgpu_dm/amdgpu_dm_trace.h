@@ -31,6 +31,7 @@
 
 #include <linux/tracepoint.h>
 
+#ifdef __linux__
 TRACE_EVENT(amdgpu_dc_rreg,
 	TP_PROTO(unsigned long *read_count, uint32_t reg, uint32_t value),
 	TP_ARGS(read_count, reg, value),
@@ -96,6 +97,11 @@ TRACE_EVENT(amdgpu_dc_performance,
 			(unsigned long)__entry->write_delta,
 			(unsigned long)__entry->writes)
 );
+
+#else
+#include "amdgpu_dm_trace_freebsd.h"
+#endif /* __linux__ */
+
 #endif /* _AMDGPU_DM_TRACE_H_ */
 
 #undef TRACE_INCLUDE_PATH

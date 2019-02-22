@@ -52,6 +52,7 @@ KMOD=	amdgpu
 	${SRCDIR}/display/modules/color \
 	${SRCDIR}/display/modules/freesync \
 	${SRCDIR}/display/modules/inc \
+	${SRCDIR}/display/modules/power \
 	${SRCDIR}/lib \
 	${SRCDIR}/powerplay \
 	${SRCDIR}/powerplay/hwmgr \
@@ -85,6 +86,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_cgs.c \
 	amdgpu_connectors.c \
 	amdgpu_cs.c \
+	amdgpu_csa.c \
 	amdgpu_ctx.c \
 	amdgpu_debugfs.c \
 	amdgpu_device.c \
@@ -116,6 +118,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_prime.c \
 	amdgpu_psp.c \
 	amdgpu_ring.c \
+	amdgpu_rlc.c \
 	amdgpu_sa.c \
 	amdgpu_sdma.c \
 	amdgpu_sched.c \
@@ -196,6 +199,7 @@ SRCS+=	amdgpu_afmt.c \
 .if ${MACHINE_CPUARCH} == "amd64"
 SRCS+= amdgpu_acpi.c \
 	amdgpu_atpx_handler.c \
+	dcn10_clk_mgr.c \
 	dcn10_cm_common.c \
 	dcn10_dpp.c \
 	dcn10_dpp_cm.c \
@@ -279,8 +283,8 @@ SRCS+=	amdgpu_dm.c \
 	dce_audio.c \
 	dce_aux.c \
 	dce_calcs.c \
+	dce_clk_mgr.c \
 	dce_clock_source.c \
-	dce_clocks.c \
 	dce_dmcu.c \
 	dce_hwseq.c \
 	dce_i2c.c \
@@ -340,6 +344,7 @@ SRCS+=	amdgpu_dm.c \
 	irq_service_dce80.c \
 	irq_service_dcn10.c \
 	log_helpers.c \
+	power_helpers.c \
 	vector.c \
 	virtual_link_encoder.c \
 	virtual_stream_encoder.c
@@ -478,9 +483,10 @@ CWARNFLAGS.amdgpu_cs.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ctx.c=
 CWARNFLAGS.amdgpu_debugfs.c=
 CWARNFLAGS.amdgpu_device.c=	-Wno-missing-prototypes -Wno-enum-conversion
-CWARNFLAGS.amdgpu_dm.c=		-Wno-missing-prototypes -Wno-pointer-bool-conversion
+CWARNFLAGS.amdgpu_dm.c=		-Wno-missing-prototypes -Wno-pointer-bool-conversion -Wno-non-literal-null-conversion
 CWARNFLAGS.amdgpu_dm_pp_smu.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.amdgpu_dm_helpers.c= -Wno-missing-braces
+CWARNFLAGS.amdgpu_dm_services.c=-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_display.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_gfx.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_gtt_mgr.c=	-Wno-missing-prototypes
@@ -494,6 +500,7 @@ CWARNFLAGS.amdgpu_sched.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ttm.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ucode.c=	-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.amdgpu_vm.c=		-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_xgmi.c=		-Wno-missing-prototypes
 CWARNFLAGS.amd_powerplay.c=	-Wno-missing-prototypes
 CWARNFLAGS.atombios.c=
 CWARNFLAGS.atombios_crtc.c=	-Wno-missing-prototypes
@@ -521,6 +528,7 @@ CWARNFLAGS.dce_v8_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_v10_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_v11_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce100_resource.c=	-Wno-missing-prototypes	-Wno-initializer-overrides
+CWARNFLAGS.dce100_hw_sequencer.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce110_compressor.c=	-Wno-missing-prototypes -Wno-unused-variable
 CWARNFLAGS.dce110_hw_sequencer.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce110_mem_input_v.c=	-Wno-missing-prototypes
@@ -534,7 +542,6 @@ CWARNFLAGS.dce80_resource.c=	-Wno-missing-prototypes	-Wno-initializer-overrides
 CWARNFLAGS.dce80_timing_generator.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce80_hw_sequencer.c=	-Wno-unused-variable
 CWARNFLAGS.dce_calcs.c=		 -Wno-parentheses-equality
-CWARNFLAGS.dce_clocks.c=	-Wno-enum-conversion
 CWARNFLAGS.dce_dmcu.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_i2c_hw.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_i2c_sw.c=	-Wno-missing-prototypes
@@ -562,6 +569,7 @@ CWARNFLAGS.gfx_v7_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.gfx_v8_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.gfx_v9_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.gpu_scheduler.c=	-Wno-missing-prototypes
+CWARNFLAGS.hardwaremanager.c=	-Wno-missing-prototypes
 CWARNFLAGS.hw_factory.c=	-Wno-missing-prototypes
 CWARNFLAGS.hw_factory_diag.c=	-Wno-missing-prototypes
 CWARNFLAGS.hw_translate_diag.c=	-Wno-missing-prototypes

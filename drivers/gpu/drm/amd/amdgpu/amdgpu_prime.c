@@ -412,10 +412,6 @@ struct dma_buf *amdgpu_gem_prime_export(struct drm_device *dev,
 	if (!IS_ERR(buf)) {
 #ifdef __linux__
 		buf->file->f_mapping = dev->anon_inode->i_mapping;
-#else
-#undef file
-		struct linux_file *f = (struct linux_file *)(buf->linux_file->f_data);
-		f->f_shmem = bo->gem_base.filp->f_shmem;
 #endif
 		buf->ops = &amdgpu_dmabuf_ops;
 	}

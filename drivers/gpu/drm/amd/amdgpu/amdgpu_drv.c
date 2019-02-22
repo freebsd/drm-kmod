@@ -1284,11 +1284,11 @@ static int __init amdgpu_init(void)
 	/* let modprobe override vga console setting */
 
 #ifndef __linux__
-	pdriver->bsdclass = drm_devclass;
-	pdriver->name = "drmn";
+	amdgpu_kms_pci_driver.bsdclass = drm_devclass;
+	amdgpu_kms_pci_driver.name = "drmn";
 
-	if (!(driver->driver_features & DRIVER_LEGACY))
-		return linux_pci_register_drm_driver(pdriver);
+	if (!(kms_driver.driver_features & DRIVER_LEGACY))
+		return linux_pci_register_drm_driver(&amdgpu_kms_pci_driver);
 
 	DRM_ERROR("FreeBSD needs DRIVER_MODESET");
 	return (-ENOTSUP);
