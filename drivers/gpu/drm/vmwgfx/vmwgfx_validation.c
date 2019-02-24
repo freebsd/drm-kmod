@@ -129,7 +129,7 @@ void *vmw_validation_mem_alloc(struct vmw_validation_context *ctx,
 		vm_page_lock(page);
 		vm_page_wire(page);
 		vm_page_unlock(page);
-		TAILQ_INSERT_TAIL(&ctx->page_list, page, plinks.q);
+		TAILQ_INSERT_TAIL(&ctx->bsd_pglist, page, plinks.q);
 #endif
 		ctx->page_address = page_address(page);
 		ctx->mem_size_left = PAGE_SIZE;
@@ -160,7 +160,7 @@ static void vmw_validation_mem_free(struct vmw_validation_context *ctx)
 	}
 #else
 	struct page *entry;
-	TAILQ_FOREACH(entry, &ctx->page_list, plinks.q) {
+	TAILQ_FOREACH(entry, &ctx->bsd_pglist, plinks.q) {
 		vm_page_lock(entry);
 		vm_page_unwire(entry, PQ_NONE);
 		vm_page_unlock(entry);
@@ -650,7 +650,6 @@ void vmw_validation_unref_lists(struct vmw_validation_context *ctx)
 	list_splice_init(&ctx->resource_ctx_list, &ctx->resource_list);
 	list_for_each_entry(val, &ctx->resource_list, head)
 		vmw_resource_unreference(&val->res);
-
 	/*
 	 * No need to detach each list entry since they are all freed with
 	 * vmw_validation_free_mem. Just make the inaccessible.
