@@ -158,7 +158,36 @@ static int smu_v11_0_load_microcode(struct smu_context *smu)
 
 static int smu_v11_0_check_fw_status(struct smu_context *smu)
 {
-	return 0;
+	struct amdgpu_device *adev = smu->adev;
+	uint32_t mp1_fw_flags;
+
+	mp1_fw_flags = RREG32_PCIE(MP1_Public |
+				   (smnMP1_FIRMWARE_FLAGS & 0xffffffff));
+
+	if ((mp1_fw_flags & MP1_FIRMWARE_FLAGS__INTERRUPTS_ENABLED_MASK) >>
+	    MP1_FIRMWARE_FLAGS__INTERRUPTS_ENABLED__SHIFT)
+		return 0;
+
+	return -EIO;
+}
+
+static int smu_v11_0_check_fw_version(struct smu_context *smu)
+{
+	uint32_t smu_version = 0xff;
+	int ret = 0;
+
+	ret = smu_send_smc_msg(smu, SMU_MSG_GetDriverIfVersion);
+	if (ret)
+		goto err;
+
+	ret = smu_read_smc_arg(smu, &smu_version);
+	if (ret)
+		goto err;
+
+	if (smu_version == SMU11_DRIVER_IF_VERSION)
+		return 0;
+err:
+	return ret;
 }
 
 static int smu_v11_0_read_pptable_from_vbios(struct smu_context *smu)
