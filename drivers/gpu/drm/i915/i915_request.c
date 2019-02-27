@@ -666,8 +666,12 @@ i915_request_alloc(struct intel_engine_cs *engine, struct i915_gem_context *ctx)
 		rq = i915_gem_active_raw(&ce->ring->timeline->last_request,
 					 &i915->drm.struct_mutex);
 		if (rq)
+#ifdef __linux__
 			cond_synchronize_rcu(rq->rcustate);
-
+#else
+			/* BSDFIXME: OK to always synchronize here? */
+			synchronize_rcu();
+#endif
 		rq = kmem_cache_alloc(i915->requests, GFP_KERNEL);
 		if (!rq) {
 			ret = -ENOMEM;
@@ -675,7 +679,9 @@ i915_request_alloc(struct intel_engine_cs *engine, struct i915_gem_context *ctx)
 		}
 	}
 
-	rq->rcustate = get_state_synchronize_rcu();
+#ifdef __linux__
+        rq->rcustate = get_state_synchronize_rcu();
+#endif
 
 	INIT_LIST_HEAD(&rq->active_list);
 	rq->i915 = i915;
