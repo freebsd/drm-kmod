@@ -31,6 +31,7 @@ SRCS=	\
 	i915_gem_shrinker.c \
 	i915_gem_tiling.c \
 	i915_gem_userptr.c \
+	i915_globals.c \
 	i915_gpu_error.c \
 	i915_irq.c \
 	i915_memcpy.c \
