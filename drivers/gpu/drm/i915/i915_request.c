@@ -574,6 +574,7 @@ i915_request_alloc(struct intel_engine_cs *engine, struct i915_gem_context *ctx)
 		return ERR_CAST(ce);
 
 	reserve_gt(i915);
+	mutex_lock(&ce->ring->timeline->mutex);
 
 	/* Move our oldest request to the slab-cache (if not in use!) */
 	rq = list_first_entry(&ce->ring->request_list, typeof(*rq), ring_link);
@@ -701,6 +702,7 @@ err_unwind:
 
 	kmem_cache_free(global.slab_requests, rq);
 err_unreserve:
+	mutex_unlock(&ce->ring->timeline->mutex);
 	unreserve_gt(i915);
 	intel_context_unpin(ce);
 	return ERR_PTR(ret);
@@ -893,7 +895,7 @@ void i915_request_add(struct i915_request *request)
 	GEM_TRACE("%s fence %llx:%lld\n",
 		  engine->name, request->fence.context, request->fence.seqno);
 
-	lockdep_assert_held(&request->i915->drm.struct_mutex);
+	lockdep_assert_held(&request->timeline->mutex);
 	trace_i915_request_add(request);
 
 	/*
@@ -1004,6 +1006,8 @@ void i915_request_add(struct i915_request *request)
 	 */
 	if (prev && i915_request_completed(prev))
 		i915_request_retire_upto(prev);
+
+	mutex_unlock(&request->timeline->mutex);
 }
 
 static unsigned long local_clock_us(unsigned int *cpu)
