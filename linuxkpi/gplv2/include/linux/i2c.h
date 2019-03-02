@@ -225,11 +225,10 @@ extern int i2c_register_driver(struct module *, struct i2c_driver *);
 extern void i2c_del_driver(struct i2c_driver *);
 
 
+extern int __i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
+                        int num);
 extern int i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
                         int num);
-// XXX: locked or unlocked, does it matter since we have our own lock
-// and don't lock with provided lock_bus function?
-#define	__i2c_transfer(a, m, n)	i2c_transfer(a, m, n)
 
 static inline void
 i2c_unregister_device(struct i2c_client *client)
