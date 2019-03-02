@@ -565,6 +565,18 @@ linux_i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 }
 
 int
+__i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
+{
+	int rc;
+
+	if (adap->algo->master_xfer == NULL)
+		return (-EOPNOTSUPP);
+
+	rc = linux_i2c_transfer(adap, msgs, num);
+	return (rc);
+}
+
+int
 i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 {
 	int rc;
