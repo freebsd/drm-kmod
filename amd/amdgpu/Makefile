@@ -180,6 +180,7 @@ SRCS+=	amdgpu_afmt.c \
 	kv_dpm.c \
 	kv_smc.c \
 	mmhub_v1_0.c \
+	mmhub_v2_0.c \
 	mxgpu_ai.c \
 	mxgpu_vi.c \
 	nbio_v2_3.c \
