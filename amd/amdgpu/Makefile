@@ -187,11 +187,13 @@ SRCS+=	amdgpu_afmt.c \
 	mmhub_v2_0.c \
 	mxgpu_ai.c \
 	mxgpu_vi.c \
+	navi10_reg_init.c \
 	nbio_v2_3.c \
 	nbio_v6_1.c \
 	nbio_v7_0.c \
 	nbio_v7_4.c \
 	navi10_ih.c \
+	nv.c \
 	psp_v3_1.c \
 	psp_v10_0.c \
 	psp_v11_0.c \
