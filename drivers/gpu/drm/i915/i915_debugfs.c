@@ -1301,7 +1301,7 @@ static int i915_hangcheck_info(struct seq_file *m, void *unused)
 			seqno[id] = intel_engine_get_hangcheck_seqno(engine);
 		}
 
-		intel_engine_get_instdone(dev_priv->engine[RCS], &instdone);
+		intel_engine_get_instdone(dev_priv->engine[RCS0], &instdone);
 	}
 
 	if (timer_pending(&dev_priv->gpu_error.hangcheck_work.timer))
@@ -1328,7 +1328,7 @@ static int i915_hangcheck_info(struct seq_file *m, void *unused)
 			   (long long)engine->hangcheck.acthd,
 			   (long long)acthd[id]);
 
-		if (engine->id == RCS) {
+		if (engine->id == RCS0) {
 			seq_puts(m, "\tinstdone read =\n");
 
 			i915_instdone_info(dev_priv, m, &instdone);
@@ -3181,7 +3181,7 @@ static int i915_shared_dplls_info(struct seq_file *m, void *unused)
 static int i915_wa_registers(struct seq_file *m, void *unused)
 {
 	struct drm_i915_private *i915 = node_to_i915(m->private);
-	const struct i915_wa_list *wal = &i915->engine[RCS]->ctx_wa_list;
+	const struct i915_wa_list *wal = &i915->engine[RCS0]->ctx_wa_list;
 	struct i915_wa *wa;
 	unsigned int i;
 
