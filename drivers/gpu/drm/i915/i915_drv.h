@@ -3147,7 +3147,7 @@ int i915_perf_add_config_ioctl(struct drm_device *dev, void *data,
 int i915_perf_remove_config_ioctl(struct drm_device *dev, void *data,
 				  struct drm_file *file);
 void i915_oa_init_reg_state(struct intel_engine_cs *engine,
-			    struct i915_gem_context *ctx,
+			    struct intel_context *ce,
 			    u32 *reg_state);
 #else
 static inline int
@@ -3176,7 +3176,7 @@ i915_perf_remove_config_ioctl(struct drm_device *dev, void *data,
 
 static inline void
 i915_oa_init_reg_state(struct intel_engine_cs *engine,
-    struct i915_gem_context *ctx,
+    struct intel_context *ce,
     u32 *reg_state)
 {
 
