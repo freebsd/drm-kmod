@@ -802,6 +802,8 @@ static void __i915_gem_set_wedged(struct drm_i915_private *i915)
 	for_each_engine(engine, i915, id)
 		reset_prepare_engine(engine);
 
+	intel_uc_reset_prepare(i915);
+
 	/* Even if the GPU reset fails, it should still stop the engines */
 	if (INTEL_GEN(i915) >= 5)
 		intel_gpu_reset(i915, ALL_ENGINES);
