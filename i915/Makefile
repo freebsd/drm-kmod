@@ -62,6 +62,7 @@ SRCS=	\
 	intel_color.c \
 	intel_combo_phy.c \
 	intel_connector.c \
+	intel_context.c \
 	intel_crt.c \
 	intel_csr.c \
 	intel_ddi.c \
