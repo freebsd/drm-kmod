@@ -3021,7 +3021,8 @@ static void assert_kernel_context_is_current(struct drm_i915_private *i915)
 	}
 }
 
-static bool switch_to_kernel_context_sync(struct drm_i915_private *i915)
+static bool switch_to_kernel_context_sync(struct drm_i915_private *i915,
+					  unsigned long mask)
 {
 	bool result = true;
 
@@ -3030,7 +3031,7 @@ static bool switch_to_kernel_context_sync(struct drm_i915_private *i915)
 	 * to save itself before we report the failure. Yes, this may be a
 	 * false positive due to e.g. ENOMEM, caveat emptor!
 	 */
-	if (i915_gem_switch_to_kernel_context(i915))
+	if (i915_gem_switch_to_kernel_context(i915, mask))
 		result = false;
 
 	if (i915_gem_wait_for_idle(i915,
@@ -3055,7 +3056,8 @@ static bool switch_to_kernel_context_sync(struct drm_i915_private *i915)
 
 static bool load_power_context(struct drm_i915_private *i915)
 {
-	if (!switch_to_kernel_context_sync(i915))
+	/* Force loading the kernel context on all engines */
+	if (!switch_to_kernel_context_sync(i915, ALL_ENGINES))
 		return false;
 
 	/*
@@ -3103,7 +3105,7 @@ i915_gem_idle_work_handler(struct work_struct *work)
 	    !i915->gt.active_requests) {
 		++i915->gt.active_requests; /* don't requeue idle */
 
-		switch_to_kernel_context_sync(i915);
+		switch_to_kernel_context_sync(i915, i915->gt.active_engines);
 
 		if (!--i915->gt.active_requests) {
 			__i915_gem_park(i915);
@@ -4568,7 +4570,7 @@ void i915_gem_suspend(struct drm_i915_private *i915)
 	 * state. Fortunately, the kernel_context is disposable and we do
 	 * not rely on its state.
 	 */
-	switch_to_kernel_context_sync(i915);
+	switch_to_kernel_context_sync(i915, i915->gt.active_engines);
 
 	mutex_unlock(&i915->drm.struct_mutex);
 	i915_reset_flush(i915);
