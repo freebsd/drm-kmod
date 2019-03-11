@@ -2733,6 +2733,9 @@ fence_driver_init:
 		goto failed;
 	}
 
+	/* must succeed. */
+	amdgpu_ras_post_init(adev);
+
 	return 0;
 
 failed:
