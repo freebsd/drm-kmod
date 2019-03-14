@@ -655,6 +655,10 @@ static void reset_prepare(struct drm_i915_private *i915)
 		reset_prepare_engine(engine);
 
 	intel_uc_reset_prepare(i915);
+}
+
+static void gt_revoke(struct drm_i915_private *i915)
+{
 #ifdef __freebsd_notyet__
 	revoke_mmaps(i915);
 #endif
@@ -732,8 +736,10 @@ static void reset_finish(struct drm_i915_private *i915)
 	struct intel_engine_cs *engine;
 	enum intel_engine_id id;
 
-	for_each_engine(engine, i915, id)
+	for_each_engine(engine, i915, id) {
 		reset_finish_engine(engine);
+		intel_engine_signal_breadcrumbs(engine);
+	}
 }
 
 static void reset_restart(struct drm_i915_private *i915)
@@ -799,10 +805,7 @@ static void __i915_gem_set_wedged(struct drm_i915_private *i915)
 	 * rolling the global seqno forward (since this would complete requests
 	 * for which we haven't set the fence error to EIO yet).
 	 */
-	for_each_engine(engine, i915, id)
-		reset_prepare_engine(engine);
-
-	intel_uc_reset_prepare(i915);
+	reset_prepare(i915);
 
 	/* Even if the GPU reset fails, it should still stop the engines */
 	if (INTEL_GEN(i915) >= 5)
@@ -825,10 +828,7 @@ static void __i915_gem_set_wedged(struct drm_i915_private *i915)
 	for_each_engine(engine, i915, id)
 		engine->cancel_requests(engine);
 
-	for_each_engine(engine, i915, id) {
-		reset_finish_engine(engine);
-		intel_engine_signal_breadcrumbs(engine);
-	}
+	reset_finish(i915);
 
 	smp_mb__before_atomic();
 	set_bit(I915_WEDGED, &error->flags);
@@ -958,7 +958,9 @@ static int do_reset(struct drm_i915_private *i915, unsigned int stalled_mask)
 	struct __i915_reset arg = { i915, stalled_mask };
 	int err, i;
 
-	err = __do_reset(__i915_reset__BKL, &arg);
+	gt_revoke(i915);
+
+	err = intel_gpu_reset(i915, ALL_ENGINES);
 	for (i = 0; err && i < RESET_MAX_RETRIES; i++) {
 		msleep(100);
 		err = __do_reset(__i915_reset__BKL, &arg);
