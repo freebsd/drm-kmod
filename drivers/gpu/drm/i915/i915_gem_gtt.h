@@ -351,7 +351,7 @@ struct i915_address_space {
 #define i915_is_ggtt(vm) ((vm)->is_ggtt)
 
 static inline bool
-i915_vm_is_48bit(const struct i915_address_space *vm)
+i915_vm_is_4lvl(const struct i915_address_space *vm)
 {
 	return (vm->total - 1) >> 32;
 }
@@ -495,7 +495,7 @@ static inline u32 gen6_pde_index(u32 addr)
 static inline unsigned int
 i915_pdpes_per_pdp(const struct i915_address_space *vm)
 {
-	if (i915_vm_is_48bit(vm))
+	if (i915_vm_is_4lvl(vm))
 		return GEN8_PML4ES_PER_PML4;
 
 	return GEN8_3LVL_PDPES;
