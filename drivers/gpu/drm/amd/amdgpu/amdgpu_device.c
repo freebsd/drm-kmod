@@ -2403,7 +2403,7 @@ static void amdgpu_device_xgmi_reset_func(struct work_struct *__work)
 
 	adev->asic_reset_res =  amdgpu_asic_reset(adev);
 	if (adev->asic_reset_res)
-		DRM_WARN("ASIC reset failed with err r, %d for drm dev, %s",
+		DRM_WARN("ASIC reset failed with error, %d for drm dev, %s",
 			 adev->asic_reset_res, adev->ddev->unique);
 }
 
@@ -3425,7 +3425,7 @@ static int amdgpu_do_asic_reset(struct amdgpu_hive_info *hive,
 				r = amdgpu_asic_reset(tmp_adev);
 
 			if (r) {
-				DRM_ERROR("ASIC reset failed with err r, %d for drm dev, %s",
+				DRM_ERROR("ASIC reset failed with error, %d for drm dev, %s",
 					 r, tmp_adev->ddev->unique);
 				break;
 			}
