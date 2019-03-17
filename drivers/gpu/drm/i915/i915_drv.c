@@ -1050,9 +1050,7 @@ static int i915_mmio_setup(struct drm_device *dev)
 	type = pci_resource_type(pdev, mmio_bar);
 	res = bus_alloc_resource_any(pdev->dev.bsddev, type, &rid, RF_ACTIVE);
 
-	dev->drm_pcir[mmio_bar].res = res;
-	dev->drm_pcir[mmio_bar].rid = rid;
-
+	dev_priv->mmio_res = res;
 	dev_priv->mmio_rid = rid;
 	dev_priv->mmio_restype = type;
 	dev_priv->regs = (void *)rman_get_bushandle(res);
@@ -1078,11 +1076,8 @@ static void i915_mmio_cleanup(struct drm_i915_private *dev_priv)
 
 	intel_teardown_mchbar(dev);
 #ifndef __linux__
-	int rid;
-
-	rid = dev_priv->mmio_rid;
 	bus_release_resource(pdev->dev.bsddev, dev_priv->mmio_restype,
-	    rid, dev->drm_pcir[rid].res);
+	    dev_priv->mmio_rid, dev_priv->mmio_res);
 #else
 	pci_iounmap(pdev, dev_priv->regs);
 #endif

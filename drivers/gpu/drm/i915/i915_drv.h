@@ -1471,6 +1471,7 @@ struct drm_i915_private {
 #ifndef __linux__
 	int mmio_rid;
 	int mmio_restype;
+	struct resource *mmio_res;
 #endif
 
 	struct intel_uncore uncore;

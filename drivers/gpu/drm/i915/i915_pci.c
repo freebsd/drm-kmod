@@ -824,11 +824,11 @@ static int __init i915_init(void)
 
 static void __exit i915_exit(void)
 {
-#ifdef __linux__
+#ifndef __linux__
+	linux_pci_unregister_drm_driver(&i915_pci_driver);
+#else
 	if (!i915_pci_driver.driver.owner)
 		return;
-
-	/* XXX */
 	pci_unregister_driver(&i915_pci_driver);
 #endif
 }
