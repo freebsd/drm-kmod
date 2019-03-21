@@ -2074,16 +2074,13 @@ __hw_ppgtt_create(struct drm_i915_private *i915)
 }
 
 struct i915_hw_ppgtt *
-i915_ppgtt_create(struct drm_i915_private *i915,
-		  struct drm_i915_file_private *fpriv)
+i915_ppgtt_create(struct drm_i915_private *i915)
 {
 	struct i915_hw_ppgtt *ppgtt;
 
 	ppgtt = __hw_ppgtt_create(i915);
 	if (IS_ERR(ppgtt))
 		return ppgtt;
-
-	ppgtt->vm.file = fpriv;
 
 	trace_i915_ppgtt_create(&ppgtt->vm);
 
@@ -2672,7 +2669,7 @@ int i915_gem_init_aliasing_ppgtt(struct drm_i915_private *i915)
 	struct i915_hw_ppgtt *ppgtt;
 	int err;
 
-	ppgtt = i915_ppgtt_create(i915, ERR_PTR(-EPERM));
+	ppgtt = i915_ppgtt_create(i915);
 	if (IS_ERR(ppgtt))
 		return PTR_ERR(ppgtt);
 
