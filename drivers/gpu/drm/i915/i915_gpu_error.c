@@ -464,8 +464,8 @@ static void error_print_context(struct drm_i915_error_state_buf *m,
 				const char *header,
 				const struct drm_i915_error_context *ctx)
 {
-	err_printf(m, "%s%s[%d] user_handle %d hw_id %d, prio %d, guilty %d active %d\n",
-		   header, ctx->comm, ctx->pid, ctx->handle, ctx->hw_id,
+	err_printf(m, "%s%s[%d] hw_id %d, prio %d, guilty %d active %d\n",
+		   header, ctx->comm, ctx->pid, ctx->hw_id,
 		   ctx->sched_attr.priority, ctx->guilty, ctx->active);
 }
 
@@ -770,11 +770,9 @@ static void __err_print_to_sgl(struct drm_i915_error_state_buf *m,
 		if (obj) {
 			err_puts(m, m->i915->engine[i]->name);
 			if (ee->context.pid)
-				err_printf(m, " (submitted by %s [%d], ctx %d [%d])",
+				err_printf(m, " (submitted by %s [%d])",
 					   ee->context.comm,
-					   ee->context.pid,
-					   ee->context.handle,
-					   ee->context.hw_id);
+					   ee->context.pid);
 			err_printf(m, " --- gtt_offset = 0x%08x %08x\n",
 				   upper_32_bits(obj->gtt_offset),
 				   lower_32_bits(obj->gtt_offset));
@@ -1342,7 +1340,6 @@ static void record_context(struct drm_i915_error_context *e,
 		rcu_read_unlock();
 	}
 
-	e->handle = ctx->user_handle;
 	e->hw_id = ctx->hw_id;
 	e->sched_attr = ctx->sched;
 	e->guilty = atomic_read(&ctx->guilty_count);
