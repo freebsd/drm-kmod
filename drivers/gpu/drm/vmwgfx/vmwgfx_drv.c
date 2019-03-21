@@ -1627,6 +1627,7 @@ MODULE_VERSION(__stringify(VMWGFX_DRIVER_MAJOR) "."
 LKPI_DRIVER_MODULE(vmwgfx, vmwgfx_init, vmwgfx_exit);
 LKPI_PNP_INFO(pci, vmwgfx, vmw_pci_id_list);
 MODULE_DEPEND(vmwgfx, drmn, 2, 2, 2);
+MODULE_DEPEND(vmwgfx, ttm, 1, 1, 1);
 MODULE_DEPEND(vmwgfx, agp, 1, 1, 1);
 MODULE_DEPEND(vmwgfx, linuxkpi, 1, 1, 1);
 MODULE_DEPEND(vmwgfx, linuxkpi_gplv2, 1, 1, 1);

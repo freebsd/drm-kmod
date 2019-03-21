@@ -19,6 +19,10 @@ drm/*.h
 drm/x86
 drm/machine
 drm/export_syms
+ttm/*.h
+ttm/x86
+ttm/machine
+ttm/export_syms
 i915/*.h
 i915/x86
 i915/machine

@@ -118,6 +118,8 @@ SRCS+=  opt_acpi.h \
 	radeon_atpx_handler.c
 .endif
 
+CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
+
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
@@ -130,6 +132,7 @@ CFLAGS+= -I${SRCDIR:H}/amd/include
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
+
 CFLAGS.gcc+= -Wno-redundant-decls -Wno-cast-qual -Wno-unused-but-set-variable \
 	-Wno-maybe-uninitialized
 

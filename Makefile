@@ -2,6 +2,7 @@
 
 SUBDIR=	linuxkpi	\
 	lindebugfs	\
+	ttm		\
 	drm		\
 	${_vmwgfx}	\
 	${_i915}	\
