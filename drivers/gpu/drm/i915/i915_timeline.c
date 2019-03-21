@@ -201,7 +201,6 @@ static void cacheline_free(struct i915_timeline_cacheline *cl)
 
 int i915_timeline_init(struct drm_i915_private *i915,
 		       struct i915_timeline *timeline,
-		       const char *name,
 		       struct i915_vma *hwsp)
 {
 	void *vaddr;
@@ -217,7 +216,6 @@ int i915_timeline_init(struct drm_i915_private *i915,
 	BUILD_BUG_ON(KSYNCMAP < I915_NUM_ENGINES);
 
 	timeline->i915 = i915;
-	timeline->name = name;
 	timeline->pin_count = 0;
 	timeline->has_initial_breadcrumb = !hwsp;
 	timeline->hwsp_cacheline = NULL;
@@ -346,7 +344,6 @@ void i915_timeline_fini(struct i915_timeline *timeline)
 
 struct i915_timeline *
 i915_timeline_create(struct drm_i915_private *i915,
-		     const char *name,
 		     struct i915_vma *global_hwsp)
 {
 	struct i915_timeline *timeline;
@@ -356,7 +353,7 @@ i915_timeline_create(struct drm_i915_private *i915,
 	if (!timeline)
 		return ERR_PTR(-ENOMEM);
 
-	err = i915_timeline_init(i915, timeline, name, global_hwsp);
+	err = i915_timeline_init(i915, timeline, global_hwsp);
 	if (err) {
 		kfree(timeline);
 		return ERR_PTR(err);
