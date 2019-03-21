@@ -3657,6 +3657,7 @@ static void amdgpu_device_get_min_pci_speed_width(struct amdgpu_device *adev,
 	struct pci_dev *pdev = adev->pdev;
 	enum pci_bus_speed cur_speed;
 	enum pcie_link_width cur_width;
+	u32 ret = 1;
 
 	*speed = PCI_SPEED_UNKNOWN;
 	*width = PCIE_LNK_WIDTH_UNKNOWN;
@@ -3664,6 +3665,10 @@ static void amdgpu_device_get_min_pci_speed_width(struct amdgpu_device *adev,
 	while (pdev) {
 		cur_speed = pcie_get_speed_cap(pdev);
 		cur_width = pcie_get_width_cap(pdev);
+		ret = pcie_bandwidth_available(adev->pdev, NULL,
+						       NULL, &cur_width);
+		if (!ret)
+			cur_width = PCIE_LNK_WIDTH_RESRV;
 
 		if (cur_speed != PCI_SPEED_UNKNOWN) {
 			if (*speed == PCI_SPEED_UNKNOWN)
