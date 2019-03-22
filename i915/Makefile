@@ -49,6 +49,7 @@ SRCS=	\
 	i915_sysfs.c \
 	i915_timeline.c \
 	i915_trace_points.c \
+	i915_user_extensions.c \
 	i915_vgpu.c \
 	i915_vma.c \
 	icl_dsi.c \
