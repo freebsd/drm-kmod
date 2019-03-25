@@ -876,7 +876,8 @@ static void gen11_dsi_enable_transcoder(struct intel_encoder *encoder)
 		I915_WRITE(PIPECONF(dsi_trans), tmp);
 
 		/* wait for transcoder to be enabled */
-		if (intel_wait_for_register(dev_priv, PIPECONF(dsi_trans),
+		if (intel_wait_for_register(&dev_priv->uncore,
+					    PIPECONF(dsi_trans),
 					    I965_PIPECONF_ACTIVE,
 					    I965_PIPECONF_ACTIVE, 10))
 			DRM_ERROR("DSI transcoder not enabled\n");
@@ -1054,7 +1055,8 @@ static void gen11_dsi_disable_transcoder(struct intel_encoder *encoder)
 		I915_WRITE(PIPECONF(dsi_trans), tmp);
 
 		/* wait for transcoder to be disabled */
-		if (intel_wait_for_register(dev_priv, PIPECONF(dsi_trans),
+		if (intel_wait_for_register(&dev_priv->uncore,
+					    PIPECONF(dsi_trans),
 					    I965_PIPECONF_ACTIVE, 0, 50))
 			DRM_ERROR("DSI trancoder not disabled\n");
 	}

@@ -2299,7 +2299,7 @@ static void wait_panel_status(struct intel_dp *intel_dp,
 			I915_READ(pp_stat_reg),
 			I915_READ(pp_ctrl_reg));
 
-	if (intel_wait_for_register(dev_priv,
+	if (intel_wait_for_register(&dev_priv->uncore,
 				    pp_stat_reg, mask, value,
 				    5000))
 		DRM_ERROR("Panel status timeout: status %08x control %08x\n",
@@ -3888,7 +3888,7 @@ void intel_dp_set_idle_link_train(struct intel_dp *intel_dp)
 	if (port == PORT_A)
 		return;
 
-	if (intel_wait_for_register(dev_priv,DP_TP_STATUS(port),
+	if (intel_wait_for_register(&dev_priv->uncore, DP_TP_STATUS(port),
 				    DP_TP_STATUS_IDLE_DONE,
 				    DP_TP_STATUS_IDLE_DONE,
 				    1))
