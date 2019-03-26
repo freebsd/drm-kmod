@@ -2050,21 +2050,8 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 	return 0;
 }
 
-/**
- * drm_fb_helper_fill_fix - initializes fixed fbdev information
- * @info: fbdev registered by the helper
- * @pitch: desired pitch
- * @depth: desired depth
- *
- * Helper to fill in the fixed fbdev information useful for a non-accelerated
- * fbdev emulations. Drivers which support acceleration methods which impose
- * additional constraints need to set up their own limits.
- *
- * Drivers should call this (or their equivalent setup code) from their
- * &drm_fb_helper_funcs.fb_probe callback.
- */
-void drm_fb_helper_fill_fix(struct fb_info *info, uint32_t pitch,
-			    uint32_t depth)
+static void drm_fb_helper_fill_fix(struct fb_info *info, uint32_t pitch,
+				   uint32_t depth)
 {
 	info->fix.type = FB_TYPE_PACKED_PIXELS;
 	info->fix.visual = depth == 8 ? FB_VISUAL_PSEUDOCOLOR :
@@ -2083,24 +2070,10 @@ void drm_fb_helper_fill_fix(struct fb_info *info, uint32_t pitch,
 #endif
 	return;
 }
-EXPORT_SYMBOL(drm_fb_helper_fill_fix);
 
-/**
- * drm_fb_helper_fill_var - initalizes variable fbdev information
- * @info: fbdev instance to set up
- * @fb_helper: fb helper instance to use as template
- * @fb_width: desired fb width
- * @fb_height: desired fb height
- *
- * Sets up the variable fbdev metainformation from the given fb helper instance
- * and the drm framebuffer allocated in &drm_fb_helper.fb.
- *
- * Drivers should call this (or their equivalent setup code) from their
- * &drm_fb_helper_funcs.fb_probe callback after having allocated the fbdev
- * backing storage framebuffer.
- */
-void drm_fb_helper_fill_var(struct fb_info *info, struct drm_fb_helper *fb_helper,
-			    uint32_t fb_width, uint32_t fb_height)
+static void drm_fb_helper_fill_var(struct fb_info *info,
+				   struct drm_fb_helper *fb_helper,
+				   uint32_t fb_width, uint32_t fb_height)
 {
 	struct drm_framebuffer *fb = fb_helper->fb;
 
@@ -2127,7 +2100,6 @@ void drm_fb_helper_fill_var(struct fb_info *info, struct drm_fb_helper *fb_helpe
 	info->fbio.fb_depth = info->var.bits_per_pixel;
 #endif
 }
-EXPORT_SYMBOL(drm_fb_helper_fill_var);
 
 /**
  * drm_fb_helper_fill_info - initializes fbdev information
