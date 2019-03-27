@@ -850,6 +850,13 @@ static int vmw_driver_load(struct drm_device *dev, unsigned long chipset)
 		DRM_ERROR("Failed initializing TTM buffer object driver.\n");
 		goto out_no_bdev;
 	}
+	dev_priv->vm_ops = *dev_priv->bdev.vm_ops;
+	dev_priv->vm_ops.fault = vmw_bo_vm_fault;
+#ifdef __freebsd_notyet__
+	dev_priv->vm_ops.pfn_mkwrite = vmw_bo_vm_mkwrite;
+	dev_priv->vm_ops.page_mkwrite = vmw_bo_vm_mkwrite;
+#endif
+	dev_priv->bdev.vm_ops = &dev_priv->vm_ops;
 
 	/*
 	 * Enable VRAM, but initially don't use it until SVGA is enabled and
