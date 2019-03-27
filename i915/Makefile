@@ -195,6 +195,7 @@ CWARNFLAGS.intel_dp.c=		-Wno-enum-conversion -Wno-format -Wno-unused
 CWARNFLAGS.intel_ddi.c=		-Wno-enum-conversion -Wno-compare-distinct-pointer-types -Wno-unused
 CWARNFLAGS.intel_display.c=	-Wno-tautological-pointer-compare -Wno-enum-conversion -Wno-cast-qual -Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.intel_dpll_mgr.c=	-Wno-compare-distinct-pointer-types -Wno-missing-prototypes
+CWARNFLAGS.intel_device_info.c=	-Wno-sometimes-uninitialized
 CWARNFLAGS.intel_dsi_panel_vbt.c= -Wno-cast-qual
 CWARNFLAGS.intel_engine_cs.c= -Wno-cast-qual
 CWARNFLAGS.intel_fbdev.c=	-Wno-initializer-overrides
