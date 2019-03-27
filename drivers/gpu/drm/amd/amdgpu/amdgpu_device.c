@@ -2596,6 +2596,14 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	if (amdgpu_mcbp)
 		DRM_INFO("MCBP is enabled\n");
 
+	if (amdgpu_discovery) {
+		r = amdgpu_discovery_init(adev);
+		if (r) {
+			dev_err(adev->dev, "amdgpu_discovery_init failed\n");
+			return r;
+		}
+	}
+
 	/* early init functions */
 	r = amdgpu_device_ip_early_init(adev);
 	if (r)
@@ -2867,6 +2875,9 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 
 	amdgpu_debugfs_preempt_cleanup(adev);
 #endif
+
+	if (amdgpu_discovery)
+		amdgpu_discovery_fini(adev);
 }
 
 
