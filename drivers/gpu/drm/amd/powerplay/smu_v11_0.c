@@ -1738,6 +1738,9 @@ set_fan_speed_rpm_failed:
 	return ret;
 }
 
+#define XGMI_STATE_D0 1
+#define XGMI_STATE_D3 0
+
 static int smu_v11_0_set_xgmi_pstate(struct smu_context *smu,
 				     uint32_t pstate)
 {
