@@ -2951,7 +2951,11 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 	u64 remain, offset;
 	unsigned int pg;
 
-	/* Before we instantiate/pin the backing store for our use, we
+	/* Caller already validated user args */
+	GEM_BUG_ON(!access_ok(user_data, arg->size));
+
+	/*
+	 * Before we instantiate/pin the backing store for our use, we
 	 * can prepopulate the shmemfs filp efficiently using a write into
 	 * the pagecache. We avoid the penalty of instantiating all the
 	 * pages, important if the user is just writing to a few and never
@@ -2965,7 +2969,8 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 	if (obj->mm.madv != I915_MADV_WILLNEED)
 		return -EFAULT;
 
-	/* Before the pages are instantiated the object is treated as being
+	/*
+	 * Before the pages are instantiated the object is treated as being
 	 * in the CPU domain. The pages will be clflushed as required before
 	 * use, and we can freely write into the pages directly. If userspace
 	 * races pwrite with any other operation; corruption will ensue -
@@ -2981,6 +2986,9 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 		struct page *page;
 		void *data, *vaddr;
 		int err;
+#ifdef __linux__
+		char c;
+#endif
 
 		len = PAGE_SIZE - pg;
 		if (len > remain)
@@ -2991,6 +2999,15 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 		(void)err;
 		page = shmem_read_mapping_page(mapping, OFF_TO_IDX(offset));
 #else
+		/* Prefault the user page to reduce potential recursion */
+		err = __get_user(c, user_data);
+		if (err)
+			return err;
+
+		err = __get_user(c, user_data + len - 1);
+		if (err)
+			return err;
+
 		err = pagecache_write_begin(obj->base.filp, mapping,
 					    offset, len, 0,
 					    &page, &data);
@@ -2998,9 +3015,11 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 			return err;
 #endif
 
-		vaddr = kmap(page);
-		unwritten = copy_from_user(vaddr + pg, user_data, len);
-		kunmap(page);
+		vaddr = kmap_atomic(page);
+		unwritten = __copy_from_user_inatomic(vaddr + pg,
+						      user_data,
+						      len);
+		kunmap_atomic(vaddr);
 
 #ifdef __linux__
 		err = pagecache_write_end(obj->base.filp, mapping,
@@ -3012,8 +3031,9 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 		put_page(page);
 #endif
 
+		/* We don't handle -EFAULT, leave it to the caller to check */
 		if (unwritten)
-			return -EFAULT;
+			return -ENODEV;
 
 		remain -= len;
 		user_data += len;
