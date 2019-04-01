@@ -121,6 +121,8 @@
 		[PIPE_C] = IVB_CURSOR_C_OFFSET, \
 	}
 
+#define I9XX_COLORS \
+	.color = { .gamma_lut_size = 256 }
 #define I965_COLORS \
 	.color = { .gamma_lut_size = 129, \
 		   .gamma_lut_tests = DRM_COLOR_LUT_NON_DECREASING, \
@@ -161,6 +163,7 @@
 	.has_coherent_ggtt = false, \
 	I9XX_PIPE_OFFSETS, \
 	I9XX_CURSOR_OFFSETS, \
+	I9XX_COLORS, \
 	GEN_DEFAULT_PAGE_SIZES
 
 #define I845_FEATURES \
@@ -177,6 +180,7 @@
 	.has_coherent_ggtt = false, \
 	I845_PIPE_OFFSETS, \
 	I845_CURSOR_OFFSETS, \
+	I9XX_COLORS, \
 	GEN_DEFAULT_PAGE_SIZES
 
 static const struct intel_device_info intel_i830_info = {
@@ -210,6 +214,7 @@ static const struct intel_device_info intel_i865g_info = {
 	.has_coherent_ggtt = true, \
 	I9XX_PIPE_OFFSETS, \
 	I9XX_CURSOR_OFFSETS, \
+	I9XX_COLORS, \
 	GEN_DEFAULT_PAGE_SIZES
 
 static const struct intel_device_info intel_i915g_info = {
