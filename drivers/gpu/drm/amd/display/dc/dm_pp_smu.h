@@ -82,6 +82,7 @@ struct pp_smu_funcs_rv {
 	/* PPSMC_MSG_SetDisplayCount
 	 * 0 triggers S0i2 optimization
 	 */
+
 	void (*set_display_count)(struct pp_smu *pp, int count);
 
 	/* reader and writer WM's are sent together as part of one table*/
@@ -117,7 +118,6 @@ struct pp_smu_funcs_rv {
 
 	/* PME w/a */
 	void (*set_pme_wa_enable)(struct pp_smu *pp);
-
 };
 
 struct pp_smu_funcs {
