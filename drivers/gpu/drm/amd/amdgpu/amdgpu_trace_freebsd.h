@@ -148,10 +148,10 @@ trace_amdgpu_ib_pipe_sync(struct amdgpu_job *job, struct dma_fence *fence){
 		CTR3(KTR_DRM, "amdgpu_ttm_bo_move %p new %d old %d", (bo), (new), (old_mem_type)); \
 	} while (0)
 
-#define trace_amdgpu_vm_set_ptes(pe, addr, count, incr, flags)	\
+#define trace_amdgpu_vm_set_ptes(pe, addr, count, incr, flags, direct)		\
 	CTR5(KTR_DRM, "amdgpu_vm_set_ptes %lx %lx %u %u %x", pe, addr, count, incr, flags)
 
-#define trace_amdgpu_vm_copy_ptes(pe, src, count)	\
+#define trace_amdgpu_vm_copy_ptes(pe, src, count, direct)			\
 	CTR3(KTR_DRM, "amdgpu_vm_copy_ptes %lx %lx %u", pe, src, count)
 
 #endif
