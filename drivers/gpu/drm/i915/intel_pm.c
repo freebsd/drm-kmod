@@ -36,6 +36,7 @@
 #include "i915_drv.h"
 #include "intel_drv.h"
 #include "intel_fbc.h"
+#include "intel_pm.h"
 #ifdef __FreeBSD__
 #include <machine/clock.h>
 #include <asm/atomic.h>
@@ -5260,7 +5261,7 @@ static inline bool skl_ddb_entries_overlap(const struct skl_ddb_entry *a,
 }
 
 bool skl_ddb_allocation_overlaps(const struct skl_ddb_entry *ddb,
-				 const struct skl_ddb_entry entries[],
+				 const struct skl_ddb_entry *entries,
 				 int num_entries, int ignore_idx)
 {
 	int i;

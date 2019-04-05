@@ -50,6 +50,7 @@
 #include "intel_drv.h"
 #include "intel_frontbuffer.h"
 #include "intel_mocs.h"
+#include "intel_pm.h"
 #include "intel_workarounds.h"
 
 #ifdef __FreeBSD__
