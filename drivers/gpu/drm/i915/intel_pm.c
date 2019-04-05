@@ -35,6 +35,7 @@
 
 #include "i915_drv.h"
 #include "intel_drv.h"
+#include "intel_fbc.h"
 #ifdef __FreeBSD__
 #include <machine/clock.h>
 #include <asm/atomic.h>
