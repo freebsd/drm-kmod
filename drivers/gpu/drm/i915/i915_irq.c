@@ -34,12 +34,15 @@
 #include <linux/cpuidle.h>
 #endif
 #include <linux/circ_buf.h>
-#include <drm/drm_irq.h>
+
 #include <drm/drm_drv.h>
+#include <drm/drm_irq.h>
 #include <drm/i915_drm.h>
+
 #include "i915_drv.h"
 #include "i915_trace.h"
 #include "intel_drv.h"
+#include "intel_psr.h"
 
 #ifdef __FreeBSD__
 // drm/drm_os_freebsd.c:
