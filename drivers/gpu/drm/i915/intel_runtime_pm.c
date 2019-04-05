@@ -3667,7 +3667,7 @@ static void skl_display_core_init(struct drm_i915_private *dev_priv,
 
 	mutex_unlock(&power_domains->lock);
 
-	skl_init_cdclk(dev_priv);
+	intel_cdclk_init(dev_priv);
 
 	gen9_dbuf_enable(dev_priv);
 
@@ -3684,7 +3684,7 @@ static void skl_display_core_uninit(struct drm_i915_private *dev_priv)
 
 	gen9_dbuf_disable(dev_priv);
 
-	skl_uninit_cdclk(dev_priv);
+	intel_cdclk_uninit(dev_priv);
 
 	/* The spec doesn't call for removing the reset handshake flag */
 	/* disable PG1 and Misc I/O */
@@ -3729,7 +3729,7 @@ void bxt_display_core_init(struct drm_i915_private *dev_priv,
 
 	mutex_unlock(&power_domains->lock);
 
-	bxt_init_cdclk(dev_priv);
+	intel_cdclk_init(dev_priv);
 
 	gen9_dbuf_enable(dev_priv);
 
@@ -3746,7 +3746,7 @@ void bxt_display_core_uninit(struct drm_i915_private *dev_priv)
 
 	gen9_dbuf_disable(dev_priv);
 
-	bxt_uninit_cdclk(dev_priv);
+	intel_cdclk_uninit(dev_priv);
 
 	/* The spec doesn't call for removing the reset handshake flag */
 
@@ -3788,7 +3788,7 @@ static void cnl_display_core_init(struct drm_i915_private *dev_priv, bool resume
 	mutex_unlock(&power_domains->lock);
 
 	/* 5. Enable CD clock */
-	cnl_init_cdclk(dev_priv);
+	intel_cdclk_init(dev_priv);
 
 	/* 6. Enable DBUF */
 	gen9_dbuf_enable(dev_priv);
@@ -3810,7 +3810,7 @@ static void cnl_display_core_uninit(struct drm_i915_private *dev_priv)
 	gen9_dbuf_disable(dev_priv);
 
 	/* 3. Disable CD clock */
-	cnl_uninit_cdclk(dev_priv);
+	intel_cdclk_uninit(dev_priv);
 
 	/*
 	 * 4. Disable Power Well 1 (PG1).
@@ -3852,7 +3852,7 @@ void icl_display_core_init(struct drm_i915_private *dev_priv,
 	mutex_unlock(&power_domains->lock);
 
 	/* 5. Enable CDCLK. */
-	icl_init_cdclk(dev_priv);
+	intel_cdclk_init(dev_priv);
 
 	/* 6. Enable DBUF. */
 	icl_dbuf_enable(dev_priv);
@@ -3877,7 +3877,7 @@ void icl_display_core_uninit(struct drm_i915_private *dev_priv)
 	icl_dbuf_disable(dev_priv);
 
 	/* 3. Disable CD clock */
-	icl_uninit_cdclk(dev_priv);
+	intel_cdclk_uninit(dev_priv);
 
 	/*
 	 * 4. Disable Power Well 1 (PG1).
