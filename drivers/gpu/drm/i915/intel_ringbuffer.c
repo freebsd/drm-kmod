@@ -1512,9 +1512,16 @@ err_unpin:
 	return err;
 }
 
+static void ring_context_reset(struct intel_context *ce)
+{
+	intel_ring_reset(ce->ring, 0);
+}
+
 static const struct intel_context_ops ring_context_ops = {
 	.pin = ring_context_pin,
 	.unpin = ring_context_unpin,
+
+	.reset = ring_context_reset,
 	.destroy = ring_context_destroy,
 };
 
@@ -1583,16 +1590,6 @@ void intel_engine_cleanup(struct intel_engine_cs *engine)
 
 	dev_priv->engine[engine->id] = NULL;
 	kfree(engine);
-}
-
-void intel_legacy_submission_resume(struct drm_i915_private *dev_priv)
-{
-	struct intel_engine_cs *engine;
-	enum intel_engine_id id;
-
-	/* Restart from the beginning of the rings for convenience */
-	for_each_engine(engine, dev_priv, id)
-		intel_ring_reset(engine->buffer, 0);
 }
 
 static int load_pd_dir(struct i915_request *rq,
