@@ -1390,8 +1390,8 @@ static int set_sseu(struct i915_gem_context *ctx,
 		return -EINVAL;
 
 	engine = intel_engine_lookup_user(i915,
-					  user_sseu.engine_class,
-					  user_sseu.engine_instance);
+					  user_sseu.engine.engine_class,
+					  user_sseu.engine.engine_instance);
 	if (!engine)
 		return -EINVAL;
 
@@ -1630,8 +1630,8 @@ static int get_sseu(struct i915_gem_context *ctx,
 		return -EINVAL;
 
 	engine = intel_engine_lookup_user(ctx->i915,
-					  user_sseu.engine_class,
-					  user_sseu.engine_instance);
+					  user_sseu.engine.engine_class,
+					  user_sseu.engine.engine_instance);
 	if (!engine)
 		return -EINVAL;
 
