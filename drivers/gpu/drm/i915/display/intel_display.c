@@ -14934,7 +14934,7 @@ intel_primary_plane_create(struct drm_i915_private *dev_priv, enum pipe pipe)
 	const u64 *modifiers;
 	const u32 *formats;
 	int num_formats;
-	int ret;
+	int ret, zpos;
 
 	if (INTEL_GEN(dev_priv) >= 9)
 		return skl_universal_plane_create(dev_priv, pipe,
@@ -15023,6 +15023,9 @@ intel_primary_plane_create(struct drm_i915_private *dev_priv, enum pipe pipe)
 						   DRM_MODE_ROTATE_0,
 						   supported_rotations);
 
+	zpos = 0;
+	drm_plane_create_zpos_immutable_property(&plane->base, zpos);
+
 	drm_plane_helper_add(&plane->base, &intel_plane_helper_funcs);
 
 	return plane;
@@ -15039,7 +15042,7 @@ intel_cursor_plane_create(struct drm_i915_private *dev_priv,
 {
 	unsigned int possible_crtcs;
 	struct intel_plane *cursor;
-	int ret;
+	int ret, zpos;
 
 	cursor = intel_plane_alloc();
 	if (IS_ERR(cursor))
@@ -15087,6 +15090,9 @@ intel_cursor_plane_create(struct drm_i915_private *dev_priv,
 						   DRM_MODE_ROTATE_0,
 						   DRM_MODE_ROTATE_0 |
 						   DRM_MODE_ROTATE_180);
+
+	zpos = RUNTIME_INFO(dev_priv)->num_sprites[pipe] + 1;
+	drm_plane_create_zpos_immutable_property(&cursor->base, zpos);
 
 	drm_plane_helper_add(&cursor->base, &intel_plane_helper_funcs);
 
