@@ -31,12 +31,6 @@
 #define	prio	task_thread->td_priority
 #endif
 
-#if defined(__linux__) && defined(CONFIG_SMP)
-#define task_asleep(tsk) ((tsk)->state & TASK_NORMAL && !(tsk)->on_rq)
-#else
-#define task_asleep(tsk) (atomic_read(&(tsk)->state) & TASK_NORMAL)
-#endif
-
 static void irq_enable(struct intel_engine_cs *engine)
 {
 	if (!engine->irq_enable)
@@ -90,7 +84,7 @@ static inline bool __request_completed(const struct i915_request *rq)
 	return i915_seqno_passed(__hwsp_seqno(rq), rq->fence.seqno);
 }
 
-bool intel_engine_breadcrumbs_irq(struct intel_engine_cs *engine)
+void intel_engine_breadcrumbs_irq(struct intel_engine_cs *engine)
 {
 	struct intel_breadcrumbs *b = &engine->breadcrumbs;
 	struct intel_context *ce, *cn;
@@ -154,19 +148,13 @@ bool intel_engine_breadcrumbs_irq(struct intel_engine_cs *engine)
 		dma_fence_signal(&rq->fence);
 		i915_request_put(rq);
 	}
-
-	return !list_empty(&signal);
 }
 
-bool intel_engine_signal_breadcrumbs(struct intel_engine_cs *engine)
+void intel_engine_signal_breadcrumbs(struct intel_engine_cs *engine)
 {
-	bool result;
-
 	local_irq_disable();
-	result = intel_engine_breadcrumbs_irq(engine);
+	intel_engine_breadcrumbs_irq(engine);
 	local_irq_enable();
-
-	return result;
 }
 
 static void signal_irq_work(struct irq_work *work)
