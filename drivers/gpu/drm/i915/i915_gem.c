@@ -706,7 +706,7 @@ i915_gem_create(struct drm_file *file,
 		return ret;
 
 	*handle_p = handle;
-	*size_p = obj->base.size;
+	*size_p = size;
 	return 0;
 }
 
