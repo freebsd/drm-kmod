@@ -3362,7 +3362,7 @@ static int amdgpu_device_pre_asic_reset(struct amdgpu_device *adev,
 		if (!ring || !ring->sched.thread)
 			continue;
 
-		drm_sched_stop(&ring->sched);
+		drm_sched_stop(&ring->sched, &job->base);
 
 		/* after all hw jobs are reset, hw fence is meaningless, so force_completion */
 		amdgpu_fence_driver_force_completion(ring);
@@ -3370,8 +3370,6 @@ static int amdgpu_device_pre_asic_reset(struct amdgpu_device *adev,
 
 	if(job)
 		drm_sched_increase_karma(&job->base);
-
-
 
 	if (!amdgpu_sriov_vf(adev)) {
 
@@ -3510,8 +3508,7 @@ end:
 	return r;
 }
 
-static void amdgpu_device_post_asic_reset(struct amdgpu_device *adev,
-					  struct amdgpu_job *job)
+static void amdgpu_device_post_asic_reset(struct amdgpu_device *adev)
 {
 	int i;
 
@@ -3651,7 +3648,7 @@ retry:	/* Rest of adevs pre asic reset from XGMI hive. */
 
 	/* Post ASIC reset for all devs .*/
 	list_for_each_entry(tmp_adev, device_list_handle, gmc.xgmi.head) {
-		amdgpu_device_post_asic_reset(tmp_adev, tmp_adev == adev ? job : NULL);
+		amdgpu_device_post_asic_reset(tmp_adev);
 
 		if (r) {
 			/* bad news, how to tell it to userspace ? */
