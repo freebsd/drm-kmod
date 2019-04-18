@@ -5,24 +5,20 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 .PATH:	${SRCDIR} ${SRCDIR}/scheduler
 
 KMOD=	drm
-SRCS=	ati_pcigart.c \
-	drm_atomic.c \
+SRCS=	drm_atomic.c \
 	drm_atomic_helper.c \
 	drm_atomic_state_helper.c \
 	drm_atomic_uapi.c \
 	drm_auth.c \
 	drm_blend.c \
-	drm_bufs.c \
 	drm_bridge.c \
 	drm_cache.c \
 	drm_client.c \
 	drm_color_mgmt.c \
 	drm_connector.c \
-	drm_context.c \
 	drm_crtc.c \
 	drm_crtc_helper.c \
 	drm_damage_helper.c \
-	drm_dma.c \
 	drm_dp_aux_dev.c \
 	drm_dp_dual_mode_helper.c \
 	drm_dp_helper.c \
@@ -48,7 +44,6 @@ SRCS=	ati_pcigart.c \
 	drm_info.c \
 	drm_irq.c \
 	drm_lease.c \
-	drm_lock.c \
 	drm_memory.c \
 	drm_mipi_dsi.c \
 	drm_mm.c \
@@ -68,7 +63,6 @@ SRCS=	ati_pcigart.c \
 	drm_probe_helper.c \
 	drm_property.c \
 	drm_rect.c \
-	drm_scatter.c \
 	drm_scdc_helper.c \
 	drm_syncobj.c \
 	drm_sysctl_freebsd.c \
@@ -80,6 +74,15 @@ SRCS=	ati_pcigart.c \
 	linux_fb.c \
 	tainted_linux_fb.c \
 	linux_hdmi.c
+
+#Files that requires CONFIG_DRM_LEGACY
+SRCS+=	ati_pcigart.c \
+	drm_legacy_misc.c \
+	drm_bufs.c \
+	drm_context.c \
+	drm_dma.c \
+	drm_scatter.c \
+	drm_lock.c
 
 # Debug files, not handled for now
 SRCS_DEBUG=	\
@@ -112,6 +115,7 @@ CFLAGS+= -I${SRCDIR:H}
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_'
 CFLAGS+= -include ${SRCDIR}/drm_os_config.h
+CFLAGS+= -DCONFIG_DRM_LEGACY -DCONFIG_DRM_VM
 
 SRCS+=	device_if.h \
 	vnode_if.h \

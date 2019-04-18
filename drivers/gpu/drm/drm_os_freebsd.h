@@ -250,5 +250,7 @@ static inline int vga_switcheroo_get_client_state(struct pci_dev *pdev) { return
 #define CONFIG_X86_PAT
 extern	u_int	cpu_clflush_line_size;
 
+#define	CONFIG_DRM_VM		1
+#define	CONFIG_DRM_LEGACY	1
 
 #endif /* _DRM_OS_FREEBSD_H_ */
