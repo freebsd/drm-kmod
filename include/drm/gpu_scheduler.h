@@ -263,6 +263,7 @@ struct drm_sched_backend_ops {
  *              guilty and it will be considered for scheduling further.
  * @num_jobs: the number of jobs in queue in the scheduler
  * @ready: marks if the underlying HW is ready to work
+ * @free_guilty: A hit to time out handler to free the guilty job.
  *
  * One scheduler is implemented for each hardware ring.
  */
@@ -283,6 +284,7 @@ struct drm_gpu_scheduler {
 	int				hang_limit;
 	atomic_t                        num_jobs;
 	bool			ready;
+	bool				free_guilty;
 };
 
 int drm_sched_init(struct drm_gpu_scheduler *sched,
