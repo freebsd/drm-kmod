@@ -2273,8 +2273,7 @@ i915_gem_mmap_gtt_ioctl(struct drm_device *dev, void *data,
 }
 
 /* Immediately discard the backing storage */
-static void
-i915_gem_object_truncate(struct drm_i915_gem_object *obj)
+void __i915_gem_object_truncate(struct drm_i915_gem_object *obj)
 {
 	i915_gem_object_free_mmap_offset(obj);
 
@@ -2293,36 +2292,6 @@ i915_gem_object_truncate(struct drm_i915_gem_object *obj)
 #endif
 	obj->mm.madv = __I915_MADV_PURGED;
 	obj->mm.pages = ERR_PTR(-EFAULT);
-}
-
-/* Try to discard unwanted pages */
-void __i915_gem_object_invalidate(struct drm_i915_gem_object *obj)
-{
-#ifdef __FreeBSD__
-	vm_object_t mapping;
-#else
-	struct address_space *mapping;
-#endif
-
-	lockdep_assert_held(&obj->mm.lock);
-	GEM_BUG_ON(i915_gem_object_has_pages(obj));
-
-	switch (obj->mm.madv) {
-	case I915_MADV_DONTNEED:
-		i915_gem_object_truncate(obj);
-	case __I915_MADV_PURGED:
-		return;
-	}
-
-	if (obj->base.filp == NULL)
-		return;
-
-#ifdef __FreeBSD__
-	mapping = obj->base.filp->f_shmem;
-#else
-	mapping = obj->base.filp->f_mapping,
-#endif
-	invalidate_mapping_pages(mapping, 0, (loff_t)-1);
 }
 
 /*
@@ -4198,7 +4167,7 @@ i915_gem_madvise_ioctl(struct drm_device *dev, void *data,
 	/* if the object is no longer attached, discard its backing storage */
 	if (obj->mm.madv == I915_MADV_DONTNEED &&
 	    !i915_gem_object_has_pages(obj))
-		i915_gem_object_truncate(obj);
+		__i915_gem_object_truncate(obj);
 
 	args->retained = obj->mm.madv != __I915_MADV_PURGED;
 	mutex_unlock(&obj->mm.lock);
