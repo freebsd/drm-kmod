@@ -317,7 +317,7 @@ struct drm_device {
 
 	/* Everything below here is for legacy driver, never use! */
 	/* private: */
-
+#if IS_ENABLED(CONFIG_DRM_LEGACY)
 	/* Context handle management - linked list of context handles */
 	struct list_head ctxlist;
 
@@ -364,6 +364,7 @@ struct drm_device {
 
 	/* Scatter gather memory */
 	struct drm_sg_mem *sg;
+#endif
 };
 
 #endif
