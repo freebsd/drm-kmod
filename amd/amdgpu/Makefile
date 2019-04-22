@@ -256,6 +256,9 @@ SRCS+=	dce_abm.c \
 	dce_audio.c \
 	dce_aux.c \
 	dce_clk_mgr.c \
+	dce110_clk_mgr.c \
+	dce112_clk_mgr.c \
+	dce120_clk_mgr.c \
 	dce_clock_source.c \
 	dce_dmcu.c \
 	dce_hwseq.c \
@@ -303,7 +306,10 @@ SRCS+=	dce80_hw_sequencer.c \
 
 # display/dc/dcn10
 .if ${MACHINE_CPUARCH} == "amd64"
-SRCS+=	dcn10_clk_mgr.c \
+SRCS+=	clk_mgr.c \
+	rv1_clk_mgr_vbios_smu.c \
+	rv1_clk_mgr.c \
+	rv2_clk_mgr.c \
 	dcn10_cm_common.c \
 	dcn10_dpp.c \
 	dcn10_dpp_cm.c \
@@ -584,6 +590,7 @@ CWARNFLAGS.dce_dmcu.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_i2c_hw.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_i2c_sw.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_transform.c=	-Wno-enum-conversion
+CWARNFLAGS.rv1_clk_mgr_vbios_smu.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn10_clk_mgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp_dscl.c=	-Wno-missing-prototypes
