@@ -661,6 +661,7 @@ CWARNFLAGS.iceland_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.kv_dpm.c=	-Wno-unused-const-variable
 CWARNFLAGS.mes_v10_1.c=	-Wno-unused-const-variable
 CWARNFLAGS.mxgpu_vi.c=	-Wno-enum-conversion
+CWARNFLAGS.navi10_ppt.c=	-Wno-incompatible-pointer-types
 CWARNFLAGS.polaris10_clockpowergating.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.polaris10_hwmgr.c=	-Wno-missing-prototypes  -Wno-unused-const-variable
 CWARNFLAGS.polaris10_powertune.c=	-Wno-missing-prototypes
