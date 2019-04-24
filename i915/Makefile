@@ -117,6 +117,7 @@ SRCS=	\
 	intel_sdvo.c \
 	intel_sideband.c \
 	intel_sprite.c \
+	intel_sseu.c \
 	intel_tv.c \
 	intel_uc.c \
 	intel_uc_fw.c \
