@@ -114,6 +114,7 @@ SRCS=	\
 	intel_uc_fw.c \
 	intel_uncore.c \
 	intel_vdsc.c \
+	intel_wakeref.c \
 	intel_wopcm.c \
 	vlv_dsi.c \
 	vlv_dsi_pll.c
