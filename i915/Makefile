@@ -124,6 +124,8 @@ SRCS=	\
 SRCS+=	intel_breadcrumbs.c \
 	intel_context.c \
 	intel_engine_cs.c \
+	intel_engine_pm.c \
+	intel_gt_pm.c \
 	intel_hangcheck.c \
 	intel_lrc.c \
 	intel_mocs.c \

@@ -455,6 +455,8 @@ void __i915_request_submit(struct i915_request *request)
 	/* Transfer from per-context onto the global per-engine timeline */
 	move_to_timeline(request, &engine->timeline);
 
+	engine->serial++;
+
 	trace_i915_request_execute(request);
 }
 
@@ -1201,7 +1203,6 @@ struct i915_request *__i915_request_commit(struct i915_request *rq)
 	list_add_tail(&rq->ring_link, &ring->request_list);
 	if (list_is_first(&rq->ring_link, &ring->request_list))
 		list_add(&ring->active_link, &rq->i915->gt.active_rings);
-	rq->i915->gt.active_engines |= rq->engine->mask;
 	rq->emitted_jiffies = jiffies;
 
 	/*
@@ -1498,14 +1499,11 @@ out:
 	return timeout;
 }
 
-void i915_retire_requests(struct drm_i915_private *i915)
+bool i915_retire_requests(struct drm_i915_private *i915)
 {
 	struct intel_ring *ring, *tmp;
 
 	lockdep_assert_held(&i915->drm.struct_mutex);
-
-	if (!i915->gt.active_requests)
-		return;
 
 	list_for_each_entry_safe(ring, tmp,
 				 &i915->gt.active_rings, active_link) {
@@ -1513,6 +1511,8 @@ void i915_retire_requests(struct drm_i915_private *i915)
 		ring_retire_requests(ring);
 		intel_ring_put(ring);
 	}
+
+	return !list_empty(&i915->gt.active_rings);
 }
 
 #if IS_ENABLED(CONFIG_DRM_I915_SELFTEST)
