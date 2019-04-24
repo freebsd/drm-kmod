@@ -8,9 +8,10 @@
 
 #include <drm/drm_drv.h>
 
+#include "gt/intel_engine.h"
+
 #include "i915_drv.h"
 #include "intel_drv.h"
-#include "intel_ringbuffer.h"
 
 #ifdef __linux__
 #undef TRACE_SYSTEM

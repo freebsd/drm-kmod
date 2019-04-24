@@ -33,7 +33,6 @@
 #include "i915_active.h"
 #include "i915_drv.h"
 #include "i915_globals.h"
-#include "i915_reset.h"
 #include "intel_pm.h"
 
 #ifdef __FreeBSD__

@@ -2,7 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
-.PATH:	${SRCDIR}
+.PATH:	${SRCDIR} ${SRCDIR}/gt
 
 .include "../kconfig.mk"
 
@@ -42,7 +42,6 @@ SRCS=	\
 	i915_pci.c \
 	i915_query.c \
 	i915_request.c \
-	i915_reset.c \
 	i915_scheduler.c \
 	i915_suspend.c \
 	i915_sw_fence.c \
@@ -59,12 +58,10 @@ SRCS=	\
 	intel_atomic_plane.c \
 	intel_audio.c \
 	intel_bios.c \
-	intel_breadcrumbs.c \
 	intel_cdclk.c \
 	intel_color.c \
 	intel_combo_phy.c \
 	intel_connector.c \
-	intel_context.c \
 	intel_crt.c \
 	intel_csr.c \
 	intel_ddi.c \
@@ -81,7 +78,6 @@ SRCS=	\
 	intel_dsi_vbt.c \
 	intel_dvo.c \
 	intel_fbc.c \
-	intel_engine_cs.c \
 	intel_fifo_underrun.c \
 	intel_freebsd.c \
 	intel_frontbuffer.c \
@@ -91,17 +87,14 @@ SRCS=	\
 	intel_guc_fw.c \
 	intel_guc_log.c \
 	intel_guc_submission.c \
-	intel_hangcheck.c \
 	intel_hdcp.c \
 	intel_hdmi.c \
 	intel_hotplug.c \
 	intel_huc.c \
 	intel_huc_fw.c \
 	intel_i2c.c \
-	intel_lrc.c \
 	intel_lspcon.c \
 	intel_lvds.c \
-	intel_mocs.c \
 	intel_opregion.c \
 	intel_overlay.c \
 	intel_panel.c \
@@ -112,21 +105,30 @@ SRCS=	\
 	intel_renderstate_gen7.c \
 	intel_renderstate_gen8.c \
 	intel_renderstate_gen9.c \
-	intel_ringbuffer.c \
 	intel_runtime_pm.c \
 	intel_sdvo.c \
 	intel_sideband.c \
 	intel_sprite.c \
-	intel_sseu.c \
 	intel_tv.c \
 	intel_uc.c \
 	intel_uc_fw.c \
 	intel_uncore.c \
 	intel_vdsc.c \
 	intel_wopcm.c \
-	intel_workarounds.c \
 	vlv_dsi.c \
 	vlv_dsi_pll.c
+
+# gt/*
+SRCS+=	intel_breadcrumbs.c \
+	intel_context.c \
+	intel_engine_cs.c \
+	intel_hangcheck.c \
+	intel_lrc.c \
+	intel_mocs.c \
+	intel_reset.c \
+	intel_ringbuffer.c \
+	intel_sseu.c \
+	intel_workarounds.c
 
 .if !empty(KCONFIG:MDRM_COMPAT)
 SRCS+=	i915_ioc32.c
@@ -158,7 +160,7 @@ CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm
 CFLAGS+= -I${.CURDIR:H}/include/uapi
-CFLAGS+= -I${SRCDIR:H:H}
+CFLAGS+= -I${SRCDIR:H:H} -I${SRCDIR}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=i915_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD} -DLINUXKPI_VERSION=50000

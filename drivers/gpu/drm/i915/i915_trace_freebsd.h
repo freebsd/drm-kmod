@@ -4,7 +4,7 @@
 #include <drm/drmP.h>
 #include "i915_drv.h"
 #include "intel_drv.h"
-#include "intel_ringbuffer.h"
+#include "gt/intel_engine.h"
 
 static inline void
 trace_i915_flip_complete(int plane, struct drm_i915_gem_object *pending_flip_obj)
