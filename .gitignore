@@ -3,10 +3,6 @@
 *.ko.full
 *.ko
 TAGS
-vmwgfx/*.h
-vmwgfx/x86
-vmwgfx/machine
-vmwgfx/export_syms
 amd/amdgpu/*.h
 amd/amdgpu/x86
 amd/amdgpu/machine
@@ -35,3 +31,11 @@ radeon/*.h
 radeon/x86
 radeon/machine
 radeon/export_syms
+ttm/*.h
+ttm/x86
+ttm/machine
+ttm/export_syms
+vmwgfx/*.h
+vmwgfx/x86
+vmwgfx/machine
+vmwgfx/export_syms

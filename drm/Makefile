@@ -2,7 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
-.PATH:	${SRCDIR} ${SRCDIR}/ttm ${SRCDIR}/scheduler
+.PATH:	${SRCDIR} ${SRCDIR}/scheduler
 
 KMOD=	drm
 SRCS=	ati_pcigart.c \
@@ -84,18 +84,7 @@ SRCS=	ati_pcigart.c \
 	drm_writeback.c \
 	linux_fb.c \
 	tainted_linux_fb.c \
-	linux_hdmi.c \
-	ttm_agp_backend.c \
-	ttm_tt.c \
-	ttm_bo_util.c \
-	ttm_bo.c \
-	ttm_bo_manager.c \
-	ttm_execbuf_util.c \
-	ttm_memory.c \
-	ttm_module.c \
-	ttm_page_alloc.c \
-	ttm_page_alloc_dma.c \
-	ttm_bo_vm.c
+	linux_hdmi.c
 
 # Skip for now...
 #	drm_dp_cec.c
@@ -105,15 +94,17 @@ SRCS+=	sched_main.c \
 	sched_fence.c \
 	sched_entity.c
 
+CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
+
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include # fallback to dummy
 CFLAGS+= -I${SRCDIR}
-CFLAGS+= -I${SRCDIR}/ttm
 CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm
 CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H}
+
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 
 CFLAGS+= -include ${SRCDIR}/drm_os_config.h

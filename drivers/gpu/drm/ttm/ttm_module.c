@@ -94,9 +94,17 @@ static void __exit ttm_exit(void)
 	wait_event(exit_q, atomic_read(&device_released) == 1);
 }
 
-module_init_order(ttm_init, SI_ORDER_ANY);
-module_exit_order(ttm_exit, SI_ORDER_ANY);
+#ifdef __linux__
+module_init(ttm_init);
+module_exit(ttm_exit);
 
 MODULE_AUTHOR("Thomas Hellstrom, Jerome Glisse");
 MODULE_DESCRIPTION("TTM memory manager subsystem (for DRM device)");
 MODULE_LICENSE("GPL and additional rights");
+#else
+LKPI_DRIVER_MODULE(ttm, ttm_init, ttm_exit);
+MODULE_VERSION(ttm, 1);
+MODULE_DEPEND(ttm, drmn, 2, 2, 2);
+MODULE_DEPEND(ttm, linuxkpi, 1, 1, 1);
+MODULE_DEPEND(ttm, linuxkpi_gplv2, 1, 1, 1);
+#endif

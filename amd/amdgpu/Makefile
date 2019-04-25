@@ -398,6 +398,8 @@ SRCS+=	amd_powerplay.c \
 	vega20_thermal.c \
 	vegam_smumgr.c
 
+CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
+
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/dummy/include
