@@ -92,9 +92,6 @@ do {								\
 #define	smp_mb__before_atomic_inc()	mb()
 #define	smp_mb__after_atomic_inc()	mb()
 
-#define	lower_32_bits(n)	((u32)(n))
-#define	upper_32_bits(n)	((u32)(((n) >> 16) >> 16))
-
 /* XXXKIB what is the right code for the FreeBSD ? */
 /* kib@ used ENXIO here -- dumbbell@ */
 #define	EREMOTEIO	EIO
