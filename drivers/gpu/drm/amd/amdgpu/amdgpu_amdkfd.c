@@ -366,7 +366,7 @@ void amdgpu_amdkfd_get_local_mem_info(struct kgd_dev *kgd,
 				      struct kfd_local_mem_info *mem_info)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
-#ifdef __linux__
+#if __FreeBSD_version < 1300021
 	uint64_t address_mask = adev->dev->dma_mask ? ~*adev->dev->dma_mask :
 #else
         /* BSDFIXME: Change required by D19845. Sketchy conversion depends
