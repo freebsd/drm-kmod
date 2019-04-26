@@ -6,6 +6,11 @@
 #ifndef IOSF_MBI_SYMS_H
 #define IOSF_MBI_SYMS_H
 
+#ifdef __FreeBSD__
+#include <linux/kconfig.h>	/* For IS_ENABLED */
+#include <linux/kernel.h>	/* For WARN */
+#endif
+
 #include <linux/notifier.h>
 
 #define MBI_MCR_OFFSET		0xD0
