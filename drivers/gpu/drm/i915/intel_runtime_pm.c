@@ -1200,7 +1200,6 @@ static void vlv_set_power_well(struct drm_i915_private *dev_priv,
 	state = enable ? PUNIT_PWRGT_PWR_ON(pw_idx) :
 			 PUNIT_PWRGT_PWR_GATE(pw_idx);
 
-	mutex_lock(&dev_priv->pcu_lock);
 	vlv_punit_get(dev_priv);
 
 #define COND \
@@ -1223,7 +1222,6 @@ static void vlv_set_power_well(struct drm_i915_private *dev_priv,
 
 out:
 	vlv_punit_put(dev_priv);
-	mutex_unlock(&dev_priv->pcu_lock);
 }
 
 static void vlv_power_well_enable(struct drm_i915_private *dev_priv,
@@ -1250,7 +1248,6 @@ static bool vlv_power_well_enabled(struct drm_i915_private *dev_priv,
 	mask = PUNIT_PWRGT_MASK(pw_idx);
 	ctrl = PUNIT_PWRGT_PWR_ON(pw_idx);
 
-	mutex_lock(&dev_priv->pcu_lock);
 	vlv_punit_get(dev_priv);
 
 	state = vlv_punit_read(dev_priv, PUNIT_REG_PWRGT_STATUS) & mask;
@@ -1271,7 +1268,6 @@ static bool vlv_power_well_enabled(struct drm_i915_private *dev_priv,
 	WARN_ON(ctrl != state);
 
 	vlv_punit_put(dev_priv);
-	mutex_unlock(&dev_priv->pcu_lock);
 
 	return enabled;
 }
@@ -1760,7 +1756,6 @@ static bool chv_pipe_power_well_enabled(struct drm_i915_private *dev_priv,
 	bool enabled;
 	u32 state, ctrl;
 
-	mutex_lock(&dev_priv->pcu_lock);
 	vlv_punit_get(dev_priv);
 
 	state = vlv_punit_read(dev_priv, PUNIT_REG_DSPSSPM) & DP_SSS_MASK(pipe);
@@ -1779,7 +1774,6 @@ static bool chv_pipe_power_well_enabled(struct drm_i915_private *dev_priv,
 	WARN_ON(ctrl << 16 != state);
 
 	vlv_punit_put(dev_priv);
-	mutex_unlock(&dev_priv->pcu_lock);
 
 	return enabled;
 }
@@ -1794,7 +1788,6 @@ static void chv_set_pipe_power_well(struct drm_i915_private *dev_priv,
 
 	state = enable ? DP_SSS_PWR_ON(pipe) : DP_SSS_PWR_GATE(pipe);
 
-	mutex_lock(&dev_priv->pcu_lock);
 	vlv_punit_get(dev_priv);
 
 #define COND \
@@ -1817,7 +1810,6 @@ static void chv_set_pipe_power_well(struct drm_i915_private *dev_priv,
 
 out:
 	vlv_punit_put(dev_priv);
-	mutex_unlock(&dev_priv->pcu_lock);
 }
 
 static void chv_pipe_power_well_enable(struct drm_i915_private *dev_priv,
@@ -4011,11 +4003,9 @@ static bool vlv_punit_is_power_gated(struct drm_i915_private *dev_priv, u32 reg0
 {
 	bool ret;
 
-	mutex_lock(&dev_priv->pcu_lock);
 	vlv_punit_get(dev_priv);
 	ret = (vlv_punit_read(dev_priv, reg0) & SSPM0_SSC_MASK) == SSPM0_SSC_PWR_GATE;
 	vlv_punit_put(dev_priv);
-	mutex_unlock(&dev_priv->pcu_lock);
 
 	return ret;
 }
