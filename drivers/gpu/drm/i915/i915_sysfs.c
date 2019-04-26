@@ -29,7 +29,9 @@
 #include <linux/module.h>
 #include <linux/stat.h>
 #include <linux/sysfs.h>
+
 #include "intel_drv.h"
+#include "intel_sideband.h"
 #include "i915_drv.h"
 
 #ifdef __FreeBSD__

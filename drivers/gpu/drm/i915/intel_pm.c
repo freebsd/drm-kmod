@@ -41,7 +41,9 @@
 #ifdef __FreeBSD__
 #include <machine/clock.h>
 #include <asm/atomic.h>
-#else
+#endif
+#include "intel_sideband.h"
+#ifdef __linux__
 #include "../../../platform/x86/intel_ips.h"
 #endif
 
