@@ -444,7 +444,6 @@ struct smu_power_gate {
 	bool vce_gated;
 };
 
-
 struct smu_power_context {
 	void *power_context;
 	uint32_t power_context_size;
