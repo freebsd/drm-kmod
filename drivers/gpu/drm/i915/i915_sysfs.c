@@ -30,9 +30,10 @@
 #include <linux/stat.h>
 #include <linux/sysfs.h>
 
-#include "intel_drv.h"
-#include "intel_sideband.h"
 #include "i915_drv.h"
+#include "intel_drv.h"
+#include "intel_pm.h"
+#include "intel_sideband.h"
 
 #ifdef __FreeBSD__
 /* TODO: Move to base (when refactoring sysfs.h to sysfs.c) */
