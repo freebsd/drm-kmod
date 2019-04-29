@@ -36,8 +36,9 @@
 
 #include <drm/drm_print.h>
 
-#include "i915_gpu_error.h"
 #include "i915_drv.h"
+#include "i915_gpu_error.h"
+#include "intel_overlay.h"
 
 #ifdef __FreeBSD__
 #include <linux/sizes.h>	/* Needed for SZ_64K */
