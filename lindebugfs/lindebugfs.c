@@ -107,10 +107,17 @@ debugfs_fill(PFS_FILL_ARGS)
 	}
 	sf = lf.private_data;
 	sf->buf = sb;
-	if (uio->uio_rw == UIO_READ)
-		rc = d->dm_fops->read(&lf, NULL, len, &off);
-	else
-		rc = d->dm_fops->write(&lf, buf, len, &off);
+	if (uio->uio_rw == UIO_READ) {
+		if (d->dm_fops->read)
+			rc = d->dm_fops->read(&lf, NULL, len, &off);
+		else
+			rc = ENODEV;
+	} else {
+		if (d->dm_fops->write)
+			rc = d->dm_fops->write(&lf, buf, len, &off);
+		else
+			rc = ENODEV;
+	}
 	if (d->dm_fops->release)
 		d->dm_fops->release(&vn, &lf);
 	else

@@ -239,6 +239,7 @@ static int obj_rank_by_stolen(const void *A, const void *B)
 
 static int i915_gem_stolen_list_info(struct seq_file *m, void *data)
 {
+	return 0;
 	struct drm_i915_private *dev_priv = node_to_i915(m->private);
 	struct drm_device *dev = &dev_priv->drm;
 	struct drm_i915_gem_object **objects;
@@ -944,6 +945,7 @@ static int i915_gem_fence_regs_info(struct seq_file *m, void *data)
 }
 
 #if IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR)
+#ifdef __linux__
 static ssize_t gpu_state_read(struct file *file, char __user *ubuf,
 			      size_t count, loff_t *pos)
 {
@@ -1040,7 +1042,118 @@ static const struct file_operations i915_error_state_fops = {
 	.llseek = default_llseek,
 	.release = gpu_state_release,
 };
-#endif
+
+#else /* !__linux__*/
+
+static int gpu_state_read(struct seq_file *m, void *unused)
+{
+	struct i915_gpu_state *gpu;
+	char *buf;
+	int ret;
+	size_t count = 4*PAGE_SIZE; /* size? */
+	loff_t pos = 0;
+
+	gpu = m->private;
+	if (!gpu)
+		return -ENOENT;
+
+	/* Bounce buffer required because of kernfs __user API convenience. */
+	buf = kzalloc(count, GFP_KERNEL);
+	if (!buf)
+		return -ENOMEM;
+
+	ret = i915_gpu_state_copy_to_buffer(gpu, buf, pos, count);
+	if (ret <= 0)
+		goto out;
+
+	(void)sbuf_printf(m->buf, "%s\n", buf);
+
+out:
+	kfree(buf);
+	return 0;
+}
+
+static int i915_gpu_info_open(struct inode *inode, struct file *file)
+{
+	struct drm_i915_private *i915;
+	struct i915_gpu_state *gpu;
+
+	i915 = inode->i_private;
+	intel_runtime_pm_get(i915);
+	gpu = i915_capture_gpu_state(i915);
+	intel_runtime_pm_put(i915);
+	if (IS_ERR(gpu))
+		return PTR_ERR(gpu);
+
+	return single_open(file, gpu_state_read, gpu);
+}
+
+static int i915_error_state_open(struct inode *inode, struct file *file)
+{
+	struct drm_i915_private *i915;
+	struct i915_gpu_state *error;
+
+	i915 = inode->i_private;
+	error = i915_first_error_state(i915);
+	if (IS_ERR(error))
+		return PTR_ERR(error);
+
+	return single_open(file, gpu_state_read, error);
+}
+
+static ssize_t
+i915_error_state_write(struct file *filp,
+		       const char __user *ubuf,
+		       size_t cnt,
+		       loff_t *ppos)
+{
+	struct seq_file *sf;
+	struct i915_gpu_state *error;
+
+	sf = filp->private_data;
+	error = sf->private;
+	if (!error)
+		return 0;
+
+	DRM_DEBUG_DRIVER("Resetting error state\n");
+	i915_reset_error_state(error->i915);
+
+	return cnt;
+}
+
+static int i915_gpu_state_release(struct inode *inode, struct file *file)
+{
+	struct seq_file *sf;
+	struct i915_gpu_state *error;
+
+	sf = file->private_data;
+	error = sf->private;
+
+	/* BSDFIXME: Leak memory for now otherwise we'll panic */
+	/* i915_gpu_state_put(error); */
+
+	return single_release(inode, file);
+}
+
+static const struct file_operations i915_gpu_info_fops = {
+	.owner = THIS_MODULE,
+	.open = i915_gpu_info_open,
+	.read = seq_read,
+	.llseek = seq_lseek,
+	.release = i915_gpu_state_release,
+};
+
+static const struct file_operations i915_error_state_fops = {
+	.owner = THIS_MODULE,
+	.open = i915_error_state_open,
+	.read = seq_read,
+	.write = i915_error_state_write,
+	.llseek = seq_lseek,
+	.release = i915_gpu_state_release,
+};
+
+#endif /* !__linux__ */
+#endif /* !IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR) */
 
 static int
 i915_next_seqno_set(void *data, u64 val)
@@ -4586,6 +4699,7 @@ static int i915_sseu_status(struct seq_file *m, void *unused)
 	return 0;
 }
 
+#ifdef __linux__
 static int i915_forcewake_open(struct inode *inode, struct file *file)
 {
 	struct drm_i915_private *i915 = inode->i_private;
@@ -4617,6 +4731,51 @@ static const struct file_operations i915_forcewake_fops = {
 	.open = i915_forcewake_open,
 	.release = i915_forcewake_release,
 };
+
+#else /* !__linux__ */
+
+/* debugfs can't handle empty file->private_data so let's
+ * use the standard seq_file entry here. */
+
+static int i915_forcewake_show(struct seq_file *m, void *data)
+{
+	/* NOP */
+
+	return 0;
+}
+
+static int i915_forcewake_open(struct inode *inode, struct file *file)
+{
+	struct drm_i915_private *i915 = inode->i_private;
+
+	if (INTEL_GEN(i915) < 6)
+		return -ENODEV;
+
+	intel_runtime_pm_get(i915);
+	intel_uncore_forcewake_user_get(i915);
+
+	return single_open(file, i915_forcewake_show, inode->i_private);
+}
+
+static int i915_forcewake_release(struct inode *inode, struct file *file)
+{
+	struct drm_i915_private *i915 = inode->i_private;
+
+	if (INTEL_GEN(i915) < 6)
+		return -ENODEV;
+
+	intel_uncore_forcewake_user_put(i915);
+	intel_runtime_pm_put(i915);
+
+	return single_release(inode, file);
+}
+
+static const struct file_operations i915_forcewake_fops = {
+	.owner = THIS_MODULE,
+	.open = i915_forcewake_open,
+	.release = i915_forcewake_release,
+};
+#endif
 
 static int i915_hpd_storm_ctl_show(struct seq_file *m, void *data)
 {
@@ -4843,6 +5002,8 @@ out:
 
 DEFINE_SIMPLE_ATTRIBUTE(i915_drrs_ctl_fops, NULL, i915_drrs_ctl_set, "%llu\n");
 
+#ifdef __linux__
+/* BSDFIXME: Needs work (crashing) */
 static ssize_t
 i915_fifo_underrun_reset_write(struct file *filp,
 			       const char __user *ubuf,
@@ -4903,6 +5064,7 @@ static const struct file_operations i915_fifo_underrun_reset_ops = {
 	.write = i915_fifo_underrun_reset_write,
 	.llseek = default_llseek,
 };
+#endif
 
 static const struct drm_info_list i915_debugfs_list[] = {
 	{"i915_capabilities", i915_capabilities, 0},
@@ -4968,7 +5130,10 @@ static const struct i915_debugfs_files {
 	{"i915_error_state", &i915_error_state_fops},
 	{"i915_gpu_info", &i915_gpu_info_fops},
 #endif
+#ifdef __linux__
+/* BSDFIXME: Needs work (crashing) */
 	{"i915_fifo_underrun_reset", &i915_fifo_underrun_reset_ops},
+#endif
 	{"i915_next_seqno", &i915_next_seqno_fops},
 	{"i915_pri_wm_latency", &i915_pri_wm_latency_fops},
 	{"i915_spr_wm_latency", &i915_spr_wm_latency_fops},
