@@ -889,6 +889,7 @@ static int i915_gem_fence_regs_info(struct seq_file *m, void *data)
 }
 
 #if IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR)
+#ifdef __linux__
 static ssize_t gpu_state_read(struct file *file, char __user *ubuf,
 			      size_t count, loff_t *pos)
 {
@@ -979,7 +980,115 @@ static const struct file_operations i915_error_state_fops = {
 	.llseek = default_llseek,
 	.release = gpu_state_release,
 };
-#endif
+
+#else /* !__linux__*/
+
+static int gpu_state_read(struct seq_file *m, void *unused)
+{
+	struct i915_gpu_state *gpu;
+	struct drm_i915_error_state_buf str;
+	int ret;
+	size_t count = PAGE_SIZE; /* size? */
+	loff_t pos = 0;
+
+	gpu = m->private;
+	if (!gpu)
+		return -ENOENT;
+
+	ret = i915_error_state_buf_init(&str, gpu->i915, count, pos);
+	if (ret)
+		return ret;
+
+	ret = i915_error_state_to_str(&str, gpu);
+	if (ret)
+		goto out;
+
+	(void)sbuf_printf(m->buf, "%s\n", str.buf);
+
+out:
+	i915_error_state_buf_release(&str);
+	return 0;
+}
+
+static int i915_gpu_info_open(struct inode *inode, struct file *file)
+{
+	struct drm_i915_private *i915;
+	struct i915_gpu_state *gpu;
+
+	i915 = inode->i_private;
+	intel_runtime_pm_get(i915);
+	gpu = i915_capture_gpu_state(i915);
+	intel_runtime_pm_put(i915);
+	if (!gpu)
+		return -ENOMEM;
+
+	return single_open(file, gpu_state_read, gpu);
+}
+
+static int i915_error_state_open(struct inode *inode, struct file *file)
+{
+	struct drm_i915_private *i915;
+	struct i915_gpu_state *error;
+
+	i915 = inode->i_private;
+	error = i915_first_error_state(inode->i_private);
+	if (!error)
+		return -ENOENT;
+
+	return single_open(file, gpu_state_read, error);
+}
+
+static ssize_t
+i915_error_state_write(struct file *filp,
+		       const char __user *ubuf,
+		       size_t cnt,
+		       loff_t *ppos)
+{
+	struct seq_file *sf;
+	struct i915_gpu_state *error;
+
+	sf = filp->private_data;
+	error = sf->private;
+	if (!error)
+		return 0;
+
+	DRM_DEBUG_DRIVER("Resetting error state\n");
+	i915_reset_error_state(error->i915);
+
+	return cnt;
+}
+
+static int i915_gpu_state_release(struct inode *inode, struct file *file)
+{
+	struct seq_file *sf;
+	struct i915_gpu_state *error;
+
+	sf = file->private_data;
+	error = sf->private;
+	i915_gpu_state_put(error);
+
+	return single_release(inode, file);
+}
+
+static const struct file_operations i915_gpu_info_fops = {
+	.owner = THIS_MODULE,
+	.open = i915_gpu_info_open,
+	.read = seq_read,
+	.llseek = seq_lseek,
+	.release = i915_gpu_state_release,
+};
+
+static const struct file_operations i915_error_state_fops = {
+	.owner = THIS_MODULE,
+	.open = i915_error_state_open,
+	.read = seq_read,
+	.write = i915_error_state_write,
+	.llseek = seq_lseek,
+	.release = i915_gpu_state_release,
+};
+
+#endif /* !__linux__ */
+#endif /* !IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR) */
 
 static int
 i915_next_seqno_set(void *data, u64 val)
@@ -4521,6 +4630,7 @@ static int i915_sseu_status(struct seq_file *m, void *unused)
 	return 0;
 }
 
+#ifdef __linux__
 static int i915_forcewake_open(struct inode *inode, struct file *file)
 {
 	struct drm_i915_private *i915 = inode->i_private;
@@ -4552,6 +4662,53 @@ static const struct file_operations i915_forcewake_fops = {
 	.open = i915_forcewake_open,
 	.release = i915_forcewake_release,
 };
+
+#else /* !__linux__ */
+
+/* debugfs can't handle empty file->private_data so let's
+ * use the standard seq_file entry here. */
+
+static int i915_forcewake_show(struct seq_file *m, void *data)
+{
+	/* NOP */
+
+	return 0;
+}
+
+static int i915_forcewake_open(struct inode *inode, struct file *file)
+{
+	struct drm_i915_private *i915 = inode->i_private;
+
+	if (INTEL_GEN(i915) < 6)
+		return -ENODEV;
+
+	intel_runtime_pm_get(i915);
+	intel_uncore_forcewake_user_get(i915);
+
+	return single_open(file, i915_forcewake_show, inode->i_private);
+}
+
+static int i915_forcewake_release(struct inode *inode, struct file *file)
+{
+	struct drm_i915_private *i915 = inode->i_private;
+
+	if (INTEL_GEN(i915) < 6)
+		return -ENODEV;
+
+	intel_uncore_forcewake_user_put(i915);
+	intel_runtime_pm_put(i915);
+
+	return single_release(inode, file);
+}
+
+static const struct file_operations i915_forcewake_fops = {
+	.owner = THIS_MODULE,
+	.open = i915_forcewake_open,
+	.read = seq_read,
+	.llseek = seq_lseek,
+	.release = i915_forcewake_release,
+};
+#endif
 
 static int i915_hpd_storm_ctl_show(struct seq_file *m, void *data)
 {
