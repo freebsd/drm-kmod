@@ -988,7 +988,11 @@ static int gpu_state_read(struct seq_file *m, void *unused)
 	struct i915_gpu_state *gpu;
 	struct drm_i915_error_state_buf str;
 	int ret;
-	size_t count = PAGE_SIZE; /* size? */
+	/*
+	 * i915_gpu_info is around 60 KB
+	 * i915_error_state size?
+	 */
+	size_t count = 25*PAGE_SIZE; /* 100 KB should suffice */
 	loff_t pos = 0;
 
 	gpu = m->private;
