@@ -840,6 +840,12 @@ emit_semaphore_wait(struct i915_request *to,
 	if (err < 0)
 		return err;
 
+	err = i915_sw_fence_await_dma_fence(&to->semaphore,
+					    &from->fence, 0,
+					    I915_FENCE_GFP);
+	if (err < 0)
+		return err;
+
 	/* We need to pin the signaler's HWSP until we are finished reading. */
 	err = i915_timeline_read_hwsp(from, to, &hwsp_offset);
 	if (err)
