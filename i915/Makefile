@@ -82,6 +82,7 @@ SRCS=	\
 	intel_fifo_underrun.c \
 	intel_freebsd.c \
 	intel_frontbuffer.c \
+	intel_gmbus.c \
 	intel_guc.c \
 	intel_guc_ads.c \
 	intel_guc_ct.c \
@@ -93,7 +94,6 @@ SRCS=	\
 	intel_hotplug.c \
 	intel_huc.c \
 	intel_huc_fw.c \
-	intel_i2c.c \
 	intel_lspcon.c \
 	intel_lvds.c \
 	intel_opregion.c \
