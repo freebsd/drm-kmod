@@ -61,11 +61,12 @@
  */
 
 #include <linux/acpi.h>
+#include <linux/delay.h>
 #include <linux/device.h>
 #include <linux/irq.h>
 #include <linux/pci.h>
-#include <linux/pm_runtime.h>
 #include <linux/platform_device.h>
+#include <linux/pm_runtime.h>
 
 #ifdef __FreeBSD__
 #include <linux/platform_device.h>
@@ -76,9 +77,10 @@
 
 #endif
 
-#include "i915_drv.h"
-#include <linux/delay.h>
 #include <drm/intel_lpe_audio.h>
+
+#include "i915_drv.h"
+#include "intel_lpe_audio.h"
 
 #define HAS_LPE_AUDIO(dev_priv) ((dev_priv)->lpe_audio.platdev != NULL)
 
