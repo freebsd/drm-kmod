@@ -116,6 +116,22 @@ __dma_fence_signal__notify(struct dma_fence *fence)
 	INIT_LIST_HEAD(&fence->cb_list);
 }
 
+__maybe_unused static bool
+check_signal_order(struct intel_context *ce, struct i915_request *rq)
+{
+	if (!list_is_last(&rq->signal_link, &ce->signals) &&
+	    i915_seqno_passed(rq->fence.seqno,
+			      list_next_entry(rq, signal_link)->fence.seqno))
+		return false;
+
+	if (!list_is_first(&rq->signal_link, &ce->signals) &&
+	    i915_seqno_passed(list_prev_entry(rq, signal_link)->fence.seqno,
+			      rq->fence.seqno))
+		return false;
+
+	return true;
+}
+
 void intel_engine_breadcrumbs_irq(struct intel_engine_cs *engine)
 {
 	struct intel_breadcrumbs *b = &engine->breadcrumbs;
@@ -135,6 +151,8 @@ void intel_engine_breadcrumbs_irq(struct intel_engine_cs *engine)
 		list_for_each_safe(pos, next, &ce->signals) {
 			struct i915_request *rq =
 				list_entry(pos, typeof(*rq), signal_link);
+
+			GEM_BUG_ON(!check_signal_order(ce, rq));
 
 			if (!__request_completed(rq))
 				break;
@@ -318,6 +336,7 @@ bool i915_request_enable_breadcrumb(struct i915_request *rq)
 		list_add(&rq->signal_link, pos);
 		if (pos == &ce->signals) /* catch transitions from empty list */
 			list_move_tail(&ce->signal_link, &b->signalers);
+		GEM_BUG_ON(!check_signal_order(ce, rq));
 
 		set_bit(I915_FENCE_FLAG_SIGNAL, &rq->fence.flags);
 		spin_unlock(&b->irq_lock);
