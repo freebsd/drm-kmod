@@ -1094,6 +1094,13 @@ bool intel_engine_is_idle(struct intel_engine_cs *engine)
 	if (READ_ONCE(engine->execlists.active)) {
 		struct tasklet_struct *t = &engine->execlists.tasklet;
 
+#ifdef __linux__
+		synchronize_hardirq(engine->i915->drm.irq);
+#elif defined(__FreeBSD__)
+		/* BSDFIXME: Is it enough to wait that all cpu have context-switched ? */
+		synchronize_rcu();
+#endif
+
 		local_bh_disable();
 		if (tasklet_trylock(t)) {
 			/* Must wait for any GPU reset in progress. */

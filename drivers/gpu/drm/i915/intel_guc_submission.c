@@ -24,6 +24,7 @@
 
 #include <linux/circ_buf.h>
 
+#include "gt/intel_engine_pm.h"
 #include "gt/intel_lrc_reg.h"
 
 #include "intel_guc_submission.h"
@@ -1364,6 +1365,7 @@ static void guc_interrupts_release(struct drm_i915_private *dev_priv)
 
 static void guc_submission_park(struct intel_engine_cs *engine)
 {
+	intel_engine_park(engine);
 	intel_engine_unpin_breadcrumbs_irq(engine);
 	engine->flags &= ~I915_ENGINE_NEEDS_BREADCRUMB_TASKLET;
 }

@@ -136,6 +136,7 @@
 #include "i915_drv.h"
 #include "i915_gem_render_state.h"
 #include "i915_vgpu.h"
+#include "intel_engine_pm.h"
 #include "intel_lrc_reg.h"
 #include "intel_mocs.h"
 #include "intel_reset.h"
@@ -2339,6 +2340,11 @@ static int gen8_init_rcs_context(struct i915_request *rq)
 	return i915_gem_render_state_emit(rq);
 }
 
+static void execlists_park(struct intel_engine_cs *engine)
+{
+	intel_engine_park(engine);
+}
+
 void intel_execlists_set_default_submission(struct intel_engine_cs *engine)
 {
 	engine->submit_request = execlists_submit_request;
@@ -2350,7 +2356,7 @@ void intel_execlists_set_default_submission(struct intel_engine_cs *engine)
 	engine->reset.reset = execlists_reset;
 	engine->reset.finish = execlists_reset_finish;
 
-	engine->park = NULL;
+	engine->park = execlists_park;
 	engine->unpark = NULL;
 
 	engine->flags |= I915_ENGINE_SUPPORTS_STATS;
@@ -2363,17 +2369,6 @@ void intel_execlists_set_default_submission(struct intel_engine_cs *engine)
 
 static void execlists_destroy(struct intel_engine_cs *engine)
 {
-	/*
-	 * Tasklet cannot be active at this point due intel_mark_active/idle
-	 * so this is just for documentation.
-	 */
-#ifdef __linux__
-	/* BSD: Let's just wait until it finished executing */
-	if (GEM_DEBUG_WARN_ON(test_bit(TASKLET_STATE_SCHED,
-				       &engine->execlists.tasklet.state)))
-#endif
-		tasklet_kill(&engine->execlists.tasklet);
-
 	intel_engine_cleanup_common(engine);
 	lrc_destroy_wa_ctx(engine);
 	kfree(engine);
