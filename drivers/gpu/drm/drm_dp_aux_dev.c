@@ -27,17 +27,19 @@
 
 #include <linux/device.h>
 #include <linux/fs.h>
-#include <linux/slab.h>
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/sched/signal.h>
+#include <linux/slab.h>
 #include <linux/uaccess.h>
 #ifdef __linux__
 #include <linux/uio.h>
 #endif
-#include <drm/drm_dp_helper.h>
+
 #include <drm/drm_crtc.h>
-#include <drm/drmP.h>
+#include <drm/drm_dp_helper.h>
+#include <drm/drm_print.h>
 
 #include "drm_crtc_helper_internal.h"
 
