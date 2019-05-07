@@ -93,6 +93,9 @@ struct amdgpu_ras {
 	struct dentry *ent;
 	/* sysfs */
 	struct device_attribute features_attr;
+#ifdef __linux__
+	struct bin_attribute badpages_attr;
+#endif
 	/* block array */
 	struct ras_manager *objs;
 
