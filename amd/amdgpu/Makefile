@@ -24,6 +24,12 @@ _dml=	${SRCDIR}/display/dc/dml
 	${SRCDIR}/display/dc/bios/dce80 \
 	${SRCDIR}/display/dc/calcs \
 	${SRCDIR}/display/dc/core \
+	${SRCDIR}/display/dc/clk_mgr \
+	${SRCDIR}/display/dc/clk_mgr/dce100 \
+	${SRCDIR}/display/dc/clk_mgr/dce110 \
+	${SRCDIR}/display/dc/clk_mgr/dce112 \
+	${SRCDIR}/display/dc/clk_mgr/dce120 \
+	${SRCDIR}/display/dc/clk_mgr/dcn10 \
 	${SRCDIR}/display/dc/dce \
 	${SRCDIR}/display/dc/dce100 \
 	${SRCDIR}/display/dc/dce110 \
@@ -255,10 +261,6 @@ SRCS+=	dc_debug.c \
 SRCS+=	dce_abm.c \
 	dce_audio.c \
 	dce_aux.c \
-	dce_clk_mgr.c \
-	dce110_clk_mgr.c \
-	dce112_clk_mgr.c \
-	dce120_clk_mgr.c \
 	dce_clock_source.c \
 	dce_dmcu.c \
 	dce_hwseq.c \
@@ -304,13 +306,19 @@ SRCS+=	dce80_hw_sequencer.c \
 	dce80_resource.c \
 	dce80_timing_generator.c
 
+# display/dc/clk_mgr
+SRCS+=	clk_mgr.c \
+	dce_clk_mgr.c \
+	dce110_clk_mgr.c \
+	dce112_clk_mgr.c \
+	dce120_clk_mgr.c \
+	rv1_clk_mgr.c \
+	rv1_clk_mgr_vbios_smu.c \
+	rv2_clk_mgr.c
+
 # display/dc/dcn10
 .if ${MACHINE_CPUARCH} == "amd64"
-SRCS+=	clk_mgr.c \
-	rv1_clk_mgr_vbios_smu.c \
-	rv1_clk_mgr.c \
-	rv2_clk_mgr.c \
-	dcn10_cm_common.c \
+SRCS+=	dcn10_cm_common.c \
 	dcn10_dpp.c \
 	dcn10_dpp_cm.c \
 	dcn10_dpp_dscl.c \
@@ -458,6 +466,7 @@ CFLAGS+= -I${SRCDIR}/amdgpu
 CFLAGS+= -I${SRCDIR}/display
 CFLAGS+= -I${SRCDIR}/display/amdgpu_dm
 CFLAGS+= -I${SRCDIR}/display/dc
+CFLAGS+= -I${SRCDIR}/display/dc/clk_mgr/
 CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
 CFLAGS+= -I${SRCDIR}/display/include
