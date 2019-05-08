@@ -23,6 +23,7 @@
 
 EXPORT_TRACEPOINT_SYMBOL(dma_fence_emit);
 EXPORT_TRACEPOINT_SYMBOL(dma_fence_enable_signal);
+EXPORT_TRACEPOINT_SYMBOL(dma_fence_signaled);
 #elif defined(__FreeBSD__)
 #include <linux/lockdep.h>	/* For lockded_assert_hold (manu 20200511) */
 #define trace_dma_fence_init(x)
@@ -33,6 +34,9 @@ EXPORT_TRACEPOINT_SYMBOL(dma_fence_enable_signal);
 #define trace_dma_fence_wait_end(x)
 #endif
 
+static DEFINE_SPINLOCK(dma_fence_stub_lock);
+static struct dma_fence dma_fence_stub;
+
 /*
  * fence context counter: each execution context should have its own
  * fence context, this allows checking if fences belong to the same
@@ -41,8 +45,6 @@ EXPORT_TRACEPOINT_SYMBOL(dma_fence_enable_signal);
  */
 static atomic64_t dma_fence_context_counter = ATOMIC64_INIT(1);
 
-static DEFINE_SPINLOCK(dma_fence_stub_lock);
-static struct dma_fence dma_fence_stub;
 /**
  * DOC: DMA fences overview
  *

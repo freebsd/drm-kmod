@@ -87,6 +87,22 @@ static inline bool __request_completed(const struct i915_request *rq)
 	return i915_seqno_passed(__hwsp_seqno(rq), rq->fence.seqno);
 }
 
+__maybe_unused static bool
+check_signal_order(struct intel_context *ce, struct i915_request *rq)
+{
+	if (!list_is_last(&rq->signal_link, &ce->signals) &&
+	    i915_seqno_passed(rq->fence.seqno,
+			      list_next_entry(rq, signal_link)->fence.seqno))
+		return false;
+
+	if (!list_is_first(&rq->signal_link, &ce->signals) &&
+	    i915_seqno_passed(list_prev_entry(rq, signal_link)->fence.seqno,
+			      rq->fence.seqno))
+		return false;
+
+	return true;
+}
+
 static bool
 __dma_fence_signal(struct dma_fence *fence)
 {
@@ -114,22 +130,6 @@ __dma_fence_signal__notify(struct dma_fence *fence)
 		cur->func(fence, cur);
 	}
 	INIT_LIST_HEAD(&fence->cb_list);
-}
-
-__maybe_unused static bool
-check_signal_order(struct intel_context *ce, struct i915_request *rq)
-{
-	if (!list_is_last(&rq->signal_link, &ce->signals) &&
-	    i915_seqno_passed(rq->fence.seqno,
-			      list_next_entry(rq, signal_link)->fence.seqno))
-		return false;
-
-	if (!list_is_first(&rq->signal_link, &ce->signals) &&
-	    i915_seqno_passed(list_prev_entry(rq, signal_link)->fence.seqno,
-			      rq->fence.seqno))
-		return false;
-
-	return true;
 }
 
 void intel_engine_breadcrumbs_irq(struct intel_engine_cs *engine)
