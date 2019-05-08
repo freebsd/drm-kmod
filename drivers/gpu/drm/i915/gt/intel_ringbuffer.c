@@ -313,11 +313,6 @@ static u32 *gen6_rcs_emit_breadcrumb(struct i915_request *rq, u32 *cs)
 	*cs++ = rq->timeline->hwsp_offset | PIPE_CONTROL_GLOBAL_GTT;
 	*cs++ = rq->fence.seqno;
 
-	*cs++ = GFX_OP_PIPE_CONTROL(4);
-	*cs++ = PIPE_CONTROL_QW_WRITE | PIPE_CONTROL_STORE_DATA_INDEX;
-	*cs++ = I915_GEM_HWS_HANGCHECK_ADDR | PIPE_CONTROL_GLOBAL_GTT;
-	*cs++ = intel_engine_next_hangcheck_seqno(rq->engine);
-
 	*cs++ = MI_USER_INTERRUPT;
 	*cs++ = MI_NOOP;
 
@@ -419,13 +414,6 @@ static u32 *gen7_rcs_emit_breadcrumb(struct i915_request *rq, u32 *cs)
 	*cs++ = rq->timeline->hwsp_offset;
 	*cs++ = rq->fence.seqno;
 
-	*cs++ = GFX_OP_PIPE_CONTROL(4);
-	*cs++ = (PIPE_CONTROL_QW_WRITE |
-		 PIPE_CONTROL_STORE_DATA_INDEX |
-		 PIPE_CONTROL_GLOBAL_GTT_IVB);
-	*cs++ = I915_GEM_HWS_HANGCHECK_ADDR;
-	*cs++ = intel_engine_next_hangcheck_seqno(rq->engine);
-
 	*cs++ = MI_USER_INTERRUPT;
 	*cs++ = MI_NOOP;
 
@@ -444,12 +432,7 @@ static u32 *gen6_xcs_emit_breadcrumb(struct i915_request *rq, u32 *cs)
 	*cs++ = I915_GEM_HWS_SEQNO_ADDR | MI_FLUSH_DW_USE_GTT;
 	*cs++ = rq->fence.seqno;
 
-	*cs++ = MI_FLUSH_DW | MI_FLUSH_DW_OP_STOREDW | MI_FLUSH_DW_STORE_INDEX;
-	*cs++ = I915_GEM_HWS_HANGCHECK_ADDR | MI_FLUSH_DW_USE_GTT;
-	*cs++ = intel_engine_next_hangcheck_seqno(rq->engine);
-
 	*cs++ = MI_USER_INTERRUPT;
-	*cs++ = MI_NOOP;
 
 	rq->tail = intel_ring_offset(rq, cs);
 	assert_ring_tail_valid(rq->ring, rq->tail);
@@ -469,10 +452,6 @@ static u32 *gen7_xcs_emit_breadcrumb(struct i915_request *rq, u32 *cs)
 	*cs++ = I915_GEM_HWS_SEQNO_ADDR | MI_FLUSH_DW_USE_GTT;
 	*cs++ = rq->fence.seqno;
 
-	*cs++ = MI_FLUSH_DW | MI_FLUSH_DW_OP_STOREDW | MI_FLUSH_DW_STORE_INDEX;
-	*cs++ = I915_GEM_HWS_HANGCHECK_ADDR | MI_FLUSH_DW_USE_GTT;
-	*cs++ = intel_engine_next_hangcheck_seqno(rq->engine);
-
 	for (i = 0; i < GEN7_XCS_WA; i++) {
 		*cs++ = MI_STORE_DWORD_INDEX;
 		*cs++ = I915_GEM_HWS_SEQNO_ADDR;
@@ -484,6 +463,7 @@ static u32 *gen7_xcs_emit_breadcrumb(struct i915_request *rq, u32 *cs)
 	*cs++ = 0;
 
 	*cs++ = MI_USER_INTERRUPT;
+	*cs++ = MI_NOOP;
 
 	rq->tail = intel_ring_offset(rq, cs);
 	assert_ring_tail_valid(rq->ring, rq->tail);
@@ -932,11 +912,8 @@ static u32 *i9xx_emit_breadcrumb(struct i915_request *rq, u32 *cs)
 	*cs++ = I915_GEM_HWS_SEQNO_ADDR;
 	*cs++ = rq->fence.seqno;
 
-	*cs++ = MI_STORE_DWORD_INDEX;
-	*cs++ = I915_GEM_HWS_HANGCHECK_ADDR;
-	*cs++ = intel_engine_next_hangcheck_seqno(rq->engine);
-
 	*cs++ = MI_USER_INTERRUPT;
+	*cs++ = MI_NOOP;
 
 	rq->tail = intel_ring_offset(rq, cs);
 	assert_ring_tail_valid(rq->ring, rq->tail);
@@ -954,10 +931,6 @@ static u32 *gen5_emit_breadcrumb(struct i915_request *rq, u32 *cs)
 
 	*cs++ = MI_FLUSH;
 
-	*cs++ = MI_STORE_DWORD_INDEX;
-	*cs++ = I915_GEM_HWS_HANGCHECK_ADDR;
-	*cs++ = intel_engine_next_hangcheck_seqno(rq->engine);
-
 	BUILD_BUG_ON(GEN5_WA_STORES < 1);
 	for (i = 0; i < GEN5_WA_STORES; i++) {
 		*cs++ = MI_STORE_DWORD_INDEX;
@@ -966,7 +939,6 @@ static u32 *gen5_emit_breadcrumb(struct i915_request *rq, u32 *cs)
 	}
 
 	*cs++ = MI_USER_INTERRUPT;
-	*cs++ = MI_NOOP;
 
 	rq->tail = intel_ring_offset(rq, cs);
 	assert_ring_tail_valid(rq->ring, rq->tail);
