@@ -390,6 +390,7 @@ CFLAGS+= -I${SRCDIR}/powerplay/smumgr
 CFLAGS+= -I${DRM}/scheduler
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=amdgpu_'
 CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
 
 SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \

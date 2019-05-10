@@ -54,6 +54,7 @@ CFLAGS+= -I${SRCDIR}/powerplay/inc
 CFLAGS+= -I${SRCDIR}/scheduler
 CFLAGS+= -I${SRCDIR}/include/asic_reg
 
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=amdkfd_'
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 
 SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.h \
