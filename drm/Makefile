@@ -106,7 +106,7 @@ CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_'
 CFLAGS+= -include ${SRCDIR}/drm_os_config.h
 
 SRCS+=	device_if.h \

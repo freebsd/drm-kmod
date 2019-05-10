@@ -131,6 +131,7 @@ CFLAGS+= -I${SRCDIR:H:H}
 CFLAGS+= -I${SRCDIR:H}/amd/include
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=radeon_'
 CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
 
 CFLAGS.gcc+= -Wno-redundant-decls -Wno-cast-qual -Wno-unused-but-set-variable \
