@@ -846,12 +846,6 @@ emit_semaphore_wait(struct i915_request *to,
 	if (err < 0)
 		return err;
 
-	err = i915_sw_fence_await_dma_fence(&to->semaphore,
-					    &from->fence, 0,
-					    I915_FENCE_GFP);
-	if (err < 0)
-		return err;
-
 	/* Only submit our spinner after the signaler is running! */
 	err = i915_request_await_execution(to, from, gfp);
 	if (err)
