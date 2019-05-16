@@ -5006,8 +5006,6 @@ out:
 
 DEFINE_SIMPLE_ATTRIBUTE(i915_drrs_ctl_fops, NULL, i915_drrs_ctl_set, "%llu\n");
 
-#ifdef __linux__
-/* BSDFIXME: Needs work (crashing) */
 static ssize_t
 i915_fifo_underrun_reset_write(struct file *filp,
 			       const char __user *ubuf,
@@ -5062,9 +5060,30 @@ i915_fifo_underrun_reset_write(struct file *filp,
 	return cnt;
 }
 
+#ifdef __linux__
 static const struct file_operations i915_fifo_underrun_reset_ops = {
 	.owner = THIS_MODULE,
 	.open = simple_open,
+	.write = i915_fifo_underrun_reset_write,
+	.llseek = default_llseek,
+};
+#else
+/* BSDFIXME: Experimental! */
+static int i915_fifo_underrun_reset_show(struct seq_file *m, void *data)
+{
+	/* NOP */
+	return 0;
+}
+
+static int
+i915_fifo_underrun_reset_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, i915_fifo_underrun_reset_show, inode->i_private);
+}
+
+static const struct file_operations i915_fifo_underrun_reset_ops = {
+	.owner = THIS_MODULE,
+	.open = i915_fifo_underrun_reset_open,
 	.write = i915_fifo_underrun_reset_write,
 	.llseek = default_llseek,
 };
@@ -5134,10 +5153,7 @@ static const struct i915_debugfs_files {
 	{"i915_error_state", &i915_error_state_fops},
 	{"i915_gpu_info", &i915_gpu_info_fops},
 #endif
-#ifdef __linux__
-/* BSDFIXME: Needs work (crashing) */
 	{"i915_fifo_underrun_reset", &i915_fifo_underrun_reset_ops},
-#endif
 	{"i915_next_seqno", &i915_next_seqno_fops},
 	{"i915_pri_wm_latency", &i915_pri_wm_latency_fops},
 	{"i915_spr_wm_latency", &i915_spr_wm_latency_fops},
