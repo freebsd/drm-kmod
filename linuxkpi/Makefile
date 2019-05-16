@@ -26,7 +26,6 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_rbtree.c		\
 	linux_relay.c		\
 	linux_reservation.c	\
-	linux_seq_file.c	\
 	linux_sort.c		\
 	linux_sync_file.c
 
