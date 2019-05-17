@@ -1,7 +1,6 @@
 # $FreeBSD$
 
 SUBDIR=	linuxkpi	\
-	lindebugfs	\
 	ttm		\
 	drm		\
 	${_vmwgfx}	\
