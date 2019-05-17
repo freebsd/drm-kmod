@@ -1272,7 +1272,6 @@ static int smu_v11_0_thermal_get_temperature(struct smu_context *smu,
 
 	return 0;
 }
-
 static uint16_t convert_to_vddc(uint8_t vid)
 {
 	return (uint16_t) ((6200 - (vid * 25)) / SMU11_VOLTAGE_SCALE);
@@ -1309,12 +1308,6 @@ static int smu_v11_0_read_sensor(struct smu_context *smu,
 		break;
 	case AMDGPU_PP_SENSOR_GFX_SCLK:
 		ret = smu_get_current_clk_freq(smu, SMU_GFXCLK, (uint32_t *)data);
-		*size = 4;
-		break;
-	case AMDGPU_PP_SENSOR_HOTSPOT_TEMP:
-	case AMDGPU_PP_SENSOR_EDGE_TEMP:
-	case AMDGPU_PP_SENSOR_MEM_TEMP:
-		ret = smu_v11_0_thermal_get_temperature(smu, sensor, (uint32_t *)data);
 		*size = 4;
 		break;
 	case AMDGPU_PP_SENSOR_VDDGFX:
