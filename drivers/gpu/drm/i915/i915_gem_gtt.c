@@ -373,7 +373,19 @@ static struct page *vm_alloc_page(struct i915_address_space *vm, gfp_t gfp)
 		return page;
 
 	if (!vm->pt_kmap_wc)
+#ifdef __linux__
 		return alloc_page(gfp);
+#else
+	{
+		struct page* page = alloc_page(gfp);
+		if (!page)
+			return (NULL);
+		vm_page_lock(page);
+		vm_page_wire(page);
+		vm_page_unlock(page);
+		return (page);
+	}
+#endif
 
 	/* Look in our global stash of WC pages... */
 	page = stash_pop_page(&vm->i915->mm.wc_stash);
@@ -396,6 +408,11 @@ static struct page *vm_alloc_page(struct i915_address_space *vm, gfp_t gfp)
 		if (unlikely(!page))
 			break;
 
+#ifndef __linux__
+		vm_page_lock(page);
+		vm_page_wire(page);
+		vm_page_unlock(page);
+#endif
 		stack.pages[stack.nr++] = page;
 	} while (pagevec_space(&stack));
 
