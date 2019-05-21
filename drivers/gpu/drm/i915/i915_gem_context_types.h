@@ -30,9 +30,7 @@ struct i915_timeline;
 struct intel_ring;
 
 struct i915_gem_engines {
-#ifdef __freebsd_notyet__
 	struct rcu_work rcu;
-#endif
 	struct drm_i915_private *i915;
 	unsigned int num_engines;
 	struct intel_context *engines[];
@@ -152,6 +150,7 @@ struct i915_gem_context {
 #define CONTEXT_BANNED			0
 #define CONTEXT_CLOSED			1
 #define CONTEXT_FORCE_SINGLE_SUBMISSION	2
+#define CONTEXT_USER_ENGINES		3
 
 	/**
 	 * @hw_id: - unique identifier for the context
