@@ -232,6 +232,7 @@ struct intel_engine_execlists {
 	 * @queue: queue of requests, in priority lists
 	 */
 	struct rb_root_cached queue;
+	struct rb_root_cached virtual;
 
 	/**
 	 * @csb_write: control register for Context Switch buffer
@@ -450,6 +451,7 @@ struct intel_engine_cs {
 #define I915_ENGINE_HAS_PREEMPTION   BIT(2)
 #define I915_ENGINE_HAS_SEMAPHORES   BIT(3)
 #define I915_ENGINE_NEEDS_BREADCRUMB_TASKLET BIT(4)
+#define I915_ENGINE_IS_VIRTUAL       BIT(5)
 	unsigned int flags;
 
 	/*
@@ -537,6 +539,12 @@ static inline bool
 intel_engine_needs_breadcrumb_tasklet(const struct intel_engine_cs *engine)
 {
 	return engine->flags & I915_ENGINE_NEEDS_BREADCRUMB_TASKLET;
+}
+
+static inline bool
+intel_engine_is_virtual(const struct intel_engine_cs *engine)
+{
+	return engine->flags & I915_ENGINE_IS_VIRTUAL;
 }
 
 #define instdone_slice_mask(dev_priv__) \

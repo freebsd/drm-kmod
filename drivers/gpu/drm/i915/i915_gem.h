@@ -91,4 +91,13 @@ static inline bool __tasklet_enable(struct tasklet_struct *t)
 	return atomic_dec_and_test(&t->count);
 }
 
+static inline bool __tasklet_is_scheduled(struct tasklet_struct *t)
+{
+#ifdef __linux__
+	return test_bit(TASKLET_STATE_SCHED, &t->state);
+#elif defined(__FreeBSD__)
+	return t->tasklet_state == 3;	/* BSDFIXME: Check if it's correct to use TASKLET_ST_LOOP */
+#endif
+}
+
 #endif /* __I915_GEM_H__ */
