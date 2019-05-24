@@ -5006,8 +5006,6 @@ out:
 
 DEFINE_SIMPLE_ATTRIBUTE(i915_drrs_ctl_fops, NULL, i915_drrs_ctl_set, "%llu\n");
 
-#ifdef __linux__
-/* BSDFIXME: Needs work (crashing) */
 static ssize_t
 i915_fifo_underrun_reset_write(struct file *filp,
 			       const char __user *ubuf,
@@ -5067,8 +5065,11 @@ static const struct file_operations i915_fifo_underrun_reset_ops = {
 	.open = simple_open,
 	.write = i915_fifo_underrun_reset_write,
 	.llseek = default_llseek,
-};
+#ifndef __linux__
+	/* Our default release expects seq_file as private_data so use dummy */
+	.release = simple_release,
 #endif
+};
 
 static const struct drm_info_list i915_debugfs_list[] = {
 	{"i915_capabilities", i915_capabilities, 0},
@@ -5134,10 +5135,7 @@ static const struct i915_debugfs_files {
 	{"i915_error_state", &i915_error_state_fops},
 	{"i915_gpu_info", &i915_gpu_info_fops},
 #endif
-#ifdef __linux__
-/* BSDFIXME: Needs work (crashing) */
 	{"i915_fifo_underrun_reset", &i915_fifo_underrun_reset_ops},
-#endif
 	{"i915_next_seqno", &i915_next_seqno_fops},
 	{"i915_pri_wm_latency", &i915_pri_wm_latency_fops},
 	{"i915_spr_wm_latency", &i915_spr_wm_latency_fops},
