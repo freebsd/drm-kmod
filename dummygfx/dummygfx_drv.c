@@ -24,6 +24,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <linux/module.h>
+
 #include "dummygfx_drv.h"
 
 static int __init dummygfx_init(void)
