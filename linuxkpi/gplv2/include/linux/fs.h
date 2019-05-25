@@ -14,7 +14,7 @@
 static inline void
 i_size_write(void *inode, uint64_t size)
 {
-	printf("%s unimplemented\n", __FUNCTION__);
+	UNIMPLEMENTED_ONCE();
 }
 
 extern loff_t default_llseek(struct file *file, loff_t offset, int whence);
