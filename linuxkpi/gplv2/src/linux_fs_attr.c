@@ -105,10 +105,10 @@ out:
 }
 
 ssize_t
-simple_attr_write(struct file *file, const char *buf, size_t len, loff_t *ppos)
+simple_attr_write(struct file *file, const char __user *ubuf, size_t len, loff_t *ppos)
 {
-	struct sbuf *sb;
-	struct simple_attr *attr;
+        struct simple_attr *attr;
+	char *kbuf;
 	u64 val;
 	ssize_t ret;
 
@@ -116,14 +116,20 @@ simple_attr_write(struct file *file, const char *buf, size_t len, loff_t *ppos)
 	if (!attr->set)
 		return -EACCES;
 
+	kbuf = kmalloc(len, GFP_KERNEL);
 	ret = mutex_lock_interruptible(&attr->mutex);
 	if (ret)
-		return ret;
+		goto free;
 
-	sb = attr->sb;
-	(void)sbuf_finish(sb);
-	val = simple_strtoll(sbuf_data(sb), NULL, 0);
+	ret = copyin(ubuf, kbuf, len);
+	if (ret)
+		goto unlock;
+
+	val = simple_strtoll(kbuf, NULL, 0);
 	ret = attr->set(attr->data, val);
+unlock:
 	mutex_unlock(&attr->mutex);
+free:
+	kfree(kbuf);
 	return (ret);
 }
