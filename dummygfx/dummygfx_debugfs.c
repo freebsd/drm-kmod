@@ -48,8 +48,8 @@ static int testseq_show(struct seq_file *m, void *unused)
 static int testseq_open(struct inode *inode, struct file *file)
 {
 	printf("%s\n", __func__);
-	
-	return single_open(file, testseq_show, (void *)str);
+
+	return single_open(file, testseq_show, (void *)inode->i_private);
 }
 static int testseq_release(struct inode *inode, struct file *file)
 {
@@ -65,6 +65,8 @@ static const struct file_operations testseq_fops = {
 	.release = testseq_release,
 };
 
+
+
 /*
  * single_open seq_file read/write test
  */
@@ -77,24 +79,17 @@ static int testseqrw_show(struct seq_file *m, void *unused)
 	(void)sbuf_printf(m->buf, "%s\n", buf);
 	return 0;
 }
-static int testseqrw_open(struct inode *inode, struct file *file)
-{
-	printf("%s\n", __func__);
-	
-	return single_open(file, testseqrw_show, (void *)str);
-}
 static ssize_t testseqrw_write(struct file *file, const char __user *ubuf, size_t len, loff_t *offp)
 {
 	printf("%s\n", __func__);
-	/* struct seq_file *m = file->private_data; */
-	/* struct drm_i915_private *dev_priv = m->private; */
+	copyin(ubuf, str, min(len, 10));
 	return 0;
 }
-static int testseqrw_release(struct inode *inode, struct file *file)
+static int testseqrw_open(struct inode *inode, struct file *file)
 {
 	printf("%s\n", __func__);
 
-	return single_release(inode, file);
+	return single_open(file, testseqrw_show, (void *)inode->i_private);
 }
 static const struct file_operations testseqrw_fops = {
 	.owner = THIS_MODULE,
@@ -102,7 +97,6 @@ static const struct file_operations testseqrw_fops = {
 	.read = seq_read,
 	.write = testseqrw_write,
 	.llseek = seq_lseek,
-	.release = testseqrw_release,
 };
 
 
@@ -123,14 +117,18 @@ static ssize_t customrw_read(struct file *file, char __user *ubuf, size_t len, o
 {
 	printf("%s\n", __func__);
 	void *p = file->private_data;
-	printf("%s: file->private_data %p, %s\n", __func__, p, (char *)p);
+	printf("%s: file->private_data %p, private=%s\n", __func__, p, (char *)p);
+	/* private_data always overwritten with seq_file for read functions... */
 	return 0;
 }
 static ssize_t customrw_write(struct file *file, const char __user *ubuf, size_t len, off_t *offp)
 {
 	printf("%s\n", __func__);
 	void *p = file->private_data;
-	printf("%s: file->private_data %p, %s, ubuf %s\n", __func__, p, (char *)p, ubuf);
+	char *kbuf = malloc(len, M_DEVBUF, M_WAITOK);
+	copyin(ubuf, kbuf, len);
+	printf("%s: file->private_data %p, private=%s, kbuf=%s\n", __func__, p, (char *)p, kbuf);
+	free(kbuf, M_DEVBUF);
 	return 0;
 }
 static int customrw_release(struct inode *inode, struct file *file)
@@ -150,7 +148,7 @@ static const struct file_operations customrw_fops = {
 
 
 /*
- * simple test
+ * simple-rw test
  */
 static int simplerw_open(struct inode *inode, struct file *file)
 {
@@ -177,6 +175,40 @@ static const struct file_operations simplerw_fops = {
 };
 
 
+/*
+ * simple test
+ */
+static const struct file_operations simple_fops = {
+	.owner = THIS_MODULE,
+	.open = simple_open,
+	.release = simple_release,
+};
+
+
+
+/*
+ * attr test
+ */
+static int attr_val = 12345;
+
+static int
+attr_get(void *data, u64 *val)
+{
+	printf("%s: data %p\n", __func__, data);
+
+	*val = attr_val;
+	return 0;
+}
+static int
+attr_set(void *data, u64 val)
+{
+	printf("%s: data %p\n", __func__, data);
+
+	attr_val = val;
+	return 0;
+}
+DEFINE_SIMPLE_ATTRIBUTE(attr_fops, attr_get, attr_set, "%llu\n");
+
 
 int dummygfx_debugfs_init()
 {
@@ -186,19 +218,19 @@ int dummygfx_debugfs_init()
 	str = malloc(10, M_DEVBUF, M_WAITOK);
 	strncpy(str, "dummygfx", 9);
 
-	printf("%s: str %p\n", __func__, str);
+	printf("%s: str %p, str=%s\n", __func__, str, str);
 
 	debugfs_root = debugfs_create_dir("dummygfx", NULL);
 	if (!debugfs_root) {
 		DRM_ERROR("Cannot create debugfs root\n");
 		return -ENOMEM;
 	}
-	d = debugfs_create_file("test-seq", S_IRUSR, debugfs_root, NULL, &testseq_fops);
+	d = debugfs_create_file("test-seq", S_IRUSR, debugfs_root, str, &testseq_fops);
 	if (!d) {
 		DRM_ERROR("Cannot create debugfs test-seq\n");
 		return -ENOMEM;
 	}
-	d = debugfs_create_file("test-seq-rw", S_IRUSR | S_IWUSR, debugfs_root, NULL, &testseqrw_fops);
+	d = debugfs_create_file("test-seq-rw", S_IRUSR | S_IWUSR, debugfs_root, str, &testseqrw_fops);
 	if (!d) {
 		DRM_ERROR("Cannot create debugfs test-seq-rw\n");
 		return -ENOMEM;
@@ -208,9 +240,19 @@ int dummygfx_debugfs_init()
 		DRM_ERROR("Cannot create debugfs custom-rw\n");
 		return -ENOMEM;
 	}
-	d = debugfs_create_file("simple", S_IRUSR | S_IWUSR, debugfs_root, str, &simplerw_fops);
+	d = debugfs_create_file("simple-rw", S_IRUSR | S_IWUSR, debugfs_root, str, &simplerw_fops);
 	if (!d) {
 		DRM_ERROR("Cannot create debugfs simple\n");
+		return -ENOMEM;
+	}
+	d = debugfs_create_file("simple", S_IRUSR | S_IWUSR, debugfs_root, str, &simple_fops);
+	if (!d) {
+		DRM_ERROR("Cannot create debugfs simple-rw\n");
+		return -ENOMEM;
+	}
+	d = debugfs_create_file("attr", S_IRUSR | S_IWUSR, debugfs_root, str, &attr_fops);
+	if (!d) {
+		DRM_ERROR("Cannot create debugfs attr\n");
 		return -ENOMEM;
 	}
 	return 0;

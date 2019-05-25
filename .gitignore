@@ -15,7 +15,8 @@ drm/*.h
 drm/x86
 drm/machine
 drm/export_syms
-dummygfx/*.h
+dummygfx/*_if*.h
+dummygfx/opt*.h
 dummygfx/x86
 dummygfx/machine
 dummygfx/export_syms
