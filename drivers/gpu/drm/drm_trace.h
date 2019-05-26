@@ -7,6 +7,7 @@
 #include <linux/tracepoint.h>
 
 #ifdef __linux__
+struct drm_file;
 
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM drm
