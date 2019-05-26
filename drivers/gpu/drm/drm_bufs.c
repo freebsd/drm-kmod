@@ -32,23 +32,49 @@
 #include <sys/param.h>
 #include <sys/shm.h>
 #include <sys/mman.h>
+#include <sys/queue.h>
+#include <sys/rwlock.h>
+#include <vm/vm.h>
+#include <vm/pmap.h>
+#include <vm/vm_extern.h>
+#include <vm/vm_kern.h>
+#include <vm/vm_map.h>
+#include <vm/vm_object.h>
+#include <vm/vm_page.h>
+#include <vm/vm_pageout.h>
+#include <vm/vm_pager.h>
+#include <vm/vm_param.h>
+#include <vm/vm_phys.h>
 #endif
 
-#include <linux/vmalloc.h>
-#include <linux/slab.h>
-#include <linux/log2.h>
 #include <linux/export.h>
+#include <linux/log2.h>
+#include <linux/mm.h>
+#include <linux/mman.h>
+#include <linux/nospec.h>
+#include <linux/slab.h>
+#include <linux/uaccess.h>
+#include <linux/vmalloc.h>
+
 #ifdef __linux__
 #include <asm/shmparam.h>
 #endif
+
+#include <drm/drm_agpsupport.h>
+#include <drm/drm_device.h>
+#include <drm/drm_drv.h>
+#include <drm/drm_file.h>
+#include <drm/drm_pci.h>
+#include <drm/drm_print.h>
+
 #ifdef __FreeBSD__
 #include <dev/pci/pcireg.h>
+#include <asm/mtrr.h>	/* Needed for arch_phys_wc_* */
 #endif
-#include <drm/drmP.h>
+
 #include "drm_legacy.h"
 #define aper_size ai_aperture_size
 
-#include <linux/nospec.h>
 
 static struct drm_map_list *drm_find_matching_map(struct drm_device *dev,
 						  struct drm_local_map *map)

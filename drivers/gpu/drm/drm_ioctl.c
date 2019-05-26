@@ -30,15 +30,23 @@
 
 #include <drm/drmP.h>
 // drmP.h must be the first to include because of file -> linux_file definition
-#include <drm/drm_ioctl.h>
-#include <drm/drm_auth.h>
-#include "drm_legacy.h"
-#include "drm_internal.h"
-#include "drm_crtc_internal.h"
 
-#include <linux/pci.h>
 #include <linux/export.h>
 #include <linux/nospec.h>
+#include <linux/pci.h>
+#include <linux/uaccess.h>
+
+#include <drm/drm_agpsupport.h>
+#include <drm/drm_auth.h>
+#include <drm/drm_crtc.h>
+#include <drm/drm_drv.h>
+#include <drm/drm_file.h>
+#include <drm/drm_ioctl.h>
+#include <drm/drm_print.h>
+
+#include "drm_crtc_internal.h"
+#include "drm_internal.h"
+#include "drm_legacy.h"
 
 /**
  * DOC: getunique and setversion story

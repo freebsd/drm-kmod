@@ -28,10 +28,20 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <drm/drmP.h>
+#include <linux/slab.h>
+
+#include <drm/drm_auth.h>
+#include <drm/drm_drv.h>
+#include <drm/drm_file.h>
+#include <drm/drm_lease.h>
+#include <drm/drm_print.h>
+
 #include "drm_internal.h"
 #include "drm_legacy.h"
-#include <drm/drm_lease.h>
+
+#ifdef __FreeBSD__
+#include <linux/lockdep.h>	/* For lockdep_assert_held* */
+#endif
 
 /**
  * DOC: master and authentication
