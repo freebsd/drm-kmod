@@ -2,7 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
-.PATH:	${SRCDIR} ${SRCDIR}/gt
+.PATH:	${SRCDIR} ${SRCDIR}/gt ${SRCDIR}/gem
 
 .include "../kconfig.mk"
 
