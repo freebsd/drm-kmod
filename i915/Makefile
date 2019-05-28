@@ -142,6 +142,7 @@ SRCS+=	i915_gem_busy.c \
 	i915_gem_shmem.c \
 	i915_gem_shrinker.c \
 	i915_gem_stolen.c \
+	i915_gem_throttle.c \
 	i915_gem_tiling.c \
 	i915_gem_userptr.c \
 	i915_gem_wait.c
