@@ -142,7 +142,8 @@ SRCS+=	i915_gem_clflush.c \
 	i915_gem_shrinker.c \
 	i915_gem_stolen.c \
 	i915_gem_tiling.c \
-	i915_gem_userptr.c
+	i915_gem_userptr.c \
+	i915_gem_wait.c
 
 .if !empty(KCONFIG:MDRM_COMPAT)
 SRCS+=	i915_ioc32.c
