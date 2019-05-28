@@ -27,7 +27,6 @@ SRCS=	\
 	i915_gem_fence_reg.c \
 	i915_gem_gtt.c \
 	i915_gem_internal.c \
-	i915_gem_object.c \
 	i915_gem_pm.c \
 	i915_gem_render_state.c \
 	i915_gem_stolen.c \
@@ -134,6 +133,10 @@ SRCS+=	intel_breadcrumbs.c \
 	intel_ringbuffer.c \
 	intel_sseu.c \
 	intel_workarounds.c
+
+# gem/*
+SRCS+=	i915_gem_object.c \
+	i915_gem_shmem.c
 
 .if !empty(KCONFIG:MDRM_COMPAT)
 SRCS+=	i915_ioc32.c
