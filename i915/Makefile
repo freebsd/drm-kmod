@@ -126,7 +126,8 @@ SRCS+=	intel_breadcrumbs.c \
 	intel_workarounds.c
 
 # gem/*
-SRCS+=	i915_gem_clflush.c \
+SRCS+=	i915_gem_busy.c \
+	i915_gem_clflush.c \
 	i915_gem_context.c \
 	i915_gem_domain.c \
 	i915_gem_dmabuf.c \
