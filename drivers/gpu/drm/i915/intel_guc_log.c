@@ -356,23 +356,17 @@ static void capture_logs_work(struct work_struct *work)
 
 static int guc_log_map(struct intel_guc_log *log)
 {
-	struct intel_guc *guc = log_to_guc(log);
-	struct drm_i915_private *dev_priv = guc_to_i915(guc);
 	void *vaddr;
 	int ret;
 
-#ifdef __FreeBSD__
-	// fix unused variable
-	(void)dev_priv;
-#endif
 	lockdep_assert_held(&log->relay.lock);
 
 	if (!log->vma)
 		return -ENODEV;
 
-	mutex_lock(&dev_priv->drm.struct_mutex);
+	i915_gem_object_lock(log->vma->obj);
 	ret = i915_gem_object_set_to_wc_domain(log->vma->obj, true);
-	mutex_unlock(&dev_priv->drm.struct_mutex);
+	i915_gem_object_unlock(log->vma->obj);
 	if (ret)
 		return ret;
 

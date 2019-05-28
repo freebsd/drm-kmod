@@ -131,6 +131,7 @@ SRCS+=	i915_gem_clflush.c \
 	i915_gem_domain.c \
 	i915_gem_dmabuf.c \
 	i915_gem_execbuffer.c \
+	i915_gem_fence.c \
 	i915_gem_internal.c \
 	i915_gem_mman.c \
 	i915_gem_object.c \
