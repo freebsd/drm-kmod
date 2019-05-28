@@ -19,20 +19,10 @@ SRCS=	\
 	i915_drv.c \
 	i915_gem.c \
 	i915_gem_batch_pool.c \
-	i915_gem_clflush.c \
-	i915_gem_context.c \
-	i915_gem_dmabuf.c \
 	i915_gem_evict.c \
-	i915_gem_execbuffer.c \
 	i915_gem_fence_reg.c \
 	i915_gem_gtt.c \
-	i915_gem_internal.c \
-	i915_gem_pm.c \
 	i915_gem_render_state.c \
-	i915_gem_stolen.c \
-	i915_gem_shrinker.c \
-	i915_gem_tiling.c \
-	i915_gem_userptr.c \
 	i915_globals.c \
 	i915_irq.c \
 	i915_memcpy.c \
@@ -135,12 +125,22 @@ SRCS+=	intel_breadcrumbs.c \
 	intel_workarounds.c
 
 # gem/*
-SRCS+=	i915_gem_domain.c \
+SRCS+=	i915_gem_clflush.c \
+	i915_gem_context.c \
+	i915_gem_domain.c \
+	i915_gem_dmabuf.c \
+	i915_gem_execbuffer.c \
+	i915_gem_internal.c \
 	i915_gem_mman.c \
 	i915_gem_object.c \
 	i915_gem_pages.c \
 	i915_gem_phys.c \
-	i915_gem_shmem.c
+	i915_gem_pm.c \
+	i915_gem_shmem.c \
+	i915_gem_shrinker.c \
+	i915_gem_stolen.c \
+	i915_gem_tiling.c \
+	i915_gem_userptr.c
 
 .if !empty(KCONFIG:MDRM_COMPAT)
 SRCS+=	i915_ioc32.c
