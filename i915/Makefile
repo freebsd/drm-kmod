@@ -135,7 +135,8 @@ SRCS+=	intel_breadcrumbs.c \
 	intel_workarounds.c
 
 # gem/*
-SRCS+=	i915_gem_object.c \
+SRCS+=	i915_gem_mman.c \
+	i915_gem_object.c \
 	i915_gem_pages.c \
 	i915_gem_phys.c \
 	i915_gem_shmem.c
