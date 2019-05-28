@@ -136,6 +136,8 @@ SRCS+=	intel_breadcrumbs.c \
 
 # gem/*
 SRCS+=	i915_gem_object.c \
+	i915_gem_pages.c \
+	i915_gem_phys.c \
 	i915_gem_shmem.c
 
 .if !empty(KCONFIG:MDRM_COMPAT)
