@@ -701,6 +701,7 @@ CWARNFLAGS.vega12_processpptables.c= -Wno-missing-prototypes
 CWARNFLAGS.vega12_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.vega12_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.vega20_hwmgr.c=	-Wno-missing-prototypes
+CWARNFLAGS.vega20_ppt.c=	-Wno-constant-conversion
 CWARNFLAGS.vegam_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.vi.c= -Wno-unused-const-variable
 CWARNFLAGS.uvd_v7_0.c=	-Wno-missing-prototypes
