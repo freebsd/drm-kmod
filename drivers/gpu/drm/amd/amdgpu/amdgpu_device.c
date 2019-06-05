@@ -2700,6 +2700,9 @@ fence_driver_init:
 
 	amdgpu_fbdev_init(adev);
 
+	if (amdgpu_sriov_vf(adev) && amdgim_is_hwperf(adev))
+		amdgpu_pm_virt_sysfs_init(adev);
+
 	r = amdgpu_pm_sysfs_init(adev);
 	if (r)
 		DRM_ERROR("registering pm debugfs failed (%d).\n", r);
@@ -2825,6 +2828,9 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	iounmap(adev->rmmio);
 	adev->rmmio = NULL;
 	amdgpu_device_doorbell_fini(adev);
+	if (amdgpu_sriov_vf(adev) && amdgim_is_hwperf(adev))
+		amdgpu_pm_virt_sysfs_fini(adev);
+
 #if defined(CONFIG_DEBUG_FS)
 	amdgpu_debugfs_regs_cleanup(adev);
 #endif
