@@ -72,4 +72,22 @@ static const struct file_operations __fops = {				\
 	.llseek	 = generic_file_llseek,					\
 }
 
+/* XXX: Move to base if needed when debugfs mess is fixed */
+static inline int
+simple_open(struct inode *inode, struct file *file)
+{
+
+	file->private_data = inode->i_private;
+	file->f_inode = inode;
+	return (0);
+}
+
+static inline int
+simple_release(struct inode *inode, struct file *file)
+{
+
+	/* NOP */
+	return (0);
+}
+
 #endif /* _LINUX_FS_NEXT_H_ */
