@@ -2829,7 +2829,7 @@ static void i915_gtt_color_adjust(const struct drm_mm_node *node,
 		*end -= I915_GTT_PAGE_SIZE;
 }
 
-int i915_gem_init_aliasing_ppgtt(struct drm_i915_private *i915)
+static int init_aliasing_ppgtt(struct drm_i915_private *i915)
 {
 	struct i915_ggtt *ggtt = &i915->ggtt;
 	struct i915_hw_ppgtt *ppgtt;
@@ -2869,7 +2869,7 @@ err_ppgtt:
 	return err;
 }
 
-void i915_gem_fini_aliasing_ppgtt(struct drm_i915_private *i915)
+static void fini_aliasing_ppgtt(struct drm_i915_private *i915)
 {
 	struct i915_ggtt *ggtt = &i915->ggtt;
 	struct i915_hw_ppgtt *ppgtt;
@@ -2939,7 +2939,7 @@ int i915_gem_init_ggtt(struct drm_i915_private *dev_priv)
 	ggtt->vm.clear_range(&ggtt->vm, ggtt->vm.total - PAGE_SIZE, PAGE_SIZE);
 
 	if (INTEL_PPGTT(dev_priv) == INTEL_PPGTT_ALIASING) {
-		ret = i915_gem_init_aliasing_ppgtt(dev_priv);
+		ret = init_aliasing_ppgtt(dev_priv);
 		if (ret)
 			goto err_appgtt;
 	}
@@ -2966,7 +2966,7 @@ void i915_ggtt_cleanup_hw(struct drm_i915_private *dev_priv)
 	ggtt->vm.closed = true;
 
 	mutex_lock(&dev_priv->drm.struct_mutex);
-	i915_gem_fini_aliasing_ppgtt(dev_priv);
+	fini_aliasing_ppgtt(dev_priv);
 
 	list_for_each_entry_safe(vma, vn, &ggtt->vm.bound_list, vm_link)
 		WARN_ON(i915_vma_unbind(vma));
