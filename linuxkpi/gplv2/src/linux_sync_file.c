@@ -144,11 +144,11 @@ char *sync_file_get_name(struct sync_file *sync_file, char *buf, int len)
 	} else {
 		struct dma_fence *fence = sync_file->fence;
 
-		snprintf(buf, len, "%s-%s%lu-%d",
+		snprintf(buf, len, "%s-%s%llu-%llu",
 			 fence->ops->get_driver_name(fence),
 			 fence->ops->get_timeline_name(fence),
-			 fence->context,
-			 fence->seqno);
+			 (unsigned long long)fence->context,
+			 (unsigned long long)fence->seqno);
 	}
 
 	return buf;

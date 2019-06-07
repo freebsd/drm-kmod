@@ -37,7 +37,7 @@ struct shrinker {
 
 	int seeks;	/* seeks to recreate an obj */
 	long batch;	/* reclaim batch size, 0 = default */
-	unsigned long flags;
+	unsigned flags;
 
 	/* These are for internal use */
 	struct list_head list;

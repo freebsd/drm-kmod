@@ -1460,7 +1460,11 @@ int __drm_legacy_mapbufs(struct drm_device *dev, void *data, int *p,
 {
 	struct drm_device_dma *dma = dev->dma;
 	int retcode = 0;
+#ifdef __linux__
 	unsigned long virtual;
+#else
+	vm_offset_t virtual;
+#endif
 	int i;
 
 #ifndef __linux__

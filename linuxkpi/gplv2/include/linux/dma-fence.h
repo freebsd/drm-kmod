@@ -44,7 +44,7 @@ struct dma_fence {
 	struct list_head cb_list;
 	spinlock_t *lock;
 	u64 context;
-	unsigned seqno;
+	u64 seqno;
 	unsigned long flags;
 	ktime_t timestamp;
 	int error;

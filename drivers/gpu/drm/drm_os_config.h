@@ -18,6 +18,7 @@
 #define	CONFIG_X86	1
 #define	CONFIG_X86_64	1
 #define CONFIG_64BIT	1
+#define CONFIG_AS_MOVNTDQA 1
 #endif
 #ifdef __ia64__
 #define	CONFIG_IA64	1
@@ -30,8 +31,6 @@
 #define	CONFIG_ACPI_SLEEP 1
 #define	CONFIG_DRM_I915_KMS 1
 #undef	CONFIG_INTEL_IOMMU
-// For platforms with SSE4.1 (needed for GuC)
-#define CONFIG_AS_MOVNTDQA
 #endif
 
 #ifdef __powerpc64__

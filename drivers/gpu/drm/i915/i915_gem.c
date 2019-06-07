@@ -1882,13 +1882,15 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 {
 	struct drm_i915_gem_mmap *args = data;
 	struct drm_i915_gem_object *obj;
-	unsigned long addr;
 #ifndef __linux__
+	vm_offset_t addr;
 	vm_object_t vmobj;
 	struct proc *p;
 	vm_map_t map;
 	vm_size_t size;
 	int error, rv;
+#else
+	unsigned long addr;
 #endif
 
 	if (args->flags & ~(I915_MMAP_WC)) {
