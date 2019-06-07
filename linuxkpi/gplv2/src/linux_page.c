@@ -30,6 +30,7 @@
 
 #include <sys/lock.h>
 #include <sys/rwlock.h>
+#include <sys/sf_buf.h>
 
 #include <machine/atomic.h>
 
