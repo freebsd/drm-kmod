@@ -47,10 +47,6 @@ enum mode_set_atomic {
 	ENTER_ATOMIC_MODE_SET,
 };
 
-struct drm_fb_offset {
-	int x, y;
-};
-
 /**
  * struct drm_fb_helper_surface_size - describes fbdev size and scanout surface size
  * @fb_width: fbdev width
