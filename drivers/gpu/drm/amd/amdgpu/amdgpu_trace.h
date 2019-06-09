@@ -28,8 +28,6 @@
 #include <linux/types.h>
 #include <linux/tracepoint.h>
 
-#include <drm/drmP.h>
-
 #ifdef __linux__
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM amdgpu
