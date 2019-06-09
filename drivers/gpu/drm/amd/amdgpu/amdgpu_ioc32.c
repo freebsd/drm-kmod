@@ -29,8 +29,13 @@
  */
 #include <linux/compat.h>
 
-#include <drm/drmP.h>
+#ifdef __FreeBSD__
+#include <linux/file.h>	/* Needed for struct file -> struct linux_file */
+#endif
+
 #include <drm/amdgpu_drm.h>
+#include <drm/drm_ioctl.h>
+
 #include "amdgpu_drv.h"
 
 #ifdef CONFIG_COMPAT
