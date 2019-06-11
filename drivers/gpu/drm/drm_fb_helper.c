@@ -1417,8 +1417,8 @@ static int pan_display_legacy(struct fb_var_screeninfo *var,
 	struct drm_mode_set *modeset;
 	int ret = 0;
 
-	drm_modeset_lock_all(fb_helper->dev);
 	mutex_lock(&client->modeset_mutex);
+	drm_modeset_lock_all(fb_helper->dev);
 	drm_client_for_each_modeset(modeset, client) {
 		modeset->x = var->xoffset;
 		modeset->y = var->yoffset;
@@ -1431,8 +1431,8 @@ static int pan_display_legacy(struct fb_var_screeninfo *var,
 			}
 		}
 	}
-	mutex_unlock(&client->modeset_mutex);
 	drm_modeset_unlock_all(fb_helper->dev);
+	mutex_unlock(&client->modeset_mutex);
 
 	return ret;
 }
