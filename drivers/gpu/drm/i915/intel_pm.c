@@ -8173,18 +8173,18 @@ unsigned long i915_chipset_val(struct drm_i915_private *dev_priv)
 	return val;
 }
 
-unsigned long i915_mch_val(struct drm_i915_private *dev_priv)
+unsigned long i915_mch_val(struct drm_i915_private *i915)
 {
 	unsigned long m, x, b;
 	u32 tsfs;
 
-	tsfs = I915_READ(TSFS);
+	tsfs = intel_uncore_read(&i915->uncore, TSFS);
 
 	m = ((tsfs & TSFS_SLOPE_MASK) >> TSFS_SLOPE_SHIFT);
-#ifdef __FreeBSD__
-	x = I915_READ8(I915_TR1);
-#else
-	x = I915_READ8(TR1);
+#ifdef __linux__
+	x = intel_uncore_read8(&i915->uncore, TR1);
+#elif defined(__FreeBSD__)
+	x = intel_uncore_read8(&i915->uncore, I915_TR1);
 #endif
 
 	b = tsfs & TSFS_INTR_MASK;
