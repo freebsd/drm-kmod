@@ -1927,6 +1927,16 @@ struct drm_i915_private {
 		ktime_t last_init_time;
 
 		struct i915_vma *scratch;
+
+		/*
+		 * We must never wait on the GPU while holding a lock as we
+		 * may need to perform a GPU reset. So while we don't need to
+		 * serialise wait/reset with an explicit lock, we do want
+		 * lockdep to detect potential dependency cycles.
+		 */
+#ifdef __linux__
+		struct lockdep_map reset_lockmap;
+#endif
 	} gt;
 
 	struct {
