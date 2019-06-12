@@ -13471,7 +13471,7 @@ static void intel_crtc_check_fastset(struct intel_crtc_state *old_crtc_state,
 /**
  * intel_atomic_check - validate state object
  * @dev: drm device
- * @state: state to validate
+ * @_state: state to validate
  */
 static int intel_atomic_check(struct drm_device *dev,
 			      struct drm_atomic_state *_state)
