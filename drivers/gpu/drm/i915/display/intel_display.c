@@ -13510,11 +13510,7 @@ static int intel_atomic_check(struct drm_device *dev,
 		if (ret)
 			goto fail;
 
-		if (intel_pipe_config_compare(dev_priv, old_crtc_state,
-					      new_crtc_state, true)) {
-			new_crtc_state->base.mode_changed = false;
-			new_crtc_state->update_pipe = true;
-		}
+		intel_crtc_check_fastset(old_crtc_state, new_crtc_state);
 
 		if (needs_modeset(&new_crtc_state->base))
 			any_ms = true;
