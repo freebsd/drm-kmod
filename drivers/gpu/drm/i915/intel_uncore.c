@@ -587,7 +587,7 @@ void intel_uncore_forcewake_get(struct intel_uncore *uncore,
 	if (!uncore->funcs.force_wake_get)
 		return;
 
-	__assert_rpm_wakelock_held(uncore->rpm);
+	assert_rpm_wakelock_held(uncore->rpm);
 
 	spin_lock_irqsave(&uncore->lock, irqflags);
 	__intel_uncore_forcewake_get(uncore, fw_domains);
@@ -741,7 +741,7 @@ void assert_forcewakes_active(struct intel_uncore *uncore,
 	if (!uncore->funcs.force_wake_get)
 		return;
 
-	__assert_rpm_wakelock_held(uncore->rpm);
+	assert_rpm_wakelock_held(uncore->rpm);
 
 	fw_domains &= uncore->fw_domains;
 	WARN(fw_domains & ~uncore->fw_domains_active,
@@ -1058,7 +1058,7 @@ unclaimed_reg_debug(struct intel_uncore *uncore,
 
 #define GEN2_READ_HEADER(x) \
 	u##x val = 0; \
-	__assert_rpm_wakelock_held(uncore->rpm);
+	assert_rpm_wakelock_held(uncore->rpm);
 
 #define GEN2_READ_FOOTER \
 	trace_i915_reg_rw(false, reg, val, sizeof(val), trace); \
@@ -1100,7 +1100,7 @@ __gen2_read(64)
 	u32 offset = i915_mmio_reg_offset(reg); \
 	unsigned long irqflags; \
 	u##x val = 0; \
-	__assert_rpm_wakelock_held(uncore->rpm); \
+	assert_rpm_wakelock_held(uncore->rpm); \
 	spin_lock_irqsave(&uncore->lock, irqflags); \
 	unclaimed_reg_debug(uncore, reg, true, true)
 
@@ -1174,7 +1174,7 @@ __gen6_read(64)
 
 #define GEN2_WRITE_HEADER \
 	trace_i915_reg_rw(true, reg, val, sizeof(val), trace); \
-	__assert_rpm_wakelock_held(uncore->rpm); \
+	assert_rpm_wakelock_held(uncore->rpm); \
 
 #define GEN2_WRITE_FOOTER
 
@@ -1212,7 +1212,7 @@ __gen2_write(32)
 	u32 offset = i915_mmio_reg_offset(reg); \
 	unsigned long irqflags; \
 	trace_i915_reg_rw(true, reg, val, sizeof(val), trace); \
-	__assert_rpm_wakelock_held(uncore->rpm); \
+	assert_rpm_wakelock_held(uncore->rpm); \
 	spin_lock_irqsave(&uncore->lock, irqflags); \
 	unclaimed_reg_debug(uncore, reg, false, true)
 
