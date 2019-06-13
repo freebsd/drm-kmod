@@ -285,6 +285,7 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	struct drm_i915_gem_object *obj = to_intel_bo(area->vm_private_data);
 	struct drm_device *dev = obj->base.dev;
 	struct drm_i915_private *i915 = to_i915(dev);
+	struct intel_runtime_pm *rpm = &i915->runtime_pm;
 	struct i915_ggtt *ggtt = &i915->ggtt;
 	bool write = area->vm_flags & VM_WRITE;
 	intel_wakeref_t wakeref;
@@ -305,7 +306,7 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	if (ret)
 		goto err;
 
-	wakeref = intel_runtime_pm_get(i915);
+	wakeref = intel_runtime_pm_get(rpm);
 
 #ifdef __freebsd_notyet__
 	srcu = i915_reset_trylock(i915);
@@ -372,7 +373,7 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 		goto err_fence;
 
 	/* Mark as being mmapped into userspace for later revocation */
-	assert_rpm_wakelock_held(&i915->runtime_pm);
+	assert_rpm_wakelock_held(rpm);
 	if (!i915_vma_set_userfault(vma) && !obj->userfault_count++)
 		list_add(&obj->userfault_link, &i915->ggtt.userfault_list);
 	if (CONFIG_DRM_I915_USERFAULT_AUTOSUSPEND)
@@ -393,7 +394,7 @@ err_reset:
 	i915_reset_unlock(i915, srcu);
 err_rpm:
 #endif
-	intel_runtime_pm_put(i915, wakeref);
+	intel_runtime_pm_put(rpm, wakeref);
 	i915_gem_object_unpin_pages(obj);
 err:
 	switch (ret) {
@@ -480,7 +481,7 @@ void i915_gem_object_release_mmap(struct drm_i915_gem_object *obj)
 	 * wakeref.
 	 */
 	lockdep_assert_held(&i915->drm.struct_mutex);
-	wakeref = intel_runtime_pm_get(i915);
+	wakeref = intel_runtime_pm_get(&i915->runtime_pm);
 
 	if (!obj->userfault_count)
 		goto out;
@@ -497,7 +498,7 @@ void i915_gem_object_release_mmap(struct drm_i915_gem_object *obj)
 	wmb();
 
 out:
-	intel_runtime_pm_put(i915, wakeref);
+	intel_runtime_pm_put(&i915->runtime_pm, wakeref);
 }
 
 static int create_mmap_offset(struct drm_i915_gem_object *obj)

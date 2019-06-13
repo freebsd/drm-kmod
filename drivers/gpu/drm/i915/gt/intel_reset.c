@@ -1320,7 +1320,7 @@ void i915_handle_error(struct drm_i915_private *i915,
 	 * isn't the case at least when we get here by doing a
 	 * simulated reset via debugfs, so get an RPM reference.
 	 */
-	wakeref = intel_runtime_pm_get(i915);
+	wakeref = intel_runtime_pm_get(&i915->runtime_pm);
 
 	engine_mask &= INTEL_INFO(i915)->engine_mask;
 
@@ -1383,7 +1383,7 @@ void i915_handle_error(struct drm_i915_private *i915,
 	wake_up_all(&error->reset_queue);
 
 out:
-	intel_runtime_pm_put(i915, wakeref);
+	intel_runtime_pm_put(&i915->runtime_pm, wakeref);
 }
 
 #ifdef __freebsd_notyet__
