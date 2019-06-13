@@ -2,18 +2,12 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
-.PATH:	${SRCDIR} ${SRCDIR}/gt ${SRCDIR}/gem
+.PATH:	${SRCDIR} ${SRCDIR}/gt ${SRCDIR}/gem ${SRCDIR}/display
 
 .include "../kconfig.mk"
 
 KMOD=	i915kms
 SRCS=	\
-	dvo_ch7017.c \
-	dvo_ch7xxx.c \
-	dvo_ivch.c \
-	dvo_ns2501.c \
-	dvo_sil164.c \
-	dvo_tfp410.c \
 	i915_active.c \
 	i915_cmd_parser.c \
 	i915_drv.c \
@@ -43,7 +37,6 @@ SRCS=	\
 	i915_user_extensions.c \
 	i915_vgpu.c \
 	i915_vma.c \
-	icl_dsi.c \
 	intel_acpi.c \
 	intel_atomic.c \
 	intel_atomic_plane.c \
@@ -54,27 +47,16 @@ SRCS=	\
 	intel_color.c \
 	intel_combo_phy.c \
 	intel_connector.c \
-	intel_crt.c \
 	intel_csr.c \
-	intel_ddi.c \
 	intel_device_info.c \
 	intel_display.c \
 	intel_display_power.c \
-	intel_dp.c \
-	intel_dp_aux_backlight.c \
-	intel_dp_link_training.c \
-	intel_dp_mst.c \
 	intel_dpio_phy.c \
 	intel_dpll_mgr.c \
-	intel_dsi.c \
-	intel_dsi_dcs_backlight.c \
-	intel_dsi_vbt.c \
-	intel_dvo.c \
 	intel_fbc.c \
 	intel_fifo_underrun.c \
 	intel_freebsd.c \
 	intel_frontbuffer.c \
-	intel_gmbus.c \
 	intel_guc.c \
 	intel_guc_ads.c \
 	intel_guc_ct.c \
@@ -82,15 +64,11 @@ SRCS=	\
 	intel_guc_log.c \
 	intel_guc_submission.c \
 	intel_hdcp.c \
-	intel_hdmi.c \
 	intel_hotplug.c \
 	intel_huc.c \
 	intel_huc_fw.c \
-	intel_lspcon.c \
-	intel_lvds.c \
 	intel_opregion.c \
 	intel_overlay.c \
-	intel_panel.c \
 	intel_pm.c \
 	intel_psr.c \
 	intel_quirks.c \
@@ -99,16 +77,40 @@ SRCS=	\
 	intel_renderstate_gen8.c \
 	intel_renderstate_gen9.c \
 	intel_runtime_pm.c \
-	intel_sdvo.c \
 	intel_sideband.c \
 	intel_sprite.c \
-	intel_tv.c \
 	intel_uc.c \
 	intel_uc_fw.c \
 	intel_uncore.c \
-	intel_vdsc.c \
 	intel_wakeref.c \
-	intel_wopcm.c \
+	intel_wopcm.c
+
+# display/*
+SRCS+=	dvo_ch7017.c \
+	dvo_ch7xxx.c \
+	dvo_ivch.c \
+	dvo_ns2501.c \
+	dvo_sil164.c \
+	dvo_tfp410.c \
+	icl_dsi.c \
+	intel_crt.c \
+	intel_ddi.c \
+	intel_dp.c \
+	intel_dp_aux_backlight.c \
+	intel_dp_link_training.c \
+	intel_dp_mst.c \
+	intel_dsi.c \
+	intel_dsi_dcs_backlight.c \
+	intel_dsi_vbt.c \
+	intel_dvo.c \
+	intel_gmbus.c \
+	intel_hdmi.c \
+	intel_lspcon.c \
+	intel_lvds.c \
+	intel_panel.c \
+	intel_sdvo.c \
+	intel_tv.c \
+	intel_vdsc.c \
 	vlv_dsi.c \
 	vlv_dsi_pll.c
 
