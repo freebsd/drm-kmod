@@ -12,6 +12,8 @@
 #include <drm/drm_syncobj.h>
 #include <drm/i915_drm.h>
 
+#include "display/intel_frontbuffer.h"
+
 #include "gem/i915_gem_ioctls.h"
 #include "gt/intel_context.h"
 #include "gt/intel_gt_pm.h"
@@ -22,9 +24,12 @@
 #include "i915_trace.h"
 #include "intel_drv.h"
 #include "intel_frontbuffer.h"
+
+#ifdef __FreeBSD__
 /* CEM: Make sure we got the Linux version */
 CTASSERT(PAGE_MASK != (PAGE_SIZE - 1));
 #define clflushopt linux_clflushopt
+#endif
 
 enum {
 	FORCE_CPU_RELOC = 1,
