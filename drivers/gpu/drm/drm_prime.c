@@ -915,6 +915,7 @@ struct drm_gem_object *drm_gem_prime_import_dev(struct drm_device *dev,
 	}
 
 	obj->import_attach = attach;
+	obj->resv = dma_buf->resv;
 
 	return obj;
 
