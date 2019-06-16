@@ -197,6 +197,7 @@ SRCS+=	amdgpu_afmt.c \
 	gfxhub_v1_0.c \
 	gfxhub_v1_1.c \
 	gfxhub_v2_0.c \
+	gfxhub_v2_1.c \
 	gmc_v6_0.c \
 	gmc_v7_0.c \
 	gmc_v8_0.c \
