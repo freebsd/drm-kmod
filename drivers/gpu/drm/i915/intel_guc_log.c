@@ -213,7 +213,11 @@ static bool guc_check_log_buf_overflow(struct intel_guc_log *log,
 			/* buffer_full_cnt is a 4 bit counter */
 			log->stats[type].sampled_overflow += 16;
 		}
-		DRM_ERROR_RATELIMITED("GuC log buffer overflow\n");
+
+#ifdef __freebsd_notyet__
+		dev_notice_ratelimited(guc_to_i915(log_to_guc(log))->drm.dev,
+				       "GuC log buffer overflow\n");
+#endif
 	}
 
 	return overflow;
