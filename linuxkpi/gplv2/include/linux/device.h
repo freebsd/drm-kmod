@@ -42,6 +42,12 @@ devm_kzalloc(struct device *dev, size_t size, gfp_t gfp)
 	return devm_kmalloc(dev, size, gfp | __GFP_ZERO);
 }
 
+static inline void *
+devm_kcalloc(struct device *dev, size_t n, size_t size, gfp_t gfp)
+{
+	return devm_kmalloc(dev, n * size, gfp | __GFP_ZERO);
+}
+
 /*
  * drivers/base/devres.c - device resource management
  *
