@@ -134,4 +134,7 @@
 // KMS framebuffer on VMware
 #define	CONFIG_DRM_VMWGFX_FBCON 1
 
+// Should be supported by all archs we support
+#define	CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG 1
+
 #endif

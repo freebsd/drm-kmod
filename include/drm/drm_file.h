@@ -33,6 +33,7 @@
 #include <linux/types.h>
 #include <linux/completion.h>
 #include <linux/idr.h>
+#include <linux/file.h>
 
 #include <uapi/drm/drm.h>
 

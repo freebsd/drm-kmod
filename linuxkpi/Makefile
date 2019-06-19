@@ -16,6 +16,7 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_firmware.c	\
 	linux_fs.c		\
 	linux_fs_attr.c		\
+	linux_genalloc.c	\
 	linux_i2c.c		\
 	linux_interval_tree.c	\
 	linux_irq.c		\
