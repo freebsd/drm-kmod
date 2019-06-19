@@ -1638,22 +1638,24 @@ static int __init vmwgfx_init(void)
 	if (vgacon_text_force())
 		return -EINVAL;
 
-#ifndef __linux__
-       vmw_pci_driver.bsdclass = drm_devclass;
-       ret = linux_pci_register_drm_driver(&vmw_pci_driver);
-       if (ret)
-               DRM_ERROR("Failed initializing DRM.\n");
-#else
+#ifdef __linux__
 	ret = pci_register_driver(&vmw_pci_driver);
+#else
+	vmw_pci_driver.bsdclass = drm_devclass;
+	ret = linux_pci_register_drm_driver(&vmw_pci_driver);
+#endif
 	if (ret)
 		DRM_ERROR("Failed initializing DRM.\n");
-#endif
 	return ret;
 }
 
 static void __exit vmwgfx_exit(void)
 {
+#ifdef __linux__
 	pci_unregister_driver(&vmw_pci_driver);
+#else
+	linux_pci_unregister_drm_driver(&vmw_pci_driver);
+#endif
 }
 
 #ifdef __linux__
