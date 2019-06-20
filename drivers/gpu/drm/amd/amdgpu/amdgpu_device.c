@@ -62,6 +62,7 @@
 
 #include "amdgpu_xgmi.h"
 #include "amdgpu_ras.h"
+#include "amdgpu_pmu.h"
 
 MODULE_FIRMWARE("amdgpu/vega10_gpu_info.bin");
 MODULE_FIRMWARE("amdgpu/vega12_gpu_info.bin");
@@ -2768,6 +2769,12 @@ fence_driver_init:
 		return r;
 	}
 
+#ifdef CONFIG_DEBUGFS
+	r = amdgpu_pmu_init(adev);
+	if (r)
+		dev_err(adev->dev, "amdgpu_pmu_init failed\n");
+#endif
+
 	return 0;
 
 failed:
@@ -2838,6 +2845,11 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 #endif
 	device_remove_file(adev->dev, &dev_attr_pcie_replay_count);
 	amdgpu_ucode_sysfs_fini(adev);
+#if defined(CONFIG_DEBUG_FS)
+	amdgpu_pmu_fini(adev);
+
+	amdgpu_debugfs_preempt_cleanup(adev);
+#endif
 }
 
 

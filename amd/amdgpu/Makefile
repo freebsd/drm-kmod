@@ -449,6 +449,10 @@ SRCS+=	amd_powerplay.c \
 	vega20_thermal.c \
 	vegam_smumgr.c
 
+.ifdef (CONFIG_DEBUGFS)
+SRCS+=	amdgpu_pmu.c
+.endif
+
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
