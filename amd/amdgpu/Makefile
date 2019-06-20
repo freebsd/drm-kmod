@@ -101,6 +101,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_csa.c \
 	amdgpu_ctx.c \
 	amdgpu_device.c \
+	amdgpu_discovery.c \
 	amdgpu_display.c \
 	amdgpu_dpm.c \
 	amdgpu_drv.c \
