@@ -12,6 +12,7 @@
 #include <linux/kref.h>
 #include <linux/list.h>
 #include <linux/llist.h>
+#include <linux/timer.h>
 #include <linux/types.h>
 
 #ifdef __FreeBSD__
@@ -153,6 +154,11 @@ struct intel_engine_execlists {
 	 * @tasklet: softirq tasklet for bottom handler
 	 */
 	struct tasklet_struct tasklet;
+
+	/**
+	 * @timer: kick the current context if its timeslice expires
+	 */
+	struct timer_list timer;
 
 	/**
 	 * @default_priolist: priority list for I915_PRIORITY_NORMAL
