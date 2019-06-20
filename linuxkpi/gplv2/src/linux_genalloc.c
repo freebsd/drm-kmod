@@ -705,44 +705,44 @@ static void devm_gen_pool_release(struct device *dev, void *res)
  * memory not managed by the regular kmalloc/kfree interface. The pool will be
  * automatically destroyed by the device management code.
  */
-struct gen_pool *devm_gen_pool_create(struct device *dev, int min_alloc_order,
-				      int nid, const char *name)
-{
-	struct gen_pool **ptr, *pool;
-	const char *pool_name = NULL;
+/* struct gen_pool *devm_gen_pool_create(struct device *dev, int min_alloc_order, */
+/* 				      int nid, const char *name) */
+/* { */
+/* 	struct gen_pool **ptr, *pool; */
+/* 	const char *pool_name = NULL; */
 
-	/* Check that genpool to be created is uniquely addressed on device */
-	if (gen_pool_get(dev, name))
-		return ERR_PTR(-EINVAL);
+/* 	/\* Check that genpool to be created is uniquely addressed on device *\/ */
+/* 	if (gen_pool_get(dev, name)) */
+/* 		return ERR_PTR(-EINVAL); */
 
-	if (name) {
-		pool_name = kstrdup_const(name, GFP_KERNEL);
-		if (!pool_name)
-			return ERR_PTR(-ENOMEM);
-	}
+/* 	if (name) { */
+/* 		pool_name = kstrdup_const(name, GFP_KERNEL); */
+/* 		if (!pool_name) */
+/* 			return ERR_PTR(-ENOMEM); */
+/* 	} */
 
-	ptr = devres_alloc(devm_gen_pool_release, sizeof(*ptr), GFP_KERNEL);
-	if (!ptr)
-		goto free_pool_name;
+/* 	ptr = devres_alloc(devm_gen_pool_release, sizeof(*ptr), GFP_KERNEL); */
+/* 	if (!ptr) */
+/* 		goto free_pool_name; */
 
-	pool = gen_pool_create(min_alloc_order, nid);
-	if (!pool)
-		goto free_devres;
+/* 	pool = gen_pool_create(min_alloc_order, nid); */
+/* 	if (!pool) */
+/* 		goto free_devres; */
 
-	*ptr = pool;
-	pool->name = pool_name;
-	devres_add(dev, ptr);
+/* 	*ptr = pool; */
+/* 	pool->name = pool_name; */
+/* 	devres_add(dev, ptr); */
 
-	return pool;
+/* 	return pool; */
 
-free_devres:
-	devres_free(ptr);
-free_pool_name:
-	kfree_const(pool_name);
+/* free_devres: */
+/* 	devres_free(ptr); */
+/* free_pool_name: */
+/* 	kfree_const(pool_name); */
 
-	return ERR_PTR(-ENOMEM);
-}
-EXPORT_SYMBOL(devm_gen_pool_create);
+/* 	return ERR_PTR(-ENOMEM); */
+/* } */
+/* EXPORT_SYMBOL(devm_gen_pool_create); */
 
 #ifdef CONFIG_OF
 /**
