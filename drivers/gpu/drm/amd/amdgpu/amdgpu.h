@@ -680,6 +680,7 @@ struct amdgpu_nbio_funcs {
 
 struct amdgpu_df_funcs {
 	void (*init)(struct amdgpu_device *adev);
+	void (*sw_init)(struct amdgpu_device *adev);
 	void (*enable_broadcast_mode)(struct amdgpu_device *adev,
 				      bool enable);
 	u32 (*get_fb_channel_number)(struct amdgpu_device *adev);
@@ -730,6 +731,7 @@ struct amd_powerplay {
 };
 
 #define AMDGPU_RESET_MAGIC_NUM 64
+#define AMDGPU_MAX_DF_PERFMONS 4
 struct amdgpu_device {
 	struct device			*dev;
 	struct drm_device		*ddev;
@@ -965,6 +967,7 @@ struct amdgpu_device {
 	long				compute_timeout;
 
 	uint64_t			unique_id;
+	uint64_t	df_perfmon_config_assign_mask[AMDGPU_MAX_DF_PERFMONS];
 };
 
 static inline struct amdgpu_device *amdgpu_ttm_adev(struct ttm_bo_device *bdev)
@@ -1204,4 +1207,19 @@ static inline int amdgpu_dm_display_resume(struct amdgpu_device *adev) { return 
 #endif
 
 #include "amdgpu_object.h"
+
+/* used by df_v3_6.c and amdgpu_pmu.c */
+#define AMDGPU_PMU_ATTR(_name, _object)					\
+static ssize_t								\
+_name##_show(struct device *dev,					\
+			       struct device_attribute *attr,		\
+			       char *page)				\
+{									\
+	BUILD_BUG_ON(sizeof(_object) >= PAGE_SIZE - 1);			\
+	return sprintf(page, _object "\n");				\
+}									\
+									\
+static struct device_attribute pmu_attr_##_name = __ATTR_RO(_name)
+
 #endif
+
