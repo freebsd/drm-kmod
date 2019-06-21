@@ -6,6 +6,7 @@ SYSDIR?=/usr/src/sys
 .if !defined(OSVERSION)
 .if exists(${SYSDIR}/sys/param.h)
 OSVERSION!=	awk '/^\#define[[:blank:]]__FreeBSD_version/ {print $$3}' < ${SYSDIR}/sys/param.h
+.MAKEFLAGS:	OSVERSION=${OSVERSION}
 .else
 .error Unable to determine OS version. Missing kernel sources?
 .endif
