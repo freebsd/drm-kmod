@@ -32,7 +32,6 @@ SRCS=	\
 	i915_sw_fence.c \
 	i915_syncmap.c \
 	i915_sysfs.c \
-	i915_timeline.c \
 	i915_trace_points.c \
 	i915_user_extensions.c \
 	i915_vgpu.c \
@@ -126,6 +125,7 @@ SRCS+=	intel_breadcrumbs.c \
 	intel_reset.c \
 	intel_ringbuffer.c \
 	intel_sseu.c \
+	intel_timeline.c \
 	intel_workarounds.c
 
 # gem/*
