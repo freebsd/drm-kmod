@@ -1,5 +1,16 @@
 # $FreeBSD$
 
+SYSDIR?=/usr/src/sys
+
+# Get __FreeBSD_version (obtained from bsd.port.mk)
+.if !defined(OSVERSION)
+.if exists(${SYSDIR}/sys/param.h)
+OSVERSION!=	awk '/^\#define[[:blank:]]__FreeBSD_version/ {print $$3}' < ${SYSDIR}/sys/param.h
+.else
+.error Unable to determine OS version. Missing kernel sources?
+.endif
+.endif
+
 SUBDIR=	linuxkpi	\
 	ttm		\
 	drm		\
@@ -13,7 +24,9 @@ SUBDIR=	linuxkpi	\
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386"
 _i915 =		i915 
 _vmwgfx =	vmwgfx
+.if ${OSVERSION} >= 1300033
 _vboxvideo =	vboxvideo
+.endif
 .endif
 
 .if defined(DUMMYGFX)
