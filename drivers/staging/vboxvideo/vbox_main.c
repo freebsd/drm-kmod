@@ -142,16 +142,17 @@ static int vbox_accel_init(struct vbox_private *vbox)
 	int rid, type;
 
 	rid = PCIR_BAR(0);
-	type = pci_resource_type(vbox->ddev.pdev, PCIR_BAR(0));
-	res = bus_alloc_resource(vbox->ddev.pdev->dev.bsddev, type, &rid,
-	    vbox->available_vram_size,						/* start */
-	    vbox->available_vram_size + vbox->num_crtcs * VBVA_MIN_BUFFER_SIZE,	/* end */  
-	    vbox->num_crtcs * VBVA_MIN_BUFFER_SIZE,				/* size */ 
-	    RF_ACTIVE);
+	type = pci_resource_type(vbox->ddev.pdev, 0);
+	res = bus_alloc_resource_any(vbox->ddev.pdev->dev.bsddev, type, &rid, RF_ACTIVE);
+	if (!res) {
+		DRM_ERROR("Could not allocate resource for vbva buffers\n");
+		return -ENOMEM;
+	}
 	vbox->vbva_buffers_res = res;
 	vbox->vbva_buffers_rid = rid;
 	vbox->vbva_buffers_restype = type;
-	vbox->vbva_buffers = (void *)rman_get_bushandle(res);
+	/* BSDFIXME: Map with offset in a less dodgy way */
+	vbox->vbva_buffers = (void *)(rman_get_bushandle(res) + vbox->available_vram_size);
 #endif
 	if (!vbox->vbva_buffers)
 		return -ENOMEM;
@@ -221,7 +222,7 @@ int vbox_hw_init(struct vbox_private *vbox)
 	vbox->full_vram_size = inl(VBE_DISPI_IOPORT_DATA);
 	vbox->any_pitch = vbox_check_supported(VBE_DISPI_ID_ANYX);
 
-	DRM_INFO("VRAM %08x\n", vbox->full_vram_size);
+	DRM_INFO("VRAM 0x%08x\n", vbox->full_vram_size);
 
 	/* Map guest-heap at end of vram */
 #ifdef __linux__
@@ -233,16 +234,17 @@ int vbox_hw_init(struct vbox_private *vbox)
 	int rid, type;
 
 	rid = PCIR_BAR(0);
-	type = pci_resource_type(vbox->ddev.pdev, PCIR_BAR(0));
-	res = bus_alloc_resource(vbox->ddev.pdev->dev.bsddev, type, &rid,
-	    GUEST_HEAP_OFFSET(vbox), 			/* start */ 
-	    GUEST_HEAP_OFFSET(vbox) + GUEST_HEAP_SIZE, 	/* end */
-	    GUEST_HEAP_SIZE, 				/* size */
-	    RF_ACTIVE);
+	type = pci_resource_type(vbox->ddev.pdev, 0);
+	res = bus_alloc_resource_any(vbox->ddev.pdev->dev.bsddev, type, &rid, RF_ACTIVE);
+	if (!res) {
+		DRM_ERROR("Could not allocate resource for guest heap\n");
+		return -ENOMEM;
+	}
 	vbox->guest_heap_res = res;
 	vbox->guest_heap_rid = rid;
 	vbox->guest_heap_restype = type;
-	vbox->guest_heap = (void *)rman_get_bushandle(res);
+	/* BSDFIXME: Map with offset in a less dodgy way */
+	vbox->guest_heap = (void *)rman_get_bushandle(res) + GUEST_HEAP_OFFSET(vbox);
 #endif
 	if (!vbox->guest_heap)
 		return -ENOMEM;
@@ -260,10 +262,8 @@ int vbox_hw_init(struct vbox_private *vbox)
 		goto err_destroy_guest_pool;
 
 	ret = hgsmi_test_query_conf(vbox->guest_pool);
-	if (ret) {
-		DRM_ERROR("vboxvideo: hgsmi_test_query_conf failed\n");
+	if (ret)
 		goto err_destroy_guest_pool;
-	}
 
 	/* Reduce available VRAM size to reflect the guest heap. */
 	vbox->available_vram_size = GUEST_HEAP_OFFSET(vbox);
