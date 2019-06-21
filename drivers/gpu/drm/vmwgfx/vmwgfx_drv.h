@@ -44,8 +44,11 @@
 #include <linux/sync_file.h>
 
 #ifndef __linux__
-#define	outl(a,b) outl(b,a)
+/* BSD: Make sure we get out[bwl] redefines */
+#include <linux/compiler.h>
+#endif
 
+#ifndef __linux__
 static inline void
 spin_lock_init_spin(spinlock_t *lock)
 {

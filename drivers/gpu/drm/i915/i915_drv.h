@@ -87,6 +87,11 @@
 
 #include "intel_gvt.h"
 
+#ifndef __linux__
+/* BSD: Make sure we get out[bwl] redefines */
+#include <linux/compiler.h>
+#endif
+
 /* General customization:
  */
 
@@ -3563,10 +3568,6 @@ __raw_write(64, q)
 
 #undef __raw_read
 #undef __raw_write
-
-#ifndef __linux__
-#define outb _outb
-#endif
 
 /* These are untraced mmio-accessors that are only valid to be used inside
  * critical sections, such as inside IRQ handlers, where forcewake is explicitly

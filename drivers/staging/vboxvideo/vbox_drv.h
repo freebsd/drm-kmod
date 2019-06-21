@@ -30,6 +30,11 @@
 #include "vboxvideo_vbe.h"
 #include "hgsmi_ch_setup.h"
 
+#ifndef __linux__
+/* BSD: Make sure we get out[bwl] redefines */
+#include <linux/compiler.h>
+#endif
+
 #define DRIVER_NAME         "vboxvideo"
 #define DRIVER_DESC         "Oracle VM VirtualBox Graphics Card"
 #define DRIVER_DATE         "20130823"
