@@ -399,6 +399,7 @@ SRCS+=	gpio_base.c \
 	gpio_service.c \
 	hw_ddc.c \
 	hw_factory.c \
+	hw_generic.c \
 	hw_gpio.c \
 	hw_hpd.c \
 	hw_translate.c \
