@@ -261,7 +261,9 @@ void i915_gem_resume(struct drm_i915_private *i915)
 	 * guarantee that the context image is complete. So let's just reset
 	 * it and start again.
 	 */
-	if (intel_gt_resume(i915))
+	intel_gt_resume(&i915->gt);
+
+	if (i915_gem_init_hw(i915))
 		goto err_wedged;
 
 	intel_uc_resume(i915);
