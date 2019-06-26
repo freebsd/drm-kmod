@@ -780,8 +780,6 @@ static void reset_finish(struct drm_i915_private *i915,
 		if (awake & engine->mask)
 			intel_engine_pm_put(engine);
 	}
-
-	intel_gt_pm_put(&i915->gt);
 }
 
 static void nop_submit_request(struct i915_request *request)
@@ -1109,7 +1107,7 @@ int i915_reset_engine(struct intel_engine_cs *engine, const char *msg)
 	GEM_TRACE("%s flags=%lx\n", engine->name, error->flags);
 	GEM_BUG_ON(!test_bit(I915_RESET_ENGINE + engine->id, &error->flags));
 
-	if (!intel_engine_pm_is_awake(engine))
+	if (!intel_engine_pm_get_if_awake(engine))
 		return 0;
 
 	reset_prepare_engine(engine);
