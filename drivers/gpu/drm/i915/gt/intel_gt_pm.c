@@ -123,7 +123,7 @@ void intel_gt_sanitize(struct intel_gt *gt, bool force)
 		intel_engine_reset(engine, false);
 }
 
-void intel_gt_resume(struct intel_gt *gt)
+int intel_gt_resume(struct intel_gt *gt)
 {
 	struct intel_engine_cs *engine;
 	enum intel_engine_id id;
@@ -135,6 +135,7 @@ void intel_gt_resume(struct intel_gt *gt)
 	 * Only the kernel contexts should remain pinned over suspend,
 	 * allowing us to fixup the user contexts on their first pin.
 	 */
+	intel_gt_pm_get(gt);
 	for_each_engine(engine, gt->i915, id) {
 		struct intel_context *ce;
 
@@ -159,4 +160,7 @@ void intel_gt_resume(struct intel_gt *gt)
 			break;
 		}
 	}
+	intel_gt_pm_put(gt);
+
+	return err;
 }
