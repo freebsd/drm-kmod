@@ -2,7 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
-.PATH:	${SRCDIR} ${SRCDIR}/gt ${SRCDIR}/gem ${SRCDIR}/display
+.PATH:	${SRCDIR} ${SRCDIR}/gt ${SRCDIR}/gem ${SRCDIR}/display ${SRCDIR}/oa
 
 .include "../kconfig.mk"
 
@@ -20,8 +20,6 @@ SRCS=	\
 	i915_globals.c \
 	i915_irq.c \
 	i915_memcpy.c \
-	i915_oa_hsw.c \
-	i915_oa_icl.c \
 	i915_params.c \
 	i915_pci.c \
 	i915_query.c \
@@ -149,6 +147,22 @@ SRCS+=	i915_gem_busy.c \
 	i915_gem_tiling.c \
 	i915_gem_userptr.c \
 	i915_gem_wait.c
+
+# oa/*
+SRCS+=	i915_oa_bdw.c \
+	i915_oa_cflgt3.c \
+	i915_oa_glk.c \
+	i915_oa_kblgt2.c \
+	i915_oa_sklgt3.c \
+	i915_oa_bxt.c \
+	i915_oa_chv.c \
+	i915_oa_hsw.c \
+	i915_oa_kblgt3.c \
+	i915_oa_sklgt4.c \
+	i915_oa_cflgt2.c \
+	i915_oa_cnl.c \
+	i915_oa_icl.c \
+	i915_oa_sklgt2.c
 
 .if !empty(KCONFIG:MCOMPAT)
 SRCS+=	i915_ioc32.c
