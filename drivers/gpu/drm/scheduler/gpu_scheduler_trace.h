@@ -28,8 +28,6 @@
 #include <linux/types.h>
 #include <linux/tracepoint.h>
 
-#include <drm/drmP.h>
-
 #ifdef __FreeBSD__
 
 static inline void
