@@ -1168,7 +1168,7 @@ bool intel_engine_is_idle(struct intel_engine_cs *engine)
 		struct tasklet_struct *t = &engine->execlists.tasklet;
 
 #ifdef __linux__
-		synchronize_hardirq(engine->i915->drm.irq);
+		synchronize_hardirq(engine->i915->drm.pdev->irq);
 #elif defined(__FreeBSD__)
 		/* BSDFIXME: Is it enough to wait that all cpu have context-switched ? */
 		synchronize_rcu();
