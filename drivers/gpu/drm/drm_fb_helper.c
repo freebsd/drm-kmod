@@ -2305,6 +2305,7 @@ int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
 			fbi->fix.smem_start =
 				page_to_phys(virt_to_page(fbi->screen_buffer));
 #endif
+	}
 #endif
 	}
 
