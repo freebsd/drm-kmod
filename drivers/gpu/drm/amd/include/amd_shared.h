@@ -30,7 +30,7 @@
 #include <linux/seq_file.h>
 #endif
 
-#define AMD_MAX_USEC_TIMEOUT		200000  /* 200 ms */
+#define AMD_MAX_USEC_TIMEOUT		1000000  /* 1000 ms */
 
 /*
  * Chip flags
