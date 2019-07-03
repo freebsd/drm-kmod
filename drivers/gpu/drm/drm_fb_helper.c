@@ -413,6 +413,7 @@ static void drm_fb_helper_dirty_work(struct work_struct *work)
 	struct drm_clip_rect *clip = &helper->dirty_clip;
 	struct drm_clip_rect clip_copy;
 	unsigned long flags;
+	void *vaddr;
 
 	spin_lock_irqsave(&helper->dirty_lock, flags);
 	clip_copy = *clip;
@@ -422,10 +423,18 @@ static void drm_fb_helper_dirty_work(struct work_struct *work)
 
 	/* call dirty callback only when it has been really touched */
 	if (clip_copy.x1 < clip_copy.x2 && clip_copy.y1 < clip_copy.y2) {
+
 		/* Generic fbdev uses a shadow buffer */
-		if (helper->buffer)
+		if (helper->buffer) {
+			vaddr = drm_client_buffer_vmap(helper->buffer);
+			if (IS_ERR(vaddr))
+				return;
 			drm_fb_helper_dirty_blit_real(helper, &clip_copy);
+		}
 		helper->fb->funcs->dirty(helper->fb, NULL, 0, 0, &clip_copy, 1);
+
+		if (helper->buffer)
+			drm_client_buffer_vunmap(helper->buffer);
 	}
 }
 
@@ -2222,6 +2231,7 @@ int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
 	struct drm_framebuffer *fb;
 	struct fb_info *fbi;
 	u32 format;
+	void *vaddr;
 
 	DRM_DEBUG_KMS("surface width(%d), height(%d) and bpp(%d)\n",
 		      sizes->surface_width, sizes->surface_height,
@@ -2244,13 +2254,7 @@ int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
 	fbi->fbops = &drm_fbdev_fb_ops;
 	fbi->screen_size = fb->height * fb->pitches[0];
 	fbi->fix.smem_len = fbi->screen_size;
-	fbi->screen_buffer = buffer->vaddr;
-	/* Shamelessly leak the physical address to user-space */
-#if IS_ENABLED(CONFIG_DRM_FBDEV_LEAK_PHYS_SMEM)
-	if (drm_leak_fbdev_smem && fbi->fix.smem_start == 0)
-		fbi->fix.smem_start =
-			page_to_phys(virt_to_page(fbi->screen_buffer));
-#endif
+
 	drm_fb_helper_fill_info(fbi, fb_helper, sizes);
 
 	if (fb->funcs->dirty) {
