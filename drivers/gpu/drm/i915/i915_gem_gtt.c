@@ -1565,7 +1565,6 @@ unwind_pdp:
 	spin_lock(&pml4->lock);
 	if (atomic_dec_and_test(&pdp->used)) {
 		gen8_ppgtt_set_pml4e(pml4, vm->scratch_pdp, pml4e);
-		pml4->entry[pml4e] = vm->scratch_pdp;
 		GEM_BUG_ON(alloc);
 		alloc = pdp; /* defer the free until after the lock */
 	}
