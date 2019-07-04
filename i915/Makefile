@@ -16,7 +16,6 @@ SRCS=	\
 	i915_gem_evict.c \
 	i915_gem_fence_reg.c \
 	i915_gem_gtt.c \
-	i915_gem_render_state.c \
 	i915_globals.c \
 	i915_irq.c \
 	i915_memcpy.c \
@@ -69,10 +68,6 @@ SRCS=	\
 	intel_pm.c \
 	intel_psr.c \
 	intel_quirks.c \
-	intel_renderstate_gen6.c \
-	intel_renderstate_gen7.c \
-	intel_renderstate_gen8.c \
-	intel_renderstate_gen9.c \
 	intel_runtime_pm.c \
 	intel_sideband.c \
 	intel_sprite.c \
@@ -113,7 +108,11 @@ SRCS+=	dvo_ch7017.c \
 	vlv_dsi_pll.c
 
 # gt/*
-SRCS+=	intel_breadcrumbs.c \
+SRCS+=	gen6_renderstate.c \
+	gen7_renderstate.c \
+	gen8_renderstate.c \
+	gen9_renderstate.c \
+	intel_breadcrumbs.c \
 	intel_context.c \
 	intel_engine_cs.c \
 	intel_engine_pm.c \
@@ -121,6 +120,7 @@ SRCS+=	intel_breadcrumbs.c \
 	intel_hangcheck.c \
 	intel_lrc.c \
 	intel_mocs.c \
+	intel_renderstate.c \
 	intel_reset.c \
 	intel_ringbuffer.c \
 	intel_sseu.c \
