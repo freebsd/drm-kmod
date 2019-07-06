@@ -677,6 +677,7 @@ CWARNFLAGS.dcn20_optc.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn20_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
 CWARNFLAGS.dcn20_clk_mgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hubp.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn21_hubbub.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hwseq.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_link_encoder.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn21_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
