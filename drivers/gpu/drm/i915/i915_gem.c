@@ -3126,8 +3126,9 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 					  page, data);
 		if (err < 0)
 			return err;
+#else
+		put_page(page);
 #endif
-
 		if (unwritten)
 			return -EFAULT;
 
@@ -6209,6 +6210,8 @@ i915_gem_object_create_from_data(struct drm_i915_private *dev_priv,
 					  page, pgdata);
 		if (err < 0)
 			goto fail;
+#else
+		put_page(page);
 #endif
 
 		size -= len;
