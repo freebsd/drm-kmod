@@ -2634,7 +2634,7 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	if (amdgpu_mes && adev->asic_type >= CHIP_NAVI10)
 		adev->enable_mes = true;
 
-	if (amdgpu_discovery) {
+	if (amdgpu_discovery && adev->asic_type >= CHIP_NAVI10) {
 		r = amdgpu_discovery_init(adev);
 		if (r) {
 			dev_err(adev->dev, "amdgpu_discovery_init failed\n");
@@ -2913,7 +2913,7 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	amdgpu_debugfs_preempt_cleanup(adev);
 #endif
 
-	if (amdgpu_discovery)
+	if (amdgpu_discovery && adev->asic_type >= CHIP_NAVI10)
 		amdgpu_discovery_fini(adev);
 }
 
