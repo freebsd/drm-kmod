@@ -373,7 +373,9 @@ SRCS+=	dcn20_dccg.c \
 	dcn20_optc.c \
 	dcn20_resource.c \
 	dcn20_stream_encoder.c \
-	dcn20_vmid.c
+	dcn20_vmid.c \
+	display_rq_dlg_calc_20v2.c \
+	display_mode_vba_20v2.c
 
 # display/dc/core
 SRCS+=	dc_vm_helper.c
@@ -565,6 +567,11 @@ CFLAGS.display_rq_dlg_calc_20.c= -msse -mstack-alignment=4
 CFLAGS.soc_bounding_box.c= -msse -mstack-alignment=4
 CFLAGS.dml_common_defs.c= -msse -mstack-alignment=4
 
+CFLAGS.display_rq_dlg_calc_20v2.c= -msse -mstack-alignment=4
+CFLAGS.display_mode_vba_20v2.c= -msse -mstack-alignment=4
+
+CFLAGS.rc_calc.c= -msse -mstack-alignment=4
+CFLAGS.rc_calc_dpi.c= -msse -mstack-alignment=4
 
 .if ${MACHINE_CPUARCH} != "powerpc"
 CWARNFLAGS+=	-Wno-expansion-to-defined
