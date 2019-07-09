@@ -743,6 +743,7 @@ CWARNFLAGS.tonga_hwmgr.c=	-Wno-missing-prototypes  -Wno-unused-const-variable
 CWARNFLAGS.tonga_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.tonga_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.vcn_v1_0.c=	-Wno-sometimes-uninitialized
+CWARNFLAGS.vcn_v2_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.vector.c=	-Wno-missing-prototypes
 CWARNFLAGS.vega10_hwmgr.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized
 CWARNFLAGS.vega10_ih.c=
