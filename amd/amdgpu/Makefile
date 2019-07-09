@@ -190,6 +190,7 @@ SRCS+=	amdgpu_afmt.c \
 	mes_v10_1.c \
 	mmhub_v1_0.c \
 	mmhub_v2_0.c \
+	mmhub_v9_4.c \
 	mxgpu_ai.c \
 	mxgpu_vi.c \
 	navi10_reg_init.c \
@@ -711,6 +712,7 @@ CWARNFLAGS.iceland_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.iceland_thermal.c=	-Wno-missing-prototypes
 CWARNFLAGS.kv_dpm.c=	-Wno-unused-const-variable
 CWARNFLAGS.mes_v10_1.c=	-Wno-unused-const-variable
+CWARNFLAGS.mmhub_v9_4.c=	-Wno-missing-prototypes
 CWARNFLAGS.mxgpu_vi.c=	-Wno-enum-conversion
 CWARNFLAGS.navi10_ppt.c=	-Wno-incompatible-pointer-types -Wno-return-type
 CWARNFLAGS.polaris10_clockpowergating.c=	-Wno-missing-prototypes -Wno-enum-conversion
