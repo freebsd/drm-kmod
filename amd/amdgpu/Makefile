@@ -454,6 +454,7 @@ SRCS+=	dcn_calc_auto.c \
 # powerplay
 SRCS+=	amd_powerplay.c \
 	amdgpu_smu.c \
+	arcturus_ppt.c \
 	common_baco.c \
 	ci_smumgr.c \
 	fiji_smumgr.c \
