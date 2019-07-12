@@ -7,6 +7,8 @@
 #include <linux/mman.h>
 #include <linux/sizes.h>
 
+#include "gt/intel_gt.h"
+
 #include "i915_drv.h"
 #include "i915_gem_gtt.h"
 #include "i915_gem_ioctls.h"
@@ -309,7 +311,7 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	wakeref = intel_runtime_pm_get(rpm);
 
 #ifdef __freebsd_notyet__
-	srcu = i915_reset_trylock(i915);
+	srcu = intel_gt_reset_trylock(ggtt->vm.gt);
 	if (srcu < 0) {
 		ret = srcu;
 		goto err_rpm;
@@ -391,7 +393,7 @@ err_unlock:
 	mutex_unlock(&dev->struct_mutex);
 err_reset:
 #ifdef __freebsd_notyet__
-	i915_reset_unlock(i915, srcu);
+	intel_gt_reset_unlock(ggtt->vm.gt, srcu);
 err_rpm:
 #endif
 	intel_runtime_pm_put(rpm, wakeref);
@@ -405,7 +407,7 @@ err:
 		 * fail). But any other -EIO isn't ours (e.g. swap in failure)
 		 * and so needs to be reported.
 		 */
-		if (!i915_terminally_wedged(i915))
+		if (!intel_gt_is_wedged(ggtt->vm.gt))
 			return VM_FAULT_SIGBUS;
 		/* else, fall through */
 	case -EAGAIN:
