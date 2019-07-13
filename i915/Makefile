@@ -2,7 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
-.PATH:	${SRCDIR} ${SRCDIR}/gt ${SRCDIR}/gem ${SRCDIR}/display ${SRCDIR}/oa
+.PATH:	${SRCDIR} ${SRCDIR}/gt ${SRCDIR}/gt/uc ${SRCDIR}/gem ${SRCDIR}/display ${SRCDIR}/oa
 
 .include "../kconfig.mk"
 
@@ -53,16 +53,8 @@ SRCS=	\
 	intel_fifo_underrun.c \
 	intel_freebsd.c \
 	intel_frontbuffer.c \
-	intel_guc.c \
-	intel_guc_ads.c \
-	intel_guc_ct.c \
-	intel_guc_fw.c \
-	intel_guc_log.c \
-	intel_guc_submission.c \
 	intel_hdcp.c \
 	intel_hotplug.c \
-	intel_huc.c \
-	intel_huc_fw.c \
 	intel_opregion.c \
 	intel_overlay.c \
 	intel_pm.c \
@@ -71,8 +63,6 @@ SRCS=	\
 	intel_runtime_pm.c \
 	intel_sideband.c \
 	intel_sprite.c \
-	intel_uc.c \
-	intel_uc_fw.c \
 	intel_uncore.c \
 	intel_wakeref.c \
 	intel_wopcm.c
@@ -126,6 +116,18 @@ SRCS+=	gen6_renderstate.c \
 	intel_sseu.c \
 	intel_timeline.c \
 	intel_workarounds.c
+
+# gt/uc*
+SRCS+=	intel_guc.c \
+	intel_guc_ads.c \
+	intel_guc_ct.c \
+	intel_guc_fw.c \
+	intel_guc_log.c \
+	intel_guc_submission.c \
+	intel_huc.c \
+	intel_huc_fw.c \
+	intel_uc.c \
+	intel_uc_fw.c
 
 # gem/*
 SRCS+=	i915_gem_busy.c \
