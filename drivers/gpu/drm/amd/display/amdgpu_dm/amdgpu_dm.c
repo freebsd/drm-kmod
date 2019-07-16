@@ -1255,7 +1255,7 @@ static int dm_resume(void *handle)
 	 */
 	amdgpu_dm_irq_resume_early(adev);
 
-	/* On resume we need to  rewrite the MSTM control bits to enable MST*/
+	/* On resume we need to rewrite the MSTM control bits to enable MST*/
 	s3_handle_mst(ddev, false);
 
 	/* Do detection*/
