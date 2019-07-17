@@ -25,7 +25,7 @@ SUBDIR=	linuxkpi	\
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386"
 _i915 =		i915 
 _vmwgfx =	vmwgfx
-.if ${OSVERSION} >= 1300033
+.if ${OSVERSION} >= 1300033 || (${OSVERSION} >= 1200514 && ${OSVERSION} < 1300000)
 _vboxvideo =	vboxvideo
 .endif
 .endif
