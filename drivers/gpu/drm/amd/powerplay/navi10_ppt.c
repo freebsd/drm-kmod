@@ -1632,7 +1632,7 @@ static int navi10_set_peak_clock_by_device(struct smu_context *smu)
 	uint32_t sclk_freq = 0, uclk_freq = 0;
 	uint32_t uclk_level = 0;
 
-	switch (adev->pdev->revision) {
+	switch (adev->rev_id) {
 	case 0xf0: /* XTX */
 	case 0xc0:
 		sclk_freq = NAVI10_PEAK_SCLK_XTX;
@@ -1679,22 +1679,6 @@ static int navi10_set_performance_level(struct smu_context *smu, enum amd_dpm_fo
 	return ret;
 }
 
-static int navi10_get_thermal_temperature_range(struct smu_context *smu,
-						struct smu_temperature_range *range)
-{
-	struct smu_table_context *table_context = &smu->smu_table;
-	struct smu_11_0_powerplay_table *powerplay_table = table_context->power_play_table;
-
-	if (!range || !powerplay_table)
-		return -EINVAL;
-
-	/* The unit is temperature */
-	range->min = 0;
-	range->max = powerplay_table->software_shutdown_temp;
-
-	return 0;
-}
-
 static const struct pptable_funcs navi10_ppt_funcs = {
 	.tables_init = navi10_tables_init,
 	.alloc_dpm_context = navi10_allocate_dpm_context,
@@ -1732,7 +1716,6 @@ static const struct pptable_funcs navi10_ppt_funcs = {
 	.get_ppfeature_status = navi10_get_ppfeature_status,
 	.set_ppfeature_status = navi10_set_ppfeature_status,
 	.set_performance_level = navi10_set_performance_level,
-	.get_thermal_temperature_range = navi10_get_thermal_temperature_range,
 };
 
 void navi10_set_ppt_funcs(struct smu_context *smu)
