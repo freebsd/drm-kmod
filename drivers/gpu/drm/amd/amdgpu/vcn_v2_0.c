@@ -2099,17 +2099,17 @@ static int vcn_v2_0_dec_ring_test_ring(struct amdgpu_ring *ring)
 	unsigned i;
 	int r;
 
-	WREG32(adev->vcn.inst[0].external.scratch9, 0xCAFEDEAD);
+	WREG32(adev->vcn.inst[ring->me].external.scratch9, 0xCAFEDEAD);
 	r = amdgpu_ring_alloc(ring, 4);
 	if (r)
 		return r;
-	amdgpu_ring_write(ring, PACKET0(mmUVD_GPCOM_VCPU_CMD_INTERNAL_OFFSET, 0));
+	amdgpu_ring_write(ring, PACKET0(adev->vcn.internal.cmd, 0));
 	amdgpu_ring_write(ring, VCN_DEC_KMD_CMD | (VCN_DEC_CMD_PACKET_START << 1));
 	amdgpu_ring_write(ring, PACKET0(adev->vcn.internal.scratch9, 0));
 	amdgpu_ring_write(ring, 0xDEADBEEF);
 	amdgpu_ring_commit(ring);
 	for (i = 0; i < adev->usec_timeout; i++) {
-		tmp = RREG32(adev->vcn.inst[0].external.scratch9);
+		tmp = RREG32(adev->vcn.inst[ring->me].external.scratch9);
 		if (tmp == 0xDEADBEEF)
 			break;
 		DRM_UDELAY(1);
