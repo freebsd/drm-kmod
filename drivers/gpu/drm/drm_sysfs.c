@@ -14,6 +14,7 @@
 #include <linux/err.h>
 #include <linux/export.h>
 #include <linux/gfp.h>
+#include <linux/i2c.h>
 #include <linux/kdev_t.h>
 #include <linux/slab.h>
 
@@ -305,6 +306,11 @@ int drm_sysfs_connector_add(struct drm_connector *connector)
 	/* Let userspace know we have a new connector */
 	drm_sysfs_hotplug_event(dev);
 
+#ifdef __linux__
+	if (connector->ddc)
+		return sysfs_create_link(&connector->kdev->kobj,
+				 &connector->ddc->dev.kobj, "ddc");
+#endif
 	return 0;
 }
 
@@ -312,6 +318,12 @@ void drm_sysfs_connector_remove(struct drm_connector *connector)
 {
 	if (!connector->kdev)
 		return;
+
+#ifdef __linux__
+	if (connector->ddc)
+		sysfs_remove_link(&connector->kdev->kobj, "ddc");
+#endif
+
 	DRM_DEBUG("removing \"%s\" from sysfs\n",
 		  connector->name);
 
