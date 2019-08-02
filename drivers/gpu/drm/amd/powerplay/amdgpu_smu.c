@@ -435,7 +435,7 @@ int smu_common_read_sensor(struct smu_context *smu, enum amd_pp_sensors sensor,
 		*size = 4;
 		break;
 	case AMDGPU_PP_SENSOR_VCN_POWER_STATE:
-		*(uint32_t *)data = smu_feature_is_enabled(smu, SMU_FEATURE_VCN_PG_BIT) ? 1 : 0;
+		*(uint32_t *)data = power_gate->vcn_gated ? 0 : 1;
 		*size = 4;
 		break;
 	default:
