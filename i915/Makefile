@@ -12,7 +12,6 @@ SRCS=	\
 	i915_cmd_parser.c \
 	i915_drv.c \
 	i915_gem.c \
-	i915_gem_batch_pool.c \
 	i915_gem_evict.c \
 	i915_gem_fence_reg.c \
 	i915_gem_gtt.c \
@@ -106,6 +105,7 @@ SRCS+=	gen6_renderstate.c \
 	intel_context.c \
 	intel_engine_cs.c \
 	intel_engine_pm.c \
+	intel_engine_pool.c \
 	intel_gt_pm.c \
 	intel_hangcheck.c \
 	intel_lrc.c \
