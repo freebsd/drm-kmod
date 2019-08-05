@@ -677,10 +677,7 @@ static void ttm_bo_release(struct kref *kref)
 	struct ttm_bo_device *bdev = bo->bdev;
 	struct ttm_mem_type_manager *man = &bdev->man[bo->mem.mem_type];
 
-	if (bo->bdev->driver->release_notify)
-		bo->bdev->driver->release_notify(bo);
-
-	drm_vma_offset_remove(&bdev->vma_manager, &bo->vma_node);
+	drm_vma_offset_remove(&bdev->vma_manager, &bo->base.vma_node);
 	ttm_mem_io_lock(man, false);
 	ttm_mem_io_free_vm(bo);
 	ttm_mem_io_unlock(man);
@@ -1351,9 +1348,9 @@ int ttm_bo_init_reserved(struct ttm_bo_device *bdev,
 		 * struct elements we want use regardless.
 		 */
 		reservation_object_init(&bo->base._resv);
+		drm_vma_node_reset(&bo->base.vma_node);
 	}
 	atomic_inc(&bo->bdev->glob->bo_count);
-	drm_vma_node_reset(&bo->vma_node);
 
 	/*
 	 * For ttm_bo_type_device buffers, allocate
@@ -1361,7 +1358,7 @@ int ttm_bo_init_reserved(struct ttm_bo_device *bdev,
 	 */
 	if (bo->type == ttm_bo_type_device ||
 	    bo->type == ttm_bo_type_sg)
-		ret = drm_vma_offset_add(&bdev->vma_manager, &bo->vma_node,
+		ret = drm_vma_offset_add(&bdev->vma_manager, &bo->base.vma_node,
 					 bo->mem.num_pages);
 
 	/* passed reservation objects should already be locked,
@@ -1796,9 +1793,9 @@ void ttm_bo_unmap_virtual_locked(struct ttm_buffer_object *bo)
 #ifdef __linux__
 	struct ttm_bo_device *bdev = bo->bdev;
 
-	drm_vma_node_unmap(&bo->vma_node, bdev->dev_mapping);
+	drm_vma_node_unmap(&bo->base.vma_node, bdev->dev_mapping);
 #elif defined(__FreeBSD__)
-	drm_vma_node_unmap(&bo->vma_node, bo);
+	drm_vma_node_unmap(&bo->base.vma_node, bo);
 #endif
 	ttm_mem_io_free_vm(bo);
 }
