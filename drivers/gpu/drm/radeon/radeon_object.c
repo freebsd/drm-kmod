@@ -265,7 +265,6 @@ int radeon_bo_create(struct radeon_device *rdev,
 	r = ttm_bo_init(&rdev->mman.bdev, &bo->tbo, size, type,
 			&bo->placement, page_align, !kernel, acc_size,
 			sg, resv, &radeon_ttm_bo_destroy);
-	bo->tbo.base.resv = bo->tbo.resv;
 	up_read(&rdev->pm.mclk_lock);
 	if (unlikely(r != 0)) {
 		return r;
@@ -614,7 +613,7 @@ int radeon_bo_get_surface_reg(struct radeon_bo *bo)
 	int steal;
 	int i;
 
-	reservation_object_assert_held(bo->tbo.resv);
+	reservation_object_assert_held(bo->tbo.base.resv);
 
 	if (!bo->tiling_flags)
 		return 0;
@@ -740,7 +739,7 @@ void radeon_bo_get_tiling_flags(struct radeon_bo *bo,
 				uint32_t *tiling_flags,
 				uint32_t *pitch)
 {
-	reservation_object_assert_held(bo->tbo.resv);
+	reservation_object_assert_held(bo->tbo.base.resv);
 
 	if (tiling_flags)
 		*tiling_flags = bo->tiling_flags;
@@ -752,7 +751,7 @@ int radeon_bo_check_tiling(struct radeon_bo *bo, bool has_moved,
 				bool force_drop)
 {
 	if (!force_drop)
-		reservation_object_assert_held(bo->tbo.resv);
+		reservation_object_assert_held(bo->tbo.base.resv);
 
 	if (!(bo->tiling_flags & RADEON_TILING_SURFACE))
 		return 0;
@@ -874,7 +873,7 @@ int radeon_bo_wait(struct radeon_bo *bo, u32 *mem_type, bool no_wait)
 void radeon_bo_fence(struct radeon_bo *bo, struct radeon_fence *fence,
 		     bool shared)
 {
-	struct reservation_object *resv = bo->tbo.resv;
+	struct reservation_object *resv = bo->tbo.base.resv;
 
 	if (shared)
 		reservation_object_add_shared_fence(resv, &fence->base);
