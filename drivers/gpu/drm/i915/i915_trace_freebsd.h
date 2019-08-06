@@ -3,7 +3,7 @@
 
 #include <drm/drmP.h>
 #include "i915_drv.h"
-#include "intel_drv.h"
+#include "intel_display_types.h"
 #include "gt/intel_engine.h"
 
 static inline void
