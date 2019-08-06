@@ -35,6 +35,7 @@
 #include <linux/pm_runtime.h>
 #include <linux/vga_switcheroo.h>
 #include <drm/drm_probe_helper.h>
+#include <linux/mmu_notifier.h>
 
 #include "amdgpu.h"
 #include "amdgpu_irq.h"
@@ -1501,6 +1502,9 @@ static void __exit amdgpu_exit(void)
 	amdgpu_unregister_atpx_handler();
 	amdgpu_sync_fini();
 	amdgpu_fence_slab_fini();
+#ifdef __linux__
+	mmu_notifier_synchronize();
+#endif
 }
 
 #ifdef __linux__
