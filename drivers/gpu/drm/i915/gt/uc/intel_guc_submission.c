@@ -490,7 +490,7 @@ static void guc_add_request(struct intel_guc *guc, struct i915_request *rq)
 			   ring_tail, rq->fence.seqno);
 	guc_ring_doorbell(client);
 
-	client->submissions[engine->id] += 1;
+	client->submissions[engine->guc_id] += 1;
 }
 
 /*

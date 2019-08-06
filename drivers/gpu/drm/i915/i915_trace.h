@@ -678,7 +678,7 @@ TRACE_EVENT(i915_request_queue,
 			   __entry->dev = rq->i915->drm.primary->index;
 			   __entry->hw_id = rq->gem_context->hw_id;
 			   __entry->class = rq->engine->uabi_class;
-			   __entry->instance = rq->engine->instance;
+			   __entry->instance = rq->engine->uabi_instance;
 			   __entry->ctx = rq->fence.context;
 			   __entry->seqno = rq->fence.seqno;
 			   __entry->flags = flags;
@@ -707,7 +707,7 @@ DECLARE_EVENT_CLASS(i915_request,
 			   __entry->dev = rq->i915->drm.primary->index;
 			   __entry->hw_id = rq->gem_context->hw_id;
 			   __entry->class = rq->engine->uabi_class;
-			   __entry->instance = rq->engine->instance;
+			   __entry->instance = rq->engine->uabi_instance;
 			   __entry->ctx = rq->fence.context;
 			   __entry->seqno = rq->fence.seqno;
 			   ),
@@ -752,7 +752,7 @@ TRACE_EVENT(i915_request_in,
 			   __entry->dev = rq->i915->drm.primary->index;
 			   __entry->hw_id = rq->gem_context->hw_id;
 			   __entry->class = rq->engine->uabi_class;
-			   __entry->instance = rq->engine->instance;
+			   __entry->instance = rq->engine->uabi_instance;
 			   __entry->ctx = rq->fence.context;
 			   __entry->seqno = rq->fence.seqno;
 			   __entry->prio = rq->sched.attr.priority;
@@ -783,7 +783,7 @@ TRACE_EVENT(i915_request_out,
 			   __entry->dev = rq->i915->drm.primary->index;
 			   __entry->hw_id = rq->gem_context->hw_id;
 			   __entry->class = rq->engine->uabi_class;
-			   __entry->instance = rq->engine->instance;
+			   __entry->instance = rq->engine->uabi_instance;
 			   __entry->ctx = rq->fence.context;
 			   __entry->seqno = rq->fence.seqno;
 			   __entry->completed = i915_request_completed(rq);
@@ -848,7 +848,7 @@ TRACE_EVENT(i915_request_wait_begin,
 			   __entry->dev = rq->i915->drm.primary->index;
 			   __entry->hw_id = rq->gem_context->hw_id;
 			   __entry->class = rq->engine->uabi_class;
-			   __entry->instance = rq->engine->instance;
+			   __entry->instance = rq->engine->uabi_instance;
 			   __entry->ctx = rq->fence.context;
 			   __entry->seqno = rq->fence.seqno;
 			   __entry->flags = flags;
