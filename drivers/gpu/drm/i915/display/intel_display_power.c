@@ -732,7 +732,7 @@ static u32 gen9_dc_mask(struct drm_i915_private *dev_priv)
 	return mask;
 }
 
-void gen9_sanitize_dc_state(struct drm_i915_private *dev_priv)
+static void gen9_sanitize_dc_state(struct drm_i915_private *dev_priv)
 {
 	u32 val;
 
@@ -792,7 +792,7 @@ static void gen9_set_dc_state(struct drm_i915_private *dev_priv, u32 state)
 	dev_priv->csr.dc_state = val & mask;
 }
 
-void bxt_enable_dc9(struct drm_i915_private *dev_priv)
+static void bxt_enable_dc9(struct drm_i915_private *dev_priv)
 {
 	assert_can_enable_dc9(dev_priv);
 
@@ -807,7 +807,7 @@ void bxt_enable_dc9(struct drm_i915_private *dev_priv)
 	gen9_set_dc_state(dev_priv, DC_STATE_EN_DC9);
 }
 
-void bxt_disable_dc9(struct drm_i915_private *dev_priv)
+static void bxt_disable_dc9(struct drm_i915_private *dev_priv)
 {
 	assert_can_disable_dc9(dev_priv);
 
@@ -861,7 +861,7 @@ static void assert_can_enable_dc5(struct drm_i915_private *dev_priv)
 	assert_csr_loaded(dev_priv);
 }
 
-void gen9_enable_dc5(struct drm_i915_private *dev_priv)
+static void gen9_enable_dc5(struct drm_i915_private *dev_priv)
 {
 	assert_can_enable_dc5(dev_priv);
 
@@ -885,7 +885,7 @@ static void assert_can_enable_dc6(struct drm_i915_private *dev_priv)
 	assert_csr_loaded(dev_priv);
 }
 
-void skl_enable_dc6(struct drm_i915_private *dev_priv)
+static void skl_enable_dc6(struct drm_i915_private *dev_priv)
 {
 	assert_can_enable_dc6(dev_priv);
 
@@ -4449,7 +4449,7 @@ static void hsw_restore_lcpll(struct drm_i915_private *dev_priv)
  * For more, read "Display Sequences for Package C8" on the hardware
  * documentation.
  */
-void hsw_enable_pc8(struct drm_i915_private *dev_priv)
+static void hsw_enable_pc8(struct drm_i915_private *dev_priv)
 {
 	u32 val;
 
@@ -4465,7 +4465,7 @@ void hsw_enable_pc8(struct drm_i915_private *dev_priv)
 	hsw_disable_lcpll(dev_priv, true, true);
 }
 
-void hsw_disable_pc8(struct drm_i915_private *dev_priv)
+static void hsw_disable_pc8(struct drm_i915_private *dev_priv)
 {
 	u32 val;
 
@@ -4565,8 +4565,7 @@ static void skl_display_core_uninit(struct drm_i915_private *dev_priv)
 	usleep_range(10, 30);		/* 10 us delay per Bspec */
 }
 
-void bxt_display_core_init(struct drm_i915_private *dev_priv,
-			   bool resume)
+static void bxt_display_core_init(struct drm_i915_private *dev_priv, bool resume)
 {
 	struct i915_power_domains *power_domains = &dev_priv->power_domains;
 	struct i915_power_well *well;
@@ -4597,7 +4596,7 @@ void bxt_display_core_init(struct drm_i915_private *dev_priv,
 		intel_csr_load_program(dev_priv);
 }
 
-void bxt_display_core_uninit(struct drm_i915_private *dev_priv)
+static void bxt_display_core_uninit(struct drm_i915_private *dev_priv)
 {
 	struct i915_power_domains *power_domains = &dev_priv->power_domains;
 	struct i915_power_well *well;
@@ -4688,8 +4687,8 @@ static void cnl_display_core_uninit(struct drm_i915_private *dev_priv)
 	intel_combo_phy_uninit(dev_priv);
 }
 
-void icl_display_core_init(struct drm_i915_private *dev_priv,
-			   bool resume)
+static void icl_display_core_init(struct drm_i915_private *dev_priv,
+				  bool resume)
 {
 	struct i915_power_domains *power_domains = &dev_priv->power_domains;
 	struct i915_power_well *well;
@@ -4724,7 +4723,7 @@ void icl_display_core_init(struct drm_i915_private *dev_priv,
 		intel_csr_load_program(dev_priv);
 }
 
-void icl_display_core_uninit(struct drm_i915_private *dev_priv)
+static void icl_display_core_uninit(struct drm_i915_private *dev_priv)
 {
 	struct i915_power_domains *power_domains = &dev_priv->power_domains;
 	struct i915_power_well *well;
@@ -5201,3 +5200,58 @@ static void intel_power_domains_verify_state(struct drm_i915_private *i915)
 }
 
 #endif
+
+void intel_display_power_suspend_late(struct drm_i915_private *i915)
+{
+	if (INTEL_GEN(i915) >= 11 || IS_GEN9_LP(i915))
+		bxt_enable_dc9(i915);
+	else if (IS_HASWELL(i915) || IS_BROADWELL(i915))
+		hsw_enable_pc8(i915);
+}
+
+void intel_display_power_resume_early(struct drm_i915_private *i915)
+{
+	if (INTEL_GEN(i915) >= 11 || IS_GEN9_LP(i915)) {
+		gen9_sanitize_dc_state(i915);
+		bxt_disable_dc9(i915);
+	} else if (IS_HASWELL(i915) || IS_BROADWELL(i915)) {
+		hsw_disable_pc8(i915);
+	}
+}
+
+void intel_display_power_suspend(struct drm_i915_private *i915)
+{
+	if (INTEL_GEN(i915) >= 11) {
+		icl_display_core_uninit(i915);
+		bxt_enable_dc9(i915);
+	} else if (IS_GEN9_LP(i915)) {
+		bxt_display_core_uninit(i915);
+		bxt_enable_dc9(i915);
+	} else if (IS_HASWELL(i915) || IS_BROADWELL(i915)) {
+		hsw_enable_pc8(i915);
+	}
+}
+
+void intel_display_power_resume(struct drm_i915_private *i915)
+{
+	if (INTEL_GEN(i915) >= 11) {
+		bxt_disable_dc9(i915);
+		icl_display_core_init(i915, true);
+		if (i915->csr.dmc_payload) {
+			if (i915->csr.allowed_dc_mask &
+			    DC_STATE_EN_UPTO_DC6)
+				skl_enable_dc6(i915);
+			else if (i915->csr.allowed_dc_mask &
+				 DC_STATE_EN_UPTO_DC5)
+				gen9_enable_dc5(i915);
+		}
+	} else if (IS_GEN9_LP(i915)) {
+		bxt_disable_dc9(i915);
+		bxt_display_core_init(i915, true);
+		if (i915->csr.dmc_payload &&
+		    (i915->csr.allowed_dc_mask & DC_STATE_EN_UPTO_DC5))
+			gen9_enable_dc5(i915);
+	} else if (IS_HASWELL(i915) || IS_BROADWELL(i915)) {
+		hsw_disable_pc8(i915);
+	}
+}
