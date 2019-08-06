@@ -151,7 +151,7 @@ linux_intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
 	intel_gtt_read_pte(pg_start + i - 1);
 }
 
-void
+static void
 i915_locks_destroy(struct drm_i915_private *dev_priv)
 {
 
