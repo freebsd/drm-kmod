@@ -10,6 +10,7 @@
 
 #ifdef __FreeBSD__
 #include <linux/xarray.h>
+#include <linux/vmalloc.h>
 #endif
 
 void __i915_gem_object_set_pages(struct drm_i915_gem_object *obj,

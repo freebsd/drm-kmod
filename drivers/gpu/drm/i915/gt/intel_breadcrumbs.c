@@ -27,6 +27,7 @@
 #include <uapi/linux/sched/types.h>
 
 #include "i915_drv.h"
+#include "i915_trace.h"
 
 #ifdef __FreeBSD__
 #define	prio	task_thread->td_priority

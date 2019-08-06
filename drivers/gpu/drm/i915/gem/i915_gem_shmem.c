@@ -10,6 +10,7 @@
 #include "i915_drv.h"
 #include "i915_gem_object.h"
 #include "i915_scatterlist.h"
+#include "i915_trace.h"
 
 #ifdef __FreeBSD__
 static inline unsigned long totalram_pages() { return physmem; }

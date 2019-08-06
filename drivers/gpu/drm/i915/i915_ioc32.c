@@ -29,11 +29,8 @@
 #include <linux/compat.h>
 
 #include <drm/i915_drm.h>
-#ifdef __linux__
-/* Problem with struct file != struct linux_file manu (20200507) */
-#include <drm/drm_ioctl.h>
-#endif
 #include "i915_drv.h"
+#include <drm/drm_ioctl.h>
 
 struct drm_i915_getparam32 {
 	s32 param;
