@@ -193,7 +193,12 @@ int vce_v1_0_load_fw(struct radeon_device *rdev, uint32_t *data)
 	data[3] = sign->val[i].nonce[3];
 	data[4] = cpu_to_le32(le32_to_cpu(sign->len) + 64);
 
+#ifdef __linux__
 	memset(&data[5], 0, 44);
+#else
+	/* Workaround for alignment exception on POWER9 */
+	explicit_bzero(&data[5], 44);
+#endif
 	memcpy(&data[16], &sign[1], rdev->vce_fw->size - sizeof(*sign));
 
 	data += (le32_to_cpu(sign->len) + 64) / 4;
