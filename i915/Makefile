@@ -11,6 +11,7 @@ SRCS=	\
 	i915_active.c \
 	i915_cmd_parser.c \
 	i915_drv.c \
+	i915_getparam.c \
 	i915_gem.c \
 	i915_gem_evict.c \
 	i915_gem_fence_reg.c \
