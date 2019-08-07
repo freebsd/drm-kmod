@@ -1241,7 +1241,7 @@ static int i915_driver_init_hw(struct drm_i915_private *dev_priv)
 
 	i915_gem_load_init_fences(dev_priv);
 
-#ifdef __linux__
+#if defined(__linux__) || defined(pci_enable_msi)
 	/* On the 945G/GM, the chipset reports the MSI capability on the
 	 * integrated graphics even though the support isn't actually there
 	 * according to the published specs.  It doesn't appear to function
@@ -1279,11 +1279,15 @@ out_ggtt:
  */
 static void i915_driver_cleanup_hw(struct drm_i915_private *dev_priv)
 {
-#ifdef __linux__
+#if defined(__linux__) || defined(pci_disable_msi)
 	struct pci_dev *pdev = dev_priv->drm.pdev;
+#endif
 
+#ifdef CONFIG_I915_PERF
 	i915_perf_fini(dev_priv);
+#endif
 
+#if defined(__linux__) || defined(pci_disable_msi)
 	if (pdev->msi_enabled)
 		pci_disable_msi(pdev);
 #endif
