@@ -29,6 +29,7 @@
 #include "gt/intel_context.h"
 #include "gt/intel_engine_pm.h"
 #include "gt/intel_gt.h"
+#include "gt/intel_gt_pm.h"
 #include "gt/intel_lrc_reg.h"
 #include "intel_guc_submission.h"
 
@@ -540,6 +541,7 @@ static struct i915_request *schedule_in(struct i915_request *rq, int idx)
 	if (!rq->hw_context->inflight)
 		rq->hw_context->inflight = rq->engine;
 	intel_context_inflight_inc(rq->hw_context);
+	intel_gt_pm_get(rq->engine->gt);
 
 	return i915_request_get(rq);
 }
@@ -552,6 +554,7 @@ static void schedule_out(struct i915_request *rq)
 	if (!intel_context_inflight_count(rq->hw_context))
 		rq->hw_context->inflight = NULL;
 
+	intel_gt_pm_put(rq->engine->gt);
 	i915_request_put(rq);
 }
 
@@ -1079,7 +1082,6 @@ static void guc_interrupts_release(struct intel_gt *gt)
 
 static void guc_submission_park(struct intel_engine_cs *engine)
 {
-	intel_engine_park(engine);
 	intel_engine_unpin_breadcrumbs_irq(engine);
 	engine->flags &= ~I915_ENGINE_NEEDS_BREADCRUMB_TASKLET;
 }
