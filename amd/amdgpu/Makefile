@@ -474,6 +474,7 @@ SRCS+=	amd_powerplay.c \
 	hwmgr.c \
 	iceland_smumgr.c \
 	navi10_ppt.c \
+	renoir_ppt.c \
 	polaris10_smumgr.c \
 	pp_overdriver.c \
 	pp_psm.c \
