@@ -25,8 +25,9 @@
 #include <linux/debugfs.h>
 
 #include "gt/intel_gt.h"
-#include "intel_guc_log.h"
 #include "i915_drv.h"
+#include "i915_memcpy.h"
+#include "intel_guc_log.h"
 
 #ifdef __FreeBSD__
 bool intel_guc_log_relay_enabled(const struct intel_guc_log *log);
