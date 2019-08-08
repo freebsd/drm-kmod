@@ -11,6 +11,7 @@
 #include <drm/i915_drm.h>
 
 #include "i915_drv.h"
+#include "i915_gem_stolen.h"
 
 #ifdef __FreeBSD__
 #define	resource linux_resource
