@@ -65,6 +65,7 @@ SRCS=	\
 	intel_sideband.c \
 	intel_sprite.c \
 	intel_uncore.c \
+	i915_utils.c \
 	intel_wakeref.c \
 	intel_wopcm.c
 
