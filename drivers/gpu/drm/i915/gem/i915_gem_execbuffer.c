@@ -9,6 +9,10 @@
 #include <linux/sync_file.h>
 #include <linux/uaccess.h>
 
+#ifdef __FreeBSD__
+#include <linux/typecheck.h>
+#endif
+
 #include <drm/drm_syncobj.h>
 #include <drm/i915_drm.h>
 

@@ -7,6 +7,10 @@
 #ifndef __I915_GEM_CONTEXT_H__
 #define __I915_GEM_CONTEXT_H__
 
+#ifdef __FreeBSD__
+#include <linux/typecheck.h>
+#endif
+
 #include "i915_gem_context_types.h"
 
 #include "gt/intel_context.h"
