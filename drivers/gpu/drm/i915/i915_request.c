@@ -311,11 +311,11 @@ static bool i915_request_retire(struct i915_request *rq)
 
 	local_irq_enable();
 
-	intel_context_exit(rq->hw_context);
-	intel_context_unpin(rq->hw_context);
-
 	i915_request_remove_from_client(rq);
 	list_del(&rq->link);
+
+	intel_context_exit(rq->hw_context);
+	intel_context_unpin(rq->hw_context);
 
 	free_capture_list(rq);
 	i915_sched_node_fini(&rq->sched);
@@ -625,7 +625,7 @@ out:
 struct i915_request *
 __i915_request_create(struct intel_context *ce, gfp_t gfp)
 {
-	struct intel_timeline *tl = ce->ring->timeline;
+	struct intel_timeline *tl = ce->timeline;
 	struct i915_request *rq;
 	u32 seqno;
 	int ret;
@@ -782,7 +782,7 @@ i915_request_create(struct intel_context *ce)
 
 	/* Check that we do not interrupt ourselves with a new request */
 #ifdef __freebsd_notyet__
-	rq->cookie = lockdep_pin_lock(&ce->ring->timeline->mutex);
+	rq->cookie = lockdep_pin_lock(&ce->timeline->mutex);
 #endif
 
 	return rq;
