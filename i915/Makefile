@@ -112,6 +112,7 @@ SRCS+=	gen6_renderstate.c \
 	intel_engine_pool.c \
 	intel_engine_user.c \
 	intel_gt.c \
+	intel_gt_irq.c \
 	intel_gt_pm.c \
 	intel_gt_pm_irq.c \
 	intel_hangcheck.c \
