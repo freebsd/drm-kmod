@@ -51,7 +51,7 @@ __FBSDID("$FreeBSD$");
 
 #include <linux/list.h>
 #include <linux/dma-buf.h>
-#include <linux/reservation.h>
+#include <linux/dma-resv.h>
 
 #include <uapi/linux/dma-buf.h>
 
@@ -110,8 +110,8 @@ dma_buf_close(struct file *fp, struct thread *td)
 	list_del(&db->list_node);
 	sx_xunlock(&db_list.lock);
 
-	if (db->resv == (struct reservation_object *)&db[1])
-		reservation_object_fini(db->resv);
+	if (db->resv == (struct dma_resv *)&db[1])
+		dma_resv_fini(db->resv);
 
 	free(db, M_DMABUF);
 	return (0);
@@ -355,7 +355,7 @@ dma_buf_export(const struct dma_buf_export_info *exp_info)
 {
 	struct dma_buf *db;
 	struct file *fp;
-	struct reservation_object *ro;
+	struct dma_resv *ro;
 	int size, err;
 	
 	ro = exp_info->resv;
@@ -375,8 +375,8 @@ dma_buf_export(const struct dma_buf_export_info *exp_info)
 	db->cb_excl.active = db->cb_shared.active = 0;
 
 	if (ro == NULL) {
-		ro = (struct reservation_object *)&db[1];
-		reservation_object_init(ro);
+		ro = (struct dma_resv *)&db[1];
+		dma_resv_init(ro);
 	}
 	db->resv = ro;
 	if ((err = falloc_noinstall(curthread, &fp)) != 0)

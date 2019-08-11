@@ -71,7 +71,7 @@ static atomic64_t dma_fence_context_counter = ATOMIC64_INIT(1);
  *
  * - Then there's also implicit fencing, where the synchronization points are
  *   implicitly passed around as part of shared &dma_buf instances. Such
- *   implicit fences are stored in &struct reservation_object through the
+ *   implicit fences are stored in &struct dma_resv through the
  *   &dma_buf.resv pointer.
  */
 
@@ -252,7 +252,8 @@ void dma_fence_release(struct kref *kref)
 		 fence->context, fence->seqno)) {
 #elif defined(__FreeBSD__)
 		/* unsigned long vs unsigned long long (manu 20200525) */
-	if (WARN(!list_empty(&fence->cb_list),
+	if (WARN(!list_empty(&fence->cb_list) &&
+		 !test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags),
 		 "Fence %s:%s:%jx:%jx released with pending signals!\n",
 		 fence->ops->get_driver_name(fence),
 		 fence->ops->get_timeline_name(fence),
