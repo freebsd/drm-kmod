@@ -797,10 +797,11 @@ int radeon_ttm_init(struct radeon_device *rdev)
 			       &radeon_bo_driver,
 #ifdef __FreeBSD__
 			       NULL,
+			       false);
 #else
 			       rdev->ddev->anon_inode->i_mapping,
+			       dma_addressing_limited(&rdev->pdev->dev));
 #endif
-			       rdev->need_dma32);
 	if (r) {
 		DRM_ERROR("failed initializing buffer object driver(%d).\n", r);
 		return r;
