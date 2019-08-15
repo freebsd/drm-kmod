@@ -1746,10 +1746,11 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 			       &amdgpu_bo_driver,
 #ifdef __linux__
 			       adev->ddev->anon_inode->i_mapping,
+			       dma_addressing_limited(adev->dev));
 #elif defined(__FreeBSD__)
 			       NULL, /* Dummy on BSD */
+			       false);
 #endif
-			       adev->need_dma32);
 	if (r) {
 		DRM_ERROR("failed initializing buffer object driver(%d).\n", r);
 		return r;
