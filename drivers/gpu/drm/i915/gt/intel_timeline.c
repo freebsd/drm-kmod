@@ -342,6 +342,8 @@ void intel_timeline_enter(struct intel_timeline *tl)
 {
 	struct intel_gt_timelines *timelines = &tl->gt->timelines;
 
+	lockdep_assert_held(&tl->mutex);
+
 	GEM_BUG_ON(!atomic_read(&tl->pin_count));
 	if (tl->active_count++)
 		return;
@@ -355,6 +357,8 @@ void intel_timeline_enter(struct intel_timeline *tl)
 void intel_timeline_exit(struct intel_timeline *tl)
 {
 	struct intel_gt_timelines *timelines = &tl->gt->timelines;
+
+	lockdep_assert_held(&tl->mutex);
 
 	GEM_BUG_ON(!tl->active_count);
 	if (--tl->active_count)
