@@ -8,6 +8,9 @@
 #define _I915_ACTIVE_H_
 
 #include <linux/lockdep.h>
+#ifdef __FreeBSD__
+#include <linux/list.h>
+#endif
 
 #include "i915_active_types.h"
 #include "i915_request.h"
