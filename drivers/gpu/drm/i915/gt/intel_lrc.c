@@ -2200,6 +2200,7 @@ static int intel_init_workaround_bb(struct intel_engine_cs *engine)
 		return 0;
 
 	switch (INTEL_GEN(engine->i915)) {
+	case 12:
 	case 11:
 		return 0;
 	case 10:
