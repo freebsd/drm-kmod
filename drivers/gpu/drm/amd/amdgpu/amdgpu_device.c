@@ -65,6 +65,8 @@
 #include "amdgpu_ras.h"
 #include "amdgpu_pmu.h"
 
+#include <linux/suspend.h>
+
 MODULE_FIRMWARE("amdgpu/vega10_gpu_info.bin");
 MODULE_FIRMWARE("amdgpu/vega12_gpu_info.bin");
 MODULE_FIRMWARE("amdgpu/raven_gpu_info.bin");
@@ -3807,6 +3809,20 @@ int amdgpu_device_gpu_recover(struct amdgpu_device *adev,
 	struct amdgpu_device *tmp_adev = NULL;
 	int i, r = 0;
 	bool in_ras_intr = amdgpu_ras_intr_triggered();
+
+	/*
+	 * Flush RAM to disk so that after reboot
+	 * the user can read log and see why the system rebooted.
+	 */
+	if (in_ras_intr && amdgpu_ras_get_context(adev)->reboot) {
+
+		DRM_WARN("Emergency reboot.");
+
+#ifdef __linux__
+		ksys_sync_helper();
+		emergency_restart();
+#endif
+	}
 
 	need_full_reset = job_signaled = false;
 	INIT_LIST_HEAD(&device_list);
