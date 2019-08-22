@@ -727,7 +727,7 @@ extern int linux_register_framebuffer(struct linux_fb_info *fb_info);
 extern int linux_unregister_framebuffer(struct linux_fb_info *fb_info);
 extern int remove_conflicting_framebuffers(struct apertures_struct *a,
 				const char *name, bool primary);
-extern int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, int res_id, const char *name);
+extern int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name);
 struct linux_fb_info *framebuffer_alloc(size_t size, struct device *dev);
 extern void framebuffer_release(struct linux_fb_info *info);
 
