@@ -368,19 +368,33 @@ remove_conflicting_framebuffers(struct apertures_struct *a,
 	return (0);
 }
 
+
+#define	PCI_STD_NUM_BARS	6
 int
-remove_conflicting_pci_framebuffers(struct pci_dev *pdev, int res_id,
-				    const char *name)
+remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 {
 	struct apertures_struct *ap;
 	bool primary = false;
+	int err, idx, bar;
 
-	ap = alloc_apertures(1);
+	for (idx = 0, bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
+		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
+			continue;
+		idx++;
+	}
+
+	ap = alloc_apertures(idx);
 	if (!ap)
 		return -ENOMEM;
 
-	ap->ranges[0].base = pci_resource_start(pdev, res_id);
-	ap->ranges[0].size = pci_resource_len(pdev, res_id);
+	for (idx = 0, bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
+		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
+			continue;
+		ap->ranges[idx].base = pci_resource_start(pdev, bar);
+		ap->ranges[idx].size = pci_resource_len(pdev, bar);
+		idx++;
+	}
+
 #ifdef CONFIG_X86
 #ifndef __linux__
 	/* BSDFIXME: Check primary! */
