@@ -336,7 +336,7 @@ struct amdgpu_ras {
 	struct mutex recovery_lock;
 
 	uint32_t flags;
-
+	bool reboot;
 	struct amdgpu_ras_eeprom_control eeprom_control;
 };
 
