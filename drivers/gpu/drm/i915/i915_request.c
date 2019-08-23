@@ -1490,9 +1490,10 @@ bool i915_retire_requests(struct drm_i915_private *i915)
 {
 	struct intel_gt_timelines *timelines = &i915->gt.timelines;
 	struct intel_timeline *tl, *tn;
+	unsigned long flags;
 	LIST_HEAD(free);
 
-	spin_lock(&timelines->lock);
+	spin_lock_irqsave(&timelines->lock, flags);
 	list_for_each_entry_safe(tl, tn, &timelines->active_list, link) {
 		if (!mutex_trylock(&tl->mutex))
 			continue;
@@ -1500,11 +1501,11 @@ bool i915_retire_requests(struct drm_i915_private *i915)
 		intel_timeline_get(tl);
 		GEM_BUG_ON(!tl->active_count);
 		tl->active_count++; /* pin the list element */
-		spin_unlock(&timelines->lock);
+		spin_unlock_irqrestore(&timelines->lock, flags);
 
 		retire_requests(tl);
 
-		spin_lock(&timelines->lock);
+		spin_lock_irqsave(&timelines->lock, flags);
 
 		/* Resume iteration after dropping lock */
 		list_safe_reset_next(tl, tn, link);
@@ -1519,7 +1520,7 @@ bool i915_retire_requests(struct drm_i915_private *i915)
 			list_add(&tl->link, &free);
 		}
 	}
-	spin_unlock(&timelines->lock);
+	spin_unlock_irqrestore(&timelines->lock, flags);
 
 	list_for_each_entry_safe(tl, tn, &free, link)
 		__intel_timeline_free(&tl->kref);
