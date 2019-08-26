@@ -36,6 +36,7 @@
 #include <linux/list.h>	/* Needed by drm_client */
 #endif
 
+#include <drm/drm_bridge.h>
 #include <drm/drm_client.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_edid.h>
