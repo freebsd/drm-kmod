@@ -13,6 +13,11 @@
 
 
 #if defined(__i386__) || defined(__amd64__)
+/*
+ * intel_graphics_stolen_* are defined in sys/dev/pci/pcivar.h
+ * and set at early boot from machdep.c. Copy over the values
+ * here to a linux_resource struct.
+ */
 struct linux_resource intel_graphics_stolen_res;
 struct cpuinfo_x86 boot_cpu_data;
 #endif
