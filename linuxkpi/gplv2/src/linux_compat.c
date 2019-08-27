@@ -38,15 +38,10 @@ linux_compat_init(void *arg __unused)
 
 #endif
 #if defined(__amd64__)
-#if __FreeBSD_version >= 1200086
 	/* Defined in $SYSDIR/x86/pci/pci_early_quirks.c */
 	intel_graphics_stolen_res = (struct linux_resource)
 	        DEFINE_RES_MEM(intel_graphics_stolen_base,
 	            intel_graphics_stolen_size);
-#else
-	printf("WARNING: This kernel is too old for proper function of i915kms.\n");
-	intel_graphics_stolen_res = (struct linux_resource)DEFINE_RES_MEM(0, 0);
-#endif
 #endif
 }
 SYSINIT(linux_compat, SI_SUB_VFS, SI_ORDER_ANY, linux_compat_init, NULL);
