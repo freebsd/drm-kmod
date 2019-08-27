@@ -419,8 +419,8 @@ static int drm_vblank_info DRM_SYSCTL_HANDLER_ARGS
 	int retcode;
 	int i;
 
-	DRM_SYSCTL_PRINT("\ncrtc ref count    last     enabled inmodeset\n");
 	mutex_lock(&dev->struct_mutex);
+	DRM_SYSCTL_PRINT("\ncrtc ref count    last     enabled inmodeset\n");
 	if (dev->vblank == NULL)
 		goto done;
 	for (i = 0 ; i < dev->num_crtcs ; i++) {
