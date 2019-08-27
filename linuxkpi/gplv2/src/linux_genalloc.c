@@ -656,10 +656,10 @@ unsigned long gen_pool_best_fit(unsigned long *map, unsigned long size,
 }
 EXPORT_SYMBOL(gen_pool_best_fit);
 
-static void devm_gen_pool_release(struct device *dev, void *res)
-{
-	gen_pool_destroy(*(struct gen_pool **)res);
-}
+/* static void devm_gen_pool_release(struct device *dev, void *res) */
+/* { */
+/* 	gen_pool_destroy(*(struct gen_pool **)res); */
+/* } */
 
 /* static int devm_gen_pool_match(struct device *dev, void *res, void *data) */
 /* { */

@@ -1169,6 +1169,7 @@ static const struct dev_pm_ops amdgpu_pm_ops = {
 	.runtime_idle = amdgpu_pmops_runtime_idle,
 };
 
+#ifdef __linux__ /* Mute unused function warning (see below). */
 static int amdgpu_flush(struct file *f, fl_owner_t id)
 {
 	struct drm_file *file_priv = f->private_data;
@@ -1178,7 +1179,7 @@ static int amdgpu_flush(struct file *f, fl_owner_t id)
 
 	return 0;
 }
-
+#endif
 
 static const struct file_operations amdgpu_driver_kms_fops = {
 	.owner = THIS_MODULE,

@@ -491,6 +491,7 @@ CWARNFLAGS.amdgpu_dm_pp_smu.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.amdgpu_dm_helpers.c= -Wno-missing-braces
 CWARNFLAGS.amdgpu_dm_services.c=-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_display.c=	-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_drv.c=	-Wno-unused-function
 CWARNFLAGS.amdgpu_gfx.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_gtt_mgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_job.c=	-Wno-missing-prototypes

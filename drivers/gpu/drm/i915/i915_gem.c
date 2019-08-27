@@ -1846,6 +1846,7 @@ i915_gem_sw_finish_ioctl(struct drm_device *dev, void *data,
 	return 0;
 }
 
+#ifdef __linux__ /* Mute unused function warning. */
 static inline bool
 __vma_matches(struct vm_area_struct *vma, struct file *filp,
 	      unsigned long addr, unsigned long size)
@@ -1855,6 +1856,7 @@ __vma_matches(struct vm_area_struct *vma, struct file *filp,
 
 	return vma->vm_start == addr && (vma->vm_end - vma->vm_start) == size;
 }
+#endif
 
 /**
  * i915_gem_mmap_ioctl - Maps the contents of an object, returning the address
