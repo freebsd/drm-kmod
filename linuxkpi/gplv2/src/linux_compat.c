@@ -1,8 +1,8 @@
 #include <sys/param.h>
 #include <sys/kernel.h>
 #if defined(__i386__) || defined(__amd64__)
-#include <machine/specialreg.h>
 #include <sys/pcpu.h>
+#include <machine/specialreg.h>
 #include <machine/md_var.h>
 #endif
 #include <linux/bitops.h>
