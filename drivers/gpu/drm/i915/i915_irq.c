@@ -1406,11 +1406,11 @@ static bool icp_ddi_port_hotplug_long_detect(enum hpd_pin pin, u32 val)
 {
 	switch (pin) {
 	case HPD_PORT_A:
-		return val & ICP_DDIA_HPD_LONG_DETECT;
+		return val & SHOTPLUG_CTL_DDI_HPD_LONG_DETECT(PORT_A);
 	case HPD_PORT_B:
-		return val & ICP_DDIB_HPD_LONG_DETECT;
+		return val & SHOTPLUG_CTL_DDI_HPD_LONG_DETECT(PORT_B);
 	case HPD_PORT_C:
-		return val & TGP_DDIC_HPD_LONG_DETECT;
+		return val & SHOTPLUG_CTL_DDI_HPD_LONG_DETECT(PORT_C);
 	default:
 		return false;
 	}
@@ -1427,20 +1427,6 @@ static bool icp_tc_port_hotplug_long_detect(enum hpd_pin pin, u32 val)
 		return val & ICP_TC_HPD_LONG_DETECT(PORT_TC3);
 	case HPD_PORT_F:
 		return val & ICP_TC_HPD_LONG_DETECT(PORT_TC4);
-	default:
-		return false;
-	}
-}
-
-static bool tgp_ddi_port_hotplug_long_detect(enum hpd_pin pin, u32 val)
-{
-	switch (pin) {
-	case HPD_PORT_A:
-		return val & ICP_DDIA_HPD_LONG_DETECT;
-	case HPD_PORT_B:
-		return val & ICP_DDIB_HPD_LONG_DETECT;
-	case HPD_PORT_C:
-		return val & TGP_DDIC_HPD_LONG_DETECT;
 	default:
 		return false;
 	}
@@ -2329,7 +2315,7 @@ static void tgp_irq_handler(struct drm_i915_private *dev_priv, u32 pch_iir)
 		intel_get_hpd_pins(dev_priv, &pin_mask, &long_mask,
 				   ddi_hotplug_trigger,
 				   dig_hotplug_reg, hpd_tgp,
-				   tgp_ddi_port_hotplug_long_detect);
+				   icp_ddi_port_hotplug_long_detect);
 	}
 
 	if (tc_hotplug_trigger) {
