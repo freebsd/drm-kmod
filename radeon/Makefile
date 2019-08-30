@@ -112,7 +112,7 @@ SRCS=	atom.c \
 	vce_v1_0.c \
 	vce_v2_0.c
 
-.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386"
+.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
 SRCS+=  opt_acpi.h \
 	radeon_acpi.c \
 	radeon_atpx_handler.c

@@ -33,7 +33,7 @@ SRCS=	linux_kmod_gplv2.c	\
 SRCS+=	linux_genalloc.c
 .endif
 
-.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386"
+.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
 SRCS+=	linux_acpi.c	\
 	linux_video.c 	\
 	opt_acpi.h

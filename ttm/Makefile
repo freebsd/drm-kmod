@@ -5,8 +5,7 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/ttm
 .PATH:	${SRCDIR}
 
 KMOD=	ttm
-SRCS=	ttm_agp_backend.c \
-	ttm_bo.c \
+SRCS=	ttm_bo.c \
 	ttm_bo_manager.c \
 	ttm_bo_util.c \
 	ttm_bo_vm.c \
@@ -16,6 +15,10 @@ SRCS=	ttm_agp_backend.c \
 	ttm_page_alloc.c \
 	ttm_page_alloc_dma.c \
 	ttm_tt.c
+
+.if ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "amd64"
+SRCS+=	ttm_agp_backend.c
+.endif
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 

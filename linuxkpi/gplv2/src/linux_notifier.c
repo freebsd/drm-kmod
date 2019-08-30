@@ -11,11 +11,7 @@
 #include <linux/math64.h>
 #include <linux/kernel.h>
 
-#if defined(__amd64__) || defined(__i386__)
-#define X86
-#endif
-
-#ifdef X86
+#ifdef CONFIG_ACPI
 #include <linux/acpi.h>
 #include <acpi/button.h>
 #endif
@@ -167,7 +163,7 @@ unregister_reboot_notifier(struct notifier_block *nb)
 	return (0);
 }
 
-#ifdef X86
+#ifdef CONFIG_ACPI
 int
 acpi_lid_notifier_register(struct notifier_block *nb)
 {

@@ -5,6 +5,10 @@ DRM= ${.CURDIR:H:H}/drivers/gpu/drm
 
 KMOD=	amdgpu
 
+.if ${MACHINE_CPUARCH} == "amd64"
+_dml=	${SRCDIR}/display/dc/dml
+.endif
+
 .PATH:	${SRCDIR}/acp \
 	${SRCDIR}/amdgpu \
 	${SRCDIR}/amdkfd \
@@ -25,7 +29,7 @@ KMOD=	amdgpu
 	${SRCDIR}/display/dc/dce120 \
 	${SRCDIR}/display/dc/dce80 \
 	${SRCDIR}/display/dc/dcn10 \
-	${SRCDIR}/display/dc/dml \
+	${_dml} \
 	${SRCDIR}/display/dc/gpio \
 	${SRCDIR}/display/dc/gpio/dce110 \
 	${SRCDIR}/display/dc/gpio/dce120 \
@@ -196,10 +200,14 @@ SRCS+=	amdgpu_afmt.c \
 	vcn_v1_0.c \
 	vega10_ih.c \
 	vi.c
+
+.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
+SRCS+=	amdgpu_acpi.c \
+	amdgpu_atpx_handler.c
+.endif
+
 .if ${MACHINE_CPUARCH} == "amd64"
-SRCS+= amdgpu_acpi.c \
-	amdgpu_atpx_handler.c \
-	dcn10_clk_mgr.c \
+SRCS+=	dcn10_clk_mgr.c \
 	dcn10_cm_common.c \
 	dcn10_dpp.c \
 	dcn10_dpp_cm.c \
@@ -297,11 +305,6 @@ SRCS+=	amdgpu_dm.c \
 	dce_scl_filters.c \
 	dce_stream_encoder.c \
 	dce_transform.c \
-	dcn_calc_math.c \
-	display_mode_lib.c \
-	display_rq_dlg_helpers.c \
-	dml1_display_rq_dlg_calc.c \
-	dml_common_defs.c \
 	engine_base.c \
 	fixpt31_32.c \
 	freesync.c \
@@ -348,6 +351,14 @@ SRCS+=	amdgpu_dm.c \
 	vector.c \
 	virtual_link_encoder.c \
 	virtual_stream_encoder.c
+
+.if ${MACHINE_CPUARCH} == "amd64"
+SRCS+=	display_mode_lib.c \
+	dcn_calc_math.c \
+	display_rq_dlg_helpers.c \
+	dml_common_defs.c \
+	dml1_display_rq_dlg_calc.c
+.endif
 
 # lib
 SRCS+=	chash.c
@@ -435,21 +446,8 @@ SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h device_if.h iicbus_if.h opt_drm.
 
 .include <bsd.kmod.mk>
 
-CFLAGS.gcc+= -Wno-redundant-decls -Wno-cast-qual -Wno-unused-but-set-variable
-.if ${MACHINE_CPUARCH} == "powerpc"
-CFLAGS.dcn_calcs.c= -maltivec -mhard-float -mfull-toc
-CFLAGS.dcn_calc_auto.c= -maltivec -mhard-float -mfull-toc
-CFLAGS.dcn_calc_math.c= -maltivec -mhard-float -mfull-toc
+CFLAGS.gcc+= -Wno-redundant-decls -Wno-unused-but-set-variable
 
-CFLAGS.display_mode_vba.c= -maltivec -mhard-float -mfull-toc
-CFLAGS.display_mode_lib.c= -maltivec -mhard-float -mfull-toc
-CFLAGS.display_pipe_clocks.c= -maltivec -mhard-float -mfull-toc
-CFLAGS.display_rq_dlg_calc.c= -maltivec -mhard-float -mfull-toc
-CFLAGS.dml1_display_rq_dlg_calc.c= -maltivec -mhard-float -mfull-toc
-CFLAGS.display_rq_dlg_helpers.c= -maltivec -mhard-float -mfull-toc
-CFLAGS.soc_bounding_box.c= -maltivec -mhard-float -mfull-toc
-CFLAGS.dml_common_defs.c= -maltivec -mhard-float -mfull-toc
-.else
 CFLAGS.dcn_calcs.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_auto.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_math.c= -msse -mstack-alignment=4 -Wno-tautological-compare
@@ -462,8 +460,6 @@ CFLAGS.soc_bounding_box.c= -msse -mstack-alignment=4
 CFLAGS.dml_common_defs.c= -msse -mstack-alignment=4
 
 CWARNFLAGS+=	-Wno-pointer-arith -Wno-format -Wno-cast-qual
-.endif
-CWARNFLAGS+=	-Wno-pointer-arith -Wno-format
 CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
 CWARNFLAGS+=	-Wno-expansion-to-defined
 

@@ -6,7 +6,6 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
 KMOD=	drm
 SRCS=	ati_pcigart.c \
-	drm_agpsupport.c \
 	drm_atomic.c \
 	drm_atomic_helper.c \
 	drm_atomic_state_helper.c \
@@ -85,6 +84,10 @@ SRCS=	ati_pcigart.c \
 	linux_fb.c \
 	tainted_linux_fb.c \
 	linux_hdmi.c
+
+.if ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "amd64"
+SRCS+=	drm_agpsupport.c
+.endif
 
 # Skip for now...
 #	drm_dp_cec.c

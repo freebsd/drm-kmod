@@ -45,13 +45,21 @@
 #undef CONFIG_AS_MOVNTDQA
 #endif
 
-
+#ifdef __aarch64__
+#define CONFIG_ARM64 1
+#define CONFIG_PCI 1
+#define CONFIG_ACPI 1
+#undef CONFIG_ACPI_SLEEP
+#undef CONFIG_DRM_I915_KMS
+#undef CONFIG_INTEL_IOMMU
+#undef CONFIG_AS_MOVNTDQA
+#endif
 
 #ifdef _KERNEL
 #define	__KERNEL__
 #endif
 
-#if !defined(__powerpc__)
+#if !defined(__powerpc__) && !defined(__aarch64__)
 #define	CONFIG_AGP	1
 #endif
 

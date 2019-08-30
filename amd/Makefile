@@ -1,12 +1,11 @@
 # $FreeBSD$
 
-.if ${MACHINE_CPUARCH} == "amd64" 
+.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "aarch64" || ${MACHINE_ARCH} == "powerpc64"
 _amdgpu=	amdgpu
-# _amdkfd=	amdkfd
 .endif
 
-.if ${MACHINE_ARCH} == "powerpc64"
-_amdgpu=	amdgpu
+.if ${MACHINE_CPUARCH} == "amd64"
+# _amdkfd=	amdkfd
 .endif
 
 SUBDIR=	${_amdgpu} \
