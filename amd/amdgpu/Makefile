@@ -459,10 +459,19 @@ CFLAGS.display_rq_dlg_helpers.c= -msse -mstack-alignment=4
 CFLAGS.soc_bounding_box.c= -msse -mstack-alignment=4
 CFLAGS.dml_common_defs.c= -msse -mstack-alignment=4
 
+
+.if ${MACHINE_CPUARCH} != "powerpc"
+CWARNFLAGS+=	-Wno-expansion-to-defined
+.endif
 CWARNFLAGS+=	-Wno-pointer-arith -Wno-format -Wno-cast-qual
 CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
-CWARNFLAGS+=	-Wno-expansion-to-defined
 
+
+.if ${MACHINE_CPUARCH} == "powerpc"
+CWARNFLAGS.amdgpu_device.c=	-Wno-missing-prototypes
+.else
+CWARNFLAGS.amdgpu_device.c=	-Wno-missing-prototypes -Wno-enum-conversion
+.endif
 CWARNFLAGS.amdgpu_acpi.c=	-Wno-int-conversion -Wno-missing-prototypes -Wno-unused-variable
 CWARNFLAGS.amdgpu_amdkfd.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_amdkfd_fence.c=
@@ -481,7 +490,6 @@ CWARNFLAGS.amdgpu_connectors.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_cs.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ctx.c=
 CWARNFLAGS.amdgpu_debugfs.c=
-CWARNFLAGS.amdgpu_device.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.amdgpu_dm.c=		-Wno-missing-prototypes -Wno-pointer-bool-conversion -Wno-non-literal-null-conversion
 CWARNFLAGS.amdgpu_dm_pp_smu.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.amdgpu_dm_helpers.c= -Wno-missing-braces
