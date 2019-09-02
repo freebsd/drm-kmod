@@ -1748,7 +1748,8 @@ static void drm_handle_vblank_events(struct drm_device *dev, unsigned int pipe)
 	}
 
 #ifdef __linux__
-	trace_drm_vblank_event(pipe, seq);
+	trace_drm_vblank_event(pipe, seq, now,
+			dev->driver->get_vblank_timestamp != NULL);
 #endif
 }
 
