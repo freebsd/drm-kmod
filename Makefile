@@ -2,6 +2,8 @@
 
 SYSDIR?=/usr/src/sys
 
+.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64" || ${MACHINE_ARCH} == "powerpc64"
+
 # Get __FreeBSD_version (obtained from bsd.port.mk)
 .if !defined(OSVERSION)
 .if exists(${SYSDIR}/sys/param.h)
@@ -35,3 +37,8 @@ _dummygfx = dummygfx
 .endif
 
 .include <bsd.subdir.mk>
+
+.else
+dummy:
+	echo "Unsupported architecture"
+.endif
