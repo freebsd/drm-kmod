@@ -46,6 +46,7 @@ SRCS=	\
 	i915_suspend.c \
 	i915_sw_fence.c \
 	i915_syncmap.c \
+	i915_sysfs.c \
 	i915_timeline.c \
 	i915_trace_points.c \
 	i915_vgpu.c \
@@ -242,3 +243,4 @@ CWARNFLAGS.i915_gem_userptr.c= -Wno-cast-qual
 CWARNFLAGS.i915_gpu_error.c= -Wno-cast-qual -Wno-unused-function
 CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides -Wno-unused-variable
 CWARNFLAGS.i915_sw_fence.c= -Wno-unused-function
+CWARNFLAGS.i915_sysfs.c=	-Wno-unused-variable

@@ -38,7 +38,6 @@ static inline struct drm_i915_private *kdev_minor_to_i915(struct device *kdev)
 	return to_i915(minor->dev);
 }
 
-#ifdef __linux__
 #ifdef CONFIG_PM
 static u32 calc_residency(struct drm_i915_private *dev_priv,
 			  i915_reg_t reg)
@@ -138,8 +137,10 @@ static const struct attribute_group media_rc6_attr_group = {
 	.name = power_group_name,
 	.attrs =  media_rc6_attrs
 };
-#endif
+#endif /* CONFIG_PM */
 
+#ifdef __linux__
+/* Missing sysfs bin files support */
 static int l3_access_valid(struct drm_i915_private *dev_priv, loff_t offset)
 {
 	if (!HAS_L3_DPF(dev_priv))
@@ -254,7 +255,7 @@ static const struct bin_attribute dpf_attrs_1 = {
 	.mmap = NULL,
 	.private = (void *)1
 };
-#endif
+#endif /* __linux__ */
 
 static ssize_t gt_act_freq_mhz_show(struct device *kdev,
 				    struct device_attribute *attr, char *buf)
@@ -453,7 +454,6 @@ static ssize_t gt_min_freq_mhz_store(struct device *kdev,
 	return ret ?: count;
 }
 
-#ifdef __linux__
 static DEVICE_ATTR_RO(gt_act_freq_mhz);
 static DEVICE_ATTR_RO(gt_cur_freq_mhz);
 static DEVICE_ATTR_RW(gt_boost_freq_mhz);
@@ -511,8 +511,9 @@ static const struct attribute * const vlv_attrs[] = {
 	NULL,
 };
 
+#ifdef __linux__
+/* Missing sysfs bin files support */
 #if IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR)
-
 static ssize_t error_state_read(struct file *filp, struct kobject *kobj,
 				struct bin_attribute *attr, char *buf,
 				loff_t off, size_t count)
@@ -560,7 +561,6 @@ static const struct bin_attribute error_state_attr = {
 	.read = error_state_read,
 	.write = error_state_write,
 };
-#endif
 
 static void i915_setup_error_capture(struct device *kdev)
 {
@@ -575,14 +575,17 @@ static void i915_teardown_error_capture(struct device *kdev)
 #else
 static void i915_setup_error_capture(struct device *kdev) {}
 static void i915_teardown_error_capture(struct device *kdev) {}
-#endif
+#endif /* IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR) */
+#endif /* __linux__ */
 
 void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 {
-#ifdef __linux__
 	struct device *kdev = dev_priv->drm.primary->kdev;
 	int ret;
 
+#ifdef __linux__
+	/* Missing sysfs bin files support */
+	/* Missing sysfs group merge support */
 #ifdef CONFIG_PM
 	if (HAS_RC6(dev_priv)) {
 		ret = sysfs_merge_group(&kdev->kobj,
@@ -615,30 +618,39 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 				DRM_ERROR("l3 parity slice 1 setup failed\n");
 		}
 	}
-
+#endif /* __linux__ */
 	ret = 0;
+#if __FreeBSD_version > 1300043
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
 		ret = sysfs_create_files(&kdev->kobj, vlv_attrs);
 	else if (INTEL_GEN(dev_priv) >= 6)
 		ret = sysfs_create_files(&kdev->kobj, gen6_attrs);
+#endif
 	if (ret)
 		DRM_ERROR("RPS sysfs setup failed\n");
-
+#ifdef __linux__
+	/* Missing sysfs bin files support */
 	i915_setup_error_capture(kdev);
 #endif
 }
 
 void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
 {
-#ifdef __linux__
 	struct device *kdev = dev_priv->drm.primary->kdev;
 
+#ifdef __linux__
+	/* Missing sysfs bin files support */
 	i915_teardown_error_capture(kdev);
-
+#endif
+#if __FreeBSD_version > 1300043
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
 		sysfs_remove_files(&kdev->kobj, vlv_attrs);
 	else
 		sysfs_remove_files(&kdev->kobj, gen6_attrs);
+#endif
+#ifdef __linux__
+	/* Missing sysfs bin files support */
+	/* Missing sysfs group merge support */
 	device_remove_bin_file(kdev,  &dpf_attrs_1);
 	device_remove_bin_file(kdev,  &dpf_attrs);
 #ifdef CONFIG_PM
