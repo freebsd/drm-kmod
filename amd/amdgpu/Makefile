@@ -198,6 +198,7 @@ SRCS+=	amdgpu_afmt.c \
 	mmhub_v2_0.c \
 	mmhub_v9_4.c \
 	mxgpu_ai.c \
+	mxgpu_nv.c \
 	mxgpu_vi.c \
 	navi10_reg_init.c \
 	navi12_reg_init.c \
