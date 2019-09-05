@@ -146,6 +146,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_trace_points.c \
 	amdgpu_ttm.c \
 	amdgpu_ucode.c \
+	amdgpu_umc.c \
 	amdgpu_uvd.c \
 	amdgpu_vce.c \
 	amdgpu_vcn.c \
