@@ -843,6 +843,7 @@ static int vmw_driver_load(struct drm_device *dev, unsigned long chipset)
 #elif defined(__FreeBSD__)
 	    			 NULL,
 #endif
+				 NULL,
 				 false);
 	if (unlikely(ret != 0)) {
 		DRM_ERROR("Failed initializing TTM buffer object driver.\n");

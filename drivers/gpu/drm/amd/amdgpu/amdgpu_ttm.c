@@ -1749,9 +1749,11 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 			       &amdgpu_bo_driver,
 #ifdef __linux__
 			       adev->ddev->anon_inode->i_mapping,
-			       dma_addressing_limited(adev->dev));
+			       NULL,
+			       adev->need_dma32);
 #elif defined(__FreeBSD__)
 			       NULL, /* Dummy on BSD */
+				       NULL,
 			       false);
 #endif
 	if (r) {
