@@ -801,7 +801,7 @@ int radeon_ttm_init(struct radeon_device *rdev)
 			       false);
 #else
 			       rdev->ddev->anon_inode->i_mapping,
-			       NULL,
+			       rdev->ddev->vma_offset_manager,
 			       rdev->need_dma32);
 #endif
 	if (r) {
