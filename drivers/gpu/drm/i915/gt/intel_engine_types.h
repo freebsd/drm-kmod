@@ -487,6 +487,7 @@ struct intel_engine_cs {
 #define I915_ENGINE_NEEDS_BREADCRUMB_TASKLET BIT(4)
 #define I915_ENGINE_IS_VIRTUAL       BIT(5)
 #define I915_ENGINE_REQUIRES_CMD_PARSER BIT(7)
+#define I915_ENGINE_HAS_RELATIVE_MMIO BIT(6)
 	unsigned int flags;
 
 	/*
@@ -586,6 +587,12 @@ static inline bool
 intel_engine_is_virtual(const struct intel_engine_cs *engine)
 {
 	return engine->flags & I915_ENGINE_IS_VIRTUAL;
+}
+
+static inline bool
+intel_engine_has_relative_mmio(const struct intel_engine_cs * const engine)
+{
+	return engine->flags & I915_ENGINE_HAS_RELATIVE_MMIO;
 }
 
 #define instdone_has_slice(dev_priv___, sseu___, slice___) \
