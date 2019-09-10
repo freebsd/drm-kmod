@@ -14319,7 +14319,7 @@ static int intel_atomic_commit(struct drm_device *dev,
 	if (nonblock && state->modeset) {
 		queue_work(dev_priv->modeset_wq, &state->base.commit_work);
 	} else if (nonblock) {
-		queue_work(system_unbound_wq, &state->base.commit_work);
+		queue_work(dev_priv->flip_wq, &state->base.commit_work);
 	} else {
 		if (state->modeset)
 			flush_workqueue(dev_priv->modeset_wq);
@@ -16228,6 +16228,12 @@ int intel_modeset_init(struct drm_device *dev)
 	int ret;
 
 	dev_priv->modeset_wq = alloc_ordered_workqueue("i915_modeset", 0);
+	dev_priv->flip_wq = alloc_workqueue("i915_flip", WQ_HIGHPRI |
+#ifdef __linux__
+					    WQ_UNBOUND, WQ_UNBOUND_MAX_ACTIVE);
+#elif defined(__FreeBSD__)
+					    WQ_UNBOUND, 512);
+#endif
 
 	drm_mode_config_init(dev);
 
@@ -17186,6 +17192,7 @@ void intel_modeset_driver_remove(struct drm_device *dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
 
+	flush_workqueue(dev_priv->flip_wq);
 	flush_workqueue(dev_priv->modeset_wq);
 
 	flush_work(&dev_priv->atomic_helper.free_work);
@@ -17222,6 +17229,7 @@ void intel_modeset_driver_remove(struct drm_device *dev)
 
 	intel_gmbus_teardown(dev_priv);
 
+	destroy_workqueue(dev_priv->flip_wq);
 	destroy_workqueue(dev_priv->modeset_wq);
 
 	intel_fbc_cleanup_cfb(dev_priv);
