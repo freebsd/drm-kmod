@@ -658,6 +658,10 @@ int amdgpu_ras_error_query(struct amdgpu_device *adev,
 		if (adev->mmhub_funcs->query_ras_error_count)
 			adev->mmhub_funcs->query_ras_error_count(adev, &err_data);
 		break;
+	case AMDGPU_RAS_BLOCK__PCIE_BIF:
+		if (adev->nbio.funcs->query_ras_error_count)
+			adev->nbio.funcs->query_ras_error_count(adev, &err_data);
+		break;
 	default:
 		break;
 	}
@@ -707,6 +711,7 @@ int amdgpu_ras_error_inject(struct amdgpu_device *adev,
 	case AMDGPU_RAS_BLOCK__UMC:
 	case AMDGPU_RAS_BLOCK__MMHUB:
 	case AMDGPU_RAS_BLOCK__XGMI_WAFL:
+	case AMDGPU_RAS_BLOCK__PCIE_BIF:
 		ret = psp_ras_trigger_error(&adev->psp, &block_info);
 		break;
 	default:
