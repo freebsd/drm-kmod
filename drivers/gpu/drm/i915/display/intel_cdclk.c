@@ -1170,14 +1170,12 @@ static const struct intel_cdclk_vals bxt_cdclk_table[] = {
 	{}
 };
 
-#ifdef __notyet__
 static const struct intel_cdclk_vals glk_cdclk_table[] = {
 	{ .refclk = 19200, .cdclk =  79200, .divider = 8, .ratio = 33 },
 	{ .refclk = 19200, .cdclk = 158400, .divider = 4, .ratio = 33 },
 	{ .refclk = 19200, .cdclk = 316800, .divider = 2, .ratio = 33 },
 	{}
 };
-#endif
 
 static const struct intel_cdclk_vals cnl_cdclk_table[] = {
 	{ .refclk = 19200, .cdclk = 168000, .divider = 4, .ratio = 35 },
@@ -2513,7 +2511,10 @@ void intel_init_cdclk_hooks(struct drm_i915_private *dev_priv)
 		dev_priv->display.set_cdclk = bxt_set_cdclk;
 		dev_priv->display.modeset_calc_cdclk = bxt_modeset_calc_cdclk;
 		dev_priv->display.calc_voltage_level = bxt_calc_voltage_level;
-		dev_priv->cdclk.table = bxt_cdclk_table;
+		if (IS_GEMINILAKE(dev_priv))
+			dev_priv->cdclk.table = glk_cdclk_table;
+		else
+			dev_priv->cdclk.table = bxt_cdclk_table;
 	} else if (IS_GEN9_BC(dev_priv)) {
 		dev_priv->display.set_cdclk = skl_set_cdclk;
 		dev_priv->display.modeset_calc_cdclk = skl_modeset_calc_cdclk;
