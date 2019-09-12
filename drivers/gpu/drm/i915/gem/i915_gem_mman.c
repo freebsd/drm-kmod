@@ -308,11 +308,9 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	wakeref = intel_runtime_pm_get(rpm);
 
 #ifdef __freebsd_notyet__
-	srcu = intel_gt_reset_trylock(ggtt->vm.gt);
-	if (srcu < 0) {
-		ret = srcu;
+	ret = intel_gt_reset_trylock(ggtt->vm.gt, &srcu);
+	if (ret)
 		goto err_rpm;
-	}
 #endif
 
 	ret = i915_mutex_lock_interruptible(dev);
