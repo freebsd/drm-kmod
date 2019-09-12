@@ -32,6 +32,11 @@
 #include "intel_drv.h"
 #include "i915_drv.h"
 
+#ifndef __linux__
+/* TODO: Move to base (when refactoring sysfs.h to sysfs.c) */
+const char power_group_name[] = "power";
+#endif
+
 static inline struct drm_i915_private *kdev_minor_to_i915(struct device *kdev)
 {
 	struct drm_minor *minor = dev_get_drvdata(kdev);
@@ -583,10 +588,8 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 	struct device *kdev = dev_priv->drm.primary->kdev;
 	int ret;
 
-#ifdef __linux__
-	/* Missing sysfs bin files support */
-	/* Missing sysfs group merge support */
 #ifdef CONFIG_PM
+#if LKPI_HAVE_SYSFS_GROUPS
 	if (HAS_RC6(dev_priv)) {
 		ret = sysfs_merge_group(&kdev->kobj,
 					&rc6_attr_group);
@@ -606,6 +609,9 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 			DRM_ERROR("Media RC6 residency sysfs setup failed\n");
 	}
 #endif
+#endif
+#ifdef __linux__
+	/* Missing sysfs bin files support */
 	if (HAS_L3_DPF(dev_priv)) {
 		ret = device_create_bin_file(kdev, &dpf_attrs);
 		if (ret)
@@ -620,7 +626,7 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 	}
 #endif /* __linux__ */
 	ret = 0;
-#if __FreeBSD_version > 1300043
+#if LKPI_HAVE_SYSFS_GROUPS
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
 		ret = sysfs_create_files(&kdev->kobj, vlv_attrs);
 	else if (INTEL_GEN(dev_priv) >= 6)
@@ -642,7 +648,7 @@ void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
 	/* Missing sysfs bin files support */
 	i915_teardown_error_capture(kdev);
 #endif
-#if __FreeBSD_version > 1300043
+#if LKPI_HAVE_SYSFS_GROUPS
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
 		sysfs_remove_files(&kdev->kobj, vlv_attrs);
 	else
@@ -650,10 +656,11 @@ void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
 #endif
 #ifdef __linux__
 	/* Missing sysfs bin files support */
-	/* Missing sysfs group merge support */
 	device_remove_bin_file(kdev,  &dpf_attrs_1);
 	device_remove_bin_file(kdev,  &dpf_attrs);
+#endif
 #ifdef CONFIG_PM
+#if LKPI_HAVE_SYSFS_GROUPS
 	sysfs_unmerge_group(&kdev->kobj, &rc6_attr_group);
 	sysfs_unmerge_group(&kdev->kobj, &rc6p_attr_group);
 #endif

@@ -97,7 +97,6 @@ void drm_sysfs_destroy(void)
 	drm_class = NULL;
 }
 
-#ifdef __linux__
 /*
  * Connector properties
  */
@@ -116,6 +115,7 @@ static ssize_t status_store(struct device *device,
 
 	old_force = connector->force;
 
+#if LKPI_HAVE_SYSFS_GROUPS
 	if (sysfs_streq(buf, "detect"))
 		connector->force = 0;
 	else if (sysfs_streq(buf, "on"))
@@ -125,6 +125,7 @@ static ssize_t status_store(struct device *device,
 	else if (sysfs_streq(buf, "off"))
 		connector->force = DRM_FORCE_OFF;
 	else
+#endif
 		ret = -EINVAL;
 
 	if (old_force != connector->force || !connector->force) {
@@ -155,7 +156,6 @@ static ssize_t status_show(struct device *device,
 	return snprintf(buf, PAGE_SIZE, "%s\n",
 			drm_get_connector_status_name(status));
 }
-#endif
 
 static ssize_t dpms_show(struct device *device,
 			   struct device_attribute *attr,
@@ -235,17 +235,13 @@ static ssize_t modes_show(struct device *device,
 	return written;
 }
 
-#ifdef __linux__
 static DEVICE_ATTR_RW(status);
-#endif
 static DEVICE_ATTR_RO(enabled);
 static DEVICE_ATTR_RO(dpms);
 static DEVICE_ATTR_RO(modes);
 
 static struct attribute *connector_dev_attrs[] = {
-#ifdef __linux__
 	&dev_attr_status.attr,
-#endif
 	&dev_attr_enabled.attr,
 	&dev_attr_dpms.attr,
 	&dev_attr_modes.attr,
