@@ -2404,6 +2404,14 @@ static void __execlists_reset(struct intel_engine_cs *engine, bool stalled)
 	struct i915_request *rq;
 	u32 *regs;
 
+	mb(); /* paranoia: read the CSB pointers from after the reset */
+#ifdef __linux__
+	clflush(execlists->csb_write);
+#elif __FreeBSD__
+	clflush((u_long)execlists->csb_write);
+#endif
+	mb();
+
 	process_csb(engine); /* drain preemption events */
 
 	/* Following the reset, we need to reload the CSB read/write pointers */
