@@ -3,6 +3,8 @@
  * Copyright 2018 Noralf Trønnes
  */
 
+#include <drm/drmP.h>
+// drmP.h must be the first to include because of file -> linux_file definition
 #include <linux/list.h>
 #include <linux/module.h>
 #include <linux/mutex.h>
@@ -18,7 +20,6 @@
 #include <drm/drm_gem.h>
 #include <drm/drm_mode.h>
 #include <drm/drm_print.h>
-#include <drm/drmP.h>
 
 #include "drm_crtc_internal.h"
 #include "drm_internal.h"
