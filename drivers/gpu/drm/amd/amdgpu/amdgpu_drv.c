@@ -49,6 +49,8 @@ SYSCTL_NODE(_hw, OID_AUTO, amdgpu,
     DRIVER_DESC " parameters");
 #endif
 
+#include "amdgpu_ras.h"
+
 /*
  * KMS wrapper.
  * - 3.0.0 - initial driver
@@ -1154,6 +1156,9 @@ amdgpu_pci_shutdown(struct pci_dev *pdev)
 {
 	struct drm_device *dev = pci_get_drvdata(pdev);
 	struct amdgpu_device *adev = dev->dev_private;
+
+	if (amdgpu_ras_intr_triggered())
+		return;
 
 	/* if we are running in a VM, make sure the device
 	 * torn down properly on reboot/shutdown.
