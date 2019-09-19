@@ -166,7 +166,7 @@ SX_SYSINIT(amdgpu_mgpu_info_mtx, &mgpu_info.mutex.sx, "amdgpu mgpu");
 #endif
 
 int amdgpu_ras_enable = -1;
-uint amdgpu_ras_mask = 0xfffffffb;
+uint amdgpu_ras_mask = 0xffffffff;
 
 /**
  * DOC: vramlimit (int)
