@@ -1558,6 +1558,7 @@ struct drm_i915_private {
 	 */
 	struct mutex av_mutex;
 	int audio_power_refcount;
+	u32 audio_freq_cntrl;
 
 	struct {
 		struct mutex mutex;
