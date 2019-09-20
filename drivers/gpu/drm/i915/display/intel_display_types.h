@@ -1036,6 +1036,9 @@ struct intel_crtc {
 
 	/* scalers available on this crtc */
 	int num_scalers;
+
+	/* per pipe DSB related info */
+	struct intel_dsb dsb;
 };
 
 struct intel_plane {
