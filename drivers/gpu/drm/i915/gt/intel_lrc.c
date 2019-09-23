@@ -1257,6 +1257,7 @@ static void execlists_dequeue(struct intel_engine_cs *engine)
 				submit = true;
 				last = rq;
 			}
+			i915_request_put(rq);
 
 			/*
 			 * Hmm, we have a bunch of virtual engine requests,
@@ -2580,6 +2581,7 @@ static void execlists_cancel_requests(struct intel_engine_cs *engine)
 
 			rq->engine = engine;
 			__i915_request_submit(rq);
+			i915_request_put(rq);
 
 			ve->base.execlists.queue_priority_hint = INT_MIN;
 		}
