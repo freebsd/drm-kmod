@@ -2558,7 +2558,6 @@ static void execlists_cancel_requests(struct intel_engine_cs *engine)
 		int i;
 
 		priolist_for_each_request_consume(rq, rn, p, i) {
-			mark_eio(rq);
 			__i915_request_submit(rq);
 		}
 
