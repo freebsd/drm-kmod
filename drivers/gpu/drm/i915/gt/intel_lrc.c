@@ -1257,7 +1257,6 @@ static void execlists_dequeue(struct intel_engine_cs *engine)
 				submit = true;
 				last = rq;
 			}
-			i915_request_put(rq);
 
 			/*
 			 * Hmm, we have a bunch of virtual engine requests,
