@@ -2557,6 +2557,7 @@ static void execlists_cancel_requests(struct intel_engine_cs *engine)
 		int i;
 
 		priolist_for_each_request_consume(rq, rn, p, i) {
+			mark_eio(rq);
 			__i915_request_submit(rq);
 		}
 
@@ -2579,7 +2580,6 @@ static void execlists_cancel_requests(struct intel_engine_cs *engine)
 
 			rq->engine = engine;
 			__i915_request_submit(rq);
-			i915_request_put(rq);
 
 			ve->base.execlists.queue_priority_hint = INT_MIN;
 		}
