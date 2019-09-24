@@ -224,6 +224,7 @@ SRCS+=	amdgpu_afmt.c \
 	si.c \
 	soc15.c \
 	tonga_ih.c \
+	umc_v6_0.c \
 	umc_v6_1.c \
 	uvd_v4_2.c \
 	uvd_v5_0.c \
