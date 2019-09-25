@@ -174,6 +174,7 @@ SRCS	+=			\
 	opt_acpi.h		\
 	opt_compat.h		\
 	opt_drm.h		\
+	opt_epoch.h		\
 	opt_syscons.h		\
 	acpi_if.h		\
 	bus_if.h		\
