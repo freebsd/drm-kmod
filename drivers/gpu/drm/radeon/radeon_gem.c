@@ -296,6 +296,10 @@ int radeon_gem_userptr_ioctl(struct drm_device *dev, void *data,
 	uint32_t handle;
 	int r;
 
+#ifdef __linux__
+	args->addr = untagged_addr(args->addr);
+#endif
+
 	if (offset_in_page(args->addr | args->size))
 		return -EINVAL;
 
