@@ -413,8 +413,14 @@ void amdgpu_dm_initialize_dp_connector(struct amdgpu_display_manager *dm,
 	aconnector->dm_dp_aux.ddc_service = aconnector->dc_link->ddc;
 
 	drm_dp_aux_register(&aconnector->dm_dp_aux.aux);
+#ifdef __linux__
 	drm_dp_cec_register_connector(&aconnector->dm_dp_aux.aux,
-				      &aconnector->base);
+				      aconnector->base.name, dm->adev->dev);
+#endif
+
+	if (aconnector->base.connector_type == DRM_MODE_CONNECTOR_eDP)
+		return;
+
 	aconnector->mst_mgr.cbs = &dm_mst_cbs;
 	drm_dp_mst_topology_mgr_init(
 		&aconnector->mst_mgr,
