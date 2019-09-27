@@ -64,7 +64,6 @@ SRCS	+=			\
 	opt_acpi.h		\
 	opt_compat.h		\
 	opt_drm.h		\
-	opt_epoch.h		\
 	opt_platform.h		\
 	opt_splash.h		\
 	opt_syscons.h		\
