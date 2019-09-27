@@ -377,6 +377,7 @@ static vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault 
 
 	return ret;
 }
+EXPORT_SYMBOL(ttm_bo_vm_fault);
 
 void ttm_bo_vm_open(struct vm_area_struct *vma)
 {
@@ -438,8 +439,8 @@ static int ttm_bo_vm_access_kmap(struct ttm_buffer_object *bo,
 	return len;
 }
 
-static int ttm_bo_vm_access(struct vm_area_struct *vma, unsigned long addr,
-			    void *buf, int len, int write)
+int ttm_bo_vm_access(struct vm_area_struct *vma, unsigned long addr,
+		     void *buf, int len, int write)
 {
 	unsigned long offset = (addr) - vma->vm_start;
 	struct ttm_buffer_object *bo = vma->vm_private_data;
@@ -475,6 +476,7 @@ static int ttm_bo_vm_access(struct vm_area_struct *vma, unsigned long addr,
 
 	return ret;
 }
+EXPORT_SYMBOL(ttm_bo_vm_access);
 
 static const struct vm_operations_struct ttm_bo_vm_ops = {
 	.fault = ttm_bo_vm_fault,
