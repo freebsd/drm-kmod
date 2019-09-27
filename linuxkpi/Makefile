@@ -42,7 +42,6 @@ SRCS+=	linux_acpi.c	\
 SRCS+=	bus_if.h		\
 	device_if.h		\
 	pci_if.h		\
-	opt_epoch.h		\
 	vnode_if.h
 
 
