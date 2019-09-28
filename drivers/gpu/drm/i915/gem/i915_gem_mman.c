@@ -412,6 +412,7 @@ err:
 		/* fallthrough */
 	case -EIO: /* shmemfs failure from swap device */
 	case -EFAULT: /* purged object */
+	case -ENODEV: /* bad object, how did you get here! */
 		return VM_FAULT_SIGBUS;
 
 	case -ENOSPC: /* shmemfs allocation failure */
