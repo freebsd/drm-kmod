@@ -644,6 +644,7 @@ CWARNFLAGS.bios_parser.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_hw_sequencer.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_link.c=			-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.dc_link_dp.c=		-Wno-missing-prototypes
+CWARNFLAGS.dc_resource.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_aux.c=			-Wno-missing-prototypes
 CWARNFLAGS.dce_clock_source.c=		-Wno-unused-const-variable
 CWARNFLAGS.dce_dmcu.c=			-Wno-missing-prototypes
