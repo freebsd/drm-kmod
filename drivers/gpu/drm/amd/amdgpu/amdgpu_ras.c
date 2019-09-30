@@ -71,13 +71,10 @@ const char *ras_block_string[] = {
 
 atomic_t amdgpu_ras_in_intr = ATOMIC_INIT(0);
 
-static int amdgpu_ras_reserve_vram(struct amdgpu_device *adev,
-		uint64_t offset, uint64_t size,
-		struct amdgpu_bo **bo_ptr);
-static int amdgpu_ras_release_vram(struct amdgpu_device *adev,
-		struct amdgpu_bo **bo_ptr);
-
 #ifdef CONFIG_DEBUGFS
+static bool amdgpu_ras_check_bad_page(struct amdgpu_device *adev,
+				uint64_t addr);
+
 static ssize_t amdgpu_ras_debugfs_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
@@ -295,6 +292,14 @@ static ssize_t amdgpu_ras_debugfs_ctrl_write(struct file *f, const char __user *
 		if ((data.inject.address >= adev->gmc.mc_vram_size) ||
 		    (data.inject.address >= RAS_UMC_INJECT_ADDR_LIMIT)) {
 			ret = -EINVAL;
+			break;
+		}
+
+		/* umc ce/ue error injection for a bad page is not allowed */
+		if ((data.head.block == AMDGPU_RAS_BLOCK__UMC) &&
+		    amdgpu_ras_check_bad_page(adev, data.inject.address)) {
+			DRM_WARN("RAS WARN: 0x%llx has been marked as bad before error injection!\n",
+					data.inject.address);
 			break;
 		}
 
@@ -1460,6 +1465,39 @@ static int amdgpu_ras_load_bad_pages(struct amdgpu_device *adev)
 
 out:
 	kfree(bps);
+	return ret;
+}
+
+/*
+ * check if an address belongs to bad page
+ *
+ * Note: this check is only for umc block
+ */
+static bool amdgpu_ras_check_bad_page(struct amdgpu_device *adev,
+				uint64_t addr)
+{
+	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
+	struct ras_err_handler_data *data;
+	int i;
+	bool ret = false;
+
+	if (!con || !con->eh_data)
+		return ret;
+
+	mutex_lock(&con->recovery_lock);
+	data = con->eh_data;
+	if (!data)
+		goto out;
+
+	addr >>= AMDGPU_GPU_PAGE_SHIFT;
+	for (i = 0; i < data->count; i++)
+		if (addr == data->bps[i].retired_page) {
+			ret = true;
+			goto out;
+		}
+
+out:
+	mutex_unlock(&con->recovery_lock);
 	return ret;
 }
 
