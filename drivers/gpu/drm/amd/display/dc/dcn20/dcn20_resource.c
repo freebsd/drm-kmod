@@ -2938,6 +2938,7 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 #else
 	double p_state_latency_us = context->bw_ctx.dml.soc.dram_clock_change_latency_us;
 #endif
+	context->bw_ctx.dml.soc.disable_dram_clock_change_vactive_support = dc->debug.disable_dram_clock_change_vactive_support;
 
 	if (fast_validate) {
 #ifdef __FreeBSD__
