@@ -531,6 +531,9 @@ int vmw_validation_bo_validate_single(struct ttm_buffer_object *bo,
 	};
 	int ret;
 
+	if (atomic_read(&vbo->cpu_writers))
+		return -EBUSY;
+
 	if (vbo->pin_count > 0)
 		return 0;
 
