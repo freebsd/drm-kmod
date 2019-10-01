@@ -304,7 +304,7 @@ void drm_dev_dbg(const struct device *dev, unsigned int category,
 	struct va_format vaf;
 	va_list args;
 
-	if (!(drm_debug & category))
+	if (!drm_debug_enabled(category))
 		return;
 
 	va_start(args, format);
@@ -349,7 +349,7 @@ void drm_dbg(unsigned int category, const char *format, ...)
 	struct va_format vaf;
 	va_list args;
 
-	if (!(drm_debug & category))
+	if (!drm_debug_enabled(category))
 		return;
 
 	va_start(args, format);
