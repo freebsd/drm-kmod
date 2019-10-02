@@ -40,6 +40,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dce80 \
 	${SRCDIR}/display/dc/dcn10 \
 	${SRCDIR}/display/dc/dcn20 \
+	${SRCDIR}/display/dc/dcn21 \
 	${SRCDIR}/display/dc/dsc \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
@@ -387,6 +388,12 @@ SRCS+=	dcn20_dccg.c \
 	display_rq_dlg_calc_20v2.c \
 	display_mode_vba_20v2.c
 
+# display/dc/dcn21
+SRCS+=	dcn21_hubbub.c \
+	dcn21_hubp.c \
+	dcn21_hwseq.c \
+	dcn21_resource.c
+
 # display/dc/core
 SRCS+=	dc_vm_helper.c
 
@@ -578,6 +585,7 @@ CFLAGS.dcn_calcs.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_auto.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_math.c= -msse -mstack-alignment=4 -Wno-tautological-compare
 CFLAGS.dcn20_resource.c= -msse -mstack-alignment=4
+CFLAGS.dcn21_resource.c= -msse -mstack-alignment=4
 
 CFLAGS.display_mode_lib.c= -msse -mstack-alignment=4
 CFLAGS.display_mode_vba.c= -msse -mstack-alignment=4
@@ -667,6 +675,9 @@ CWARNFLAGS.dcn20_mpc.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn20_optc.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn20_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
 CWARNFLAGS.dcn20_clk_mgr.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn21_hubp.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn21_hwseq.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn21_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
 CWARNFLAGS.rc_calc.c=			-Wno-missing-prototypes
 CWARNFLAGS.hw_factory.c=		-Wno-missing-prototypes -Wno-unused-function
 CWARNFLAGS.hw_factory_diag.c=		-Wno-missing-prototypes
