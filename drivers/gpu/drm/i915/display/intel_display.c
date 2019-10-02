@@ -12579,10 +12579,10 @@ pipe_config_infoframe_mismatch(struct drm_i915_private *dev_priv,
 		drm_dbg(DRM_UT_KMS, __func__, "found");
 		hdmi_infoframe_log(KERN_DEBUG, dev_priv->drm.dev, b);
 	} else {
-		drm_err(__func__, "mismatch in %s infoframe", name);
-		drm_err(__func__, "expected:");
+		DRM_ERROR("mismatch in %s infoframe\n", name);
+		DRM_ERROR("expected:\n");
 		hdmi_infoframe_log(KERN_ERR, dev_priv->drm.dev, a);
-		drm_err(__func__, "found");
+		DRM_ERROR("found:\n");
 		hdmi_infoframe_log(KERN_ERR, dev_priv->drm.dev, b);
 	}
 }
@@ -12601,7 +12601,7 @@ pipe_config_mismatch(bool fastset, const char *name, const char *format, ...)
 	if (fastset)
 		drm_dbg(DRM_UT_KMS, "fastset mismatch in %s %pV", name, &vaf);
 	else
-		drm_err("mismatch in %s %pV", name, &vaf);
+		DRM_ERROR("mismatch in %s %pV\n", name, &vaf);
 
 	va_end(args);
 #elif defined(__FreeBSD__)
