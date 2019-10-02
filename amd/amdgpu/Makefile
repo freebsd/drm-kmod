@@ -392,6 +392,7 @@ SRCS+=	dcn20_dccg.c \
 SRCS+=	dcn21_hubbub.c \
 	dcn21_hubp.c \
 	dcn21_hwseq.c \
+	dcn21_link_encoder.c \
 	dcn21_resource.c
 
 # display/dc/core
@@ -677,6 +678,7 @@ CWARNFLAGS.dcn20_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dcn20_clk_mgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hwseq.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn21_link_encoder.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn21_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
 CWARNFLAGS.rc_calc.c=			-Wno-missing-prototypes
 CWARNFLAGS.hw_factory.c=		-Wno-missing-prototypes -Wno-unused-function
