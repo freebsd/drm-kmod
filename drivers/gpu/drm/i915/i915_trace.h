@@ -666,7 +666,6 @@ TRACE_EVENT(i915_request_queue,
 
 	    TP_STRUCT__entry(
 			     __field(u32, dev)
-			     __field(u32, hw_id)
 			     __field(u64, ctx)
 			     __field(u16, class)
 			     __field(u16, instance)
@@ -676,7 +675,6 @@ TRACE_EVENT(i915_request_queue,
 
 	    TP_fast_assign(
 			   __entry->dev = rq->i915->drm.primary->index;
-			   __entry->hw_id = rq->gem_context->hw_id;
 			   __entry->class = rq->engine->uabi_class;
 			   __entry->instance = rq->engine->uabi_instance;
 			   __entry->ctx = rq->fence.context;
@@ -684,10 +682,9 @@ TRACE_EVENT(i915_request_queue,
 			   __entry->flags = flags;
 			   ),
 
-	    TP_printk("dev=%u, engine=%u:%u, hw_id=%u, ctx=%llu, seqno=%u, flags=0x%x",
+	    TP_printk("dev=%u, engine=%u:%u, ctx=%llu, seqno=%u, flags=0x%x",
 		      __entry->dev, __entry->class, __entry->instance,
-		      __entry->hw_id, __entry->ctx, __entry->seqno,
-		      __entry->flags)
+		      __entry->ctx, __entry->seqno, __entry->flags)
 );
 
 DECLARE_EVENT_CLASS(i915_request,
@@ -696,7 +693,6 @@ DECLARE_EVENT_CLASS(i915_request,
 
 	    TP_STRUCT__entry(
 			     __field(u32, dev)
-			     __field(u32, hw_id)
 			     __field(u64, ctx)
 			     __field(u16, class)
 			     __field(u16, instance)
@@ -705,16 +701,15 @@ DECLARE_EVENT_CLASS(i915_request,
 
 	    TP_fast_assign(
 			   __entry->dev = rq->i915->drm.primary->index;
-			   __entry->hw_id = rq->gem_context->hw_id;
 			   __entry->class = rq->engine->uabi_class;
 			   __entry->instance = rq->engine->uabi_instance;
 			   __entry->ctx = rq->fence.context;
 			   __entry->seqno = rq->fence.seqno;
 			   ),
 
-	    TP_printk("dev=%u, engine=%u:%u, hw_id=%u, ctx=%llu, seqno=%u",
+	    TP_printk("dev=%u, engine=%u:%u, ctx=%llu, seqno=%u",
 		      __entry->dev, __entry->class, __entry->instance,
-		      __entry->hw_id, __entry->ctx, __entry->seqno)
+		      __entry->ctx, __entry->seqno)
 );
 
 DEFINE_EVENT(i915_request, i915_request_add,
@@ -739,7 +734,6 @@ TRACE_EVENT(i915_request_in,
 
 	    TP_STRUCT__entry(
 			     __field(u32, dev)
-			     __field(u32, hw_id)
 			     __field(u64, ctx)
 			     __field(u16, class)
 			     __field(u16, instance)
@@ -750,7 +744,6 @@ TRACE_EVENT(i915_request_in,
 
 	    TP_fast_assign(
 			   __entry->dev = rq->i915->drm.primary->index;
-			   __entry->hw_id = rq->gem_context->hw_id;
 			   __entry->class = rq->engine->uabi_class;
 			   __entry->instance = rq->engine->uabi_instance;
 			   __entry->ctx = rq->fence.context;
@@ -759,9 +752,9 @@ TRACE_EVENT(i915_request_in,
 			   __entry->port = port;
 			   ),
 
-	    TP_printk("dev=%u, engine=%u:%u, hw_id=%u, ctx=%llu, seqno=%u, prio=%u, port=%u",
+	    TP_printk("dev=%u, engine=%u:%u, ctx=%llu, seqno=%u, prio=%u, port=%u",
 		      __entry->dev, __entry->class, __entry->instance,
-		      __entry->hw_id, __entry->ctx, __entry->seqno,
+		      __entry->ctx, __entry->seqno,
 		      __entry->prio, __entry->port)
 );
 
@@ -771,7 +764,6 @@ TRACE_EVENT(i915_request_out,
 
 	    TP_STRUCT__entry(
 			     __field(u32, dev)
-			     __field(u32, hw_id)
 			     __field(u64, ctx)
 			     __field(u16, class)
 			     __field(u16, instance)
@@ -781,7 +773,6 @@ TRACE_EVENT(i915_request_out,
 
 	    TP_fast_assign(
 			   __entry->dev = rq->i915->drm.primary->index;
-			   __entry->hw_id = rq->gem_context->hw_id;
 			   __entry->class = rq->engine->uabi_class;
 			   __entry->instance = rq->engine->uabi_instance;
 			   __entry->ctx = rq->fence.context;
@@ -789,10 +780,9 @@ TRACE_EVENT(i915_request_out,
 			   __entry->completed = i915_request_completed(rq);
 			   ),
 
-		    TP_printk("dev=%u, engine=%u:%u, hw_id=%u, ctx=%llu, seqno=%u, completed?=%u",
+		    TP_printk("dev=%u, engine=%u:%u, ctx=%llu, seqno=%u, completed?=%u",
 			      __entry->dev, __entry->class, __entry->instance,
-			      __entry->hw_id, __entry->ctx, __entry->seqno,
-			      __entry->completed)
+			      __entry->ctx, __entry->seqno, __entry->completed)
 );
 
 #else
@@ -830,7 +820,6 @@ TRACE_EVENT(i915_request_wait_begin,
 
 	    TP_STRUCT__entry(
 			     __field(u32, dev)
-			     __field(u32, hw_id)
 			     __field(u64, ctx)
 			     __field(u16, class)
 			     __field(u16, instance)
@@ -846,7 +835,6 @@ TRACE_EVENT(i915_request_wait_begin,
 	     */
 	    TP_fast_assign(
 			   __entry->dev = rq->i915->drm.primary->index;
-			   __entry->hw_id = rq->gem_context->hw_id;
 			   __entry->class = rq->engine->uabi_class;
 			   __entry->instance = rq->engine->uabi_instance;
 			   __entry->ctx = rq->fence.context;
@@ -854,9 +842,9 @@ TRACE_EVENT(i915_request_wait_begin,
 			   __entry->flags = flags;
 			   ),
 
-	    TP_printk("dev=%u, engine=%u:%u, hw_id=%u, ctx=%llu, seqno=%u, flags=0x%x",
+	    TP_printk("dev=%u, engine=%u:%u, ctx=%llu, seqno=%u, flags=0x%x",
 		      __entry->dev, __entry->class, __entry->instance,
-		      __entry->hw_id, __entry->ctx, __entry->seqno,
+		      __entry->ctx, __entry->seqno,
 		      __entry->flags)
 );
 
@@ -959,19 +947,17 @@ DECLARE_EVENT_CLASS(i915_context,
 	TP_STRUCT__entry(
 			__field(u32, dev)
 			__field(struct i915_gem_context *, ctx)
-			__field(u32, hw_id)
 			__field(struct i915_address_space *, vm)
 	),
 
 	TP_fast_assign(
 			__entry->dev = ctx->i915->drm.primary->index;
 			__entry->ctx = ctx;
-			__entry->hw_id = ctx->hw_id;
 			__entry->vm = ctx->vm;
 	),
 
-	TP_printk("dev=%u, ctx=%p, ctx_vm=%p, hw_id=%u",
-		  __entry->dev, __entry->ctx, __entry->vm, __entry->hw_id)
+	TP_printk("dev=%u, ctx=%p, ctx_vm=%p",
+		  __entry->dev, __entry->ctx, __entry->vm)
 )
 
 DEFINE_EVENT(i915_context, i915_context_create,
