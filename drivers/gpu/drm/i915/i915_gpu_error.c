@@ -1307,7 +1307,7 @@ capture_vma(struct capture_vma *next,
 	if (!c)
 		return next;
 
-	if (!i915_active_trygrab(&vma->active)) {
+	if (!i915_active_acquire_if_busy(&vma->active)) {
 		kfree(c);
 		return next;
 	}
@@ -1447,7 +1447,7 @@ gem_record_rings(struct i915_gpu_state *error, struct compress *compress)
 			*this->slot =
 				i915_error_object_create(i915, vma, compress);
 
-			i915_active_ungrab(&vma->active);
+			i915_active_release(&vma->active);
 			i915_vma_put(vma);
 
 			capture = this->next;

@@ -8,6 +8,7 @@
 #define __I915_GEM_OBJECT_TYPES_H__
 
 #include <drm/drm_gem.h>
+#include <uapi/drm/i915_drm.h>
 
 #ifdef __FreeBSD__
 #include <linux/radix-tree.h>
