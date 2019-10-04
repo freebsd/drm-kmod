@@ -1866,7 +1866,6 @@ static const struct i915_vma_ops pd_vma_ops = {
 
 static struct i915_vma *pd_vma_create(struct gen6_ppgtt *ppgtt, int size)
 {
-	struct drm_i915_private *i915 = ppgtt->base.vm.i915;
 	struct i915_ggtt *ggtt = ppgtt->base.vm.gt->ggtt;
 	struct i915_vma *vma;
 
@@ -1877,7 +1876,7 @@ static struct i915_vma *pd_vma_create(struct gen6_ppgtt *ppgtt, int size)
 	if (!vma)
 		return ERR_PTR(-ENOMEM);
 
-	i915_active_init(i915, &vma->active, NULL, NULL);
+	i915_active_init(&vma->active, NULL, NULL);
 
 	mutex_init(&vma->pages_mutex);
 	vma->vm = i915_vm_get(&ggtt->vm);
