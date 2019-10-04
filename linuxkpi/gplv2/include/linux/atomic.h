@@ -13,4 +13,7 @@
 	(__p == __o);							\
 })
 
+/* LKPI_TODO */
+#define	atomic_try_cmpxchg(a, b, c) 0
+
 #endif

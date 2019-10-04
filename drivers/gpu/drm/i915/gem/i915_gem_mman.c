@@ -316,16 +316,6 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 		goto err_rpm;
 #endif
 
-	ret = i915_mutex_lock_interruptible(dev);
-	if (ret)
-		goto err_reset;
-
-	/* Access to snoopable pages through the GTT is incoherent. */
-	if (obj->cache_level != I915_CACHE_NONE && !HAS_LLC(i915)) {
-		ret = -EFAULT;
-		goto err_unlock;
-	}
-
 	/* Now pin it into the GTT as needed */
 	vma = i915_gem_object_ggtt_pin(obj, NULL, 0, 0,
 				       PIN_MAPPABLE |
@@ -358,7 +348,13 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	}
 	if (IS_ERR(vma)) {
 		ret = PTR_ERR(vma);
-		goto err_unlock;
+		goto err_reset;
+	}
+
+	/* Access to snoopable pages through the GTT is incoherent. */
+	if (obj->cache_level != I915_CACHE_NONE && !HAS_LLC(i915)) {
+		ret = -EFAULT;
+		goto err_unpin;
 	}
 
 	ret = i915_vma_pin_fence(vma);
@@ -396,8 +392,6 @@ err_fence:
 	i915_vma_unpin_fence(vma);
 err_unpin:
 	__i915_vma_unpin(vma);
-err_unlock:
-	mutex_unlock(&dev->struct_mutex);
 err_reset:
 #ifdef __freebsd_notyet__
 	intel_gt_reset_unlock(ggtt->vm.gt, srcu);
