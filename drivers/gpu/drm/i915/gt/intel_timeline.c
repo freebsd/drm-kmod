@@ -140,6 +140,7 @@ static void __idle_cacheline_free(struct intel_timeline_cacheline *cl)
 	kfree(cl);
 }
 
+__i915_active_call
 static void __cacheline_retire(struct i915_active *active)
 {
 	struct intel_timeline_cacheline *cl =
