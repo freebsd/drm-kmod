@@ -1040,6 +1040,25 @@ static bool ring_is_idle(struct intel_engine_cs *engine)
 	return idle;
 }
 
+void intel_engine_flush_submission(struct intel_engine_cs *engine)
+{
+	struct tasklet_struct *t = &engine->execlists.tasklet;
+
+	if (__tasklet_is_scheduled(t)) {
+		local_bh_disable();
+		if (tasklet_trylock(t)) {
+			/* Must wait for any GPU reset in progress. */
+			if (__tasklet_is_enabled(t))
+				t->func(t->data);
+			tasklet_unlock(t);
+		}
+		local_bh_enable();
+	}
+
+	/* Otherwise flush the tasklet if it was running on another cpu */
+	tasklet_unlock_wait(t);
+}
+
 /**
  * intel_engine_is_idle() - Report if the engine has finished process all work
  * @engine: the intel_engine_cs
@@ -1058,26 +1077,16 @@ bool intel_engine_is_idle(struct intel_engine_cs *engine)
 
 	/* Waiting to drain ELSP? */
 	if (execlists_active(&engine->execlists)) {
+#ifdef __linux__
 		struct tasklet_struct *t = &engine->execlists.tasklet;
 
-#ifdef __linux__
 		synchronize_hardirq(engine->i915->drm.pdev->irq);
 #elif defined(__FreeBSD__)
 		/* BSDFIXME: Is it enough to wait that all cpu have context-switched ? */
 		synchronize_rcu();
 #endif
 
-		local_bh_disable();
-		if (tasklet_trylock(t)) {
-			/* Must wait for any GPU reset in progress. */
-			if (__tasklet_is_enabled(t))
-				t->func(t->data);
-			tasklet_unlock(t);
-		}
-		local_bh_enable();
-
-		/* Otherwise flush the tasklet if it was on another cpu */
-		tasklet_unlock_wait(t);
+		intel_engine_flush_submission(engine);
 
 		if (execlists_active(&engine->execlists))
 			return false;
