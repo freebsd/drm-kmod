@@ -58,6 +58,7 @@ SRCS=	\
 	intel_frontbuffer.c \
 	intel_hdcp.c \
 	intel_hotplug.c \
+	intel_memory_region.c \
 	intel_opregion.c \
 	intel_overlay.c \
 	intel_pch.c \
@@ -156,6 +157,7 @@ SRCS+=	i915_gem_busy.c \
 	i915_gem_pages.c \
 	i915_gem_phys.c \
 	i915_gem_pm.c \
+	i915_gem_region.c \
 	i915_gem_shmem.c \
 	i915_gem_shrinker.c \
 	i915_gem_stolen.c \
