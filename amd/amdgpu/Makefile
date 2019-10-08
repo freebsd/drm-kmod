@@ -695,6 +695,7 @@ CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes -Wno-unused-variable
 
 # powerplay/*
+CWARNFLAGS.arcturus_ppt.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_smu.c=		-Wno-missing-prototypes
 CWARNFLAGS.ci_smumgr.c=			-Wno-missing-prototypes
 CWARNFLAGS.hardwaremanager.c=		-Wno-missing-prototypes
