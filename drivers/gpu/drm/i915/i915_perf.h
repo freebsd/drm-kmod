@@ -23,6 +23,7 @@ void i915_perf_init(struct drm_i915_private *i915);
 void i915_perf_fini(struct drm_i915_private *i915);
 void i915_perf_register(struct drm_i915_private *i915);
 void i915_perf_unregister(struct drm_i915_private *i915);
+int i915_perf_ioctl_version(void);
 #else
 static inline void
 i915_perf_init(struct drm_i915_private *dev_priv)
@@ -51,6 +52,12 @@ i915_perf_unregister(struct drm_i915_private *dev_priv)
 
 	return;
 }
+
+static inline int i915_perf_ioctl_version(void)
+{
+	return 1;
+}
+
 #endif
 
 #if defined(CONFIG_I915_PERF)
