@@ -508,6 +508,14 @@ struct intel_atomic_state {
 
 	bool rps_interactive;
 
+	/*
+	 * active_pipes
+	 * min_cdclk[]
+	 * min_voltage_level[]
+	 * cdclk.*
+	 */
+	bool global_state_changed;
+
 	/* Gen9+ only */
 	struct skl_ddb_values wm_results;
 
