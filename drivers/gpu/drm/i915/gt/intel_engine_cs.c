@@ -1254,6 +1254,19 @@ static struct intel_timeline *get_timeline(struct i915_request *rq)
 	return tl;
 }
 
+#ifdef __linux__
+static const char *repr_timer(const struct timer_list *t)
+{
+	if (!READ_ONCE(t->expires))
+		return "inactive";
+
+	if (timer_pending(t))
+		return "active";
+
+	return "expired";
+}
+#endif
+
 static void intel_engine_print_registers(struct intel_engine_cs *engine,
 					 struct drm_printer *m)
 {
@@ -1315,22 +1328,23 @@ static void intel_engine_print_registers(struct intel_engine_cs *engine,
 		unsigned int idx;
 		u8 read, write;
 
-		drm_printf(m, "\tExeclist status: 0x%08x %08x, entries %u\n",
-			   ENGINE_READ(engine, RING_EXECLIST_STATUS_LO),
-			   ENGINE_READ(engine, RING_EXECLIST_STATUS_HI),
-			   num_entries);
+#ifdef __linux__
+		/* BSDFIXME: We don't have a tasklet.state or tasklet.count */
+		drm_printf(m, "\tExeclist tasklet queued? %s (%s), timeslice? %s\n",
+			   yesno(test_bit(TASKLET_STATE_SCHED,
+					  &engine->execlists.tasklet.state)),
+			   enableddisabled(!atomic_read(&engine->execlists.tasklet.count)),
+			   repr_timer(&engine->execlists.timer));
+#endif
 
 		read = execlists->csb_head;
 		write = READ_ONCE(*execlists->csb_write);
 
-#ifdef __linux__
-		/* BSDFIXME: We don't have a tasklet.state or tasklet.count */
-		drm_printf(m, "\tExeclist CSB read %d, write %d, tasklet queued? %s (%s)\n",
-			   read, write,
-			   yesno(test_bit(TASKLET_STATE_SCHED,
-					  &engine->execlists.tasklet.state)),
-			   enableddisabled(!atomic_read(&engine->execlists.tasklet.count)));
-#endif
+		drm_printf(m, "\tExeclist status: 0x%08x %08x; CSB read:%d, write:%d, entries:%d\n",
+			   ENGINE_READ(engine, RING_EXECLIST_STATUS_LO),
+			   ENGINE_READ(engine, RING_EXECLIST_STATUS_HI),
+			   read, write, num_entries);
+
 		if (read >= num_entries)
 			read = 0;
 		if (write >= num_entries)
