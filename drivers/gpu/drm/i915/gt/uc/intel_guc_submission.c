@@ -1026,7 +1026,7 @@ static void guc_interrupts_capture(struct intel_gt *gt)
 	 * to GuC
 	 */
 	irqs = _MASKED_BIT_ENABLE(GFX_INTERRUPT_STEERING);
-	for_each_engine(engine, gt->i915, id)
+	for_each_engine(engine, gt, id)
 		ENGINE_WRITE(engine, RING_MODE_GEN7, irqs);
 
 	/* route USER_INTERRUPT to Host, all others are sent to GuC. */
@@ -1074,7 +1074,7 @@ static void guc_interrupts_release(struct intel_gt *gt)
 	 */
 	irqs = _MASKED_FIELD(GFX_FORWARD_VBLANK_MASK, GFX_FORWARD_VBLANK_NEVER);
 	irqs |= _MASKED_BIT_DISABLE(GFX_INTERRUPT_STEERING);
-	for_each_engine(engine, gt->i915, id)
+	for_each_engine(engine, gt, id)
 		ENGINE_WRITE(engine, RING_MODE_GEN7, irqs);
 
 	/* route all GT interrupts to the host */
@@ -1157,7 +1157,7 @@ int intel_guc_submission_enable(struct intel_guc *guc)
 	/* Take over from manual control of ELSP (execlists) */
 	guc_interrupts_capture(gt);
 
-	for_each_engine(engine, gt->i915, id) {
+	for_each_engine(engine, gt, id) {
 		engine->set_default_submission = guc_set_default_submission;
 		engine->set_default_submission(engine);
 	}
