@@ -189,25 +189,10 @@ static inline bool need_preempt(int prio, int active)
 	return prio >= max(I915_PRIORITY_NORMAL, active);
 }
 
-static void kick_submission(struct intel_engine_cs *engine,
-			    const struct i915_request *rq,
-			    int prio)
+static void kick_submission(struct intel_engine_cs *engine, int prio)
 {
-	const struct i915_request *inflight;
-
-	/*
-	 * We only need to kick the tasklet once for the high priority
-	 * new context we add into the queue.
-	 */
-	if (prio <= engine->execlists.queue_priority_hint)
-		return;
-
-	rcu_read_lock();
-
-	/* Nothing currently active? We're overdue for a submission! */
-	inflight = execlists_active(&engine->execlists);
-	if (!inflight)
-		goto unlock;
+	const struct i915_request *inflight =
+		execlists_active(&engine->execlists);
 
 	/*
 	 * If we are already the currently executing context, don't
@@ -216,14 +201,13 @@ static void kick_submission(struct intel_engine_cs *engine,
 	 * tasklet, i.e. we have not change the priority queue
 	 * sufficiently to oust the running context.
 	 */
-	if (inflight->hw_context == rq->hw_context)
-		goto unlock;
+	if (!inflight || !need_preempt(prio, rq_prio(inflight)))
+		return;
 
 	engine->execlists.queue_priority_hint = prio;
 	if (need_preempt(prio, rq_prio(inflight)))
 		tasklet_hi_schedule(&engine->execlists.tasklet);
 
-unlock:
 	rcu_read_unlock();
 }
 
@@ -351,7 +335,7 @@ static void __i915_schedule(struct i915_sched_node *node,
 		}
 
 		/* Defer (tasklet) submission until after all of our updates. */
-		kick_submission(engine, node_to_request(node), prio);
+		kick_submission(engine, prio);
 	}
 
 	spin_unlock(&engine->active.lock);
