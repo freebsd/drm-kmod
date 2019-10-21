@@ -31,6 +31,10 @@
 #include <linux/types.h>
 #include <linux/workqueue.h>
 
+#ifdef __FreeBSD__
+#include <linux/typecheck.h>
+#endif
+
 struct drm_i915_private;
 
 #undef WARN_ON
