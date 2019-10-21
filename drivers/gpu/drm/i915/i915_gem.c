@@ -1449,7 +1449,6 @@ void i915_gem_init_early(struct drm_i915_private *dev_priv)
 	int err;
 
 	i915_gem_init__mm(dev_priv);
-	i915_gem_init__pm(dev_priv);
 
 	spin_lock_init(&dev_priv->fb_tracking.lock);
 
