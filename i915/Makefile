@@ -126,6 +126,7 @@ SRCS+=	gen6_renderstate.c \
 	intel_renderstate.c \
 	intel_reset.c \
 	intel_ring.c \
+	intel_rps.c \
 	intel_sseu.c \
 	intel_timeline.c \
 	intel_workarounds.c
