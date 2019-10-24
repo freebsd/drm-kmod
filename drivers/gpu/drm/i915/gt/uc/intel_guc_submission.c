@@ -1017,7 +1017,7 @@ void intel_guc_submission_fini(struct intel_guc *guc)
 
 static void guc_interrupts_capture(struct intel_gt *gt)
 {
-	struct intel_rps *rps = &gt->i915->gt_pm.rps;
+	struct intel_rps *rps = &gt->rps;
 	struct intel_uncore *uncore = gt->uncore;
 	struct intel_engine_cs *engine;
 	enum intel_engine_id id;
@@ -1063,7 +1063,7 @@ static void guc_interrupts_capture(struct intel_gt *gt)
 
 static void guc_interrupts_release(struct intel_gt *gt)
 {
-	struct intel_rps *rps = &gt->i915->gt_pm.rps;
+	struct intel_rps *rps = &gt->rps;
 	struct intel_uncore *uncore = gt->uncore;
 	struct intel_engine_cs *engine;
 	enum intel_engine_id id;
