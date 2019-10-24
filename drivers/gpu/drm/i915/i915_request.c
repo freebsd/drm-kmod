@@ -33,6 +33,7 @@
 
 #include "gem/i915_gem_context.h"
 #include "gt/intel_context.h"
+#include "gt/intel_ring.h"
 
 #include "i915_active.h"
 #include "i915_drv.h"
