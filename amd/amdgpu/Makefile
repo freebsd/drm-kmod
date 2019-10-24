@@ -670,6 +670,7 @@ CWARNFLAGS.amdgpu_xgmi.c=			-Wno-missing-prototypes
 CWARNFLAGS.atombios_encoders.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dce_v6_0.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.dce_v8_0.c=				-Wno-unused-but-set-variable
+CWARNFLAGS.amdgpu_gfx.c=			-Wno-missing-prototypes
 CWARNFLAGS.gfx_v7_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gfx_v8_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gfx_v9_0.c=				-Wno-missing-prototypes
