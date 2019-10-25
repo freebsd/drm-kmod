@@ -474,7 +474,8 @@ SRCS+=	color_gamma.c \
 	power_helpers.c
 
 # display/dc
-SRCS+=	dc_helper.c
+SRCS+=	dc_helper.c \
+	dc_dmub_srv.c
 
 # display/dmub/src
 SRCS+=	dmub_dcn20.c \
