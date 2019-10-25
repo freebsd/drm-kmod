@@ -179,7 +179,8 @@ SRCS+=	i915_oa_bdw.c \
 	i915_oa_cflgt2.c \
 	i915_oa_cnl.c \
 	i915_oa_icl.c \
-	i915_oa_sklgt2.c
+	i915_oa_sklgt2.c \
+	i915_oa_tgl.c
 
 .if !empty(KCONFIG:MCOMPAT)
 SRCS+=	i915_ioc32.c
