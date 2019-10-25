@@ -71,6 +71,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn20 \
 	${SRCDIR}/display/dc/irq/dcn21 \
 	${SRCDIR}/display/dc/virtual \
+	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
 	${SRCDIR}/display/modules/color \
 	${SRCDIR}/display/modules/freesync \
@@ -475,6 +476,12 @@ SRCS+=	color_gamma.c \
 # display/dc
 SRCS+=	dc_helper.c
 
+# display/dmub/src
+SRCS+=	dmub_dcn20.c \
+	dmub_dcn21.c \
+	dmub_reg.c \
+	dmub_srv.c
+
 # Debug files, not handled for now
 SRCS_DEBUG=	amdgpu_dm_crc.c \
 		amdgpu_debugfs.c \
@@ -577,6 +584,7 @@ CFLAGS+= -I${SRCDIR}/display/dc
 CFLAGS+= -I${SRCDIR}/display/dc/clk_mgr/
 CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
+CFLAGS+= -I${SRCDIR}/display/dmub/inc
 CFLAGS+= -I${SRCDIR}/display/include
 CFLAGS+= -I${SRCDIR}/display/modules/inc
 CFLAGS+= -I${SRCDIR}/include
