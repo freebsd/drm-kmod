@@ -65,6 +65,7 @@ SRCS=	\
 	intel_pm.c \
 	intel_psr.c \
 	intel_quirks.c \
+	intel_region_lmem.c \
 	intel_runtime_pm.c \
 	intel_sideband.c \
 	intel_sprite.c \
@@ -152,6 +153,7 @@ SRCS+=	i915_gem_busy.c \
 	i915_gem_execbuffer.c \
 	i915_gem_fence.c \
 	i915_gem_internal.c \
+	i915_gem_lmem.c \
 	i915_gem_mman.c \
 	i915_gem_object.c \
 	i915_gem_pages.c \
