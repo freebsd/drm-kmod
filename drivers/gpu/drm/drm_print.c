@@ -346,7 +346,7 @@ void drm_dev_dbg(const struct device *dev, unsigned int category,
 #endif
 
 #ifdef __linux__
-void drm_dbg(unsigned int category, const char *format, ...)
+void __drm_dbg(unsigned int category, const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -363,10 +363,10 @@ void drm_dbg(unsigned int category, const char *format, ...)
 
 	va_end(args);
 }
-EXPORT_SYMBOL(drm_dbg);
+EXPORT_SYMBOL(__drm_dbg);
 #elif defined(__FreeBSD__)
-void drm_dbg(unsigned int category, const char *function_name,
-	     const char *format, ...)
+void __drm_dbg(unsigned int category, const char *function_name,
+	       const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -390,10 +390,11 @@ void drm_dbg(unsigned int category, const char *function_name,
 
 	va_end(args);
 }
+EXPORT_SYMBOL(__drm_dbg);
 #endif
 
 #ifdef __linux__
-void drm_err(const char *format, ...)
+void __drm_err(const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -407,9 +408,9 @@ void drm_err(const char *format, ...)
 
 	va_end(args);
 }
-EXPORT_SYMBOL(drm_err);
+EXPORT_SYMBOL(__drm_err);
 #elif defined(__FreeBSD__)
-void drm_err(const char *function_name, const char *format, ...)
+void __drm_err(const char *function_name, const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -431,6 +432,7 @@ void drm_err(const char *function_name, const char *format, ...)
 	va_end(args);
 }
 #endif
+EXPORT_SYMBOL(__drm_err);
 
 #ifdef CONFIG_DEBUGSFS
 /**
