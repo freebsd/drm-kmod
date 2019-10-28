@@ -43,17 +43,17 @@
 #include <drm/drm_print.h>
 
 /*
- * drm_debug: Enable debug output.
+ * __drm_debug: Enable debug output.
  * Bitmask of DRM_UT_x. See include/drm/drm_print.h for details.
  */
 #ifdef __FreeBSD__
 #if defined(DRM_DEBUG_LOG_ALL) || defined(INVARIANTS)
-unsigned int drm_debug = 0xffffffff;	/* bitmask of DRM_UT_x */
+unsigned int __drm_debug = 0xffffffff;	/* bitmask of DRM_UT_x */
 #else
-unsigned int drm_debug = 0;
+unsigned int __drm_debug = 0;
 #endif
 #endif
-EXPORT_SYMBOL(drm_debug);
+EXPORT_SYMBOL(__drm_debug);
 
 MODULE_PARM_DESC(debug, "Enable debug output, where each bit enables a debug category.\n"
 "\t\tBit 0 (0x01)  will enable CORE messages (drm core code)\n"
@@ -64,7 +64,7 @@ MODULE_PARM_DESC(debug, "Enable debug output, where each bit enables a debug cat
 "\t\tBit 5 (0x20)  will enable VBL messages (vblank code)\n"
 "\t\tBit 7 (0x80)  will enable LEASE messages (leasing code)\n"
 "\t\tBit 8 (0x100) will enable DP messages (displayport code)");
-module_param_named(debug, drm_debug, int, 0600);
+module_param_named(debug, __drm_debug, int, 0600);
 
 void __drm_puts_coredump(struct drm_printer *p, const char *str)
 {
