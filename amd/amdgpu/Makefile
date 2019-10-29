@@ -264,6 +264,7 @@ SRCS+=	amdgpu_dm_color.c \
 
 # display/dc/basics
 SRCS+=	conversion.c \
+	dc_common.c \
 	fixpt31_32.c \
 	log_helpers.c \
 	vector.c
@@ -370,6 +371,7 @@ SRCS+=	dcn10_cm_common.c \
 	dcn10_hubp.c \
 	dcn10_hw_sequencer.c \
 	dcn10_hw_sequencer_debug.c \
+	dcn10_init.c \
 	dcn10_ipp.c \
 	dcn10_link_encoder.c \
 	dcn10_mpc.c \
@@ -388,6 +390,7 @@ SRCS+=	dcn20_dccg.c \
 	dcn20_hubbub.c \
 	dcn20_hubp.c \
 	dcn20_hwseq.c \
+	dcn20_init.c \
 	dcn20_link_encoder.c \
 	dcn20_mmhubbub.c \
 	dcn20_mpc.c \
@@ -403,6 +406,7 @@ SRCS+=	dcn20_dccg.c \
 SRCS+=	dcn21_hubbub.c \
 	dcn21_hubp.c \
 	dcn21_hwseq.c \
+	dcn21_init.c \
 	dcn21_link_encoder.c \
 	dcn21_resource.c
 
