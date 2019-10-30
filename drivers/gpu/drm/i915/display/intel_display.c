@@ -14343,7 +14343,7 @@ static void intel_update_crtc(struct intel_crtc *crtc,
 		intel_crtc_enable_pipe_crc(crtc);
 	} else {
 		if (new_crtc_state->preload_luts &&
-		    (new_crtc_state->base.color_mgmt_changed ||
+		    (new_crtc_state->uapi.color_mgmt_changed ||
 		     new_crtc_state->update_pipe))
 			intel_color_load_luts(new_crtc_state);
 
@@ -14860,6 +14860,7 @@ static void intel_atomic_commit_tail(struct intel_atomic_state *state)
 	for_each_new_intel_crtc_in_state(state, crtc, new_crtc_state, i) {
 		if (new_crtc_state->hw.active &&
 		    !needs_modeset(new_crtc_state) &&
+		    !new_crtc_state->preload_luts &&
 		    (new_crtc_state->uapi.color_mgmt_changed ||
 		     new_crtc_state->update_pipe))
 			intel_color_load_luts(new_crtc_state);
