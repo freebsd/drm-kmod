@@ -11,6 +11,27 @@
 
 #include "i915_drv.h"
 
+<<<<<<< HEAD
+=======
+static void user_forcewake(struct intel_gt *gt, bool suspend)
+{
+	int count = atomic_read(&gt->user_wakeref);
+
+	/* Inside suspend/resume so single threaded, no races to worry about. */
+	if (likely(!count))
+		return;
+
+	intel_gt_pm_get(gt);
+	if (suspend) {
+		GEM_BUG_ON(count > atomic_read(&gt->wakeref.count));
+		atomic_sub(count, &gt->wakeref.count);
+	} else {
+		atomic_add(count, &gt->wakeref.count);
+	}
+	intel_gt_pm_put(gt);
+}
+
+>>>>>>> drm/i915/gem: Leave reloading kernel context on resume to GT
 void i915_gem_suspend(struct drm_i915_private *i915)
 {
 	GEM_TRACE("\n");
@@ -114,15 +135,12 @@ void i915_gem_resume(struct drm_i915_private *i915)
 	if (intel_gt_resume(&i915->gt))
 		goto err_wedged;
 
-<<<<<<< HEAD
-=======
 	/* Always reload a context for powersaving. */
 	if (!switch_to_kernel_context_sync(&i915->gt))
 		goto err_wedged;
 
 	user_forcewake(&i915->gt, false);
 
->>>>>>> drm/i915/gt: Call intel_gt_sanitize() directly
 out_unlock:
 	intel_uncore_forcewake_put(&i915->uncore, FORCEWAKE_ALL);
 	return;
