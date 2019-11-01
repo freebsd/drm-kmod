@@ -238,8 +238,6 @@ int intel_gt_resume(struct intel_gt *gt)
 
 	intel_uc_resume(&gt->uc);
 
-	user_forcewake(gt, false);
-
 	intel_uncore_forcewake_put(gt->uncore, FORCEWAKE_ALL);
 	intel_gt_pm_put(gt);
 
@@ -303,6 +301,8 @@ void intel_gt_suspend_late(struct intel_gt *gt)
 #ifdef __linux__
 	if (pm_suspend_target() == PM_SUSPEND_TO_IDLE)
 		return;
+
+	intel_uc_suspend(&gt->uc);
 
 	with_intel_runtime_pm(gt->uncore->rpm, wakeref) {
 		intel_rps_disable(&gt->rps);
