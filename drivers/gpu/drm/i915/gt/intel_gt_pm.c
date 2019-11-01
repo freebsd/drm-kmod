@@ -238,6 +238,8 @@ int intel_gt_resume(struct intel_gt *gt)
 
 	intel_uc_resume(&gt->uc);
 
+	user_forcewake(gt, false);
+
 	intel_uncore_forcewake_put(gt->uncore, FORCEWAKE_ALL);
 	intel_gt_pm_put(gt);
 
@@ -284,6 +286,8 @@ void intel_gt_suspend_late(struct intel_gt *gt)
 #ifdef __linux__
 	intel_wakeref_t wakeref;
 #endif
+
+	user_forcewake(gt, true);
 
 	/* We expect to be idle already; but also want to be independent */
 	wait_for_suspend(gt);
