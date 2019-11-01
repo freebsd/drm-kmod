@@ -4,6 +4,8 @@
  * Copyright © 2019 Intel Corporation
  */
 
+#include <linux/suspend.h>
+
 #include "i915_drv.h"
 #include "i915_globals.h"
 #include "i915_params.h"
@@ -240,8 +242,11 @@ int intel_gt_resume(struct intel_gt *gt)
 	return err;
 }
 
-static void wait_for_idle(struct intel_gt *gt)
+static void wait_for_suspend(struct intel_gt *gt)
 {
+	if (!intel_gt_pm_is_awake(gt))
+		return;
+
 	if (intel_gt_wait_for_idle(gt, I915_GEM_IDLE_TIMEOUT) == -ETIME) {
 		/*
 		 * Forcibly cancel outstanding work and leave
@@ -250,19 +255,51 @@ static void wait_for_idle(struct intel_gt *gt)
 		intel_gt_set_wedged(gt);
 	}
 
+	GEM_BUG_ON(atomic_read(&gt->user_wakeref));
 	intel_gt_pm_wait_for_idle(gt);
 }
 
-void intel_gt_suspend(struct intel_gt *gt)
+void intel_gt_suspend_prepare(struct intel_gt *gt)
 {
-	intel_wakeref_t wakeref;
-
 	user_forcewake(gt, true);
-
-	/* We expect to be idle already; but also want to be independent */
-	wait_for_idle(gt);
+	wait_for_suspend(gt);
 
 	intel_uc_suspend(&gt->uc);
+}
+
+#ifdef __linux__
+static suspend_state_t pm_suspend_target(void)
+{
+#if IS_ENABLED(CONFIG_PM_SLEEP)
+	return pm_suspend_target_state;
+#else
+	return PM_SUSPEND_TO_IDLE;
+#endif
+}
+#endif
+
+void intel_gt_suspend_late(struct intel_gt *gt)
+{
+#ifdef __linux__
+	intel_wakeref_t wakeref;
+#endif
+
+	/* We expect to be idle already; but also want to be independent */
+	wait_for_suspend(gt);
+
+	/*
+	 * On disabling the device, we want to turn off HW access to memory
+	 * that we no longer own.
+	 *
+	 * However, not all suspend-states disable the device. S0 (s2idle)
+	 * is effectively runtime-suspend, the device is left powered on
+	 * but needs to be put into a low power state. We need to keep
+	 * powermanagement enabled, but we also retain system state and so
+	 * it remains safe to keep on using our allocated memory.
+	 */
+#ifdef __linux__
+	if (pm_suspend_target() == PM_SUSPEND_TO_IDLE)
+		return;
 
 	with_intel_runtime_pm(gt->uncore->rpm, wakeref) {
 		intel_rps_disable(&gt->rps);
@@ -273,6 +310,7 @@ void intel_gt_suspend(struct intel_gt *gt)
 	intel_gt_sanitize(gt, false);
 
 	GEM_TRACE("\n");
+#endif
 }
 
 void intel_gt_runtime_suspend(struct intel_gt *gt)
