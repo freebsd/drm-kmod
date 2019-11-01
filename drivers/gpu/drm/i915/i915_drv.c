@@ -1207,6 +1207,10 @@ static int i915_driver_hw_probe(struct drm_i915_private *dev_priv)
 	if (ret)
 		goto err_ggtt;
 
+	ret = intel_memory_regions_hw_probe(dev_priv);
+	if (ret)
+		goto err_ggtt;
+
 	intel_gt_init_hw_early(&dev_priv->gt, &dev_priv->ggtt);
 
 	ret = i915_ggtt_enable_hw(dev_priv);
@@ -1846,8 +1850,6 @@ static int i915_drm_resume(struct drm_device *dev)
 	int ret;
 
 	disable_rpm_wakeref_asserts(&dev_priv->runtime_pm);
-
-	intel_rc6_ctx_wa_resume(&dev_priv->gt.rc6);
 
 	intel_gt_sanitize(&dev_priv->gt, true);
 
