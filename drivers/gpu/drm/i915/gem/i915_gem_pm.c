@@ -27,7 +27,7 @@ void i915_gem_suspend(struct drm_i915_private *i915)
 	 * state. Fortunately, the kernel_context is disposable and we do
 	 * not rely on its state.
 	 */
-	intel_gt_suspend_prepare(&i915->gt);
+	intel_gt_suspend(&i915->gt);
 
 	i915_gem_drain_freed_objects(i915);
 }
@@ -113,6 +113,12 @@ void i915_gem_resume(struct drm_i915_private *i915)
 	 */
 	if (intel_gt_resume(&i915->gt))
 		goto err_wedged;
+
+	/* Always reload a context for powersaving. */
+	if (!switch_to_kernel_context_sync(&i915->gt))
+		goto err_wedged;
+
+	user_forcewake(&i915->gt, false);
 
 out_unlock:
 	intel_uncore_forcewake_put(&i915->uncore, FORCEWAKE_ALL);
