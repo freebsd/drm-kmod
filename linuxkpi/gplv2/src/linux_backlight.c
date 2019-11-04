@@ -25,7 +25,7 @@ static struct list_head backlight_dev_list;
 static struct mutex backlight_dev_list_mutex;
 static struct blocking_notifier_head backlight_notifier;
 
-#ifdef __linux__
+#if defined(__linux__) || __FreeBSD_version >= 1300055
 static const char *const backlight_types[] = {
 	[BACKLIGHT_RAW] = "raw",
 	[BACKLIGHT_PLATFORM] = "platform",
@@ -125,7 +125,7 @@ static void backlight_generate_event(struct backlight_device *bd,
 #endif
 }
 
-#ifdef __linux__
+#if defined(__linux__) || __FreeBSD_version >= 1300055
 static ssize_t bl_power_show(struct device *dev, struct device_attribute *attr,
 		char *buf)
 {
@@ -278,7 +278,7 @@ static void bl_device_release(struct device *dev)
 	kfree(bd);
 }
 
-#ifdef __linux__
+#if defined(__linux__) || __FreeBSD_version >= 1300055
 static struct attribute *bl_device_attrs[] = {
 	&dev_attr_bl_power.attr,
 	&dev_attr_brightness.attr,
@@ -585,7 +585,7 @@ backlight_class_init(void)
 		return PTR_ERR(backlight_class);
 	}
 
-#ifdef __linux__
+#if defined(__linux__) || __FreeBSD_version >= 1300055
 	backlight_class->dev_groups = bl_device_groups;
 #endif
 	backlight_class->pm = &backlight_class_dev_pm_ops;
