@@ -1581,8 +1581,11 @@ static void commit_tail(struct drm_atomic_state *old_state)
 {
 	struct drm_device *dev = old_state->dev;
 	const struct drm_mode_config_helper_funcs *funcs;
+	struct drm_crtc_state *new_crtc_state;
+	struct drm_crtc *crtc;
 	ktime_t start;
 	s64 commit_time_ms;
+	unsigned int i, new_self_refresh_mask = 0;
 
 	funcs = dev->mode_config.helper_private;
 
@@ -1601,6 +1604,15 @@ static void commit_tail(struct drm_atomic_state *old_state)
 	drm_atomic_helper_wait_for_fences(dev, old_state, false);
 
 	drm_atomic_helper_wait_for_dependencies(old_state);
+
+	/*
+	 * We cannot safely access new_crtc_state after
+	 * drm_atomic_helper_commit_hw_done() so figure out which crtc's have
+	 * self-refresh active beforehand:
+	 */
+	for_each_new_crtc_in_state(old_state, crtc, new_crtc_state, i)
+		if (new_crtc_state->self_refresh_active)
+			new_self_refresh_mask |= BIT(i);
 
 	if (funcs && funcs->atomic_commit_tail)
 		funcs->atomic_commit_tail(old_state);
