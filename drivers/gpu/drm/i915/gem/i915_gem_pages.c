@@ -107,7 +107,7 @@ int __i915_gem_object_get_pages(struct drm_i915_gem_object *obj)
 {
 	int err;
 
-	err = mutex_lock_interruptible(&obj->mm.lock);
+	err = mutex_lock_interruptible_nested(&obj->mm.lock, I915_MM_GET_PAGES);
 	if (err)
 		return err;
 
@@ -185,8 +185,7 @@ __i915_gem_object_unset_pages(struct drm_i915_gem_object *obj)
 	return pages;
 }
 
-int __i915_gem_object_put_pages(struct drm_i915_gem_object *obj,
-				enum i915_mm_subclass subclass)
+int __i915_gem_object_put_pages(struct drm_i915_gem_object *obj)
 {
 	struct sg_table *pages;
 	int err;
@@ -197,7 +196,7 @@ int __i915_gem_object_put_pages(struct drm_i915_gem_object *obj,
 	GEM_BUG_ON(atomic_read(&obj->bind_count));
 
 	/* May be called by shrinker from within get_pages() (on another bo) */
-	mutex_lock_nested(&obj->mm.lock, subclass);
+	mutex_lock(&obj->mm.lock);
 	if (unlikely(atomic_read(&obj->mm.pages_pin_count))) {
 		err = -EBUSY;
 		goto unlock;
@@ -291,7 +290,7 @@ void *i915_gem_object_pin_map(struct drm_i915_gem_object *obj,
 	if (unlikely(!i915_gem_object_has_struct_page(obj)))
 		return ERR_PTR(-ENXIO);
 
-	err = mutex_lock_interruptible(&obj->mm.lock);
+	err = mutex_lock_interruptible_nested(&obj->mm.lock, I915_MM_GET_PAGES);
 	if (err)
 		return ERR_PTR(err);
 
