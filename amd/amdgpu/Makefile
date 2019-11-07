@@ -237,6 +237,7 @@ SRCS+=	amdgpu_afmt.c \
 	si_ih.c \
 	si_smc.c \
 	si.c \
+	sienna_cichlid_reg_init.c \
 	soc15.c \
 	tonga_ih.c \
 	umc_v6_0.c \
