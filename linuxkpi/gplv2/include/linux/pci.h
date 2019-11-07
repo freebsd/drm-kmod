@@ -9,6 +9,9 @@
 
 #include_next <linux/pci.h>
 
+/* LKPI_TODO */
+#define	pci_free_irq_vectors(dev) 0
+
 #define	DEFINE_RES_MEM(_start, _size)		\
 	{					\
 	 .bsd_res = NULL,			\
