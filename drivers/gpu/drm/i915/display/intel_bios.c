@@ -1796,7 +1796,7 @@ bool intel_bios_is_valid_vbt(const void *buf, size_t size)
 	vga_pci_unmap_bios(device_get_parent(pdev->dev.bsddev), bios)
 #endif
 
-static const struct vbt_header *find_vbt(void __iomem *bios, size_t size)
+static const struct vbt_header *find_vbt(void __iomem *oprom, size_t size)
 {
 	size_t i;
 
@@ -1804,14 +1804,14 @@ static const struct vbt_header *find_vbt(void __iomem *bios, size_t size)
 	for (i = 0; i + 4 < size; i++) {
 		void *vbt;
 
-		if (ioread32(bios + i) != *((const u32 *) "$VBT"))
+		if (ioread32(oprom + i) != *((const u32 *)"$VBT"))
 			continue;
 
 		/*
 		 * This is the one place where we explicitly discard the address
 		 * space (__iomem) of the BIOS/VBT.
 		 */
-		vbt = (void __force *) bios + i;
+		vbt = (void __force *)oprom + i;
 		if (intel_bios_is_valid_vbt(vbt, size - i))
 			return vbt;
 
@@ -1834,7 +1834,7 @@ void intel_bios_init(struct drm_i915_private *dev_priv)
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 	const struct vbt_header *vbt = dev_priv->opregion.vbt;
 	const struct bdb_header *bdb;
-	u8 __iomem *bios = NULL;
+	u8 __iomem *oprom = NULL;
 
 	INIT_LIST_HEAD(&dev_priv->vbt.display_devices);
 
@@ -1849,11 +1849,11 @@ void intel_bios_init(struct drm_i915_private *dev_priv)
 	if (!vbt) {
 		size_t size;
 
-		bios = pci_map_rom(pdev, &size);
-		if (!bios)
+		oprom = pci_map_rom(pdev, &size);
+		if (!oprom)
 			goto out;
 
-		vbt = find_vbt(bios, size);
+		vbt = find_vbt(oprom, size);
 		if (!vbt)
 			goto out;
 
@@ -1887,8 +1887,8 @@ out:
 		init_vbt_missing_defaults(dev_priv);
 	}
 
-	if (bios)
-		pci_unmap_rom(pdev, bios);
+	if (oprom)
+		pci_unmap_rom(pdev, oprom);
 }
 
 /**
