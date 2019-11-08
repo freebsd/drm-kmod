@@ -534,40 +534,41 @@ struct clk_bw_params rn_bw_params = {
 		.num_entries = 4,
 	},
 
-	.wm_table = {
-		.entries = {
-			{
-				.wm_inst = WM_A,
-				.wm_type = WM_TYPE_PSTATE_CHG,
-				.pstate_latency_us = 11.72,
-				.sr_exit_time_us = 6.09,
-				.sr_enter_plus_exit_time_us = 7.14,
-				.valid = true,
-			},
-			{
-				.wm_inst = WM_B,
-				.wm_type = WM_TYPE_PSTATE_CHG,
-				.pstate_latency_us = 11.72,
-				.sr_exit_time_us = 10.12,
-				.sr_enter_plus_exit_time_us = 11.48,
-				.valid = true,
-			},
-			{
-				.wm_inst = WM_C,
-				.wm_type = WM_TYPE_PSTATE_CHG,
-				.pstate_latency_us = 11.72,
-				.sr_exit_time_us = 10.12,
-				.sr_enter_plus_exit_time_us = 11.48,
-				.valid = true,
-			},
-			{
-				.wm_inst = WM_D,
-				.wm_type = WM_TYPE_PSTATE_CHG,
-				.pstate_latency_us = 11.72,
-				.sr_exit_time_us = 10.12,
-				.sr_enter_plus_exit_time_us = 11.48,
-				.valid = true,
-			},
+};
+
+struct wm_table ddr4_wm_table = {
+	.entries = {
+		{
+			.wm_inst = WM_A,
+			.wm_type = WM_TYPE_PSTATE_CHG,
+			.pstate_latency_us = 11.72,
+			.sr_exit_time_us = 6.09,
+			.sr_enter_plus_exit_time_us = 7.14,
+			.valid = true,
+		},
+		{
+			.wm_inst = WM_B,
+			.wm_type = WM_TYPE_PSTATE_CHG,
+			.pstate_latency_us = 11.72,
+			.sr_exit_time_us = 10.12,
+			.sr_enter_plus_exit_time_us = 11.48,
+			.valid = true,
+		},
+		{
+			.wm_inst = WM_C,
+			.wm_type = WM_TYPE_PSTATE_CHG,
+			.pstate_latency_us = 11.72,
+			.sr_exit_time_us = 10.12,
+			.sr_enter_plus_exit_time_us = 11.48,
+			.valid = true,
+		},
+		{
+			.wm_inst = WM_D,
+			.wm_type = WM_TYPE_PSTATE_CHG,
+			.pstate_latency_us = 11.72,
+			.sr_exit_time_us = 10.12,
+			.sr_enter_plus_exit_time_us = 11.48,
+			.valid = true,
 		},
 	}
 };
