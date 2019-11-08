@@ -26,6 +26,7 @@
 
 #include <drm/spsc_queue.h>
 #include <linux/dma-fence.h>
+#include <linux/completion.h>
 
 #ifdef __FreeBSD__
 #include <linux/workqueue.h>
