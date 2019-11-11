@@ -1040,6 +1040,59 @@ execlists_check_context(const struct intel_context *ce,
 	WARN_ONCE(!valid, "Invalid lrc state found before submission\n");
 }
 
+static void restore_default_state(struct intel_context *ce,
+				  struct intel_engine_cs *engine)
+{
+	u32 *regs = ce->lrc_reg_state;
+
+	if (engine->pinned_default_state)
+		memcpy(regs, /* skip restoring the vanilla PPHWSP */
+		       engine->pinned_default_state + LRC_STATE_PN * PAGE_SIZE,
+		       engine->context_size - PAGE_SIZE);
+
+	execlists_init_reg_state(regs, ce, engine, ce->ring, false);
+}
+
+static void reset_active(struct i915_request *rq,
+			 struct intel_engine_cs *engine)
+{
+	struct intel_context * const ce = rq->hw_context;
+	u32 head;
+
+	/*
+	 * The executing context has been cancelled. We want to prevent
+	 * further execution along this context and propagate the error on
+	 * to anything depending on its results.
+	 *
+	 * In __i915_request_submit(), we apply the -EIO and remove the
+	 * requests' payloads for any banned requests. But first, we must
+	 * rewind the context back to the start of the incomplete request so
+	 * that we do not jump back into the middle of the batch.
+	 *
+	 * We preserve the breadcrumbs and semaphores of the incomplete
+	 * requests so that inter-timeline dependencies (i.e other timelines)
+	 * remain correctly ordered. And we defer to __i915_request_submit()
+	 * so that all asynchronous waits are correctly handled.
+	 */
+	GEM_TRACE("%s(%s): { rq=%llx:%lld }\n",
+		  __func__, engine->name, rq->fence.context, rq->fence.seqno);
+
+	/* On resubmission of the active request, payload will be scrubbed */
+	if (i915_request_completed(rq))
+		head = rq->tail;
+	else
+		head = active_request(ce->timeline, rq)->head;
+	ce->ring->head = intel_ring_wrap(ce->ring, head);
+	intel_ring_update_space(ce->ring);
+
+	/* Scrub the context image to prevent replaying the previous batch */
+	restore_default_state(ce, engine);
+	__execlists_update_reg_state(ce, engine);
+
+	/* We've switched away, so this should be a no-op, but intent matters */
+	ce->lrc_desc |= CTX_DESC_FORCE_RESTORE;
+}
+
 static inline struct intel_engine_cs *
 __execlists_schedule_in(struct i915_request *rq)
 {
@@ -1048,8 +1101,11 @@ __execlists_schedule_in(struct i915_request *rq)
 
 	intel_context_get(ce);
 
+	if (unlikely(i915_gem_context_is_banned(ce->gem_context)))
+		reset_active(rq, engine);
+
 	if (IS_ENABLED(CONFIG_DRM_I915_DEBUG_GEM))
-		execlists_check_context(ce, rq->engine);
+		execlists_check_context(ce, engine);
 
 	if (ce->tag) {
 		/* Use a fixed tag for OA and friends */
@@ -1114,17 +1170,9 @@ __execlists_schedule_out(struct i915_request *rq,
 	 * refrain from doing non-trivial work here.
 	 */
 
-	/*
-	 * If we have just completed this context, the engine may now be
-	 * idle and we want to re-enter powersaving.
-	 */
-	if (list_is_last(&rq->link, &ce->timeline->requests) &&
-	    i915_request_completed(rq))
-		intel_engine_add_retire(engine, ce->timeline);
-
 	intel_engine_context_out(engine);
 	execlists_context_status_change(rq, INTEL_CONTEXT_SCHEDULE_OUT);
-	intel_gt_pm_put_async(engine->gt);
+	intel_gt_pm_put(engine->gt);
 
 	/*
 	 * If this is part of a virtual engine, its next request may
