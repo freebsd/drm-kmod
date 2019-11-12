@@ -180,6 +180,7 @@ static bool dmub_reg_value_burst_set_pack(const struct dc_context *ctx, uint32_t
 	}
 
 	cmd_buf->header.type = DMUB_CMD__REG_SEQ_BURST_WRITE;
+	cmd_buf->header.sub_type = 0;
 	cmd_buf->addr = addr;
 	cmd_buf->write_values[offload->reg_seq_count] = reg_val;
 	offload->reg_seq_count++;
@@ -208,6 +209,7 @@ static uint32_t dmub_reg_value_pack(const struct dc_context *ctx, uint32_t addr,
 
 	/* pack commands */
 	cmd_buf->header.type = DMUB_CMD__REG_SEQ_READ_MODIFY_WRITE;
+	cmd_buf->header.sub_type = 0;
 	seq = &cmd_buf->seq[offload->reg_seq_count];
 
 	if (offload->reg_seq_count) {
@@ -232,6 +234,7 @@ static void dmub_reg_wait_done_pack(const struct dc_context *ctx, uint32_t addr,
 	struct dmub_rb_cmd_reg_wait *cmd_buf = &offload->cmd_data.reg_wait;
 
 	cmd_buf->header.type = DMUB_CMD__REG_REG_WAIT;
+	cmd_buf->header.sub_type = 0;
 	cmd_buf->reg_wait.addr = addr;
 	cmd_buf->reg_wait.condition_field_value = mask & (condition_value << shift);
 	cmd_buf->reg_wait.mask = mask;
