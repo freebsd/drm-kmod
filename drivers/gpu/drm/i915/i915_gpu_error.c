@@ -1014,13 +1014,46 @@ i915_error_object_create(struct drm_i915_private *i915,
 	for_each_sgt_daddr(dma, iter, vma->pages) {
 		void __iomem *s;
 
-		ggtt->vm.insert_page(&ggtt->vm, dma, slot, I915_CACHE_NONE, 0);
+		for_each_sgt_daddr(dma, iter, vma->pages) {
+			ggtt->vm.insert_page(&ggtt->vm, dma, slot,
+					     I915_CACHE_NONE, 0);
 
-		s = io_mapping_map_wc(&ggtt->iomap, slot, PAGE_SIZE);
-		ret = compress_page(compress, (void  __force *)s, dst);
-		io_mapping_unmap(s);
-		if (ret)
-			break;
+			s = io_mapping_map_wc(&ggtt->iomap, slot, PAGE_SIZE);
+			ret = compress_page(compress, (void  __force *)s, dst);
+			io_mapping_unmap(s);
+			if (ret)
+				break;
+		}
+	} else if (i915_gem_object_is_lmem(vma->obj)) {
+		struct intel_memory_region *mem = vma->obj->mm.region;
+		dma_addr_t dma;
+
+		for_each_sgt_daddr(dma, iter, vma->pages) {
+			void __iomem *s;
+
+			s = io_mapping_map_wc(&mem->iomap, dma, PAGE_SIZE);
+			ret = compress_page(compress, (void __force *)s, dst);
+			io_mapping_unmap(s);
+			if (ret)
+				break;
+		}
+	} else {
+		struct page *page;
+
+		for_each_sgt_page(page, iter, vma->pages) {
+			void *s;
+
+			drm_clflush_pages(&page, 1);
+
+			s = kmap(page);
+			ret = compress_page(compress, s, dst);
+			kunmap(s);
+
+			drm_clflush_pages(&page, 1);
+
+			if (ret)
+				break;
+		}
 	}
 
 	if (ret || compress_flush(compress, dst)) {
