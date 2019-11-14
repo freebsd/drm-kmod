@@ -97,14 +97,15 @@ static void debug_active_init(struct i915_active *ref)
 
 static void debug_active_activate(struct i915_active *ref)
 {
-	lockdep_assert_held(&ref->mutex);
+	spin_lock_irq(&ref->tree_lock);
 	if (!atomic_read(&ref->count)) /* before the first inc */
 		debug_object_activate(ref, &active_debug_desc);
+	spin_unlock_irq(&ref->tree_lock);
 }
 
 static void debug_active_deactivate(struct i915_active *ref)
 {
-	lockdep_assert_held(&ref->mutex);
+	lockdep_assert_held(&ref->tree_lock);
 	if (!atomic_read(&ref->count)) /* after the last dec */
 		debug_object_deactivate(ref, &active_debug_desc);
 }
@@ -134,29 +135,23 @@ __active_retire(struct i915_active *ref)
 {
 	struct active_node *it, *n;
 	struct rb_root root;
-	bool retire = false;
+	unsigned long flags = 0;
 
-	lockdep_assert_held(&ref->mutex);
 	GEM_BUG_ON(i915_active_is_idle(ref));
 
 	/* return the unused nodes to our slabcache -- flushing the allocator */
-	if (atomic_dec_and_test(&ref->count)) {
-		debug_active_deactivate(ref);
-		root = ref->tree;
-		ref->tree = RB_ROOT;
-		ref->cache = NULL;
-		retire = true;
-	}
-
-	mutex_unlock(&ref->mutex);
-	if (!retire)
+	if (!atomic_dec_and_lock_irqsave(&ref->count, &ref->tree_lock, flags))
 		return;
 
+	flags = 1;
 	GEM_BUG_ON(rcu_access_pointer(ref->excl.fence));
-	rbtree_postorder_for_each_entry_safe(it, n, &root, node) {
-		GEM_BUG_ON(i915_active_fence_isset(&it->base));
-		kmem_cache_free(global.slab_cache, it);
-	}
+	debug_active_deactivate(ref);
+
+	root = ref->tree;
+	ref->tree = RB_ROOT;
+	ref->cache = NULL;
+
+	spin_unlock_irqrestore(&ref->tree_lock, flags);
 
 	/* After the final retire, the entire struct may be freed */
 	if (ref->retire)
@@ -164,6 +159,11 @@ __active_retire(struct i915_active *ref)
 
 	/* ... except if you wait on it, you must manage your own references! */
 	wake_up_var(ref);
+
+	rbtree_postorder_for_each_entry_safe(it, n, &root, node) {
+		GEM_BUG_ON(i915_active_fence_isset(&it->base));
+		kmem_cache_free(global.slab_cache, it);
+	}
 }
 
 static void
@@ -175,7 +175,6 @@ active_work(struct work_struct *wrk)
 	if (atomic_add_unless(&ref->count, -1, 1))
 		return;
 
-	mutex_lock(&ref->mutex);
 	__active_retire(ref);
 }
 
@@ -186,9 +185,7 @@ active_retire(struct i915_active *ref)
 	if (atomic_add_unless(&ref->count, -1, 1))
 		return;
 
-	/* If we are inside interrupt context (fence signaling), defer */
-	if (ref->flags & I915_ACTIVE_RETIRE_SLEEPS ||
-	    !mutex_trylock(&ref->mutex)) {
+	if (ref->flags & I915_ACTIVE_RETIRE_SLEEPS) {
 		queue_work(system_unbound_wq, &ref->work);
 		return;
 	}
@@ -233,7 +230,7 @@ active_instance(struct i915_active *ref, struct intel_timeline *tl)
 	if (!prealloc)
 		return NULL;
 
-	mutex_lock(&ref->mutex);
+	spin_lock_irq(&ref->tree_lock);
 	GEM_BUG_ON(i915_active_is_idle(ref));
 
 	parent = NULL;
@@ -263,7 +260,7 @@ active_instance(struct i915_active *ref, struct intel_timeline *tl)
 
 out:
 	ref->cache = node;
-	mutex_unlock(&ref->mutex);
+	spin_unlock_irq(&ref->tree_lock);
 
 	BUILD_BUG_ON(offsetof(typeof(*node), base));
 	return &node->base;
@@ -284,8 +281,10 @@ void __i915_active_init(struct i915_active *ref,
 	if (bits & I915_ACTIVE_MAY_SLEEP)
 		ref->flags |= I915_ACTIVE_RETIRE_SLEEPS;
 
+	spin_lock_init(&ref->tree_lock);
 	ref->tree = RB_ROOT;
 	ref->cache = NULL;
+
 	init_llist_head(&ref->preallocated_barriers);
 	atomic_set(&ref->count, 0);
 	__mutex_init(&ref->mutex, "i915_active", key);
@@ -516,7 +515,7 @@ static struct active_node *reuse_idle_barrier(struct i915_active *ref, u64 idx)
 	if (RB_EMPTY_ROOT(&ref->tree))
 		return NULL;
 
-	mutex_lock(&ref->mutex);
+	spin_lock_irq(&ref->tree_lock);
 	GEM_BUG_ON(i915_active_is_idle(ref));
 
 	/*
@@ -581,7 +580,7 @@ static struct active_node *reuse_idle_barrier(struct i915_active *ref, u64 idx)
 			goto match;
 	}
 
-	mutex_unlock(&ref->mutex);
+	spin_unlock_irq(&ref->tree_lock);
 
 	return NULL;
 
@@ -589,7 +588,7 @@ match:
 	rb_erase(p, &ref->tree); /* Hide from waits and sibling allocations */
 	if (p == &ref->cache->node)
 		ref->cache = NULL;
-	mutex_unlock(&ref->mutex);
+	spin_unlock_irq(&ref->tree_lock);
 
 	return rb_entry(p, struct active_node, node);
 }
@@ -670,6 +669,7 @@ unwind:
 void i915_active_acquire_barrier(struct i915_active *ref)
 {
 	struct llist_node *pos, *next;
+	unsigned long flags;
 
 	GEM_BUG_ON(i915_active_is_idle(ref));
 
@@ -679,7 +679,7 @@ void i915_active_acquire_barrier(struct i915_active *ref)
 	 * populated by i915_request_add_active_barriers() to point to the
 	 * request that will eventually release them.
 	 */
-	mutex_lock_nested(&ref->mutex, SINGLE_DEPTH_NESTING);
+	spin_lock_irqsave_nested(&ref->tree_lock, flags, SINGLE_DEPTH_NESTING);
 	llist_for_each_safe(pos, next, take_preallocated_barriers(ref)) {
 		struct active_node *node = barrier_from_ll(pos);
 		struct intel_engine_cs *engine = barrier_to_engine(node);
@@ -705,7 +705,7 @@ void i915_active_acquire_barrier(struct i915_active *ref)
 		llist_add(barrier_to_ll(node), &engine->barrier_tasks);
 		intel_engine_pm_put(engine);
 	}
-	mutex_unlock(&ref->mutex);
+	spin_unlock_irqrestore(&ref->tree_lock, flags);
 }
 
 void i915_request_add_active_barriers(struct i915_request *rq)
