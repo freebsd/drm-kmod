@@ -24,7 +24,7 @@
  *
  */
 
-
+#include <linux/mem_encrypt.h>
 #include <linux/slab.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -151,7 +151,8 @@ static unsigned long vmw_port_hb_out(struct rpc_channel *channel,
 	unsigned long si, di, eax, ebx, ecx, edx;
 	unsigned long msg_len = strlen(msg);
 
-	if (hb) {
+	/* HB port can't access encrypted memory. */
+	if (hb && !mem_encrypt_active()) {
 		unsigned long bp = channel->cookie_high;
 
 		si = (uintptr_t) msg;
@@ -204,7 +205,8 @@ static unsigned long vmw_port_hb_in(struct rpc_channel *channel, char *reply,
 {
 	unsigned long si, di, eax, ebx, ecx, edx;
 
-	if (hb) {
+	/* HB port can't access encrypted memory */
+	if (hb && !mem_encrypt_active()) {
 		unsigned long bp = channel->cookie_low;
 
 		si = channel->cookie_high;
