@@ -1690,10 +1690,8 @@ IS_SUBPLATFORM(const struct drm_i915_private *i915,
 	(IS_BROADWELL(dev_priv) || IS_GEN(dev_priv, 9))
 
 /* WaRsDisableCoarsePowerGating:skl,cnl */
-#define NEEDS_WaRsDisableCoarsePowerGating(dev_priv)			\
-	(IS_CANNONLAKE(dev_priv) ||					\
-	 IS_SKL_GT3(dev_priv) ||					\
-	 IS_SKL_GT4(dev_priv))
+#define NEEDS_WaRsDisableCoarsePowerGating(dev_priv) \
+	IS_GEN_RANGE(dev_priv, 9, 10)
 
 #define HAS_GMBUS_IRQ(dev_priv) (INTEL_GEN(dev_priv) >= 4)
 #define HAS_GMBUS_BURST_READ(dev_priv) (INTEL_GEN(dev_priv) >= 10 || \
