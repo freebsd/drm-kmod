@@ -154,7 +154,7 @@ long intel_gt_retire_requests_timeout(struct intel_gt *gt, long timeout)
 
 		/* Resume iteration after dropping lock */
 		list_safe_reset_next(tl, tn, link);
-		if (!--tl->active_count)
+		if (atomic_dec_and_test(&tl->active_count))
 			list_del(&tl->link);
 		else
 			active_count += !!rcu_access_pointer(tl->last_request.fence);
