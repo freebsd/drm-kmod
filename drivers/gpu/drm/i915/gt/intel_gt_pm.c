@@ -277,7 +277,7 @@ void intel_gt_suspend_prepare(struct intel_gt *gt)
 #ifdef __linux__
 static suspend_state_t pm_suspend_target(void)
 {
-#if IS_ENABLED(CONFIG_PM_SLEEP)
+#if IS_ENABLED(CONFIG_SUSPEND) && IS_ENABLED(CONFIG_PM_SLEEP)
 	return pm_suspend_target_state;
 #else
 	return PM_SUSPEND_TO_IDLE;
