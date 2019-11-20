@@ -364,7 +364,8 @@ void intel_timeline_enter(struct intel_timeline *tl)
 		return;
 
 	spin_lock_irqsave(&timelines->lock, flags);
-	list_add_tail(&tl->link, &timelines->active_list);
+	if (!atomic_fetch_inc(&tl->active_count))
+		list_add_tail(&tl->link, &timelines->active_list);
 	spin_unlock_irqrestore(&timelines->lock, flags);
 }
 
