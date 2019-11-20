@@ -4197,10 +4197,6 @@ static int gfx_v9_0_ecc_late_init(void *handle)
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r;
 
-	r = amdgpu_gfx_ras_late_init(adev);
-	if (r)
-		return r;
-
 	r = gfx_v9_0_do_edc_gds_workarounds(adev);
 	if (r)
 		return r;
@@ -4227,6 +4223,10 @@ static int gfx_v9_0_late_init(void *handle)
 		return r;
 
 	r = gfx_v9_0_ecc_late_init(handle);
+	if (r)
+		return r;
+
+	r = amdgpu_gfx_ras_late_init(adev);
 	if (r)
 		return r;
 
