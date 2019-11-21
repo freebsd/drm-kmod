@@ -1121,7 +1121,7 @@ __execlists_schedule_in(struct i915_request *rq)
 #endif
 	}
 
-	intel_gt_pm_get(engine->gt);
+	__intel_gt_pm_get(engine->gt);
 	execlists_context_status_change(rq, INTEL_CONTEXT_SCHEDULE_IN);
 	intel_engine_context_in(engine);
 
