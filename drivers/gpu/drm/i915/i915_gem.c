@@ -1042,6 +1042,18 @@ out:
 	return err;
 }
 
+static int __intel_context_flush_retire(struct intel_context *ce)
+{
+	struct intel_timeline *tl;
+
+	tl = intel_context_timeline_lock(ce);
+	if (IS_ERR(tl))
+		return PTR_ERR(tl);
+
+	intel_context_timeline_unlock(tl);
+	return 0;
+}
+
 static int __intel_engines_record_defaults(struct intel_gt *gt)
 {
 	struct i915_request *requests[I915_NUM_ENGINES] = {};
