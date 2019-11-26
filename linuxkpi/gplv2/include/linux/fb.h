@@ -681,7 +681,11 @@ struct linux_fb_info {
 	struct fb_info fbio;
 	struct cdev *fb_cdev;
 	device_t fb_bsddev;
+#ifdef __linux__
 };
+#else
+} __aligned(sizeof(long));
+#endif
 
 
 static inline struct apertures_struct *alloc_apertures(unsigned int max_num) {

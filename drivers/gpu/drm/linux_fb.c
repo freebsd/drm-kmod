@@ -250,22 +250,15 @@ fb_exit(void)
 }
 SYSUNINIT(fb_exit, SI_SUB_KLD, SI_ORDER_MIDDLE, fb_exit, NULL);
 
+CTASSERT((sizeof(struct linux_fb_info) % sizeof(long)) == 0);
 
 struct linux_fb_info *
 framebuffer_alloc(size_t size, struct device *dev)
 {
-#define BYTES_PER_LONG (BITS_PER_LONG/8)
-#define PADDING (BYTES_PER_LONG - (sizeof(struct linux_fb_info) % BYTES_PER_LONG))
-	int fb_info_size = sizeof(struct linux_fb_info);
 	struct linux_fb_info *info;
 	struct vt_kms_softc *sc;
-	char *p;
 
-	if (size)
-		fb_info_size += PADDING;
-
-	p = malloc(sizeof(*info), DRM_MEM_KMS, M_WAITOK | M_ZERO);
-	info = (struct linux_fb_info *)p;
+	info = malloc(sizeof(*info) + size, DRM_MEM_KMS, M_WAITOK | M_ZERO);
 	sc = malloc(sizeof(*sc), DRM_MEM_KMS, M_WAITOK | M_ZERO);
 	TASK_INIT(&sc->fb_mode_task, 0, vt_restore_fbdev_mode, sc);
 
@@ -273,13 +266,11 @@ framebuffer_alloc(size_t size, struct device *dev)
 	info->fbio.enter = &vt_kms_postswitch;
 
 	if (size)
-		info->par = p + fb_info_size;
+		info->par = info + 1;
 
 	info->device = dev;
 
 	return info;
-#undef PADDING
-#undef BYTES_PER_LONG
 }
 
 void
