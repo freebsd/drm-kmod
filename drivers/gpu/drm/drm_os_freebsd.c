@@ -59,6 +59,17 @@ reset_debug_log(void)
 	}
 }
 
+static int
+sysctl_pci_id(SYSCTL_HANDLER_ARGS)
+{
+	uint16_t vid = arg2 & 0xFFFF;
+	uint16_t pid = (arg2 >> 16) & 0xFFFF;
+	char buf[32];
+
+	snprintf(buf, sizeof(buf), "%x:%x", vid, pid);
+	return (sysctl_handle_string(oidp, buf, sizeof(buf), req));
+}
+
 int
 drm_dev_alias(struct device *ldev, struct drm_minor *minor, const char *minor_str)
 {
@@ -67,29 +78,28 @@ drm_dev_alias(struct device *ldev, struct drm_minor *minor, const char *minor_st
 	struct linux_cdev *cdevp;
 	struct sysctl_oid *node;
 	device_t dev = ldev->parent->bsddev;
-	char buf[20];
+	char buf[32];
 	char *devbuf;
+	u32 tmp;
 
 	MPASS(dev != NULL);
 	ctx_list = device_get_sysctl_ctx(dev);
 	child = SYSCTL_CHILDREN(device_get_sysctl_tree(dev));
-	sprintf(buf, "%d", minor->index);
+	snprintf(buf, sizeof(buf), "%d", minor->index);
 	node = SYSCTL_ADD_NODE(ctx_list, SYSCTL_STATIC_CHILDREN(_dev_drm), OID_AUTO, buf,
-			       CTLFLAG_RD, NULL, "drm properties");
+	    CTLFLAG_RD, NULL, "DRM properties");
 	oid_list = SYSCTL_CHILDREN(node);
-	sprintf(buf, "%x:%x", pci_get_vendor(dev),
-		pci_get_device(dev));
-	/* XXX leak - fix me */
-	devbuf = strndup(buf, 20, DRM_MEM_DRIVER);
-	SYSCTL_ADD_STRING(ctx_list, oid_list, OID_AUTO, "PCI_ID",
-			  CTLFLAG_RD, devbuf, 0, "vendor and device ids");
+	tmp = pci_get_vendor(dev) + ((u32)pci_get_device(dev) << 16);
+	SYSCTL_ADD_PROC(ctx_list, oid_list, OID_AUTO, "PCI_ID",
+	    CTLTYPE_STRING | CTLFLAG_RD, NULL, tmp,
+	    sysctl_pci_id, "A", "PCI vendor and device ID");
 
 	/*
 	 * FreeBSD won't automaticaly create the corresponding device
 	 * node as linux must so we find the corresponding one created by
 	 * register_chrdev in drm_drv.c and alias it.
 	 */
-	sprintf(buf, "dri/%s", minor_str);
+	snprintf(buf, sizeof(buf), "dri/%s", minor_str);
 	cdevp = linux_find_cdev("drm", DRM_MAJOR, minor->index);
 	MPASS(cdevp != NULL);
 	if (cdevp == NULL)
