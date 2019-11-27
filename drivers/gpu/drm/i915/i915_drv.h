@@ -398,9 +398,6 @@ struct intel_fbc {
 	 * these problems.
 	 */
 	struct intel_fbc_state_cache {
-		struct i915_vma *vma;
-		unsigned long flags;
-
 		struct {
 			unsigned int mode_flags;
 			u32 hsw_bdw_pixel_rate;
@@ -430,6 +427,7 @@ struct intel_fbc {
 			unsigned int stride;
 		} fb;
 		u16 gen9_wa_cfb_stride;
+		s8 fence_id;
 	} state_cache;
 
 	/*
@@ -440,9 +438,6 @@ struct intel_fbc {
 	 * are supposed to read from it in order to program the registers.
 	 */
 	struct intel_fbc_reg_params {
-		struct i915_vma *vma;
-		unsigned long flags;
-
 		struct {
 			enum pipe pipe;
 			enum i9xx_plane_id i9xx_plane;
@@ -456,6 +451,7 @@ struct intel_fbc {
 
 		int cfb_size;
 		u16 gen9_wa_cfb_stride;
+		s8 fence_id;
 		bool plane_visible;
 	} params;
 
