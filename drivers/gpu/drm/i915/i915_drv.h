@@ -431,6 +431,7 @@ struct intel_fbc {
 			const struct drm_format_info *format;
 			unsigned int stride;
 		} fb;
+		u16 gen9_wa_cfb_stride;
 	} state_cache;
 
 	/*
@@ -456,7 +457,7 @@ struct intel_fbc {
 		} fb;
 
 		int cfb_size;
-		unsigned int gen9_wa_cfb_stride;
+		u16 gen9_wa_cfb_stride;
 	} params;
 
 	const char *no_fbc_reason;
