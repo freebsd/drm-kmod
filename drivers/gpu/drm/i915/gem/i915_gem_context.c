@@ -280,8 +280,6 @@ static void i915_gem_context_free(struct i915_gem_context *ctx)
 	free_engines(rcu_access_pointer(ctx->engines));
 	mutex_destroy(&ctx->engines_mutex);
 
-	kfree(ctx->jump_whitelist);
-
 	if (ctx->timeline)
 		intel_timeline_put(ctx->timeline);
 
