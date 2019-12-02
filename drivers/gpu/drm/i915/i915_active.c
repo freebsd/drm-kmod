@@ -491,6 +491,11 @@ int i915_active_wait(struct i915_active *ref)
 	if (wait_var_event_interruptible(ref, i915_active_is_idle(ref)))
 		return -EINTR;
 
+#ifdef __linux__
+	flush_work(&ref->work);
+#elif defined(__FreeBSD__)
+	irq_work_sync(&ref->work);
+#endif
 	return 0;
 }
 
