@@ -8,6 +8,7 @@
 #include "i915_gem_object.h"
 #include "i915_scatterlist.h"
 #include "i915_gem_lmem.h"
+#include "i915_gem_mman.h"
 
 #ifdef __FreeBSD__
 #include <linux/xarray.h>
@@ -211,6 +212,8 @@ int __i915_gem_object_put_pages(struct drm_i915_gem_object *obj)
 		err = -EBUSY;
 		goto unlock;
 	}
+
+	i915_gem_object_release_mmap_offset(obj);
 
 	/*
 	 * ->put_pages might need to allocate memory for the bit17 swizzle
