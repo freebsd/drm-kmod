@@ -12,6 +12,8 @@
 #include <linux/xarray.h>
 #include <linux/vmalloc.h>
 #endif
+#include "i915_gem_lmem.h"
+#include "i915_gem_mman.h"
 
 void __i915_gem_object_set_pages(struct drm_i915_gem_object *obj,
 				 struct sg_table *pages,
@@ -201,6 +203,8 @@ int __i915_gem_object_put_pages(struct drm_i915_gem_object *obj)
 		err = -EBUSY;
 		goto unlock;
 	}
+
+	i915_gem_object_release_mmap_offset(obj);
 
 	/*
 	 * ->put_pages might need to allocate memory for the bit17 swizzle
