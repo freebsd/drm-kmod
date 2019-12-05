@@ -44,7 +44,7 @@ SYSCTL_NODE(_hw, OID_AUTO, i915kms,
 	MODULE_PARM_DESC(name, desc)
 
 struct i915_params i915_modparams __read_mostly = {
-#define MEMBER(T, member, value) .member = (value),
+#define MEMBER(T, member, value, ...) .member = (value),
 	I915_PARAMS_FOR_EACH(MEMBER)
 #undef MEMBER
 };
