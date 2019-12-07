@@ -2889,26 +2889,19 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 	bool voltage_supported = false;
 	bool full_pstate_supported = false;
 	bool dummy_pstate_supported = false;
-#ifdef __FreeBSD__
 	double p_state_latency_us;
 
-	kernel_fpu_begin();
+	DC_FP_START();
 	p_state_latency_us = context->bw_ctx.dml.soc.dram_clock_change_latency_us;
-#else
-	double p_state_latency_us = context->bw_ctx.dml.soc.dram_clock_change_latency_us;
-#endif
-	context->bw_ctx.dml.soc.disable_dram_clock_change_vactive_support = dc->debug.disable_dram_clock_change_vactive_support;
+	context->bw_ctx.dml.soc.disable_dram_clock_change_vactive_support =
+		dc->debug.disable_dram_clock_change_vactive_support;
 
 	if (fast_validate) {
-#ifdef __FreeBSD__
 		voltage_supported = dcn20_validate_bandwidth_internal(dc, context, true);
-		kernel_fpu_end();
-		return voltage_supported;
-#else
-		return dcn20_validate_bandwidth_internal(dc, context, true);
-#endif
-	}
 
+		DC_FP_END();
+		return voltage_supported;
+	}
 
 	// Best case, we support full UCLK switch latency
 	voltage_supported = dcn20_validate_bandwidth_internal(dc, context, false);
@@ -2937,9 +2930,7 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 restore_dml_state:
 	context->bw_ctx.dml.soc.dram_clock_change_latency_us = p_state_latency_us;
 
-#ifdef __FreeBSD__
-	kernel_fpu_end();
-#endif
+	DC_FP_END();
 	return voltage_supported;
 }
 
@@ -3461,9 +3452,7 @@ static bool dcn20_resource_construct(
 	enum dml_project dml_project_version =
 			get_dml_project_version(ctx->asic_id.hw_internal_rev);
 
-#ifdef __FreeBSD__
-	kernel_fpu_begin();
-#endif
+	DC_FP_START();
 
 	ctx->dc_bios->regs = &bios_regs;
 	pool->base.funcs = &dcn20_res_pool_funcs;
@@ -3765,13 +3754,12 @@ static bool dcn20_resource_construct(
 		pool->base.oem_device = NULL;
 	}
 
+	DC_FP_END();
 	return true;
 
 create_fail:
 
-#ifdef __FreeBSD__
-	kernel_fpu_end();
-#endif
+	DC_FP_END();
 	dcn20_resource_destruct(pool);
 
 	return false;
