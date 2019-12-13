@@ -229,10 +229,7 @@ bool i915_request_retire(struct i915_request *rq)
 	if (!i915_request_completed(rq))
 		return false;
 
-	GEM_TRACE("%s fence %llx:%lld, current %d\n",
-		  rq->engine->name,
-		  rq->fence.context, rq->fence.seqno,
-		  hwsp_seqno(rq));
+	RQ_TRACE(rq, "\n");
 
 	GEM_BUG_ON(!i915_sw_fence_signaled(&rq->submit));
 	trace_i915_request_retire(rq);
@@ -293,10 +290,7 @@ void i915_request_retire_upto(struct i915_request *rq)
 	struct intel_timeline * const tl = i915_request_timeline(rq);
 	struct i915_request *tmp;
 
-	GEM_TRACE("%s fence %llx:%lld, current %d\n",
-		  rq->engine->name,
-		  rq->fence.context, rq->fence.seqno,
-		  hwsp_seqno(rq));
+	RQ_TRACE(rq, "\n");
 
 	GEM_BUG_ON(!i915_request_completed(rq));
 
@@ -357,10 +351,7 @@ bool __i915_request_submit(struct i915_request *request)
 	struct intel_engine_cs *engine = request->engine;
 	bool result = false;
 
-	GEM_TRACE("%s fence %llx:%lld, current %d\n",
-		  engine->name,
-		  request->fence.context, request->fence.seqno,
-		  hwsp_seqno(request));
+	RQ_TRACE(request, "\n");
 
 	GEM_BUG_ON(!irqs_disabled());
 	lockdep_assert_held(&engine->active.lock);
@@ -450,10 +441,7 @@ void __i915_request_unsubmit(struct i915_request *request)
 #ifdef __freebsd_notyet__
 	struct intel_engine_cs *engine = request->engine;
 
-	GEM_TRACE("%s fence %llx:%lld, current %d\n",
-		  engine->name,
-		  request->fence.context, request->fence.seqno,
-		  hwsp_seqno(request));
+	RQ_TRACE(request, "\n");
 #endif
 
 	GEM_BUG_ON(!irqs_disabled());
@@ -1281,8 +1269,7 @@ struct i915_request *__i915_request_commit(struct i915_request *rq)
 	struct intel_ring *ring = rq->ring;
 	u32 *cs;
 
-	GEM_TRACE("%s fence %llx:%lld\n",
-		  engine->name, rq->fence.context, rq->fence.seqno);
+	RQ_TRACE(rq, "\n");
 
 	/*
 	 * To ensure that this call will not fail, space for its emissions
