@@ -21,7 +21,7 @@ static int __engine_unpark(struct intel_wakeref *wf)
 		container_of(wf, typeof(*engine), wakeref);
 	void *map;
 
-	GEM_TRACE("%s\n", engine->name);
+	ENGINE_TRACE(engine, "\n");
 
 	intel_gt_pm_get(engine->gt);
 
@@ -79,6 +79,17 @@ __intel_timeline_enter_and_release_pm(struct intel_timeline *tl,
 {
 	struct intel_gt_timelines *timelines = &engine->gt->timelines;
 
+	ENGINE_TRACE(engine, "\n");
+
+	/*
+	 * We have to serialise all potential retirement paths with our
+	 * submission, as we don't want to underflow either the
+	 * engine->wakeref.counter or our timeline->active_count.
+	 *
+	 * Equally, we cannot allow a new submission to start until
+	 * after we finish queueing, nor could we allow that submitter
+	 * to retire us before we are ready!
+	 */
 	spin_lock(&timelines->lock);
 
 	if (!atomic_fetch_inc(&tl->active_count))
@@ -189,7 +200,7 @@ static int __engine_park(struct intel_wakeref *wf)
 	if (!switch_to_kernel_context(engine))
 		return -EBUSY;
 
-	GEM_TRACE("%s\n", engine->name);
+	ENGINE_TRACE(engine, "\n");
 
 	call_idle_barriers(engine); /* cleanup after wedging */
 
