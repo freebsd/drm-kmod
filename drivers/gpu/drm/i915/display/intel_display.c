@@ -169,7 +169,6 @@ static void vlv_prepare_pll(struct intel_crtc *crtc,
 static void chv_prepare_pll(struct intel_crtc *crtc,
 			    const struct intel_crtc_state *pipe_config);
 static void skylake_pfit_enable(const struct intel_crtc_state *crtc_state);
-static void ironlake_pfit_disable(const struct intel_crtc_state *old_crtc_state);
 static void ironlake_pfit_enable(const struct intel_crtc_state *crtc_state);
 static void intel_modeset_setup_hw_state(struct drm_device *dev,
 					 struct drm_modeset_acquire_ctx *ctx);
@@ -1827,7 +1826,7 @@ static void intel_crtc_vblank_on(const struct intel_crtc_state *crtc_state)
 	drm_crtc_vblank_on(&crtc->base);
 }
 
-static void intel_crtc_vblank_off(const struct intel_crtc_state *crtc_state)
+void intel_crtc_vblank_off(const struct intel_crtc_state *crtc_state)
 {
 	struct intel_crtc *crtc = to_intel_crtc(crtc_state->uapi.crtc);
 
@@ -1895,7 +1894,7 @@ static void intel_enable_pipe(const struct intel_crtc_state *new_crtc_state)
 		intel_wait_for_pipe_scanline_moving(crtc);
 }
 
-static void intel_disable_pipe(const struct intel_crtc_state *old_crtc_state)
+void intel_disable_pipe(const struct intel_crtc_state *old_crtc_state)
 {
 	struct intel_crtc *crtc = to_intel_crtc(old_crtc_state->uapi.crtc);
 	struct drm_i915_private *dev_priv = to_i915(crtc->base.dev);
@@ -4588,20 +4587,6 @@ static void icl_enable_trans_port_sync(const struct intel_crtc_state *crtc_state
 		   trans_ddi_func_ctl2_val);
 }
 
-static void icl_disable_transcoder_port_sync(const struct intel_crtc_state *old_crtc_state)
-{
-	struct intel_crtc *crtc = to_intel_crtc(old_crtc_state->uapi.crtc);
-	struct drm_i915_private *dev_priv = to_i915(crtc->base.dev);
-
-	if (old_crtc_state->master_transcoder == INVALID_TRANSCODER)
-		return;
-
-	DRM_DEBUG_KMS("Disabling Transcoder Port Sync on Slave Transcoder %s\n",
-		      transcoder_name(old_crtc_state->cpu_transcoder));
-
-	I915_WRITE(TRANS_DDI_FUNC_CTL2(old_crtc_state->cpu_transcoder), 0);
-}
-
 static void intel_fdi_normal_train(struct intel_crtc *crtc)
 {
 	struct drm_device *dev = crtc->base.dev;
@@ -5772,7 +5757,7 @@ static int skl_update_scaler_plane(struct intel_crtc_state *crtc_state,
 	return 0;
 }
 
-static void skylake_scaler_disable(const struct intel_crtc_state *old_crtc_state)
+void skylake_scaler_disable(const struct intel_crtc_state *old_crtc_state)
 {
 	struct intel_crtc *crtc = to_intel_crtc(old_crtc_state->uapi.crtc);
 	int i;
@@ -6669,7 +6654,7 @@ static void haswell_crtc_enable(struct intel_atomic_state *state,
 	}
 }
 
-static void ironlake_pfit_disable(const struct intel_crtc_state *old_crtc_state)
+void ironlake_pfit_disable(const struct intel_crtc_state *old_crtc_state)
 {
 	struct intel_crtc *crtc = to_intel_crtc(old_crtc_state->uapi.crtc);
 	struct drm_i915_private *dev_priv = to_i915(crtc->base.dev);
@@ -6744,32 +6729,11 @@ static void ironlake_crtc_disable(struct intel_atomic_state *state,
 static void haswell_crtc_disable(struct intel_atomic_state *state,
 				 struct intel_crtc *crtc)
 {
-	const struct intel_crtc_state *old_crtc_state =
-		intel_atomic_get_old_crtc_state(state, crtc);
-	struct drm_i915_private *dev_priv = to_i915(crtc->base.dev);
-	enum transcoder cpu_transcoder = old_crtc_state->cpu_transcoder;
-
+	/*
+	 * FIXME collapse everything to one hook.
+	 * Need care with mst->ddi interactions.
+	 */
 	intel_encoders_disable(state, crtc);
-
-	intel_crtc_vblank_off(old_crtc_state);
-
-	/* XXX: Do the pipe assertions at the right place for BXT DSI. */
-	if (!transcoder_is_dsi(cpu_transcoder))
-		intel_disable_pipe(old_crtc_state);
-
-	if (INTEL_GEN(dev_priv) >= 11)
-		icl_disable_transcoder_port_sync(old_crtc_state);
-
-	if (!transcoder_is_dsi(cpu_transcoder))
-		intel_ddi_disable_transcoder_func(old_crtc_state);
-
-	intel_dsc_disable(old_crtc_state);
-
-	if (INTEL_GEN(dev_priv) >= 9)
-		skylake_scaler_disable(old_crtc_state);
-	else
-		ironlake_pfit_disable(old_crtc_state);
-
 	intel_encoders_post_disable(state, crtc);
 }
 
