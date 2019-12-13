@@ -30,6 +30,7 @@
 #include "display/intel_fbdev.h"
 
 #include "i915_drv.h"
+#include "i915_perf.h"
 #include "i915_globals.h"
 #include "i915_selftest.h"
 
@@ -1055,10 +1056,18 @@ static int __init i915_init(void)
 
 #ifdef __FreeBSD__
 	i915_pci_driver.bsdclass = drm_devclass;
-	return linux_pci_register_drm_driver(&i915_pci_driver);
+	err = linux_pci_register_drm_driver(&i915_pci_driver);
 #else
-	return pci_register_driver(&i915_pci_driver);
+	err = pci_register_driver(&i915_pci_driver);
 #endif
+	if (err)
+		return err;
+
+#ifdef __linux__
+	i915_perf_sysctl_register();
+#endif
+
+	return 0;
 }
 
 static void __exit i915_exit(void)
@@ -1069,6 +1078,7 @@ static void __exit i915_exit(void)
 	if (!i915_pci_driver.driver.owner)
 		return;
 
+	i915_perf_sysctl_unregister();
 	pci_unregister_driver(&i915_pci_driver);
 #endif
 	i915_globals_exit();
