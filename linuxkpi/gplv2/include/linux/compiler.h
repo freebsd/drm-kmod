@@ -45,6 +45,12 @@
 
 #define	unreachable()	__unreachable()
 
+// Changed in base linuxkpi in 13.0-CURRENT
+#ifdef __deprecated
+#undef __deprecated
+#endif
+#define	__deprecated
+
 // BSDFIXME! (everything to end of this file)
 
 #include <linux/bitops.h>
