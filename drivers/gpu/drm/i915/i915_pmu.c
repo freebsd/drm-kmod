@@ -155,6 +155,7 @@ static u64 get_rc6(struct intel_gt *gt)
 	if (intel_gt_pm_get_if_awake(gt)) {
 		val = __get_rc6(gt);
 		intel_gt_pm_put_async(gt);
+		awake = true;
 	}
 
 	spin_lock_irqsave(&pmu->lock, flags);
