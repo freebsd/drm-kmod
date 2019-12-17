@@ -303,7 +303,7 @@ EXPORT_SYMBOL(of_drm_find_panel);
 #endif
 
 #ifdef __linux__
-#if IS_ENABLED(CONFIG_BACKLIGHT_CLASS_DEVICE)
+#if IS_REACHABLE(CONFIG_BACKLIGHT_CLASS_DEVICE)
 /**
  * drm_panel_of_backlight - use backlight device node for backlight
  * @panel: DRM panel
