@@ -2713,6 +2713,7 @@ i915_gem_do_execbuffer(struct drm_device *dev,
 	err = eb_submit(&eb);
 err_request:
 	add_to_client(eb.request, file);
+	i915_request_get(eb.request);
 	i915_request_add(eb.request);
 
 	if (fences)
@@ -2728,6 +2729,7 @@ err_request:
 			fput(out_fence->file);
 		}
 	}
+	i915_request_put(eb.request);
 
 err_batch_unpin:
 	if (eb.batch_flags & I915_DISPATCH_SECURE)
