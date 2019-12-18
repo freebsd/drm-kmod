@@ -279,7 +279,7 @@ static void intel_overlay_flip_prepare(struct intel_overlay *overlay,
 				       struct i915_vma *vma)
 {
 	enum pipe pipe = overlay->crtc->pipe;
-	struct intel_frontbuffer *from = NULL, *to = NULL;
+	struct intel_frontbuffer *from, *to;
 
 	WARN_ON(overlay->old_vma);
 
