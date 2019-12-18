@@ -162,7 +162,7 @@ i915_gem_phys_pwrite(struct drm_i915_gem_object *obj,
 	 * We manually control the domain here and pretend that it
 	 * remains coherent i.e. in the GTT domain, like shmem_pwrite.
 	 */
-	intel_frontbuffer_invalidate(obj->frontbuffer, ORIGIN_CPU);
+	i915_gem_object_invalidate_frontbuffer(obj, ORIGIN_CPU);
 
 	if (copy_from_user(vaddr, user_data, args->size))
 		return -EFAULT;
@@ -170,7 +170,7 @@ i915_gem_phys_pwrite(struct drm_i915_gem_object *obj,
 	drm_clflush_virt_range(vaddr, args->size);
 	intel_gt_chipset_flush(&to_i915(obj->base.dev)->gt);
 
-	intel_frontbuffer_flush(obj->frontbuffer, ORIGIN_CPU);
+	i915_gem_object_flush_frontbuffer(obj, ORIGIN_CPU);
 	return 0;
 }
 
@@ -590,7 +590,7 @@ i915_gem_gtt_pwrite_fast(struct drm_i915_gem_object *obj,
 		goto out_unpin;
 	}
 
-	intel_frontbuffer_invalidate(obj->frontbuffer, ORIGIN_CPU);
+	i915_gem_object_invalidate_frontbuffer(obj, ORIGIN_CPU);
 
 	user_data = u64_to_user_ptr(args->data_ptr);
 	offset = args->offset;
@@ -632,7 +632,7 @@ i915_gem_gtt_pwrite_fast(struct drm_i915_gem_object *obj,
 		user_data += page_length;
 		offset += page_length;
 	}
-	intel_frontbuffer_flush(obj->frontbuffer, ORIGIN_CPU);
+	i915_gem_object_flush_frontbuffer(obj, ORIGIN_CPU);
 
 	i915_gem_object_unlock_fence(obj, fence);
 out_unpin:
@@ -722,7 +722,7 @@ i915_gem_shmem_pwrite(struct drm_i915_gem_object *obj,
 		offset = 0;
 	}
 
-	intel_frontbuffer_flush(obj->frontbuffer, ORIGIN_CPU);
+	i915_gem_object_flush_frontbuffer(obj, ORIGIN_CPU);
 	i915_gem_object_unlock_fence(obj, fence);
 
 	return ret;
