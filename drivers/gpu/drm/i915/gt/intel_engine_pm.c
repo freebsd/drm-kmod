@@ -73,6 +73,15 @@ static inline void __timeline_mark_unlock(struct intel_context *ce,
 
 #endif /* !IS_ENABLED(CONFIG_LOCKDEP) */
 
+static void duration(struct dma_fence *fence, struct dma_fence_cb *cb)
+{
+	struct i915_request *rq = to_request(fence);
+
+	ewma__engine_latency_add(&rq->engine->latency,
+				 ktime_us_delta(rq->fence.timestamp,
+						rq->duration.emitted));
+}
+
 static void
 __intel_timeline_enter_and_release_pm(struct intel_timeline *tl,
 				      struct intel_engine_cs *engine)
@@ -157,7 +166,18 @@ static bool switch_to_kernel_context(struct intel_engine_cs *engine)
 
 	/* Install ourselves as a preemption barrier */
 	rq->sched.attr.priority = I915_PRIORITY_BARRIER;
-	__i915_request_commit(rq);
+	if (likely(!__i915_request_commit(rq))) { /* engine should be idle! */
+		/*
+		 * Use an interrupt for precise measurement of duration,
+		 * otherwise we rely on someone else retiring all the requests
+		 * which may delay the signaling (i.e. we will likely wait
+		 * until the background request retirement running every
+		 * second or two).
+		 */
+		BUILD_BUG_ON(sizeof(rq->duration) > sizeof(rq->submitq));
+		dma_fence_add_callback(&rq->fence, &rq->duration.cb, duration);
+		rq->duration.emitted = ktime_get();
+	}
 
 	__i915_request_queue(rq, NULL);
 
