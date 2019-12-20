@@ -619,6 +619,16 @@ static bool amdgpu_atpx_detect(void)
 		has_atpx |= (amdgpu_atpx_pci_probe_handle(pdev) == true);
 
 		parent_pdev = pci_upstream_bridge(pdev);
+		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
+		amdgpu_atpx_get_quirks(pdev);
+	}
+
+	while ((pdev = pci_get_class(PCI_CLASS_DISPLAY_OTHER << 8, pdev)) != NULL) {
+		vga_count++;
+
+		has_atpx |= (amdgpu_atpx_pci_probe_handle(pdev) == true);
+
+		parent_pdev = pci_upstream_bridge(pdev);
 #ifdef __linux__
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
 #elif defined(__FreeBSD__)
