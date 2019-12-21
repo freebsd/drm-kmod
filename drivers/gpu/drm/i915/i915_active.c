@@ -13,6 +13,7 @@
 #include <linux/llist.h>
 #endif
 
+#include "gt/intel_context.h"
 #include "gt/intel_engine_pm.h"
 #include "gt/intel_ring.h"
 
@@ -787,6 +788,7 @@ void i915_request_add_active_barriers(struct i915_request *rq)
 	struct llist_node *node, *next;
 	unsigned long flags;
 
+	GEM_BUG_ON(!intel_context_is_barrier(rq->context));
 	GEM_BUG_ON(intel_engine_is_virtual(engine));
 	GEM_BUG_ON(i915_request_timeline(rq) != engine->kernel_context->timeline);
 
