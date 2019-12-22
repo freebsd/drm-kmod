@@ -109,7 +109,10 @@ SRCS+=	dvo_ch7017.c \
 	vlv_dsi_pll.c
 
 # gt/*
-SRCS+=	gen6_renderstate.c \
+SRCS+=	debugfs_engines.c \
+	debugfs_gt.c \
+	debugfs_gt_pm.c \
+	gen6_renderstate.c \
 	gen7_renderstate.c \
 	gen8_renderstate.c \
 	gen9_renderstate.c \
