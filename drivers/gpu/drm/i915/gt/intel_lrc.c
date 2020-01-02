@@ -2520,10 +2520,11 @@ set_redzone(void *vaddr, const struct intel_engine_cs *engine)
 	vaddr += engine->context_size;
 
 #ifdef __linux__
-	memset(vaddr, POISON_INUSE, I915_GTT_PAGE_SIZE);
+	memset(vaddr, CONTEXT_REDZONE, I915_GTT_PAGE_SIZE);
 #elif defined(__FreeBSD__)
 	memset(vaddr, 0x5a, I915_GTT_PAGE_SIZE);
 #endif
+>>>>>>> drm/i915/gt: Always poison the kernel_context image before unparking
 }
 
 static void
@@ -2535,7 +2536,7 @@ check_redzone(const void *vaddr, const struct intel_engine_cs *engine)
 	vaddr += engine->context_size;
 
 #ifdef __linux__
-	if (memchr_inv(vaddr, POISON_INUSE, I915_GTT_PAGE_SIZE))
+	if (memchr_inv(vaddr, CONTEXT_REDZONE, I915_GTT_PAGE_SIZE))
 #elif defined(__FreeBSD__)
 	if (memchr_inv(vaddr, 0x5a, I915_GTT_PAGE_SIZE))
 #endif
