@@ -112,8 +112,10 @@ SRCS+=	dvo_ch7017.c \
 SRCS+=	debugfs_engines.c \
 	debugfs_gt.c \
 	debugfs_gt_pm.c \
+	gen6_ppgtt.c \
 	gen6_renderstate.c \
 	gen7_renderstate.c \
+	gen8_ppgtt.c \
 	gen8_renderstate.c \
 	gen9_renderstate.c \
 	intel_breadcrumbs.c \
@@ -123,14 +125,17 @@ SRCS+=	debugfs_engines.c \
 	intel_engine_pm.c \
 	intel_engine_pool.c \
 	intel_engine_user.c \
+	intel_ggtt.c \
 	intel_gt.c \
 	intel_gt_irq.c \
 	intel_gt_pm.c \
 	intel_gt_pm_irq.c \
 	intel_gt_requests.c \
+	intel_gtt.c \
 	intel_llc.c \
 	intel_lrc.c \
 	intel_mocs.c \
+	intel_ppgtt.c \
 	intel_rc6.c \
 	intel_renderstate.c \
 	intel_reset.c \
