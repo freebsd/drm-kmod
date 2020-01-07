@@ -1,31 +1,70 @@
 /* SPDX-License-Identifier: MIT */
 /*
  * Copyright © 2020 Intel Corporation
+ *
+ * Please try to maintain the following order within this file unless it makes
+ * sense to do otherwise. From top to bottom:
+ * 1. typedefs
+ * 2. #defines, and macros
+ * 3. structure definitions
+ * 4. function prototypes
+ *
+ * Within each section, please try to order by generation in ascending order,
+ * from top to bottom (ie. gen6 on the top, gen8 on the bottom).
  */
 
-#ifndef __I915_GEM_GTT_H__
-#define __I915_GEM_GTT_H__
+#ifndef __INTEL_GTT_H__
+#define __INTEL_GTT_H__
 
 #include <linux/io-mapping.h>
-#include <linux/types.h>
+#include <linux/kref.h>
+#include <linux/mm.h>
+#include <linux/pagevec.h>
+#include <linux/scatterlist.h>
+#include <linux/workqueue.h>
 
 #include <drm/drm_mm.h>
 
-#ifdef __FreeBSD__ // For linux_resource
-#include <linux/pci.h>
-#endif
-#include "gt/intel_gtt.h"
-#include "i915_scatterlist.h"
+#include "gt/intel_reset.h"
+#include "i915_gem_fence_reg.h"
+#include "i915_selftest.h"
+#include "i915_vma_types.h"
 
-struct drm_i915_gem_object;
-<<<<<<< HEAD
-struct i915_vma;
-struct intel_gt;
+#define I915_GFP_ALLOW_FAIL (GFP_KERNEL | __GFP_RETRY_MAYFAIL | __GFP_NOWARN)
+
+#if IS_ENABLED(CONFIG_DRM_I915_TRACE_GTT)
+#define DBG(...) trace_printk(__VA_ARGS__)
+#else
+#define DBG(...)
+#endif
+
+#define NALLOC 3 /* 1 normal, 1 for concurrent threads, 1 for preallocation */
+
+#define I915_GTT_PAGE_SIZE_4K	BIT_ULL(12)
+#define I915_GTT_PAGE_SIZE_64K	BIT_ULL(16)
+#define I915_GTT_PAGE_SIZE_2M	BIT_ULL(21)
+
+#define I915_GTT_PAGE_SIZE I915_GTT_PAGE_SIZE_4K
+#define I915_GTT_MAX_PAGE_SIZE I915_GTT_PAGE_SIZE_2M
+
+#define I915_GTT_PAGE_MASK -I915_GTT_PAGE_SIZE
+
+#define I915_GTT_MIN_ALIGNMENT I915_GTT_PAGE_SIZE
+
+#define I915_FENCE_REG_NONE -1
+#define I915_MAX_NUM_FENCES 32
+/* 32 fences + sign bit for FENCE_REG_NONE */
+#define I915_MAX_NUM_FENCE_BITS 6
 
 typedef u32 gen6_pte_t;
 typedef u64 gen8_pte_t;
 
 #define ggtt_total_entries(ggtt) ((ggtt)->vm.total >> PAGE_SHIFT)
+
+#define I915_PTES(pte_len)		((unsigned int)(PAGE_SIZE / (pte_len)))
+#define I915_PTE_MASK(pte_len)		(I915_PTES(pte_len) - 1)
+#define I915_PDES			512
+#define I915_PDE_MASK			(I915_PDES - 1)
 
 /* gen6-hsw has bit 11-4 for physical addr bit 39-32 */
 #define GEN6_GTT_ADDR_ENCODE(addr)	((addr) | (((addr) >> 28) & 0xff0))
@@ -33,26 +72,22 @@ typedef u64 gen8_pte_t;
 #define GEN6_PDE_ADDR_ENCODE(addr)	GEN6_GTT_ADDR_ENCODE(addr)
 #define GEN6_PTE_CACHE_LLC		(2 << 1)
 #define GEN6_PTE_UNCACHED		(1 << 1)
-#define GEN6_PTE_VALID			(1 << 0)
-
-#define I915_PTES(pte_len)		((unsigned int)(PAGE_SIZE / (pte_len)))
-#define I915_PTE_MASK(pte_len)		(I915_PTES(pte_len) - 1)
-#define I915_PDES			512
-#define I915_PDE_MASK			(I915_PDES - 1)
-#define NUM_PTE(pde_shift)     (1 << (pde_shift - PAGE_SHIFT))
+#define GEN6_PTE_VALID			REG_BIT(0)
 
 #define GEN6_PTES			I915_PTES(sizeof(gen6_pte_t))
 #define GEN6_PD_SIZE		        (I915_PDES * PAGE_SIZE)
 #define GEN6_PD_ALIGN			(PAGE_SIZE * 16)
 #define GEN6_PDE_SHIFT			22
-#define GEN6_PDE_VALID			(1 << 0)
+#define GEN6_PDE_VALID			REG_BIT(0)
+#define NUM_PTE(pde_shift)     (1 << (pde_shift - PAGE_SHIFT))
 
 #define GEN7_PTE_CACHE_L3_LLC		(3 << 1)
 
-#define BYT_PTE_SNOOPED_BY_CPU_CACHES	(1 << 2)
-#define BYT_PTE_WRITEABLE		(1 << 1)
+#define BYT_PTE_SNOOPED_BY_CPU_CACHES	REG_BIT(2)
+#define BYT_PTE_WRITEABLE		REG_BIT(1)
 
-/* Cacheability Control is a 4-bit value. The low three bits are stored in bits
+/*
+ * Cacheability Control is a 4-bit value. The low three bits are stored in bits
  * 3:1 of the PTE, while the fourth bit is stored in bit 11 of the PTE.
  */
 #define HSW_CACHEABILITY_CONTROL(bits)	((((bits) & 0x7) << 1) | \
@@ -85,7 +120,7 @@ typedef u64 gen8_pte_t;
 #define PPAT_CACHED			_PAGE_PAT /* WB LLCeLLC */
 #define PPAT_DISPLAY_ELLC		_PAGE_PCD /* WT eLLC */
 
-#define CHV_PPAT_SNOOP			(1<<6)
+#define CHV_PPAT_SNOOP			REG_BIT(6)
 #define GEN8_PPAT_AGE(x)		((x)<<4)
 #define GEN8_PPAT_LLCeLLC		(3<<2)
 #define GEN8_PPAT_LLCELLC		(2<<2)
@@ -103,77 +138,13 @@ typedef u64 gen8_pte_t;
 #define for_each_sgt_daddr(__dp, __iter, __sgt) \
 	__for_each_sgt_daddr(__dp, __iter, __sgt, I915_GTT_PAGE_SIZE)
 
-struct intel_remapped_plane_info {
-	/* in gtt pages */
-	unsigned int width, height, stride, offset;
-} __packed;
-
-struct intel_remapped_info {
-	struct intel_remapped_plane_info plane[2];
-	unsigned int unused_mbz;
-} __packed;
-
-struct intel_rotation_info {
-	struct intel_remapped_plane_info plane[2];
-} __packed;
-
-struct intel_partial_info {
-	u64 offset;
-	unsigned int size;
-} __packed;
-
-enum i915_ggtt_view_type {
-	I915_GGTT_VIEW_NORMAL = 0,
-	I915_GGTT_VIEW_ROTATED = sizeof(struct intel_rotation_info),
-	I915_GGTT_VIEW_PARTIAL = sizeof(struct intel_partial_info),
-	I915_GGTT_VIEW_REMAPPED = sizeof(struct intel_remapped_info),
-};
-
-static inline void assert_i915_gem_gtt_types(void)
-{
-	BUILD_BUG_ON(sizeof(struct intel_rotation_info) != 8*sizeof(unsigned int));
-	BUILD_BUG_ON(sizeof(struct intel_partial_info) != sizeof(u64) + sizeof(unsigned int));
-	BUILD_BUG_ON(sizeof(struct intel_remapped_info) != 9*sizeof(unsigned int));
-
-	/* Check that rotation/remapped shares offsets for simplicity */
-	BUILD_BUG_ON(offsetof(struct intel_remapped_info, plane[0]) !=
-		     offsetof(struct intel_rotation_info, plane[0]));
-	BUILD_BUG_ON(offsetofend(struct intel_remapped_info, plane[1]) !=
-		     offsetofend(struct intel_rotation_info, plane[1]));
-
-	/* As we encode the size of each branch inside the union into its type,
-	 * we have to be careful that each branch has a unique size.
-	 */
-	switch ((enum i915_ggtt_view_type)0) {
-	case I915_GGTT_VIEW_NORMAL:
-	case I915_GGTT_VIEW_PARTIAL:
-	case I915_GGTT_VIEW_ROTATED:
-	case I915_GGTT_VIEW_REMAPPED:
-		/* gcc complains if these are identical cases */
-		break;
-	}
-}
-
-struct i915_ggtt_view {
-	enum i915_ggtt_view_type type;
-	union {
-		/* Members need to contain no holes/padding */
-		struct intel_partial_info partial;
-		struct intel_rotation_info rotated;
-		struct intel_remapped_info remapped;
-	};
-};
-
-enum i915_cache_level;
-
-struct i915_vma;
-
 struct i915_page_dma {
 	struct page *page;
 	union {
 		dma_addr_t daddr;
 
-		/* For gen6/gen7 only. This is the offset in the GGTT
+		/*
+		 * For gen6/gen7 only. This is the offset in the GGTT
 		 * where the page directory entries for PPGTT begin
 		 */
 		u32 ggtt_offset;
@@ -217,6 +188,13 @@ struct i915_page_directory {
 	(void)0))
 #define px_used(px) (&px_pt(px)->used)
 
+enum i915_cache_level;
+
+struct drm_i915_file_private;
+struct drm_i915_gem_object;
+struct i915_vma;
+struct intel_gt;
+
 struct i915_vma_ops {
 	/* Map an object into an address space with the given cache flags. */
 	int (*bind_vma)(struct i915_vma *vma,
@@ -237,6 +215,8 @@ struct pagestash {
 	struct pagevec pvec;
 };
 
+void stash_init(struct pagestash *stash);
+
 struct i915_address_space {
 	struct kref ref;
 	struct rcu_work rcu;
@@ -245,7 +225,8 @@ struct i915_address_space {
 	struct intel_gt *gt;
 	struct drm_i915_private *i915;
 	struct device *dma;
-	/* Every address space belongs to a struct file - except for the global
+	/*
+	 * Every address space belongs to a struct file - except for the global
 	 * GTT that is owned by the driver (and so @file is set to NULL). In
 	 * principle, no information should leak from one context to another
 	 * (or between files/processes etc) unless explicitly shared by the
@@ -295,7 +276,7 @@ struct i915_address_space {
 	u64 (*pte_encode)(dma_addr_t addr,
 			  enum i915_cache_level level,
 			  u32 flags); /* Create a valid PTE */
-#define PTE_READ_ONLY	(1<<0)
+#define PTE_READ_ONLY	BIT(0)
 
 	int (*allocate_va_range)(struct i915_address_space *vm,
 				 u64 start, u64 length);
@@ -318,27 +299,8 @@ struct i915_address_space {
 	I915_SELFTEST_DECLARE(bool scrub_64K);
 };
 
-#define i915_is_ggtt(vm) ((vm)->is_ggtt)
-
-static inline bool
-i915_vm_is_4lvl(const struct i915_address_space *vm)
-{
-	return (vm->total - 1) >> 32;
-}
-
-static inline bool
-i915_vm_has_scratch_64K(struct i915_address_space *vm)
-{
-	return vm->scratch_order == get_order(I915_GTT_PAGE_SIZE_64K);
-}
-
-static inline bool
-i915_vm_has_cache_coloring(struct i915_address_space *vm)
-{
-	return i915_is_ggtt(vm) && vm->mm.color_adjust;
-}
-
-/* The Graphics Translation Table is the way in which GEN hardware translates a
+/*
+ * The Graphics Translation Table is the way in which GEN hardware translates a
  * Graphics Virtual Address into a Physical Address. In addition to the normal
  * collateral associated with any va->pa translations GEN hardware also has a
  * portion of the GTT which can be mapped by the CPU and remain both coherent
@@ -349,11 +311,7 @@ struct i915_ggtt {
 	struct i915_address_space vm;
 
 	struct io_mapping iomap;	/* Mapping to our CPU mappable region */
-#ifdef __linux__
 	struct resource gmadr;          /* GMADR resource */
-#elif defined(__FreeBSD__)
-	struct linux_resource gmadr;          /* GMADR resource */
-#endif
 	resource_size_t mappable_end;	/* End offset that we can CPU map */
 
 	/** "Graphics Stolen Memory" holds the global PTEs */
@@ -378,7 +336,8 @@ struct i915_ggtt {
 	struct i915_fence_reg fence_regs[I915_MAX_NUM_FENCES];
 	struct list_head fence_list;
 
-	/** List of all objects in gtt_space, currently mmaped by userspace.
+	/**
+	 * List of all objects in gtt_space, currently mmaped by userspace.
 	 * All objects within this list must also be on bound_list.
 	 */
 	struct list_head userfault_list;
@@ -396,116 +355,24 @@ struct i915_ppgtt {
 	struct i915_page_directory *pd;
 };
 
-struct gen6_ppgtt {
-	struct i915_ppgtt base;
+#define i915_is_ggtt(vm) ((vm)->is_ggtt)
 
-	struct mutex flush;
-	struct i915_vma *vma;
-	gen6_pte_t __iomem *pd_addr;
-
-	atomic_t pin_count;
-	struct mutex pin_mutex;
-
-	bool scan_for_unused_pt;
-};
-
-#define __to_gen6_ppgtt(base) container_of(base, struct gen6_ppgtt, base)
-
-static inline struct gen6_ppgtt *to_gen6_ppgtt(struct i915_ppgtt *base)
+static inline bool
+i915_vm_is_4lvl(const struct i915_address_space *vm)
 {
-	BUILD_BUG_ON(offsetof(struct gen6_ppgtt, base));
-	return __to_gen6_ppgtt(base);
+	return (vm->total - 1) >> 32;
 }
 
-/*
- * gen6_for_each_pde() iterates over every pde from start until start+length.
- * If start and start+length are not perfectly divisible, the macro will round
- * down and up as needed. Start=0 and length=2G effectively iterates over
- * every PDE in the system. The macro modifies ALL its parameters except 'pd',
- * so each of the other parameters should preferably be a simple variable, or
- * at most an lvalue with no side-effects!
- */
-#define gen6_for_each_pde(pt, pd, start, length, iter)			\
-	for (iter = gen6_pde_index(start);				\
-	     length > 0 && iter < I915_PDES &&				\
-		     (pt = i915_pt_entry(pd, iter), true);		\
-	     ({ u32 temp = ALIGN(start+1, 1 << GEN6_PDE_SHIFT);		\
-		    temp = min(temp - start, length);			\
-		    start += temp, length -= temp; }), ++iter)
-
-#define gen6_for_all_pdes(pt, pd, iter)					\
-	for (iter = 0;							\
-	     iter < I915_PDES &&					\
-		     (pt = i915_pt_entry(pd, iter), true);		\
-	     ++iter)
-
-static inline u32 i915_pte_index(u64 address, unsigned int pde_shift)
+static inline bool
+i915_vm_has_scratch_64K(struct i915_address_space *vm)
 {
-	const u32 mask = NUM_PTE(pde_shift) - 1;
-
-	return (address >> PAGE_SHIFT) & mask;
+	return vm->scratch_order == get_order(I915_GTT_PAGE_SIZE_64K);
 }
 
-/* Helper to counts the number of PTEs within the given length. This count
- * does not cross a page table boundary, so the max value would be
- * GEN6_PTES for GEN6, and GEN8_PTES for GEN8.
-*/
-static inline u32 i915_pte_count(u64 addr, u64 length, unsigned int pde_shift)
+static inline bool
+i915_vm_has_cache_coloring(struct i915_address_space *vm)
 {
-	const u64 mask = ~((1ULL << pde_shift) - 1);
-	u64 end;
-
-	GEM_BUG_ON(length == 0);
-	GEM_BUG_ON(offset_in_page(addr | length));
-
-	end = addr + length;
-
-	if ((addr & mask) != (end & mask))
-		return NUM_PTE(pde_shift) - i915_pte_index(addr, pde_shift);
-
-	return i915_pte_index(end, pde_shift) - i915_pte_index(addr, pde_shift);
-}
-
-static inline u32 i915_pde_index(u64 addr, u32 shift)
-{
-	return (addr >> shift) & I915_PDE_MASK;
-}
-
-static inline u32 gen6_pte_index(u32 addr)
-{
-	return i915_pte_index(addr, GEN6_PDE_SHIFT);
-}
-
-static inline u32 gen6_pte_count(u32 addr, u32 length)
-{
-	return i915_pte_count(addr, length, GEN6_PDE_SHIFT);
-}
-
-static inline u32 gen6_pde_index(u32 addr)
-{
-	return i915_pde_index(addr, GEN6_PDE_SHIFT);
-}
-
-static inline struct i915_page_table *
-i915_pt_entry(const struct i915_page_directory * const pd,
-	      const unsigned short n)
-{
-	return pd->entry[n];
-}
-
-static inline struct i915_page_directory *
-i915_pd_entry(const struct i915_page_directory * const pdp,
-	      const unsigned short n)
-{
-	return pdp->entry[n];
-}
-
-static inline dma_addr_t
-i915_page_dir_dma_addr(const struct i915_ppgtt *ppgtt, const unsigned int n)
-{
-	struct i915_page_dma *pt = ppgtt->pd->entry[n];
-
-	return px_dma(pt ?: px_base(&ppgtt->vm.scratch[ppgtt->vm.top]));
+	return i915_is_ggtt(vm) && vm->mm.color_adjust;
 }
 
 static inline struct i915_ggtt *
@@ -523,23 +390,6 @@ i915_vm_to_ppgtt(struct i915_address_space *vm)
 	GEM_BUG_ON(i915_is_ggtt(vm));
 	return container_of(vm, struct i915_ppgtt, vm);
 }
-
-int i915_ggtt_probe_hw(struct drm_i915_private *dev_priv);
-int i915_ggtt_init_hw(struct drm_i915_private *dev_priv);
-int i915_ggtt_enable_hw(struct drm_i915_private *dev_priv);
-void i915_ggtt_enable_guc(struct i915_ggtt *ggtt);
-void i915_ggtt_disable_guc(struct i915_ggtt *ggtt);
-int i915_init_ggtt(struct drm_i915_private *dev_priv);
-void i915_ggtt_driver_release(struct drm_i915_private *dev_priv);
-
-static inline bool i915_ggtt_has_aperture(const struct i915_ggtt *ggtt)
-{
-	return ggtt->mappable_end > 0;
-}
-
-int i915_ppgtt_init_hw(struct intel_gt *gt);
-
-struct i915_ppgtt *i915_ppgtt_create(struct drm_i915_private *dev_priv);
 
 static inline struct i915_address_space *
 i915_vm_get(struct i915_address_space *vm)
@@ -584,45 +434,153 @@ i915_vm_close(struct i915_address_space *vm)
 	i915_vm_put(vm);
 }
 
-int gen6_ppgtt_pin(struct i915_ppgtt *base);
-void gen6_ppgtt_unpin(struct i915_ppgtt *base);
-void gen6_ppgtt_unpin_all(struct i915_ppgtt *base);
+void i915_address_space_init(struct i915_address_space *vm, int subclass);
+void i915_address_space_fini(struct i915_address_space *vm);
 
-void i915_gem_suspend_gtt_mappings(struct drm_i915_private *dev_priv);
-void i915_gem_restore_gtt_mappings(struct drm_i915_private *dev_priv);
-=======
-struct i915_address_space;
->>>>>>> drm/i915/gtt: split up i915_gem_gtt
+static inline u32 i915_pte_index(u64 address, unsigned int pde_shift)
+{
+	const u32 mask = NUM_PTE(pde_shift) - 1;
 
-int __must_check i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
-					    struct sg_table *pages);
-void i915_gem_gtt_finish_pages(struct drm_i915_gem_object *obj,
-			       struct sg_table *pages);
+	return (address >> PAGE_SHIFT) & mask;
+}
 
-int i915_gem_gtt_reserve(struct i915_address_space *vm,
-			 struct drm_mm_node *node,
-			 u64 size, u64 offset, unsigned long color,
-			 unsigned int flags);
+/*
+ * Helper to counts the number of PTEs within the given length. This count
+ * does not cross a page table boundary, so the max value would be
+ * GEN6_PTES for GEN6, and GEN8_PTES for GEN8.
+ */
+static inline u32 i915_pte_count(u64 addr, u64 length, unsigned int pde_shift)
+{
+	const u64 mask = ~((1ULL << pde_shift) - 1);
+	u64 end;
 
-int i915_gem_gtt_insert(struct i915_address_space *vm,
-			struct drm_mm_node *node,
-			u64 size, u64 alignment, unsigned long color,
-			u64 start, u64 end, unsigned int flags);
+	GEM_BUG_ON(length == 0);
+	GEM_BUG_ON(offset_in_page(addr | length));
 
-/* Flags used by pin/bind&friends. */
-#define PIN_NOEVICT		BIT_ULL(0)
-#define PIN_NOSEARCH		BIT_ULL(1)
-#define PIN_NONBLOCK		BIT_ULL(2)
-#define PIN_MAPPABLE		BIT_ULL(3)
-#define PIN_ZONE_4G		BIT_ULL(4)
-#define PIN_HIGH		BIT_ULL(5)
-#define PIN_OFFSET_BIAS		BIT_ULL(6)
-#define PIN_OFFSET_FIXED	BIT_ULL(7)
+	end = addr + length;
 
-#define PIN_UPDATE		BIT_ULL(9)
-#define PIN_GLOBAL		BIT_ULL(10) /* I915_VMA_GLOBAL_BIND */
-#define PIN_USER		BIT_ULL(11) /* I915_VMA_LOCAL_BIND */
+	if ((addr & mask) != (end & mask))
+		return NUM_PTE(pde_shift) - i915_pte_index(addr, pde_shift);
 
-#define PIN_OFFSET_MASK		I915_GTT_PAGE_MASK
+	return i915_pte_index(end, pde_shift) - i915_pte_index(addr, pde_shift);
+}
+
+static inline u32 i915_pde_index(u64 addr, u32 shift)
+{
+	return (addr >> shift) & I915_PDE_MASK;
+}
+
+static inline struct i915_page_table *
+i915_pt_entry(const struct i915_page_directory * const pd,
+	      const unsigned short n)
+{
+	return pd->entry[n];
+}
+
+static inline struct i915_page_directory *
+i915_pd_entry(const struct i915_page_directory * const pdp,
+	      const unsigned short n)
+{
+	return pdp->entry[n];
+}
+
+static inline dma_addr_t
+i915_page_dir_dma_addr(const struct i915_ppgtt *ppgtt, const unsigned int n)
+{
+	struct i915_page_dma *pt = ppgtt->pd->entry[n];
+
+	return px_dma(pt ?: px_base(&ppgtt->vm.scratch[ppgtt->vm.top]));
+}
+
+void ppgtt_init(struct i915_ppgtt *ppgtt, struct intel_gt *gt);
+
+int i915_ggtt_probe_hw(struct drm_i915_private *i915);
+int i915_ggtt_init_hw(struct drm_i915_private *i915);
+int i915_ggtt_enable_hw(struct drm_i915_private *i915);
+void i915_ggtt_enable_guc(struct i915_ggtt *ggtt);
+void i915_ggtt_disable_guc(struct i915_ggtt *ggtt);
+int i915_init_ggtt(struct drm_i915_private *i915);
+void i915_ggtt_driver_release(struct drm_i915_private *i915);
+
+static inline bool i915_ggtt_has_aperture(const struct i915_ggtt *ggtt)
+{
+	return ggtt->mappable_end > 0;
+}
+
+int i915_ppgtt_init_hw(struct intel_gt *gt);
+
+struct i915_ppgtt *i915_ppgtt_create(struct intel_gt *gt);
+
+void i915_gem_suspend_gtt_mappings(struct drm_i915_private *i915);
+void i915_gem_restore_gtt_mappings(struct drm_i915_private *i915);
+
+u64 gen8_pte_encode(dma_addr_t addr,
+		    enum i915_cache_level level,
+		    u32 flags);
+
+int setup_page_dma(struct i915_address_space *vm, struct i915_page_dma *p);
+void cleanup_page_dma(struct i915_address_space *vm, struct i915_page_dma *p);
+
+#define kmap_atomic_px(px) kmap_atomic(px_base(px)->page)
+
+void
+fill_page_dma(const struct i915_page_dma *p, const u64 val, unsigned int count);
+
+#define fill_px(px, v) fill_page_dma(px_base(px), (v), PAGE_SIZE / sizeof(u64))
+#define fill32_px(px, v) do {						\
+	u64 v__ = lower_32_bits(v);					\
+	fill_px((px), v__ << 32 | v__);					\
+} while (0)
+
+int setup_scratch_page(struct i915_address_space *vm, gfp_t gfp);
+void cleanup_scratch_page(struct i915_address_space *vm);
+void free_scratch(struct i915_address_space *vm);
+
+struct i915_page_table *alloc_pt(struct i915_address_space *vm);
+struct i915_page_directory *alloc_pd(struct i915_address_space *vm);
+struct i915_page_directory *__alloc_pd(size_t sz);
+
+void free_pd(struct i915_address_space *vm, struct i915_page_dma *pd);
+
+#define free_px(vm, px) free_pd(vm, px_base(px))
+
+void
+__set_pd_entry(struct i915_page_directory * const pd,
+	       const unsigned short idx,
+	       struct i915_page_dma * const to,
+	       u64 (*encode)(const dma_addr_t, const enum i915_cache_level));
+
+#define set_pd_entry(pd, idx, to) \
+	__set_pd_entry((pd), (idx), px_base(to), gen8_pde_encode)
+
+void
+clear_pd_entry(struct i915_page_directory * const pd,
+	       const unsigned short idx,
+	       const struct i915_page_scratch * const scratch);
+
+bool
+release_pd_entry(struct i915_page_directory * const pd,
+		 const unsigned short idx,
+		 struct i915_page_table * const pt,
+		 const struct i915_page_scratch * const scratch);
+void gen6_ggtt_invalidate(struct i915_ggtt *ggtt);
+
+int ggtt_set_pages(struct i915_vma *vma);
+int ppgtt_set_pages(struct i915_vma *vma);
+void clear_pages(struct i915_vma *vma);
+
+void gtt_write_workarounds(struct intel_gt *gt);
+
+void setup_private_pat(struct intel_uncore *uncore);
+
+static inline struct sgt_dma {
+	struct scatterlist *sg;
+	dma_addr_t dma, max;
+} sgt_dma(struct i915_vma *vma) {
+	struct scatterlist *sg = vma->pages->sgl;
+	dma_addr_t addr = sg_dma_address(sg);
+
+	return (struct sgt_dma){ sg, addr, addr + sg->length };
+}
 
 #endif
