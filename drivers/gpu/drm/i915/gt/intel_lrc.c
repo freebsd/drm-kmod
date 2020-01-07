@@ -3956,7 +3956,6 @@ logical_ring_default_vfuncs(struct intel_engine_cs *engine)
 {
 	/* Default vfuncs which can be overriden by each engine. */
 
-	engine->release = execlists_release;
 	engine->resume = execlists_resume;
 
 	engine->cops = &execlists_context_ops;
@@ -4070,6 +4069,9 @@ int intel_execlists_submission_setup(struct intel_engine_cs *engine)
 		execlists->csb_size = GEN11_CSB_ENTRIES;
 
 	reset_csb_pointers(engine);
+
+	/* Finally, take ownership and responsibility for cleanup! */
+	engine->release = execlists_release;
 
 	return 0;
 }
