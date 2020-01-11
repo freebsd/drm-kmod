@@ -627,7 +627,7 @@ static int ct_handle_response(struct intel_guc_ct *ct, const u32 *msg)
 {
 	u32 header = msg[0];
 	u32 len = ct_header_get_len(header);
-	u32 msglen = len + 1; /* total message length including header */
+	u32 msgsize = (len + 1) * sizeof(u32); /* msg size in bytes w/header */
 	u32 fence;
 	u32 status;
 	u32 datalen;
@@ -642,7 +642,7 @@ static int ct_handle_response(struct intel_guc_ct *ct, const u32 *msg)
 
 	/* Response payload shall at least include fence and status */
 	if (unlikely(len < 2)) {
-		DRM_ERROR("CT: corrupted response %*ph\n", 4 * msglen, msg);
+		DRM_ERROR("CT: corrupted response %*ph\n", msgsize, msg);
 		return -EPROTO;
 	}
 
@@ -652,7 +652,7 @@ static int ct_handle_response(struct intel_guc_ct *ct, const u32 *msg)
 
 	/* Format of the status follows RESPONSE message */
 	if (unlikely(!INTEL_GUC_MSG_IS_RESPONSE(status))) {
-		DRM_ERROR("CT: corrupted response %*ph\n", 4 * msglen, msg);
+		DRM_ERROR("CT: corrupted response %*ph\n", msgsize, msg);
 		return -EPROTO;
 	}
 
@@ -667,7 +667,7 @@ static int ct_handle_response(struct intel_guc_ct *ct, const u32 *msg)
 		}
 		if (unlikely(datalen > req->response_len)) {
 			DRM_ERROR("CT: response %u too long %*ph\n",
-				  req->fence, 4 * msglen, msg);
+				  req->fence, msgsize, msg);
 			datalen = 0;
 		}
 		if (datalen)
@@ -680,7 +680,7 @@ static int ct_handle_response(struct intel_guc_ct *ct, const u32 *msg)
 	spin_unlock(&ct->requests.lock);
 
 	if (!found)
-		DRM_ERROR("CT: unsolicited response %*ph\n", 4 * msglen, msg);
+		DRM_ERROR("CT: unsolicited response %*ph\n", msgsize, msg);
 	return 0;
 }
 
@@ -770,18 +770,18 @@ static int ct_handle_request(struct intel_guc_ct *ct, const u32 *msg)
 {
 	u32 header = msg[0];
 	u32 len = ct_header_get_len(header);
-	u32 msglen = len + 1; /* total message length including header */
+	u32 msgsize = (len + 1) * sizeof(u32); /* msg size in bytes w/header */
 	struct ct_incoming_request *request;
 	unsigned long flags;
 
 	GEM_BUG_ON(ct_header_is_response(header));
 
-	request = kmalloc(sizeof(*request) + 4 * msglen, GFP_ATOMIC);
+	request = kmalloc(sizeof(*request) + msgsize, GFP_ATOMIC);
 	if (unlikely(!request)) {
-		DRM_ERROR("CT: dropping request %*ph\n", 4 * msglen, msg);
+		DRM_ERROR("CT: dropping request %*ph\n", msgsize, msg);
 		return 0; /* XXX: -ENOMEM ? */
 	}
-	memcpy(request->msg, msg, 4 * msglen);
+	memcpy(request->msg, msg, msgsize);
 
 	spin_lock_irqsave(&ct->requests.lock, flags);
 	list_add_tail(&request->link, &ct->requests.incoming);
