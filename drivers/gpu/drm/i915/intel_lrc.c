@@ -1318,6 +1318,15 @@ static u32 *gen9_init_indirectctx_bb(struct intel_engine_cs *engine, u32 *batch)
 	/* WaFlushCoherentL3CacheLinesAtContextSwitch:skl,bxt,glk */
 	batch = gen8_emit_flush_coherentl3_wa(engine, batch);
 
+	/* WaClearSlmSpaceAtContextSwitch:skl,bxt,kbl,glk */
+	batch = gen8_emit_pipe_control(batch,
+				       PIPE_CONTROL_FLUSH_L3 |
+				       PIPE_CONTROL_GLOBAL_GTT_IVB |
+				       PIPE_CONTROL_CS_STALL |
+				       PIPE_CONTROL_QW_WRITE,
+				       i915_ggtt_offset(engine->scratch) +
+				       2 * CACHELINE_BYTES);
+
 	/* WaDisableGatherAtSetShaderCommonSlice:skl,bxt,kbl,glk */
 	*batch++ = MI_LOAD_REGISTER_IMM(1);
 	*batch++ = i915_mmio_reg_offset(COMMON_SLICE_CHICKEN2);
