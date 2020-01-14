@@ -71,9 +71,9 @@ spin_lock_init_spin(spinlock_t *lock)
 } while (0)
 #endif
 #define VMWGFX_DRIVER_NAME "vmwgfx"
-#define VMWGFX_DRIVER_DATE "20190328"
+#define VMWGFX_DRIVER_DATE "20200114"
 #define VMWGFX_DRIVER_MAJOR 2
-#define VMWGFX_DRIVER_MINOR 16
+#define VMWGFX_DRIVER_MINOR 17
 #define VMWGFX_DRIVER_PATCHLEVEL 0
 #define VMWGFX_FIFO_STATIC_SIZE (1024*1024)
 #define VMWGFX_MAX_RELOCATIONS 2048
