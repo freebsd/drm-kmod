@@ -5731,8 +5731,9 @@ intel_get_crtc_new_encoder(const struct intel_atomic_state *state,
 		num_encoders++;
 	}
 
-	WARN(num_encoders != 1, "%d encoders for pipe %c\n",
-	     num_encoders, pipe_name(crtc->pipe));
+	drm_WARN(encoder->base.dev, num_encoders != 1,
+		 "%d encoders for pipe %c\n",
+		 num_encoders, pipe_name(crtc->pipe));
 
 	return encoder;
 }
