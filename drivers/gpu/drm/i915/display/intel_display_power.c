@@ -4810,7 +4810,7 @@ static void skl_display_core_init(struct drm_i915_private *dev_priv,
 
 	mutex_unlock(&power_domains->lock);
 
-	intel_cdclk_init(dev_priv);
+	intel_cdclk_init_hw(dev_priv);
 
 	gen9_dbuf_enable(dev_priv);
 
@@ -4827,7 +4827,7 @@ static void skl_display_core_uninit(struct drm_i915_private *dev_priv)
 
 	gen9_dbuf_disable(dev_priv);
 
-	intel_cdclk_uninit(dev_priv);
+	intel_cdclk_uninit_hw(dev_priv);
 
 	/* The spec doesn't call for removing the reset handshake flag */
 	/* disable PG1 and Misc I/O */
@@ -4871,7 +4871,7 @@ static void bxt_display_core_init(struct drm_i915_private *dev_priv, bool resume
 
 	mutex_unlock(&power_domains->lock);
 
-	intel_cdclk_init(dev_priv);
+	intel_cdclk_init_hw(dev_priv);
 
 	gen9_dbuf_enable(dev_priv);
 
@@ -4888,7 +4888,7 @@ static void bxt_display_core_uninit(struct drm_i915_private *dev_priv)
 
 	gen9_dbuf_disable(dev_priv);
 
-	intel_cdclk_uninit(dev_priv);
+	intel_cdclk_uninit_hw(dev_priv);
 
 	/* The spec doesn't call for removing the reset handshake flag */
 
@@ -4930,7 +4930,7 @@ static void cnl_display_core_init(struct drm_i915_private *dev_priv, bool resume
 	mutex_unlock(&power_domains->lock);
 
 	/* 5. Enable CD clock */
-	intel_cdclk_init(dev_priv);
+	intel_cdclk_init_hw(dev_priv);
 
 	/* 6. Enable DBUF */
 	gen9_dbuf_enable(dev_priv);
@@ -4952,7 +4952,7 @@ static void cnl_display_core_uninit(struct drm_i915_private *dev_priv)
 	gen9_dbuf_disable(dev_priv);
 
 	/* 3. Disable CD clock */
-	intel_cdclk_uninit(dev_priv);
+	intel_cdclk_uninit_hw(dev_priv);
 
 	/*
 	 * 4. Disable Power Well 1 (PG1).
@@ -5047,7 +5047,7 @@ static void icl_display_core_init(struct drm_i915_private *dev_priv,
 	mutex_unlock(&power_domains->lock);
 
 	/* 4. Enable CDCLK. */
-	intel_cdclk_init(dev_priv);
+	intel_cdclk_init_hw(dev_priv);
 
 	/* 5. Enable DBUF. */
 	icl_dbuf_enable(dev_priv);
@@ -5076,7 +5076,7 @@ static void icl_display_core_uninit(struct drm_i915_private *dev_priv)
 	icl_dbuf_disable(dev_priv);
 
 	/* 3. Disable CD clock */
-	intel_cdclk_uninit(dev_priv);
+	intel_cdclk_uninit_hw(dev_priv);
 
 	/*
 	 * 4. Disable Power Well 1 (PG1).
