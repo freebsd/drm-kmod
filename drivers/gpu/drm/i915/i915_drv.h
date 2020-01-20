@@ -75,6 +75,7 @@
 #include "display/intel_dpll_mgr.h"
 #include "display/intel_dsb.h"
 #include "display/intel_frontbuffer.h"
+#include "display/intel_global_state.h"
 #include "display/intel_gmbus.h"
 #include "display/intel_opregion.h"
 
@@ -1111,6 +1112,8 @@ struct drm_i915_private {
 	 * plls share registers.
 	 */
 	struct mutex dpll_lock;
+
+	struct list_head global_obj_list;
 
 	/*
 	 * For reading active_pipes, cdclk_state holding any crtc
