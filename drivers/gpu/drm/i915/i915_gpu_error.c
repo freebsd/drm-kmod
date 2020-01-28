@@ -1230,7 +1230,7 @@ static bool record_context(struct i915_gem_context_coredump *e,
 {
 	struct i915_gem_context *ctx;
 	struct task_struct *task;
-	bool capture;
+	bool simulated;
 
 	rcu_read_lock();
 	ctx = rcu_dereference(rq->context->gem_context);
@@ -1238,7 +1238,7 @@ static bool record_context(struct i915_gem_context_coredump *e,
 		ctx = NULL;
 	rcu_read_unlock();
 	if (!ctx)
-		return false;
+		return true;
 
 	rcu_read_lock();
 	task = pid_task(ctx->pid, PIDTYPE_PID);
@@ -1252,10 +1252,10 @@ static bool record_context(struct i915_gem_context_coredump *e,
 	e->guilty = atomic_read(&ctx->guilty_count);
 	e->active = atomic_read(&ctx->active_count);
 
-	capture = i915_gem_context_no_error_capture(ctx);
+	simulated = i915_gem_context_no_error_capture(ctx);
 
 	i915_gem_context_put(ctx);
-	return capture;
+	return simulated;
 }
 
 struct intel_engine_capture_vma {
