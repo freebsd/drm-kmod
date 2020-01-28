@@ -801,7 +801,7 @@ TRACE_EVENT(i915_request_in,
 			     __field(u16, instance)
 			     __field(u32, seqno)
 			     __field(u32, port)
-			     __field(u32, prio)
+			     __field(s32, prio)
 			    ),
 
 	    TP_fast_assign(
@@ -814,7 +814,7 @@ TRACE_EVENT(i915_request_in,
 			   __entry->port = port;
 			   ),
 
-	    TP_printk("dev=%u, engine=%u:%u, ctx=%llu, seqno=%u, prio=%u, port=%u",
+	    TP_printk("dev=%u, engine=%u:%u, ctx=%llu, seqno=%u, prio=%d, port=%u",
 		      __entry->dev, __entry->class, __entry->instance,
 		      __entry->ctx, __entry->seqno,
 		      __entry->prio, __entry->port)
