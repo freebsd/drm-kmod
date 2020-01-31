@@ -122,6 +122,7 @@ SRCS+=	debugfs_engines.c \
 	gen9_renderstate.c \
 	intel_breadcrumbs.c \
 	intel_context.c \
+	intel_context_sseu.c \
 	intel_engine_cs.c \
 	intel_engine_heartbeat.c \
 	intel_engine_pm.c \
