@@ -144,30 +144,6 @@ drm_dma_handle_t *drm_pci_alloc(struct drm_device * dev, size_t size, size_t ali
 
 EXPORT_SYMBOL(drm_pci_alloc);
 
-/*
- * Free a PCI consistent memory block without freeing its descriptor.
- *
- * This function is for internal use in the Linux-specific DRM core code.
- */
-void __drm_legacy_pci_free(struct drm_device * dev, drm_dma_handle_t * dmah)
-{
-	unsigned long addr;
-	size_t sz;
-
-#ifdef __FreeBSD__
-	if (dmah == NULL)
-		return;
-
-	bus_dmamap_unload(dmah->tag, dmah->map);
-	bus_dmamem_free(dmah->tag, dmah->vaddr, dmah->map);
-	bus_dma_tag_destroy(dmah->tag);
-#else
-	if (dmah->vaddr)
-		dma_free_coherent(&dev->pdev->dev, dmah->size, dmah->vaddr,
-				  dmah->busaddr);
-#endif
-}
-
 /**
  * drm_pci_free - Free a PCI consistent memory block
  * @dev: DRM device
@@ -178,7 +154,8 @@ void __drm_legacy_pci_free(struct drm_device * dev, drm_dma_handle_t * dmah)
  */
 void drm_pci_free(struct drm_device * dev, drm_dma_handle_t * dmah)
 {
-	__drm_legacy_pci_free(dev, dmah);
+	dma_free_coherent(&dev->pdev->dev, dmah->size, dmah->vaddr,
+			  dmah->busaddr);
 	kfree(dmah);
 }
 
