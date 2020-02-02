@@ -1200,7 +1200,7 @@ struct drm_i915_private {
 		bool distrust_bios_wm;
 	} wm;
 
-	u8 enabled_dbuf_slices_num; /* GEN11 has configurable 2 slices */
+	u8 enabled_dbuf_slices_mask; /* GEN11 has configurable 2 slices */
 
 	struct dram_info {
 		bool valid;
