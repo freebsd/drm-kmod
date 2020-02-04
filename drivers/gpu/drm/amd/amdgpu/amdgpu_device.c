@@ -3283,9 +3283,8 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	if (IS_ENABLED(CONFIG_PERF_EVENTS))
 		amdgpu_pmu_fini(adev);
 #if defined(CONFIG_DEBUG_FS)
-	amdgpu_debugfs_preempt_cleanup(adev);
+	amdgpu_debugfs_fini(adev);
 #endif
-
 	if (amdgpu_discovery && adev->asic_type >= CHIP_NAVI10)
 		amdgpu_discovery_fini(adev);
 }
