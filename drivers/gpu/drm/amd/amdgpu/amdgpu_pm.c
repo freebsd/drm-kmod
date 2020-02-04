@@ -41,9 +41,6 @@
 #include "hwmgr.h"
 #define WIDTH_4K 3840
 
-static int amdgpu_debugfs_pm_init(struct amdgpu_device *adev);
-
-#if defined(CONFIG_DEBUG_FS)
 static const struct cg_flag_name clocks[] = {
 	{AMD_CG_SUPPORT_GFX_MGCG, "Graphics Medium Grain Clock Gating"},
 	{AMD_CG_SUPPORT_GFX_MGLS, "Graphics Medium Grain memory Light Sleep"},
@@ -3408,11 +3405,6 @@ int amdgpu_pm_sysfs_init(struct amdgpu_device *adev)
 		DRM_ERROR("failed to create device file unique_id\n");
 		return ret;
 	}
-	ret = amdgpu_debugfs_pm_init(adev);
-	if (ret) {
-		DRM_ERROR("Failed to register debugfs file for dpm!\n");
-		return ret;
-	}
 
 	if ((adev->asic_type >= CHIP_VEGA10) &&
 	    !(adev->flags & AMD_IS_APU)) {
@@ -3681,7 +3673,7 @@ static const struct drm_info_list amdgpu_pm_info_list[] = {
 };
 #endif
 
-static int amdgpu_debugfs_pm_init(struct amdgpu_device *adev)
+int amdgpu_debugfs_pm_init(struct amdgpu_device *adev)
 {
 #if defined(CONFIG_DEBUG_FS)
 	return amdgpu_debugfs_add_files(adev, amdgpu_pm_info_list, ARRAY_SIZE(amdgpu_pm_info_list));
