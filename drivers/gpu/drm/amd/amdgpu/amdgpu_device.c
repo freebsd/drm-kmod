@@ -3139,10 +3139,6 @@ fence_driver_init:
 	} else
 		adev->ucode_sysfs_en = true;
 
-	r = amdgpu_debugfs_firmware_init(adev);
-	if (r)
-		DRM_ERROR("registering firmware debugfs failed (%d).\n", r);
-
 #if defined(CONFIG_DEBUG_FS)
 	r = amdgpu_debugfs_init(adev);
 	if (r)
