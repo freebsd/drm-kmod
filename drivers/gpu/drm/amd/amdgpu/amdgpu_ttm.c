@@ -72,11 +72,6 @@ static int amdgpu_map_buffer(struct ttm_buffer_object *bo,
 			     struct amdgpu_ring *ring,
 			     uint64_t *addr);
 
-static int amdgpu_invalidate_caches(struct ttm_bo_device *bdev, uint32_t flags)
-{
-	return 0;
-}
-
 /**
  * amdgpu_init_mem_type - Initialize a memory manager for a specific type of
  * memory request.
