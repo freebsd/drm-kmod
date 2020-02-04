@@ -4495,15 +4495,12 @@ static void icl_mbus_init(struct drm_i915_private *dev_priv)
 		MBUS_ABOX_BT_CREDIT_POOL2_MASK |
 		MBUS_ABOX_B_CREDIT_MASK |
 		MBUS_ABOX_BW_CREDIT_MASK;
-
-	val = I915_READ(MBUS_ABOX_CTL);
-	val &= ~mask;
-	val |= MBUS_ABOX_BT_CREDIT_POOL1(16) |
+	val = MBUS_ABOX_BT_CREDIT_POOL1(16) |
 		MBUS_ABOX_BT_CREDIT_POOL2(16) |
 		MBUS_ABOX_B_CREDIT(1) |
 		MBUS_ABOX_BW_CREDIT(1);
 
-	intel_de_write(dev_priv, MBUS_ABOX_CTL, val);
+	intel_de_rmw(dev_priv, MBUS_ABOX_CTL, mask, val);
 }
 
 static void hsw_assert_cdclk(struct drm_i915_private *dev_priv)
