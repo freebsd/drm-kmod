@@ -504,7 +504,6 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 
 	pvec = kvmalloc_array(npages, sizeof(struct page *), GFP_KERNEL);
 	if (pvec != NULL) {
-#ifdef __linux__
 		struct mm_struct *mm = obj->userptr.mm->mm;
 		unsigned int flags = 0;
 
@@ -520,7 +519,11 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 					 obj->userptr.ptr + pinned * PAGE_SIZE,
 					 npages - pinned,
 					 flags,
+#ifdef __linux__
 					 pvec + pinned, NULL, NULL);
+#else
+					 pvec + pinned, NULL);
+#endif
 				if (ret < 0)
 					break;
 
@@ -529,10 +532,6 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 			up_read(&mm->mmap_sem);
 			mmput(mm);
 		}
-#else
-		/* XXXmarkj this code is non-functional anyway. */
-		ret = -EFAULT;
-#endif
 	}
 
 	mutex_lock(&obj->mm.lock);
