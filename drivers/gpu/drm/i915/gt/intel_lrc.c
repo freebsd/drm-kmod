@@ -1674,11 +1674,6 @@ last_active(const struct intel_engine_execlists *execlists)
 				     &(rq__)->sched.waiters_list, \
 				     wait_link)
 
-#define for_each_signaler(p__, rq__) \
-	list_for_each_entry_lockless(p__, \
-				     &(rq__)->sched.signalers_list, \
-				     signal_link)
-
 static void defer_request(struct i915_request *rq, struct list_head * const pl)
 {
 	LIST_HEAD(list);
