@@ -1621,6 +1621,11 @@ static void virtual_xfer_breadcrumbs(struct virtual_engine *ve,
 				     &(rq__)->sched.waiters_list, \
 				     wait_link)
 
+#define for_each_waiter(p__, rq__) \
+	list_for_each_entry_lockless(p__, \
+				     &(rq__)->sched.waiters_list, \
+				     wait_link)
+
 static void defer_request(struct i915_request *rq, struct list_head * const pl)
 {
 	LIST_HEAD(list);
