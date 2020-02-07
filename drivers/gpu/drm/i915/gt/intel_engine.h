@@ -9,6 +9,10 @@
 #include <linux/random.h>
 #include <linux/seqlock.h>
 
+#ifdef __FreeBSD__
+#include <linux/typecheck.h>
+#endif
+
 #include "i915_pmu.h"
 #include "i915_reg.h"
 #include "i915_request.h"
@@ -254,6 +258,14 @@ static inline void intel_ring_advance(struct i915_request *rq, u32 *cs)
 static inline u32 intel_ring_wrap(const struct intel_ring *ring, u32 pos)
 {
 	return pos & (ring->size - 1);
+}
+
+static inline int intel_ring_direction(const struct intel_ring *ring,
+				       u32 next, u32 prev)
+{
+	typecheck(typeof(ring->size), next);
+	typecheck(typeof(ring->size), prev);
+	return (next - prev) << ring->wrap;
 }
 
 static inline bool
