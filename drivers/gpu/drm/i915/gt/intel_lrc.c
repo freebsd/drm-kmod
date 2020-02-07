@@ -1627,6 +1627,11 @@ last_active(const struct intel_engine_execlists *execlists)
 				     &(rq__)->sched.waiters_list, \
 				     wait_link)
 
+#define for_each_signaler(p__, rq__) \
+	list_for_each_entry_lockless(p__, \
+				     &(rq__)->sched.signalers_list, \
+				     signal_link)
+
 static void defer_request(struct i915_request *rq, struct list_head * const pl)
 {
 	LIST_HEAD(list);
@@ -2390,7 +2395,7 @@ static void __execlists_hold(struct i915_request *rq)
 		list_move_tail(&rq->sched.link, &rq->engine->active.hold);
 		i915_request_set_hold(rq);
 
-		list_for_each_entry(p, &rq->sched.waiters_list, wait_link) {
+		for_each_waiter(p, rq) {
 			struct i915_request *w =
 				container_of(p->waiter, typeof(*w), sched);
 
@@ -2476,7 +2481,7 @@ static bool hold_request(const struct i915_request *rq)
 	 * If one of our ancestors is on hold, we must also be on hold,
 	 * otherwise we will bypass it and execute before it.
 	 */
-	list_for_each_entry(p, &rq->sched.signalers_list, signal_link) {
+	for_each_signaler(p, rq) {
 		const struct i915_request *s =
 			container_of(p->signaler, typeof(*s), sched);
 
@@ -2508,7 +2513,7 @@ static void __execlists_unhold(struct i915_request *rq)
 		RQ_TRACE(rq, "hold release\n");
 
 		/* Also release any children on this engine that are ready */
-		list_for_each_entry(p, &rq->sched.waiters_list, wait_link) {
+		for_each_waiter(p, rq) {
 			struct i915_request *w =
 				container_of(p->waiter, typeof(*w), sched);
 
