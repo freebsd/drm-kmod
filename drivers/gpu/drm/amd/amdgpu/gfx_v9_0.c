@@ -4384,12 +4384,7 @@ static int gfx_v9_0_ecc_late_init(void *handle)
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r;
 
-	/*
-	 * Temp workaround to fix the issue that CP firmware fails to
-	 * update read pointer when CPDMA is writing clearing operation
-	 * to GDS in suspend/resume sequence on several cards. So just
-	 * limit this operation in cold boot sequence.
-	 */
+	/* limit gds clearing operation in cold boot sequence */
 	if (!adev->in_suspend) {
 		r = gfx_v9_0_do_edc_gds_workarounds(adev);
 		if (r)
