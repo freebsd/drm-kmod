@@ -3,8 +3,7 @@
 
 #include_next <linux/mm_types.h>
 
-#if (__FreeBSD_version >= 1100000 && __FreeBSD_version < 1103508) || \
-    (__FreeBSD_version >= 1200000 && __FreeBSD_version < 1201512)
+#if __FreeBSD_version < 1300077
 static inline bool
 mmget_not_zero(struct mm_struct *mm)
 {
