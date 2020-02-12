@@ -320,7 +320,8 @@ SRCS+=	dce_abm.c \
 	dce_opp.c \
 	dce_scl_filters.c \
 	dce_stream_encoder.c \
-	dce_transform.c
+	dce_transform.c \
+	dmub_psr.c
 
 # display/dc/dce100
 SRCS+=	dce100_hw_sequencer.c \
