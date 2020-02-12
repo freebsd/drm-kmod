@@ -2902,7 +2902,6 @@ static void intel_hdmi_connector_unregister(struct drm_connector *connector)
 #endif
 
 	intel_hdmi_remove_i2c_symlink(connector);
-
 	intel_connector_unregister(connector);
 }
 
