@@ -282,7 +282,7 @@ void drm_dev_printk(const struct device *dev, const char *level,
 EXPORT_SYMBOL(drm_dev_printk);
 #elif defined(__FreeBSD__)
 void drm_dev_printk(const struct device *dev, const char *level,
-		    const char *function_name, const char *format, ...)
+		    const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -291,9 +291,9 @@ void drm_dev_printk(const struct device *dev, const char *level,
 	vaf.fmt = format;
 	vaf.va = &args;
 	if (dev)
-		device_printf((dev)->bsddev, "[" DRM_NAME ":%s] ", function_name);
+		device_printf((dev)->bsddev, "[" DRM_NAME "] ");
 	else
-		printf("[" DRM_NAME ":%s] ", function_name);
+		printf("[" DRM_NAME "] ");
 	vprintf(format, args);
 	va_end(args);
 }
@@ -325,7 +325,7 @@ void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 EXPORT_SYMBOL(drm_dev_dbg);
 #elif defined(__FreeBSD__)
 void drm_dev_dbg(const struct device *dev, unsigned int category,
-		 const char *function_name, const char *format, ...)
+		 const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -337,9 +337,9 @@ void drm_dev_dbg(const struct device *dev, unsigned int category,
 	vaf.fmt = format;
 	vaf.va = &args;
 	if (dev)
-		device_printf((dev)->bsddev, "[" DRM_NAME ":%s] ", function_name);
+		device_printf((dev)->bsddev, "[" DRM_NAME "] ");
 	else
-		printf("[" DRM_NAME ":%s] ", function_name);
+		printf("[" DRM_NAME "] ");
 	vprintf(format, args);
 	va_end(args);
 }
@@ -385,7 +385,7 @@ void __drm_dbg(unsigned int category, const char *function_name,
 	if (panicstr != NULL)
 		return;
 
-	printf("[" DRM_NAME ":%s] ", function_name);
+	printf("[" DRM_NAME "] ");
 	vprintf(format, args);
 
 	va_end(args);
