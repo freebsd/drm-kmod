@@ -18944,6 +18944,7 @@ static void intel_hpd_poll_fini(struct drm_i915_private *i915)
 	drm_connector_list_iter_end(&conn_iter);
 }
 
+/* part #1: call before irq uninstall */
 void intel_modeset_driver_remove(struct drm_i915_private *i915)
 {
 	flush_workqueue(i915->flip_wq);
@@ -18956,14 +18957,11 @@ void intel_modeset_driver_remove(struct drm_i915_private *i915)
 	/* schedule_work() can be skipped if called from critical section */
 	intel_atomic_helper_free_state(i915);
 #endif
+}
 
-	/*
-	 * Interrupts and polling as the first thing to avoid creating havoc.
-	 * Too much stuff here (turning of connectors, ...) would
-	 * experience fancy races otherwise.
-	 */
-	intel_irq_uninstall(i915);
-
+/* part #2: call after irq uninstall */
+void intel_modeset_driver_remove_noirq(struct drm_i915_private *i915)
+{
 	/*
 	 * Due to the hpd irq storm handling the hotplug work can re-arm the
 	 * poll handlers. Hence disable polling after hpd handling is shut down.
