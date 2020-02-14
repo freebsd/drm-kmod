@@ -438,78 +438,6 @@ void drm_err(const char *function_name, const char *format, ...);
 #define DRM_DEV_DEBUG_KMS(dev, fmt, ...)				\
 	drm_dev_dbg(dev, DRM_UT_KMS, fmt, ##__VA_ARGS__)
 
-#elif defined(__FreeBSD__)
-
-#define DRM_DEV_DEBUG(dev, fmt, ...)					\
-	drm_dev_dbg(dev, DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
-#define DRM_DEBUG(fmt, ...)						\
-	drm_dbg(DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
-
-#define DRM_DEV_DEBUG_DRIVER(dev, fmt, ...)				\
-	drm_dev_dbg(dev, DRM_UT_DRIVER, __func__, fmt, ##__VA_ARGS__)
-#define DRM_DEBUG_DRIVER(fmt, ...)					\
-	drm_dbg(DRM_UT_DRIVER, __func__, fmt, ##__VA_ARGS__)
-
-#define DRM_DEV_DEBUG_KMS(dev, fmt, ...)				\
-	drm_dev_dbg(dev, DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
-#define DRM_DEBUG_KMS(fmt, ...)						\
-	drm_dbg(DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
-
-#define DRM_DEV_DEBUG_PRIME(dev, fmt, ...)				\
-	drm_dev_dbg(dev, DRM_UT_PRIME, __func__, fmt, ##__VA_ARGS__)
-#define DRM_DEBUG_PRIME(fmt, ...)					\
-	drm_dbg(DRM_UT_PRIME, __func__, fmt, ##__VA_ARGS__)
-
-#define DRM_DEV_DEBUG_ATOMIC(dev, fmt, ...)				\
-	drm_dev_dbg(dev, DRM_UT_ATOMIC, __func__, fmt, ##__VA_ARGS__)
-#define DRM_DEBUG_ATOMIC(fmt, ...)					\
-	drm_dbg(DRM_UT_ATOMIC, __func__, fmt, ##__VA_ARGS__)
-
-#define DRM_DEV_DEBUG_VBL(dev, fmt, ...)				\
-	drm_dev_dbg(dev, DRM_UT_VBL, __func__, fmt, ##__VA_ARGS__)
-#define DRM_DEBUG_VBL(fmt, ...)						\
-	drm_dbg(DRM_UT_VBL, __func__, fmt, ##__VA_ARGS__)
-
-#define DRM_DEBUG_LEASE(fmt, ...)					\
-	drm_dbg(DRM_UT_LEASE, __func__, fmt, ##__VA_ARGS__)
-
-#define	DRM_DEV_DEBUG_DP(dev, fmt, ...)					\
-	drm_dev_dbg(dev, DRM_UT_DP, __func__, fmt, ## __VA_ARGS__)
-#define DRM_DEBUG_DP(dev, fmt, ...)					\
-	drm_dbg(DRM_UT_DP, __func__, fmt, ## __VA_ARGS__)
-#endif
-
-#ifdef __linux__
-#define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, category, fmt, ...)	\
-({									\
-	static DEFINE_RATELIMIT_STATE(_rs,				\
-				      DEFAULT_RATELIMIT_INTERVAL,	\
-				      DEFAULT_RATELIMIT_BURST);		\
-	if (__ratelimit(&_rs))						\
-		drm_dev_dbg(dev, category, fmt, ##__VA_ARGS__);		\
-})
-
-#elif defined(__FreeBSD__)
-#define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, category, fmt, ...)	\
-({									\
-	static DEFINE_RATELIMIT_STATE(_rs,				\
-				      DEFAULT_RATELIMIT_INTERVAL,	\
-				      DEFAULT_RATELIMIT_BURST);		\
-	if (__ratelimit(&_rs))						\
-		drm_dev_dbg(dev, category, __func__, fmt, 		\
-		    ##__VA_ARGS__);			  		\
-})
-#endif
-/**
- * Rate limited debug output. Like DRM_DEBUG() but won't flood the log.
- *
- * @dev: device pointer
- * @fmt: printf() like format string.
- */
-#define DRM_DEV_DEBUG_KMS_RATELIMITED(dev, fmt, ...)			\
-	_DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, DRM_UT_KMS,		\
-					  fmt, ##__VA_ARGS__)
-
 /*
  * struct drm_device based logging
  *
@@ -633,7 +561,13 @@ void __drm_err(const char *format, ...);
 
 
 #define DRM_DEBUG_KMS_RATELIMITED(fmt, ...)				\
-	DRM_DEV_DEBUG_KMS_RATELIMITED(NULL, fmt, ##__VA_ARGS__)
+({									\
+	static DEFINE_RATELIMIT_STATE(_rs,				\
+				      DEFAULT_RATELIMIT_INTERVAL,       \
+				      DEFAULT_RATELIMIT_BURST);         \
+	if (__ratelimit(&_rs))						\
+		drm_dev_dbg(NULL, DRM_UT_KMS, fmt, ##__VA_ARGS__);	\
+})
 
 /*
  * struct drm_device based WARNs
