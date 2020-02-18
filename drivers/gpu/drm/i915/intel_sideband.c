@@ -41,10 +41,6 @@
 /* Private register write, double-word addressing, non-posted */
 #define SB_CRWRDA_NP	0x07
 
-static void ping(void *info)
-{
-}
-
 static void __vlv_punit_get(struct drm_i915_private *i915)
 {
 	iosf_mbi_punit_acquire();
