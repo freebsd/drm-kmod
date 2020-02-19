@@ -39,9 +39,14 @@ struct i915_pmu_sample {
 
 struct i915_pmu {
 	/**
-	 * @node: List node for CPU hotplug handling.
+	 * @cpuhp: Struct used for CPU hotplug handling.
 	 */
-	struct hlist_node node;
+	struct {
+		struct hlist_node node;
+#ifdef __linux__
+		enum cpuhp_state slot;
+#endif
+	} cpuhp;
 	/**
 	 * @base: PMU base.
 	 */
