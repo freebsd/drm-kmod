@@ -43,13 +43,9 @@ struct i915_pmu {
 	 */
 	struct {
 		struct hlist_node node;
-<<<<<<< HEAD
 #ifdef __linux__
 		enum cpuhp_state slot;
 #endif
-=======
-		enum cpuhp_state slot;
->>>>>>> drm/i915/pmu: Avoid using globals for CPU hotplug state
 	} cpuhp;
 	/**
 	 * @base: PMU base.
