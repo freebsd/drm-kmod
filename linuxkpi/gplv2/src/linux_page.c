@@ -239,13 +239,8 @@ retry:
 			page = vm_page_lookup(devobj, i);
 			if (page == NULL)
 				continue;
-#if __FreeBSD_version >= 1300052
 			if (!vm_page_busy_acquire(page, VM_ALLOC_WAITFAIL))
 				goto retry;
-#else
-			if (vm_page_sleep_if_busy(page, "linuxkpi"))
-				goto retry;
-#endif
 			cdev_pager_free_page(devobj, page);
 		}
 		VM_OBJECT_WUNLOCK(devobj);

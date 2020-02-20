@@ -25,13 +25,11 @@ static struct list_head backlight_dev_list;
 static struct mutex backlight_dev_list_mutex;
 static struct blocking_notifier_head backlight_notifier;
 
-#if defined(__linux__) || __FreeBSD_version >= 1300055
 static const char *const backlight_types[] = {
 	[BACKLIGHT_RAW] = "raw",
 	[BACKLIGHT_PLATFORM] = "platform",
 	[BACKLIGHT_FIRMWARE] = "firmware",
 };
-#endif
 
 #if defined(CONFIG_FB) || (defined(CONFIG_FB_MODULE) && \
 			   defined(CONFIG_BACKLIGHT_CLASS_DEVICE_MODULE))
@@ -125,7 +123,6 @@ static void backlight_generate_event(struct backlight_device *bd,
 #endif
 }
 
-#if defined(__linux__) || __FreeBSD_version >= 1300055
 static ssize_t bl_power_show(struct device *dev, struct device_attribute *attr,
 		char *buf)
 {
@@ -235,7 +232,6 @@ static ssize_t actual_brightness_show(struct device *dev,
 	return rc;
 }
 static DEVICE_ATTR_RO(actual_brightness);
-#endif
 
 static struct class *backlight_class;
 
@@ -278,7 +274,6 @@ static void bl_device_release(struct device *dev)
 	kfree(bd);
 }
 
-#if defined(__linux__) || __FreeBSD_version >= 1300055
 static struct attribute *bl_device_attrs[] = {
 	&dev_attr_bl_power.attr,
 	&dev_attr_brightness.attr,
@@ -288,7 +283,6 @@ static struct attribute *bl_device_attrs[] = {
 	NULL,
 };
 ATTRIBUTE_GROUPS(bl_device);
-#endif
 
 /**
  * backlight_force_update - tell the backlight subsystem that hardware state
@@ -585,9 +579,7 @@ backlight_class_init(void)
 		return PTR_ERR(backlight_class);
 	}
 
-#if defined(__linux__) || __FreeBSD_version >= 1300055
 	backlight_class->dev_groups = bl_device_groups;
-#endif
 	backlight_class->pm = &backlight_class_dev_pm_ops;
 	INIT_LIST_HEAD(&backlight_dev_list);
 	mutex_init(&backlight_dev_list_mutex);

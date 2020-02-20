@@ -126,11 +126,6 @@ void *vmw_validation_mem_alloc(struct vmw_validation_context *ctx,
 #ifdef __linux__
 		list_add_tail(&page->lru, &ctx->page_list);
 #else
-#if __FreeBSD_version < 1300031
-		vm_page_lock(page);
-		vm_page_wire(page);
-		vm_page_unlock(page);
-#endif
 		TAILQ_INSERT_TAIL(&ctx->bsd_pglist, page, plinks.q);
 #endif
 		ctx->page_address = page_address(page);
@@ -162,11 +157,6 @@ static void vmw_validation_mem_free(struct vmw_validation_context *ctx)
 	}
 #else
 	TAILQ_FOREACH_SAFE(entry, &ctx->bsd_pglist, plinks.q, next) {
-#if __FreeBSD_version < 1300031
-		vm_page_lock(entry);
-		vm_page_unwire(entry, PQ_NONE);
-		vm_page_unlock(entry);
-#endif
 		__free_page(entry);
 	}
 #endif

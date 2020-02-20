@@ -263,13 +263,6 @@ static void ttm_pages_put(struct page *pages[], unsigned npages,
 			if (ttm_set_pages_wb(pages[i], pages_nr))
 				pr_err("Failed to set %d pages to wb!\n", pages_nr);
 		}
-#ifndef __linux__
-#if __FreeBSD_version < 1300031
-		vm_page_lock(pages[i]);
-		vm_page_unwire(pages[i], PQ_NONE);
-		vm_page_unlock(pages[i]);
-#endif
-#endif
 		__free_pages(pages[i], order);
 	}
 }
@@ -512,11 +505,6 @@ static void ttm_handle_caching_state_failure(struct pglist *pages,
 		list_del(&failed_pages[i]->lru);
 #else
 		TAILQ_REMOVE(pages, failed_pages[i], plinks.q);
-#if __FreeBSD_version < 1300031
-		vm_page_lock(failed_pages[i]);
-		vm_page_unwire(failed_pages[i], PQ_NONE);
-		vm_page_unlock(failed_pages[i]);
-#endif
 #endif
 		__free_page(failed_pages[i]);
 	}
@@ -575,11 +563,6 @@ static int ttm_alloc_new_pages(struct pglist *pages, gfp_t gfp_flags,
 #ifdef __linux__
 		list_add(&p->lru, pages);
 #else
-#if __FreeBSD_version < 1300031
-		vm_page_lock(p);
-		vm_page_wire(p);
-		vm_page_unlock(p);
-#endif
 		TAILQ_INSERT_HEAD(pages, p, plinks.q);
 #endif
 
@@ -845,13 +828,6 @@ static void ttm_put_pages(struct page **pages, unsigned npages, int flags,
 
 			if (page_count(pages[i]) != 1)
 				pr_err("Erroneous page count. Leaking pages.\n");
-#ifndef __linux__
-#if __FreeBSD_version < 1300031
-			vm_page_lock(pages[i]);
-			vm_page_unwire(pages[i], PQ_NONE);
-			vm_page_unlock(pages[i]);
-#endif
-#endif
 			__free_pages(pages[i], order);
 
 			j = 1 << order;
@@ -1002,13 +978,6 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 				return -ENOMEM;
 			}
 
-#ifndef __linux__
-#if __FreeBSD_version < 1300031
-			vm_page_lock(p);
-			vm_page_wire(p);
-			vm_page_unlock(p);
-#endif
-#endif
 			/* Swap the pages if we detect consecutive order */
 			if (i > first && pages[i - 1] == p - 1)
 				swap(p, pages[i - 1]);
