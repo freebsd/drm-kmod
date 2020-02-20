@@ -322,6 +322,7 @@ SRCS+=	dce_abm.c \
 	dce_scl_filters.c \
 	dce_stream_encoder.c \
 	dce_transform.c \
+	dmub_abm.c \
 	dmub_psr.c
 
 # display/dc/dce100
@@ -763,6 +764,7 @@ CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes -Wno-unused-variable
 CWARNFLAGS.dc_dmub_srv.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_psr.c=			-Wno-unused-but-set-variable
+CWARNFLAGS.dmub_abm.c=			-Wno-unused-but-set-variable
 
 # display/dmub/*
 CWARNFLAGS.dmub_dcn20.c=		-Wno-unused-but-set-variable
