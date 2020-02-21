@@ -19,7 +19,6 @@ _i915 =		i915
 _vmwgfx =	vmwgfx
 _vboxvideo =	vboxvideo
 .endif
-.endif
 
 .if defined(DUMMYGFX)
 _dummygfx = dummygfx
