@@ -16,6 +16,7 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_firmware.c	\
 	linux_fs.c		\
 	linux_fs_attr.c		\
+	linux_genalloc.c	\
 	linux_i2c.c		\
 	linux_interval_tree.c	\
 	linux_irq.c		\
@@ -29,9 +30,6 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_sort.c		\
 	linux_sync_file.c
 
-.if ${OSVERSION} >= 1300033
-SRCS+=	linux_genalloc.c
-.endif
 
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
 SRCS+=	linux_acpi.c	\
