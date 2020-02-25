@@ -54,12 +54,18 @@ int drm_get_pci_dev(struct pci_dev *pdev,
 		    const struct pci_device_id *ent,
 		    struct drm_driver *driver);
 #else
-static inline int drm_get_pci_dev(struct pci_dev *pdev,
-				  const struct pci_device_id *ent,
-				  struct drm_driver *driver)
+
+static inline struct drm_dma_handle *drm_pci_alloc(struct drm_device *dev,
+						   size_t size, size_t align)
 {
-	return -ENOSYS;
+	return NULL;
 }
+
+static inline void drm_pci_free(struct drm_device *dev,
+				struct drm_dma_handle *dmah)
+{
+}
+
 #endif
 
 #endif /* _DRM_PCI_H_ */
