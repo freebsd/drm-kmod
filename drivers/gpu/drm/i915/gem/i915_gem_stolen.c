@@ -12,6 +12,7 @@
 
 #include "i915_drv.h"
 #include "i915_gem_stolen.h"
+#include "i915_vgpu.h"
 
 #ifdef __FreeBSD__
 #define	resource linux_resource
