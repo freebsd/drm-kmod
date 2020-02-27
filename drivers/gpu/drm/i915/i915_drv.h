@@ -105,18 +105,7 @@
 #include "i915_vma.h"
 #include "i915_irq.h"
 
-#include "intel_gvt.h"
-
-#ifdef __FreeBSD__
-/* BSD: Make sure we get out[bwl] redefines */
-#include <linux/compiler.h>
-#include <linux/typecheck.h>
-#include <linux/ratelimit.h>
-#include <linux/poll.h>
-#include <linux/shrinker.h>
-#include <linux/uuid.h>
-#define resource linux_resource
-#endif
+#include "intel_region_lmem.h"
 
 /* General customization:
  */
