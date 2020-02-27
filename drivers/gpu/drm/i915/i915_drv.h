@@ -108,8 +108,6 @@
 
 #include "intel_region_lmem.h"
 
-#include "intel_gvt.h"
-
 #ifdef __FreeBSD__
 /* BSD: Make sure we get out[bwl] redefines */
 #include <linux/compiler.h>
