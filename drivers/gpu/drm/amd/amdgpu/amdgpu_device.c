@@ -3254,9 +3254,6 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	adev->rmmio = NULL;
 	amdgpu_device_doorbell_fini(adev);
 
-#if defined(CONFIG_DEBUG_FS)
-	amdgpu_debugfs_regs_cleanup(adev);
-#endif
 	device_remove_file(adev->dev, &dev_attr_pcie_replay_count);
 	if (adev->ucode_sysfs_en)
 		amdgpu_ucode_sysfs_fini(adev);
