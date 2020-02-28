@@ -5039,18 +5039,21 @@ static void tgl_bw_buddy_init(struct drm_i915_private *dev_priv)
 		intel_de_write(dev_priv, BW_BUDDY1_CTL, BW_BUDDY_DISABLE);
 		intel_de_write(dev_priv, BW_BUDDY2_CTL, BW_BUDDY_DISABLE);
 	} else {
-		intel_de_write(dev_priv, BW_BUDDY1_PAGE_MASK,
-			       table[i].page_mask);
-		intel_de_write(dev_priv, BW_BUDDY2_PAGE_MASK,
-			       table[i].page_mask);
+		u32 val;
+
+		I915_WRITE(BW_BUDDY1_PAGE_MASK, table[i].page_mask);
+		I915_WRITE(BW_BUDDY2_PAGE_MASK, table[i].page_mask);
 
 		/* Wa_22010178259:tgl */
-		intel_de_rmw(dev_priv, BW_BUDDY1_CTL,
-			     BW_BUDDY_TLB_REQ_TIMER_MASK,
-			     REG_FIELD_PREP(BW_BUDDY_TLB_REQ_TIMER_MASK, 0x8));
-		intel_de_rmw(dev_priv, BW_BUDDY2_CTL,
-			     BW_BUDDY_TLB_REQ_TIMER_MASK,
-			     REG_FIELD_PREP(BW_BUDDY_TLB_REQ_TIMER_MASK, 0x8));
+		val = I915_READ(BW_BUDDY1_CTL);
+		val &= ~BW_BUDDY_TLB_REQ_TIMER_MASK;
+		val |= REG_FIELD_PREP(BW_BUDDY_TLB_REQ_TIMER_MASK, 0x8);
+		I915_WRITE(BW_BUDDY1_CTL, val);
+
+		val = I915_READ(BW_BUDDY2_CTL);
+		val &= ~BW_BUDDY_TLB_REQ_TIMER_MASK;
+		val |= REG_FIELD_PREP(BW_BUDDY_TLB_REQ_TIMER_MASK, 0x8);
+		I915_WRITE(BW_BUDDY2_CTL, val);
 	}
 }
 
