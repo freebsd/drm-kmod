@@ -150,7 +150,8 @@ SRCS+=	debugfs_engines.c \
 	intel_rps.c \
 	intel_sseu.c \
 	intel_timeline.c \
-	intel_workarounds.c
+	intel_workarounds.c \
+	sysfs_engines.c
 
 # gt/uc*
 SRCS+=	intel_guc.c \
