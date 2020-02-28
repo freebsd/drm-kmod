@@ -32,6 +32,7 @@
 
 #include "gt/intel_rc6.h"
 #include "gt/intel_rps.h"
+#include "gt/sysfs_engines.h"
 
 #include "i915_drv.h"
 #include "i915_sysfs.h"
@@ -620,8 +621,7 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 		drm_err(&dev_priv->drm, "RPS sysfs setup failed\n");
 
 #ifdef __linux__
-	/* Missing sysfs bin files support */
-	i915_setup_error_capture(kdev);
+	intel_engines_add_sysfs(dev_priv);
 #endif
 }
 
