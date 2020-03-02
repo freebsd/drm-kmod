@@ -113,9 +113,7 @@ static bool dmub_setup_psr(struct dmub_psr *dmub,
 		}
 	}
 
-	if (!pipe_ctx ||
-			!&pipe_ctx->plane_res ||
-			!&pipe_ctx->stream_res)
+	if (!pipe_ctx)
 		return false;
 
 	// Program DP DPHY fast training registers
