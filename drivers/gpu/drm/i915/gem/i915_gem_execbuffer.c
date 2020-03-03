@@ -57,17 +57,15 @@ enum {
 #define DBG_FORCE_RELOC 0 /* choose one of the above! */
 };
 
-#define __EXEC_OBJECT_HAS_REF		BIT(31)
-#define __EXEC_OBJECT_HAS_PIN		BIT(30)
-#define __EXEC_OBJECT_HAS_FENCE		BIT(29)
-#define __EXEC_OBJECT_NEEDS_MAP		BIT(28)
-#define __EXEC_OBJECT_NEEDS_BIAS	BIT(27)
-#define __EXEC_OBJECT_INTERNAL_FLAGS	(~0u << 27) /* all of the above */
+#define __EXEC_OBJECT_HAS_PIN		BIT(31)
+#define __EXEC_OBJECT_HAS_FENCE		BIT(30)
+#define __EXEC_OBJECT_NEEDS_MAP		BIT(29)
+#define __EXEC_OBJECT_NEEDS_BIAS	BIT(28)
+#define __EXEC_OBJECT_INTERNAL_FLAGS	(~0u << 28) /* all of the above */
 #define __EXEC_OBJECT_RESERVED (__EXEC_OBJECT_HAS_PIN | __EXEC_OBJECT_HAS_FENCE)
 
 #define __EXEC_HAS_RELOC	BIT(31)
-#define __EXEC_VALIDATED	BIT(30)
-#define __EXEC_INTERNAL_FLAGS	(~0u << 30)
+#define __EXEC_INTERNAL_FLAGS	(~0u << 31)
 #define UPDATE			PIN_OFFSET_FIXED
 
 #define BATCH_OFFSET_BIAS (256*1024)
@@ -483,24 +481,17 @@ eb_validate_vma(struct i915_execbuffer *eb,
 	return 0;
 }
 
-static int
+static void
 eb_add_vma(struct i915_execbuffer *eb,
 	   unsigned int i, unsigned batch_idx,
 	   struct i915_vma *vma)
 {
 	struct drm_i915_gem_exec_object2 *entry = &eb->exec[i];
 	struct eb_vma *ev = &eb->vma[i];
-	int err;
 
 	GEM_BUG_ON(i915_vma_is_closed(vma));
 
-	if (!(eb->args->flags & __EXEC_VALIDATED)) {
-		err = eb_validate_vma(eb, entry, vma);
-		if (unlikely(err))
-			return err;
-	}
-
-	ev->vma = vma;
+	ev->vma = i915_vma_get(vma);
 	ev->exec = entry;
 	ev->flags = entry->flags;
 
@@ -533,7 +524,6 @@ eb_add_vma(struct i915_execbuffer *eb,
 		eb->batch = ev;
 	}
 
-	err = 0;
 	if (eb_pin_vma(eb, entry, ev)) {
 		if (entry->offset != vma->node.start) {
 			entry->offset = vma->node.start | UPDATE;
@@ -541,12 +531,8 @@ eb_add_vma(struct i915_execbuffer *eb,
 		}
 	} else {
 		eb_unreserve_vma(ev);
-
 		list_add_tail(&ev->bind_link, &eb->unbound);
-		if (drm_mm_node_allocated(&vma->node))
-			err = i915_vma_unbind(vma);
 	}
-	return err;
 }
 
 static inline int use_cpu_reloc(const struct reloc_cache *cache,
@@ -592,6 +578,13 @@ static int eb_reserve_vma(const struct i915_execbuffer *eb,
 		pin_flags |= entry->offset | PIN_OFFSET_FIXED;
 	else if (exec_flags & __EXEC_OBJECT_NEEDS_BIAS)
 		pin_flags |= BATCH_OFFSET_BIAS | PIN_OFFSET_BIAS;
+
+	if (drm_mm_node_allocated(&vma->node) &&
+	    eb_vma_misplaced(entry, vma, ev->flags)) {
+		err = i915_vma_unbind(vma);
+		if (err)
+			return err;
+	}
 
 	err = i915_vma_pin(vma,
 			   entry->pad_to_size, entry->alignment,
@@ -652,7 +645,7 @@ static int eb_reserve(struct i915_execbuffer *eb)
 			if (err)
 				break;
 		}
-		if (err != -ENOSPC)
+		if (!(err == -ENOSPC || err == -EAGAIN))
 			return err;
 
 		/* Resort *all* the objects into priority order */
@@ -682,6 +675,11 @@ static int eb_reserve(struct i915_execbuffer *eb)
 				list_add_tail(&ev->bind_link, &last);
 		}
 		list_splice_tail(&last, &eb->unbound);
+
+		if (err == -EAGAIN) {
+			flush_workqueue(eb->i915->mm.userptr_wq);
+			continue;
+		}
 
 		switch (pass++) {
 		case 0:
@@ -738,16 +736,13 @@ static int eb_lookup_vmas(struct i915_execbuffer *eb)
 	unsigned int i, batch;
 	int err;
 
+	if (unlikely(i915_gem_context_is_closed(eb->gem_context)))
+		return -ENOENT;
+
 	INIT_LIST_HEAD(&eb->relocs);
 	INIT_LIST_HEAD(&eb->unbound);
 
 	batch = eb_batch_index(eb);
-
-	mutex_lock(&eb->gem_context->mutex);
-	if (unlikely(i915_gem_context_is_closed(eb->gem_context))) {
-		err = -ENOENT;
-		goto err_ctx;
-	}
 
 	for (i = 0; i < eb->buffer_count; i++) {
 		u32 handle = eb->exec[i].handle;
@@ -793,25 +788,19 @@ static int eb_lookup_vmas(struct i915_execbuffer *eb)
 		i915_gem_object_unlock(obj);
 
 add_vma:
-		err = eb_add_vma(eb, i, batch, vma);
+		err = eb_validate_vma(eb, &eb->exec[i], vma);
 		if (unlikely(err))
 			goto err_vma;
 
-		GEM_BUG_ON(drm_mm_node_allocated(&vma->node) &&
-			   eb_vma_misplaced(&eb->exec[i], vma, eb->vma[i].flags));
+		eb_add_vma(eb, i, batch, vma);
 	}
 
-	mutex_unlock(&eb->gem_context->mutex);
-
-	eb->args->flags |= __EXEC_VALIDATED;
-	return eb_reserve(eb);
+	return 0;
 
 err_obj:
 	i915_gem_object_put(obj);
 err_vma:
 	eb->vma[i].vma = NULL;
-err_ctx:
-	mutex_unlock(&eb->gem_context->mutex);
 	return err;
 }
 
@@ -852,17 +841,8 @@ static void eb_release_vmas(const struct i915_execbuffer *eb)
 		if (ev->flags & __EXEC_OBJECT_HAS_PIN)
 			__eb_unreserve_vma(vma, ev->flags);
 
-		if (ev->flags & __EXEC_OBJECT_HAS_REF)
-			i915_vma_put(vma);
+		i915_vma_put(vma);
 	}
-}
-
-static void eb_reset_vmas(const struct i915_execbuffer *eb)
-{
-	eb_release_vmas(eb);
-	if (eb->lut_size > 0)
-		memset(eb->buckets, 0,
-		       sizeof(struct hlist_head) << eb->lut_size);
 }
 
 static void eb_destroy(const struct i915_execbuffer *eb)
@@ -1682,8 +1662,6 @@ repeat:
 		goto out;
 	}
 
-	/* We may process another execbuffer during the unlock... */
-	eb_reset_vmas(eb);
 	mutex_unlock(&dev->struct_mutex);
 
 	/*
@@ -1721,11 +1699,6 @@ repeat:
 		mutex_lock(&dev->struct_mutex);
 		goto out;
 	}
-
-	/* reacquire the objects */
-	err = eb_lookup_vmas(eb);
-	if (err)
-		goto err;
 
 	GEM_BUG_ON(!eb->batch);
 
@@ -1777,8 +1750,17 @@ out:
 
 static int eb_relocate(struct i915_execbuffer *eb)
 {
-	if (eb_lookup_vmas(eb))
-		goto slow;
+	int err;
+
+	mutex_lock(&eb->gem_context->mutex);
+	err = eb_lookup_vmas(eb);
+	mutex_unlock(&eb->gem_context->mutex);
+	if (err)
+		return err;
+
+	err = eb_reserve(eb);
+	if (err)
+		return err;
 
 	/* The objects are in their final locations, apply the relocations. */
 	if (eb->args->flags & __EXEC_HAS_RELOC) {
@@ -1786,14 +1768,11 @@ static int eb_relocate(struct i915_execbuffer *eb)
 
 		list_for_each_entry(ev, &eb->relocs, reloc_link) {
 			if (eb_relocate_vma(eb, ev))
-				goto slow;
+				return eb_relocate_slow(eb);
 		}
 	}
 
 	return 0;
-
-slow:
-	return eb_relocate_slow(eb);
 }
 
 static int eb_move_to_gpu(struct i915_execbuffer *eb)
@@ -1875,8 +1854,7 @@ static int eb_move_to_gpu(struct i915_execbuffer *eb)
 		i915_vma_unlock(vma);
 
 		__eb_unreserve_vma(vma, flags);
-		if (unlikely(flags & __EXEC_OBJECT_HAS_REF))
-			i915_vma_put(vma);
+		i915_vma_put(vma);
 
 		ev->vma = NULL;
 	}
@@ -2136,8 +2114,7 @@ static int eb_parse(struct i915_execbuffer *eb)
 		goto err_trampoline;
 
 	eb->vma[eb->buffer_count].vma = i915_vma_get(shadow);
-	eb->vma[eb->buffer_count].flags =
-		__EXEC_OBJECT_HAS_PIN | __EXEC_OBJECT_HAS_REF;
+	eb->vma[eb->buffer_count].flags = __EXEC_OBJECT_HAS_PIN;
 	eb->batch = &eb->vma[eb->buffer_count++];
 
 	eb->trampoline = trampoline;
