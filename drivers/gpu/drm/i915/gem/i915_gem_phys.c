@@ -202,6 +202,9 @@ int i915_gem_object_attach_phys(struct drm_i915_gem_object *obj, int align)
 
 	if (!IS_ERR_OR_NULL(pages))
 		i915_gem_shmem_ops.put_pages(obj, pages);
+
+	i915_gem_object_release_memory_region(obj);
+
 	mutex_unlock(&obj->mm.lock);
 	return 0;
 
