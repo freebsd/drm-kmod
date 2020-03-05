@@ -875,9 +875,6 @@ i915_request_await_start(struct i915_request *rq, struct i915_request *signal)
 	if (i915_request_started(signal))
 		return 0;
 
-	if (i915_request_started(signal))
-		return 0;
-
 	fence = NULL;
 	rcu_read_lock();
 	spin_lock_irq(&signal->lock);
