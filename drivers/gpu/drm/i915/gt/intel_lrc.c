@@ -1806,11 +1806,8 @@ static void set_timeslice(struct intel_engine_cs *engine)
 static void start_timeslice(struct intel_engine_cs *engine)
 {
 	struct intel_engine_execlists *execlists = &engine->execlists;
-	int prio = queue_prio(execlists);
 
-	WRITE_ONCE(execlists->switch_priority_hint, prio);
-	if (prio == INT_MIN)
-		return;
+	execlists->switch_priority_hint = execlists->queue_priority_hint;
 
 	if (timer_pending(&execlists->timer))
 		return;
