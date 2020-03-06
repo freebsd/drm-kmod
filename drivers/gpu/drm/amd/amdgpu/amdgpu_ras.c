@@ -1196,9 +1196,6 @@ static void amdgpu_ras_debugfs_remove_all(struct amdgpu_device *adev)
 static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 {
 	amdgpu_ras_sysfs_create_feature_node(adev);
-#ifdef CONFIG_DEBUGFS
-	amdgpu_ras_debugfs_create_ctrl_node(adev);
-#endif
 
 	return 0;
 }
@@ -1904,8 +1901,6 @@ int amdgpu_ras_late_init(struct amdgpu_device *adev,
 			goto interrupt;
 	}
 
-	amdgpu_ras_debugfs_create(adev, fs_info);
-
 	r = amdgpu_ras_sysfs_create(adev, fs_info);
 	if (r)
 		goto sysfs;
@@ -1914,7 +1909,6 @@ int amdgpu_ras_late_init(struct amdgpu_device *adev,
 cleanup:
 	amdgpu_ras_sysfs_remove(adev, ras_block);
 sysfs:
-	amdgpu_ras_debugfs_remove(adev, ras_block);
 	if (ih_info->cb)
 		amdgpu_ras_interrupt_remove_handler(adev, ih_info);
 interrupt:
@@ -1931,7 +1925,6 @@ void amdgpu_ras_late_fini(struct amdgpu_device *adev,
 		return;
 
 	amdgpu_ras_sysfs_remove(adev, ras_block);
-	amdgpu_ras_debugfs_remove(adev, ras_block);
 	if (ih_info->cb)
                 amdgpu_ras_interrupt_remove_handler(adev, ih_info);
 	amdgpu_ras_feature_enable(adev, ras_block, 0);
