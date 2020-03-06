@@ -162,7 +162,7 @@ static int drm_map_handle(struct drm_device *dev, struct drm_hash_item *hash,
 					 shift, add);
 }
 
-/**
+/*
  * Core function to create a range of memory available for mapping by a
  * non-root process.
  *
@@ -428,7 +428,7 @@ struct drm_local_map *drm_legacy_findmap(struct drm_device *dev,
 }
 EXPORT_SYMBOL(drm_legacy_findmap);
 
-/**
+/*
  * Ioctl to specify a range of memory that is available for mapping by a
  * non-root process.
  *
@@ -529,7 +529,7 @@ int drm_legacy_getmap_ioctl(struct drm_device *dev, void *data,
 	return 0;
 }
 
-/**
+/*
  * Remove a map private from list and deallocate resources if the mapping
  * isn't in use.
  *
@@ -692,7 +692,7 @@ int drm_legacy_rmmap_ioctl(struct drm_device *dev, void *data,
 	return ret;
 }
 
-/**
+/*
  * Cleanup after an error on one of the addbufs() functions.
  *
  * \param dev DRM device.
@@ -727,7 +727,7 @@ static void drm_cleanup_buf_error(struct drm_device *dev,
 }
 
 #if IS_ENABLED(CONFIG_AGP)
-/**
+/*
  * Add AGP buffers for DMA transfers.
  *
  * \param dev struct drm_device to which the buffers are to be added.
@@ -1263,7 +1263,7 @@ static int drm_legacy_addbufs_sg(struct drm_device *dev,
 	return 0;
 }
 
-/**
+/*
  * Add buffers for DMA transfers (ioctl).
  *
  * \param inode device inode.
@@ -1304,7 +1304,7 @@ int drm_legacy_addbufs(struct drm_device *dev, void *data,
 	return ret;
 }
 
-/**
+/*
  * Get information about the buffer mappings.
  *
  * This was originally mean for debugging purposes, or by a sophisticated
@@ -1395,7 +1395,7 @@ int drm_legacy_infobufs(struct drm_device *dev, void *data,
 	return __drm_legacy_infobufs(dev, data, &request->count, copy_one_buf);
 }
 
-/**
+/*
  * Specifies a low and high water mark for buffer allocation
  *
  * \param inode device inode.
@@ -1444,7 +1444,7 @@ int drm_legacy_markbufs(struct drm_device *dev, void *data,
 	return 0;
 }
 
-/**
+/*
  * Unreserve the buffers in list, previously reserved using drmDMA.
  *
  * \param inode device inode.
@@ -1496,7 +1496,7 @@ int drm_legacy_freebufs(struct drm_device *dev, void *data,
 	return 0;
 }
 
-/**
+/*
  * Maps all of the DMA buffers into client-virtual space (ioctl).
  *
  * \param inode device inode.
