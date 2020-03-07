@@ -264,6 +264,18 @@ drm_getpciinfo(struct drm_device *dev, void *data, struct drm_file *file_priv)
 }
 #endif
 
+void drm_pci_agp_destroy(struct drm_device *dev)
+{
+	if (dev->agp) {
+		arch_phys_wc_del(dev->agp->agp_mtrr);
+		drm_legacy_agp_clear(dev);
+		kfree(dev->agp);
+		dev->agp = NULL;
+	}
+}
+
+#ifdef CONFIG_DRM_LEGACY
+
 static void drm_pci_agp_init(struct drm_device *dev)
 {
 	if (drm_core_check_feature(dev, DRIVER_USE_AGP)) {
@@ -277,18 +289,6 @@ static void drm_pci_agp_init(struct drm_device *dev)
 		}
 	}
 }
-
-void drm_pci_agp_destroy(struct drm_device *dev)
-{
-	if (dev->agp) {
-		arch_phys_wc_del(dev->agp->agp_mtrr);
-		drm_legacy_agp_clear(dev);
-		kfree(dev->agp);
-		dev->agp = NULL;
-	}
-}
-
-#ifdef CONFIG_DRM_LEGACY
 
 static int drm_get_pci_dev(struct pci_dev *pdev,
 			   const struct pci_device_id *ent,
