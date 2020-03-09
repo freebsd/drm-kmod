@@ -1604,6 +1604,11 @@ static bool can_merge_ctx(const struct intel_context *prev,
 	return true;
 }
 
+static unsigned long i915_request_flags(const struct i915_request *rq)
+{
+	return READ_ONCE(rq->fence.flags);
+}
+
 static bool can_merge_rq(const struct i915_request *prev,
 			 const struct i915_request *next)
 {
@@ -1621,7 +1626,7 @@ static bool can_merge_rq(const struct i915_request *prev,
 	if (i915_request_completed(next))
 		return true;
 
-	if (unlikely((prev->fence.flags ^ next->fence.flags) &
+	if (unlikely((i915_request_flags(prev) ^ i915_request_flags(next)) &
 		     (BIT(I915_FENCE_FLAG_NOPREEMPT) |
 		      BIT(I915_FENCE_FLAG_SENTINEL))))
 		return false;
