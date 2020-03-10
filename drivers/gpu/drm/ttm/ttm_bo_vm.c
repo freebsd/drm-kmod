@@ -305,11 +305,8 @@ static vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault 
 	for (i = 0; i < TTM_BO_VM_NUM_PREFAULT && page_offset < page_last;
 	    i++, page_offset++, pidx++) {
 retry:
-		page = vm_page_lookup(obj, pidx);
-		if (page != NULL) {
-			if (vm_page_sleep_if_busy(page, "ttmflt"))
-				goto retry;
-		} else {
+		page = vm_page_grab(obj, pidx, VM_ALLOC_NOCREAT);
+		if (page == NULL) {
 			if (bo->mem.bus.is_iomem) {
 				pfn = ttm_bo_io_mem_pfn(bo, page_offset);
 				page = PHYS_TO_VM_PAGE(IDX_TO_OFF(pfn));
@@ -319,15 +316,16 @@ retry:
 					goto fail;
 				page->oflags &= ~VPO_UNMANAGED;
 			}
-			if (vm_page_busied(page))
+			if (!vm_page_busy_acquire(page, VM_ALLOC_WAITFAIL))
+				goto retry;
+			if (vm_page_insert(page, obj, pidx)) {
+				vm_page_xunbusy(page);
 				goto fail;
-			if (vm_page_insert(page, obj, pidx))
-				goto fail;
-			page->valid = VM_PAGE_BITS_ALL;
+			}
+			vm_page_valid(page);
 		}
 		pmap_page_set_memattr(page,
 		    pgprot2cachemode(cvma.vm_page_prot));
-		vm_page_xbusy(page);
 		vma->vm_pfn_count++;
 		continue;
 fail:

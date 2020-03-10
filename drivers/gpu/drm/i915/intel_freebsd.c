@@ -188,21 +188,13 @@ remap_io_mapping(struct vm_area_struct *vma, unsigned long addr,
 	for (pidx = pidx_start; pidx < pidx_start + count;
 	    pidx++, pa += PAGE_SIZE) {
 retry:
-		m = vm_page_lookup(vm_obj, pidx);
-		if (m != NULL) {
-			/* XXX need to unpin object first */
-			if (vm_page_sleep_if_busy(m, "i915flt"))
-				goto retry;
-		} else {
+		m = vm_page_grab(vm_obj, pidx, VM_ALLOC_NOCREAT);
+		if (m == NULL) {
 			m = PHYS_TO_VM_PAGE(pa);
-			if (vm_page_busied(m)) {
-				vm_page_lock(m);
-				VM_OBJECT_WUNLOCK(vm_obj);
-				vm_page_busy_sleep(m, "i915flt", false);
-				VM_OBJECT_WLOCK(vm_obj);
+			if (!vm_page_busy_acquire(m, VM_ALLOC_WAITFAIL))
 				goto retry;
-			}
 			if (vm_page_insert(m, vm_obj, pidx)) {
+				vm_page_xunbusy(m);
 				VM_OBJECT_WUNLOCK(vm_obj);
 #ifdef VM_WAIT
 				VM_WAIT;
@@ -212,9 +204,8 @@ retry:
 				VM_OBJECT_WLOCK(vm_obj);
 				goto retry;
 			}
-			m->valid = VM_PAGE_BITS_ALL;
+			vm_page_valid(m);
 		}
-		vm_page_xbusy(m);
 		pmap_page_set_memattr(m, attr);
 		vma->vm_pfn_count++;
 	}
