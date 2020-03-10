@@ -1008,7 +1008,7 @@ __unwind_incomplete_requests(struct intel_engine_cs *engine)
 				i915_request_cancel_breadcrumb(rq);
 				spin_unlock(&rq->lock);
 			}
-			rq->engine = owner;
+			WRITE_ONCE(rq->engine, owner);
 			owner->submit_request(rq);
 			active = NULL;
 		}
@@ -2040,13 +2040,14 @@ static void execlists_dequeue(struct intel_engine_cs *engine)
 				     "",
 				     yesno(engine != ve->siblings[0]));
 
-			ve->request = NULL;
-			ve->base.execlists.queue_priority_hint = INT_MIN;
+			WRITE_ONCE(ve->request, NULL);
+			WRITE_ONCE(ve->base.execlists.queue_priority_hint,
+				   INT_MIN);
 			rb_erase_cached(rb, &execlists->virtual);
 			RB_CLEAR_NODE(rb);
 
 			GEM_BUG_ON(!(rq->execution_mask & engine->mask));
-			rq->engine = engine;
+			WRITE_ONCE(rq->engine, engine);
 
 			if (engine != ve->siblings[0]) {
 				u32 *regs = ve->context.lrc_reg_state;
@@ -4970,7 +4971,7 @@ static intel_engine_mask_t virtual_submission_mask(struct virtual_engine *ve)
 static void virtual_submission_tasklet(unsigned long data)
 {
 	struct virtual_engine * const ve = (struct virtual_engine *)data;
-	const int prio = ve->base.execlists.queue_priority_hint;
+	const int prio = READ_ONCE(ve->base.execlists.queue_priority_hint);
 	intel_engine_mask_t mask;
 	unsigned int n;
 
