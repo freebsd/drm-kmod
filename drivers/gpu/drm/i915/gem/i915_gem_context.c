@@ -266,6 +266,46 @@ static void free_engines_rcu(struct rcu_head *rcu)
 	free_engines(engines);
 }
 
+static int __i915_sw_fence_call
+engines_notify(struct i915_sw_fence *fence, enum i915_sw_fence_notify state)
+{
+	struct i915_gem_engines *engines =
+		container_of(fence, typeof(*engines), fence);
+
+	switch (state) {
+	case FENCE_COMPLETE:
+		if (!list_empty(&engines->link)) {
+			struct i915_gem_context *ctx = engines->ctx;
+			unsigned long flags;
+
+			spin_lock_irqsave(&ctx->stale.lock, flags);
+			list_del(&engines->link);
+			spin_unlock_irqrestore(&ctx->stale.lock, flags);
+		}
+		i915_gem_context_put(engines->ctx);
+		break;
+
+	case FENCE_FREE:
+		init_rcu_head(&engines->rcu);
+		call_rcu(&engines->rcu, free_engines_rcu);
+		break;
+	}
+
+	return NOTIFY_DONE;
+}
+
+static struct i915_gem_engines *alloc_engines(unsigned int count)
+{
+	struct i915_gem_engines *e;
+
+	e = kzalloc(struct_size(e, engines, count), GFP_KERNEL);
+	if (!e)
+		return NULL;
+
+	i915_sw_fence_init(&e->fence, engines_notify);
+	return e;
+}
+
 static struct i915_gem_engines *default_engines(struct i915_gem_context *ctx)
 {
 	const struct intel_gt *gt = &ctx->i915->gt;
@@ -273,7 +313,7 @@ static struct i915_gem_engines *default_engines(struct i915_gem_context *ctx)
 	struct i915_gem_engines *e;
 	enum intel_engine_id id;
 
-	e = kzalloc(struct_size(e, engines, I915_NUM_ENGINES), GFP_KERNEL);
+	e = alloc_engines(I915_NUM_ENGINES);
 	if (!e)
 		return ERR_PTR(-ENOMEM);
 
@@ -524,41 +564,12 @@ static void kill_context(struct i915_gem_context *ctx)
 	kill_stale_engines(ctx);
 }
 
-static int __i915_sw_fence_call
-engines_notify(struct i915_sw_fence *fence, enum i915_sw_fence_notify state)
-{
-	struct i915_gem_engines *engines =
-		container_of(fence, typeof(*engines), fence);
-
-	switch (state) {
-	case FENCE_COMPLETE:
-		if (!list_empty(&engines->link)) {
-			struct i915_gem_context *ctx = engines->ctx;
-			unsigned long flags;
-
-			spin_lock_irqsave(&ctx->stale.lock, flags);
-			list_del(&engines->link);
-			spin_unlock_irqrestore(&ctx->stale.lock, flags);
-		}
-		i915_gem_context_put(engines->ctx);
-		break;
-
-	case FENCE_FREE:
-		init_rcu_head(&engines->rcu);
-		call_rcu(&engines->rcu, free_engines_rcu);
-		break;
-	}
-
-	return NOTIFY_DONE;
-}
-
 static void engines_idle_release(struct i915_gem_context *ctx,
 				 struct i915_gem_engines *engines)
 {
 	struct i915_gem_engines_iter it;
 	struct intel_context *ce;
 
-	i915_sw_fence_init(&engines->fence, engines_notify);
 	INIT_LIST_HEAD(&engines->link);
 
 	engines->ctx = i915_gem_context_get(ctx);
@@ -1066,6 +1077,30 @@ static void cb_retire(struct i915_active *base)
 	kfree(cb);
 }
 
+static inline struct i915_gem_engines *
+__context_engines_await(const struct i915_gem_context *ctx)
+{
+	struct i915_gem_engines *engines;
+
+	rcu_read_lock();
+	do {
+		engines = rcu_dereference(ctx->engines);
+		if (unlikely(!engines))
+			break;
+
+		if (unlikely(!i915_sw_fence_await(&engines->fence)))
+			continue;
+
+		if (likely(engines == rcu_access_pointer(ctx->engines)))
+			break;
+
+		i915_sw_fence_complete(&engines->fence);
+	} while (1);
+	rcu_read_unlock();
+
+	return engines;
+}
+
 I915_SELFTEST_DECLARE(static intel_engine_mask_t context_barrier_inject_fault);
 static int context_barrier_task(struct i915_gem_context *ctx,
 				intel_engine_mask_t engines,
@@ -1076,6 +1111,7 @@ static int context_barrier_task(struct i915_gem_context *ctx,
 {
 	struct context_barrier_task *cb;
 	struct i915_gem_engines_iter it;
+	struct i915_gem_engines *e;
 	struct intel_context *ce;
 	int err = 0;
 
@@ -1092,7 +1128,13 @@ static int context_barrier_task(struct i915_gem_context *ctx,
 		return err;
 	}
 
-	for_each_gem_engine(ce, i915_gem_context_lock_engines(ctx), it) {
+	e = __context_engines_await(ctx);
+	if (!e) {
+		i915_active_release(&cb->base);
+		return -ENOENT;
+	}
+
+	for_each_gem_engine(ce, e, it) {
 		struct i915_request *rq;
 
 		if (I915_SELFTEST_ONLY(context_barrier_inject_fault &
@@ -1123,7 +1165,7 @@ static int context_barrier_task(struct i915_gem_context *ctx,
 		if (err)
 			break;
 	}
-	i915_gem_context_unlock_engines(ctx);
+	i915_sw_fence_complete(&e->fence);
 
 	cb->task = err ? NULL : task; /* caller needs to unwind instead */
 	cb->data = data;
@@ -1750,9 +1792,7 @@ set_engines(struct i915_gem_context *ctx,
 	 * first 64 engines defined here.
 	 */
 	num_engines = (args->size - sizeof(*user)) / sizeof(*user->engines);
-
-	set.engines = kmalloc(struct_size(set.engines, engines, num_engines),
-			      GFP_KERNEL);
+	set.engines = alloc_engines(num_engines);
 	if (!set.engines)
 		return -ENOMEM;
 
@@ -1832,7 +1872,7 @@ __copy_engines(struct i915_gem_engines *e)
 	struct i915_gem_engines *copy;
 	unsigned int n;
 
-	copy = kmalloc(struct_size(e, engines, e->num_engines), GFP_KERNEL);
+	copy = alloc_engines(e->num_engines);
 	if (!copy)
 		return ERR_PTR(-ENOMEM);
 
@@ -2093,7 +2133,7 @@ static int clone_engines(struct i915_gem_context *dst,
 	bool user_engines;
 	unsigned long n;
 
-	clone = kmalloc(struct_size(e, engines, e->num_engines), GFP_KERNEL);
+	clone = alloc_engines(e->num_engines);
 	if (!clone)
 		goto err_unlock;
 
