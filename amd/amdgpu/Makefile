@@ -123,6 +123,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_fb.c \
 	amdgpu_fence.c \
 	amdgpu_freebsd.c \
+	amdgpu_fru_eeprom.c \
 	amdgpu_gart.c \
 	amdgpu_gem.c \
 	amdgpu_gfx.c \
@@ -655,6 +656,7 @@ CWARNFLAGS.amdgpu_cs.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_csa.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_dma_buf.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_device.c=			-Wno-unused-but-set-variable
+CWARNFLAGS.amdgpu_fru_eeprom.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ioc32.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_job.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_pm.c=				-Wno-unused-const-variable
