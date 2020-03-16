@@ -70,7 +70,7 @@ static int ggtt_init_hw(struct i915_ggtt *ggtt)
 					      ggtt->mappable_end);
 	}
 
-	i915_ggtt_init_fences(ggtt);
+	intel_ggtt_init_fences(ggtt);
 
 	return 0;
 }
