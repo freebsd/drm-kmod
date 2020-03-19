@@ -282,6 +282,11 @@ static ssize_t amdgpu_ras_debugfs_ctrl_write(struct file *f, const char __user *
 	struct ras_debug_if data;
 	int ret = 0;
 
+	if (amdgpu_ras_intr_triggered()) {
+		DRM_WARN("RAS WARN: error injection currently inaccessible\n");
+		return size;
+	}
+
 	ret = amdgpu_ras_debugfs_ctrl_parse_data(f, buf, size, pos, &data);
 	if (ret)
 		return -EINVAL;
@@ -395,6 +400,10 @@ static ssize_t amdgpu_ras_sysfs_read(struct device *dev,
 	struct ras_query_if info = {
 		.head = obj->head,
 	};
+
+	if (amdgpu_ras_intr_triggered())
+		return snprintf(buf, PAGE_SIZE,
+				"Query currently inaccessible\n");
 
 	if (amdgpu_ras_error_query(obj->adev, &info))
 		return -EINVAL;
