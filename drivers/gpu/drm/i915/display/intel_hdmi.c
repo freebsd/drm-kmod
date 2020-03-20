@@ -2840,6 +2840,7 @@ intel_hdmi_get_i2c_adapter(struct drm_connector *connector)
 static void intel_hdmi_create_i2c_symlink(struct drm_connector *connector)
 {
 #ifdef __linux__
+	struct drm_i915_private *i915 = to_i915(connector->dev);
 	struct i2c_adapter *adapter = intel_hdmi_get_i2c_adapter(connector);
 	struct kobject *i2c_kobj = &adapter->dev.kobj;
 	struct kobject *connector_kobj = &connector->kdev->kobj;
