@@ -42,6 +42,7 @@ SRCS=	drm_atomic.c \
 	drm_ioctl.c \
 	drm_irq.c \
 	drm_lease.c \
+	drm_managed.c \
 	drm_memory.c \
 	drm_mm.c \
 	drm_modes.c \
