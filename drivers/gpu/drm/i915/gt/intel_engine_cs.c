@@ -349,8 +349,6 @@ static int intel_engine_setup(struct intel_gt *gt, enum intel_engine_id id)
 	gt->engine_class[info->class][info->instance] = engine;
 	gt->engine[id] = engine;
 
-	i915->engine[id] = engine;
-
 	return 0;
 }
 
@@ -427,8 +425,6 @@ void intel_engines_release(struct intel_gt *gt)
 		engine->release = NULL;
 
 		memset(&engine->reset, 0, sizeof(engine->reset));
-
-		gt->i915->engine[id] = NULL;
 	}
 }
 
