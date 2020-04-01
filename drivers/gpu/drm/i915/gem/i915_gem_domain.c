@@ -368,9 +368,6 @@ static void i915_gem_object_bump_inactive_ggtt(struct drm_i915_gem_object *obj)
 	struct drm_i915_private *i915 = to_i915(obj->base.dev);
 	struct i915_vma *vma;
 
-	if (!atomic_read(&obj->bind_count))
-		return;
-
 	mutex_lock(&i915->ggtt.vm.mutex);
 	spin_lock(&obj->vma.lock);
 	for_each_ggtt_vma(vma, obj) {
