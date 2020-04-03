@@ -54,6 +54,8 @@ drm_pci_busdma_callback(void *arg, bus_dma_segment_t *segs, int nsegs, int error
 }
 #endif
 
+#ifdef CONFIG_DRM_LEGACY
+
 /**
  * drm_pci_alloc - Allocate a PCI consistent memory block, for DMA.
  * @dev: DRM device
@@ -158,6 +160,7 @@ void drm_pci_free(struct drm_device * dev, drm_dma_handle_t * dmah)
 }
 
 EXPORT_SYMBOL(drm_pci_free);
+#endif
 
 static int drm_get_pci_domain(struct drm_device *dev)
 {
