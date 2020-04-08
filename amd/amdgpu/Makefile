@@ -318,7 +318,7 @@ SRCS+=	dce_abm.c \
 	dce_link_encoder.c \
 	dce_mem_input.c \
 	dce_opp.c \
-	dce_panel.c \
+	dce_panel_cntl.c \
 	dce_scl_filters.c \
 	dce_stream_encoder.c \
 	dce_transform.c \
@@ -710,7 +710,7 @@ CWARNFLAGS.dce_i2c_hw.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_i2c_sw.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_link_encoder.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dce_stream_encoder.c=	-Wno-unused-but-set-variable
-CWARNFLAGS.dce_panel.c=			-Wno-missing-prototypes
+CWARNFLAGS.dce_panel_cntl.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce100_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dce110_compressor.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce110_hw_sequencer.c=	-Wno-missing-prototypes
