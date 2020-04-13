@@ -38,6 +38,7 @@
 #include "psp_v10_0.h"
 #include "psp_v11_0.h"
 #include "psp_v12_0.h"
+#include "psp_v13_0.h"
 
 #include "amdgpu_ras.h"
 #include "amdgpu_securedisplay.h"
@@ -112,6 +113,9 @@ static int psp_early_init(void *handle)
 		break;
 	case CHIP_RENOIR:
 		psp_v12_0_set_psp_funcs(psp);
+		break;
+	case CHIP_ALDEBARAN:
+		psp_v13_0_set_psp_funcs(psp);
 		break;
 	default:
 		return -EINVAL;
