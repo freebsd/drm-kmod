@@ -1950,9 +1950,6 @@ int amdgpu_ras_late_init(struct amdgpu_device *adev,
 
 	/* in resume phase, no need to create ras fs node */
 	if (adev->in_suspend || adev->in_gpu_reset) {
-#ifdef CONFIG_DEBUG_FS
-		amdgpu_ras_set_error_query_ready(adev, true);
-#endif
 		return 0;
 	}
 
@@ -1965,10 +1962,6 @@ int amdgpu_ras_late_init(struct amdgpu_device *adev,
 	r = amdgpu_ras_sysfs_create(adev, fs_info);
 	if (r)
 		goto sysfs;
-
-#ifdef CONFIG_DEBUG_FS
-	amdgpu_ras_set_error_query_ready(adev, true);
-#endif
 
 	return 0;
 cleanup:
