@@ -5050,11 +5050,14 @@ static void virtual_submission_tasklet(unsigned long data)
 #ifdef __linux__
 	local_irq_disable();
 #endif
-	for (n = 0; READ_ONCE(ve->request) && n < ve->num_siblings; n++) {
-		struct intel_engine_cs *sibling = ve->siblings[n];
+	for (n = 0; n < ve->num_siblings; n++) {
+		struct intel_engine_cs *sibling = READ_ONCE(ve->siblings[n]);
 		struct ve_node * const node = &ve->nodes[sibling->id];
 		struct rb_node **parent, *rb;
 		bool first;
+
+		if (!READ_ONCE(ve->request))
+			break; /* already handled by a sibling's tasklet */
 
 		if (unlikely(!(mask & sibling->mask))) {
 			if (!RB_EMPTY_NODE(&node->rb)) {
