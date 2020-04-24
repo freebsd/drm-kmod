@@ -437,7 +437,6 @@ SRCS+=	display_mode_lib.c \
 	display_rq_dlg_helpers.c \
 	display_rq_dlg_calc_20.c \
 	display_rq_dlg_calc_21.c \
-	dml_common_defs.c \
 	dml1_display_rq_dlg_calc.c
 .endif
 
@@ -633,7 +632,6 @@ CFLAGS.display_rq_dlg_helpers.c= -msse -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_20.c= -msse -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_21.c= -msse -mstack-alignment=4 -Wno-missing-prototypes
 CFLAGS.soc_bounding_box.c= -msse -mstack-alignment=4
-CFLAGS.dml_common_defs.c= -msse -mstack-alignment=4
 
 CFLAGS.display_rq_dlg_calc_20v2.c= -msse -mstack-alignment=4
 CFLAGS.display_mode_vba_20v2.c= -msse -mstack-alignment=4
