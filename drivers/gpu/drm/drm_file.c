@@ -617,7 +617,12 @@ put_back_event:
 				file_priv->event_space -= length;
 				list_add(&e->link, &file_priv->event_list);
 				spin_unlock_irq(&dev->event_lock);
+#ifdef __linux__
+				wake_up_interruptible_poll(&file_priv->event_wait,
+					EPOLLIN | EPOLLRDNORM);
+#elif defined(__FreeBSD__)
 				wake_up_interruptible(&file_priv->event_wait);
+#endif
 				break;
 			}
 
@@ -817,7 +822,12 @@ void drm_send_event_locked(struct drm_device *dev, struct drm_pending_event *e)
 	list_del(&e->pending_link);
 	list_add_tail(&e->link,
 		      &e->file_priv->event_list);
+#ifdef __linux__
+	wake_up_interruptible_poll(&e->file_priv->event_wait,
+		EPOLLIN | EPOLLRDNORM);
+#elif defined(__FreeBSD__)
 	wake_up_interruptible(&e->file_priv->event_wait);
+#endif
 }
 EXPORT_SYMBOL(drm_send_event_locked);
 
