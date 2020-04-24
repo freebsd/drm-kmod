@@ -131,6 +131,7 @@ SRCS+=	gen6_ppgtt.c \
 	intel_ggtt.c \
 	intel_ggtt_fencing.c \
 	intel_gt.c \
+	intel_gt_clock_utils.c \
 	intel_gt_irq.c \
 	intel_gt_pm.c \
 	intel_gt_pm_irq.c \
