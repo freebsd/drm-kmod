@@ -134,6 +134,7 @@
 #define	CONFIG_DRM_AMD_DC 1
 #ifdef __amd64__
 #define	CONFIG_DRM_AMD_DC_DCN1_0 1
+#define	CONFIG_DRM_AMD_DC_DCN1_01 1
 #endif
 
 // Frame buffer compression on AMD DC
