@@ -1548,8 +1548,9 @@ dump_port(char *buf, int buflen, const char *prefix, struct i915_request *rq)
 	if (!rq)
 		return "";
 
-	snprintf(buf, buflen, "%s%llx:%lld%s prio %d",
+	snprintf(buf, buflen, "%sccid:%x %llx:%lld%s prio %d",
 		 prefix,
+		 rq->context->lrc.ccid,
 		 rq->fence.context, rq->fence.seqno,
 		 i915_request_completed(rq) ? "!" :
 		 i915_request_started(rq) ? "*" :
@@ -2960,7 +2961,7 @@ active_context(struct intel_engine_cs *engine, u32 ccid)
 	 */
 
 	for (port = el->active; (rq = *port); port++) {
-		if (upper_32_bits(rq->context->lrc_desc) == ccid) {
+		if (rq->context->lrc.ccid == ccid) {
 			ENGINE_TRACE(engine,
 				     "ccid found at active:%zd\n",
 				     port - el->active);
@@ -2969,7 +2970,7 @@ active_context(struct intel_engine_cs *engine, u32 ccid)
 	}
 
 	for (port = el->pending; (rq = *port); port++) {
-		if (upper_32_bits(rq->context->lrc_desc) == ccid) {
+		if (rq->context->lrc.ccid == ccid) {
 			ENGINE_TRACE(engine,
 				     "ccid found at pending:%zd\n",
 				     port - el->pending);
