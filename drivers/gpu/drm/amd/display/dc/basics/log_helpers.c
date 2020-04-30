@@ -30,10 +30,15 @@
 
 void dc_conn_log_hex_linux(const uint8_t *hex_data, int hex_data_count)
 {
+#ifdef __linux__
 	int i;
 
 	if (hex_data)
 		for (i = 0; i < hex_data_count; i++)
 			DC_LOG_DEBUG("%2.2X ", hex_data[i]);
+#else
+	if (hex_data)
+		DC_LOG_DEBUG("%*D\n", hex_data_count, hex_data, " ");
+#endif
 }
 
