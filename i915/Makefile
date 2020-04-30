@@ -126,11 +126,11 @@ SRCS+=	gen6_ppgtt.c \
 	intel_engine_cs.c \
 	intel_engine_heartbeat.c \
 	intel_engine_pm.c \
-	intel_engine_pool.c \
 	intel_engine_user.c \
 	intel_ggtt.c \
 	intel_ggtt_fencing.c \
 	intel_gt.c \
+	intel_gt_buffer_pool.c \
 	intel_gt_clock_utils.c \
 	intel_gt_irq.c \
 	intel_gt_pm.c \
