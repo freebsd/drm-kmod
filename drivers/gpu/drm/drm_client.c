@@ -342,9 +342,10 @@ static int drm_client_buffer_addfb(struct drm_client_buffer *buffer,
 
 #ifdef __linux__
 	strscpy(buffer->fb->comm, client->name, TASK_COMM_LEN);
-#else
+#elif defined(__FreeBSD__)
 	strncpy(buffer->fb->comm, client->name, TASK_COMM_LEN);
 #endif
+
 	return 0;
 }
 
@@ -422,6 +423,8 @@ int drm_client_debugfs_init(struct drm_minor *minor)
 					ARRAY_SIZE(drm_client_debugfs_list),
 					minor->debugfs_root, minor);
 }
+
+#ifdef __FreeBSD__
 /* BSDFIXME: REMOVE ME! */
 int drm_client_new(struct drm_device *dev, struct drm_client_dev *client,
 		   const char *name, const struct drm_client_funcs *funcs)
@@ -430,6 +433,5 @@ int drm_client_new(struct drm_device *dev, struct drm_client_dev *client,
 	// dummy
 	return 0;
 }
-
-
+#endif
 #endif

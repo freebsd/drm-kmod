@@ -38,7 +38,7 @@
 #include <linux/mm.h>
 #include <linux/pagevec.h>
 
-#ifndef __linux__ // For linux_resource
+#ifdef __FreeBSD__ // For linux_resource
 #include <linux/pci.h>
 #endif
 #include "i915_request.h"
@@ -392,7 +392,7 @@ struct i915_ggtt {
 	struct io_mapping iomap;	/* Mapping to our CPU mappable region */
 #ifdef __linux__
 	struct resource gmadr;          /* GMADR resource */
-#else
+#elif defined(__FreeBSD__)
 	struct linux_resource gmadr;          /* GMADR resource */
 #endif
 	resource_size_t mappable_end;	/* End offset that we can CPU map */

@@ -32,7 +32,7 @@
 #ifndef _VMWGFX_MSG_H
 #define _VMWGFX_MSG_H
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #define	asm __asm
 #endif
 

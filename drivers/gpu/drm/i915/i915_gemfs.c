@@ -70,7 +70,7 @@ int i915_gemfs_init(struct drm_i915_private *i915)
 	i915->mm.gemfs = gemfs;
 
 	return 0;
-#else
+#elif defined(__FreeBSD__)
 	return -ENODEV;
 #endif
 }

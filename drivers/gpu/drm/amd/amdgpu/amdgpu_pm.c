@@ -330,7 +330,7 @@ static ssize_t amdgpu_get_pp_num_states(struct device *dev,
 	struct pp_states_info data;
 	int i, buf_len;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	/* sysctl -a can panic if this data is uninitialized */
 	memset(&data, 0, sizeof(struct pp_states_info));
 #endif
@@ -412,6 +412,7 @@ static ssize_t amdgpu_set_pp_force_state(struct device *dev,
 			goto fail;
 		}
 		idx = array_index_nospec(idx, ARRAY_SIZE(data.states));
+
 		amdgpu_dpm_get_pp_num_states(adev, &data);
 		state = data.states[idx];
 		/* only set user selected power states */

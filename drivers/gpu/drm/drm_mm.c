@@ -221,7 +221,8 @@ static void drm_mm_interval_tree_add_node(struct drm_mm_node *hole_node,
 	rb_insert_augmented_cached(&node->rb, &mm->interval_tree, leftmost,
 				   &drm_mm_interval_tree_augment);
 }
-#ifndef __linux__
+
+#ifdef __FreeBSD__
 #undef RB_INSERT
 #endif
 #define RB_INSERT(root, member, expr) do { \

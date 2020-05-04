@@ -26,7 +26,7 @@
 #ifndef BW_FIXED_H_
 #define BW_FIXED_H_
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #undef BUILD_BUG_ON
 #define	BUILD_BUG_ON(x)
 #include <linux/math64.h>

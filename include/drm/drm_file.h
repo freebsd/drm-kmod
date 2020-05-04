@@ -32,8 +32,10 @@
 
 #include <linux/types.h>
 #include <linux/completion.h>
+#ifdef __FreeBSD__
 #include <linux/idr.h>
 #include <linux/file.h>
+#endif
 
 #include <uapi/drm/drm.h>
 
@@ -73,7 +75,8 @@ struct drm_minor {
 	int type;                       /* Control or render */
 	struct device *kdev;		/* Linux device */
 	struct drm_device *dev;
-#ifndef __linux__
+
+#ifdef __FreeBSD__
 	device_t bsd_kdev; 		/* OS device */
 	struct cdev *bsd_device; 	/* Device number for mknod */
 	struct sigio *buf_sigio; 	/* Processes waiting for SIGIO */
@@ -231,7 +234,7 @@ struct drm_file {
 	/** @pid: Process that opened this file. */
 #ifdef __linux__
 	struct pid *pid;
-#else
+#elif defined(__FreeBSD__)
 	pid_t pid;
 	unsigned long ioctl_count;
 #endif

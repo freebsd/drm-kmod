@@ -88,7 +88,7 @@ static void ttm_mem_type_debug(struct ttm_bo_device *bdev, struct drm_printer *p
 #ifdef __linux__
 	drm_printf(p, "    gpu_offset: 0x%08llX\n", man->gpu_offset);
 	drm_printf(p, "    size: %llu\n", man->size);
-#else
+#elif defined(__FreeBSD__)
 	drm_printf(p, "    gpu_offset: 0x%08zX\n", man->gpu_offset);
 	drm_printf(p, "    size: %zu\n", man->size);
 #endif
@@ -1638,7 +1638,7 @@ int ttm_bo_device_init(struct ttm_bo_device *bdev,
 		       struct ttm_bo_driver *driver,
 #ifdef __linux__
 		       struct address_space *mapping,
-#else
+#elif defined(__FreeBSD__)
 		       void *dummy,
 #endif
 		       uint64_t file_page_offset,
@@ -1710,7 +1710,7 @@ void ttm_bo_unmap_virtual_locked(struct ttm_buffer_object *bo)
 	struct ttm_bo_device *bdev = bo->bdev;
 
 	drm_vma_node_unmap(&bo->vma_node, bdev->dev_mapping);
-#else
+#elif defined(__FreeBSD__)
 	struct drm_vma_offset_node *node;
 
 	node = &bo->vma_node;

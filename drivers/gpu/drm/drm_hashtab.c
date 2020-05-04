@@ -37,7 +37,7 @@
 #include <linux/hash.h>
 #include <linux/slab.h>
 #include <linux/export.h>
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/rculist.h>
 #endif
 

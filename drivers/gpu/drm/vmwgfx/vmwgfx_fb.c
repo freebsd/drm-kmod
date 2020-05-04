@@ -34,7 +34,7 @@
 
 #include <drm/ttm/ttm_placement.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <dev/vt/vt.h>
 #include "vmwgfx_fb_freebsd.h"
 #define	fb_info linux_fb_info
@@ -379,6 +379,7 @@ static struct fb_deferred_io vmw_defio = {
 	.deferred_io	= vmw_deferred_io,
 };
 #endif
+
 /*
  * Draw code
  */
@@ -766,7 +767,7 @@ int vmw_fb_init(struct vmw_private *vmw_priv)
 	info->apertures->ranges[0].base = vmw_priv->vram_start;
 	info->apertures->ranges[0].size = vmw_priv->vram_size;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	/* Save values for BSD */
 	info->fbio.fb_width = fb_width;
 	info->fbio.fb_height = fb_height;
@@ -793,6 +794,7 @@ int vmw_fb_init(struct vmw_private *vmw_priv)
 	info->fbdefio = &vmw_defio;
 	fb_deferred_io_init(info);
 #endif
+
 	ret = register_framebuffer(info);
 	if (unlikely(ret != 0))
 		goto err_defio;

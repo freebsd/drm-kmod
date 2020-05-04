@@ -33,9 +33,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 #include <linux/highmem.h>
 #include <linux/export.h>
 #include <drm/drmP.h>
@@ -95,7 +92,7 @@ static void *agp_remap(unsigned long offset, unsigned long size,
 	vfree(page_map);
 
 	return addr;
-#else
+#elif defined(__FreeBSD__)
 	/*
 	 * FIXME Linux<->FreeBSD: Not implemented. This is never called
 	 * on FreeBSD anyway, because drm_agp_mem->cant_use_aperture is
@@ -105,12 +102,13 @@ static void *agp_remap(unsigned long offset, unsigned long size,
 #endif
 }
 
+#ifdef __FreeBSD__
 #define	vunmap(handle)
-
+#endif
 /** Wrapper around agp_free_memory() */
 #ifdef __linux__
 void drm_free_agp(struct agp_memory *handle, int pages)
-#else
+#elif defined(__FreeBSD__)
 void drm_free_agp(DRM_AGP_MEM * handle, int pages)
 #endif
 {
@@ -122,7 +120,7 @@ void drm_free_agp(DRM_AGP_MEM * handle, int pages)
 
 #ifdef __linux__
 	agp_free_memory(handle);
-#else
+#elif defined(__FreeBSD__)
 	agp_free_memory(agpdev, handle);
 #endif
 }
@@ -130,7 +128,7 @@ void drm_free_agp(DRM_AGP_MEM * handle, int pages)
 /** Wrapper around agp_bind_memory() */
 #ifdef __linux__
 int drm_bind_agp(struct agp_memory *handle, unsigned int start)
-#else
+#elif defined(__FreeBSD__)
 int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
 #endif
 {
@@ -142,7 +140,7 @@ int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
 
 #ifdef __linux__
 	return agp_bind_memory(handle, start);
-#else
+#elif defined(__FreeBSD__)
 	return -agp_bind_memory(agpdev, handle, start * PAGE_SIZE);
 #endif
 }
@@ -150,7 +148,7 @@ int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
 /** Wrapper around agp_unbind_memory() */
 #ifdef __linux__
 int drm_unbind_agp(struct agp_memory *handle)
-#else
+#elif defined(__FreeBSD__)
 int drm_unbind_agp(DRM_AGP_MEM * handle)
 #endif
 {
@@ -162,7 +160,7 @@ int drm_unbind_agp(DRM_AGP_MEM * handle)
 
 #ifdef __linux__
 	return agp_unbind_memory(handle);
-#else
+#elif defined(__FreeBSD__)
 	return -agp_unbind_memory(agpdev, handle);
 #endif
 }
@@ -210,13 +208,14 @@ u64 drm_get_max_iomem(void)
 {
 #ifdef __linux__
 	struct resource *tmp;
-
 	resource_size_t max_iomem = 0;
+
 	for (tmp = iomem_resource.child; tmp; tmp = tmp->sibling) {
 		max_iomem = max(max_iomem,  tmp->end);
 	}
+
 	return max_iomem;
-#else
+#elif defined(__FreeBSD__)
 	// Only used in combination with CONFIG_SWIOTLB in v4.17
 	// BSDFIXME: Let's say we can dma all physical memory...
 	return 0xFFFFFFFFFFFFFFFF;

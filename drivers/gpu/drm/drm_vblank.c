@@ -80,9 +80,9 @@ static bool
 drm_get_last_vbltimestamp(struct drm_device *dev, unsigned int pipe,
 			  ktime_t *tvblank, bool in_vblank_irq);
 
-unsigned int drm_timestamp_precision = 20;  /* Default to 20 usecs. */
+static unsigned int drm_timestamp_precision = 20;  /* Default to 20 usecs. */
 
-int drm_vblank_offdelay = 5000;    /* Default to 5000 msecs. */
+static int drm_vblank_offdelay = 5000;    /* Default to 5000 msecs. */
 
 module_param_named(vblankoffdelay, drm_vblank_offdelay, int, 0600);
 module_param_named(timestamp_precision_usec, drm_timestamp_precision, int, 0600);
@@ -407,7 +407,7 @@ void drm_vblank_cleanup(struct drm_device *dev)
 		del_timer_sync(&vblank->disable_timer);
 	}
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	spin_lock_destroy(&dev->vbl_lock);
 	spin_lock_destroy(&dev->vblank_time_lock);
 #endif

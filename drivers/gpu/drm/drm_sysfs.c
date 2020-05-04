@@ -76,6 +76,7 @@ int drm_sysfs_init(void)
 		drm_class = NULL;
 		return err;
 	}
+
 	drm_class->devnode = drm_devnode;
 	return 0;
 }
@@ -89,7 +90,7 @@ void drm_sysfs_destroy(void)
 {
 	if (IS_ERR_OR_NULL(drm_class))
 		return;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	cancel_reset_debug_log();
 #endif
 	class_remove_file(drm_class, &class_attr_version.attr);
@@ -340,7 +341,7 @@ void drm_sysfs_hotplug_event(struct drm_device *dev)
 	DRM_DEBUG("generating hotplug event\n");
 
 	kobject_uevent_env(&dev->primary->kdev->kobj, KOBJ_CHANGE, envp);
-#else
+#elif defined(__FreeBSD__)
 	struct sbuf *sb = sbuf_new_auto();
 
 	DRM_DEBUG("generating hotplug event\n");
@@ -372,6 +373,7 @@ struct device *drm_sysfs_minor_alloc(struct drm_minor *minor)
 	kdev = kzalloc(sizeof(*kdev), GFP_KERNEL);
 	if (!kdev)
 		return ERR_PTR(-ENOMEM);
+
 #ifdef __linux__
 	device_initialize(kdev);
 #endif
@@ -380,7 +382,7 @@ struct device *drm_sysfs_minor_alloc(struct drm_minor *minor)
 	kdev->type = &drm_sysfs_device_minor;
 	kdev->parent = minor->dev->dev;
 	kdev->release = drm_sysfs_release;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	/* FreeBSD needs the class and parent to be set first */
 	device_initialize(kdev);
 #endif
@@ -389,7 +391,8 @@ struct device *drm_sysfs_minor_alloc(struct drm_minor *minor)
 	r = dev_set_name(kdev, minor_str, minor->index);
 	if (r < 0)
 		goto err_free;
-#ifndef __linux__
+
+#ifdef __FreeBSD__
 	r = drm_dev_alias(kdev, minor, minor_str);
 	if (r < 0)
 		goto err_free;

@@ -22,7 +22,7 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/types.h>
 #endif
 #include <drm/drm_print.h>

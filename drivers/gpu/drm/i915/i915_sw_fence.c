@@ -219,7 +219,7 @@ void __i915_sw_fence_init(struct i915_sw_fence *fence,
 
 #ifdef __linux__
 	__init_waitqueue_head(&fence->wait, name, key);
-#else
+#elif defined(__FreeBSD__)
 	init_waitqueue_head(&fence->wait);
 #endif
 	atomic_set(&fence->pending, 1);
@@ -415,9 +415,10 @@ static void dma_i915_sw_fence_wake_timer(struct dma_fence *dma,
 	fence = xchg(&cb->base.fence, NULL);
 	if (fence)
 		i915_sw_fence_complete(fence);
+
 #ifdef __linux__
 	irq_work_queue(&cb->work);
-#else
+#elif defined(__FreeBSD__)
 	del_timer_sync(&cb->timer);
 	dma_fence_put(cb->dma);
 	kfree_rcu(cb, rcu);

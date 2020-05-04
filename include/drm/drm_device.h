@@ -226,7 +226,7 @@ struct drm_device {
 	/*@} */
 	int switch_power_state;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	struct drm_sysctl_info *sysctl;
 	int  sysctl_node_idx;
 	void *drm_ttm_bdev;
@@ -235,8 +235,6 @@ struct drm_device {
 	int modesetting;
 #define	MAX_ORDER 11
 #endif
-
-
 	/**
 	 * @fb_helper:
 	 *

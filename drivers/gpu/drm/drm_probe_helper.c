@@ -64,7 +64,7 @@
 
 static bool drm_kms_helper_poll = true;
 module_param_named(poll, drm_kms_helper_poll, bool, 0600);
-#ifndef __linux__
+#ifdef __FreeBSD__
 // BSD need this!
 MODULE_PARM_DESC(poll, "help drm kms poll");
 #endif

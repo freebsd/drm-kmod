@@ -28,7 +28,7 @@
 #include <linux/list.h>
 #include <linux/dma-fence.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <asm/atomic64.h>
 #endif
 

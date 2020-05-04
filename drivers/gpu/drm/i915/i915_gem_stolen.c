@@ -30,7 +30,7 @@
 #include <drm/i915_drm.h>
 #include "i915_drv.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #define	resource linux_resource
 #endif
 
@@ -134,7 +134,7 @@ static int i915_adjust_stolen(struct drm_i915_private *dev_priv,
 		}
 	}
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	(void)r;
 #else
 	/*
@@ -396,7 +396,7 @@ int i915_gem_init_stolen(struct drm_i915_private *dev_priv)
 		return 0;
 	}
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	DRM_INFO("Got stolen memory base 0x%x, size 0x%x\n",
 	    intel_graphics_stolen_res.start,
 	    resource_size(&intel_graphics_stolen_res));
@@ -404,8 +404,8 @@ int i915_gem_init_stolen(struct drm_i915_private *dev_priv)
 
 	if (resource_size(&intel_graphics_stolen_res) == 0)
 		return 0;
-	dev_priv->dsm = intel_graphics_stolen_res;
 
+	dev_priv->dsm = intel_graphics_stolen_res;
 
 	if (i915_adjust_stolen(dev_priv, &dev_priv->dsm))
 		return 0;

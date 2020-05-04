@@ -97,7 +97,7 @@ void drm_modeset_lock_all(struct drm_device *dev)
 	struct drm_modeset_acquire_ctx *ctx;
 	int ret;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return;
 #endif
@@ -155,7 +155,7 @@ void drm_modeset_unlock_all(struct drm_device *dev)
 	struct drm_mode_config *config = &dev->mode_config;
 	struct drm_modeset_acquire_ctx *ctx = config->acquire_ctx;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return;
 #endif
@@ -184,7 +184,7 @@ void drm_warn_on_modeset_not_all_locked(struct drm_device *dev)
 	struct drm_crtc *crtc;
 
 	/* Locking is currently fubar in the panic handler. */
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return;
 #endif
@@ -209,7 +209,7 @@ EXPORT_SYMBOL(drm_warn_on_modeset_not_all_locked);
 void drm_modeset_acquire_init(struct drm_modeset_acquire_ctx *ctx,
 		uint32_t flags)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return;
 #endif
@@ -229,7 +229,7 @@ EXPORT_SYMBOL(drm_modeset_acquire_init);
  */
 void drm_modeset_acquire_fini(struct drm_modeset_acquire_ctx *ctx)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return;
 #endif
@@ -246,7 +246,7 @@ EXPORT_SYMBOL(drm_modeset_acquire_fini);
  */
 void drm_modeset_drop_locks(struct drm_modeset_acquire_ctx *ctx)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return;
 #endif
@@ -269,7 +269,7 @@ static inline int modeset_lock(struct drm_modeset_lock *lock,
 {
 	int ret;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return 0;
 #endif
@@ -326,7 +326,7 @@ int drm_modeset_backoff(struct drm_modeset_acquire_ctx *ctx)
 {
 	struct drm_modeset_lock *contended = ctx->contended;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return 0;
 #endif
@@ -374,7 +374,7 @@ EXPORT_SYMBOL(drm_modeset_lock_init);
 int drm_modeset_lock(struct drm_modeset_lock *lock,
 		struct drm_modeset_acquire_ctx *ctx)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return 0;
 #endif
@@ -398,7 +398,7 @@ EXPORT_SYMBOL(drm_modeset_lock);
  */
 int drm_modeset_lock_single_interruptible(struct drm_modeset_lock *lock)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return 0;
 #endif
@@ -412,7 +412,7 @@ EXPORT_SYMBOL(drm_modeset_lock_single_interruptible);
  */
 void drm_modeset_unlock(struct drm_modeset_lock *lock)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return;
 #endif
@@ -449,7 +449,7 @@ int drm_modeset_lock_all_ctx(struct drm_device *dev,
 	struct drm_plane *plane;
 	int ret;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (oops_in_progress)
 		return 0;
 #endif

@@ -27,7 +27,7 @@
 #include <linux/atomic.h>
 #include <linux/preempt.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <asm/processor.h>
 #endif
 

@@ -22,7 +22,7 @@
  *
  */
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include "i915_drv.h" /* Missing various macros */
 #endif
 

@@ -14,12 +14,16 @@ struct drm_device;
 struct drm_file;
 
 struct drm_agp_head {
+#ifdef __linux__
+	struct agp_kern_info agp_info;
+#elif defined(__FreeBSD__)
 	DRM_AGP_KERN agp_info;
+#endif
 	struct list_head memory;
 	unsigned long mode;
 #ifdef __linux__
 	struct agp_bridge_data *bridge;
-#else
+#elif defined(__FreeBSD__)
 	device_t bridge;
 #endif
 	int enabled;
@@ -31,6 +35,17 @@ struct drm_agp_head {
 };
 
 #if IS_ENABLED(CONFIG_AGP)
+
+#ifdef __linux__
+void drm_free_agp(struct agp_memory * handle, int pages);
+int drm_bind_agp(struct agp_memory * handle, unsigned int start);
+int drm_unbind_agp(struct agp_memory * handle);
+struct agp_memory *drm_agp_bind_pages(struct drm_device *dev,
+				struct page **pages,
+				unsigned long num_pages,
+				uint32_t gtt_offset,
+				uint32_t type);
+#elif defined(__FreeBSD__)
 void drm_free_agp(DRM_AGP_MEM * handle, int pages);
 int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start);
 int drm_unbind_agp(DRM_AGP_MEM * handle);
@@ -39,6 +54,7 @@ DRM_AGP_MEM *drm_agp_bind_pages(struct drm_device *dev,
 				unsigned long num_pages,
 				uint32_t gtt_offset,
 				uint32_t type);
+#endif
 
 struct drm_agp_head *drm_agp_init(struct drm_device *dev);
 void drm_legacy_agp_clear(struct drm_device *dev);
@@ -69,6 +85,31 @@ int drm_agp_bind_ioctl(struct drm_device *dev, void *data,
 
 #else /* CONFIG_AGP */
 
+#ifdef __linux__
+static inline void drm_free_agp(struct agp_memory * handle, int pages)
+{
+}
+
+static inline int drm_bind_agp(struct agp_memory * handle, unsigned int start)
+{
+	return -ENODEV;
+}
+
+static inline int drm_unbind_agp(struct agp_memory * handle)
+{
+	return -ENODEV;
+}
+
+static inline struct agp_memory *drm_agp_bind_pages(struct drm_device *dev,
+					      struct page **pages,
+					      unsigned long num_pages,
+					      uint32_t gtt_offset,
+					      uint32_t type)
+{
+	return NULL;
+}
+
+#elif defined(__FreeBSD__)
 static inline void drm_free_agp(DRM_AGP_MEM * handle, int pages)
 {
 }
@@ -91,6 +132,7 @@ static inline DRM_AGP_MEM *drm_agp_bind_pages(struct drm_device *dev,
 {
 	return NULL;
 }
+#endif
 
 static inline struct drm_agp_head *drm_agp_init(struct drm_device *dev)
 {

@@ -34,7 +34,7 @@
 
 #include <linux/pci.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/platform_device.h>
 #endif
 

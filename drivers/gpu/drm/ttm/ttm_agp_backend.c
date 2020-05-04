@@ -47,7 +47,7 @@ struct ttm_agp_backend {
 #ifdef __linux__
 	struct agp_memory *mem;
 	struct agp_bridge_data *bridge;
-#else
+#elif defined(__FreeBSD__)
 	vm_offset_t offset;
 	device_t bridge;
 	struct page **pages;
@@ -83,7 +83,7 @@ static int ttm_agp_bind(struct ttm_tt *ttm, struct ttm_mem_reg *bo_mem)
 	mem->type = (cached) ? AGP_USER_CACHED_MEMORY : AGP_USER_MEMORY;
 
 	ret = agp_bind_memory(mem, node->start);
-#else
+#elif defined(__FreeBSD__)
 	int ret;
 	for (i = 0; i < ttm->num_pages; i++) {
 		struct page *page = ttm->pages[i];
@@ -116,7 +116,7 @@ static int ttm_agp_unbind(struct ttm_tt *ttm)
 		agp_be->mem = NULL;
 	}
 	return 0;
-#else
+#elif defined(__FreeBSD__)
 	return -agp_unbind_pages(agp_be->bridge, ttm->num_pages << PAGE_SHIFT,
 	    agp_be->offset);
 #endif
@@ -129,7 +129,7 @@ static void ttm_agp_destroy(struct ttm_tt *ttm)
 #ifdef __linux__
 	if (agp_be->mem)
 		ttm_agp_unbind(ttm);
-#else
+#elif defined(__FreeBSD__)
 	kfree(agp_be->pages);
 #endif
 	ttm_tt_fini(ttm);
@@ -145,7 +145,7 @@ static struct ttm_backend_func ttm_agp_func = {
 struct ttm_tt *ttm_agp_tt_create(struct ttm_buffer_object *bo,
 #ifdef __linux__
 				 struct agp_bridge_data *bridge,
-#else
+#elif defined(__FreeBSD__)
 				 device_t bridge,
 #endif
 				 uint32_t page_flags)
@@ -167,7 +167,7 @@ struct ttm_tt *ttm_agp_tt_create(struct ttm_buffer_object *bo,
 		return NULL;
 	}
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	agp_be->offset = 0;
 	agp_be->pages = kmalloc(agp_be->ttm.num_pages * sizeof(*agp_be->pages),
 			       GFP_KERNEL);

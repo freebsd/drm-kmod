@@ -55,11 +55,12 @@
 #include <linux/pci.h>
 #include <linux/firmware.h>
 #include "amdgpu_vf_error.h"
+
 #include "amdgpu_amdkfd.h"
 #include "amdgpu_pm.h"
 #include "amdgpu_xgmi.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #define pci_save_state linux_pci_save_state
 #define pci_restore_state linux_pci_restore_state
 /* #define	resource linux_resource */
@@ -528,9 +529,10 @@ static int amdgpu_device_doorbell_init(struct amdgpu_device *adev)
 		adev->doorbell.ptr = NULL;
 		return 0;
 	}
+
 #ifdef __linux__
 	if (pci_resource_flags(adev->pdev, 2) & IORESOURCE_UNSET)
-#else
+#elif defined(__FreeBSD__)
 	if (pci_resource_flags(adev->pdev, 2) == 0)
 #endif
 		return -EINVAL;
@@ -685,13 +687,12 @@ void amdgpu_device_wb_free(struct amdgpu_device *adev, u32 wb)
  */
 int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	// BSDFIXME
 	UNIMPLEMENTED();
 	return 0;
 #else
 	u64 space_needed = roundup_pow_of_two(adev->gmc.real_vram_size);
-
 	u32 rbar_size = order_base_2(((space_needed >> 20) | 1)) - 1;
 	struct pci_bus *root;
 	struct resource *res;
@@ -2406,7 +2407,8 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	int r, i;
 	bool runtime = false;
 	u32 max_MBps;
-#ifndef __linux__
+
+#ifdef __FreeBSD__
 	(void)i;
 #endif
 	adev->shutdown = false;

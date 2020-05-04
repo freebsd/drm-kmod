@@ -43,12 +43,10 @@
 #include "ttm_lock.h"
 #include <linux/sync_file.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 /* BSD: Make sure we get out[bwl] redefines */
 #include <linux/compiler.h>
-#endif
 
-#ifndef __linux__
 static inline void
 spin_lock_init_spin(spinlock_t *lock)
 {
@@ -71,7 +69,6 @@ spin_lock_init_spin(spinlock_t *lock)
 	mtx_unlock_spin(&(_l)->m);		\
 } while (0)
 #endif
-
 #define VMWGFX_DRIVER_NAME "vmwgfx"
 #define VMWGFX_DRIVER_DATE "20180704"
 #define VMWGFX_DRIVER_MAJOR 2
@@ -500,7 +497,7 @@ struct vmw_private {
 
 #ifdef __linux__
 	void *fb_info;
-#else
+#elif defined(__FreeBSD__)
 	/* fb_info collides with our macro definition of linux_fb_info */
 	void *fbinfo;
 #endif
@@ -664,14 +661,14 @@ static inline void vmw_write(struct vmw_private *dev_priv,
 {
 #ifdef __linux__
 	spin_lock(&dev_priv->hw_lock);
-#else
+#elif defined(__FreeBSD__)
 	spin_lock_spin(&dev_priv->hw_lock);
 #endif
 	outl(offset, dev_priv->io_start + VMWGFX_INDEX_PORT);
 	outl(value, dev_priv->io_start + VMWGFX_VALUE_PORT);
 #ifdef __linux__
 	spin_unlock(&dev_priv->hw_lock);
-#else
+#elif defined(__FreeBSD__)
 	spin_unlock_spin(&dev_priv->hw_lock);
 #endif
 }
@@ -683,14 +680,14 @@ static inline uint32_t vmw_read(struct vmw_private *dev_priv,
 
 #ifdef __linux__
 	spin_lock(&dev_priv->hw_lock);
-#else
+#elif defined(__FreeBSD__)
 	spin_lock_spin(&dev_priv->hw_lock);
 #endif
 	outl(offset, dev_priv->io_start + VMWGFX_INDEX_PORT);
 	val = inl(dev_priv->io_start + VMWGFX_VALUE_PORT);
 #ifdef __linux__
 	spin_unlock(&dev_priv->hw_lock);
-#else
+#elif defined(__FreeBSD__)
 	spin_unlock_spin(&dev_priv->hw_lock);
 #endif
 

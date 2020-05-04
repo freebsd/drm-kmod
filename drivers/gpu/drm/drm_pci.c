@@ -32,7 +32,7 @@
 #include "drm_legacy.h"
 
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #define aper_base ai_aperture_base
 #define aper_size ai_aperture_size
 
@@ -63,7 +63,7 @@ drm_pci_busdma_callback(void *arg, bus_dma_segment_t *segs, int nsegs, int error
  */
 drm_dma_handle_t *drm_pci_alloc(struct drm_device * dev, size_t size, size_t align)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	drm_dma_handle_t *dmah;
 	int ret;
 
@@ -144,6 +144,7 @@ drm_dma_handle_t *drm_pci_alloc(struct drm_device * dev, size_t size, size_t ali
 	return dmah;
 #endif
 }
+
 EXPORT_SYMBOL(drm_pci_alloc);
 
 /*
@@ -156,7 +157,7 @@ void __drm_legacy_pci_free(struct drm_device * dev, drm_dma_handle_t * dmah)
 	unsigned long addr;
 	size_t sz;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (dmah == NULL)
 		return;
 
@@ -206,7 +207,7 @@ static int drm_get_pci_domain(struct drm_device *dev)
 		return 0;
 #endif /* __alpha__ */
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	return pci_get_domain(dev->dev->bsddev);
 #else
 	return pci_domain_nr(dev->pdev->bus);
@@ -215,7 +216,7 @@ static int drm_get_pci_domain(struct drm_device *dev)
 
 int drm_pci_set_busid(struct drm_device *dev, struct drm_master *master)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	master->unique = kasprintf(GFP_KERNEL, "pci:%04x:%02x:%02x.%d",
 					drm_get_pci_domain(dev),
 					pci_get_bus(dev->dev->bsddev),
@@ -365,7 +366,7 @@ err_free:
 EXPORT_SYMBOL(drm_get_pci_dev);
 
 /**
- * drm_legacy_pci_init - Register matching PCI devices with the DRM subsystem
+ * drm_legacy_pci_init - shadow-attach a legacy DRM PCI driver
  * @driver: DRM device driver
  * @pdriver: PCI device driver
  *
@@ -384,7 +385,7 @@ int drm_legacy_pci_init(struct drm_driver *driver, struct pci_driver *pdriver)
 	if (WARN_ON(!(driver->driver_features & DRIVER_LEGACY)))
 		return -EINVAL;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 
 	// XXX: clean up this
 	
@@ -398,7 +399,6 @@ int drm_legacy_pci_init(struct drm_driver *driver, struct pci_driver *pdriver)
 	return (-ENOTSUP);
 
 #else
-
 	/* If not using KMS, fall back to stealth mode manual scanning. */
 	INIT_LIST_HEAD(&driver->legacy_dev_list);
 	for (i = 0; pdriver->id_table[i].vendor != 0; i++) {
@@ -425,6 +425,7 @@ int drm_legacy_pci_init(struct drm_driver *driver, struct pci_driver *pdriver)
 	return 0;
 #endif
 }
+EXPORT_SYMBOL(drm_legacy_pci_init);
 
 #else
 
@@ -437,10 +438,8 @@ int drm_irq_by_busid(struct drm_device *dev, void *data,
 }
 #endif
 
-EXPORT_SYMBOL(drm_pci_init);
-
 /**
- * drm_legacy_pci_exit - Unregister matching PCI devices from the DRM subsystem
+ * drm_legacy_pci_exit - unregister shadow-attach legacy DRM driver
  * @driver: DRM device driver
  * @pdriver: PCI device driver
  *

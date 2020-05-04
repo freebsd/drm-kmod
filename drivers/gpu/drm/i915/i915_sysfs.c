@@ -32,7 +32,7 @@
 #include "intel_drv.h"
 #include "i915_drv.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 /* TODO: Move to base (when refactoring sysfs.h to sysfs.c) */
 const char power_group_name[] = "power";
 #endif

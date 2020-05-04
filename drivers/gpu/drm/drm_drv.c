@@ -26,8 +26,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __FreeBSD__
 #include <sys/sysent.h>
-
+#endif
 #include <linux/debugfs.h>
 #include <linux/fs.h>
 #include <linux/module.h>
@@ -51,10 +52,12 @@
  * drm_debug: Enable debug output.
  * Bitmask of DRM_UT_x. See include/drm/drmP.h for details.
  */
+#ifdef __FreeBSD__
 #if defined(DRM_DEBUG_LOG_ALL) || defined(INVARIANTS)
 unsigned int drm_debug = 0xffffffff;	/* bitmask of DRM_UT_x */
 #else
-unsigned int drm_debug = 0;	/* bitmask of DRM_UT_x */
+unsigned int drm_debug = 0;
+#endif
 #endif
 EXPORT_SYMBOL(drm_debug);
 
@@ -588,7 +591,7 @@ err_minors:
 #endif
 err_free:
 
-#ifndef __linux__ // In LKPI spinlock is a mutex so we need to destroy them
+#ifdef __FreeBSD__ // In LKPI spinlock is a mutex so we need to destroy them
 	spin_lock_destroy(&dev->buf_lock);
 	spin_lock_destroy(&dev->event_lock);
 #endif
@@ -630,7 +633,7 @@ void drm_dev_fini(struct drm_device *dev)
 	drm_minor_free(dev, DRM_MINOR_PRIMARY);
 	drm_minor_free(dev, DRM_MINOR_RENDER);
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	spin_lock_destroy(&dev->buf_lock);
 	spin_lock_destroy(&dev->event_lock);
 #endif
@@ -762,6 +765,7 @@ static int create_compat_control_link(struct drm_device *dev)
 				&minor->kdev->kobj,
 				name);
 #endif
+
 	kfree(name);
 
 	return ret;
@@ -985,7 +989,6 @@ static const struct file_operations drm_stub_fops = {
 
 static void drm_core_exit(void)
 {
-
 	unregister_chrdev(DRM_MAJOR, "drm");
 	debugfs_remove(drm_debugfs_root);
 	drm_sysfs_destroy();
@@ -1012,6 +1015,7 @@ static int __init drm_core_init(void)
 		DRM_ERROR("Cannot create debugfs-root: %d\n", ret);
 		goto error;
 	}
+
 #ifdef __linux__
 	ret = register_chrdev(DRM_MAJOR, "drm", &drm_stub_fops);
 #else
@@ -1031,5 +1035,10 @@ error:
 	return ret;
 }
 
+#ifdef __linux__
+module_init(drm_core_init);
+module_exit(drm_core_exit);
+#elif defined(__FreeBSD__)
 module_init_order(drm_core_init, SI_ORDER_FIRST);
 module_exit_order(drm_core_exit, SI_ORDER_FIRST);
+#endif

@@ -30,7 +30,7 @@
 #include <drm/drm_plane_helper.h>
 #include "i915_drv.h"
 #include "intel_drv.h"
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <machine/clock.h>
 #include <asm/atomic.h>
 #else
@@ -4942,7 +4942,7 @@ static void skl_compute_transition_wm(const struct intel_crtc_state *cstate,
 	const uint16_t trans_amount = 10; /* This is configurable amount */
 	uint16_t wm0_sel_res_b, trans_offset_b, res_blocks;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	trans_min = 0;
 #endif
 	/* Transition WM are not recommended by HW team for GEN9 */
@@ -7359,7 +7359,7 @@ static void gen6_update_ring_freq(struct drm_i915_private *dev_priv)
 		 * Default to measured freq if none found, PCU will ensure we
 		 * don't go over
 		 */
-#ifndef __linux__
+#ifdef __FreeBSD__
 		max_ia_freq = tsc_freq / 1000;
 #else
 		max_ia_freq = tsc_khz;
@@ -8027,11 +8027,12 @@ unsigned long i915_mch_val(struct drm_i915_private *dev_priv)
 	tsfs = I915_READ(TSFS);
 
 	m = ((tsfs & TSFS_SLOPE_MASK) >> TSFS_SLOPE_SHIFT);
-#ifndef __linux__
+#ifdef __FreeBSD__
 	x = I915_READ8(I915_TR1);
 #else
 	x = I915_READ8(TR1);
 #endif
+
 	b = tsfs & TSFS_INTR_MASK;
 
 	return ((m * x) / 127) - b;
@@ -8308,7 +8309,7 @@ ips_ping_for_i915_load(void)
 		symbol_put(ips_link_to_i915_driver);
 	}
 }
-#else
+#elif defined(__FreeBSD__)
 #define ips_ping_for_i915_load()
 #endif
 

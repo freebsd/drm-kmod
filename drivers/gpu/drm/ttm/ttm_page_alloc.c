@@ -71,7 +71,7 @@ struct ttm_page_pool {
 	bool			fill_lock;
 #ifdef __linux__
 	struct list_head	list;
-#else
+#elif defined(__FreeBSD__)
 	struct pglist		list;
 #endif
 	gfp_t			gfp_flags;
@@ -293,7 +293,7 @@ static int ttm_page_pool_free(struct ttm_page_pool *pool, unsigned nr_free,
 	struct page **pages_to_free;
 	unsigned freed_pages = 0,
 		 npages_to_free = nr_free;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	int i;
 #endif
 
@@ -316,7 +316,7 @@ restart:
 
 #ifdef __linux__
 	list_for_each_entry_reverse(p, &pool->list, lru) {
-#else
+#elif defined(__FreeBSD__)
 	TAILQ_FOREACH_REVERSE(p, &pool->list, pglist, plinks.q) {
 #endif
 		if (freed_pages >= npages_to_free)
@@ -328,7 +328,7 @@ restart:
 			/* remove range of pages from the pool */
 #ifdef __linux__
 			__list_del(p->lru.prev, &pool->list);
-#else
+#elif defined(__FreeBSD__)
 			for (i = 0; i < freed_pages; i++) {
 				TAILQ_REMOVE(&pool->list, pages_to_free[i],
 				    plinks.q);
@@ -370,7 +370,7 @@ restart:
 	if (freed_pages) {
 #ifdef __linux__
 		__list_del(&p->lru, &pool->list);
-#else
+#elif defined(__FreeBSD__)
 		for (i = 0; i < freed_pages; i++) {
 			TAILQ_REMOVE(&pool->list, pages_to_free[i], plinks.q);
 		}
@@ -492,7 +492,7 @@ static int ttm_set_pages_caching(struct page **pages,
  */
 #ifdef __linux__
 static void ttm_handle_caching_state_failure(struct list_head *pages,
-#else
+#elif defined(__FreeBSD__)
 static void ttm_handle_caching_state_failure(struct pglist *pages,
 #endif
 		int ttm_flags, enum ttm_caching_state cstate,
@@ -503,7 +503,7 @@ static void ttm_handle_caching_state_failure(struct pglist *pages,
 	for (i = 0; i < cpages; ++i) {
 #ifdef __linux__
 		list_del(&failed_pages[i]->lru);
-#else
+#elif defined(__FreeBSD__)
 		TAILQ_REMOVE(pages, failed_pages[i], plinks.q);
 #endif
 		__free_page(failed_pages[i]);
@@ -518,7 +518,7 @@ static void ttm_handle_caching_state_failure(struct pglist *pages,
  */
 #ifdef __linux__
 static int ttm_alloc_new_pages(struct list_head *pages, gfp_t gfp_flags,
-#else
+#elif defined(__FreeBSD__)
 static int ttm_alloc_new_pages(struct pglist *pages, gfp_t gfp_flags,
 #endif
 			       int ttm_flags, enum ttm_caching_state cstate,
@@ -562,7 +562,7 @@ static int ttm_alloc_new_pages(struct pglist *pages, gfp_t gfp_flags,
 
 #ifdef __linux__
 		list_add(&p->lru, pages);
-#else
+#elif defined(__FreeBSD__)
 		TAILQ_INSERT_HEAD(pages, p, plinks.q);
 #endif
 
@@ -631,7 +631,7 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool, int ttm_flags,
 		&& count > pool->npages) {
 #ifdef __linux__
 		struct list_head new_pages;
-#else
+#elif defined(__FreeBSD__)
 		struct pglist new_pages;
 #endif
 		unsigned alloc_size = _manager->options.alloc_size;
@@ -644,7 +644,7 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool, int ttm_flags,
 
 #ifdef __linux__
 		INIT_LIST_HEAD(&new_pages);
-#else
+#elif defined(__FreeBSD__)
 		TAILQ_INIT(&new_pages);
 #endif
 		r = ttm_alloc_new_pages(&new_pages, pool->gfp_flags, ttm_flags,
@@ -654,7 +654,7 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool, int ttm_flags,
 		if (!r) {
 #ifdef __linux__
 			list_splice(&new_pages, &pool->list);
-#else
+#elif defined(__FreeBSD__)
 			TAILQ_CONCAT(&pool->list, &new_pages, plinks.q);
 #endif
 			++pool->nrefills;
@@ -664,14 +664,14 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool, int ttm_flags,
 			/* If we have any pages left put them to the pool. */
 #ifdef __linux__
 			list_for_each_entry(p, &new_pages, lru) {
-#else
+#elif defined(__FreeBSD__)
 			TAILQ_FOREACH(p, &pool->list, plinks.q) {
 #endif
 				++cpages;
 			}
 #ifdef __linux__
 			list_splice(&new_pages, &pool->list);
-#else
+#elif defined(__FreeBSD__)
 			TAILQ_CONCAT(&pool->list, &new_pages, plinks.q);
 #endif
 			pool->npages += cpages;
@@ -689,7 +689,7 @@ static void ttm_page_pool_fill_locked(struct ttm_page_pool *pool, int ttm_flags,
 static int ttm_page_pool_get_pages(struct ttm_page_pool *pool,
 #ifdef __linux__
 				   struct list_head *pages,
-#else
+#elif defined(__FreeBSD__)
 				   struct pglist *pages,
 #endif
 				   int ttm_flags,
@@ -699,7 +699,7 @@ static int ttm_page_pool_get_pages(struct ttm_page_pool *pool,
 	unsigned long irq_flags;
 #ifdef __linux__
 	struct list_head *p;
-#else
+#elif defined(__FreeBSD__)
 	struct page *p;
 #endif
 	unsigned i;
@@ -714,7 +714,7 @@ static int ttm_page_pool_get_pages(struct ttm_page_pool *pool,
 		/* take all pages from the pool */
 #ifdef __linux__
 		list_splice_init(&pool->list, pages);
-#else
+#elif defined(__FreeBSD__)
 		TAILQ_CONCAT(pages, &pool->list, plinks.q);
 #endif
 		count -= pool->npages;
@@ -739,7 +739,7 @@ static int ttm_page_pool_get_pages(struct ttm_page_pool *pool,
 	}
 	/* Cut 'count' number of pages from the pool */
 	list_cut_position(pages, &pool->list, p);
-#else
+#elif defined(__FreeBSD__)
 	for (i = 0; i < count; i++) {
 		p = TAILQ_FIRST(&pool->list);
 		TAILQ_REMOVE(&pool->list, p, plinks.q);
@@ -762,7 +762,7 @@ out:
 			else
 				clear_page(page_address(page));
 		}
-#else
+#elif defined(__FreeBSD__)
 		TAILQ_FOREACH(page, pages, plinks.q) {
 			pmap_zero_page(page);
 		}
@@ -886,7 +886,7 @@ static void ttm_put_pages(struct page **pages, unsigned npages, int flags,
 				pr_err("Erroneous page count. Leaking pages.\n");
 #ifdef __linux__
 			list_add_tail(&pages[i]->lru, &pool->list);
-#else
+#elif defined(__FreeBSD__)
 			TAILQ_INSERT_TAIL(&pool->list, pages[i], plinks.q);
 #endif
 			pages[i] = NULL;
@@ -921,7 +921,7 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 #endif
 #ifdef __linux__
 	struct list_head plist;
-#else
+#elif defined(__FreeBSD__)
 	struct pglist plist;
 #endif
 	struct page *p = NULL;
@@ -1022,7 +1022,7 @@ static int ttm_get_pages(struct page **pages, unsigned npages, int flags,
 		pages[count++] = tmp;
 	}
 
-#else
+#elif defined(__FreeBSD__)
 	TAILQ_INIT(&plist);
 	r = ttm_page_pool_get_pages(pool, &plist, flags, cstate,
 	    npages, 0);
@@ -1056,7 +1056,7 @@ static void ttm_page_pool_init_locked(struct ttm_page_pool *pool, gfp_t flags,
 	pool->fill_lock = false;
 #ifdef __linux__
 	INIT_LIST_HEAD(&pool->list);
-#else
+#elif defined(__FreeBSD__)
 	TAILQ_INIT(&pool->list);
 #endif
 	pool->npages = pool->nfrees = 0;

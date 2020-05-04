@@ -38,7 +38,6 @@
 #include <drm/drm_client.h>
 #include <drm/drm_file.h>
 #include <drm/drmP.h>
-#include <drm/drm_file.h>
 
 #include "drm_legacy.h"
 #include "drm_internal.h"
@@ -315,6 +314,7 @@ int drm_open(struct inode *inode, struct file *filp)
 #ifdef __linux__
 	filp->f_mapping = dev->anon_inode->i_mapping;
 #endif
+
 	retcode = drm_open_helper(filp, minor);
 	if (retcode)
 		goto err_undo;
@@ -616,9 +616,10 @@ __poll_t drm_poll(struct file *filp, struct poll_table_struct *wait)
 	if (!list_empty(&file_priv->event_list))
 #ifdef __linux__
 		mask |= EPOLLIN | EPOLLRDNORM;
-#else
+#elif defined(__FreeBSD__)
 		mask |= POLLIN | POLLRDNORM;
 #endif
+
 	return mask;
 }
 EXPORT_SYMBOL(drm_poll);

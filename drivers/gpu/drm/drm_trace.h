@@ -60,7 +60,7 @@ TRACE_EVENT(drm_vblank_event_delivered,
 		      __entry->seq)
 );
 
-#else
+#elif defined(__FreeBSD__)
 #include "drm_trace_freebsd.h"
 #endif
 

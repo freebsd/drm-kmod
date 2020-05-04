@@ -51,7 +51,7 @@
 
 #define VMWGFX_VALIDATION_MEM_GRAN (16*PAGE_SIZE)
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #define pci_restore_state linux_pci_restore_state
 #define pci_save_state	  linux_pci_save_state
 #endif
@@ -563,8 +563,9 @@ static bool vmw_assume_iommu(struct drm_device *dev)
 
 	return !dma_is_direct(ops) && ops &&
 		ops->map_page != dma_direct_map_page;
-#endif
+#elif defined(__FreeBSD__)
 	return false;
+#endif
 }
 
 /**
@@ -664,7 +665,7 @@ static int vmw_driver_load(struct drm_device *dev, unsigned long chipset)
 	spin_lock_init(&dev_priv->resource_lock);
 #ifdef __linux__
 	spin_lock_init(&dev_priv->hw_lock);
-#else
+#elif defined(__FreeBSD__)
 	/* spin_lock is sleepable on FreeBSD, this one needs to be MTX_SPIN */
 	spin_lock_init_spin(&dev_priv->hw_lock);
 #endif
@@ -866,7 +867,7 @@ static int vmw_driver_load(struct drm_device *dev, unsigned long chipset)
 				 &vmw_bo_driver,
 #ifdef __linux__
 				 dev->anon_inode->i_mapping,
-#else
+#elif defined(__FreeBSD__)
 	    			 NULL,
 #endif
 				 VMWGFX_FILE_PAGE_OFFSET,
@@ -1640,7 +1641,7 @@ static int __init vmwgfx_init(void)
 
 #ifdef __linux__
 	ret = pci_register_driver(&vmw_pci_driver);
-#else
+#elif defined(__FreeBSD__)
 	vmw_pci_driver.bsdclass = drm_devclass;
 	ret = linux_pci_register_drm_driver(&vmw_pci_driver);
 #endif
@@ -1653,7 +1654,7 @@ static void __exit vmwgfx_exit(void)
 {
 #ifdef __linux__
 	pci_unregister_driver(&vmw_pci_driver);
-#else
+#elif defined(__FreeBSD__)
 	linux_pci_unregister_drm_driver(&vmw_pci_driver);
 #endif
 }
@@ -1669,7 +1670,7 @@ MODULE_VERSION(__stringify(VMWGFX_DRIVER_MAJOR) "."
 	       __stringify(VMWGFX_DRIVER_MINOR) "."
 	       __stringify(VMWGFX_DRIVER_PATCHLEVEL) "."
 	       "0");
-#else /* BSD stuff */
+#elif defined(__FreeBSD__) /* BSD stuff */
 LKPI_DRIVER_MODULE(vmwgfx, vmwgfx_init, vmwgfx_exit);
 LKPI_PNP_INFO(pci, vmwgfx, vmw_pci_id_list);
 MODULE_DEPEND(vmwgfx, drmn, 2, 2, 2);

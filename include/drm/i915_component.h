@@ -31,8 +31,6 @@
  */
 #define MAX_PORTS 6
 
-struct device;
-
 /**
  * struct i915_audio_component - Used for direct communication between i915 and hda drivers
  */

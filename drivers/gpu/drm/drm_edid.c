@@ -2925,6 +2925,7 @@ cea_mode_alternate_timings(u8 vic, struct drm_display_mode *mode)
 		     edid_cea_modes[27].vtotal != 312 ||
 		     edid_cea_modes[28].vtotal != 312);
 #endif
+
 	if (((vic == 8 || vic == 9 ||
 	      vic == 12 || vic == 13) && mode->vtotal < 263) ||
 	    ((vic == 23 || vic == 24 ||

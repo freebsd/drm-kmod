@@ -23,7 +23,7 @@
  *
  */
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 /* For lower_32_bits() */
 #include <drm/drm_os_freebsd.h>
 #endif

@@ -23,7 +23,7 @@
 #ifndef _SMUMGR_H_
 #define _SMUMGR_H_
 #include <linux/types.h>
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/math64.h>
 #endif
 #include "amd_powerplay.h"

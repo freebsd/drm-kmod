@@ -100,7 +100,7 @@ drm_gem_init(struct drm_device *dev)
 	mutex_init(&dev->object_name_lock);
 #ifdef __linux__
 	idr_init_base(&dev->object_name_idr, 1);
-#else
+#elif defined(__FreeBSD__)
 	idr_init(&dev->object_name_idr);
 #endif
 
@@ -793,7 +793,7 @@ drm_gem_open(struct drm_device *dev, struct drm_file *file_private)
 {
 #ifdef __linux__
 	idr_init_base(&file_private->object_idr, 1);
-#else
+#elif defined(__FreeBSD__)
 	idr_init(&file_private->object_idr);
 #endif
 	spin_lock_init(&file_private->table_lock);

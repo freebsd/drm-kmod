@@ -50,7 +50,7 @@
 #include "amdgpu_sdma.h"
 #include "bif/bif_4_1_d.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include "sys/cdefs.h" // for __DECONST()
 #endif
 
@@ -751,8 +751,10 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 	down_read(&mm->mmap_sem);
 
 	if (gtt->userflags & AMDGPU_GEM_USERPTR_ANONONLY) {
+#ifdef __FreeBSD__
 		/* BSDFIXME: no userptr support yet */
 		panic("Missing implementation");
+#endif
 		/*
 		 * check that we only use anonymous memory to prevent problems
 		 * with writeback
@@ -1679,7 +1681,7 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 			       &amdgpu_bo_driver,
 #ifdef __linux__
 			       adev->ddev->anon_mapping,
-#else
+#elif defined(__FreeBSD__)
 			       NULL, /* Dummy on BSD */
 #endif
 			       DRM_FILE_PAGE_OFFSET,
@@ -2230,7 +2232,7 @@ static ssize_t amdgpu_ttm_vram_write(struct file *f, const char __user *buf,
 			return result;
 #ifdef __linux__
 		r = get_user(value, (uint32_t *)buf);
-#else
+#elif defined(__FreeBSD__)
 		r = get_user(value, __DECONST(uint32_t *, buf));
 #endif
 		if (r)
@@ -2354,6 +2356,7 @@ static ssize_t amdgpu_iomem_read(struct file *f, char __user *buf,
 		if (p->mapping != adev->mman.bdev.dev_mapping)
 			return -EPERM;
 #endif
+
 		ptr = kmap(p);
 		r = copy_to_user(buf, ptr + off, bytes);
 		kunmap(p);
@@ -2407,6 +2410,7 @@ static ssize_t amdgpu_iomem_write(struct file *f, const char __user *buf,
 		if (p->mapping != adev->mman.bdev.dev_mapping)
 			return -EPERM;
 #endif
+
 		ptr = kmap(p);
 		r = copy_from_user(ptr + off, buf, bytes);
 		kunmap(p);

@@ -55,7 +55,7 @@
 #include "intel_uc.h"
 #include "intel_workarounds.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #define pci_get_class linux_pci_get_class
 #define	pci_save_state linux_pci_save_state
 #define	resource linux_resource
@@ -251,7 +251,7 @@ intel_virt_detect_pch(const struct drm_i915_private *dev_priv)
 #ifdef __linux__
 static void intel_detect_pch(struct drm_i915_private *dev_priv)
 {
-#else
+#elif defined(__FreeBSD__)
 static void intel_detect_pch(struct drm_device *dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
@@ -477,7 +477,7 @@ static int i915_get_bridge_dev(struct drm_device *dev)
 
 	dev_priv->bridge_dev =
 	        pci_get_domain_bus_and_slot(domain, 0, PCI_DEVFN(0, 0));
-#else
+#elif defined(__FreeBSD__)
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	dev_priv->bridge_dev = pci_get_bus_and_slot(0, PCI_DEVFN(0, 0));
 #endif
@@ -511,7 +511,7 @@ intel_alloc_mchbar_resource(struct drm_device *dev)
 #endif
 
 	/* Get some space for it */
-#ifndef __linux__
+#ifdef __FreeBSD__
 #undef resource
 	device_t vga;
 	(void)ret;
@@ -619,7 +619,7 @@ intel_teardown_mchbar(struct drm_device *dev)
 		}
 	}
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (dev_priv->mch_res.bsd_res != NULL) {
 		device_t vga;
 
@@ -800,7 +800,7 @@ static int i915_kick_out_firmware_fb(struct drm_i915_private *dev_priv)
 	ap->ranges[0].base = ggtt->gmadr.start;
 	ap->ranges[0].size = ggtt->mappable_end;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	(void)pdev;
 	primary = false;
 #else
@@ -1042,7 +1042,7 @@ static int i915_mmio_setup(struct drm_device *dev)
 		mmio_size = 512 * 1024;
 	else
 		mmio_size = 2 * 1024 * 1024;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	struct resource *res;
 	int rid, type;
 
@@ -1075,7 +1075,7 @@ static void i915_mmio_cleanup(struct drm_i915_private *dev_priv)
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 
 	intel_teardown_mchbar(dev);
-#ifndef __linux__
+#ifdef __FreeBSD__
 	bus_release_resource(pdev->dev.bsddev, dev_priv->mmio_restype,
 	    dev_priv->mmio_rid, dev_priv->mmio_res);
 #else

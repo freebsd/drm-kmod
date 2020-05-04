@@ -92,7 +92,7 @@ static void __sg_set_buf(struct scatterlist *sg,
 	sg->page_link = (unsigned long)virt_to_page(addr);
 #ifdef __linux__
 	sg->offset = offset_in_page(addr);
-#else
+#elif defined(__FreeBSD__)
 	sg->offset = offset_in_page((unsigned long)addr);
 #endif
 	sg_dma_len(sg) = len;

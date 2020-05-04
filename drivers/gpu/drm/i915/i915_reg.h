@@ -200,7 +200,7 @@ static inline bool i915_mmio_reg_valid(i915_reg_t reg)
 		BUILD_BUG_ON_MSG((value) & ~(mask),			   \
 				 "Incorrect value for mask");		   \
 	__MASKED_FIELD(mask, value); })
-#else
+#elif defined(__FreeBSD__)
 #define __MASKED_FIELD(mask, value) ({ (mask) << 16 | (value); })
 #define _MASKED_FIELD(mask, value) __MASKED_FIELD(mask, value)
 #endif
@@ -3586,7 +3586,7 @@ enum i915_power_well_id {
 #define   TSE			(1 << 0)
 #ifdef __linux__ // FreeBSD already has TR1
 #define TR1			_MMIO(0x11006)
-#else
+#elif defined(__FreeBSD__)
 #define I915_TR1		_MMIO(0x11006)
 #endif
 #define TSFS			_MMIO(0x11020)

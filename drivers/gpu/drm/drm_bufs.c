@@ -28,17 +28,22 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __FreeBSD__
 #include <sys/param.h>
 #include <sys/shm.h>
+#endif
 
 #include <linux/vmalloc.h>
 #include <linux/slab.h>
 #include <linux/log2.h>
 #include <linux/export.h>
+#ifdef __linux__
+#include <asm/shmparam.h>
+#endif
+#ifdef __FreeBSD__
 #include <dev/pci/pcireg.h>
-#include <linux/log2.h>
+#endif
 #include <drm/drmP.h>
-
 #include "drm_legacy.h"
 #define aper_size ai_aperture_size
 
@@ -185,12 +190,14 @@ static int drm_addmap_core(struct drm_device *dev, resource_size_t offset,
 	switch (map->type) {
 	case _DRM_REGISTERS:
 	case _DRM_FRAME_BUFFER:
-#if defined(__linux__) && !defined(__sparc__) && !defined(__alpha__) && !defined(__ia64__) && !defined(__powerpc64__) && !defined(__x86_64__) && !defined(__arm__)
+#ifdef __linux__
+#if !defined(__sparc__) && !defined(__alpha__) && !defined(__ia64__) && !defined(__powerpc64__) && !defined(__x86_64__) && !defined(__arm__)
 		if (map->offset + (map->size-1) < map->offset ||
 		    map->offset < virt_to_phys(high_memory)) {
 			kfree(map);
 			return -EINVAL;
 		}
+#endif
 #endif
 		/* Some drivers preinitialize some maps, without the X Server
 		 * needing to be aware of it.  Therefore, we just return success
@@ -1462,12 +1469,12 @@ int __drm_legacy_mapbufs(struct drm_device *dev, void *data, int *p,
 	int retcode = 0;
 #ifdef __linux__
 	unsigned long virtual;
-#else
+#elif defined(__FreeBSD__)
 	vm_offset_t virtual;
 #endif
 	int i;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	struct vmspace *vms;
 	vms = DRM_CURPROC->td_proc->p_vmspace;
 #endif
@@ -1500,19 +1507,40 @@ int __drm_legacy_mapbufs(struct drm_device *dev, void *data, int *p,
 				retcode = -EINVAL;
 				goto done;
 			}
+#ifdef __linux__
+			virtual = vm_mmap(file_priv->filp, 0, map->size,
+					  PROT_READ | PROT_WRITE,
+					  MAP_SHARED,
+					  token);
+
+#elif defined(__FreeBSD__)
 			retcode = vm_mmap(&vms->vm_map, &virtual, map->size,
 			    VM_PROT_READ | VM_PROT_WRITE, VM_PROT_ALL,
 			    MAP_SHARED | MAP_NOSYNC, OBJT_DEVICE,
 			    file_priv->minor->bsd_device, token);
+#endif
 		} else {
+#ifdef __linux__
+			virtual = vm_mmap(file_priv->filp, 0, dma->byte_count,
+					  PROT_READ | PROT_WRITE,
+					  MAP_SHARED, 0);
+
+#elif defined(__FreeBSD__)
 			retcode = vm_mmap(&vms->vm_map, &virtual, dma->byte_count,
 			    VM_PROT_READ | VM_PROT_WRITE, VM_PROT_ALL,
 			    MAP_SHARED | MAP_NOSYNC, OBJT_DEVICE,
 			    file_priv->minor->bsd_device, 0);
+#endif
 		}
+#ifdef __linux__
+		if (virtual > -1024UL) {
+			/* Real error */
+			retcode = (signed long)virtual;
+#elif defined(__FreeBSD__)
 		if (retcode) {
 			/* Real error */
 			retcode = -retcode;
+#endif
 			goto done;
 		}
 		*v = (void __user *)virtual;

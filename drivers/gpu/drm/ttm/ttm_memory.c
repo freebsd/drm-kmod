@@ -248,7 +248,7 @@ static bool ttm_zones_above_swap_target(struct ttm_mem_global *glob,
 			target = zone->swap_limit;
 #ifdef __linux__
 		else if (capable(CAP_SYS_ADMIN))
-#else
+#elif defined(__FreeBSD__)
 		else if (priv_check(curthread, PRIV_VM_MLOCK) == 0)
 #endif
 			target = zone->emer_mem;
@@ -551,7 +551,7 @@ ttm_check_under_lowerlimit(struct ttm_mem_global *glob,
 
 #ifdef __linux__
 	available = get_nr_swap_pages() + si_mem_available();
-#else
+#elif defined(__FreeBSD__)
 	// XXX: get_nr_swap_pages is not implemented
 	available = get_nr_swap_pages() + vm_free_count();
 #endif

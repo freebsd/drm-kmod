@@ -25,7 +25,9 @@
 #define _INTEL_LPE_AUDIO_H_
 
 #include <linux/types.h>
-//#include <linux/spinlock_types.h>
+#ifdef __linux__
+#include <linux/spinlock_types.h>
+#endif
 
 struct platform_device;
 

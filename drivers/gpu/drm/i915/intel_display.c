@@ -11637,12 +11637,14 @@ pipe_config_err(bool adjust, const char *name, const char *format, ...)
 	va_start(args, format);
 	vaf.fmt = format;
 	vaf.va = &args;
+
 	if (adjust)
 		drm_dbg(DRM_UT_KMS, "mismatch in %s %pV", name, &vaf);
 	else
 		drm_err("mismatch in %s %pV", name, &vaf);
+
 	va_end(args);
-#else
+#elif defined(__FreeBSD__)
 	if (adjust)
 		drm_dbg(DRM_UT_KMS, "mismatch in %s %s", name, format);
 	else

@@ -121,7 +121,7 @@ static bool igp_read_bios_from_vram(struct amdgpu_device *adev)
 	return true;
 }
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #define	pci_map_rom(pdev, sizep)					\
 	vga_pci_map_bios(device_get_parent(pdev->dev.bsddev), sizep)
 #define	pci_unmap_rom(pdev, bios)					\
@@ -363,7 +363,7 @@ static bool amdgpu_acpi_vfct_bios(struct amdgpu_device *adev)
 
 	if (!ACPI_SUCCESS(acpi_get_table("VFCT", 1, &hdr)))
 		return false;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	tbl_size = hdr->Length;
 #else
 	tbl_size = hdr->length;

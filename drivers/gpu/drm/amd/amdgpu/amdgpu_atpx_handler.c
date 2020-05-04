@@ -623,7 +623,7 @@ static bool amdgpu_atpx_detect(void)
 		parent_pdev = pci_upstream_bridge(pdev);
 #ifdef __linux__
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
-#else
+#elif defined(__FreeBSD__)
 		// BSDFIXME
 		d3_supported |= 1;
 #endif
@@ -638,7 +638,7 @@ static bool amdgpu_atpx_detect(void)
 		parent_pdev = pci_upstream_bridge(pdev);
 #ifdef __linux__
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
-#else
+#elif defined(__FreeBSD__)
 		// BSDFIXME
 		d3_supported |= 1;
 #endif

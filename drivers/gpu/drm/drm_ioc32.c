@@ -78,7 +78,7 @@
 
 #define DRM_IOCTL_MODE_ADDFB232		DRM_IOWR(0xb8, drm_mode_fb_cmd232_t)
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 extern int drm_version(struct drm_device *dev, void *data,
 			struct drm_file *file_priv);
 
@@ -890,7 +890,9 @@ static int compat_drm_mode_addfb2(struct file *file, unsigned int cmd,
 	struct drm_mode_fb_cmd232 __user *argp = (void __user *)arg;
 	struct drm_mode_fb_cmd2 req64;
 	int err;
+#ifdef __FreeBSD__
 	u32 fb_id;
+#endif
 
 	if (copy_from_user(&req64, argp,
 			   offsetof(drm_mode_fb_cmd232_t, modifier)))

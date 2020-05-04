@@ -22,7 +22,7 @@
  *
  */
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/module.h>
 #endif
 
@@ -814,7 +814,7 @@ static int __init i915_init(void)
 		return 0;
 	}
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	i915_pci_driver.bsdclass = drm_devclass;
 	return linux_pci_register_drm_driver(&i915_pci_driver);
 #else
@@ -824,11 +824,12 @@ static int __init i915_init(void)
 
 static void __exit i915_exit(void)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	linux_pci_unregister_drm_driver(&i915_pci_driver);
 #else
 	if (!i915_pci_driver.driver.owner)
 		return;
+
 	pci_unregister_driver(&i915_pci_driver);
 #endif
 }
@@ -845,7 +846,7 @@ MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_LICENSE("GPL and additional rights");
 
 /* BSD stuff */
-#ifndef __linux__
+#ifdef __FreeBSD__
 LKPI_DRIVER_MODULE(i915kms, i915_init, i915_exit);
 LKPI_PNP_INFO(pci, i915kms, pciidlist);
 MODULE_DEPEND(i915kms, drmn, 2, 2, 2);

@@ -108,7 +108,7 @@ struct amdkfd_process_info {
 	struct delayed_work restore_userptr_work;
 #ifdef __linux__
 	struct pid *pid;
-#else
+#elif defined(__FreeBSD__)
 	pid_t pid;
 #endif
 };

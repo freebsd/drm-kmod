@@ -7,7 +7,7 @@
 #include <linux/hashtable.h>
 #include <linux/seqlock.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 /* For tasklet_struct */
 #include <linux/interrupt.h>
 #endif

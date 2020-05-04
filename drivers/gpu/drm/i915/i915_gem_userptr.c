@@ -526,7 +526,7 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 					 flags,
 #ifdef __linux__
 					 pvec + pinned, NULL, NULL);
-#else
+#elif defined(__FreeBSD__)
 					 pvec + pinned, NULL);
 #endif
 				if (ret < 0)

@@ -60,7 +60,7 @@
 #include "dce_virtual.h"
 #include "mxgpu_ai.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #define	pci_save_state		linux_pci_save_state
 #define	pci_restore_state	linux_pci_restore_state
 #endif

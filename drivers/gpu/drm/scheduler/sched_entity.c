@@ -166,7 +166,7 @@ long drm_sched_entity_flush(struct drm_sched_entity *entity, long timeout)
 	long ret = timeout;
 
 	sched = entity->rq->sched;
-
+#ifdef __FreeBSD__
 	if (!sched) {
 		/*
 		 * BSDFIXME: When running glmark2, sched is null two times
@@ -175,13 +175,14 @@ long drm_sched_entity_flush(struct drm_sched_entity *entity, long timeout)
 		DRM_ERROR("==========> BUG: entity->rq->sched is NULL\n");
 		return ret;
 	}
+#endif
 	/**
 	 * The client will not queue more IBs during this fini, consume existing
 	 * queued IBs or discard them on SIGKILL
 	 */
 #ifdef __linux__
 	if (current->flags & PF_EXITING) {
-#else
+#elif defined(__FreeBSD__)
 	if (current_exiting()) {
 #endif
 		if (timeout)
@@ -199,7 +200,7 @@ long drm_sched_entity_flush(struct drm_sched_entity *entity, long timeout)
 	if ((!last_user || last_user == current->group_leader) &&
 #ifdef __linux__
 	    (current->flags & PF_EXITING) && (current->exit_code == SIGKILL)) {
-#else
+#elif defined(__FreeBSD__)
 	    current_exiting() && fatal_signal_pending(current)) {
 #endif
 		spin_lock(&entity->rq_lock);

@@ -33,7 +33,7 @@
 #include "drm_crtc_internal.h"
 #include "drm_internal.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/lockdep.h>
 #include <linux/refcount.h>
 #endif

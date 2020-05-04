@@ -14,7 +14,7 @@
 #include <linux/notifier.h> /* for NOTIFY_DONE */
 #include <linux/wait.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/lockdep.h>
 #endif
 

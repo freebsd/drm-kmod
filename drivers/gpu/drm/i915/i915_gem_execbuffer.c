@@ -1573,7 +1573,7 @@ static int check_relocations(const struct drm_i915_gem_exec_object2 *entry)
 	for (; addr < end; addr += PAGE_SIZE) {
 #ifdef __linux__
 		int err = __get_user(c, addr);
-#else
+#elif defined(__FreeBSD__)
 		// XXX: Move deconst to lkpi?
 		int err = __get_user(c, __DECONST(char *, addr));
 #endif
@@ -1582,7 +1582,7 @@ static int check_relocations(const struct drm_i915_gem_exec_object2 *entry)
 	}
 #ifdef __linux__
 	return __get_user(c, end - 1);
-#else
+#elif defined(__FreeBSD__)
 	return __get_user(c, __DECONST(char *, end - 1));
 #endif
 }

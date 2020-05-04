@@ -36,8 +36,6 @@
 #if defined(CONFIG_X86)
 #include <asm/smp.h>
 
-#define clflushopt(addr) linux_clflushopt(addr)
-
 /*
  * clflushopt is an unordered instruction which needs fencing with mfence or
  * sfence to avoid ordering issues.  For drm_clflush_page this fencing happens
@@ -102,7 +100,12 @@ drm_clflush_pages(struct page *pages[], unsigned long num_pages)
 			continue;
 
 		page_virtual = kmap_atomic(page);
+#ifdef __linux__
+		flush_dcache_range((unsigned long)page_virtual,
+				   (unsigned long)page_virtual + PAGE_SIZE);
+#elif defined(__FreeBSD__)
 		cpu_flush_dcache(page_virtual, PAGE_SIZE);
+#endif
 		kunmap_atomic(page_virtual);
 	}
 #else

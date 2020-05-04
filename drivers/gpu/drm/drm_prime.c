@@ -318,7 +318,7 @@ struct sg_table *drm_gem_map_dma_buf(struct dma_buf_attachment *attach,
 #ifdef __linux__
 		// linuxkpi's dma_attrs is old and incompatible
 				      DMA_ATTR_SKIP_CPU_SYNC)) {
-#else
+#elif defined(__FreeBSD__)
 				      NULL)) {
 #endif
 			sg_free_table(sgt);
@@ -1007,7 +1007,7 @@ void drm_prime_init_file_private(struct drm_prime_file_private *prime_fpriv)
 
 void drm_prime_destroy_file_private(struct drm_prime_file_private *prime_fpriv)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	mutex_destroy(&prime_fpriv->lock);
 #endif
 	/* by now drm_gem_release should've made sure the list is empty */

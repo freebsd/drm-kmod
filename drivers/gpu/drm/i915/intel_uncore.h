@@ -28,7 +28,7 @@
 #include <linux/spinlock.h>
 #include <linux/notifier.h>
 #include <linux/hrtimer.h>
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/bitops.h>
 #endif
 #include "i915_reg.h"
@@ -47,7 +47,7 @@ enum forcewake_domain_id {
 	FW_DOMAIN_ID_MEDIA_VEBOX1,
 
 	FW_DOMAIN_ID_COUNT,
-#ifndef __linux__
+#ifdef __FreeBSD__
 	FW_DOMAIN_ID_DUMMY = -1, /* force enum type signed */
 #endif
 };

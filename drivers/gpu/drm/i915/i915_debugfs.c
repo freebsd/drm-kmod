@@ -32,7 +32,7 @@
 #include "intel_drv.h"
 #include "intel_guc_submission.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <asm/msr.h>
 #endif
 
@@ -1043,7 +1043,7 @@ static const struct file_operations i915_error_state_fops = {
 	.release = gpu_state_release,
 };
 
-#else /* !__linux__*/
+#elif defined(__FreeBSD__)
 
 static int gpu_state_read(struct seq_file *m, void *unused)
 {
@@ -2098,7 +2098,7 @@ static int i915_context_status(struct seq_file *m, void *unused)
 					   task->comm, task->pid);
 				put_task_struct(task);
 			}
-#else
+#elif defined(__FreeBSD__)
 			pid_t pid = ctx->pid;
 			struct thread *td = tdfind(pid, -1);
 			if (td != NULL) {
@@ -2969,7 +2969,7 @@ static int i915_energy_uJ(struct seq_file *m, void *data)
 
 #ifdef __linux__
 	if (rdmsrl_safe(MSR_RAPL_POWER_UNIT, &power)) {
-#else
+#elif defined(__FreeBSD__)
 	if (rdmsrl_safe(MSR_RAPL_POWER_UNIT, (uint64_t *)(&power))) {
 #endif
 		intel_runtime_pm_put(dev_priv);
@@ -2999,7 +2999,7 @@ static int i915_runtime_pm_status(struct seq_file *m, void *unused)
 		   yesno(!dev_priv->gt.awake), dev_priv->gt.epoch);
 	seq_printf(m, "IRQs disabled: %s\n",
 		   yesno(!intel_irqs_enabled(dev_priv)));
-#ifndef __linux__
+#ifdef __FreeBSD__
 	(void)pdev;
 #else
 #ifdef CONFIG_PM
@@ -4736,7 +4736,7 @@ static const struct file_operations i915_forcewake_fops = {
 	.release = i915_forcewake_release,
 };
 
-#else /* !__linux__ */
+#elif defined(__FreeBSD__)
 
 /* debugfs can't handle empty file->private_data so let's
  * use the standard seq_file entry here. */
@@ -5065,7 +5065,7 @@ static const struct file_operations i915_fifo_underrun_reset_ops = {
 	.open = simple_open,
 	.write = i915_fifo_underrun_reset_write,
 	.llseek = default_llseek,
-#ifndef __linux__
+#ifdef __FreeBSD__
 	/* Our default release expects seq_file as private_data so use dummy */
 	.release = simple_release,
 #endif

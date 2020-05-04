@@ -27,7 +27,7 @@
 
 #include "i915_drv.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #define	prio	task_thread->td_priority
 #endif
 
@@ -56,8 +56,8 @@ static unsigned int __intel_breadcrumbs_wakeup(struct intel_breadcrumbs *b)
 		 * signal should remain from genuine missed_breadcrumb()
 		 * for us to detect in CI.
 		 */
-
 		bool was_asleep = task_asleep(wait->tsk);
+
 		result = ENGINE_WAKEUP_WAITER;
 		if (wake_up_process(wait->tsk) && was_asleep)
 			result |= ENGINE_WAKEUP_ASLEEP;
@@ -369,7 +369,7 @@ static inline void __intel_breadcrumbs_finish(struct intel_breadcrumbs *b,
 
 #ifdef __linux__
 	if (wait->tsk->state != TASK_RUNNING)
-#else
+#elif defined(__FreeBSD__)
 	if (atomic_read(&wait->tsk->state) != TASK_RUNNING)
 #endif
 		wake_up_process(wait->tsk); /* implicit smp_wmb() */
@@ -698,7 +698,7 @@ static int intel_breadcrumbs_signaler(void *arg)
 			/* Before we sleep, check for a missed seqno */
 #ifdef __linux__
 			if (current->state & TASK_NORMAL &&
-#else
+#elif defined(__FreeBSD__)
 			if (atomic_read(&current->state) & TASK_NORMAL &&
 #endif
 			    !list_empty(&b->signals) &&

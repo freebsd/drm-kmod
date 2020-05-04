@@ -74,10 +74,10 @@ static int drm_clients_info(struct seq_file *m, void *data)
 	struct drm_file *priv;
 #ifdef __linux__
 	kuid_t uid;
+
 #else
 	uid_t uid;
 #endif
-	
 	seq_printf(m,
 		   "%20s %5s %3s master a %5s %10s\n",
 		   "command",
@@ -253,7 +253,7 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 	}
 
 	/* NOTE Linux<->FreeBSD: Mesa needs the hw.dri sysctl tree. */
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (minor->type != DRM_MINOR_RENDER)
 		drm_sysctl_init(minor->dev);
 #endif
@@ -283,7 +283,7 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 	if (dev->driver->debugfs_init) {
 		ret = dev->driver->debugfs_init(minor);
 		if (ret) {
-#ifndef __linux__ 
+#ifdef __FreeBSD__ 
 			drm_sysctl_cleanup(minor->dev);
 #endif
 			DRM_ERROR("DRM: Driver failed to initialize "
@@ -337,7 +337,7 @@ int drm_debugfs_cleanup(struct drm_minor *minor)
 		return 0;
 
 	/* NOTE Linux<->FreeBSD: Mesa needs the hw.dri sysctl tree. */
-#ifndef __linux__ 
+#ifdef __FreeBSD__
 	drm_sysctl_cleanup(minor->dev);
 #endif
 	drm_debugfs_remove_all_files(minor);

@@ -116,7 +116,7 @@ static acpi_handle intel_dsm_pci_probe(struct pci_dev *pdev)
 	if (!acpi_check_dsm(dhandle,
 #ifdef __linux__
 	        &intel_dsm_guid,
-#else
+#elif defined(__FreeBSD__)
 	        (const u8 *)&intel_dsm_guid,
 #endif
 	        INTEL_DSM_REVISION_ID,

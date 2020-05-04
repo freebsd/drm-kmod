@@ -37,7 +37,7 @@
 #include "i915_trace.h"
 #include "intel_drv.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 // drm/drm_os_freebsd.c:
 extern int drm_panic_on_error;
 #undef BUILD_BUG_ON
@@ -1223,7 +1223,7 @@ static void notify_ring(struct intel_engine_cs *engine)
 
 #ifdef __linux__
 	if (tsk && tsk->state & TASK_NORMAL)
-#else
+#elif defined(__FreeBSD__)
 	if (tsk && get_task_state(tsk) & TASK_NORMAL)
 #endif
 		wake_up_process(tsk);
@@ -1263,6 +1263,7 @@ static u32 vlv_wa_c0_ei(struct drm_i915_private *dev_priv, u32 pm_iir)
 		u32 render, media;
 
 		time = ktime_us_delta(now.ktime, prev->ktime);
+
 		time *= dev_priv->czclk_freq;
 
 		/* Workload can be split between render + media,
@@ -3017,7 +3018,7 @@ gen11_gt_engine_identity(struct drm_i915_private * const i915,
 	} while (!(ident & GEN11_INTR_DATA_VALID) &&
 #ifdef __linux__
 		 !time_after32(local_clock() >> 10, timeout_ts));
-#else
+#elif defined(__FreeBSD__)
 		 !time_after(local_clock() >> 10, timeout_ts));
 #endif
 	if (unlikely(!(ident & GEN11_INTR_DATA_VALID))) {
@@ -3327,7 +3328,7 @@ void i915_handle_error(struct drm_i915_private *dev_priv,
 	char error_msg[80];
 	char *msg = NULL;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (drm_panic_on_error)
 		panic("dev=%p failure\n", dev_priv);
 #endif

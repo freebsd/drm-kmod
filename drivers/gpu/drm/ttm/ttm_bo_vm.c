@@ -108,7 +108,7 @@ static unsigned long ttm_bo_io_mem_pfn(struct ttm_buffer_object *bo,
 
 #ifdef __linux__
 static vm_fault_t ttm_bo_vm_fault(struct vm_fault *vmf)
-#else
+#elif defined(__FreeBSD__)
 static vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 #endif
 {
@@ -292,7 +292,7 @@ static vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault 
 		if (unlikely(++page_offset >= page_last))
 			break;
 	}
-#else
+#elif defined(__FreeBSD__)
 	vm_object_t obj;
 	vm_pindex_t pidx;
 

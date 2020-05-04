@@ -8,7 +8,7 @@
 #define I915_GEM_BATCH_POOL_H
 
 #include <linux/types.h>
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/list.h>
 #endif
 

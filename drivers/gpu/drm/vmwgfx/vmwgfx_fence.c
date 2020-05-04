@@ -206,7 +206,7 @@ static long vmw_fence_wait(struct dma_fence *f, bool intr, signed long timeout)
 			__set_current_state(TASK_INTERRUPTIBLE);
 		else
 			__set_current_state(TASK_UNINTERRUPTIBLE);
-#else
+#elif defined(__FreeBSD__)
 		/*
 		 * We need to use atomic here since LinuxKPI releases
 		 * the locks during dma fence callbacks.
@@ -473,7 +473,7 @@ static void __vmw_fences_update(struct vmw_fence_manager *fman)
 {
 #ifdef __linux__
 	struct vmw_fence_obj *fence, *next_fence;
-#else
+#elif defined(__FreeBSD__)
 	struct vmw_fence_obj *fence;
 #endif
 	struct list_head action_list;
@@ -495,7 +495,8 @@ rerun:
 		} else
 			break;
 	}
-#else
+
+#elif defined(__FreeBSD__)
         while(!list_empty(&fman->fence_list)) {
                 fence = list_first_entry(&fman->fence_list,
 		    struct vmw_fence_obj, head);

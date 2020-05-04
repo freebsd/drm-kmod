@@ -26,7 +26,7 @@
 
 #include <drm/drmP.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 
 static inline void
 trace_drm_sched_job(void *sched_job, void *entity) {
@@ -113,7 +113,7 @@ TRACE_EVENT(drm_sched_job_wait_dep,
 		      __entry->seqno)
 );
 
-#endif /* __linux__ */
+#endif /* __FreeBSD__ */
 #endif
 
 #ifdef __linux__

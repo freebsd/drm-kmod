@@ -104,7 +104,7 @@ static irqreturn_t vmw_irq_handler(int irq, void *arg)
 			      dev_priv->irqthread_pending))
 		ret = IRQ_WAKE_THREAD;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (ret == IRQ_WAKE_THREAD)
 		ret = vmw_thread_fn(irq, arg);
 #endif
@@ -376,10 +376,11 @@ int vmw_irq_install(struct drm_device *dev, int irq)
 		return -EBUSY;
 
 	vmw_irq_preinstall(dev);
+
 #ifdef __linux__
 	ret = request_threaded_irq(irq, vmw_irq_handler, vmw_thread_fn,
 				   IRQF_SHARED, VMWGFX_DRIVER_NAME, dev);
-#else
+#elif defined(__FreeBSD__)
 	/* BSD: Already in threaded context, call thread_fn from irq_handler */
 	ret = request_irq(irq, vmw_irq_handler, IRQF_SHARED,
 			  VMWGFX_DRIVER_NAME, dev);

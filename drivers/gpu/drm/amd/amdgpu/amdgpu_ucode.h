@@ -23,8 +23,9 @@
 #ifndef __AMDGPU_UCODE_H__
 #define __AMDGPU_UCODE_H__
 
+#ifdef __FreeBSD__
 #include <linux/firmware.h>
-
+#endif
 struct common_firmware_header {
 	uint32_t size_bytes; /* size of the entire header+image(s) in bytes */
 	uint32_t header_size_bytes; /* size of just the header in bytes */
@@ -251,7 +252,11 @@ struct amdgpu_firmware_info {
 	/* ucode ID */
 	enum AMDGPU_UCODE_ID ucode_id;
 	/* request_firmware */
+#ifdef __linux__
+	const struct firmware *fw;
+#elif defined(__FreeBSD__)
 	const struct linux_firmware *fw;
+#endif
 	/* starting mc address */
 	uint64_t mc_addr;
 	/* kernel linear address */

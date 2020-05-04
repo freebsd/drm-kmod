@@ -30,7 +30,7 @@
 
 #include "i915_drv.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #undef schedule
 // For {get,put}_cpu()
 #include <asm/smp.h>
@@ -668,10 +668,11 @@ i915_request_alloc(struct intel_engine_cs *engine, struct i915_gem_context *ctx)
 		if (rq)
 #ifdef __linux__
 			cond_synchronize_rcu(rq->rcustate);
-#else
+#elif defined(__FreeBSD__)
 			/* BSDFIXME: OK to always synchronize here? */
 			synchronize_rcu();
 #endif
+
 		rq = kmem_cache_alloc(i915->requests, GFP_KERNEL);
 		if (!rq) {
 			ret = -ENOMEM;

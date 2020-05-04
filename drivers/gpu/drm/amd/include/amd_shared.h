@@ -25,7 +25,7 @@
 
 #include <drm/amd_asic_type.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 // Fix compile error
 #include <linux/seq_file.h>
 #endif

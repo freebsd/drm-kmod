@@ -415,6 +415,7 @@ struct dma_buf *amdgpu_gem_prime_export(struct drm_device *dev,
 #endif
 		buf->ops = &amdgpu_dmabuf_ops;
 	}
+
 	return buf;
 }
 

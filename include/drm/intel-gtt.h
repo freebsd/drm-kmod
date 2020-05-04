@@ -4,9 +4,8 @@
 #ifndef _DRM_INTEL_GTT_H
 #define	_DRM_INTEL_GTT_H
 
+#ifdef __FreeBSD__
 struct agp_bridge_data;
-
-#ifndef __linux__
 struct intel_gtt;
 struct intel_gtt *intel_gtt_get(void);
 #else
@@ -21,7 +20,7 @@ void intel_gmch_remove(void);
 
 bool intel_enable_gtt(void);
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 int intel_gtt_chipset_flush(void);
 #else
 void intel_gtt_chipset_flush(void);
@@ -29,8 +28,14 @@ void intel_gtt_chipset_flush(void);
 void intel_gtt_insert_page(dma_addr_t addr,
 			   unsigned int pg,
 			   unsigned int flags);
+#ifdef __linux__
+void intel_gtt_insert_sg_entries(struct sg_table *st,
+				 unsigned int pg_start,
+				 unsigned int flags);
+#elif defined(__FreeBSD__)
 void linux_intel_gtt_insert_sg_entries(struct sg_table *st,
     unsigned int pg_start, unsigned int flags);
+#endif
 void intel_gtt_clear_range(unsigned int first_entry, unsigned int num_entries);
 
 /* Special gtt memory types */

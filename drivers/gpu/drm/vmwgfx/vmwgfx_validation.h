@@ -73,8 +73,8 @@ struct vmw_validation_context {
 	struct list_head resource_ctx_list;
 	struct list_head bo_list;
 #ifdef __linux__
-	struct list_head	page_list;
-#else
+	struct list_head page_list;
+#elif defined(__FreeBSD__)
 	struct pglist		bsd_pglist;
 #endif
 	struct ww_acquire_ctx ticket;
@@ -102,7 +102,6 @@ struct vmw_fence_obj;
  * is known to be very small
  */
 #endif
-
 #ifdef __linux__
 #define DECLARE_VAL_CONTEXT(_name, _ht, _merge_dups)			\
 	struct vmw_validation_context _name =				\
@@ -115,7 +114,7 @@ struct vmw_fence_obj;
 	  .merge_dups = _merge_dups,					\
 	  .mem_size_left = 0,						\
 	}
-#else
+#elif defined(__FreeBSD__)
 #define DECLARE_VAL_CONTEXT(_name, _ht, _merge_dups)			\
 	struct vmw_validation_context _name;				\
 	(_name).ht = _ht;						\

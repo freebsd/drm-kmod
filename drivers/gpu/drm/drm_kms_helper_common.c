@@ -35,7 +35,7 @@ MODULE_DESCRIPTION("DRM KMS helper");
 MODULE_LICENSE("GPL and additional rights");
 
 #ifdef __linux__ // BSD don't have struct kernel_param and don't need backward compatibility
-#if IS_ENABLED(CONFIG_DRM_LOAD_EDID_FIRMWARE) 
+#if IS_ENABLED(CONFIG_DRM_LOAD_EDID_FIRMWARE)
 
 /* Backward compatibility for drm_kms_helper.edid_firmware */
 static int edid_firmware_set(const char *val, const struct kernel_param *kp)

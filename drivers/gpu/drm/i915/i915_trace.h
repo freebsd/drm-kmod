@@ -10,6 +10,7 @@
 #include "i915_drv.h"
 #include "intel_drv.h"
 #include "intel_ringbuffer.h"
+
 #ifdef __linux__
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM i915
@@ -973,10 +974,11 @@ DEFINE_EVENT(i915_context, i915_context_free,
 	TP_ARGS(ctx)
 );
 
-#else
+#elif defined(__FreeBSD__)
 #include "i915_trace_freebsd.h"
 #endif
 #endif /* _I915_TRACE_H_ */
+
 #ifdef __linux__
 /* This part must be outside protection */
 #undef TRACE_INCLUDE_PATH

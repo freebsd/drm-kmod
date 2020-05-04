@@ -2188,7 +2188,7 @@ intel_sdvo_connector_register(struct drm_connector *connector)
 	if (ret)
 		return ret;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	(void)sdvo;
 	return (0);
 #else

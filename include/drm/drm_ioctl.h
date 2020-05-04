@@ -68,9 +68,10 @@ typedef int drm_ioctl_t(struct drm_device *dev, void *data,
  */
 typedef int drm_ioctl_compat_t(struct file *filp, unsigned int cmd,
 			       unsigned long arg);
+
 #ifdef __linux__
-#define	DRM_IOCTL_NR(n)                _IOC_NR(n)
-#else
+#define DRM_IOCTL_NR(n)                _IOC_NR(n)
+#elif defined(__FreeBSD__)
 #define	DRM_IOCTL_NR(n)                ((n) & 0xff)
 #endif
 #define DRM_MAJOR       226
@@ -184,9 +185,8 @@ int drm_noop(struct drm_device *dev, void *data,
 int drm_invalid_op(struct drm_device *dev, void *data,
 		   struct drm_file *file_priv);
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 long drm_ioctl_kernel(struct file *file, drm_ioctl_t *func, void *kdata,
     u32 flags);
 #endif
-
 #endif /* _DRM_IOCTL_H_ */

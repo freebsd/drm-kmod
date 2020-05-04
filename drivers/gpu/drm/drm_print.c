@@ -25,7 +25,7 @@
 
 #define DEBUG /* for pr_debug() */
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <machine/stdarg.h>
 #else
 #include <stdarg.h>
@@ -124,7 +124,7 @@ EXPORT_SYMBOL(__drm_printfn_coredump);
 
 void __drm_puts_seq_file(struct drm_printer *p, const char *str)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	seq_puts((struct seq_file *)(p->arg), str);
 #else
 	seq_puts(p->arg, str);
@@ -134,7 +134,7 @@ EXPORT_SYMBOL(__drm_puts_seq_file);
 
 void __drm_printfn_seq_file(struct drm_printer *p, struct va_format *vaf)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	seq_printf((struct seq_file *)(p->arg), "%pV", vaf);
 #else
 	seq_printf(p->arg, "%pV", vaf);
@@ -144,7 +144,7 @@ EXPORT_SYMBOL(__drm_printfn_seq_file);
 
 void __drm_printfn_info(struct drm_printer *p, struct va_format *vaf)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	dev_info((const struct device *)(p->arg), "[" DRM_NAME "] %pV", vaf);
 #else
 	dev_info(p->arg, "[" DRM_NAME "] %pV", vaf);
@@ -211,7 +211,7 @@ void drm_dev_printk(const struct device *dev, const char *level,
 	va_end(args);
 }
 EXPORT_SYMBOL(drm_dev_printk);
-#else
+#elif defined(__FreeBSD__)
 void drm_dev_printk(const struct device *dev, const char *level,
 		    const char *function_name, const char *format, ...)
 {
@@ -254,7 +254,7 @@ void drm_dev_dbg(const struct device *dev, unsigned int category,
 	va_end(args);
 }
 EXPORT_SYMBOL(drm_dev_dbg);
-#else
+#elif defined(__FreeBSD__)
 void drm_dev_dbg(const struct device *dev, unsigned int category,
 		 const char *function_name, const char *format, ...)
 {
@@ -295,7 +295,7 @@ void drm_dbg(unsigned int category, const char *format, ...)
 	va_end(args);
 }
 EXPORT_SYMBOL(drm_dbg);
-#else
+#elif defined(__FreeBSD__)
 void drm_dbg(unsigned int category, const char *function_name,
 	     const char *format, ...)
 {
@@ -339,7 +339,7 @@ void drm_err(const char *format, ...)
 	va_end(args);
 }
 EXPORT_SYMBOL(drm_err);
-#else
+#elif defined(__FreeBSD__)
 void drm_err(const char *function_name, const char *format, ...)
 {
 	struct va_format vaf;

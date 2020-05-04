@@ -45,10 +45,11 @@
 #include "drm_crtc_internal.h"
 #include "drm_crtc_helper_internal.h"
 
+#ifdef __FreeBSD__
 #define fb_info linux_fb_info
 #define register_framebuffer linux_register_framebuffer
 #define unregister_framebuffer linux_unregister_framebuffer
-
+#endif
 static bool drm_fbdev_emulation = true;
 module_param_named(fbdev_emulation, drm_fbdev_emulation, bool, 0600);
 MODULE_PARM_DESC(fbdev_emulation,
@@ -1883,7 +1884,7 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 	int i;
 	struct drm_fb_helper_surface_size sizes;
 	int gamma_size = 0;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	struct vt_kms_softc *sc;
 #endif
 
@@ -2023,7 +2024,7 @@ void drm_fb_helper_fill_fix(struct fb_info *info, uint32_t pitch,
 	info->fix.accel = FB_ACCEL_NONE;
 
 	info->fix.line_length = pitch;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	info->fbio.fb_stride = pitch;
 #endif
 	return;
@@ -2065,7 +2066,7 @@ void drm_fb_helper_fill_var(struct fb_info *info, struct drm_fb_helper *fb_helpe
 	info->var.xres = fb_width;
 	info->var.yres = fb_height;
 
-#ifndef __linux__ // fbio is BSD stuff
+#ifdef __FreeBSD__ // fbio is BSD stuff
 	info->fbio.fb_name = device_get_nameunit(fb_helper->dev->dev->bsddev);
 	info->fbio.fb_width = fb->width;
 	info->fbio.fb_height = fb->height;
@@ -2714,7 +2715,7 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
 		/* don't leak any physical addresses to userspace */
 		info->flags |= FBINFO_HIDE_SMEM_START;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	info->fbio.fb_video_dev = device_get_parent(fb_helper->dev->dev->bsddev);
 	info->fbio.fb_bpp = bpp_sel;
 	info->fb_bsddev = fb_helper->dev->dev->bsddev;
@@ -2963,6 +2964,7 @@ void drm_fb_helper_fbdev_teardown(struct drm_device *dev)
 		fbops = fb_helper->fbdev->fbops;
 	}
 #endif
+
 	drm_fb_helper_fini(fb_helper);
 	kfree(fbops);
 
@@ -3037,6 +3039,7 @@ static void drm_fbdev_fb_destroy(struct fb_info *info)
 		fbops = fbi->fbops;
 	}
 #endif
+
 	drm_fb_helper_fini(fb_helper);
 
 	if (shadow) {

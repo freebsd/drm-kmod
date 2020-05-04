@@ -137,7 +137,7 @@ uint amdgpu_dc_feature_mask = 0;
 struct amdgpu_mgpu_info mgpu_info = {
 	.mutex = __MUTEX_INITIALIZER(mgpu_info.mutex),
 };
-#else
+#elif defined(__FreeBSD__)
 struct amdgpu_mgpu_info mgpu_info;
 SX_SYSINIT(amdgpu_mgpu_info_mtx, &mgpu_info.mutex.sx, "amdgpu mgpu");
 #endif
@@ -1284,7 +1284,7 @@ static int __init amdgpu_init(void)
 	amdgpu_register_atpx_handler();
 	/* let modprobe override vga console setting */
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	amdgpu_kms_pci_driver.bsdclass = drm_devclass;
 	amdgpu_kms_pci_driver.name = "drmn";
 
@@ -1317,7 +1317,7 @@ static void __exit amdgpu_exit(void)
 #ifdef __linux__
 module_init(amdgpu_init);
 module_exit(amdgpu_exit);
-#else
+#elif defined(__FreeBSD__)
 LKPI_DRIVER_MODULE(amdgpu, amdgpu_init, amdgpu_exit);
 #endif
 

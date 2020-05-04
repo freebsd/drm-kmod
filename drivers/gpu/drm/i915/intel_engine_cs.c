@@ -486,6 +486,7 @@ void intel_engine_setup_common(struct intel_engine_cs *engine)
 {
 	i915_timeline_init(engine->i915, &engine->timeline, engine->name);
 	i915_timeline_set_subclass(&engine->timeline, TIMELINE_ENGINE);
+
 	intel_engine_init_execlist(engine);
 	intel_engine_init_hangcheck(engine);
 	intel_engine_init_batch_pool(engine);
@@ -1209,9 +1210,10 @@ static void print_request(struct drm_printer *m,
 		   jiffies_to_msecs(jiffies - rq->emitted_jiffies),
 		   name);
 }
+
 #ifdef __linux__
 static void hexdump(struct drm_printer *m, const void *buf, size_t len)
-#else
+#elif defined(__FreeBSD__)
 #define	hexdump linux_hexdump
 static void linux_hexdump(struct drm_printer *m, const void *buf, size_t len)
 #endif
@@ -1231,6 +1233,7 @@ static void linux_hexdump(struct drm_printer *m, const void *buf, size_t len)
 			}
 			continue;
 		}
+
 #ifdef __linux__
 		WARN_ON_ONCE(hex_dump_to_buffer(buf + pos, len - pos,
 						rowsize, sizeof(u32),
@@ -1316,6 +1319,7 @@ static void intel_engine_print_registers(const struct intel_engine_cs *engine,
 		drm_printf(m, "\tExeclist status: 0x%08x %08x\n",
 			   I915_READ(RING_EXECLIST_STATUS_LO(engine)),
 			   I915_READ(RING_EXECLIST_STATUS_HI(engine)));
+
 		read = execlists->csb_head;
 		write = READ_ONCE(*execlists->csb_write);
 
@@ -1535,7 +1539,7 @@ void intel_engine_dump(struct intel_engine_cs *engine,
 			   w->tsk->comm, w->tsk->pid,
 			   task_state_to_char(w->tsk),
 			   w->seqno);
-#else
+#elif defined(__FreeBSD__)
 		drm_printf(m, "\t%s [%d:%d] waiting for %x\n",
 			   w->tsk->comm, w->tsk->pid,
 			   get_task_state(w->tsk),
@@ -1553,9 +1557,10 @@ void intel_engine_dump(struct intel_engine_cs *engine,
 	drm_printf(m, "HWSP:\n");
 #ifdef __linux__
 	hexdump(m, engine->status_page.page_addr, PAGE_SIZE);
-#else
+#elif defined(__FreeBSD__)
 	linux_hexdump(m, engine->status_page.page_addr, PAGE_SIZE);
 #endif
+
 	drm_printf(m, "Idle? %s\n", yesno(intel_engine_is_idle(engine)));
 }
 

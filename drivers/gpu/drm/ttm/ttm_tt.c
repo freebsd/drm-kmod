@@ -348,7 +348,7 @@ int ttm_tt_swapin(struct ttm_tt *ttm)
 {
 #ifdef __linux__
 	struct address_space *swap_space;
-#else
+#elif defined(__FreeBSD__)
 	vm_object_t swap_space;
 #endif
 	struct file *swap_storage;
@@ -362,7 +362,7 @@ int ttm_tt_swapin(struct ttm_tt *ttm)
 
 #ifdef __linux__
 	swap_space = swap_storage->f_mapping;
-#else
+#elif defined(__FreeBSD__)
 	swap_space = swap_storage->f_shmem;
 #endif
 
@@ -398,7 +398,7 @@ int ttm_tt_swapout(struct ttm_tt *ttm, struct file *persistent_swap_storage)
 {
 #ifdef __linux__
 	struct address_space *swap_space;
-#else
+#elif defined(__FreeBSD__)
 	vm_object_t swap_space;
 #endif
 	struct file *swap_storage;
@@ -424,7 +424,7 @@ int ttm_tt_swapout(struct ttm_tt *ttm, struct file *persistent_swap_storage)
 
 #ifdef __linux__
 	swap_space = swap_storage->f_mapping;
-#else
+#elif defined(__FreeBSD__)
 	swap_space = swap_storage->f_shmem;
 #endif
 

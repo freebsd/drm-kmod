@@ -268,9 +268,7 @@ static inline struct drm_printer drm_debug_printer(const char *prefix)
 #define DRM_UT_LEASE		0x80
 #define DRM_UT_DP		0x100
 
-
 #ifdef __linux__
-
 __printf(3, 4)
 void drm_dev_printk(const struct device *dev, const char *level,
 		    const char *format, ...);
@@ -283,8 +281,7 @@ void drm_dbg(unsigned int category, const char *format, ...);
 __printf(1, 2)
 void drm_err(const char *format, ...);
 
-#else
-
+#elif defined(__FreeBSD__)
 __printf(4, 5)
 void drm_dev_printk(const struct device *dev, const char *level,
 		    const char *function_name, const char *format, ...);
@@ -297,9 +294,7 @@ void drm_dbg(unsigned int category, const char *function_name,
 	     const char *format, ...);
 __printf(2, 3)
 void drm_err(const char *function_name, const char *format, ...);
-
 #endif
-
 /* Macros to make printk easier */
 
 #define _DRM_PRINTK(once, level, fmt, ...)				\
@@ -326,14 +321,12 @@ void drm_err(const char *function_name, const char *format, ...);
  * @fmt: printf() like format string.
  */
 #ifdef __linux__
-
 #define DRM_DEV_ERROR(dev, fmt, ...)					\
 	drm_dev_printk(dev, KERN_ERR, "*ERROR* " fmt, ##__VA_ARGS__)
-
-#define DRM_ERROR(fmt, ...)			\
+#define DRM_ERROR(fmt, ...)						\
 	drm_err(fmt, ##__VA_ARGS__)
 
-#else
+#elif defined(__FreeBSD__)
 
 #define DRM_DEV_ERROR(dev, fmt, ...)					\
 	drm_dev_printk(dev, KERN_ERR, "*ERROR* ", __func__, fmt, ##__VA_ARGS__)
@@ -380,7 +373,6 @@ void drm_err(const char *function_name, const char *format, ...);
  * @fmt: printf() like format string.
  */
 #ifdef __linux__
-
 #define DRM_DEV_DEBUG(dev, fmt, ...)					\
 	drm_dev_dbg(dev, DRM_UT_CORE, fmt, ##__VA_ARGS__)
 #define DRM_DEBUG(fmt, ...)						\
@@ -419,7 +411,7 @@ void drm_err(const char *function_name, const char *format, ...);
 #define DRM_DEBUG_DP(fmt, ...)						\
 	drm_dbg(DRM_UT_DP, fmt, ## __VA_ARGS__)
 
-#else
+#elif defined(__FreeBSD__)
 
 #define DRM_DEV_DEBUG(dev, fmt, ...)					\
 	drm_dev_dbg(dev, DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
@@ -461,7 +453,6 @@ void drm_err(const char *function_name, const char *format, ...);
 #endif
 
 #ifdef __linux__
-
 #define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, category, fmt, ...)	\
 ({									\
 	static DEFINE_RATELIMIT_STATE(_rs,				\
@@ -470,7 +461,8 @@ void drm_err(const char *function_name, const char *format, ...);
 	if (__ratelimit(&_rs))						\
 		drm_dev_dbg(dev, category, fmt, ##__VA_ARGS__);		\
 })
-#else
+
+#elif defined(__FreeBSD__)
 #define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, category, fmt, ...)	\
 ({									\
 	static DEFINE_RATELIMIT_STATE(_rs,				\

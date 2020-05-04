@@ -43,7 +43,7 @@ struct drm_i915_getparam32 {
 	u32 value;
 };
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 extern int i915_getparam_ioctl(struct drm_device *dev, void *data,
 			 struct drm_file *file_priv);
 #endif
@@ -66,7 +66,7 @@ static int compat_i915_getparam(struct file *file, unsigned int cmd,
 	
 	return drm_ioctl(file, DRM_IOCTL_I915_GETPARAM,
 			 (unsigned long)request);
-#else
+#elif defined(__FreeBSD__)
 	drm_i915_getparam_t __user *request = (void __user *)arg;
 	struct drm_i915_getparam32 req32;
 	struct drm_i915_getparam req;

@@ -47,7 +47,7 @@
 #include <linux/pci.h>
 #include <linux/dma-buf.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/xarray.h>
 #define	resource linux_resource
 static inline unsigned long totalram_pages() { return physmem; }
@@ -273,7 +273,7 @@ i915_gem_get_aperture_ioctl(struct drm_device *dev, void *data,
 
 static int i915_gem_object_get_pages_phys(struct drm_i915_gem_object *obj)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	vm_object_t mapping = obj->base.filp->f_shmem;
 #else
 	struct address_space *mapping = obj->base.filp->f_mapping;
@@ -384,7 +384,7 @@ i915_gem_object_put_pages_phys(struct drm_i915_gem_object *obj,
 	__i915_gem_object_release_shmem(obj, pages, false);
 
 	if (obj->mm.dirty) {
-#ifndef __linux__
+#ifdef __FreeBSD__
 		vm_object_t mapping = obj->base.filp->f_shmem;
 #else
 		struct address_space *mapping = obj->base.filp->f_mapping;
@@ -600,7 +600,7 @@ static void __fence_set_priority(struct dma_fence *fence,
 
 	local_bh_disable();
 	rcu_read_lock(); /* RCU serialisation for set-wedged protection */
-#ifndef __linux__
+#ifdef __FreeBSD__
 #undef schedule
 #endif
 	if (engine->schedule)
@@ -672,7 +672,7 @@ i915_gem_object_wait(struct drm_i915_gem_object *obj,
 		     struct intel_rps_client *rps_client)
 {
 	might_sleep();
-#ifndef __linux__
+#ifdef __FreeBSD__
 	GEM_BUG_ON(!!lockdep_is_held(&obj->base.dev->struct_mutex) !=
 		   !!(flags & I915_WAIT_LOCKED));
 #else
@@ -1884,7 +1884,7 @@ i915_gem_mmap_ioctl(struct drm_device *dev, void *data,
 {
 	struct drm_i915_gem_mmap *args = data;
 	struct drm_i915_gem_object *obj;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	vm_offset_t addr;
 	vm_object_t vmobj;
 	struct proc *p;
@@ -1986,7 +1986,8 @@ out:
 #ifdef __linux__
 	if (IS_ERR((void *)addr))
 		return addr;
-#else
+
+#elif defined(__FreeBSD__)
 	if (error)
 		return error;
 #endif
@@ -2096,7 +2097,7 @@ compute_partial_view(const struct drm_i915_gem_object *obj,
  */
 #ifdef __linux__
 vm_fault_t i915_gem_fault(struct vm_fault *vmf)
-#else
+#elif defined(__FreeBSD__)
 vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 #endif
 {
@@ -2266,7 +2267,7 @@ static void __i915_gem_object_release_mmap(struct drm_i915_gem_object *obj)
 #ifdef __linux__
 	drm_vma_node_unmap(&obj->base.vma_node,
 			   obj->base.dev->anon_inode->i_mapping);
-#else
+#elif defined(__FreeBSD__)
 	struct drm_vma_offset_node *node;
 
 	node = &obj->base.vma_node;
@@ -2458,7 +2459,7 @@ i915_gem_object_truncate(struct drm_i915_gem_object *obj)
 	 * To do this we must instruct the shmfs to drop all of its
 	 * backing pages, *now*.
 	 */
-#ifndef __linux__
+#ifdef __FreeBSD__
 	shmem_truncate_range(obj->base.filp->f_shmem, 0, (loff_t)-1);
 #else
 	shmem_truncate_range(file_inode(obj->base.filp), 0, (loff_t)-1);
@@ -2470,7 +2471,7 @@ i915_gem_object_truncate(struct drm_i915_gem_object *obj)
 /* Try to discard unwanted pages */
 void __i915_gem_object_invalidate(struct drm_i915_gem_object *obj)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	vm_object_t mapping;
 #else
 	struct address_space *mapping;
@@ -2489,7 +2490,7 @@ void __i915_gem_object_invalidate(struct drm_i915_gem_object *obj)
 	if (obj->base.filp == NULL)
 		return;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	mapping = obj->base.filp->f_shmem;
 #else
 	mapping = obj->base.filp->f_mapping,
@@ -2651,7 +2652,7 @@ static int i915_gem_object_get_pages_gtt(struct drm_i915_gem_object *obj)
 	struct drm_i915_private *dev_priv = to_i915(obj->base.dev);
 	const unsigned long page_count = obj->base.size / PAGE_SIZE;
 	unsigned long i;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	vm_object_t mapping;
 #else
 	struct address_space *mapping;
@@ -2698,7 +2699,7 @@ rebuild_st:
 	 *
 	 * Fail silently without starting the shrinker
 	 */
-#ifndef __linux__
+#ifdef __FreeBSD__
 	mapping = obj->base.filp->f_shmem;
 	noreclaim = 0;
 #else
@@ -3062,7 +3063,7 @@ static int
 i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 			   const struct drm_i915_gem_pwrite *arg)
 {
-#ifndef __linux__
+#ifdef __FreeBSD__
 	vm_object_t mapping = obj->base.filp->f_shmem;
 #else
 	struct address_space *mapping = obj->base.filp->f_mapping;
@@ -3106,7 +3107,7 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 		if (len > remain)
 			len = remain;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 		(void)data;
 		(void)err;
 		page = shmem_read_mapping_page(mapping, OFF_TO_IDX(offset));
@@ -3131,6 +3132,7 @@ i915_gem_object_pwrite_gtt(struct drm_i915_gem_object *obj,
 #else
 		put_page(page);
 #endif
+
 		if (unwritten)
 			return -EFAULT;
 
@@ -4906,7 +4908,7 @@ static int i915_gem_object_create_shmem(struct drm_device *dev,
 #ifdef __linux__
 		filp = shmem_file_setup_with_mnt(i915->mm.gemfs, "i915", size,
 						 flags);
-#else
+#elif defined(__FreeBSD__)
 		panic("i915_gem.c: gemfs not supported\n");
 #endif
 	else
@@ -5017,7 +5019,7 @@ static bool discard_backing_storage(struct drm_i915_gem_object *obj)
 	 * acquiring such a reference whilst we are in the middle of
 	 * freeing the object.
 	 */
-#ifndef __linux__
+#ifdef __FreeBSD__
 	return file_count(obj->base.filp) == 1;
 #else
 	return atomic_long_read(&obj->base.filp->f_count) == 1;
@@ -6210,7 +6212,7 @@ i915_gem_object_create_from_data(struct drm_i915_private *dev_priv,
 					    &page, &pgdata);
 		if (err < 0)
 			goto fail;
-#else
+#elif defined(__FreeBSD__)
 		(void)err;
 		(void)pgdata;
 		page = shmem_read_mapping_page(obj->base.filp->f_shmem, OFF_TO_IDX(offset));
@@ -6226,7 +6228,7 @@ i915_gem_object_create_from_data(struct drm_i915_private *dev_priv,
 					  page, pgdata);
 		if (err < 0)
 			goto fail;
-#else
+#elif defined(__FreeBSD__)
 		put_page(page);
 #endif
 

@@ -66,7 +66,7 @@
 #include <linux/pci.h>
 #include <linux/pm_runtime.h>
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <linux/platform_device.h>
 #include <linux/irq.h>
 

@@ -782,7 +782,7 @@ struct amdgpu_device {
 	amdgpu_block_wreg_t		audio_endpt_wreg;
 	void __iomem                    *rio_mem;
 	resource_size_t			rio_mem_size;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	int				rio_rid;
 	int				rio_type;
 	struct resource			*rio_res;

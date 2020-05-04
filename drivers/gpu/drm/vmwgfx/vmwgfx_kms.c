@@ -216,7 +216,7 @@ void vmw_kms_cursor_snoop(struct vmw_surface *srf,
 			memcpy(srf->snooper.image + i * 64,
 #ifdef __linux__
 			       virtual + i * cmd->dma.guest.pitch,
-#else
+#elif defined(__FreeBSD__)
 			       ((char*)virtual) + i * cmd->dma.guest.pitch,
 #endif
 			       box->w * 4);

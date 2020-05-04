@@ -87,7 +87,7 @@ struct i915_gem_context {
 	 * that should only affect the default context, all contexts created
 	 * explicitly by the client are expected to be isolated.
 	 */
-#ifndef __linux__
+#ifdef __FreeBSD__
 	pid_t pid;
 #else
 	struct pid *pid;

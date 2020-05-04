@@ -147,7 +147,7 @@ static int drm_set_busid(struct drm_device *dev, struct drm_file *file_priv)
 
 #ifdef __linux__
 	if (dev->dev && dev_is_pci(dev->dev)) {
-#else
+#elif defined(__FreeBSD__)
 	// BSDFIXME: Assume it's PCI for now
 	if (dev->dev) {
 #endif
@@ -200,7 +200,7 @@ int drm_getclient(struct drm_device *dev, void *data,
 		client->pid = task_pid_vnr(current);
 #ifdef __linux__
 		client->uid = overflowuid;
-#else
+#elif defined(__FreeBSD__)
 		client->uid = 0;
 #endif
 		client->magic = 0;
@@ -811,7 +811,7 @@ long drm_ioctl(struct file *filp,
 	if (drm_dev_is_unplugged(dev))
 		return -ENODEV;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	if (IOCGROUP(cmd) != DRM_IOCTL_BASE) {
 		DRM_DEBUG("bad ioctl group 0x%x\n", (int)IOCGROUP(cmd));
 		return -EINVAL;

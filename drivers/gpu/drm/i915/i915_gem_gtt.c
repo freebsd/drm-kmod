@@ -35,13 +35,14 @@
 
 #include <drm/drmP.h>
 #include <drm/i915_drm.h>
+
 #include "i915_drv.h"
 #include "i915_vgpu.h"
 #include "i915_trace.h"
 #include "intel_drv.h"
 #include "intel_frontbuffer.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 #include <dev/agp/agp_i810.h>
 #define	resource linux_resource
 #endif
@@ -395,6 +396,7 @@ static struct page *vm_alloc_page(struct i915_address_space *vm, gfp_t gfp)
 		page = alloc_page(gfp);
 		if (unlikely(!page))
 			break;
+
 		stack.pages[stack.nr++] = page;
 	} while (pagevec_space(&stack));
 
@@ -2658,7 +2660,7 @@ static void i915_ggtt_insert_entries(struct i915_address_space *vm,
 #ifdef __linux__
 	intel_gtt_insert_sg_entries(vma->pages, vma->node.start >> PAGE_SHIFT,
 				    flags);
-#else
+#elif defined(__FreeBSD__)
 	linux_intel_gtt_insert_sg_entries(vma->pages,
 	    vma->node.start >> PAGE_SHIFT, flags);
 #endif
@@ -3476,7 +3478,7 @@ static int i915_gmch_probe(struct i915_ggtt *ggtt)
 		return -EIO;
 	}
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	struct intel_gtt *gtt;
 
 	gtt = intel_gtt_get();

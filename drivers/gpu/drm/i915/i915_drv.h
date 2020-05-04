@@ -87,7 +87,7 @@
 
 #include "intel_gvt.h"
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 /* BSD: Make sure we get out[bwl] redefines */
 #include <linux/compiler.h>
 #endif
@@ -1450,7 +1450,7 @@ struct drm_i915_private {
 	 */
 #ifdef __linux__
 	struct resource dsm;
-#else
+#elif defined(__FreeBSD__)
 	struct linux_resource dsm;
 #endif
 	/**
@@ -1458,7 +1458,7 @@ struct drm_i915_private {
 	 */
 #ifdef __linux__
 	struct resource dsm_reserved;
-#else
+#elif defined(__FreeBSD__)
 	struct linux_resource dsm_reserved;
 #endif
 
@@ -1474,7 +1474,7 @@ struct drm_i915_private {
 	resource_size_t stolen_usable_size;	/* Total size minus reserved ranges */
 
 	void __iomem *regs;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	int mmio_rid;
 	int mmio_restype;
 	struct resource *mmio_res;
@@ -1525,10 +1525,11 @@ struct drm_i915_private {
 
 #ifdef __linux__
 	struct resource mch_res;
-#else
+#elif defined(__FreeBSD__)
 	struct linux_resource mch_res;
 	int mch_res_rid;
 #endif
+
 	/* protects the irq masks */
 	spinlock_t irq_lock;
 
@@ -2205,10 +2206,11 @@ static inline unsigned int i915_sg_segment_size(void)
 {
 #ifdef __linux__
 	unsigned int size = swiotlb_max_segment();
-#else
+#elif defined(__FreeBSD__)
 	/* !CONFIG_SWIOTLB */
 	unsigned int size = 0;
 #endif
+
 	if (size == 0)
 		return SCATTERLIST_MAX_SEGMENT;
 
@@ -2243,7 +2245,7 @@ intel_info(const struct drm_i915_private *dev_priv)
 	BUILD_BUG_ON_ZERO(!__builtin_constant_p(s)) + \
 	BUILD_BUG_ON_ZERO(!__builtin_constant_p(e)) + \
 	GENMASK((e) - 1, (s) - 1))
-#else
+#elif defined(__FreeBSD__)
 #define INTEL_GEN_MASK(s, e) ( \
 	GENMASK((e) != GEN_FOREVER ? (e) - 1 : BITS_PER_LONG - 1, \
 		(s) != GEN_FOREVER ? (s) - 1 : 0) \
@@ -3117,7 +3119,7 @@ void i915_gem_resume(struct drm_i915_private *dev_priv);
 
 #ifdef __linux__
 vm_fault_t i915_gem_fault(struct vm_fault *vmf);
-#else
+#elif defined(__FreeBSD__)
 vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf);
 #endif
 
@@ -3391,7 +3393,7 @@ mkwrite_device_info(struct drm_i915_private *dev_priv)
 {
 #ifdef __linux__
 	return (struct intel_device_info *)&dev_priv->info;
-#else
+#elif defined(__FreeBSD__)
 	return __DECONST(struct intel_device_info *, &dev_priv->info);
 #endif
 }
@@ -3763,7 +3765,7 @@ __i915_request_irq_complete(const struct i915_request *rq)
 	return false;
 }
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 // intel_freebsd.c
 void i915_locks_destroy(struct drm_i915_private *dev_priv);
 #endif

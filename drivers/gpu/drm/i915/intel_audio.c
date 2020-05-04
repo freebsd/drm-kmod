@@ -674,6 +674,7 @@ void intel_audio_codec_enable(struct intel_encoder *encoder,
 		acomp->base.audio_ops->pin_eld_notify(acomp->base.audio_ops->audio_ptr,
 						 (int) port, (int) pipe);
 	}
+
 #ifdef __linux__
 	intel_lpe_audio_notify(dev_priv, pipe, port, connector->eld,
 			       crtc_state->port_clock,

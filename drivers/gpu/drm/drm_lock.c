@@ -33,14 +33,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 #include <linux/export.h>
 #include <linux/sched/signal.h>
 
 #include <drm/drmP.h>
-#include <linux/spinlock.h>
 #include "drm_legacy.h"
 #include "drm_internal.h"
 
