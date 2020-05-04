@@ -31,7 +31,6 @@ SRCS=	\
 	i915_gem_stolen.c \
 	i915_gem_shrinker.c \
 	i915_gem_tiling.c \
-	i915_gem_timeline.c \
 	i915_gem_userptr.c \
 	i915_gpu_error.c \
 	i915_irq.c \
@@ -239,7 +238,6 @@ CWARNFLAGS.i915_gem_request.c= -Wno-cast-qual
 CWARNFLAGS.i915_gem_shrinker.c= -Wno-cast-qual
 CWARNFLAGS.i915_gem_stolen.c= -Wno-cast-qual
 CWARNFLAGS.i915_gem_tiling.c=	-Wno-tautological-pointer-compare -Wno-cast-qual
-CWARNFLAGS.i915_gem_timeline.c= -Wno-cast-qual
 CWARNFLAGS.i915_gem_userptr.c= -Wno-cast-qual
 CWARNFLAGS.i915_gpu_error.c= -Wno-cast-qual -Wno-unused-function
 CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides -Wno-unused-variable
