@@ -29,7 +29,6 @@
 #ifdef __FreeBSD__
 #undef BUILD_BUG_ON
 #define	BUILD_BUG_ON(x)
-#include <linux/math64.h>
 #endif
 
 #define BW_FIXED_BITS_PER_FRACTIONAL_PART 24

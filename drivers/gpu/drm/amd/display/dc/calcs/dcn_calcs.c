@@ -35,10 +35,6 @@
 
 #include "dcn_calc_math.h"
 
-#ifndef __linux__
-#include <machine/fpu.h>
-#endif
-
 #define DC_LOGGER \
 	dc->ctx->logger
 
@@ -1310,7 +1306,7 @@ unsigned int dcn_find_dcfclk_suits_all(
 	unsigned vdd_level, vdd_level_temp;
 	unsigned dcf_clk;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	/*  FreeBSD claim access to FPU here */
 	kernel_fpu_begin();
 #endif
@@ -1346,7 +1342,7 @@ unsigned int dcn_find_dcfclk_suits_all(
 	else
 		dcf_clk =  dc->dcn_soc->dcfclkv_min0p65*1000;
 
-#ifndef __linux__
+#ifdef __FreeBSD__
 	kernel_fpu_end();
 #endif
 

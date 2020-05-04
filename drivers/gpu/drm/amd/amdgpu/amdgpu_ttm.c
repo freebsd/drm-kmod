@@ -763,6 +763,7 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 		unsigned long end = gtt->userptr + ttm->num_pages * PAGE_SIZE;
 		struct vm_area_struct *vma;
 		/* BSDFIXME: Missing impl */
+
 		vma = find_vma(mm, gtt->userptr);
 		if (!vma || vma->vm_file || vma->vm_end < end) {
 			up_read(&mm->mmap_sem);
@@ -1680,7 +1681,7 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 	r = ttm_bo_device_init(&adev->mman.bdev,
 			       &amdgpu_bo_driver,
 #ifdef __linux__
-			       adev->ddev->anon_mapping,
+			       adev->ddev->anon_inode->i_mapping,
 #elif defined(__FreeBSD__)
 			       NULL, /* Dummy on BSD */
 #endif
@@ -2230,6 +2231,7 @@ static ssize_t amdgpu_ttm_vram_write(struct file *f, const char __user *buf,
 
 		if (*pos >= adev->gmc.mc_vram_size)
 			return result;
+
 #ifdef __linux__
 		r = get_user(value, (uint32_t *)buf);
 #elif defined(__FreeBSD__)

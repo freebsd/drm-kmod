@@ -29,7 +29,6 @@
 #include <linux/dma-buf.h>
 
 const struct kgd2kfd_calls *kgd2kfd;
-bool (*kgd2kfd_init_p)(unsigned int, const struct kgd2kfd_calls**);
 
 static const unsigned int compute_vmid_bitmap = 0xFF00;
 
@@ -63,10 +62,8 @@ int amdgpu_amdkfd_init(void)
 void amdgpu_amdkfd_fini(void)
 {
 #ifdef __linux__
-	if (kgd2kfd) {
+	if (kgd2kfd)
 		kgd2kfd->exit();
-		symbol_put(kgd2kfd_init);
-	}
 #endif
 }
 
@@ -366,11 +363,15 @@ void amdgpu_amdkfd_get_local_mem_info(struct kgd_dev *kgd,
 				      struct kfd_local_mem_info *mem_info)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
-        /* BSDFIXME: Change required by D19845. Sketchy conversion depends
+#ifdef __linux__
+	uint64_t address_mask = adev->dev->dma_mask ? ~*adev->dev->dma_mask :
+#elif defined(__FreeBSD__)
+	/* BSDFIXME: Change required by D19845. Sketchy conversion depends
          * on dma_mask being the first member of dma_priv 
 	 */
 	uint64_t address_mask = adev->dev->dma_priv ? ~*((uint64_t*)adev->dev->dma_priv) :
 					     ~((1ULL << 32) - 1);
+#endif
 	resource_size_t aper_limit = adev->gmc.aper_base + adev->gmc.aper_size;
 
 	memset(mem_info, 0, sizeof(*mem_info));

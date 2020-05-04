@@ -32,7 +32,7 @@
 #include <linux/power_supply.h>
 #include <linux/hwmon.h>
 #include <linux/hwmon-sysfs.h>
-/* #include <linux/nospec.h> */
+#include <linux/nospec.h>
 #include "hwmgr.h"
 #define WIDTH_4K 3840
 

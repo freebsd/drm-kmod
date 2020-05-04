@@ -64,7 +64,7 @@
 #define DC_LOG_PERF_TRACE(...) DRM_DEBUG_KMS(__VA_ARGS__)
 #define DC_LOG_RETIMER_REDRIVER(...) DRM_DEBUG_KMS(__VA_ARGS__)
 
-#if !defined(__linux__) && defined(LOG_WARNING)
+#if defined(__FreeBSD__) && defined(LOG_WARNING)
 #undef LOG_WARNING // BSD: defined in syslog.h
 #undef LOG_DEBUG // BSD: defined in syslog.h
 #endif

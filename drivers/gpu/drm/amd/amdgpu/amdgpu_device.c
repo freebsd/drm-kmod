@@ -58,6 +58,7 @@
 
 #include "amdgpu_amdkfd.h"
 #include "amdgpu_pm.h"
+
 #include "amdgpu_xgmi.h"
 
 #ifdef __FreeBSD__
@@ -65,7 +66,6 @@
 #define pci_restore_state linux_pci_restore_state
 /* #define	resource linux_resource */
 #endif
-
 MODULE_FIRMWARE("amdgpu/vega10_gpu_info.bin");
 MODULE_FIRMWARE("amdgpu/vega12_gpu_info.bin");
 MODULE_FIRMWARE("amdgpu/raven_gpu_info.bin");
@@ -2524,6 +2524,7 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	if (adev->rio_mem == NULL)
 		DRM_INFO("PCI I/O BAR is not found.\n");
 #endif
+
 	amdgpu_device_get_pcie_info(adev);
 
 	/* early init functions */

@@ -935,14 +935,6 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
 		return -ENODEV;
 	}
 
-	/*
-	 * Initialize amdkfd before starting radeon. If it was not loaded yet,
-	 * defer radeon probing
-	 */
-	ret = amdgpu_amdkfd_init();
-	if (ret == -EPROBE_DEFER)
-		return ret;
-
 	/* Get rid of things like offb */
 	ret = drm_fb_helper_remove_conflicting_pci_framebuffers(pdev, 0, "amdgpudrmfb");
 	if (ret)
@@ -1181,6 +1173,7 @@ static int amdgpu_flush(struct file *f, fl_owner_t id)
 }
 #endif
 
+
 static const struct file_operations amdgpu_driver_kms_fops = {
 	.owner = THIS_MODULE,
 	.open = drm_open,
@@ -1282,7 +1275,9 @@ static int __init amdgpu_init(void)
 	DRM_INFO("amdgpu kernel modesetting enabled.\n");
 	kms_driver.num_ioctls = amdgpu_max_kms_ioctl;
 	amdgpu_register_atpx_handler();
-	/* let modprobe override vga console setting */
+
+	/* Ignore KFD init failures. Normal when CONFIG_HSA_AMD is not set. */
+	amdgpu_amdkfd_init();
 
 #ifdef __FreeBSD__
 	amdgpu_kms_pci_driver.bsdclass = drm_devclass;
@@ -1294,7 +1289,6 @@ static int __init amdgpu_init(void)
 	DRM_ERROR("FreeBSD needs DRIVER_MODESET");
 	return (-ENOTSUP);
 #endif
-
 	/* let modprobe override vga console setting */
 	return pci_register_driver(&amdgpu_kms_pci_driver);
 
