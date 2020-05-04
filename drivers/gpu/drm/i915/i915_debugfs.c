@@ -239,7 +239,9 @@ static int obj_rank_by_stolen(const void *A, const void *B)
 
 static int i915_gem_stolen_list_info(struct seq_file *m, void *data)
 {
+#ifdef __FreeBSD__
 	return 0;
+#endif
 	struct drm_i915_private *dev_priv = node_to_i915(m->private);
 	struct drm_device *dev = &dev_priv->drm;
 	struct drm_i915_gem_object **objects;

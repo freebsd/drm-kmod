@@ -877,6 +877,7 @@ void i915_vma_revoke_mmap(struct i915_vma *vma)
 	unmap_mapping_range(vma->obj, drm_vma_node_offset_addr(node),
 	    drm_vma_node_size(node) << PAGE_SHIFT, 1);
 #endif
+
 	i915_vma_unset_userfault(vma);
 	if (!--vma->obj->userfault_count)
 		list_del(&vma->obj->userfault_link);

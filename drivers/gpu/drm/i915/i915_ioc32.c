@@ -32,7 +32,7 @@
 #include <drm/i915_drm.h>
 #include "i915_drv.h"
 
-#if !defined(__linux__) && defined(CONFIG_COMPAT)
+#if defined(CONFIG_COMPAT)
 struct drm_i915_getparam32 {
 	s32 param;
 	/*
@@ -52,18 +52,19 @@ static int compat_i915_getparam(struct file *file, unsigned int cmd,
 				unsigned long arg)
 {
 #ifdef __linux__
- 	struct drm_i915_getparam32 req32;
+	struct drm_i915_getparam32 req32;
 	drm_i915_getparam_t __user *request;
+
 	if (copy_from_user(&req32, (void __user *)arg, sizeof(req32)))
- 		return -EFAULT;
-	
+		return -EFAULT;
+
 	request = compat_alloc_user_space(sizeof(*request));
 	if (!access_ok(request, sizeof(*request)) ||
 	    __put_user(req32.param, &request->param) ||
 	    __put_user((void __user *)(unsigned long)req32.value,
 		       &request->value))
 		return -EFAULT;
-	
+
 	return drm_ioctl(file, DRM_IOCTL_I915_GETPARAM,
 			 (unsigned long)request);
 #elif defined(__FreeBSD__)

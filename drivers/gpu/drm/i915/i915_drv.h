@@ -30,7 +30,6 @@
 #ifndef _I915_DRV_H_
 #define _I915_DRV_H_
 
-#include <uapi/linux/uuid.h>
 #include <uapi/drm/i915_drm.h>
 #include <uapi/drm/drm_fourcc.h>
 
@@ -692,7 +691,6 @@ struct intel_rps {
 
 struct intel_rc6 {
 	bool enabled;
-	bool ctx_corrupted;
 	u64 prev_hw_residency[4];
 	u64 cur_residency[4];
 };
@@ -2237,15 +2235,14 @@ intel_info(const struct drm_i915_private *dev_priv)
 #define REVID_FOREVER		0xff
 #define INTEL_REVID(dev_priv)	((dev_priv)->drm.pdev->revision)
 
-#define GEN_FOREVER (0)
-
 #ifdef __linux__
 /* BSDFIXME: Test this on BSD */
-#define INTEL_GEN_MASK(s, e) (			      \
+#define INTEL_GEN_MASK(s, e) ( \
 	BUILD_BUG_ON_ZERO(!__builtin_constant_p(s)) + \
 	BUILD_BUG_ON_ZERO(!__builtin_constant_p(e)) + \
 	GENMASK((e) - 1, (s) - 1))
 #elif defined(__FreeBSD__)
+#define GEN_FOREVER 0
 #define INTEL_GEN_MASK(s, e) ( \
 	GENMASK((e) != GEN_FOREVER ? (e) - 1 : BITS_PER_LONG - 1, \
 		(s) != GEN_FOREVER ? (s) - 1 : 0) \
@@ -2449,16 +2446,9 @@ intel_info(const struct drm_i915_private *dev_priv)
 
 #define HAS_LEGACY_SEMAPHORES(dev_priv) IS_GEN7(dev_priv)
 
-/*
- * The Gen7 cmdparser copies the scanned buffer to the ggtt for execution
- * All later gens can run the final buffer from the ppgtt
- */
-#define CMDPARSER_USES_GGTT(dev_priv) IS_GEN7(dev_priv)
-
 #define HAS_LLC(dev_priv)	((dev_priv)->info.has_llc)
 #define HAS_SNOOP(dev_priv)	((dev_priv)->info.has_snoop)
 #define HAS_EDRAM(dev_priv)	(!!((dev_priv)->edram_cap & EDRAM_ENABLED))
-#define HAS_SECURE_BATCHES(dev_priv) (INTEL_GEN(dev_priv) < 6)
 #define HAS_WT(dev_priv)	((IS_HASWELL(dev_priv) || \
 				 IS_BROADWELL(dev_priv)) && HAS_EDRAM(dev_priv))
 
@@ -2493,12 +2483,10 @@ intel_info(const struct drm_i915_private *dev_priv)
 /* Early gen2 have a totally busted CS tlb and require pinned batches. */
 #define HAS_BROKEN_CS_TLB(dev_priv)	(IS_I830(dev_priv) || IS_I845G(dev_priv))
 
-#define NEEDS_RC6_CTX_CORRUPTION_WA(dev_priv)	\
-	(IS_BROADWELL(dev_priv) || IS_GEN9(dev_priv))
-
 /* WaRsDisableCoarsePowerGating:skl,cnl */
 #define NEEDS_WaRsDisableCoarsePowerGating(dev_priv) \
-	(IS_CANNONLAKE(dev_priv) || IS_GEN9(dev_priv))
+	(IS_CANNONLAKE(dev_priv) || \
+	 IS_SKL_GT3(dev_priv) || IS_SKL_GT4(dev_priv))
 
 #define HAS_GMBUS_IRQ(dev_priv) (INTEL_GEN(dev_priv) >= 4)
 #define HAS_GMBUS_BURST_READ(dev_priv) (INTEL_GEN(dev_priv) >= 10 || \
@@ -2892,14 +2880,6 @@ i915_gem_object_ggtt_pin(struct drm_i915_gem_object *obj,
 int i915_gem_object_unbind(struct drm_i915_gem_object *obj);
 void i915_gem_release_mmap(struct drm_i915_gem_object *obj);
 
-struct i915_vma * __must_check
-i915_gem_object_pin(struct drm_i915_gem_object *obj,
-		    struct i915_address_space *vm,
-		    const struct i915_ggtt_view *view,
-		    u64 size,
-		    u64 alignment,
-		    u64 flags);
-
 void i915_gem_runtime_suspend(struct drm_i915_private *dev_priv);
 
 static inline int __sg_page_count(const struct scatterlist *sg)
@@ -3122,17 +3102,6 @@ vm_fault_t i915_gem_fault(struct vm_fault *vmf);
 #elif defined(__FreeBSD__)
 vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf);
 #endif
-
-/******* FreeBSD support ************/
-extern struct drm_driver i915_driver_info;
-extern int intel_iommu_gfx_mapped;
-
-/* i915_debugfs.c */
-int i915_sysctl_init(struct drm_device *dev, struct sysctl_ctx_list *ctx,
-    struct sysctl_oid *top);
-void i915_sysctl_cleanup(struct drm_device *dev);
-
-/***************/
 int i915_gem_object_wait(struct drm_i915_gem_object *obj,
 			 unsigned int flags,
 			 long timeout,
@@ -3312,14 +3281,12 @@ const char *i915_cache_level_str(struct drm_i915_private *i915, int type);
 int i915_cmd_parser_get_version(struct drm_i915_private *dev_priv);
 void intel_engine_init_cmd_parser(struct intel_engine_cs *engine);
 void intel_engine_cleanup_cmd_parser(struct intel_engine_cs *engine);
-int intel_engine_cmd_parser(struct i915_gem_context *cxt,
-			    struct intel_engine_cs *engine,
+int intel_engine_cmd_parser(struct intel_engine_cs *engine,
 			    struct drm_i915_gem_object *batch_obj,
-			    u64 user_batch_start,
+			    struct drm_i915_gem_object *shadow_batch_obj,
 			    u32 batch_start_offset,
 			    u32 batch_len,
-			    struct drm_i915_gem_object *shadow_batch_obj,
-			    u64 shadow_batch_start);
+			    bool is_master);
 
 /* i915_perf.c */
 #ifdef CONFIG_I915_PERF // Not yet. i915_perf.c opens a can of worms...
@@ -3766,6 +3733,7 @@ __i915_request_irq_complete(const struct i915_request *rq)
 }
 
 #ifdef __FreeBSD__
+// Seems unused (manu 20200504)
 // intel_freebsd.c
 void i915_locks_destroy(struct drm_i915_private *dev_priv);
 #endif

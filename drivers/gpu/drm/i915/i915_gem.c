@@ -2524,9 +2524,11 @@ i915_gem_object_put_pages_gtt(struct drm_i915_gem_object *obj,
 
 	if (i915_gem_object_needs_bit17_swizzle(obj))
 		i915_gem_object_save_bit_17_swizzle(obj, pages);
+
 #ifdef __linux__
 	mapping_clear_unevictable(file_inode(obj->base.filp)->i_mapping);
 #endif
+
 	pagevec_init(&pvec);
 	for_each_sgt_page(page, sgt_iter, pages) {
 		if (obj->mm.dirty)
@@ -4577,20 +4579,6 @@ i915_gem_object_ggtt_pin(struct drm_i915_gem_object *obj,
 {
 	struct drm_i915_private *dev_priv = to_i915(obj->base.dev);
 	struct i915_address_space *vm = &dev_priv->ggtt.vm;
-
-	return i915_gem_object_pin(obj, vm, view, size, alignment,
-				   flags | PIN_GLOBAL);
-}
-
-struct i915_vma *
-i915_gem_object_pin(struct drm_i915_gem_object *obj,
-		    struct i915_address_space *vm,
-		    const struct i915_ggtt_view *view,
-		    u64 size,
-		    u64 alignment,
-		    u64 flags)
-{
-	struct drm_i915_private *dev_priv = to_i915(obj->base.dev);
 	struct i915_vma *vma;
 	int ret;
 
@@ -4654,7 +4642,7 @@ i915_gem_object_pin(struct drm_i915_gem_object *obj,
 			return ERR_PTR(ret);
 	}
 
-	ret = i915_vma_pin(vma, size, alignment, flags);
+	ret = i915_vma_pin(vma, size, alignment, flags | PIN_GLOBAL);
 	if (ret)
 		return ERR_PTR(ret);
 

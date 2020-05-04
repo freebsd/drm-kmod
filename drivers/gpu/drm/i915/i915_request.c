@@ -681,7 +681,7 @@ i915_request_alloc(struct intel_engine_cs *engine, struct i915_gem_context *ctx)
 	}
 
 #ifdef __linux__
-        rq->rcustate = get_state_synchronize_rcu();
+	rq->rcustate = get_state_synchronize_rcu();
 #endif
 
 	INIT_LIST_HEAD(&rq->active_list);

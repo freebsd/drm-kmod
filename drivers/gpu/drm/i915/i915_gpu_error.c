@@ -35,9 +35,14 @@
 #endif
 
 #include <linux/ascii85.h>
+#ifdef __linux__
+#include <linux/nmi.h>
+#endif
 #include <linux/scatterlist.h>
-
 #include <linux/stop_machine.h>
+#ifdef __linux__
+#include <linux/utsname.h>
+#endif
 #include <linux/zlib.h>
 
 #include <drm/drm_print.h>
@@ -92,11 +97,13 @@ static void __sg_set_buf(struct scatterlist *sg,
 	sg->page_link = (unsigned long)virt_to_page(addr);
 #ifdef __linux__
 	sg->offset = offset_in_page(addr);
+	sg->length = len;
+	sg->dma_address = it;
 #elif defined(__FreeBSD__)
 	sg->offset = offset_in_page((unsigned long)addr);
-#endif
 	sg_dma_len(sg) = len;
 	sg_dma_address(sg) = it;
+#endif
 }
 
 static bool __i915_error_grow(struct drm_i915_error_state_buf *e, size_t len)

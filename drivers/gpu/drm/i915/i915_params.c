@@ -197,7 +197,7 @@ static __always_inline void _print_param(struct drm_printer *p,
 		drm_printf(p, "i915.%s=%s\n", name, *(const char **)x);
 	else
 		WARN_ONCE(1, "no printer defined for param type %s (i915.%s)\n",
-		    type, name);
+			  type, name);
 }
 
 /**

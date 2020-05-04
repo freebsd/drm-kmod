@@ -32,9 +32,7 @@
 #include "i915_gem.h"
 #include "i915_scheduler.h"
 
-#ifdef __linux__ // FreeBSD use pid_t
 struct pid;
-#endif
 
 struct drm_device;
 struct drm_file;
@@ -211,11 +209,6 @@ struct i915_gem_context {
 	 * context close.
 	 */
 	struct list_head handles_list;
-
-	/** jump_whitelist: Bit array for tracking cmds during cmdparsing */
-	unsigned long *jump_whitelist;
-	/** jump_whitelist_cmds: No of cmd slots available */
-	u32 jump_whitelist_cmds;
 };
 
 static inline bool i915_gem_context_is_closed(const struct i915_gem_context *ctx)

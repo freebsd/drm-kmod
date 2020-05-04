@@ -33,7 +33,6 @@
 #include <drm/drm_hdcp.h>
 #include "intel_drv.h"
 #include <drm/i915_drm.h>
-#include "intel_drv.h"
 #include "i915_drv.h"
 
 extern struct class *drm_class;

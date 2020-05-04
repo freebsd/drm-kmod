@@ -2384,9 +2384,10 @@ int i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
 				     pages->sgl, pages->nents,
 				     PCI_DMA_BIDIRECTIONAL,
 #ifdef __linux__
-		        DMA_ATTR_NO_WARN))
+				     DMA_ATTR_NO_WARN))
+
 #else
-			NULL))
+				     NULL))
 #endif
 			return 0;
 

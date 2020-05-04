@@ -470,7 +470,7 @@ int i915_sw_fence_await_dma_fence(struct i915_sw_fence *fence,
 	func = dma_i915_sw_fence_wake;
 	if (timeout) {
 		struct i915_sw_dma_fence_cb_timer *timer =
-		        container_of(cb, typeof(*timer), base);
+			container_of(cb, typeof(*timer), base);
 
 		timer->dma = dma_fence_get(dma);
 #ifdef __linux__

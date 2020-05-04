@@ -399,6 +399,11 @@ static u64 execlists_update_context(struct i915_request *rq)
 	 * may not be visible to the HW prior to the completion of the UC
 	 * register write and that we may begin execution from the context
 	 * before its image is complete leading to invalid PD chasing.
+	 *
+	 * Furthermore, Braswell, at least, wants a full mb to be sure that
+	 * the writes are coherent in memory (visible to the GPU) prior to
+	 * execution, and not just visible to other CPUs (as is the result of
+	 * wmb).
 	 */
 	wmb();
 	return ce->lrc_desc;
@@ -1415,15 +1420,6 @@ static u32 *gen9_init_indirectctx_bb(struct intel_engine_cs *engine, u32 *batch)
 
 	/* WaFlushCoherentL3CacheLinesAtContextSwitch:skl,bxt,glk */
 	batch = gen8_emit_flush_coherentl3_wa(engine, batch);
-
-	/* WaClearSlmSpaceAtContextSwitch:skl,bxt,kbl,glk,cfl */
-	batch = gen8_emit_pipe_control(batch,
-				       PIPE_CONTROL_FLUSH_L3 |
-				       PIPE_CONTROL_STORE_DATA_INDEX |
-				       PIPE_CONTROL_CS_STALL |
-				       PIPE_CONTROL_QW_WRITE,
-				       i915_scratch_offset(engine->i915) +
-				       2 * CACHELINE_BYTES);
 
 	batch = emit_lri(batch, lri, ARRAY_SIZE(lri));
 
@@ -2559,6 +2555,7 @@ static void execlists_init_reg_state(u32 *regs,
 		regs[CTX_LRI_HEADER_2] = MI_LOAD_REGISTER_IMM(1);
 		CTX_REG(regs, CTX_R_PWR_CLK_STATE, GEN8_R_PWR_CLK_STATE,
 			make_rpcs(dev_priv));
+
 #ifdef CONFIG_I915_PERF
 		i915_oa_init_reg_state(engine, ctx, regs);
 #endif

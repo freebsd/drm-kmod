@@ -2167,7 +2167,7 @@ static irqreturn_t valleyview_irq_handler(int irq, void *arg)
 #ifdef __linux__
 		// Not yet supported in BSD
 		if (iir & (I915_LPE_PIPE_A_INTERRUPT |
-		        I915_LPE_PIPE_B_INTERRUPT))
+			   I915_LPE_PIPE_B_INTERRUPT))
 			intel_lpe_audio_irq_handler(dev_priv);
 #endif
 
@@ -2253,10 +2253,11 @@ static irqreturn_t cherryview_irq_handler(int irq, void *arg)
 #ifdef __linux__
 		// lpe audio not yet supported in BSD
 		if (iir & (I915_LPE_PIPE_A_INTERRUPT |
-		        I915_LPE_PIPE_B_INTERRUPT |
-		        I915_LPE_PIPE_C_INTERRUPT))
+			   I915_LPE_PIPE_B_INTERRUPT |
+			   I915_LPE_PIPE_C_INTERRUPT))
 			intel_lpe_audio_irq_handler(dev_priv);
 #endif
+
 		/*
 		 * VLV_IIR is single buffered, and reflects the level
 		 * from PIPESTAT/PORT_HOTPLUG_STAT, hence clear it last.
@@ -3021,6 +3022,7 @@ gen11_gt_engine_identity(struct drm_i915_private * const i915,
 #elif defined(__FreeBSD__)
 		 !time_after(local_clock() >> 10, timeout_ts));
 #endif
+
 	if (unlikely(!(ident & GEN11_INTR_DATA_VALID))) {
 		DRM_ERROR("INTR_IDENTITY_REG%u:%u 0x%08x not valid!\n",
 			  bank, bit, ident);
@@ -3213,17 +3215,21 @@ static void i915_reset_device(struct drm_i915_private *dev_priv,
 			      u32 engine_mask,
 			      const char *reason)
 {
-	struct wedge_me w;
-	DRM_DEBUG_DRIVER("resetting chip\n");
 	struct i915_gpu_error *error = &dev_priv->gpu_error;
 #ifdef __linux__
 	struct kobject *kobj = &dev_priv->drm.primary->kdev->kobj;
 	char *error_event[] = { I915_ERROR_UEVENT "=1", NULL };
 	char *reset_event[] = { I915_RESET_UEVENT "=1", NULL };
 	char *reset_done_event[] = { I915_ERROR_UEVENT "=0", NULL };
+#endif
+	struct wedge_me w;
 
+#ifdef __linux__
 	kobject_uevent_env(kobj, KOBJ_CHANGE, error_event);
+#endif
 
+	DRM_DEBUG_DRIVER("resetting chip\n");
+#ifdef __linux
 	kobject_uevent_env(kobj, KOBJ_CHANGE, reset_event);
 #endif
 

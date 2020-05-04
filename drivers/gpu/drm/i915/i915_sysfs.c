@@ -142,7 +142,7 @@ static const struct attribute_group media_rc6_attr_group = {
 	.name = power_group_name,
 	.attrs =  media_rc6_attrs
 };
-#endif /* CONFIG_PM */
+#endif
 
 #ifdef __linux__
 /* Missing sysfs bin files support */
@@ -519,6 +519,7 @@ static const struct attribute * const vlv_attrs[] = {
 #ifdef __linux__
 /* Missing sysfs bin files support */
 #if IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR)
+
 static ssize_t error_state_read(struct file *filp, struct kobject *kobj,
 				struct bin_attribute *attr, char *buf,
 				loff_t off, size_t count)
@@ -580,7 +581,7 @@ static void i915_teardown_error_capture(struct device *kdev)
 #else
 static void i915_setup_error_capture(struct device *kdev) {}
 static void i915_teardown_error_capture(struct device *kdev) {}
-#endif /* IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR) */
+#endif
 #endif /* __linux__ */
 
 void i915_setup_sysfs(struct drm_i915_private *dev_priv)
@@ -608,7 +609,7 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 		if (ret)
 			DRM_ERROR("Media RC6 residency sysfs setup failed\n");
 	}
-#endif
+#endif /* LKPI_HAVE_SYSFS_GROUPS */
 #endif
 #ifdef __linux__
 	/* Missing sysfs bin files support */
@@ -625,6 +626,7 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 		}
 	}
 #endif /* __linux__ */
+
 	ret = 0;
 #if LKPI_HAVE_SYSFS_GROUPS
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
@@ -634,6 +636,7 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 #endif
 	if (ret)
 		DRM_ERROR("RPS sysfs setup failed\n");
+
 #ifdef __linux__
 	/* Missing sysfs bin files support */
 	i915_setup_error_capture(kdev);
@@ -648,6 +651,7 @@ void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
 	/* Missing sysfs bin files support */
 	i915_teardown_error_capture(kdev);
 #endif
+
 #if LKPI_HAVE_SYSFS_GROUPS
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
 		sysfs_remove_files(&kdev->kobj, vlv_attrs);
