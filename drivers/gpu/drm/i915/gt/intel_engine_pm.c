@@ -20,19 +20,10 @@ static int __engine_unpark(struct intel_wakeref *wf)
 	struct intel_engine_cs *engine =
 		container_of(wf, typeof(*engine), wakeref);
 	struct intel_context *ce;
-	void *map;
 
 	ENGINE_TRACE(engine, "\n");
 
 	intel_gt_pm_get(engine->gt);
-
-	/* Pin the default state for fast resets from atomic context. */
-	map = NULL;
-	if (engine->default_state)
-		map = i915_gem_object_pin_map(engine->default_state,
-					      I915_MAP_WB);
-	if (!IS_ERR_OR_NULL(map))
-		engine->pinned_default_state = map;
 
 	/* Discard stale context state from across idling */
 	ce = engine->kernel_context;
@@ -43,6 +34,7 @@ static int __engine_unpark(struct intel_wakeref *wf)
 		if (IS_ENABLED(CONFIG_DRM_I915_DEBUG_GEM) && ce->state) {
 			struct drm_i915_gem_object *obj = ce->state->obj;
 			int type = i915_coherent_map_type(engine->i915);
+			void *map;
 
 			map = i915_gem_object_pin_map(obj, type);
 			if (!IS_ERR(map)) {
@@ -260,11 +252,6 @@ static int __engine_park(struct intel_wakeref *wf)
 
 	if (engine->park)
 		engine->park(engine);
-
-	if (engine->pinned_default_state) {
-		i915_gem_object_unpin_map(engine->default_state);
-		engine->pinned_default_state = NULL;
-	}
 
 	engine->execlists.no_priolist = false;
 
