@@ -1468,9 +1468,7 @@ static int i915_driver_init_hw(struct drm_i915_private *dev_priv)
 
 	intel_sanitize_options(dev_priv);
 
-#ifdef __linux__
 	i915_perf_init(dev_priv);
-#endif
 
 	ret = i915_ggtt_probe_hw(dev_priv);
 	if (ret)
@@ -1589,9 +1587,7 @@ err_msi:
 err_ggtt:
 	i915_ggtt_cleanup_hw(dev_priv);
 err_perf:
-#ifdef CONFIG_I915_PERF // Not yet. i915_perf.c opens a can of worms...
 	i915_perf_fini(dev_priv);
-#endif
 	return ret;
 }
 
@@ -1605,9 +1601,7 @@ static void i915_driver_cleanup_hw(struct drm_i915_private *dev_priv)
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 #endif
 
-#ifdef CONFIG_I915_PERF
 	i915_perf_fini(dev_priv);
-#endif
 
 #if defined(__linux__) || defined(pci_disable_msi)
 	if (pdev->msi_enabled)
@@ -1646,11 +1640,8 @@ static void i915_driver_register(struct drm_i915_private *dev_priv)
 		i915_setup_sysfs(dev_priv);
 #endif
 
-#ifdef __linux__
-		/* Not yet. i915_perf.c opens a can of worms... */
 		/* Depends on sysfs having been initialized */
 		i915_perf_register(dev_priv);
-#endif
 	} else
 		DRM_ERROR("Failed to register driver for userspace access!\n");
 
@@ -1708,10 +1699,7 @@ static void i915_driver_unregister(struct drm_i915_private *dev_priv)
 	acpi_video_unregister();
 	intel_opregion_unregister(dev_priv);
 
-#ifdef CONFIG_I915_PERF // Not yet. i915_perf.c opens a can of worms...
 	i915_perf_unregister(dev_priv);
-#endif
-
 	i915_pmu_unregister(dev_priv);
 
 #if LKPI_HAVE_SYSFS_GROUPS
