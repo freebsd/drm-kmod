@@ -32,10 +32,6 @@
 #include "intel_drv.h"
 #include "intel_guc_submission.h"
 
-#ifdef __FreeBSD__
-#include <asm/msr.h>
-#endif
-
 static inline struct drm_i915_private *node_to_i915(struct drm_info_node *node)
 {
 	return to_i915(node->minor->dev);
@@ -239,9 +235,6 @@ static int obj_rank_by_stolen(const void *A, const void *B)
 
 static int i915_gem_stolen_list_info(struct seq_file *m, void *data)
 {
-#ifdef __FreeBSD__
-	return 0;
-#endif
 	struct drm_i915_private *dev_priv = node_to_i915(m->private);
 	struct drm_device *dev = &dev_priv->drm;
 	struct drm_i915_gem_object **objects;
@@ -947,7 +940,6 @@ static int i915_gem_fence_regs_info(struct seq_file *m, void *data)
 }
 
 #if IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR)
-#ifdef __linux__
 static ssize_t gpu_state_read(struct file *file, char __user *ubuf,
 			      size_t count, loff_t *pos)
 {
@@ -1044,122 +1036,7 @@ static const struct file_operations i915_error_state_fops = {
 	.llseek = default_llseek,
 	.release = gpu_state_release,
 };
-
-#elif defined(__FreeBSD__)
-
-static int gpu_state_read(struct seq_file *m, void *unused)
-{
-	struct i915_gpu_state *gpu;
-	char *buf;
-	int ret;
-	/*
-	 * i915_gpu_info is around 60 KB
-	 * i915_error_state size?
-	 */
-	size_t count = 25*PAGE_SIZE; /* 100 KB should suffice */
-	loff_t pos = 0;
-
-	gpu = m->private;
-	if (!gpu)
-		return -ENOENT;
-
-	/* Bounce buffer required because of kernfs __user API convenience. */
-	buf = kzalloc(count, GFP_KERNEL);
-	if (!buf)
-		return -ENOMEM;
-
-	ret = i915_gpu_state_copy_to_buffer(gpu, buf, pos, count);
-	if (ret <= 0)
-		goto out;
-
-	(void)sbuf_printf(m->buf, "%s\n", buf);
-
-out:
-	kfree(buf);
-	return 0;
-}
-
-static int i915_gpu_info_open(struct inode *inode, struct file *file)
-{
-	struct drm_i915_private *i915;
-	struct i915_gpu_state *gpu;
-
-	i915 = inode->i_private;
-	intel_runtime_pm_get(i915);
-	gpu = i915_capture_gpu_state(i915);
-	intel_runtime_pm_put(i915);
-	if (IS_ERR(gpu))
-		return PTR_ERR(gpu);
-
-	return single_open(file, gpu_state_read, gpu);
-}
-
-static int i915_error_state_open(struct inode *inode, struct file *file)
-{
-	struct drm_i915_private *i915;
-	struct i915_gpu_state *error;
-
-	i915 = inode->i_private;
-	error = i915_first_error_state(i915);
-	if (IS_ERR(error))
-		return PTR_ERR(error);
-
-	return single_open(file, gpu_state_read, error);
-}
-
-static ssize_t
-i915_error_state_write(struct file *filp,
-		       const char __user *ubuf,
-		       size_t cnt,
-		       loff_t *ppos)
-{
-	struct seq_file *sf;
-	struct i915_gpu_state *error;
-
-	sf = filp->private_data;
-	error = sf->private;
-	if (!error)
-		return 0;
-
-	DRM_DEBUG_DRIVER("Resetting error state\n");
-	i915_reset_error_state(error->i915);
-
-	return cnt;
-}
-
-static int i915_gpu_state_release(struct inode *inode, struct file *file)
-{
-	struct seq_file *sf;
-	struct i915_gpu_state *error;
-
-	sf = file->private_data;
-	error = sf->private;
-
-	/* BSDFIXME: Leak memory for now otherwise we'll panic */
-	/* i915_gpu_state_put(error); */
-
-	return single_release(inode, file);
-}
-
-static const struct file_operations i915_gpu_info_fops = {
-	.owner = THIS_MODULE,
-	.open = i915_gpu_info_open,
-	.read = seq_read,
-	.llseek = seq_lseek,
-	.release = i915_gpu_state_release,
-};
-
-static const struct file_operations i915_error_state_fops = {
-	.owner = THIS_MODULE,
-	.open = i915_error_state_open,
-	.read = seq_read,
-	.write = i915_error_state_write,
-	.llseek = seq_lseek,
-	.release = i915_gpu_state_release,
-};
-
-#endif /* !__linux__ */
-#endif /* !IS_ENABLED(CONFIG_DRM_I915_CAPTURE_ERROR) */
+#endif
 
 static int
 i915_next_seqno_set(void *data, u64 val)
@@ -2091,7 +1968,6 @@ static int i915_context_status(struct seq_file *m, void *unused)
 			seq_printf(m, "%x [pin %u]", ctx->hw_id,
 				   atomic_read(&ctx->hw_id_pin_count));
 		if (ctx->pid) {
-#ifdef __linux__
 			struct task_struct *task;
 
 			task = get_pid_task(ctx->pid, PIDTYPE_PID);
@@ -2100,15 +1976,6 @@ static int i915_context_status(struct seq_file *m, void *unused)
 					   task->comm, task->pid);
 				put_task_struct(task);
 			}
-#elif defined(__FreeBSD__)
-			pid_t pid = ctx->pid;
-			struct thread *td = tdfind(pid, -1);
-			if (td != NULL) {
-				seq_printf(m, "(%s [%d]) ",
-				    td->td_name, td->td_proc->p_pid);
-				PROC_UNLOCK(td->td_proc);
-			}
-#endif
 		} else if (IS_ERR(ctx->file_priv)) {
 			seq_puts(m, "(deleted) ");
 		} else {
@@ -2969,11 +2836,7 @@ static int i915_energy_uJ(struct seq_file *m, void *data)
 
 	intel_runtime_pm_get(dev_priv);
 
-#ifdef __linux__
 	if (rdmsrl_safe(MSR_RAPL_POWER_UNIT, &power)) {
-#elif defined(__FreeBSD__)
-	if (rdmsrl_safe(MSR_RAPL_POWER_UNIT, (uint64_t *)(&power))) {
-#endif
 		intel_runtime_pm_put(dev_priv);
 		return -ENODEV;
 	}
@@ -3001,9 +2864,6 @@ static int i915_runtime_pm_status(struct seq_file *m, void *unused)
 		   yesno(!dev_priv->gt.awake), dev_priv->gt.epoch);
 	seq_printf(m, "IRQs disabled: %s\n",
 		   yesno(!intel_irqs_enabled(dev_priv)));
-#ifdef __FreeBSD__
-	(void)pdev;
-#else
 #ifdef CONFIG_PM
 	seq_printf(m, "Usage count: %d\n",
 		   atomic_read(&dev_priv->drm.dev->power.usage_count));
@@ -3013,7 +2873,6 @@ static int i915_runtime_pm_status(struct seq_file *m, void *unused)
 	seq_printf(m, "PCI device power state: %s [%d]\n",
 		   pci_power_name(pdev->current_state),
 		   pdev->current_state);
-#endif
 
 	return 0;
 }
@@ -4705,7 +4564,6 @@ static int i915_sseu_status(struct seq_file *m, void *unused)
 	return 0;
 }
 
-#ifdef __linux__
 static int i915_forcewake_open(struct inode *inode, struct file *file)
 {
 	struct drm_i915_private *i915 = inode->i_private;
@@ -4737,51 +4595,6 @@ static const struct file_operations i915_forcewake_fops = {
 	.open = i915_forcewake_open,
 	.release = i915_forcewake_release,
 };
-
-#elif defined(__FreeBSD__)
-
-/* debugfs can't handle empty file->private_data so let's
- * use the standard seq_file entry here. */
-
-static int i915_forcewake_show(struct seq_file *m, void *data)
-{
-	/* NOP */
-
-	return 0;
-}
-
-static int i915_forcewake_open(struct inode *inode, struct file *file)
-{
-	struct drm_i915_private *i915 = inode->i_private;
-
-	if (INTEL_GEN(i915) < 6)
-		return -ENODEV;
-
-	intel_runtime_pm_get(i915);
-	intel_uncore_forcewake_user_get(i915);
-
-	return single_open(file, i915_forcewake_show, inode->i_private);
-}
-
-static int i915_forcewake_release(struct inode *inode, struct file *file)
-{
-	struct drm_i915_private *i915 = inode->i_private;
-
-	if (INTEL_GEN(i915) < 6)
-		return -ENODEV;
-
-	intel_uncore_forcewake_user_put(i915);
-	intel_runtime_pm_put(i915);
-
-	return single_release(inode, file);
-}
-
-static const struct file_operations i915_forcewake_fops = {
-	.owner = THIS_MODULE,
-	.open = i915_forcewake_open,
-	.release = i915_forcewake_release,
-};
-#endif
 
 static int i915_hpd_storm_ctl_show(struct seq_file *m, void *data)
 {
@@ -5067,10 +4880,6 @@ static const struct file_operations i915_fifo_underrun_reset_ops = {
 	.open = simple_open,
 	.write = i915_fifo_underrun_reset_write,
 	.llseek = default_llseek,
-#ifdef __FreeBSD__
-	/* Our default release expects seq_file as private_data so use dummy */
-	.release = simple_release,
-#endif
 };
 
 static const struct drm_info_list i915_debugfs_list[] = {
