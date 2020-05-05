@@ -502,19 +502,18 @@ intel_alloc_mchbar_resource(struct drm_i915_private *dev_priv)
 #ifdef __FreeBSD__
 #undef resource
 	device_t vga;
-	(void)ret;
-
+	ret = 0;
 	vga = device_get_parent(dev_priv->drm.dev->bsddev);
 	dev_priv->mch_res_rid = 0x100;
 	dev_priv->mch_res.bsd_res = BUS_ALLOC_RESOURCE(device_get_parent(vga),
 	    dev_priv->drm.dev->bsddev, SYS_RES_MEMORY, &dev_priv->mch_res_rid, 0, ~0UL,
 	    MCHBAR_SIZE, RF_ACTIVE | RF_SHAREABLE);
 	if (dev_priv->mch_res.bsd_res == NULL) {
-		DRM_DEBUG_DRIVER("failed bus alloc\n");
-		return -ENOMEM;
+		ret = -ENOMEM;
+	} else {
+		dev_priv->mch_res.start = rman_get_start(dev_priv->mch_res.bsd_res);
+		dev_priv->mch_res.end = rman_get_end(dev_priv->mch_res.bsd_res);
 	}
-	dev_priv->mch_res.start = rman_get_start(dev_priv->mch_res.bsd_res);
-	dev_priv->mch_res.end = rman_get_end(dev_priv->mch_res.bsd_res);
 #else
 	dev_priv->mch_res.name = "i915 MCHBAR";
 	dev_priv->mch_res.flags = IORESOURCE_MEM;
@@ -524,12 +523,12 @@ intel_alloc_mchbar_resource(struct drm_i915_private *dev_priv)
 				     PCIBIOS_MIN_MEM,
 				     0, pcibios_align_resource,
 				     dev_priv->bridge_dev);
+#endif
 	if (ret) {
 		DRM_DEBUG_DRIVER("failed bus alloc: %d\n", ret);
 		dev_priv->mch_res.start = 0;
 		return ret;
 	}
-#endif
 
 	if (INTEL_GEN(dev_priv) >= 4)
 		pci_write_config_dword(dev_priv->bridge_dev, reg + 4,
@@ -1035,7 +1034,7 @@ static int i915_mmio_setup(struct drm_i915_private *dev_priv)
 	type = pci_resource_type(pdev, mmio_bar);
 	res = bus_alloc_resource_any(pdev->dev.bsddev, type, &rid, RF_ACTIVE);
 
-	dev_priv->mmio_res = res;
+	dev_priv->mmio_res = (struct linux_resource *)res;
 	dev_priv->mmio_rid = rid;
 	dev_priv->mmio_restype = type;
 	dev_priv->regs = (void *)rman_get_bushandle(res);
@@ -1061,7 +1060,7 @@ static void i915_mmio_cleanup(struct drm_i915_private *dev_priv)
 	intel_teardown_mchbar(dev_priv);
 #ifdef __FreeBSD__
 	bus_release_resource(pdev->dev.bsddev, dev_priv->mmio_restype,
-	    dev_priv->mmio_rid, dev_priv->mmio_res);
+	  dev_priv->mmio_rid, (struct resource *)dev_priv->mmio_res);
 #else
 	pci_iounmap(pdev, dev_priv->regs);
 #endif

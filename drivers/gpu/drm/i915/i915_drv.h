@@ -45,7 +45,6 @@
 #include <linux/pm_qos.h>
 #include <linux/reservation.h>
 #include <linux/shmem_fs.h>
-#include <linux/typecheck.h>
 
 #include <drm/drmP.h>
 #include <drm/intel-gtt.h>
@@ -89,6 +88,9 @@
 #ifdef __FreeBSD__
 /* BSD: Make sure we get out[bwl] redefines */
 #include <linux/compiler.h>
+#include <linux/typecheck.h>
+
+#define resource linux_resource
 #endif
 
 /* General customization:
@@ -1446,19 +1448,11 @@ struct drm_i915_private {
 	 * exactly how much of this we are actually allowed to use, given that
 	 * some portion of it is in fact reserved for use by hardware functions.
 	 */
-#ifdef __linux__
 	struct resource dsm;
-#elif defined(__FreeBSD__)
-	struct linux_resource dsm;
-#endif
 	/**
 	 * Reseved portion of Data Stolen Memory
 	 */
-#ifdef __linux__
 	struct resource dsm_reserved;
-#elif defined(__FreeBSD__)
-	struct linux_resource dsm_reserved;
-#endif
 
 	/*
 	 * Stolen memory is segmented in hardware with different portions
@@ -1472,11 +1466,6 @@ struct drm_i915_private {
 	resource_size_t stolen_usable_size;	/* Total size minus reserved ranges */
 
 	void __iomem *regs;
-#ifdef __FreeBSD__
-	int mmio_rid;
-	int mmio_restype;
-	struct resource *mmio_res;
-#endif
 
 	struct intel_uncore uncore;
 
@@ -1521,12 +1510,7 @@ struct drm_i915_private {
 	struct intel_engine_cs *engine_class[MAX_ENGINE_CLASS + 1]
 					    [MAX_ENGINE_INSTANCE + 1];
 
-#ifdef __linux__
 	struct resource mch_res;
-#elif defined(__FreeBSD__)
-	struct linux_resource mch_res;
-	int mch_res_rid;
-#endif
 
 	/* protects the irq masks */
 	spinlock_t irq_lock;
@@ -2031,6 +2015,13 @@ struct drm_i915_private {
 	 * NOTE: This is the dri1/ums dungeon, don't add stuff here. Your patch
 	 * will be rejected. Instead look for a better place.
 	 */
+
+#ifdef __FreeBSD__
+	int mmio_rid;
+	int mmio_restype;
+	struct resource *mmio_res;
+	int mch_res_rid;
+#endif
 };
 
 struct dram_channel_info {
