@@ -22,8 +22,6 @@ SRCS=	ati_pcigart.c \
 	drm_crtc.c \
 	drm_crtc_helper.c \
 	drm_damage_helper.c \
-	drm_debugfs.c \
-	drm_debugfs_crc.c \
 	drm_dma.c \
 	drm_dp_aux_dev.c \
 	drm_dp_dual_mode_helper.c \
@@ -84,6 +82,11 @@ SRCS=	ati_pcigart.c \
 	linux_fb.c \
 	tainted_linux_fb.c \
 	linux_hdmi.c
+
+# Debug files, not handled for now
+SRCS_DEBUG=	\
+		drm_debugfs.c \
+		drm_debugfs_crc.c
 
 .if ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "amd64"
 SRCS+=	drm_agpsupport.c

@@ -13,10 +13,8 @@ SRCS=	\
 	dvo_sil164.c \
 	dvo_tfp410.c \
 	i915_cmd_parser.c \
-	i915_debugfs.c \
 	i915_drv.c \
 	i915_gem.c \
-	i915_gemfs.c \
 	i915_gem_batch_pool.c \
 	i915_gem_clflush.c \
 	i915_gem_context.c \
@@ -102,7 +100,6 @@ SRCS=	\
 	intel_opregion.c \
 	intel_overlay.c \
 	intel_panel.c \
-	intel_pipe_crc.c \
 	intel_pm.c \
 	intel_psr.c \
 	intel_quirks.c \
@@ -124,6 +121,16 @@ SRCS=	\
 	intel_workarounds.c \
 	vlv_dsi.c \
 	vlv_dsi_pll.c
+
+# COMPAT Files
+SRCS_COMPAT=	\
+		i915_ioc32.c
+
+# Debug files, not handled for now
+SRCS_DEBUG=	\
+		i915_debugfs.c \
+		i915_gemfs.c \
+		intel_pipe_crc.c
 
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
 # intel_lpe_audio.c   # Need platform and irq_chip support
@@ -166,7 +173,7 @@ CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=i915_'
 CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
 
 .if ${MACHINE_CPUARCH} == "amd64"
-SRCS+= i915_ioc32.c
+SRCS+= ${SRCS_COMPAT}
 .endif
 
 SRCS	+=			\

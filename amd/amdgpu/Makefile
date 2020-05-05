@@ -92,11 +92,9 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_cs.c \
 	amdgpu_csa.c \
 	amdgpu_ctx.c \
-	amdgpu_debugfs.c \
 	amdgpu_device.c \
 	amdgpu_display.c \
 	amdgpu_dm_color.c \
-	amdgpu_dm_debugfs.c \
 	amdgpu_dpm.c \
 	amdgpu_drv.c \
 	amdgpu_encoders.c \
@@ -201,6 +199,12 @@ SRCS+=	amdgpu_afmt.c \
 	vega10_ih.c \
 	vi.c
 
+# Debug files, not handled for now
+SRCS_DEBUG=	\
+		amdgpu_debugfs.c \
+		amdgpu_dm_debugfs.c \
+		amdgpu_dm_crc.c
+
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
 SRCS+=	amdgpu_acpi.c \
 	amdgpu_atpx_handler.c
@@ -229,7 +233,6 @@ SRCS+=	dcn10_clk_mgr.c \
 
 # display/*
 SRCS+=	amdgpu_dm.c \
-	amdgpu_dm_crc.c \
 	amdgpu_dm_helpers.c \
 	amdgpu_dm_irq.c \
 	amdgpu_dm_mst_types.c \
