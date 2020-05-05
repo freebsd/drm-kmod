@@ -98,7 +98,21 @@ pci_bus_write_config_byte(struct pci_bus *bus, unsigned int devfn, int where,
 	return (pci_bus_write_config(bus, devfn, where, val, 1));
 }
 
+static inline int
+pci_domain_nr(struct pci_bus *bus)
+{
+
+	return (0);
+}
+
 extern struct pci_dev *pci_get_bus_and_slot(unsigned int bus, unsigned int devfn);
+
+static inline struct pci_dev *
+pci_get_domain_bus_and_slot(int domain, unsigned int bus, unsigned int devfn)
+{
+
+	return (pci_get_bus_and_slot(bus, devfn));
+}
 
 void pci_dev_put(struct pci_dev *pdev);
 
