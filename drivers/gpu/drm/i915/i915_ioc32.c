@@ -32,7 +32,6 @@
 #include <drm/i915_drm.h>
 #include "i915_drv.h"
 
-#if defined(CONFIG_COMPAT)
 struct drm_i915_getparam32 {
 	s32 param;
 	/*
@@ -115,4 +114,3 @@ long i915_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 	return ret;
 }
-#endif
