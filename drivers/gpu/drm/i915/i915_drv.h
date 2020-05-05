@@ -2017,9 +2017,6 @@ struct drm_i915_private {
 	 */
 
 #ifdef __FreeBSD__
-	int mmio_rid;
-	int mmio_restype;
-	struct resource *mmio_res;
 	int mch_res_rid;
 #endif
 };

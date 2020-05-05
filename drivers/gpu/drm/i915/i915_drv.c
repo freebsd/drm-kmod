@@ -1026,21 +1026,7 @@ static int i915_mmio_setup(struct drm_i915_private *dev_priv)
 		mmio_size = 512 * 1024;
 	else
 		mmio_size = 2 * 1024 * 1024;
-#ifdef __FreeBSD__
-	struct resource *res;
-	int rid, type;
-
-	rid = PCIR_BAR(mmio_bar);
-	type = pci_resource_type(pdev, mmio_bar);
-	res = bus_alloc_resource_any(pdev->dev.bsddev, type, &rid, RF_ACTIVE);
-
-	dev_priv->mmio_res = (struct linux_resource *)res;
-	dev_priv->mmio_rid = rid;
-	dev_priv->mmio_restype = type;
-	dev_priv->regs = (void *)rman_get_bushandle(res);
-#else
 	dev_priv->regs = pci_iomap(pdev, mmio_bar, mmio_size);
-#endif
 	if (dev_priv->regs == NULL) {
 		DRM_ERROR("failed to map registers\n");
 
@@ -1058,12 +1044,7 @@ static void i915_mmio_cleanup(struct drm_i915_private *dev_priv)
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 
 	intel_teardown_mchbar(dev_priv);
-#ifdef __FreeBSD__
-	bus_release_resource(pdev->dev.bsddev, dev_priv->mmio_restype,
-	  dev_priv->mmio_rid, (struct resource *)dev_priv->mmio_res);
-#else
 	pci_iounmap(pdev, dev_priv->regs);
-#endif
 }
 
 /**
