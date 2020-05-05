@@ -38,6 +38,7 @@
 
 static int amdgpu_debugfs_pm_init(struct amdgpu_device *adev);
 
+#if defined(CONFIG_DEBUG_FS)
 static const struct cg_flag_name clocks[] = {
 	{AMD_CG_SUPPORT_GFX_MGCG, "Graphics Medium Grain Clock Gating"},
 	{AMD_CG_SUPPORT_GFX_MGLS, "Graphics Medium Grain memory Light Sleep"},
@@ -65,6 +66,7 @@ static const struct cg_flag_name clocks[] = {
 	{AMD_CG_SUPPORT_DF_MGCG, "Data Fabric Medium Grain Clock Gating"},
 	{0, NULL},
 };
+#endif
 
 void amdgpu_pm_acpi_event_handler(struct amdgpu_device *adev)
 {
