@@ -23,9 +23,7 @@
  */
 
 #include <linux/fs.h>
-#ifdef __linux__
 #include <linux/mount.h>
-#endif
 #include <linux/pagemap.h>
 
 #include "i915_drv.h"
@@ -33,7 +31,6 @@
 
 int i915_gemfs_init(struct drm_i915_private *i915)
 {
-#ifdef __linux__
 	struct file_system_type *type;
 	struct vfsmount *gemfs;
 
@@ -70,14 +67,9 @@ int i915_gemfs_init(struct drm_i915_private *i915)
 	i915->mm.gemfs = gemfs;
 
 	return 0;
-#elif defined(__FreeBSD__)
-	return -ENODEV;
-#endif
 }
 
 void i915_gemfs_fini(struct drm_i915_private *i915)
 {
-#ifdef __linux__
 	kern_unmount(i915->mm.gemfs);
-#endif
 }
