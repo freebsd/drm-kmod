@@ -3216,22 +3216,16 @@ static void i915_reset_device(struct drm_i915_private *dev_priv,
 			      const char *reason)
 {
 	struct i915_gpu_error *error = &dev_priv->gpu_error;
-#ifdef __linux__
 	struct kobject *kobj = &dev_priv->drm.primary->kdev->kobj;
 	char *error_event[] = { I915_ERROR_UEVENT "=1", NULL };
 	char *reset_event[] = { I915_RESET_UEVENT "=1", NULL };
 	char *reset_done_event[] = { I915_ERROR_UEVENT "=0", NULL };
-#endif
 	struct wedge_me w;
 
-#ifdef __linux__
 	kobject_uevent_env(kobj, KOBJ_CHANGE, error_event);
-#endif
 
 	DRM_DEBUG_DRIVER("resetting chip\n");
-#ifdef __linux
 	kobject_uevent_env(kobj, KOBJ_CHANGE, reset_event);
-#endif
 
 	/* Use a watchdog to ensure that our reset completes */
 	i915_wedge_on_timeout(&w, dev_priv, 5*HZ) {
@@ -3264,10 +3258,8 @@ static void i915_reset_device(struct drm_i915_private *dev_priv,
 		intel_finish_reset(dev_priv);
 	}
 
-#ifdef __linux__
 	if (!test_bit(I915_WEDGED, &error->flags))
 		kobject_uevent_env(kobj, KOBJ_CHANGE, reset_done_event);
-#endif
 }
 
 void i915_clear_error_registers(struct drm_i915_private *dev_priv)
