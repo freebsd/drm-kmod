@@ -122,9 +122,8 @@ static inline u64 ptr_to_u64(const void *ptr)
 })
 
 #include <linux/list.h>
-#include <sys/param.h> /* For __FreeBSD_version */
 
-#if __FreeBSD_version < 1300081
+#ifdef __linux__
 static inline int list_is_first(const struct list_head *list,
 				const struct list_head *head)
 {
