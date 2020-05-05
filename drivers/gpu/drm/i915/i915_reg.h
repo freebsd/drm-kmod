@@ -189,8 +189,8 @@ static inline bool i915_mmio_reg_valid(i915_reg_t reg)
 					      dev_priv->info.cursor_offsets[PIPE_A] + (reg) + \
 					      dev_priv->info.display_mmio_offset)
 
-#ifdef __linux__
 #define __MASKED_FIELD(mask, value) ((mask) << 16 | (value))
+#ifdef __linux__
 #define _MASKED_FIELD(mask, value) ({					   \
 	if (__builtin_constant_p(mask))					   \
 		BUILD_BUG_ON_MSG(((mask) & 0xffff0000), "Incorrect mask"); \
@@ -201,7 +201,6 @@ static inline bool i915_mmio_reg_valid(i915_reg_t reg)
 				 "Incorrect value for mask");		   \
 	__MASKED_FIELD(mask, value); })
 #elif defined(__FreeBSD__)
-#define __MASKED_FIELD(mask, value) ({ (mask) << 16 | (value); })
 #define _MASKED_FIELD(mask, value) __MASKED_FIELD(mask, value)
 #endif
 #define _MASKED_BIT_ENABLE(a)	({ typeof(a) _a = (a); _MASKED_FIELD(_a, _a); })
