@@ -25,7 +25,6 @@
  */
 #include <linux/module.h>
 #include <linux/slab.h>
-#include <linux/fb.h>
 #include <linux/pm_runtime.h>
 
 #include <drm/drmP.h>

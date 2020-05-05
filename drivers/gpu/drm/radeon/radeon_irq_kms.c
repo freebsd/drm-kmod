@@ -298,13 +298,11 @@ int radeon_irq_kms_init(struct radeon_device *rdev)
 	rdev->msi_enabled = 0;
 
 	if (radeon_msi_ok(rdev)) {
-#if defined(__linux__) || defined(pci_enable_msi)
 		int ret = pci_enable_msi(rdev->pdev);
 		if (!ret) {
 			rdev->msi_enabled = 1;
 			dev_info(rdev->dev, "radeon: using MSI.\n");
 		}
-#endif
 	}
 
 	INIT_DELAYED_WORK(&rdev->hotplug_work, radeon_hotplug_work_func);
@@ -335,10 +333,8 @@ void radeon_irq_kms_fini(struct radeon_device *rdev)
 	if (rdev->irq.installed) {
 		drm_irq_uninstall(rdev->ddev);
 		rdev->irq.installed = false;
-#if defined(__linux__) || defined(pci_disable_msi)
 		if (rdev->msi_enabled)
 			pci_disable_msi(rdev->pdev);
-#endif
 		flush_delayed_work(&rdev->hotplug_work);
 	}
 }

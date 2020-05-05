@@ -45,7 +45,7 @@
  * for GPU/CPU synchronization.  When the fence is written,
  * it is expected that all buffers associated with that fence
  * are no longer in use by the associated ring on the GPU and
- * that the relevant GPU caches have been flushed.  Whether
+ * that the the relevant GPU caches have been flushed.  Whether
  * we use a scratch register or memory location depends on the asic
  * and whether writeback is enabled.
  */
@@ -650,7 +650,7 @@ int radeon_fence_wait_next(struct radeon_device *rdev, int ring)
 	seq[ring] = atomic64_read(&rdev->fence_drv[ring].last_seq) + 1ULL;
 	if (seq[ring] >= rdev->fence_drv[ring].sync_seq[ring]) {
 		/* nothing to wait for, last_seq is
-		   already the last emitted fence */
+		   already the last emited fence */
 		return -ENOENT;
 	}
 	r = radeon_fence_wait_seq_timeout(rdev, seq, false, MAX_SCHEDULE_TIMEOUT);

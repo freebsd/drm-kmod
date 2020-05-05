@@ -505,6 +505,7 @@ static int radeon_ttm_tt_pin_userptr(struct ttm_tt *ttm)
 			return -EPERM;
 	}
 #endif
+
 	do {
 		unsigned num_pages = ttm->num_pages - pinned;
 		uint64_t userptr = gtt->userptr + pinned * PAGE_SIZE;
@@ -792,10 +793,10 @@ int radeon_ttm_init(struct radeon_device *rdev)
 	/* No others user of address space so set it to 0 */
 	r = ttm_bo_device_init(&rdev->mman.bdev,
 			       &radeon_bo_driver,
-#ifndef __linux__
+#ifdef __FreeBSD__
 			       NULL,
 #else
-			       rdev->ddev->anon_mapping,
+			       rdev->ddev->anon_inode->i_mapping,
 #endif
 			       DRM_FILE_PAGE_OFFSET,
 			       rdev->need_dma32);
