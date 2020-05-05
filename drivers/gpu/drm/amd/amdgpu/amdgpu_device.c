@@ -2666,17 +2666,21 @@ fence_driver_init:
 	if (r)
 		DRM_ERROR("registering gem debugfs failed (%d).\n", r);
 
+#if defined(CONFIG_DEBUG_FS)
 	r = amdgpu_debugfs_regs_init(adev);
 	if (r)
 		DRM_ERROR("registering register debugfs failed (%d).\n", r);
+#endif
 
 	r = amdgpu_debugfs_firmware_init(adev);
 	if (r)
 		DRM_ERROR("registering firmware debugfs failed (%d).\n", r);
 
+#if defined(CONFIG_DEBUG_FS)
 	r = amdgpu_debugfs_init(adev);
 	if (r)
 		DRM_ERROR("Creating debugfs files failed (%d).\n", r);
+#endif
 
 	if ((amdgpu_testing & 1)) {
 		if (adev->accel_working)
@@ -2764,7 +2768,9 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	iounmap(adev->rmmio);
 	adev->rmmio = NULL;
 	amdgpu_device_doorbell_fini(adev);
+#if defined(CONFIG_DEBUG_FS)
 	amdgpu_debugfs_regs_cleanup(adev);
+#endif
 }
 
 
