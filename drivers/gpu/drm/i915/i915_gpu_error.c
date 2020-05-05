@@ -27,22 +27,11 @@
  *
  */
 
-#ifdef __linux__
-#include <linux/utsname.h>
-#include <linux/nmi.h>
-#else
-#define UTS_RELEASE "FreeBSD 11 prerelease"
-#endif
-
 #include <linux/ascii85.h>
-#ifdef __linux__
 #include <linux/nmi.h>
-#endif
 #include <linux/scatterlist.h>
 #include <linux/stop_machine.h>
-#ifdef __linux__
 #include <linux/utsname.h>
-#endif
 #include <linux/zlib.h>
 
 #include <drm/drm_print.h>
