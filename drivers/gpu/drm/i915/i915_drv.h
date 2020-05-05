@@ -3165,6 +3165,7 @@ i915_gem_context_lookup(struct drm_i915_file_private *file_priv, u32 id)
 	return ctx;
 }
 
+#if defined(CONFIG_I915_PERF)
 int i915_perf_open_ioctl(struct drm_device *dev, void *data,
 			 struct drm_file *file);
 int i915_perf_add_config_ioctl(struct drm_device *dev, void *data,
@@ -3174,6 +3175,40 @@ int i915_perf_remove_config_ioctl(struct drm_device *dev, void *data,
 void i915_oa_init_reg_state(struct intel_engine_cs *engine,
 			    struct i915_gem_context *ctx,
 			    uint32_t *reg_state);
+#else
+static inline int
+i915_perf_open_ioctl(struct drm_device *dev, void *data,
+    struct drm_file *file)
+{
+
+	return (0);
+}
+
+static inline int
+i915_perf_add_config_ioctl(struct drm_device *dev, void *data,
+    struct drm_file *file)
+{
+
+	return (0);
+}
+
+static inline int
+i915_perf_remove_config_ioctl(struct drm_device *dev, void *data,
+    struct drm_file *file)
+{
+
+	return (0);
+}
+
+static inline void
+i915_oa_init_reg_state(struct intel_engine_cs *engine,
+    struct i915_gem_context *ctx,
+    uint32_t *reg_state)
+{
+
+	return;
+}
+#endif
 
 /* i915_gem_evict.c */
 int __must_check i915_gem_evict_something(struct i915_address_space *vm,
