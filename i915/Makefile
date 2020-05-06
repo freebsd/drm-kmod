@@ -135,28 +135,6 @@ SRCS_DEBUG=	\
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
 # intel_lpe_audio.c   # Need platform and irq_chip support
 
-# In case we want to build gvt some day...
-# GVT_DIR	= ${SRCDIR}/gvt
-# SRCS	+= ${GVT_DIR}/aperture_gm.c
-# SRCS	+= ${GVT_DIR}/cfg_space.c
-# SRCS	+= ${GVT_DIR}/cmd_parser.c
-# SRCS	+= ${GVT_DIR}/display.c
-# SRCS	+= ${GVT_DIR}/edid.c
-# SRCS	+= ${GVT_DIR}/execlist.c
-# SRCS	+= ${GVT_DIR}/firmware.c
-# SRCS	+= ${GVT_DIR}/gtt.c
-# SRCS	+= ${GVT_DIR}/gvt.c
-# SRCS	+= ${GVT_DIR}/handlers.c
-# SRCS	+= ${GVT_DIR}/interrupt.c
-# SRCS	+= ${GVT_DIR}/kvmgt.c
-# SRCS	+= ${GVT_DIR}/mmio.c
-# SRCS	+= ${GVT_DIR}/opregion.c
-# SRCS	+= ${GVT_DIR}/render.c
-# SRCS	+= ${GVT_DIR}/sched_policy.c
-# SRCS	+= ${GVT_DIR}/scheduler.c
-# SRCS	+= ${GVT_DIR}/trace_points.c
-# SRCS	+= ${GVT_DIR}/vgpu.c
-
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
