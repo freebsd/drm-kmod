@@ -89,7 +89,7 @@
 /* BSD: Make sure we get out[bwl] redefines */
 #include <linux/compiler.h>
 #include <linux/typecheck.h>
-
+#include <linux/ratelimit.h>
 #define resource linux_resource
 #endif
 
