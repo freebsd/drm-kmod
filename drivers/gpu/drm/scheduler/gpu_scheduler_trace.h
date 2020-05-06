@@ -24,6 +24,10 @@
 #if !defined(_GPU_SCHED_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
 #define _GPU_SCHED_TRACE_H_
 
+#include <linux/stringify.h>
+#include <linux/types.h>
+#include <linux/tracepoint.h>
+
 #include <drm/drmP.h>
 
 #ifdef __FreeBSD__
