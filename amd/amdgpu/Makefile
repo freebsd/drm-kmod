@@ -94,7 +94,6 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_ctx.c \
 	amdgpu_device.c \
 	amdgpu_display.c \
-	amdgpu_dm_color.c \
 	amdgpu_dpm.c \
 	amdgpu_drv.c \
 	amdgpu_encoders.c \
@@ -122,8 +121,8 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_ring.c \
 	amdgpu_rlc.c \
 	amdgpu_sa.c \
-	amdgpu_sdma.c \
 	amdgpu_sched.c \
+	amdgpu_sdma.c \
 	amdgpu_sync.c \
 	amdgpu_test.c \
 	amdgpu_trace_points.c \
@@ -144,14 +143,14 @@ SRCS+=	amdgpu_afmt.c \
 	atombios_i2c.c \
 	ci_dpm.c \
 	ci_smc.c \
-	cik.c \
 	cik_ih.c \
 	cik_sdma.c \
+	cik.c \
 	cz_ih.c \
-	dce_v6_0.c \
-	dce_v8_0.c \
 	dce_v10_0.c \
 	dce_v11_0.c \
+	dce_v6_0.c \
+	dce_v8_0.c \
 	dce_virtual.c \
 	df_v1_7.c \
 	df_v3_6.c \
@@ -181,11 +180,11 @@ SRCS+=	amdgpu_afmt.c \
 	sdma_v2_4.c \
 	sdma_v3_0.c \
 	sdma_v4_0.c \
-	si.c \
 	si_dma.c \
 	si_dpm.c \
 	si_ih.c \
 	si_smc.c \
+	si.c \
 	soc15.c \
 	tonga_ih.c \
 	uvd_v4_2.c \
@@ -197,19 +196,109 @@ SRCS+=	amdgpu_afmt.c \
 	vce_v4_0.c \
 	vcn_v1_0.c \
 	vega10_ih.c \
+	vega10_reg_init.c \
+	vega20_reg_init.c \
 	vi.c
 
-# Debug files, not handled for now
-SRCS_DEBUG=	\
-		amdgpu_debugfs.c \
-		amdgpu_dm_debugfs.c \
-		amdgpu_dm_crc.c
+# display/amdgpu_dm
+SRCS+=	amdgpu_dm_color.c \
+	amdgpu_dm_helpers.c \
+	amdgpu_dm_irq.c \
+	amdgpu_dm_mst_types.c \
+	amdgpu_dm_pp_smu.c \
+	amdgpu_dm_services.c \
+	amdgpu_dm.c
 
-.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
-SRCS+=	amdgpu_acpi.c \
-	amdgpu_atpx_handler.c
-.endif
+# display/dc/basics
+SRCS+=	conversion.c \
+	fixpt31_32.c \
+	log_helpers.c \
+	vector.c
 
+# display/dc/bios
+SRCS+=	bios_parser_common.c \
+	bios_parser_helper.c \
+	bios_parser_interface.c \
+	bios_parser.c \
+	bios_parser2.c \
+	command_table_helper.c \
+	command_table_helper2.c \
+	command_table.c \
+	command_table2.c \
+	command_table_helper2_dce112.c \
+	command_table_helper_dce110.c \
+	command_table_helper_dce112.c \
+	command_table_helper_dce80.c
+
+# display/dc/calcs
+SRCS+=	bw_fixed.c \
+	custom_float.c \
+	dce_calcs.c
+
+# display/dc/core
+SRCS+=	dc_debug.c \
+	dc_hw_sequencer.c \
+	dc_link_ddc.c \
+	dc_link_dp.c \
+	dc_link_hwss.c \
+	dc_link.c \
+	dc_resource.c \
+	dc_sink.c \
+	dc_stream.c \
+	dc_surface.c \
+	dc.c
+
+# display/dc/dce
+SRCS+=	dce_abm.c \
+	dce_audio.c \
+	dce_aux.c \
+	dce_clk_mgr.c \
+	dce_clock_source.c \
+	dce_dmcu.c \
+	dce_hwseq.c \
+	dce_i2c_hw.c \
+	dce_i2c_sw.c \
+	dce_i2c.c \
+	dce_ipp.c \
+	dce_link_encoder.c \
+	dce_mem_input.c \
+	dce_opp.c \
+	dce_scl_filters.c \
+	dce_stream_encoder.c \
+	dce_transform.c
+
+# display/dc/dce100
+SRCS+=	dce100_hw_sequencer.c \
+	dce100_resource.c
+
+# display/dc/dce110
+SRCS+=	dce110_compressor.c \
+	dce110_hw_sequencer.c \
+	dce110_mem_input_v.c \
+	dce110_opp_csc_v.c \
+	dce110_opp_regamma_v.c \
+	dce110_opp_v.c \
+	dce110_resource.c \
+	dce110_timing_generator.c \
+	dce110_timing_generator_v.c \
+	dce110_transform_v.c
+
+# display/dc/dce112
+SRCS+=	dce112_compressor.c \
+	dce112_hw_sequencer.c \
+	dce112_resource.c
+
+# display/dc/dce120
+SRCS+=	dce120_hw_sequencer.c \
+	dce120_resource.c \
+	dce120_timing_generator.c
+
+# display/dc/dce80
+SRCS+=	dce80_hw_sequencer.c \
+	dce80_resource.c \
+	dce80_timing_generator.c
+
+# display/dc/dcn10
 .if ${MACHINE_CPUARCH} == "amd64"
 SRCS+=	dcn10_clk_mgr.c \
 	dcn10_cm_common.c \
@@ -226,141 +315,90 @@ SRCS+=	dcn10_clk_mgr.c \
 	dcn10_opp.c \
 	dcn10_optc.c \
 	dcn10_resource.c \
-	dcn10_stream_encoder.c \
-	dcn_calc_auto.c \
-	dcn_calcs.c
+	dcn10_stream_encoder.c
 .endif
 
-# display/*
-SRCS+=	amdgpu_dm.c \
-	amdgpu_dm_helpers.c \
-	amdgpu_dm_irq.c \
-	amdgpu_dm_mst_types.c \
-	amdgpu_dm_pp_smu.c \
-	amdgpu_dm_services.c \
-	aux_engine.c \
-	aux_engine_dce110.c \
-	bios_parser.c \
-	bios_parser2.c \
-	bios_parser_common.c \
-	bios_parser_helper.c \
-	bios_parser_interface.c \
-	bw_fixed.c \
-	color_gamma.c \
-	command_table.c \
-	command_table2.c \
-	command_table_helper.c \
-	command_table_helper2.c \
-	command_table_helper2_dce112.c \
-	command_table_helper_dce110.c \
-	command_table_helper_dce112.c \
-	command_table_helper_dce80.c \
-	conversion.c \
-	custom_float.c \
-	dc.c \
-	dc_debug.c \
-	dc_helper.c \
-	dc_hw_sequencer.c \
-	dc_link.c \
-	dc_link_ddc.c \
-	dc_link_dp.c \
-	dc_link_hwss.c \
-	dc_resource.c \
-	dc_sink.c \
-	dc_stream.c \
-	dc_surface.c \
-	dce100_hw_sequencer.c \
-	dce100_resource.c \
-	dce110_compressor.c \
-	dce110_hw_sequencer.c \
-	dce110_mem_input_v.c \
-	dce110_opp_csc_v.c \
-	dce110_opp_regamma_v.c \
-	dce110_opp_v.c \
-	dce110_resource.c \
-	dce110_timing_generator.c \
-	dce110_timing_generator_v.c \
-	dce110_transform_v.c \
-	dce112_compressor.c \
-	dce112_hw_sequencer.c \
-	dce112_resource.c \
-	dce120_hw_sequencer.c \
-	dce120_resource.c \
-	dce120_timing_generator.c \
-	dce80_hw_sequencer.c \
-	dce80_resource.c \
-	dce80_timing_generator.c \
-	dce_abm.c \
-	dce_audio.c \
-	dce_aux.c \
-	dce_calcs.c \
-	dce_clk_mgr.c \
-	dce_clock_source.c \
-	dce_dmcu.c \
-	dce_hwseq.c \
-	dce_i2c.c \
-	dce_i2c_hw.c \
-	dce_i2c_sw.c \
-	dce_ipp.c \
-	dce_link_encoder.c \
-	dce_mem_input.c \
-	dce_opp.c \
-	dce_scl_filters.c \
-	dce_stream_encoder.c \
-	dce_transform.c \
-	engine_base.c \
-	fixpt31_32.c \
-	freesync.c \
-	gpio_base.c \
+# display/dc/dml
+.if ${MACHINE_CPUARCH} == "amd64"
+SRCS+=	display_mode_lib.c \
+	display_rq_dlg_helpers.c \
+	dml_common_defs.c \
+	dml1_display_rq_dlg_calc.c
+.endif
+
+# display/dc/gpio/*
+SRCS+=	gpio_base.c \
 	gpio_service.c \
 	hw_ddc.c \
 	hw_factory.c \
+	hw_gpio.c \
+	hw_hpd.c \
+	hw_translate.c \
 	hw_factory_dce110.c \
 	hw_factory_dce120.c \
 	hw_factory_dce80.c \
 	hw_factory_dcn10.c \
 	hw_factory_diag.c \
-	hw_gpio.c \
-	hw_hpd.c \
-	hw_translate.c \
 	hw_translate_dce110.c \
 	hw_translate_dce120.c \
 	hw_translate_dce80.c \
 	hw_translate_dcn10.c \
-	hw_translate_diag.c \
+	hw_translate_diag.c
+
+# display/dc/i2caux/*
+SRCS+=	aux_engine.c \
+	aux_engine_dce110.c \
+	engine_base.c \
 	i2c_engine.c \
 	i2c_generic_hw_engine.c \
 	i2c_hw_engine.c \
+	i2c_sw_engine.c \
+	i2caux.c \
 	i2c_hw_engine_dce110.c \
 	i2c_hw_engine_dce80.c \
-	i2c_sw_engine.c \
 	i2c_sw_engine_dce110.c \
 	i2c_sw_engine_dce80.c \
-	i2caux.c \
 	i2caux_dce100.c \
 	i2caux_dce110.c \
 	i2caux_dce112.c \
 	i2caux_dce120.c \
 	i2caux_dce80.c \
 	i2caux_dcn10.c \
-	i2caux_diag.c \
-	irq_service.c \
+	i2caux_diag.c
+
+# display/dc/irq/*
+SRCS+=	irq_service.c \
 	irq_service_dce110.c \
 	irq_service_dce120.c \
 	irq_service_dce80.c \
-	irq_service_dcn10.c \
-	log_helpers.c \
-	power_helpers.c \
-	vector.c \
-	virtual_link_encoder.c \
+	irq_service_dcn10.c
+
+# display/dc/virtual
+SRCS+=	virtual_link_encoder.c \
 	virtual_stream_encoder.c
 
+# display/modules/*
+SRCS+=	color_gamma.c \
+	freesync.c \
+	power_helpers.c
+
+# display/dc
+SRCS+=	dc_helper.c
+
+# Debug files, not handled for now
+SRCS_DEBUG=	amdgpu_dm_crc.c \
+		amdgpu_debugfs.c \
+		amdgpu_dm_debugfs.c
+
+.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
+SRCS+=	amdgpu_acpi.c \
+	amdgpu_atpx_handler.c
+.endif
+
 .if ${MACHINE_CPUARCH} == "amd64"
-SRCS+=	display_mode_lib.c \
+SRCS+=	dcn_calc_auto.c \
 	dcn_calc_math.c \
-	display_rq_dlg_helpers.c \
-	dml_common_defs.c \
-	dml1_display_rq_dlg_calc.c
+	dcn_calcs.c
 .endif
 
 # lib
@@ -397,7 +435,6 @@ SRCS+=	amd_powerplay.c \
 	vega10_hwmgr.c \
 	vega10_powertune.c \
 	vega10_processpptables.c \
-	vega10_reg_init.c \
 	vega10_smumgr.c \
 	vega10_thermal.c \
 	vega12_hwmgr.c \
@@ -407,7 +444,6 @@ SRCS+=	amd_powerplay.c \
 	vega20_hwmgr.c \
 	vega20_powertune.c \
 	vega20_processpptables.c \
-	vega20_reg_init.c \
 	vega20_smumgr.c \
 	vega20_thermal.c \
 	vegam_smumgr.c
