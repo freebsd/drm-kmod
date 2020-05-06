@@ -49,9 +49,14 @@ static void ttm_bo_global_kobj_release(struct kobject *kobj);
  * ttm_global_mutex - protecting the global BO state
  */
 DEFINE_MUTEX(ttm_global_mutex);
+#ifdef __linux__
+unsigned ttm_bo_glob_use_count;
+struct ttm_bo_global ttm_bo_glob;
+#elif defined(__FreeBSD__)
 struct ttm_bo_global ttm_bo_glob = {
 	.use_count = 0
 };
+#endif
 
 static struct attribute ttm_bo_count = {
 	.name = "bo_count",
@@ -122,7 +127,6 @@ static ssize_t ttm_bo_global_show(struct kobject *kobj,
 				  struct attribute *attr,
 				  char *buffer)
 {
-	printf("%s: START kobj = %p\n", __func__, kobj);
 	struct ttm_bo_global *glob =
 		container_of(kobj, struct ttm_bo_global, kobj);
 
@@ -1530,7 +1534,6 @@ EXPORT_SYMBOL(ttm_bo_init_mm);
 
 static void ttm_bo_global_kobj_release(struct kobject *kobj)
 {
-	printf("%s: START kobj = %p\n", __func__, kobj);
 	struct ttm_bo_global *glob =
 		container_of(kobj, struct ttm_bo_global, kobj);
 

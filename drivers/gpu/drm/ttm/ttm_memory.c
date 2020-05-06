@@ -331,7 +331,7 @@ static int ttm_mem_init_kernel_zone(struct ttm_mem_global *glob,
 	return 0;
 }
 
-#ifdef CONFIG_HIGHMEM /* Not on FreeBSD */
+#ifdef CONFIG_HIGHMEM
 static int ttm_mem_init_highmem_zone(struct ttm_mem_global *glob,
 				     const struct sysinfo *si)
 {
@@ -437,10 +437,11 @@ int ttm_mem_global_init(struct ttm_mem_global *glob)
 
 	/* set it as 0 by default to keep original behavior of OOM */
 	glob->lower_mem_limit = 0;
+
 	ret = ttm_mem_init_kernel_zone(glob, &si);
 	if (unlikely(ret != 0))
 		goto out_no_zone;
-#ifdef CONFIG_HIGHMEM /* Not on FreeBSD */
+#ifdef CONFIG_HIGHMEM
 	ret = ttm_mem_init_highmem_zone(glob, &si);
 	if (unlikely(ret != 0))
 		goto out_no_zone;
@@ -478,7 +479,7 @@ void ttm_mem_global_release(struct ttm_mem_global *glob)
 		zone = glob->zones[i];
 		kobject_del(&zone->kobj);
 		kobject_put(&zone->kobj);
-	}
+			}
 	kobject_del(&glob->kobj);
 	kobject_put(&glob->kobj);
 }
