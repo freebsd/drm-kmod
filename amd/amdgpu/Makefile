@@ -617,6 +617,7 @@ CWARNFLAGS.polaris10_hwmgr.c=	-Wno-missing-prototypes  -Wno-unused-const-variabl
 CWARNFLAGS.polaris10_powertune.c=	-Wno-missing-prototypes
 CWARNFLAGS.polaris10_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.polaris10_thermal.c=	-Wno-missing-prototypes
+CWARNFLAGS.power_helpers.c=	-Wno-missing-prototypes
 CWARNFLAGS.ppatomctrl.c=	-Wno-missing-prototypes -Wno-missing-braces
 CWARNFLAGS.ppatomfwctrl.c=	-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.processpptables.c=	-Wno-missing-prototypes -Wno-sometimes-uninitialized
