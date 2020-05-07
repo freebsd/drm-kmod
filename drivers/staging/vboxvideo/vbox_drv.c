@@ -280,7 +280,11 @@ static int __init vbox_init(void)
 
 static void __exit vbox_exit(void)
 {
+#ifdef __linux__
 	pci_unregister_driver(&vbox_pci_driver);
+#elif defined(__FreeBSD__)
+	linux_pci_unregister_drm_driver(&vbox_pci_driver);
+#endif
 }
 
 #ifdef __linux__
