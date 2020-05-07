@@ -28,9 +28,7 @@
 #include <linux/spinlock.h>
 #include <linux/notifier.h>
 #include <linux/hrtimer.h>
-#ifdef __FreeBSD__
-#include <linux/bitops.h>
-#endif
+
 #include "i915_reg.h"
 
 struct drm_i915_private;
