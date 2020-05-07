@@ -163,9 +163,6 @@ static ssize_t amdgpu_get_power_dpm_state(struct device *dev,
 	enum amd_pm_state_type pm;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -198,9 +195,6 @@ static ssize_t amdgpu_set_power_dpm_state(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	enum amd_pm_state_type  state;
 	int ret;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return -EINVAL;
 
 	if (strncmp("battery", buf, strlen("battery")) == 0)
 		state = POWER_STATE_TYPE_BATTERY;
@@ -303,9 +297,6 @@ static ssize_t amdgpu_get_power_dpm_force_performance_level(struct device *dev,
 	enum amd_dpm_forced_level level = 0xff;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -342,9 +333,6 @@ static ssize_t amdgpu_set_power_dpm_force_performance_level(struct device *dev,
 	enum amd_dpm_forced_level level;
 	enum amd_dpm_forced_level current_level = 0xff;
 	int ret = 0;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return -EINVAL;
 
 	if (strncmp("low", buf, strlen("low")) == 0) {
 		level = AMD_DPM_FORCED_LEVEL_LOW;
@@ -479,9 +467,6 @@ static ssize_t amdgpu_get_pp_cur_state(struct device *dev,
 	enum amd_pm_state_type pm = 0;
 	int i = 0, ret = 0;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -518,9 +503,6 @@ static ssize_t amdgpu_get_pp_force_state(struct device *dev,
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = ddev->dev_private;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	if (adev->pp_force_state_enabled)
 		return amdgpu_get_pp_cur_state(dev, attr, buf);
 	else
@@ -537,9 +519,6 @@ static ssize_t amdgpu_set_pp_force_state(struct device *dev,
 	enum amd_pm_state_type state = 0;
 	unsigned long idx;
 	int ret;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return -EINVAL;
 
 	if (strlen(buf) == 1)
 		adev->pp_force_state_enabled = false;
@@ -596,9 +575,6 @@ static ssize_t amdgpu_get_pp_table(struct device *dev,
 	char *table = NULL;
 	int size, ret;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -637,9 +613,6 @@ static ssize_t amdgpu_set_pp_table(struct device *dev,
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = ddev->dev_private;
 	int ret = 0;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return -EINVAL;
 
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
@@ -743,9 +716,6 @@ static ssize_t amdgpu_set_pp_od_clk_voltage(struct device *dev,
 	const char delimiter[3] = {' ', '\n', '\0'};
 	uint32_t type;
 
-	if (amdgpu_sriov_vf(adev))
-		return -EINVAL;
-
 	if (count > 127)
 		return -EINVAL;
 
@@ -835,9 +805,6 @@ static ssize_t amdgpu_get_pp_od_clk_voltage(struct device *dev,
 	ssize_t size;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -887,9 +854,6 @@ static ssize_t amdgpu_set_pp_features(struct device *dev,
 	uint64_t featuremask;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev))
-		return -EINVAL;
-
 	ret = kstrtou64(buf, 0, &featuremask);
 	if (ret)
 		return -EINVAL;
@@ -929,9 +893,6 @@ static ssize_t amdgpu_get_pp_features(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	ssize_t size;
 	int ret;
-
-	if (amdgpu_sriov_vf(adev))
-		return 0;
 
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
@@ -988,9 +949,6 @@ static ssize_t amdgpu_get_pp_dpm_sclk(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	ssize_t size;
 	int ret;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
 
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
@@ -1055,9 +1013,6 @@ static ssize_t amdgpu_set_pp_dpm_sclk(struct device *dev,
 	int ret;
 	uint32_t mask = 0;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return -EINVAL;
-
 	ret = amdgpu_read_mask(buf, count, &mask);
 	if (ret)
 		return ret;
@@ -1089,9 +1044,6 @@ static ssize_t amdgpu_get_pp_dpm_mclk(struct device *dev,
 	ssize_t size;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -1118,9 +1070,6 @@ static ssize_t amdgpu_set_pp_dpm_mclk(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	uint32_t mask = 0;
 	int ret;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-			return -EINVAL;
 
 	ret = amdgpu_read_mask(buf, count, &mask);
 	if (ret)
@@ -1153,9 +1102,6 @@ static ssize_t amdgpu_get_pp_dpm_socclk(struct device *dev,
 	ssize_t size;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -1182,9 +1128,6 @@ static ssize_t amdgpu_set_pp_dpm_socclk(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	int ret;
 	uint32_t mask = 0;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return -EINVAL;
 
 	ret = amdgpu_read_mask(buf, count, &mask);
 	if (ret)
@@ -1219,9 +1162,6 @@ static ssize_t amdgpu_get_pp_dpm_fclk(struct device *dev,
 	ssize_t size;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -1248,9 +1188,6 @@ static ssize_t amdgpu_set_pp_dpm_fclk(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	int ret;
 	uint32_t mask = 0;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return -EINVAL;
 
 	ret = amdgpu_read_mask(buf, count, &mask);
 	if (ret)
@@ -1285,9 +1222,6 @@ static ssize_t amdgpu_get_pp_dpm_dcefclk(struct device *dev,
 	ssize_t size;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -1314,9 +1248,6 @@ static ssize_t amdgpu_set_pp_dpm_dcefclk(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	int ret;
 	uint32_t mask = 0;
-
-	if (amdgpu_sriov_vf(adev))
-		return -EINVAL;
 
 	ret = amdgpu_read_mask(buf, count, &mask);
 	if (ret)
@@ -1351,9 +1282,6 @@ static ssize_t amdgpu_get_pp_dpm_pcie(struct device *dev,
 	ssize_t size;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -1380,9 +1308,6 @@ static ssize_t amdgpu_set_pp_dpm_pcie(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	int ret;
 	uint32_t mask = 0;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return -EINVAL;
 
 	ret = amdgpu_read_mask(buf, count, &mask);
 	if (ret)
@@ -1417,9 +1342,6 @@ static ssize_t amdgpu_get_pp_sclk_od(struct device *dev,
 	uint32_t value = 0;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -1444,9 +1366,6 @@ static ssize_t amdgpu_set_pp_sclk_od(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	int ret;
 	long int value;
-
-	if (amdgpu_sriov_vf(adev))
-		return -EINVAL;
 
 	ret = kstrtol(buf, 0, &value);
 
@@ -1486,9 +1405,6 @@ static ssize_t amdgpu_get_pp_mclk_od(struct device *dev,
 	uint32_t value = 0;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -1513,9 +1429,6 @@ static ssize_t amdgpu_set_pp_mclk_od(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	int ret;
 	long int value;
-
-	if (amdgpu_sriov_vf(adev))
-		return 0;
 
 	ret = kstrtol(buf, 0, &value);
 
@@ -1575,9 +1488,6 @@ static ssize_t amdgpu_get_pp_power_profile_mode(struct device *dev,
 	ssize_t size;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -1617,9 +1527,6 @@ static ssize_t amdgpu_set_pp_power_profile_mode(struct device *dev,
 	tmp[1] = '\0';
 	ret = kstrtol(tmp, 0, &profile_mode);
 	if (ret)
-		return -EINVAL;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
 		return -EINVAL;
 
 	if (profile_mode == PP_SMC_POWER_PROFILE_CUSTOM) {
@@ -1675,9 +1582,6 @@ static ssize_t amdgpu_get_gpu_busy_percent(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	int r, value, size = sizeof(value);
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	r = pm_runtime_get_sync(ddev->dev);
 	if (r < 0)
 		return r;
@@ -1710,9 +1614,6 @@ static ssize_t amdgpu_get_mem_busy_percent(struct device *dev,
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = ddev->dev_private;
 	int r, value, size = sizeof(value);
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
 
 	r = pm_runtime_get_sync(ddev->dev);
 	if (r < 0)
@@ -1752,9 +1653,6 @@ static ssize_t amdgpu_get_pcie_bw(struct device *dev,
 	uint64_t count0, count1;
 	int ret;
 
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
-
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -1784,9 +1682,6 @@ static ssize_t amdgpu_get_unique_id(struct device *dev,
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = ddev->dev_private;
-
-	if (amdgpu_sriov_vf(adev) && !amdgpu_sriov_is_pp_one_vf(adev))
-		return 0;
 
 	if (adev->unique_id)
 		return snprintf(buf, PAGE_SIZE, "%016llx\n", adev->unique_id);
