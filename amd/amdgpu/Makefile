@@ -141,8 +141,6 @@ SRCS+=	amdgpu_afmt.c \
 	atombios_dp.c \
 	atombios_encoders.c \
 	atombios_i2c.c \
-	ci_dpm.c \
-	ci_smc.c \
 	cik_ih.c \
 	cik_sdma.c \
 	cik.c \
@@ -385,6 +383,7 @@ SRCS+=	chash.c
 
 # powerplay
 SRCS+=	amd_powerplay.c \
+	common_baco.c \
 	ci_smumgr.c \
 	fiji_smumgr.c \
 	hardwaremanager.c \
@@ -411,6 +410,7 @@ SRCS+=	amd_powerplay.c \
 	smu_helper.c \
 	smumgr.c \
 	tonga_smumgr.c \
+	vega10_baco.c \
 	vega10_hwmgr.c \
 	vega10_powertune.c \
 	vega10_processpptables.c \
@@ -420,6 +420,7 @@ SRCS+=	amd_powerplay.c \
 	vega12_processpptables.c \
 	vega12_smumgr.c \
 	vega12_thermal.c \
+	vega20_baco.c \
 	vega20_hwmgr.c \
 	vega20_powertune.c \
 	vega20_processpptables.c \
@@ -576,6 +577,7 @@ CWARNFLAGS.dcn10_dpp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp_dscl.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn10_hw_sequencer.c=-Wno-missing-prototypes -Wno-missing-braces
 CWARNFLAGS.dcn10_hw_sequencer_debug.c= -Wno-missing-braces
+CWARNFLAGS.dcn10_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_opp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_optc.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn10_resource.c=	-Wno-missing-prototypes	-Wno-initializer-overrides
