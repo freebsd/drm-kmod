@@ -6,9 +6,12 @@
 
 #include <linux/slab.h>
 #include <linux/dma-fence.h>
+#ifdef __linux
 #include <linux/irq_work.h>
+#else
+#include <linux/workqueue.h>
+#endif
 #include <linux/reservation.h>
-
 #include "i915_sw_fence.h"
 #include "i915_selftest.h"
 
@@ -374,6 +377,8 @@ struct i915_sw_dma_fence_cb_timer {
 	struct timer_list timer;
 #ifdef __linux__
 	struct irq_work work;
+#else
+	struct work_struct work;
 #endif
 	struct rcu_head rcu;
 };
@@ -419,14 +424,15 @@ static void dma_i915_sw_fence_wake_timer(struct dma_fence *dma,
 #ifdef __linux__
 	irq_work_queue(&cb->work);
 #elif defined(__FreeBSD__)
-	del_timer_sync(&cb->timer);
-	dma_fence_put(cb->dma);
-	kfree_rcu(cb, rcu);
+	schedule_work(&cb->work);
 #endif	
 }
 
 #ifdef __linux__
 static void irq_i915_sw_fence_work(struct irq_work *wrk)
+#else
+static void irq_i915_sw_fence_work(struct work_struct *wrk)
+#endif
 {
 	struct i915_sw_dma_fence_cb_timer *cb =
 		container_of(wrk, typeof(*cb), work);
@@ -436,7 +442,6 @@ static void irq_i915_sw_fence_work(struct irq_work *wrk)
 
 	kfree_rcu(cb, rcu);
 }
-#endif
 
 int i915_sw_fence_await_dma_fence(struct i915_sw_fence *fence,
 				  struct dma_fence *dma,
@@ -475,8 +480,9 @@ int i915_sw_fence_await_dma_fence(struct i915_sw_fence *fence,
 		timer->dma = dma_fence_get(dma);
 #ifdef __linux__
 		init_irq_work(&timer->work, irq_i915_sw_fence_work);
+#else
+		INIT_WORK(&timer->work, irq_i915_sw_fence_work);
 #endif
-
 		timer_setup(&timer->timer,
 			    timer_i915_sw_fence_wake, TIMER_IRQSAFE);
 		mod_timer(&timer->timer, round_jiffies_up(jiffies + timeout));
