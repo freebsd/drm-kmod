@@ -1375,10 +1375,8 @@ static void ivybridge_parity_work(struct work_struct *work)
 		parity_event[4] = kasprintf(GFP_KERNEL, "SLICE=%d", slice);
 		parity_event[5] = NULL;
 
-#ifdef __linux__
 		kobject_uevent_env(&dev_priv->drm.primary->kdev->kobj,
 				   KOBJ_CHANGE, parity_event);
-#endif
 
 		DRM_DEBUG("Parity error: Slice = %d, Row = %d, Bank = %d, Sub bank = %d.\n",
 			  slice, row, bank, subbank);
