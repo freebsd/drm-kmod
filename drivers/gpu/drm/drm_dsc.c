@@ -10,9 +10,7 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/errno.h>
-#ifdef __linux__
 #include <linux/byteorder/generic.h>
-#endif
 #include <drm/drm_dp_helper.h>
 #include <drm/drm_dsc.h>
 
