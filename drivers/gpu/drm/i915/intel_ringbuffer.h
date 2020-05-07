@@ -23,7 +23,9 @@
 #include "intel_gpu_commands.h"
 #include "intel_workarounds.h"
 
-#include <linux/relay.h>
+#ifdef __FreeBSD__
+#include <linux/relay.h>	/* for struct irq_work (manu 20200507) */
+#endif
 
 struct drm_printer;
 struct i915_sched_attr;
