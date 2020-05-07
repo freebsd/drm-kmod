@@ -41,14 +41,12 @@ SRCS=	ati_pcigart.c \
 	drm_fourcc.c \
 	drm_framebuffer.c \
 	drm_gem.c \
-	drm_gem_cma_helper.c \
 	drm_gem_framebuffer_helper.c \
 	drm_hashtab.c \
 	drm_ioc32.c \
 	drm_ioctl.c \
 	drm_info.c \
 	drm_irq.c \
-	drm_kms_helper_common.c \
 	drm_lease.c \
 	drm_lock.c \
 	drm_memory.c \
