@@ -306,12 +306,11 @@ static void dm_pflip_high_irq(void *interrupt_params)
 		return;
 	}
 
+	/* Update to correct count(s) if racing with vblank irq */
+	amdgpu_crtc->last_flip_vblank = drm_crtc_accurate_vblank_count(&amdgpu_crtc->base);
 
 	/* wake up userspace */
 	if (amdgpu_crtc->event) {
-		/* Update to correct count(s) if racing with vblank irq */
-		drm_crtc_accurate_vblank_count(&amdgpu_crtc->base);
-
 		drm_crtc_send_vblank_event(&amdgpu_crtc->base, amdgpu_crtc->event);
 
 		/* page flip completed. clean up */
