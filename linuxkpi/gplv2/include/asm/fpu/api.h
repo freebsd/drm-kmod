@@ -16,8 +16,9 @@
 
 #include <machine/fpu.h>
 
+static struct fpu_kern_ctx *__fpu_ctx;
+
 #define	kernel_fpu_begin()			\
-	struct fpu_kern_ctx *__fpu_ctx;		\
 	__fpu_ctx = fpu_kern_alloc_ctx(0);	\
 	fpu_kern_enter(curthread, __fpu_ctx,	\
 	    FPU_KERN_NORMAL);
