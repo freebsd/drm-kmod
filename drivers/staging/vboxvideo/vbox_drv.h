@@ -30,11 +30,6 @@
 #include "vboxvideo_vbe.h"
 #include "hgsmi_ch_setup.h"
 
-#ifndef __linux__
-/* BSD: Make sure we get out[bwl] redefines */
-#include <linux/compiler.h>
-#endif
-
 #define DRIVER_NAME         "vboxvideo"
 #define DRIVER_DESC         "Oracle VM VirtualBox Graphics Card"
 #define DRIVER_DATE         "20130823"
@@ -69,13 +64,13 @@ struct vbox_private {
 	struct vbox_framebuffer afb;
 
 	u8 __iomem *guest_heap;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	int guest_heap_rid;
 	int guest_heap_restype;
 	struct resource *guest_heap_res;
 #endif
 	u8 __iomem *vbva_buffers;
-#ifndef __linux__
+#ifdef __FreeBSD__
 	int vbva_buffers_rid;
 	int vbva_buffers_restype;
 	struct resource *vbva_buffers_res;

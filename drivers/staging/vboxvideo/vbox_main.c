@@ -222,7 +222,7 @@ int vbox_hw_init(struct vbox_private *vbox)
 	vbox->full_vram_size = inl(VBE_DISPI_IOPORT_DATA);
 	vbox->any_pitch = vbox_check_supported(VBE_DISPI_ID_ANYX);
 
-	DRM_INFO("VRAM 0x%08x\n", vbox->full_vram_size);
+	DRM_INFO("VRAM %08x\n", vbox->full_vram_size);
 
 	/* Map guest-heap at end of vram */
 #ifdef __linux__
@@ -262,8 +262,10 @@ int vbox_hw_init(struct vbox_private *vbox)
 		goto err_destroy_guest_pool;
 
 	ret = hgsmi_test_query_conf(vbox->guest_pool);
-	if (ret)
+	if (ret) {
+		DRM_ERROR("vboxvideo: hgsmi_test_query_conf failed\n");
 		goto err_destroy_guest_pool;
+	}
 
 	/* Reduce available VRAM size to reflect the guest heap. */
 	vbox->available_vram_size = GUEST_HEAP_OFFSET(vbox);

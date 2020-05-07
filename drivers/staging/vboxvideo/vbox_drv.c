@@ -10,9 +10,7 @@
 #include <linux/console.h>
 #include <linux/module.h>
 #include <linux/pci.h>
-#ifdef __linux__
 #include <linux/vt_kern.h>
-#endif
 
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_drv.h>
@@ -282,11 +280,7 @@ static int __init vbox_init(void)
 
 static void __exit vbox_exit(void)
 {
-#ifdef __linux__
 	pci_unregister_driver(&vbox_pci_driver);
-#else
-	linux_pci_unregister_drm_driver(&vbox_pci_driver);
-#endif
 }
 
 #ifdef __linux__
