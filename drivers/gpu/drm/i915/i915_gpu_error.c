@@ -39,6 +39,10 @@
 #include "i915_gpu_error.h"
 #include "i915_drv.h"
 
+#ifdef __FreeBSD__
+#include <linux/sizes.h>	/* Needed for SZ_64K */
+#endif
+
 static inline const struct intel_engine_cs *
 engine_lookup(const struct drm_i915_private *i915, unsigned int id)
 {
