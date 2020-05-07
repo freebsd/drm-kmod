@@ -345,27 +345,6 @@ SRCS+=	gpio_base.c \
 	hw_translate_dcn10.c \
 	hw_translate_diag.c
 
-# display/dc/i2caux/*
-SRCS+=	aux_engine.c \
-	aux_engine_dce110.c \
-	engine_base.c \
-	i2c_engine.c \
-	i2c_generic_hw_engine.c \
-	i2c_hw_engine.c \
-	i2c_sw_engine.c \
-	i2caux.c \
-	i2c_hw_engine_dce110.c \
-	i2c_hw_engine_dce80.c \
-	i2c_sw_engine_dce110.c \
-	i2c_sw_engine_dce80.c \
-	i2caux_dce100.c \
-	i2caux_dce110.c \
-	i2caux_dce112.c \
-	i2caux_dce120.c \
-	i2caux_dce80.c \
-	i2caux_dcn10.c \
-	i2caux_diag.c
-
 # display/dc/irq/*
 SRCS+=	irq_service.c \
 	irq_service_dce110.c \
