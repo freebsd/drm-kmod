@@ -1434,11 +1434,13 @@ static int i915_driver_init_hw(struct drm_i915_private *dev_priv)
 		goto err_ggtt;
 	}
 
+#ifdef __linux__
 	ret = vga_remove_vgacon(pdev);
 	if (ret) {
 		DRM_ERROR("failed to remove conflicting VGA console\n");
 		goto err_ggtt;
 	}
+#endif
 
 	ret = i915_ggtt_init_hw(dev_priv);
 	if (ret)

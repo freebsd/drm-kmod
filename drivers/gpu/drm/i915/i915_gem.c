@@ -1851,11 +1851,9 @@ out:
 	args->addr_ptr = (u64)addr;
 	return 0;
 
-#ifdef __linux__
 err:
 	i915_gem_object_put(obj);
 	return addr;
-#endif
 }
 
 static unsigned int tile_row_pages(const struct drm_i915_gem_object *obj)
