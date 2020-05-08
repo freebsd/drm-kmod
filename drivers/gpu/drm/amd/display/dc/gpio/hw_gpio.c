@@ -130,9 +130,12 @@ enum gpio_result dal_hw_gpio_change_mode(
 void dal_hw_gpio_close(
 	struct hw_gpio_pin *ptr)
 {
+#ifndef __FreeBSD__
+	/* BSDFIXME: This doesn't seems to work when unloading the module ... (manu 20200508) */
 	struct hw_gpio *pin = FROM_HW_GPIO_PIN(ptr);
 
 	restore_registers(pin);
+#endif
 
 	ptr->mode = GPIO_MODE_UNKNOWN;
 	ptr->opened = false;

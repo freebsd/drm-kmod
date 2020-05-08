@@ -1321,7 +1321,11 @@ error_sync:
 static void __exit amdgpu_exit(void)
 {
 	amdgpu_amdkfd_fini();
+#ifdef __linux__
 	pci_unregister_driver(&amdgpu_kms_pci_driver);
+#elif defined(__FreeBSD__)
+	linux_pci_unregister_drm_driver(&amdgpu_kms_pci_driver);
+#endif
 	amdgpu_unregister_atpx_handler();
 	amdgpu_sync_fini();
 	amdgpu_fence_slab_fini();
