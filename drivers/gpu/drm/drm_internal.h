@@ -133,6 +133,7 @@ int drm_debugfs_crtc_crc_add(struct drm_crtc *crtc);
 #else
 /* Need to find a proper way to do that */
 int drm_sysctl_init(struct drm_device *dev);
+int drm_sysctl_cleanup(struct drm_device *dev);
 static inline int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 				   struct dentry *root)
 {
@@ -145,6 +146,10 @@ static inline int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 
 static inline int drm_debugfs_cleanup(struct drm_minor *minor)
 {
+#ifdef __FreeBSD__
+	if (minor->type != DRM_MINOR_RENDER)
+		drm_sysctl_cleanup(minor->dev);
+#endif
 	return 0;
 }
 
