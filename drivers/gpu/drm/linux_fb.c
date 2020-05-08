@@ -665,7 +665,9 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 	i = fb_info->node;
 	if (i < 0 || i >= FB_MAX || registered_fb[i] != fb_info)
 		return -EINVAL;
-
+	vm_phys_fictitious_unreg_range(fb_info->apertures->ranges[0].base,
+				     fb_info->apertures->ranges[0].base +
+				     fb_info->apertures->ranges[0].size);
 	if (fb_info->fbio.fb_fbd_dev) {
 		mtx_lock(&Giant);
 		device_delete_child(fb_info->fb_bsddev, fb_info->fbio.fb_fbd_dev);
