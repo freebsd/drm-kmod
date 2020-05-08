@@ -1079,6 +1079,14 @@ i915_request_await_request(struct i915_request *to, struct i915_request *from)
 	return 0;
 }
 
+static int
+i915_request_await_external(struct i915_request *rq, struct dma_fence *fence)
+{
+	return i915_sw_fence_await_dma_fence(&rq->submit, fence,
+					     fence->context ? I915_FENCE_TIMEOUT : 0,
+					     I915_FENCE_GFP);
+}
+
 int
 i915_request_await_dma_fence(struct i915_request *rq, struct dma_fence *fence)
 {
@@ -1126,9 +1134,7 @@ i915_request_await_dma_fence(struct i915_request *rq, struct dma_fence *fence)
 		if (dma_fence_is_i915(fence))
 			ret = i915_request_await_request(rq, to_request(fence));
 		else
-			ret = i915_sw_fence_await_dma_fence(&rq->submit, fence,
-							    fence->context ? I915_FENCE_TIMEOUT : 0,
-							    I915_FENCE_GFP);
+			ret = i915_request_await_external(rq, fence);
 		if (ret < 0)
 			return ret;
 
@@ -1267,9 +1273,7 @@ i915_request_await_execution(struct i915_request *rq,
 							     to_request(fence),
 							     hook);
 		else
-			ret = i915_sw_fence_await_dma_fence(&rq->submit, fence,
-							    I915_FENCE_TIMEOUT,
-							    GFP_KERNEL);
+			ret = i915_request_await_external(rq, fence);
 		if (ret < 0)
 			return ret;
 	} while (--nchild);
