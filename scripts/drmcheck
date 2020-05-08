@@ -1,0 +1,72 @@
+#!/bin/sh
+
+usage()
+{
+	cat << EOF
+	Usage: `basename $0` patchdir
+EOF
+
+	exit 1
+}
+
+if [ $# -ne 1 ]; then
+	usage
+fi
+
+linuxpath=$1
+
+echo ""
+echo "CORE FILES"
+echo ""
+
+for file in ${linuxpath}/drivers/gpu/drm/*.c ${linuxpath}/drivers/gpu/drm/*.h; do
+	blah=$(echo ${file} | awk -F '/' '{print $NF}')
+	if [ ! -f drivers/gpu/drm/$blah ]; then
+		echo "${blah} only present in ${linuxpath}/drivers/drm/"
+	fi
+done
+
+echo ""
+echo "HEADERS"
+echo ""
+
+for file in ${linuxpath}/include/drm/*.h; do
+	blah=$(echo ${file} | awk -F '/' '{print $NF}')
+	if [ ! -f include/drm/$blah ]; then
+		echo "${blah} only present in ${linuxpath}/include/drm/"
+	fi
+done
+
+echo ""
+echo "UAPI HEADERS"
+echo ""
+
+for file in ${linuxpath}/include/uapi/drm/*.h; do
+	blah=$(echo ${file} | awk -F '/' '{print $NF}')
+	if [ ! -f include/uapi/drm/$blah ]; then
+		echo "${blah} only present in ${linuxpath}/include/uapi/drm/"
+	fi
+done
+
+echo ""
+echo "KMOD CHECK"
+echo ""
+
+for file in $(find drivers/gpu/drm/ -name \*.c) ; do
+	if [ -d ${file} ]; then
+		continue
+	fi
+	if [ ! -f ${linuxpath}/${file} ]; then
+		echo "${file} only present for FreeBSD"
+	fi
+done
+exit 0
+
+for file in $(find drivers/gpu/drm/ -name \*.h) ; do
+	if [ -d ${file} ]; then
+		continue
+	fi
+	if [ ! -f ${linuxpath}/drivers/gpu/drm/${file} ]; then
+		echo "${file} only present for FreeBSD"
+	fi
+done
