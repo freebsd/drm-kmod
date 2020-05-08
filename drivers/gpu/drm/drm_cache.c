@@ -36,6 +36,8 @@
 #if defined(CONFIG_X86)
 #include <asm/smp.h>
 
+#define clflushopt(addr) linux_clflushopt(addr)
+
 /*
  * clflushopt is an unordered instruction which needs fencing with mfence or
  * sfence to avoid ordering issues.  For drm_clflush_page this fencing happens
