@@ -1,5 +1,5 @@
-# kms-drm
-The DRM part of the linuxkpi-based KMS
+# drm-kmod
+The DRM drivers ported from Linux to FreeBSD using LinuxKPI
 
 ## Contributing
 
@@ -12,7 +12,7 @@ Try to keep changes to the code to a minimum but if you have to patch it, leave 
 ```
 #ifdef __linux__
 ...intact linux code...
-#else
+#elif defined(__FreeBSD__)
 bsd code
 #endif
 ```
@@ -20,8 +20,6 @@ bsd code
 When updating and patching this code with code from Linux there are often merge conflicts where the code has been changed. If there are no markers it is difficult to know what code to keep and what to throw away.
 
 Pull requests that do not follow this will not be accepted. 
-
-Use `#if(n)def __linux__` and not `__FreeBSD__` to respect the other BSDs.
 
 Unless obvious what your code does, please leave a comment to explain to fellow developers why you patched it. The source code is the documentation!
 
@@ -31,9 +29,3 @@ If the patch can be avoided by adding functionality to LinuxKPI, please consider
 Folders `lindebugfs`, `linuxkpi`
 
 Code style and rules same as FreeBSD kernel. If a GPL'd file is copy-paste from Linux, it's OK to leave style as is.
-
-
-
-## Testing
-For testing work in progress branches please see the wiki:  
-https://github.com/FreeBSDDesktop/kms-drm/wiki/Testing  
