@@ -126,6 +126,7 @@ static void amdgpu_ras_self_test(struct amdgpu_device *adev)
 	/* TODO */
 }
 
+#ifdef CONFIG_DEBUGFS
 static ssize_t amdgpu_ras_debugfs_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
@@ -237,6 +238,7 @@ static int amdgpu_ras_debugfs_ctrl_parse_data(struct file *f,
 
 	return 0;
 }
+
 /*
  * DOC: ras debugfs control interface
  *
@@ -336,6 +338,7 @@ static const struct file_operations amdgpu_ras_debugfs_ctrl_ops = {
 	.write = amdgpu_ras_debugfs_ctrl_write,
 	.llseek = default_llseek
 };
+#endif /* CONFIG_DEBUGFS */
 
 static ssize_t amdgpu_ras_sysfs_read(struct device *dev,
 		struct device_attribute *attr, char *buf)
@@ -788,12 +791,14 @@ int amdgpu_ras_sysfs_create(struct amdgpu_device *adev,
 	};
 	sysfs_attr_init(&obj->sysfs_attr.attr);
 
+#ifdef __linux__
 	if (sysfs_add_file_to_group(&adev->dev->kobj,
 				&obj->sysfs_attr.attr,
 				"ras")) {
 		put_obj(obj);
 		return -EINVAL;
 	}
+#endif
 
 	obj->attr_inuse = 1;
 
@@ -808,9 +813,11 @@ int amdgpu_ras_sysfs_remove(struct amdgpu_device *adev,
 	if (!obj || !obj->attr_inuse)
 		return -EINVAL;
 
+#ifdef __linux__
 	sysfs_remove_file_from_group(&adev->dev->kobj,
 				&obj->sysfs_attr.attr,
 				"ras");
+#endif
 	obj->attr_inuse = 0;
 	put_obj(obj);
 
@@ -832,6 +839,7 @@ static int amdgpu_ras_sysfs_remove_all(struct amdgpu_device *adev)
 }
 /* sysfs end */
 
+#ifdef CONFIG_DEBUGFS
 /* debugfs begin */
 static int amdgpu_ras_debugfs_create_ctrl_node(struct amdgpu_device *adev)
 {
@@ -918,20 +926,25 @@ static int amdgpu_ras_debugfs_remove_all(struct amdgpu_device *adev)
 	return 0;
 }
 /* debugfs end */
+#endif
 
 /* ras fs */
 
 static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 {
 	amdgpu_ras_sysfs_create_feature_node(adev);
+#ifdef CONFIG_DEBUGFS
 	amdgpu_ras_debugfs_create_ctrl_node(adev);
+#endif
 
 	return 0;
 }
 
 static int amdgpu_ras_fs_fini(struct amdgpu_device *adev)
 {
+#ifdef CONFIG_DEBUGFS
 	amdgpu_ras_debugfs_remove_all(adev);
+#endif
 	amdgpu_ras_sysfs_remove_all(adev);
 	return 0;
 }

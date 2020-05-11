@@ -27,7 +27,6 @@
 #include "atomfirmware.h"
 #include "amdgpu_atomfirmware.h"
 #include "smu_v11_0.h"
-#include "smu_v11_0_ppsmc.h"
 #include "smu11_driver_if.h"
 #include "soc15_common.h"
 #include "atom.h"
@@ -93,19 +92,23 @@ static int smu_v11_0_wait_for_response(struct smu_context *smu)
 	if (i == adev->usec_timeout)
 		return -ETIME;
 
-	return RREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_90) ==  PPSMC_Result_OK ? 0:-EIO;
+	return RREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_90) == 0x1 ? 0 : -EIO;
 }
 
 static int smu_v11_0_send_msg(struct smu_context *smu, uint16_t msg)
 {
 	struct amdgpu_device *adev = smu->adev;
-	int ret = 0;
+	int ret = 0, index = 0;
+
+	index = smu_msg_get_index(smu, msg);
+	if (index < 0)
+		return index;
 
 	smu_v11_0_wait_for_response(smu);
 
 	WREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_90, 0);
 
-	smu_v11_0_send_msg_without_waiting(smu, msg);
+	smu_v11_0_send_msg_without_waiting(smu, (uint16_t)index);
 
 	ret = smu_v11_0_wait_for_response(smu);
 
@@ -123,7 +126,11 @@ smu_v11_0_send_msg_with_param(struct smu_context *smu, uint16_t msg,
 {
 
 	struct amdgpu_device *adev = smu->adev;
-	int ret = 0;
+	int ret = 0, index = 0;
+
+	index = smu_msg_get_index(smu, msg);
+	if (index < 0)
+		return index;
 
 	ret = smu_v11_0_wait_for_response(smu);
 	if (ret)
@@ -134,7 +141,7 @@ smu_v11_0_send_msg_with_param(struct smu_context *smu, uint16_t msg,
 
 	WREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_82, param);
 
-	smu_v11_0_send_msg_without_waiting(smu, msg);
+	smu_v11_0_send_msg_without_waiting(smu, (uint16_t)index);
 
 	ret = smu_v11_0_wait_for_response(smu);
 	if (ret)
@@ -147,8 +154,51 @@ smu_v11_0_send_msg_with_param(struct smu_context *smu, uint16_t msg,
 static int smu_v11_0_init_microcode(struct smu_context *smu)
 {
 	struct amdgpu_device *adev = smu->adev;
+	const char *chip_name;
+	char fw_name[30];
+	int err = 0;
+	const struct smc_firmware_header_v1_0 *hdr;
+	const struct common_firmware_header *header;
+	struct amdgpu_firmware_info *ucode = NULL;
 
-	return 0;
+	switch (adev->asic_type) {
+	case CHIP_VEGA20:
+		chip_name = "vega20";
+		break;
+	default:
+		BUG();
+	}
+
+	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_smc.bin", chip_name);
+
+	err = request_firmware(&adev->pm.fw, fw_name, adev->dev);
+	if (err)
+		goto out;
+	err = amdgpu_ucode_validate(adev->pm.fw);
+	if (err)
+		goto out;
+
+	hdr = (const struct smc_firmware_header_v1_0 *) adev->pm.fw->data;
+	amdgpu_ucode_print_smc_hdr(&hdr->header);
+	adev->pm.fw_version = le32_to_cpu(hdr->header.ucode_version);
+
+	if (adev->firmware.load_type == AMDGPU_FW_LOAD_PSP) {
+		ucode = &adev->firmware.ucode[AMDGPU_UCODE_ID_SMC];
+		ucode->ucode_id = AMDGPU_UCODE_ID_SMC;
+		ucode->fw = adev->pm.fw;
+		header = (const struct common_firmware_header *)ucode->fw->data;
+		adev->firmware.fw_size +=
+			ALIGN(le32_to_cpu(header->ucode_size_bytes), PAGE_SIZE);
+	}
+
+out:
+	if (err) {
+		DRM_ERROR("smu_v11_0: Failed to load firmware \"%s\"\n",
+			  fw_name);
+		release_firmware(adev->pm.fw);
+		adev->pm.fw = NULL;
+	}
+	return err;
 }
 
 static int smu_v11_0_load_microcode(struct smu_context *smu)
@@ -195,7 +245,7 @@ static int smu_v11_0_read_pptable_from_vbios(struct smu_context *smu)
 	int ret, index;
 	uint16_t size;
 	uint8_t frev, crev;
-	struct smu_11_0_powerplay_table *table;
+	void *table;
 
 	index = get_index_into_master_table(atom_master_list_of_data_tables_v2_1,
 					    powerplayinfo);
@@ -220,12 +270,7 @@ static int smu_v11_0_init_dpm_context(struct smu_context *smu)
 	if (smu_dpm->dpm_context || smu_dpm->dpm_context_size != 0)
 		return -EINVAL;
 
-	smu_dpm->dpm_context = kzalloc(sizeof(struct smu_11_0_dpm_context), GFP_KERNEL);
-	if (!smu_dpm->dpm_context)
-		return -ENOMEM;
-	smu_dpm->dpm_context_size = sizeof(struct smu_11_0_dpm_context);
-
-	return 0;
+	return smu_alloc_dpm_context(smu);
 }
 
 static int smu_v11_0_fini_dpm_context(struct smu_context *smu)
@@ -487,12 +532,12 @@ static int smu_v11_0_notify_memory_pool_location(struct smu_context *smu)
 	address_low  = (uint32_t)lower_32_bits(address);
 
 	ret = smu_send_smc_msg_with_param(smu,
-					  PPSMC_MSG_SetSystemVirtualDramAddrHigh,
+					  SMU_MSG_SetSystemVirtualDramAddrHigh,
 					  address_high);
 	if (ret)
 		return ret;
 	ret = smu_send_smc_msg_with_param(smu,
-					  PPSMC_MSG_SetSystemVirtualDramAddrLow,
+					  SMU_MSG_SetSystemVirtualDramAddrLow,
 					  address_low);
 	if (ret)
 		return ret;
@@ -501,19 +546,27 @@ static int smu_v11_0_notify_memory_pool_location(struct smu_context *smu)
 	address_high = (uint32_t)upper_32_bits(address);
 	address_low  = (uint32_t)lower_32_bits(address);
 
-	ret = smu_send_smc_msg_with_param(smu, PPSMC_MSG_DramLogSetDramAddrHigh,
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_DramLogSetDramAddrHigh,
 					  address_high);
 	if (ret)
 		return ret;
-	ret = smu_send_smc_msg_with_param(smu, PPSMC_MSG_DramLogSetDramAddrLow,
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_DramLogSetDramAddrLow,
 					  address_low);
 	if (ret)
 		return ret;
-	ret = smu_send_smc_msg_with_param(smu, PPSMC_MSG_DramLogSetDramSize,
+	ret = smu_send_smc_msg_with_param(smu, SMU_MSG_DramLogSetDramSize,
 					  (uint32_t)memory_pool->size);
 	if (ret)
 		return ret;
 
+	return ret;
+}
+
+static int smu_v11_0_check_pptable(struct smu_context *smu)
+{
+	int ret;
+
+	ret = smu_check_powerplay_table(smu);
 	return ret;
 }
 
@@ -1859,6 +1912,7 @@ static const struct smu_funcs smu_v11_0_funcs = {
 	.check_fw_version = smu_v11_0_check_fw_version,
 	.send_smc_msg = smu_v11_0_send_msg,
 	.send_smc_msg_with_param = smu_v11_0_send_msg_with_param,
+	.read_smc_arg = smu_v11_0_read_arg,
 	.read_pptable_from_vbios = smu_v11_0_read_pptable_from_vbios,
 	.init_smc_tables = smu_v11_0_init_smc_tables,
 	.fini_smc_tables = smu_v11_0_fini_smc_tables,
@@ -1867,6 +1921,7 @@ static const struct smu_funcs smu_v11_0_funcs = {
 	.get_vbios_bootup_values = smu_v11_0_get_vbios_bootup_values,
 	.get_clk_info_from_vbios = smu_v11_0_get_clk_info_from_vbios,
 	.notify_memory_pool_location = smu_v11_0_notify_memory_pool_location,
+	.check_pptable = smu_v11_0_check_pptable,
 	.parse_pptable = smu_v11_0_parse_pptable,
 	.populate_smc_pptable = smu_v11_0_populate_smc_pptable,
 	.write_pptable = smu_v11_0_write_pptable,

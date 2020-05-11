@@ -156,6 +156,7 @@ static const uint32_t ecc_umc_mcumc_ctrl_mask_addrs[] = {
 	(0x001d43e0 + 0x00001800),
 };
 
+#ifdef __linux__
 static const uint32_t ecc_umc_mcumc_status_addrs[] = {
 	(0x000143c2 + 0x00000000),
 	(0x000143c2 + 0x00000800),
@@ -190,6 +191,7 @@ static const uint32_t ecc_umc_mcumc_status_addrs[] = {
 	(0x001d43c2 + 0x00001000),
 	(0x001d43c2 + 0x00001800),
 };
+#endif
 
 static int gmc_v9_0_ecc_interrupt_state(struct amdgpu_device *adev,
 		struct amdgpu_irq_src *src,

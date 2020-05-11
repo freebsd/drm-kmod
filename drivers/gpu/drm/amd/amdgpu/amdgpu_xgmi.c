@@ -111,7 +111,9 @@ static int amdgpu_xgmi_sysfs_add_dev_info(struct amdgpu_device *adev,
 					 struct amdgpu_hive_info *hive)
 {
 	int ret = 0;
+#ifdef __linux__
 	char node[10] = { 0 };
+#endif
 
 	/* Create xgmi device id file */
 	ret = device_create_file(adev->dev, &dev_attr_xgmi_device_id);
@@ -120,6 +122,7 @@ static int amdgpu_xgmi_sysfs_add_dev_info(struct amdgpu_device *adev,
 		return ret;
 	}
 
+#ifdef __linux__
 	/* Create sysfs link to hive info folder on the first device */
 	if (adev != hive->adev) {
 		ret = sysfs_create_link(&adev->dev->kobj, hive->kobj,
@@ -137,15 +140,18 @@ static int amdgpu_xgmi_sysfs_add_dev_info(struct amdgpu_device *adev,
 		dev_err(adev->dev, "XGMI: Failed to create link from hive info");
 		goto remove_link;
 	}
+#endif
 
 	goto success;
 
 
+#ifdef __linux__
 remove_link:
 	sysfs_remove_link(&adev->dev->kobj, adev->ddev->unique);
 
 remove_file:
 	device_remove_file(adev->dev, &dev_attr_xgmi_device_id);
+#endif
 
 success:
 	return ret;
@@ -155,8 +161,10 @@ static void amdgpu_xgmi_sysfs_rem_dev_info(struct amdgpu_device *adev,
 					  struct amdgpu_hive_info *hive)
 {
 	device_remove_file(adev->dev, &dev_attr_xgmi_device_id);
+#ifdef __linux__
 	sysfs_remove_link(&adev->dev->kobj, adev->ddev->unique);
 	sysfs_remove_link(hive->kobj, adev->ddev->unique);
+#endif
 }
 
 

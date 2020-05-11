@@ -445,6 +445,12 @@ static int smu_sw_init(void *handle)
 		return ret;
 	}
 
+	ret = smu_smc_table_sw_init(smu);
+	if (ret) {
+		pr_err("Failed to sw init smc table!\n");
+		return ret;
+	}
+
 	return 0;
 }
 
@@ -807,6 +813,18 @@ static int smu_hw_init(void *handle)
 	if (ret)
 		goto failed;
 
+	ret = smu_alloc_memory_pool(smu);
+	if (ret)
+		goto failed;
+
+	/*
+	 * Use msg SetSystemVirtualDramAddr and DramLogSetDramAddr can notify
+	 * pool location.
+	 */
+	ret = smu_notify_memory_pool_location(smu);
+	if (ret)
+		goto failed;
+
 	ret = smu_start_thermal_control(smu);
 	if (ret)
 		goto failed;
@@ -923,7 +941,12 @@ static int smu_resume(void *handle)
 
 	mutex_unlock(&smu->mutex);
 
+	pr_info("SMU is resumed successfully!\n");
+
 	return 0;
+failed:
+	mutex_unlock(&smu->mutex);
+	return ret;
 }
 
 int smu_display_configuration_change(struct smu_context *smu,

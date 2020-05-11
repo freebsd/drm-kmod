@@ -336,7 +336,8 @@ struct smu_power_context {
 	uint32_t power_context_size;
 };
 
-#define SMU_FEATURE_MAX (64)
+
+#define SMU_FEATURE_MAX	(64)
 struct smu_feature
 {
 	uint32_t feature_num;
@@ -405,6 +406,7 @@ struct smu_context
 };
 
 struct pptable_funcs {
+	int (*alloc_dpm_context)(struct smu_context *smu);
 	int (*store_powerplay_table)(struct smu_context *smu);
 	int (*check_powerplay_table)(struct smu_context *smu);
 	int (*append_powerplay_table)(struct smu_context *smu);
@@ -734,6 +736,12 @@ extern int smu_get_atom_data_table(struct smu_context *smu, uint32_t table,
 extern const struct amd_ip_funcs smu_ip_funcs;
 
 extern const struct amdgpu_ip_block_version smu_v11_0_ip_block;
+extern int smu_feature_init_dpm(struct smu_context *smu);
+
+extern int smu_feature_is_enabled(struct smu_context *smu, int feature_id);
+extern int smu_feature_set_enabled(struct smu_context *smu, int feature_id, bool enable);
+extern int smu_feature_is_supported(struct smu_context *smu, int feature_id);
+extern int smu_feature_set_supported(struct smu_context *smu, int feature_id, bool enable);
 
 int smu_update_table_with_arg(struct smu_context *smu, uint16_t table_id, uint16_t exarg,
 		     void *table_data, bool drv2smu);

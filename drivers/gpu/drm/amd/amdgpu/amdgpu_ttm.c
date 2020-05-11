@@ -749,6 +749,11 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 	down_read(&mm->mmap_sem);
 
 	if (gtt->userflags & AMDGPU_GEM_USERPTR_ANONONLY) {
+#ifdef __FreeBSD__
+		/* BSDFIXME: no userptr support yet */
+		panic("Missing implementation");
+#endif
+#ifdef __linux__
 		/*
 		 * check that we only use anonymous memory to prevent problems
 		 * with writeback
@@ -761,6 +766,7 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 			up_read(&mm->mmap_sem);
 			return -EPERM;
 		}
+#endif
 	}
 
 	/* loop enough times using contiguous pages of memory */
@@ -780,7 +786,7 @@ int amdgpu_ttm_tt_get_user_pages(struct ttm_tt *ttm, struct page **pages)
 		else
 			r = get_user_pages_remote(gtt->usertask,
 					mm, userptr, num_pages,
-					flags, p, NULL, NULL);
+					flags, p, NULL);
 
 		spin_lock(&gtt->guptasklock);
 		list_del(&guptask.list);

@@ -63,6 +63,7 @@
 #include "vcn_v1_0.h"
 #include "dce_virtual.h"
 #include "mxgpu_ai.h"
+#include "amdgpu_smu.h"
 
 #ifdef __FreeBSD__
 #define	pci_save_state		linux_pci_save_state

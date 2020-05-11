@@ -28,7 +28,6 @@
 #include "atomfirmware.h"
 #include "amdgpu_atomfirmware.h"
 #include "smu_v11_0.h"
-#include "smu_v11_0_ppsmc.h"
 #include "smu11_driver_if.h"
 #include "soc15_common.h"
 #include "atom.h"
@@ -2376,6 +2375,7 @@ static int vega20_odn_edit_dpm_table(struct smu_context *smu,
 }
 
 static const struct pptable_funcs vega20_ppt_funcs = {
+	.alloc_dpm_context = vega20_allocate_dpm_context,
 	.store_powerplay_table = vega20_store_powerplay_table,
 	.check_powerplay_table = vega20_check_powerplay_table,
 	.append_powerplay_table = vega20_append_powerplay_table,
