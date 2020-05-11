@@ -47,9 +47,7 @@ extern int drm_vblank_offdelay;
 extern unsigned int drm_timestamp_precision;
 
 static int	   drm_name_info DRM_SYSCTL_HANDLER_ARGS;
-static int	   drm_vm_info DRM_SYSCTL_HANDLER_ARGS;
 static int	   drm_clients_info DRM_SYSCTL_HANDLER_ARGS;
-static int	   drm_bufs_info DRM_SYSCTL_HANDLER_ARGS;
 static int	   drm_vblank_info DRM_SYSCTL_HANDLER_ARGS;
 
 struct drm_sysctl_list {
@@ -57,9 +55,7 @@ struct drm_sysctl_list {
 	int	   (*f) DRM_SYSCTL_HANDLER_ARGS;
 } drm_sysctl_list[] = {
 	{"name",    drm_name_info},
-	{"vm",	    drm_vm_info},
 	{"clients", drm_clients_info},
-	{"bufs",    drm_bufs_info},
 	{"vblank",    drm_vblank_info},
 };
 #define DRM_SYSCTL_ENTRIES (sizeof(drm_sysctl_list)/sizeof(drm_sysctl_list[0]))
@@ -228,142 +224,6 @@ static int drm_name_info DRM_SYSCTL_HANDLER_ARGS
 	SYSCTL_OUT(req, "", 1);
 
 done:
-	return retcode;
-}
-
-static int drm_vm_info DRM_SYSCTL_HANDLER_ARGS
-{
-	struct drm_device *dev = arg1;
-	struct drm_map_list *entry;
-	struct drm_local_map *map, *tempmaps;
-	const char *types[] = {
-		[_DRM_FRAME_BUFFER] = "FB",
-		[_DRM_REGISTERS] = "REG",
-		[_DRM_SHM] = "SHM",
-		[_DRM_AGP] = "AGP",
-		[_DRM_SCATTER_GATHER] = "SG",
-		[_DRM_CONSISTENT] = "CONS",
-	};
-	const char *type, *yesno;
-	int i, mapcount;
-	char buf[128];
-	int retcode;
-
-	/* We can't hold the lock while doing SYSCTL_OUTs, so allocate a
-	 * temporary copy of all the map entries and then SYSCTL_OUT that.
-	 */
-	mutex_lock(&dev->struct_mutex);
-
-	mapcount = 0;
-	list_for_each_entry(entry, &dev->maplist, head) {
-		if (entry->map != NULL)
-			mapcount++;
-	}
-
-	tempmaps = malloc(sizeof(*tempmaps) * mapcount, DRM_MEM_DRIVER,
-	    M_NOWAIT);
-	if (tempmaps == NULL) {
-		mutex_unlock(&dev->struct_mutex);
-		return ENOMEM;
-	}
-
-	i = 0;
-	list_for_each_entry(entry, &dev->maplist, head) {
-		if (entry->map != NULL)
-			tempmaps[i++] = *entry->map;
-	}
-
-	mutex_unlock(&dev->struct_mutex);
-
-	DRM_SYSCTL_PRINT("\nslot offset	        size       "
-	    "type flags address            mtrr\n");
-
-	for (i = 0; i < mapcount; i++) {
-		map = &tempmaps[i];
-
-		switch(map->type) {
-		default:
-			type = "??";
-			break;
-		case _DRM_FRAME_BUFFER:
-		case _DRM_REGISTERS:
-		case _DRM_SHM:
-		case _DRM_AGP:
-		case _DRM_SCATTER_GATHER:
-		case _DRM_CONSISTENT:
-			type = types[map->type];
-			break;
-		}
-
-		if (map->mtrr < 0)
-			yesno = "no";
-		else
-			yesno = "yes";
-
-		DRM_SYSCTL_PRINT(
-		    "%4d 0x%016llx 0x%08lx %4.4s  0x%02x 0x%016lx %s\n",
-		    i, (unsigned long long)map->offset, map->size, type,
-		    map->flags, (unsigned long)map->handle, yesno);
-	}
-	SYSCTL_OUT(req, "", 1);
-
-done:
-	free(tempmaps, DRM_MEM_DRIVER);
-	return retcode;
-}
-
-static int drm_bufs_info DRM_SYSCTL_HANDLER_ARGS
-{
-	struct drm_device	 *dev = arg1;
-	struct drm_device_dma *dma = dev->dma;
-	struct drm_device_dma tempdma;
-	int *templists;
-	int i;
-	char buf[128];
-	int retcode;
-
-	/* We can't hold the locks around DRM_SYSCTL_PRINT, so make a temporary
-	 * copy of the whole structure and the relevant data from buflist.
-	 */
-	mutex_lock(&dev->struct_mutex);
-	if (dma == NULL) {
-		mutex_unlock(&dev->struct_mutex);
-		return 0;
-	}
-	/*DRM_SPINLOCK(&dev->dma_lock); */
-	tempdma = *dma;
-	templists = malloc(sizeof(int) * dma->buf_count, DRM_MEM_DRIVER,
-	    M_NOWAIT);
-	for (i = 0; i < dma->buf_count; i++)
-		templists[i] = dma->buflist[i]->list;
-	dma = &tempdma;
-	/* DRM_SPINUNLOCK(&dev->dma_lock); */
-	mutex_unlock(&dev->struct_mutex);
-
-	DRM_SYSCTL_PRINT("\n o     size count	 segs pages    kB\n");
-	for (i = 0; i <= DRM_MAX_ORDER; i++) {
-		if (dma->bufs[i].buf_count)
-			DRM_SYSCTL_PRINT("%2d %8d %5d %5d %5d %5d\n",
-				       i,
-				       dma->bufs[i].buf_size,
-				       dma->bufs[i].buf_count,
-				       dma->bufs[i].seg_count,
-				       dma->bufs[i].seg_count
-				       *(1 << dma->bufs[i].page_order),
-				       (dma->bufs[i].seg_count
-					* (1 << dma->bufs[i].page_order))
-				       * (int)PAGE_SIZE / 1024);
-	}
-	DRM_SYSCTL_PRINT("\n");
-	for (i = 0; i < dma->buf_count; i++) {
-		if (i && !(i%32)) DRM_SYSCTL_PRINT("\n");
-		DRM_SYSCTL_PRINT(" %d", templists[i]);
-	}
-	DRM_SYSCTL_PRINT("\n");
-
-	SYSCTL_OUT(req, "", 1);
-done:
-	free(templists, DRM_MEM_DRIVER);
 	return retcode;
 }
 
