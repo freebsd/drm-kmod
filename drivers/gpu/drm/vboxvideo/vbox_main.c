@@ -132,10 +132,28 @@ static int vbox_accel_init(struct vbox_private *vbox)
 	/* Take a command buffer for each screen from the end of usable VRAM. */
 	vbox->available_vram_size -= vbox->num_crtcs * VBVA_MIN_BUFFER_SIZE;
 
+#ifdef __linux__
 	vbox->vbva_buffers = pci_iomap_range(vbox->ddev.pdev, 0,
 					     vbox->available_vram_size,
 					     vbox->num_crtcs *
 					     VBVA_MIN_BUFFER_SIZE);
+#else
+	struct resource *res;
+	int rid, type;
+
+	rid = PCIR_BAR(0);
+	type = pci_resource_type(vbox->ddev.pdev, 0);
+	res = bus_alloc_resource_any(vbox->ddev.pdev->dev.bsddev, type, &rid, RF_ACTIVE);
+	if (!res) {
+		DRM_ERROR("Could not allocate resource for vbva buffers\n");
+		return -ENOMEM;
+	}
+	vbox->vbva_buffers_res = res;
+	vbox->vbva_buffers_rid = rid;
+	vbox->vbva_buffers_restype = type;
+	/* BSDFIXME: Map with offset in a less dodgy way */
+	vbox->vbva_buffers = (void *)(rman_get_bushandle(res) + vbox->available_vram_size);
+#endif
 	if (!vbox->vbva_buffers)
 		return -ENOMEM;
 
@@ -207,9 +225,27 @@ int vbox_hw_init(struct vbox_private *vbox)
 	DRM_INFO("VRAM %08x\n", vbox->full_vram_size);
 
 	/* Map guest-heap at end of vram */
+#ifdef __linux__
 	vbox->guest_heap =
 	    pci_iomap_range(vbox->ddev.pdev, 0, GUEST_HEAP_OFFSET(vbox),
 			    GUEST_HEAP_SIZE);
+#else
+	struct resource *res;
+	int rid, type;
+
+	rid = PCIR_BAR(0);
+	type = pci_resource_type(vbox->ddev.pdev, 0);
+	res = bus_alloc_resource_any(vbox->ddev.pdev->dev.bsddev, type, &rid, RF_ACTIVE);
+	if (!res) {
+		DRM_ERROR("Could not allocate resource for guest heap\n");
+		return -ENOMEM;
+	}
+	vbox->guest_heap_res = res;
+	vbox->guest_heap_rid = rid;
+	vbox->guest_heap_restype = type;
+	/* BSDFIXME: Map with offset in a less dodgy way */
+	vbox->guest_heap = (void *)rman_get_bushandle(res) + GUEST_HEAP_OFFSET(vbox);
+#endif
 	if (!vbox->guest_heap)
 		return -ENOMEM;
 

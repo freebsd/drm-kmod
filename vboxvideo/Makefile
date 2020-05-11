@@ -1,6 +1,6 @@
 # $FreeBSD$
 
-SRCDIR=	${.CURDIR:H}/drivers/staging/vboxvideo
+SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/vboxvideo
 
 .PATH:	${SRCDIR}
 
@@ -28,11 +28,11 @@ CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm
 CFLAGS+= -I${.CURDIR:H}/include/uapi
-CFLAGS+= -I${SRCDIR:H:H}/gpu
+CFLAGS+= -I${SRCDIR:H:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=${KMOD}_'
-CFLAGS+= -include ${SRCDIR:H:H}/gpu/drm/drm_os_config.h
+CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
 
 SRCS	+=			\
 	opt_acpi.h		\

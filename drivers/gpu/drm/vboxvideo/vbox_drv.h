@@ -63,7 +63,17 @@ struct vbox_private {
 	struct vbox_framebuffer afb;
 
 	u8 __iomem *guest_heap;
+#ifdef __FreeBSD__
+	int guest_heap_rid;
+	int guest_heap_restype;
+	struct resource *guest_heap_res;
+#endif
 	u8 __iomem *vbva_buffers;
+#ifdef __FreeBSD__
+	int vbva_buffers_rid;
+	int vbva_buffers_restype;
+	struct resource *vbva_buffers_res;
+#endif
 	struct gen_pool *guest_pool;
 	struct vbva_buf_ctx *vbva_info;
 	bool any_pitch;
@@ -201,8 +211,6 @@ void vbox_gem_free_object(struct drm_gem_object *obj);
 int vbox_dumb_mmap_offset(struct drm_file *file,
 			  struct drm_device *dev,
 			  u32 handle, u64 *offset);
-
-#define DRM_FILE_PAGE_OFFSET (0x10000000ULL >> PAGE_SHIFT)
 
 int vbox_mm_init(struct vbox_private *vbox);
 void vbox_mm_fini(struct vbox_private *vbox);

@@ -241,14 +241,28 @@ static int __init vbox_init(void)
 	if (vbox_modeset == 0)
 		return -EINVAL;
 
+#ifdef __linux__
 	return pci_register_driver(&vbox_pci_driver);
+#else
+	int ret;
+	vbox_pci_driver.bsdclass = drm_devclass;
+	ret = linux_pci_register_drm_driver(&vbox_pci_driver);
+	if (ret)
+		DRM_ERROR("Failed initializing DRM.\n");
+	return ret;
+#endif
 }
 
 static void __exit vbox_exit(void)
 {
+#ifdef __linux__
 	pci_unregister_driver(&vbox_pci_driver);
+#elif defined(__FreeBSD__)
+	linux_pci_unregister_drm_driver(&vbox_pci_driver);
+#endif
 }
 
+#ifdef __linux__
 module_init(vbox_init);
 module_exit(vbox_exit);
 
@@ -256,3 +270,14 @@ MODULE_AUTHOR("Oracle Corporation");
 MODULE_AUTHOR("Hans de Goede <hdegoede@redhat.com>");
 MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_LICENSE("GPL and additional rights");
+
+#else
+LKPI_DRIVER_MODULE(vboxvideo, vbox_init, vbox_exit);
+LKPI_PNP_INFO(pci, vboxvideo, pciidlist);
+MODULE_DEPEND(vboxvideo, drmn, 2, 2, 2);
+MODULE_DEPEND(vboxvideo, ttm, 1, 1, 1);
+MODULE_DEPEND(vboxvideo, agp, 1, 1, 1);
+MODULE_DEPEND(vboxvideo, linuxkpi, 1, 1, 1);
+MODULE_DEPEND(vboxvideo, linuxkpi_gplv2, 1, 1, 1);
+MODULE_DEPEND(vboxvideo, debugfs, 1, 1, 1);
+#endif
