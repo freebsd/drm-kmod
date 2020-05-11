@@ -13,6 +13,7 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_dmabuf.c		\
 	linux_dmafence.c	\
 	linux_dma-fence-array.c	\
+	linux_dma-fence-chain.c	\
 	linux_dmi.c		\
 	linux_firmware.c	\
 	linux_fs.c		\
