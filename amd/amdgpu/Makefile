@@ -705,6 +705,7 @@ CFLAGS+= -I${SRCDIR:H:H}
 CFLAGS+= -I${SRCDIR}
 CFLAGS+= -I${SRCDIR}/acp/include
 CFLAGS+= -I${SRCDIR}/amdgpu
+CFLAGS+= -I${SRCDIR}/amdkfd
 CFLAGS+= -I${SRCDIR}/display
 CFLAGS+= -I${SRCDIR}/display/amdgpu_dm
 CFLAGS+= -I${SRCDIR}/display/dc
