@@ -601,6 +601,9 @@ void drm_legacy_rmmaps(struct drm_device *dev)
 {
 	struct drm_map_list *r_list, *list_temp;
 
+	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
+		return;
+
 	list_for_each_entry_safe(r_list, list_temp, &dev->maplist, head)
 		drm_legacy_rmmap(dev, r_list->map);
 }

@@ -813,8 +813,10 @@ void drm_dev_fini(struct drm_device *dev)
 	if (drm_core_check_feature(dev, DRIVER_GEM))
 		drm_gem_destroy(dev);
 
-	drm_legacy_ctxbitmap_cleanup(dev);
-	drm_legacy_remove_map_hash(dev);
+	if (drm_core_check_feature(dev, DRIVER_LEGACY)) {
+		drm_legacy_ctxbitmap_cleanup(dev);
+		drm_legacy_remove_map_hash(dev);
+	}
 #ifdef __linux__
 	drm_fs_inode_free(dev->anon_inode);
 #endif
@@ -832,7 +834,9 @@ void drm_dev_fini(struct drm_device *dev)
 	mutex_destroy(&dev->clientlist_mutex);
 	mutex_destroy(&dev->filelist_mutex);
 	mutex_destroy(&dev->struct_mutex);
-	drm_legacy_destroy_members(dev);
+	if (drm_core_check_feature(dev, DRIVER_LEGACY)) {
+		drm_legacy_destroy_members(dev);
+	}
 	kfree(dev->unique);
 }
 EXPORT_SYMBOL(drm_dev_fini);
