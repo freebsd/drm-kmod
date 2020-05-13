@@ -39,11 +39,17 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     drivers/gpu/drm/vmwgfx/ \
     drivers/*/vboxvideo/ \
     drivers/*/*/vboxvideo/ \
+    drivers/dma-buf/dma-fence.c \
+    drivers/dma-buf/dma-fence-array.c \
+    drivers/dma-buf/dma-fence-chain.c \
+    drivers/video/hdmi.c \
     include/drm/*.h \
     include/drm/ttm/ \
     include/uapi/drm/*.h \
     include/linux/hdmi.h \
-    drivers/video/hdmi.c \
+    include/linux/dma-fence.h \
+    include/linux/dma-fence-array.h \
+    include/linux/dma-fence-chain.h \
     ':!drivers/gpu/drm/i915/gvt/*' \
     ':!drivers/gpu/drm/i915/selftests/*' \
     ':!drivers/gpu/drm/drm_gem_cma_helper*' \
