@@ -1284,14 +1284,11 @@ static int i915_hangcheck_info(struct seq_file *m, void *unused)
 	intel_wakeref_t wakeref;
 	enum intel_engine_id id;
 
+	seq_printf(m, "Reset flags: %lx\n", dev_priv->gpu_error.flags);
 	if (test_bit(I915_WEDGED, &dev_priv->gpu_error.flags))
-		seq_puts(m, "Wedged\n");
+		seq_puts(m, "\tWedged\n");
 	if (test_bit(I915_RESET_BACKOFF, &dev_priv->gpu_error.flags))
-		seq_puts(m, "Reset in progress: struct_mutex backoff\n");
-	if (waitqueue_active(&dev_priv->gpu_error.wait_queue))
-		seq_puts(m, "Waiter holding struct mutex\n");
-	if (waitqueue_active(&dev_priv->gpu_error.reset_queue))
-		seq_puts(m, "struct_mutex blocked for reset\n");
+		seq_puts(m, "\tDevice (global) reset in progress\n");
 
 	if (!i915_modparams.enable_hangcheck) {
 		seq_puts(m, "Hangcheck disabled\n");
@@ -3857,9 +3854,6 @@ i915_wedged_set(void *data, u64 val)
 	/* Flush any previous reset before applying for a new one */
 	wait_event(i915->gpu_error.reset_queue,
 		   !test_bit(I915_RESET_BACKOFF, &i915->gpu_error.flags));
-
-	if (i915_reset_backoff(&i915->gpu_error))
-		return -EAGAIN;
 
 	i915_handle_error(i915, val, I915_ERROR_CAPTURE,
 			  "Manually set wedged engine mask = %llx", val);
