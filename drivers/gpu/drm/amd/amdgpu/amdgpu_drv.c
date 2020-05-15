@@ -40,9 +40,6 @@
 
 #include "amdgpu_amdkfd.h"
 
-#define pci_restore_state linux_pci_restore_state
-#define pci_save_state	  linux_pci_save_state
-
 /*
  * KMS wrapper.
  * - 3.0.0 - initial driver

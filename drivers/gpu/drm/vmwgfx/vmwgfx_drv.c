@@ -51,11 +51,6 @@
 
 #define VMWGFX_VALIDATION_MEM_GRAN (16*PAGE_SIZE)
 
-#ifdef __FreeBSD__
-#define pci_restore_state linux_pci_restore_state
-#define pci_save_state	  linux_pci_save_state
-#endif
-
 /**
  * Fully encoded drm commands. Might move to vmw_drm.h
  */

@@ -62,11 +62,6 @@
 #include "amdgpu_xgmi.h"
 #include "amdgpu_ras.h"
 
-#ifdef __FreeBSD__
-#define pci_save_state linux_pci_save_state
-#define pci_restore_state linux_pci_restore_state
-/* #define	resource linux_resource */
-#endif
 MODULE_FIRMWARE("amdgpu/vega10_gpu_info.bin");
 MODULE_FIRMWARE("amdgpu/vega12_gpu_info.bin");
 MODULE_FIRMWARE("amdgpu/raven_gpu_info.bin");

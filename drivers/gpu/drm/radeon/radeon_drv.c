@@ -45,9 +45,6 @@
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_probe_helper.h>
 
-#define pci_restore_state linux_pci_restore_state
-#define pci_save_state linux_pci_save_state
-
 /*
  * KMS wrapper.
  * - 2.0.0 - initial interface

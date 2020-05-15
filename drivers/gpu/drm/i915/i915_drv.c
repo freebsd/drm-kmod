@@ -65,8 +65,6 @@
 #include "intel_workarounds.h"
 
 #ifdef __FreeBSD__
-#define pci_get_class linux_pci_get_class
-#define	pci_save_state linux_pci_save_state
 #define	resource linux_resource
 #endif
 

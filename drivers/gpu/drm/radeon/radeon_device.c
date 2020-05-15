@@ -40,9 +40,6 @@
 #include "radeon.h"
 #include "atom.h"
 
-#define pci_save_state linux_pci_save_state
-#define pci_restore_state linux_pci_restore_state
-
 static const char radeon_family_name[][16] = {
 	"R100",
 	"RV100",

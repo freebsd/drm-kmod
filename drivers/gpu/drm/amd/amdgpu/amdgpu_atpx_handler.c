@@ -13,8 +13,6 @@
 
 #include "amd_acpi.h"
 
-#define pci_get_class linux_pci_get_class
-
 #define AMDGPU_PX_QUIRK_FORCE_ATPX  (1 << 0)
 
 struct amdgpu_px_quirk {

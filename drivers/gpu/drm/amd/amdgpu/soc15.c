@@ -65,11 +65,6 @@
 #include "mxgpu_ai.h"
 #include "amdgpu_smu.h"
 
-#ifdef __FreeBSD__
-#define	pci_save_state		linux_pci_save_state
-#define	pci_restore_state	linux_pci_restore_state
-#endif
-
 #define mmMP0_MISC_CGTT_CTRL0                                                                   0x01b9
 #define mmMP0_MISC_CGTT_CTRL0_BASE_IDX                                                          0
 #define mmMP0_MISC_LIGHT_SLEEP_CTRL                                                             0x01ba

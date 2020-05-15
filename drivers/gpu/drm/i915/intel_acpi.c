@@ -8,8 +8,6 @@
 #include <linux/acpi.h>
 #include "i915_drv.h"
 
-#define pci_get_class linux_pci_get_class
-
 #define INTEL_DSM_REVISION_ID 1 /* For Calpella anyway... */
 #define INTEL_DSM_FN_PLATFORM_MUX_INFO 1 /* No args */
 

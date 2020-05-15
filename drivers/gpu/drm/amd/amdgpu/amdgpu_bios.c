@@ -35,7 +35,6 @@
  * BIOS.
  */
 
-#define pci_get_class linux_pci_get_class
 #define AMD_VBIOS_SIGNATURE " 761295520"
 #define AMD_VBIOS_SIGNATURE_OFFSET 0x30
 #define AMD_VBIOS_SIGNATURE_SIZE sizeof(AMD_VBIOS_SIGNATURE)

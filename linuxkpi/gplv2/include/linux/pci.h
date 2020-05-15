@@ -186,4 +186,8 @@ pcie_get_readrq(struct pci_dev *dev)
 	return 128 << ((ctl & PCI_EXP_DEVCTL_READRQ) >> 12);
 }
 
+#define	pci_get_class(class, dev)	linux_pci_get_class(class, dev)
+#define	pci_save_state(dev)	linux_pci_save_state(dev)
+#define	pci_restore_state(dev)	linux_pci_restore_state(dev)
+
 #endif /* _LINUX_GPLV2_PCI_H_ */
