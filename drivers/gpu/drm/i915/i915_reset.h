@@ -9,6 +9,7 @@
 
 #include <linux/compiler.h>
 #include <linux/types.h>
+#include <linux/srcu.h>
 
 #include "intel_engine_types.h"
 
