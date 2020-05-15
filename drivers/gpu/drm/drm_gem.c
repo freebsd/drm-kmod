@@ -909,7 +909,7 @@ drm_gem_open_ioctl(struct drm_device *dev, void *data,
 	args->size = obj->size;
 
 err:
-	drm_gem_object_put_unlocked(obj);
+	drm_gem_object_put(obj);
 	return ret;
 }
 
