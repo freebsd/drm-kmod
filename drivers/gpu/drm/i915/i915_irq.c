@@ -28,12 +28,10 @@
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
-#include <linux/sysrq.h>
-#include <linux/slab.h>
-#ifdef __linux__
-#include <linux/cpuidle.h>
-#endif
 #include <linux/circ_buf.h>
+#include <linux/cpuidle.h>
+#include <linux/slab.h>
+#include <linux/sysrq.h>
 
 #include <drm/drm_drv.h>
 #include <drm/drm_irq.h>
