@@ -3,22 +3,27 @@
 SYSDIR?=/usr/src/sys
 .include "${SYSDIR}/conf/kern.opts.mk"
 
-.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64" || ${MACHINE_ARCH} == "powerpc64"
+_VALID_KMODS=	linuxkpi ttm drm dummygfx i915 amd radeon vboxvideo vmwgfx
 
-SUBDIR=	linuxkpi	\
-	ttm		\
-	drm		\
-	${_dummygfx}	\
-	${_vboxvideo}	\
-	${_vmwgfx}	\
-	${_i915}	\
-	amd		\
-	radeon
+SUPPORTED_ARCH=	amd64 \
+		i386 \
+		aarch64 \
+		powerpc64
+
+.if empty(SUPPORTED_ARCH:M${MACHINE_CPUARCH})
+.error "Unsupported architetures ${MACHINE_CPUARCH}"
+.endif
+
+DEFAULT_KMODS=	linuxkpi	\
+		ttm		\
+		drm		\
+		amd		\
+		radeon
 
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386"
-_i915 =		i915 
-_vmwgfx =	vmwgfx
-_vboxvideo =	vboxvideo
+DEFAULT_KMODS+=	i915 \
+		vboxvideo \
+		vmwgfx
 .endif
 
 .if defined(DUMMYGFX)
@@ -35,9 +40,23 @@ afterinstall: .PHONY
 	fi
 .endif
 
-.include <bsd.subdir.mk>
+KMODS?=	${DEFAULT_KMODS}
 
-.else
-dummy:
-	echo "Unsupported architecture"
+.for var in ${KMODS}
+.if empty(_VALID_KMODS:M${var})
+_INVALID_KMODS+=	${var}
 .endif
+.if empty(DEFAULT_KMODS:M${var})
+_INVALID_ARCH_KMODS+=	${var}
+.endif
+.endfor
+.if !empty(_INVALID_KMODS)
+.error "Unknown drm kmod ${_INVALID_KMODS}"
+.endif
+.if !empty(_INVALID_ARCH_KMODS)
+.error "${_INVALID_ARCH_KMODS} aren't supported on this architecture"
+.endif
+
+SUBDIR=	${KMODS}
+
+.include <bsd.subdir.mk>
