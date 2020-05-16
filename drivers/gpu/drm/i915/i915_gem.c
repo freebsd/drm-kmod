@@ -4386,7 +4386,6 @@ static bool discard_backing_storage(struct drm_i915_gem_object *obj)
 	 * freeing the object.
 	 */
 	return file_count(obj->base.filp) == 1;
-	return file_count(obj->base.filp) == 1;
 }
 
 static void __i915_gem_free_objects(struct drm_i915_private *i915,
@@ -5309,6 +5308,7 @@ int i915_gem_init_early(struct drm_i915_private *dev_priv)
 	init_waitqueue_head(&dev_priv->gpu_error.wait_queue);
 	init_waitqueue_head(&dev_priv->gpu_error.reset_queue);
 	mutex_init(&dev_priv->gpu_error.wedge_mutex);
+	init_srcu_struct(&dev_priv->gpu_error.reset_backoff_srcu);
 
 	atomic_set(&dev_priv->mm.bsd_engine_dispatch_index, 0);
 
@@ -5328,9 +5328,7 @@ void i915_gem_cleanup_early(struct drm_i915_private *dev_priv)
 	GEM_BUG_ON(atomic_read(&dev_priv->mm.free_count));
 	WARN_ON(dev_priv->mm.object_count);
 
-#ifdef __freebsd_notyet__
 	cleanup_srcu_struct(&dev_priv->gpu_error.reset_backoff_srcu);
-#endif
 
 	i915_gemfs_fini(dev_priv);
 }
