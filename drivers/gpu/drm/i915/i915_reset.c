@@ -578,9 +578,6 @@ typedef int (*reset_func)(struct drm_i915_private *,
 
 static reset_func intel_get_gpu_reset(struct drm_i915_private *i915)
 {
-	if (!i915_modparams.reset)
-		return NULL;
-
 	if (INTEL_GEN(i915) >= 8)
 		return gen8_reset_engines;
 	else if (INTEL_GEN(i915) >= 6)
@@ -647,6 +644,9 @@ bool intel_has_gpu_reset(struct drm_i915_private *i915)
 	if (USES_GUC(i915))
 		return false;
 
+	if (!i915_modparams.reset)
+		return NULL;
+
 	return intel_get_gpu_reset(i915);
 }
 
@@ -687,6 +687,39 @@ static void reset_prepare_engine(struct intel_engine_cs *engine)
 	engine->reset.prepare(engine);
 }
 
+static void revoke_mmaps(struct drm_i915_private *i915)
+{
+	int i;
+
+	for (i = 0; i < i915->num_fence_regs; i++) {
+		struct drm_vma_offset_node *node;
+		struct i915_vma *vma;
+		u64 vma_offset;
+
+		vma = READ_ONCE(i915->fence_regs[i].vma);
+		if (!vma)
+			continue;
+
+		if (!i915_vma_has_userfault(vma))
+			continue;
+
+		GEM_BUG_ON(vma->fence != &i915->fence_regs[i]);
+		node = &vma->obj->base.vma_node;
+		vma_offset = vma->ggtt_view.partial.offset << PAGE_SHIFT;
+#ifdef __linux__
+		unmap_mapping_range(i915->drm.anon_inode->i_mapping,
+				    drm_vma_node_offset_addr(node) + vma_offset,
+				    vma->size,
+				    1);
+#elif defined(__FreeBSD__)
+		unmap_mapping_range(vma->obj,
+				    drm_vma_node_offset_addr(node),
+				    drm_vma_node_size(node) << PAGE_SHIFT,
+				    1);
+#endif
+	}
+}
+
 static void reset_prepare(struct drm_i915_private *i915)
 {
 	struct intel_engine_cs *engine;
@@ -700,9 +733,7 @@ static void reset_prepare(struct drm_i915_private *i915)
 
 static void gt_revoke(struct drm_i915_private *i915)
 {
-#ifdef __freebsd_notyet__
 	revoke_mmaps(i915);
-#endif
 }
 
 static int gt_reset(struct drm_i915_private *i915,
@@ -850,7 +881,7 @@ static void __i915_gem_set_wedged(struct drm_i915_private *i915)
 	reset_prepare(i915);
 
 	/* Even if the GPU reset fails, it should still stop the engines */
-	if (INTEL_GEN(i915) >= 5)
+	if (!INTEL_INFO(i915)->gpu_reset_clobbers_display)
 		intel_gpu_reset(i915, ALL_ENGINES);
 
 	for_each_engine(engine, i915, id) {
@@ -953,38 +984,6 @@ static bool __i915_gem_unset_wedged(struct drm_i915_private *i915)
 	return true;
 }
 
-struct __i915_reset {
-	struct drm_i915_private *i915;
-	unsigned int stalled_mask;
-};
-
-static int __i915_reset__BKL(void *data)
-{
-	struct __i915_reset *arg = data;
-	int err;
-
-	err = intel_gpu_reset(arg->i915, ALL_ENGINES);
-	if (err)
-		return err;
-
-	return gt_reset(arg->i915, arg->stalled_mask);
-}
-
-#if RESET_UNDER_STOP_MACHINE
-/*
- * XXX An alternative to using stop_machine would be to park only the
- * processes that have a GGTT mmap. By remote parking the threads (SIGSTOP)
- * we should be able to prevent their memmory accesses via the lost fence
- * registers over the course of the reset without the potential recursive
- * of mutexes between the pagefault handler and reset.
- *
- * See igt/gem_mmap_gtt/hang
- */
-#define __do_reset(fn, arg) stop_machine(fn, arg, NULL)
-#else
-#define __do_reset(fn, arg) fn(arg)
-#endif
-
 bool i915_gem_unset_wedged(struct drm_i915_private *i915)
 {
 	struct i915_gpu_error *error = &i915->gpu_error;
@@ -1000,18 +999,19 @@ bool i915_gem_unset_wedged(struct drm_i915_private *i915)
 static int do_reset(struct drm_i915_private *i915,
 		    intel_engine_mask_t stalled_mask)
 {
-	struct __i915_reset arg = { i915, stalled_mask };
 	int err, i;
 
 	gt_revoke(i915);
 
 	err = intel_gpu_reset(i915, ALL_ENGINES);
 	for (i = 0; err && i < RESET_MAX_RETRIES; i++) {
-		msleep(100);
-		err = __do_reset(__i915_reset__BKL, &arg);
+		msleep(10 * (i + 1));
+		err = intel_gpu_reset(i915, ALL_ENGINES);
 	}
+	if (err)
+		return err;
 
-	return err;
+	return gt_reset(i915, stalled_mask);
 }
 
 /**
