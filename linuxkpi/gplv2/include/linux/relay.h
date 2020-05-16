@@ -7,7 +7,7 @@
 #include <linux/timer.h>
 #include <linux/wait.h>
 #include <linux/list.h>
-/* #include <linux/irq_work.h> */
+#include <linux/irq_work.h>
 #include <linux/bug.h>
 #include <linux/fs.h>
 #include <linux/poll.h>
@@ -22,16 +22,7 @@
 
 // Naive (not per-cpu) relay channel impl
 
-#define irq_work_sync(x)
-#define irq_work_queue(x)
-#define init_irq_work(x, y)
-#define alloc_percpu(x) kmalloc(mp_ncpus*sizeof(x), GFP_KERNEL)
 
-
-struct irq_work {
-	
-};
-	
 struct rchan_buf
 {
 	void *start;			/* start of channel buffer */
