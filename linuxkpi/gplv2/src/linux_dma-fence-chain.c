@@ -122,7 +122,6 @@ static const char *dma_fence_chain_get_timeline_name(struct dma_fence *fence)
         return "unbound";
 }
 
-#ifdef __linux__
 static void dma_fence_chain_irq_work(struct irq_work *work)
 {
 	struct dma_fence_chain *chain;
@@ -135,21 +134,13 @@ static void dma_fence_chain_irq_work(struct irq_work *work)
 		dma_fence_signal(&chain->base);
 	dma_fence_put(&chain->base);
 }
-#endif
 
 static void dma_fence_chain_cb(struct dma_fence *f, struct dma_fence_cb *cb)
 {
 	struct dma_fence_chain *chain;
 
 	chain = container_of(cb, typeof(*chain), cb);
-#ifdef __linux__
 	irq_work_queue(&chain->work);
-#elif defined(__FreeBSD__)
-	if (!dma_fence_chain_enable_signaling(&chain->base))
-		/* Ok, we are done. No more unsignaled fences left */
-		dma_fence_signal(&chain->base);
-	dma_fence_put(&chain->base);
-#endif
 	dma_fence_put(f);
 }
 
@@ -228,9 +219,7 @@ void dma_fence_chain_init(struct dma_fence_chain *chain,
 	rcu_assign_pointer(chain->prev, prev);
 	chain->fence = fence;
 	chain->prev_seqno = 0;
-#ifdef __linux__
 	init_irq_work(&chain->work, dma_fence_chain_irq_work);
-#endif
 
 	/* Try to reuse the context of the previous chain node. */
 	if (prev_chain && __dma_fence_is_later(seqno, prev->seqno, prev->ops)) {

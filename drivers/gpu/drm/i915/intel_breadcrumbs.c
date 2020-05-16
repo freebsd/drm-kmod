@@ -257,9 +257,7 @@ void intel_engine_init_breadcrumbs(struct intel_engine_cs *engine)
 	spin_lock_init(&b->irq_lock);
 	INIT_LIST_HEAD(&b->signalers);
 
-#ifdef __linux__
 	init_irq_work(&b->irq_work, signal_irq_work);
-#endif
 }
 
 void intel_engine_reset_breadcrumbs(struct intel_engine_cs *engine)

@@ -4,6 +4,7 @@
 #include <fs/pseudofs/pseudofs.h>
 
 #include <linux/seq_file.h>
+#include <linux/irq_work.h>
 #include <linux/relay.h>
 #include <linux/slab.h>
 #include <linux/poll.h>
@@ -18,10 +19,9 @@ static DEFINE_MUTEX(relay_channels_mutex);
 static LIST_HEAD(relay_channels);
 
 #define irq_work_sync(x)
-#define irq_work_queue(x)
-#define init_irq_work(x, y)
 #define alloc_percpu(x) kmalloc(mp_ncpus*sizeof(x), GFP_KERNEL)
 
+static void wakeup_readers(struct irq_work *work);
 /* 
  Default channel callbacks
  */
@@ -350,7 +350,7 @@ static void relay_close_buf(struct rchan_buf *buf)
 	kref_put(&buf->kref, relay_remove_buf);
 }
 
-__unused static void wakeup_readers(struct irq_work *work)
+static void wakeup_readers(struct irq_work *work)
 {
 	printf("%s\n", __func__);
 	struct rchan_buf *buf;

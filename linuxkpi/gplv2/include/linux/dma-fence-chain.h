@@ -30,9 +30,7 @@ struct dma_fence_chain {
 	u64 prev_seqno;
 	struct dma_fence *fence;
 	struct dma_fence_cb cb;
-#ifdef __linux__
 	struct irq_work work;
-#endif
 };
 
 extern const struct dma_fence_ops dma_fence_chain_ops;

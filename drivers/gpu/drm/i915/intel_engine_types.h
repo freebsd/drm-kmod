@@ -14,7 +14,6 @@
 #include <linux/types.h>
 
 #ifdef __FreeBSD__
-#include <linux/relay.h>	/* For struct irq_work */
 #include <linux/seqlock.h>
 #include <linux/notifier.h>	/* for struct atomic_notifier_head */
 #endif

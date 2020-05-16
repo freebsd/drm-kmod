@@ -23,7 +23,6 @@ static const char *dma_fence_array_get_timeline_name(struct dma_fence *fence)
 	return "unbound";
 }
 
-#ifdef __linux__
 static void irq_dma_fence_array_work(struct irq_work *wrk)
 {
 	struct dma_fence_array *array = container_of(wrk, typeof(*array), work);
@@ -31,7 +30,6 @@ static void irq_dma_fence_array_work(struct irq_work *wrk)
 	dma_fence_signal(&array->base);
 	dma_fence_put(&array->base);
 }
-#endif
 
 static void dma_fence_array_cb_func(struct dma_fence *f,
 				    struct dma_fence_cb *cb)
@@ -40,14 +38,9 @@ static void dma_fence_array_cb_func(struct dma_fence *f,
 		container_of(cb, struct dma_fence_array_cb, cb);
 	struct dma_fence_array *array = array_cb->array;
 
-	if (atomic_dec_and_test(&array->num_pending)) {
-#ifdef __linux__
+	if (atomic_dec_and_test(&array->num_pending))
 		irq_work_queue(&array->work);
-#else
-		dma_fence_signal(&array->base);
-		dma_fence_put(&array->base);
-#endif
-	} else
+	else
 		dma_fence_put(&array->base);
 }
 
@@ -143,9 +136,7 @@ struct dma_fence_array *dma_fence_array_create(int num_fences,
 	spin_lock_init(&array->lock);
 	dma_fence_init(&array->base, &dma_fence_array_ops, &array->lock,
 		       context, seqno);
-#ifdef __linux__
 	init_irq_work(&array->work, irq_dma_fence_array_work);
-#endif
 
 	array->num_fences = num_fences;
 	atomic_set(&array->num_pending, signal_on_any ? 1 : num_fences);

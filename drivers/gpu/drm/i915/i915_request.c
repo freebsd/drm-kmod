@@ -357,14 +357,8 @@ static void __notify_execute_cb(struct i915_request *rq)
 	if (list_empty(&rq->execute_cb))
 		return;
 
-	list_for_each_entry(cb, &rq->execute_cb, link) {
-#ifdef __linux__
+	list_for_each_entry(cb, &rq->execute_cb, link)
 		irq_work_queue(&cb->work);
-#elif defined(__FreeBSD__)
-		i915_sw_fence_complete(cb->fence);
-		kmem_cache_free(global.slab_execute_cbs, cb);
-#endif
-	}
 
 	/*
 	 * XXX Rollback on __i915_request_unsubmit()
@@ -395,9 +389,7 @@ i915_request_await_execution(struct i915_request *rq,
 
 	cb->fence = &rq->submit;
 	i915_sw_fence_await(cb->fence);
-#ifdef __freebsd_notyet__
 	init_irq_work(&cb->work, irq_execute_cb);
-#endif
 
 	spin_lock_irq(&signal->lock);
 	if (i915_request_is_active(signal)) {
