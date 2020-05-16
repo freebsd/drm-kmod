@@ -24,10 +24,6 @@
 #include "intel_gpu_commands.h"
 #include "intel_workarounds.h"
 
-#ifdef __FreeBSD__
-#include <linux/relay.h>	/* for struct irq_work (manu 20200507) */
-#endif
-
 struct drm_printer;
 
 /* Early gen2 devices have a cacheline of just 32 bytes, using 64 is overkill,
@@ -409,9 +405,7 @@ void intel_engine_disarm_breadcrumbs(struct intel_engine_cs *engine);
 static inline void
 intel_engine_queue_breadcrumbs(struct intel_engine_cs *engine)
 {
-#ifdef __linux__
 	irq_work_queue(&engine->breadcrumbs.irq_work);
-#endif
 }
 
 void intel_engine_breadcrumbs_irq(struct intel_engine_cs *engine);
