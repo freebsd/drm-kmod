@@ -239,9 +239,7 @@ struct i915_gpu_error {
 	 */
 	wait_queue_head_t reset_queue;
 
-#ifdef __freebsd_notyet__
 	struct srcu_struct reset_backoff_srcu;
-#endif
 
 	struct i915_gpu_restart *restart;
 };
