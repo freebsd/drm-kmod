@@ -1023,8 +1023,6 @@ static int do_reset(struct drm_i915_private *i915,
  * Reset the chip.  Useful if a hang is detected. Marks the device as wedged
  * on failure.
  *
- * Caller must hold the struct_mutex.
- *
  * Procedure is fairly simple:
  *   - reset the chip using the reset reg
  *   - re-init context state
@@ -1208,9 +1206,7 @@ static void i915_reset_device(struct drm_i915_private *i915,
 		intel_prepare_reset(i915);
 
 		/* Flush everyone using a resource about to be clobbered */
-#ifdef __linux__
 		synchronize_srcu_expedited(&error->reset_backoff_srcu);
-#endif
 
 		mutex_lock(&error->wedge_mutex);
 		i915_reset(i915, engine_mask, reason);
