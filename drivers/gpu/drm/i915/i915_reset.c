@@ -1352,6 +1352,9 @@ void i915_handle_error(struct drm_i915_private *i915,
 		goto out; /* piggy-back on the other reset */
 	}
 
+	/* Make sure i915_reset_trylock() sees the I915_RESET_BACKOFF */
+	synchronize_rcu_expedited();
+
 	/* Prevent any other reset-engine attempt. */
 	for_each_engine(engine, i915, tmp) {
 		while (test_and_set_bit(I915_RESET_ENGINE + engine->id,
