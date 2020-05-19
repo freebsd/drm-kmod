@@ -26,10 +26,6 @@
 #ifndef __DRM_SYNCOBJ_H__
 #define __DRM_SYNCOBJ_H__
 
-#ifdef __FreeBSD__
-#include <linux/relay.h>
-#endif
-
 #include <linux/dma-fence.h>
 #include <linux/dma-fence-chain.h>
 
