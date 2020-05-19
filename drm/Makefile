@@ -21,7 +21,6 @@ SRCS=	drm_atomic.c \
 	drm_crtc.c \
 	drm_crtc_helper.c \
 	drm_damage_helper.c \
-	drm_dp_aux_dev.c \
 	drm_dp_dual_mode_helper.c \
 	drm_dp_helper.c \
 	drm_dp_mst_topology.c \
@@ -40,13 +39,11 @@ SRCS=	drm_atomic.c \
 	drm_gem.c \
 	drm_gem_framebuffer_helper.c \
 	drm_hashtab.c \
-	drm_ioc32.c \
 	drm_ioctl.c \
 	drm_info.c \
 	drm_irq.c \
 	drm_lease.c \
 	drm_memory.c \
-	drm_mipi_dsi.c \
 	drm_mm.c \
 	drm_modes.c \
 	drm_mode_config.c \
@@ -55,7 +52,6 @@ SRCS=	drm_atomic.c \
 	drm_modeset_helper.c \
 	drm_os_freebsd.c \
 	drm_panel.c \
-	drm_panel_orientation_quirks.c \
 	drm_pci.c \
 	drm_plane.c \
 	drm_plane_helper.c \
@@ -69,7 +65,6 @@ SRCS=	drm_atomic.c \
 	drm_sysctl_freebsd.c \
 	drm_sysfs.c \
 	drm_vblank.c \
-	drm_vm.c \
 	drm_vma_manager.c \
 	drm_writeback.c \
 	linux_fb.c \
@@ -90,6 +85,10 @@ SRCS+=	ati_pcigart.c \
 	drm_lock.c
 .endif
 
+.if !empty(KCONFIG:MDRM_COMPAT)
+SRCS+=	drm_ioc32.c
+.endif
+
 .if !empty(KCONFIG:MDEBUGFS)
 SRCS_DEBUG=	\
 		drm_debugfs.c \
@@ -102,6 +101,22 @@ SRCS+=	drm_dp_cec.c
 
 .if !empty(KCONFIG:MDRM_LOAD_EDID_FIRMWARE)
 SRCS+=	drm_edid_load.c
+.endif
+
+.if !empty(KCONFIG:MDRM_VM)
+SRCS+=	drm_vm.c
+.endif
+
+.if !empty(KCONFIG:MDRM_DP_AUX_CHARDEV)
+SRCS+=	drm_dp_aux_dev.c
+.endif
+
+.if !empty(KCONFIG:MDRM_MIPI_DSI)
+SRCS+=	drm_mipi_dsi.c
+.endif
+
+.if !empty(KCONFIG:MDRM_PANEL_ORIENTATION_QUIRKS)
+SRCS+=	drm_panel_orientation_quirks.c
 .endif
 
 # drm scheduler (moved from amdgpu)
