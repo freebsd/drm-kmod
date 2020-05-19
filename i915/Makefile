@@ -34,7 +34,6 @@ SRCS=	\
 	i915_gem_tiling.c \
 	i915_gem_userptr.c \
 	i915_globals.c \
-	i915_gpu_error.c \
 	i915_irq.c \
 	i915_memcpy.c \
 	i915_oa_hsw.c \
@@ -83,7 +82,6 @@ SRCS=	\
 	intel_dvo.c \
 	intel_fbc.c \
 	intel_engine_cs.c \
-	intel_fbdev.c \
 	intel_fifo_underrun.c \
 	intel_freebsd.c \
 	intel_frontbuffer.c \
@@ -129,15 +127,23 @@ SRCS=	\
 	vlv_dsi.c \
 	vlv_dsi_pll.c
 
-# COMPAT Files
-SRCS_COMPAT=	\
-		i915_ioc32.c
+.if !empty(KCONFIG:MDRM_COMPAT)
+SRCS+=	i915_ioc32.c
+.endif
 
-# Debug files, not handled for now
-SRCS_DEBUG=	\
-		i915_debugfs.c \
-		i915_gemfs.c \
-		intel_pipe_crc.c
+.if !empty(KCONFIG:MDEBUGFS)
+SRCS+==	i915_debugfs.c \
+	i915_gemfs.c \
+	intel_pipe_crc.c
+.endif
+
+.if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
+SRCS+=	intel_fbdev.c
+.endif
+
+.if !empty(KCONFIG:MDRM_I915_CAPTURE_ERROR)
+SRCS+=	i915_gpu_error.c
+.endif
 
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
 # intel_lpe_audio.c   # Need platform and irq_chip support
@@ -156,10 +162,6 @@ CFLAGS+= -I${SRCDIR:H:H}
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=i915_' -DLINUXKPI_VERSION=50000
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
-
-.if ${MACHINE_CPUARCH} == "amd64"
-SRCS+= ${SRCS_COMPAT}
-.endif
 
 SRCS	+=			\
 	opt_acpi.h		\
