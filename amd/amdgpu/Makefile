@@ -5,6 +5,8 @@ DRM= ${.CURDIR:H:H}/drivers/gpu/drm
 
 KMOD=	amdgpu
 
+.include "../../kconfig.mk"
+
 .if ${MACHINE_CPUARCH} == "amd64"
 _dml=	${SRCDIR}/display/dc/dml
 .endif
@@ -462,8 +464,8 @@ CFLAGS+= -I${SRCDIR}/powerplay/smumgr
 CFLAGS+= -I${DRM}/scheduler
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=amdgpu_'
-CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=amdgpu_' -DLINUXKPI_VERSION=50000
+CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h pci_iov_if.h device_if.h iicbus_if.h opt_drm.h \
         opt_vm.h opt_compat.h opt_syscons.h opt_acpi.h

@@ -1,5 +1,7 @@
 .PATH:	${.CURDIR}/gplv2/src
 
+.include "../kconfig.mk"
+
 KMOD=	linuxkpi_gplv2
 
 SRCS=	linux_kmod_gplv2.c	\
@@ -47,12 +49,12 @@ SRCS+=	bus_if.h		\
 
 
 
-CFLAGS+= -include ${.CURDIR:H}/drivers/gpu/drm/drm_os_config.h
 CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR}/dummy/include
 CFLAGS+= -I${.CURDIR}/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
-CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
+CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"' -DLINUXKPI_VERSION=50000
+CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 CFLAGS.gcc+= -Wno-cast-qual
 
 .include <bsd.kmod.mk>

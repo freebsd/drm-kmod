@@ -4,6 +4,8 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/ttm
 
 .PATH:	${SRCDIR}
 
+.include "../kconfig.mk"
+
 KMOD=	ttm
 SRCS=	ttm_bo.c \
 	ttm_bo_manager.c \
@@ -16,7 +18,7 @@ SRCS=	ttm_bo.c \
 	ttm_page_alloc_dma.c \
 	ttm_tt.c
 
-.if ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "amd64"
+.if !empty(KCONFIG:MAGP)
 SRCS+=	ttm_agp_backend.c
 .endif
 
@@ -32,8 +34,8 @@ CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=ttm_'
-CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=ttm_' -DLINUXKPI_VERSION=50000
+CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 SRCS+=	device_if.h \
 	vnode_if.h \

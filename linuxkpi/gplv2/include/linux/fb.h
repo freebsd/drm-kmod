@@ -14,8 +14,6 @@
 #include <asm/io.h>
 #include <linux/notifier.h>
 
-#define CONFIG_DRM_FBDEV_EMULATION
-
 struct linux_fb_info;
 struct videomode;
 struct vm_area_struct;

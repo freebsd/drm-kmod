@@ -4,6 +4,8 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
 .PATH:	${SRCDIR}
 
+.include "../kconfig.mk"
+
 KMOD=	i915kms
 SRCS=	\
 	dvo_ch7017.c \
@@ -152,8 +154,8 @@ CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=i915_'
-CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=i915_' -DLINUXKPI_VERSION=50000
+CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 .if ${MACHINE_CPUARCH} == "amd64"
 SRCS+= ${SRCS_COMPAT}

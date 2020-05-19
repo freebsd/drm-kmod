@@ -4,6 +4,8 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/vmwgfx
 
 .PATH:	${SRCDIR}
 
+.include "../kconfig.mk"
+
 KMOD=	vmwgfx
 SRCS=	\
 	ttm_lock.c \
@@ -44,7 +46,6 @@ SRCS=	\
 	vmwgfx_va.c \
 	vmwgfx_validation.c
 
-
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
@@ -57,8 +58,8 @@ CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=${KMOD}_'
-CFLAGS+= -include ${SRCDIR:H}/drm_os_config.h
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=${KMOD}_' -DLINUXKPI_VERSION=50000
+CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 SRCS	+=			\
 	opt_acpi.h		\

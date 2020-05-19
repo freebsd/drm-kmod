@@ -4,6 +4,8 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
 .PATH:	${SRCDIR} ${SRCDIR}/scheduler
 
+.include "../kconfig.mk"
+
 KMOD=	drm
 SRCS=	drm_atomic.c \
 	drm_atomic_helper.c \
@@ -27,7 +29,6 @@ SRCS=	drm_atomic.c \
 	drm_dsc.c \
 	drm_dumb_buffers.c \
 	drm_edid.c \
-	drm_edid_load.c \
 	drm_encoder.c \
 	drm_encoder_slave.c \
 	drm_fb_helper.c \
@@ -75,7 +76,11 @@ SRCS=	drm_atomic.c \
 	tainted_linux_fb.c \
 	linux_hdmi.c
 
-#Files that requires CONFIG_DRM_LEGACY
+.if !empty(KCONFIG:MAGP)
+SRCS+=	drm_agpsupport.c
+.endif
+
+.if !empty(KCONFIG:MDRM_LEGACY)
 SRCS+=	ati_pcigart.c \
 	drm_legacy_misc.c \
 	drm_bufs.c \
@@ -83,18 +88,21 @@ SRCS+=	ati_pcigart.c \
 	drm_dma.c \
 	drm_scatter.c \
 	drm_lock.c
+.endif
 
-# Debug files, not handled for now
+.if !empty(KCONFIG:MDEBUGFS)
 SRCS_DEBUG=	\
 		drm_debugfs.c \
 		drm_debugfs_crc.c
-
-.if ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "amd64"
-SRCS+=	drm_agpsupport.c
 .endif
 
-# Skip for now...
-#	drm_dp_cec.c
+.if !empty(KCONFIG:DRM_DP_CEC)
+SRCS+=	drm_dp_cec.c
+.endif
+
+.if !empty(KCONFIG:MDRM_LOAD_EDID_FIRMWARE)
+SRCS+=	drm_edid_load.c
+.endif
 
 # drm scheduler (moved from amdgpu)
 SRCS+=	sched_main.c \
@@ -113,9 +121,8 @@ CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_'
-CFLAGS+= -include ${SRCDIR}/drm_os_config.h
-CFLAGS+= -DCONFIG_DRM_LEGACY -DCONFIG_DRM_VM
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_' -DLINUXKPI_VERSION=50000
+CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 SRCS+=	device_if.h \
 	vnode_if.h \
@@ -141,4 +148,5 @@ CWARNFLAGS.drm_info.c+=		-Wno-tautological-compare
 CWARNFLAGS.drm_ioc32.c+=	-Wno-address-of-packed-member
 CWARNFLAGS.drm_debugfs.c+=	-Wno-format-security
 CWARNFLAGS.drm_scatter.c+=	-Wno-int-conversion
+
 .include <bsd.kmod.mk>
