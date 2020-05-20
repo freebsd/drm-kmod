@@ -36,7 +36,6 @@
 #include "drm_internal.h"
 #include "drm_crtc_internal.h"
 
-#ifdef CONFIG_COMPAT
 #define compat_ptr(x)	((void *)(unsigned long)x)
 #define ptr_to_compat(x)	((unsigned long)x)
 
@@ -77,17 +76,6 @@
 #define DRM_IOCTL_WAIT_VBLANK32		DRM_IOWR(0x3a, drm_wait_vblank32_t)
 
 #define DRM_IOCTL_MODE_ADDFB232		DRM_IOWR(0xb8, drm_mode_fb_cmd232_t)
-
-#ifdef __FreeBSD__
-extern int drm_version(struct drm_device *dev, void *data,
-			struct drm_file *file_priv);
-
-extern int drm_getunique(struct drm_device *dev, void *data,
-			struct drm_file *file_priv);
-
-extern int drm_getclient(struct drm_device *dev, void *data,
-			struct drm_file *file_priv);
-#endif
 
 typedef struct drm_version_32 {
 	int version_major;	  /* Major version */
@@ -898,9 +886,6 @@ static int compat_drm_mode_addfb2(struct file *file, unsigned int cmd,
 	struct drm_mode_fb_cmd232 __user *argp = (void __user *)arg;
 	struct drm_mode_fb_cmd2 req64;
 	int err;
-#ifdef __FreeBSD__
-	u32 fb_id;
-#endif
 
 	if (copy_from_user(&req64, argp,
 			   offsetof(drm_mode_fb_cmd232_t, modifier)))
@@ -926,41 +911,6 @@ static struct {
 	drm_ioctl_compat_t *fn;
 	char *name;
 } drm_compat_ioctls[] = {
-// before patch: prepare for conversions to drm_ioctl_kernel()
-/* #define DRM_IOCTL32_DEF(n, f) [DRM_IOCTL_NR(n##32)] = {.fn = f, .name = #n} */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_VERSION, compat_drm_version), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_GET_UNIQUE, compat_drm_getunique), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_GET_MAP, compat_drm_getmap), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_GET_CLIENT, compat_drm_getclient), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_GET_STATS, compat_drm_getstats), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_SET_UNIQUE, compat_drm_setunique), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_ADD_MAP, compat_drm_addmap), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_ADD_BUFS, compat_drm_addbufs), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_MARK_BUFS, compat_drm_markbufs), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_INFO_BUFS, compat_drm_infobufs), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_MAP_BUFS, compat_drm_mapbufs), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_FREE_BUFS, compat_drm_freebufs), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_RM_MAP, compat_drm_rmmap), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_SET_SAREA_CTX, compat_drm_setsareactx), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_GET_SAREA_CTX, compat_drm_getsareactx), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_RES_CTX, compat_drm_resctx), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_DMA, compat_drm_dma), */
-/* #if IS_ENABLED(CONFIG_AGP) */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_ENABLE, compat_drm_agp_enable), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_INFO, compat_drm_agp_info), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_ALLOC, compat_drm_agp_alloc), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_FREE, compat_drm_agp_free), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_BIND, compat_drm_agp_bind), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_AGP_UNBIND, compat_drm_agp_unbind), */
-/* #endif */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_SG_ALLOC, compat_drm_sg_alloc), */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_SG_FREE, compat_drm_sg_free), */
-/* #if defined(CONFIG_X86) || defined(CONFIG_IA64) */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_UPDATE_DRAW, compat_drm_update_draw), */
-/* #endif */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_WAIT_VBLANK, compat_drm_wait_vblank), */
-/* #if defined(CONFIG_X86) || defined(CONFIG_IA64) */
-/* 	DRM_IOCTL32_DEF(DRM_IOCTL_MODE_ADDFB2, compat_drm_mode_addfb2), */
 #define DRM_IOCTL32_DEF(n, f) [DRM_IOCTL_NR(n##32)] = {.fn = f, .name = #n}
 	DRM_IOCTL32_DEF(DRM_IOCTL_VERSION, compat_drm_version),
 	DRM_IOCTL32_DEF(DRM_IOCTL_GET_UNIQUE, compat_drm_getunique),
@@ -1047,4 +997,3 @@ long drm_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	return ret;
 }
 EXPORT_SYMBOL(drm_compat_ioctl);
-#endif
