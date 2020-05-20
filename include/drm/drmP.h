@@ -32,35 +32,9 @@
 #ifndef _DRM_P_H_
 #define _DRM_P_H_
 
-#if defined(_KERNEL) || defined(__KERNEL__)
 #include <sys/param.h>
 #include <sys/queue.h>
-#include <sys/malloc.h>
-#include <sys/kernel.h>
-#include <sys/ktr.h>
-#include <sys/module.h>
-#include <sys/systm.h>
-#include <sys/conf.h>
-#include <sys/sglist.h>
-#include <sys/stat.h>
-#include <sys/priv.h>
-#include <sys/proc.h>
-#include <sys/lock.h>
-#include <sys/fcntl.h>
-#include <sys/uio.h>
-#include <sys/filio.h>
 #include <sys/rwlock.h>
-#include <sys/selinfo.h>
-#include <sys/sysctl.h>
-#include <sys/bus.h>
-#include <sys/queue.h>
-#include <sys/signalvar.h>
-#include <sys/pciio.h>
-#include <sys/poll.h>
-#include <sys/sbuf.h>
-#include <sys/taskqueue.h>
-#include <sys/resourcevar.h>
-#include <sys/vmmeter.h>
 #include <vm/vm.h>
 #include <vm/pmap.h>
 #include <vm/vm_extern.h>
@@ -72,45 +46,36 @@
 #include <vm/vm_pager.h>
 #include <vm/vm_param.h>
 #include <vm/vm_phys.h>
-#include <machine/bus.h>
-#include <machine/resource.h>
-#if defined(__i386__) || defined(__amd64__)
-#include <machine/specialreg.h>
-#endif
-#include <machine/sysarch.h>
-#include <sys/endian.h>
-#include <sys/mman.h>
-#include <sys/rman.h>
-#include <sys/memrange.h>
-#include <dev/agp/agpvar.h>
-#include <sys/agpio.h>
-#include <sys/mutex.h>
-#include <dev/pci/pcivar.h>
-#include <dev/pci/pcireg.h>
-#include <sys/selinfo.h>
-#include <sys/bus.h>
 
-#include <linux/io.h>
-#include <linux/platform_device.h>
-#include <linux/idr.h>
-#include <linux/string.h>
-#include <linux/compat.h>
-#include <linux/compiler.h>
+#include <linux/agp_backend.h>
+#ifdef __linux__
+#include <linux/cdev.h>
+#endif
+#include <linux/dma-mapping.h>
+#ifdef __linux__
+#include <linux/file.h>
+#endif
 #include <linux/fs.h>
-#include <linux/gfp.h>
-#include <linux/pm.h>
+#include <linux/highmem.h>
+#include <linux/idr.h>
+#include <linux/init.h>
+#include <linux/io.h>
+#include <linux/jiffies.h>
 #include <linux/kernel.h>
-#include <linux/ktime.h>
+#include <linux/kref.h>
+#ifdef __linux__
+#include <linux/miscdevice.h>
+#endif
+#include <linux/mm.h>
+#include <linux/mutex.h>
+#include <linux/platform_device.h>
 #include <linux/poll.h>
 #include <linux/ratelimit.h>
 #include <linux/sched.h>
 #include <linux/slab.h>
 #include <linux/types.h>
 #include <linux/vmalloc.h>
-#include <linux/mm.h>
-#include <linux/ioctl.h>
 #include <linux/workqueue.h>
-#include <linux/math64.h>
 #include <linux/dma-fence.h>
 #include <linux/module.h>
 #include <linux/mman.h>
@@ -120,32 +85,20 @@
 #include <linux/uaccess.h>
 
 #include <uapi/drm/drm.h>
-
-
-
-#include <linux/device.h>
-#include <linux/module.h>
-#include <linux/spinlock.h>
-#include <linux/mutex.h>
-#include <linux/i2c.h>
-#include <linux/kthread.h>
-#include <linux/interrupt.h>
-#include <linux/pagemap.h>
-
+#include <uapi/drm/drm_mode.h>
 
 #include <asm/mtrr.h>
-#include <drm/drm_os_freebsd.h>
 #include <drm/drm_agpsupport.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_hashtab.h>
 #include <drm/drm_mm.h>
-#include <drm/drm_ioctl.h>
-#include <uapi/drm/drm_sarea.h>
-#include <drm/drm_vma_manager.h>
-#include <linux/atomic.h>
-#include <asm/processor.h>
-
+#ifdef __linux__
+#include <drm/drm_os_linux.h>
+#elif defined(__FreeBSD__)
+#include <drm/drm_os_freebsd.h>
+#endif
+#include <drm/drm_sarea.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_prime.h>
 #include <drm/drm_print.h>
@@ -158,22 +111,11 @@
 #include <drm/drm_irq.h>
 #include <drm/drm_device.h>
 
-#include "opt_compat.h"
-#include "opt_drm.h"
-#include "opt_syscons.h"
-
-#define __OS_HAS_AGP (defined(CONFIG_AGP) || (defined(CONFIG_AGP_MODULE) && defined(MODULE)))
-#define __OS_HAS_MTRR (defined(CONFIG_MTRR))
-
-#undef DRM_LINUX
-#define DRM_LINUX 0
-
-extern int drm_skipwc;
+struct module;
 
 struct device_node;
 struct videomode;
 struct reservation_object;
-struct seq_file;
 struct dma_buf_attachment;
 
 struct pci_dev;
@@ -193,5 +135,4 @@ extern int		drm_sysctl_cleanup(struct drm_device *dev);
  * Work is ongoing to remove drmP.h includes from existing files
  */
 
-#endif /* __KERNEL__ */
 #endif
