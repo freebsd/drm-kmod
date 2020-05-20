@@ -566,7 +566,6 @@ SRCS+=	amd_powerplay.c \
 	vega20_baco.c \
 	vega20_hwmgr.c \
 	vega20_powertune.c \
-	vega20_ppt.c \
 	vega20_processpptables.c \
 	vega20_smumgr.c \
 	vega20_thermal.c \
