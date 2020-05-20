@@ -38,8 +38,6 @@
 
 
 
-#if __OS_HAS_AGP
-
 /**
  * Get AGP information.
  *
@@ -523,5 +521,3 @@ drm_agp_bind_pages(struct drm_device *dev,
 }
 EXPORT_SYMBOL(drm_agp_bind_pages);
 #endif /* FREEBSD_NOTYET */
-
-#endif /* __OS_HAS_AGP */
