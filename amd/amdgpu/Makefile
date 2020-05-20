@@ -520,6 +520,7 @@ SRCS+=	virtual_link_encoder.c \
 
 # display/modules/*
 SRCS+=	color_gamma.c \
+	color_table.c \
 	freesync.c \
 	info_packet.c \
 	power_helpers.c
