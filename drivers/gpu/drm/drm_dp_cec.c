@@ -5,8 +5,6 @@
  * Copyright 2018 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
  */
 
-#ifdef CONFIG_DRM_DP_CEC
-
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/slab.h>
@@ -442,5 +440,3 @@ void drm_dp_cec_unregister_connector(struct drm_dp_aux *aux)
 	aux->cec.adap = NULL;
 }
 EXPORT_SYMBOL(drm_dp_cec_unregister_connector);
-
-#endif /* CONFIG_DRM_DP_CEC */

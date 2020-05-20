@@ -98,7 +98,7 @@ SRCS_DEBUG=	\
 		drm_debugfs_crc.c
 .endif
 
-.if !empty(KCONFIG:DRM_DP_CEC)
+.if !empty(KCONFIG:MDRM_DP_CEC)
 SRCS+=	drm_dp_cec.c
 .endif
 
