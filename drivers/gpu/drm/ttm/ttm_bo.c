@@ -1705,11 +1705,7 @@ void ttm_bo_unmap_virtual_locked(struct ttm_buffer_object *bo)
 
 	drm_vma_node_unmap(&bo->vma_node, bdev->dev_mapping);
 #elif defined(__FreeBSD__)
-	struct drm_vma_offset_node *node;
-
-	node = &bo->vma_node;
-	unmap_mapping_range(bo, drm_vma_node_offset_addr(node),
-	    drm_vma_node_size(node) << PAGE_SHIFT, 1);
+	drm_vma_node_unmap(&bo->vma_node, bo);
 #endif
 	ttm_mem_io_free_vm(bo);
 }

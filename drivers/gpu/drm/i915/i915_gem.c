@@ -2093,17 +2093,13 @@ static void __i915_gem_object_release_mmap(struct drm_i915_gem_object *obj)
 
 	obj->userfault_count = 0;
 	list_del(&obj->userfault_link);
-
-#ifdef __linux__
 	drm_vma_node_unmap(&obj->base.vma_node,
+#ifdef __linux__
 			   obj->base.dev->anon_inode->i_mapping);
 #elif defined(__FreeBSD__)
-	struct drm_vma_offset_node *node;
-
-	node = &obj->base.vma_node;
-	unmap_mapping_range(obj, drm_vma_node_offset_addr(node),
-	    drm_vma_node_size(node) << PAGE_SHIFT, 1);
+			   obj);
 #endif
+
 	for_each_ggtt_vma(vma, obj)
 		i915_vma_unset_userfault(vma);
 }
