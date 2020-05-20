@@ -739,8 +739,10 @@ err_minors:
 err_free:
 
 #ifdef __FreeBSD__ // In LKPI spinlock is a mutex so we need to destroy them
+#if IS_ENABLED(CONFIG_DRM_LEGACY)
 	spin_lock_destroy(&dev->buf_lock);
 	spin_lock_destroy(&dev->event_lock);
+#endif
 #endif
 
 	put_device(dev->dev);
@@ -825,8 +827,10 @@ void drm_dev_fini(struct drm_device *dev)
 	drm_minor_free(dev, DRM_MINOR_RENDER);
 
 #ifdef __FreeBSD__
+#if IS_ENABLED(CONFIG_DRM_LEGACY)
 	spin_lock_destroy(&dev->buf_lock);
 	spin_lock_destroy(&dev->event_lock);
+#endif
 #endif
 	put_device(dev->dev);
 
