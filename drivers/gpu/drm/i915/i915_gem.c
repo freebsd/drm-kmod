@@ -56,6 +56,7 @@
 #ifdef __FreeBSD__
 #include <linux/sizes.h>	/* Needed for SZ_1M */
 #include <linux/xarray.h>
+#include <sys/resourcevar.h>	/* for lim_cur_proc */
 #define	resource linux_resource
 static inline unsigned long totalram_pages() { return physmem; }
 #endif
