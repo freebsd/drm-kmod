@@ -31,6 +31,7 @@
 #ifdef __FreeBSD__
 #include <sys/param.h>
 #include <sys/shm.h>
+#include <sys/mman.h>
 #endif
 
 #include <linux/vmalloc.h>
