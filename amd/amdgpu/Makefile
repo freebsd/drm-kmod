@@ -55,6 +55,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/gpio/dcn10 \
 	${SRCDIR}/display/dc/gpio/dcn20 \
 	${SRCDIR}/display/dc/gpio/dcn21 \
+	${SRCDIR}/display/dc/gpio/dcn30 \
 	${SRCDIR}/display/dc/gpio/diagnostics \
 	${SRCDIR}/display/dc/i2caux \
 	${SRCDIR}/display/dc/i2caux/dce100 \
@@ -442,6 +443,8 @@ SRCS+=	dcn30_dio_link_encoder.c
 #	dcn30_dwb_cm.c \
 #	dcn30_dio_stream_encoder.c \
 #	irq_service_dcn30.c \
+#	hw_factory_dcn30.c \
+#	hw_translate_dcn30.c \
 #	display_mode_vba_30.c \
 #	display_rq_dlg_calc_30.c
 
