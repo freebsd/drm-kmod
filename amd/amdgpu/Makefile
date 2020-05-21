@@ -442,6 +442,7 @@ SRCS+=	dcn30_dio_link_encoder.c
 #	dcn30_dwb.c \
 #	dcn30_dwb_cm.c \
 #	dcn30_dio_stream_encoder.c \
+#	dcn30_hwseq.c \
 #	irq_service_dcn30.c \
 #	hw_factory_dcn30.c \
 #	hw_translate_dcn30.c \
