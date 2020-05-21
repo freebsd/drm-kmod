@@ -429,6 +429,10 @@ SRCS+=	dcn30_dio_link_encoder.c
 #	dcn30_clk_mgr_smu_msg.c \
 #	dcn30_dccg.c \
 #	dcn30_optc.c \
+#	dcn30_mpc.c \
+#	dcn30_cm_common.c \
+#	dcn30_dpp.c \
+#	dcn30_dpp_cm.c \
 #	dcn30_dio_stream_encoder.c
 
 # display/dc/core
