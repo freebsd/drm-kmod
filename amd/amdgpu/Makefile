@@ -433,6 +433,7 @@ SRCS+=	dcn30_dio_link_encoder.c
 #	dcn30_cm_common.c \
 #	dcn30_dpp.c \
 #	dcn30_dpp_cm.c \
+#	dcn30_hubbub.c \
 #	dcn30_dio_stream_encoder.c
 
 # display/dc/core
