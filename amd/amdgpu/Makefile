@@ -73,6 +73,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn10 \
 	${SRCDIR}/display/dc/irq/dcn20 \
 	${SRCDIR}/display/dc/irq/dcn21 \
+	${SRCDIR}/display/dc/irq/dcn30 \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
@@ -440,6 +441,7 @@ SRCS+=	dcn30_dio_link_encoder.c
 #	dcn30_dwb.c \
 #	dcn30_dwb_cm.c \
 #	dcn30_dio_stream_encoder.c \
+#	irq_service_dcn30.c \
 #	display_mode_vba_30.c \
 #	display_rq_dlg_calc_30.c
 
