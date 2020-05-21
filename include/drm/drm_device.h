@@ -301,7 +301,6 @@ struct drm_device {
 #ifdef __FreeBSD__
 	struct drm_sysctl_info *sysctl;
 	int  sysctl_node_idx;
-	void *drm_ttm_bdev;
 	void *sysctl_private;
 	char busid_str[128];
 	int modesetting;
