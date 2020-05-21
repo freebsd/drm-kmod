@@ -24,9 +24,7 @@ static LIST_HEAD(globals);
 static atomic_t active;
 static atomic_t epoch;
 static struct park_work {
-#ifdef __freebsd_notyet__
 	struct rcu_work work;
-#endif
 	int epoch;
 } park;
 
@@ -90,9 +88,7 @@ int __init i915_globals_init(void)
 		}
 	}
 
-#ifdef __freebsd_notyet__
 	INIT_RCU_WORK(&park.work, __i915_globals_park);
-#endif
 	return 0;
 }
 
@@ -111,9 +107,7 @@ void i915_globals_park(void)
 		return;
 
 	park.epoch = atomic_inc_return(&epoch);
-#ifdef __freebsd_notyet__
 	queue_rcu_work(system_wq, &park.work);
-#endif
 }
 
 void i915_globals_unpark(void)
@@ -126,9 +120,7 @@ void __exit i915_globals_exit(void)
 {
 	/* Flush any residual park_work */
 	atomic_inc(&epoch);
-#ifdef __freebsd_notyet__
 	flush_rcu_work(&park.work);
-#endif
 
 	__i915_globals_cleanup();
 
