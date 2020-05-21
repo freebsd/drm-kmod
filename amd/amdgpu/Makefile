@@ -10,7 +10,8 @@ KMOD=	amdgpu
 .if ${MACHINE_CPUARCH} == "amd64"
 _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn20 \
-	${SRCDIR}/display/dc/dml/dcn21
+	${SRCDIR}/display/dc/dml/dcn21 \
+	${SRCDIR}/display/dc/dml/dcn30
 .endif
 
 .PATH:	${SRCDIR}/acp \
@@ -438,7 +439,9 @@ SRCS+=	dcn30_dio_link_encoder.c
 #	dcn30_mmhubbub.c \
 #	dcn30_dwb.c \
 #	dcn30_dwb_cm.c \
-#	dcn30_dio_stream_encoder.c
+#	dcn30_dio_stream_encoder.c \
+#	display_mode_vba_30.c \
+#	display_rq_dlg_calc_30.c
 
 # display/dc/core
 SRCS+=	dc_vm_helper.c
