@@ -34,6 +34,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/clk_mgr/dcn10 \
 	${SRCDIR}/display/dc/clk_mgr/dcn20 \
 	${SRCDIR}/display/dc/clk_mgr/dcn21 \
+	${SRCDIR}/display/dc/clk_mgr/dcn30 \
 	${SRCDIR}/display/dc/dce \
 	${SRCDIR}/display/dc/dce100 \
 	${SRCDIR}/display/dc/dce110 \
@@ -424,6 +425,8 @@ SRCS+=	dcn21_hubbub.c \
 
 # display/dc/dcn30
 SRCS+=	dcn30_dio_link_encoder.c
+#	dcn30_clk_mgr.c \
+#	dcn30_clk_mgr_smu_msg.c
 #	dcn30_dio_stream_encoder.c
 
 # display/dc/core
