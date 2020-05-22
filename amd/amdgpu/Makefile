@@ -43,6 +43,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn10 \
 	${SRCDIR}/display/dc/dcn20 \
 	${SRCDIR}/display/dc/dcn21 \
+	${SRCDIR}/display/dc/dcn30 \
 	${SRCDIR}/display/dc/dsc \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
@@ -420,6 +421,10 @@ SRCS+=	dcn21_hubbub.c \
 	dcn21_init.c \
 	dcn21_link_encoder.c \
 	dcn21_resource.c
+
+# display/dc/dcn30
+SRCS+=	dcn30_dio_link_encoder.c
+#	dcn30_dio_stream_encoder.c
 
 # display/dc/core
 SRCS+=	dc_vm_helper.c
