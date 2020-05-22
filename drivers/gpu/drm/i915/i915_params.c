@@ -30,6 +30,12 @@
 #include "i915_params.h"
 #include "i915_drv.h"
 
+#ifdef __FreeBSD__
+SYSCTL_NODE(_dev, OID_AUTO, i915kms,
+    CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
+    DRIVER_DESC " parameters");
+#endif
+
 #define i915_param_named(name, T, perm, desc) \
 	module_param_named(name, i915_modparams.name, T, perm); \
 	MODULE_PARM_DESC(name, desc)

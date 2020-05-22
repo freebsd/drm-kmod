@@ -33,6 +33,10 @@
 
 #include "amd_shared.h"
 
+#ifdef __FreeBSD__
+SYSCTL_DECL(_dev_amdgpu);
+#endif
+
 /* General customization:
  */
 

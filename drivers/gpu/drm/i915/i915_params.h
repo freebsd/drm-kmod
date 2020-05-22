@@ -28,6 +28,10 @@
 #include <linux/bitops.h>
 #include <linux/cache.h> /* for __read_mostly */
 
+#ifdef __FreeBSD__
+SYSCTL_DECL(_dev_i915kms);
+#endif
+
 struct drm_printer;
 
 #define ENABLE_GUC_SUBMISSION		BIT(0)

@@ -45,6 +45,12 @@
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_probe_helper.h>
 
+#ifdef __FreeBSD__
+SYSCTL_NODE(_dev, OID_AUTO, radeonkms,
+    CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
+    DRIVER_DESC " parameters");
+#endif
+
 /*
  * KMS wrapper.
  * - 2.0.0 - initial interface

@@ -40,6 +40,12 @@
 
 #include "amdgpu_amdkfd.h"
 
+#ifdef __FreeBSD__
+SYSCTL_NODE(_dev, OID_AUTO, amdgpu,
+    CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
+    DRIVER_DESC " parameters");
+#endif
+
 /*
  * KMS wrapper.
  * - 3.0.0 - initial driver
