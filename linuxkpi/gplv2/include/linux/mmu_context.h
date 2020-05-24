@@ -29,13 +29,13 @@
 
 struct mm_struct;
 
-static inline void __unused
+static inline void
 use_mm(struct mm_struct *mm)
 {
 	/* NOP is deliberate */
 }
 
-static inline void __unused
+static inline void
 unuse_mm(struct mm_struct *mm)
 {
 	/* NOP is deliberate */
