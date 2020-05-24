@@ -700,7 +700,11 @@ struct bdb_driver_features {
 	u16 grs_enabled:1;
 	u16 gpmt_enabled:1;
 	u16 tbt_enabled:1;
+#ifdef __linux__
 	u16 psr_enabled:1;
+#elif defined(__FreeBSD__)
+	u16 psr_enabled:0;
+#endif
 	u16 ips_enabled:1;
 	u16 reserved3:4;
 	u16 pc_feature_valid:1;
