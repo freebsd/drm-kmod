@@ -41,7 +41,7 @@
 #endif
 
 #ifndef DRM_PARAM_PARENT
-#define	DRM_PARAM_PARENT	_dev
+#define	DRM_PARAM_PARENT	_hw
 #endif
 
 #ifndef LINUXKPI_PARAM_PREFIX
@@ -60,6 +60,7 @@
 #define	DRM_PARAM_NAME LINUXKPI_PARAM_CONCAT(DRM_PARAM_PARENT,DRM_SYSCTL_PARAM_PREFIX,,)
 
 /* No good place to put it (manu 20200522) */
+SYSCTL_DECL(_hw_dri);
 SYSCTL_DECL(_dev_drm);
 
 #define	LINUXKPI_PARAM_bool(name, var, perm)				\

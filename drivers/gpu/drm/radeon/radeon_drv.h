@@ -38,7 +38,7 @@
 #include "radeon_family.h"
 
 #ifdef __FreeBSD__
-SYSCTL_DECL(_dev_radeonkms);
+SYSCTL_DECL(_hw_radeonkms);
 #endif
 
 /* General customization:

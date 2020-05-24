@@ -46,7 +46,7 @@
 #ifdef __FreeBSD__
 /* BSD: Make sure we get out[bwl] redefines */
 #include <linux/compiler.h>
-SYSCTL_DECL(_dev_vmwgfx);
+SYSCTL_DECL(_hw_vmwgfx);
 
 static inline void
 spin_lock_init_spin(spinlock_t *lock)

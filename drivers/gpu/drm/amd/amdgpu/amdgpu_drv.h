@@ -34,7 +34,7 @@
 #include "amd_shared.h"
 
 #ifdef __FreeBSD__
-SYSCTL_DECL(_dev_amdgpu);
+SYSCTL_DECL(_hw_amdgpu);
 #endif
 
 /* General customization:

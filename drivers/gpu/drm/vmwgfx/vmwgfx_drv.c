@@ -52,7 +52,7 @@
 #define VMWGFX_VALIDATION_MEM_GRAN (16*PAGE_SIZE)
 
 #ifdef __FreeBSD__
-SYSCTL_NODE(_dev, OID_AUTO, vmwgfx,
+SYSCTL_NODE(_hw, OID_AUTO, vmwgfx,
     CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
     VMWGFX_DRIVER_DESC " parameters");
 #endif

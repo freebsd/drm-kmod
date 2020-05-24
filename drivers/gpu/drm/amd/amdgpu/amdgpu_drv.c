@@ -41,7 +41,7 @@
 #include "amdgpu_amdkfd.h"
 
 #ifdef __FreeBSD__
-SYSCTL_NODE(_dev, OID_AUTO, amdgpu,
+SYSCTL_NODE(_hw, OID_AUTO, amdgpu,
     CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
     DRIVER_DESC " parameters");
 #endif

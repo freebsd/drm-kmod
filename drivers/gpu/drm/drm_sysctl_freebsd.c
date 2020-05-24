@@ -88,8 +88,8 @@ drm_sysctl_init(struct drm_device *dev)
 	/* Find the next free slot under hw.dri */
 	i = 0;
 	SLIST_FOREACH(oid, SYSCTL_CHILDREN(drioid), oid_link) {
-		if (i <= oid->oid_arg2)
-			i = oid->oid_arg2 + 1;
+		if (i == oid->oid_name[0] - '0' && oid->oid_name[1] == 0)
+			i++;
 	}
 	if (i > 9) {
 		drm_sysctl_cleanup(dev);

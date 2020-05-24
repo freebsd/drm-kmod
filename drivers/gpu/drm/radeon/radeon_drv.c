@@ -46,7 +46,7 @@
 #include <drm/drm_probe_helper.h>
 
 #ifdef __FreeBSD__
-SYSCTL_NODE(_dev, OID_AUTO, radeonkms,
+SYSCTL_NODE(_hw, OID_AUTO, radeonkms,
     CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
     DRIVER_DESC " parameters");
 #endif

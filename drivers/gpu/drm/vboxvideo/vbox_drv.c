@@ -20,7 +20,7 @@
 #include "vbox_drv.h"
 
 #ifdef __FreeBSD__
-SYSCTL_NODE(_dev, OID_AUTO, vboxvideo,
+SYSCTL_NODE(_hw, OID_AUTO, vboxvideo,
     CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
     DRIVER_DESC " parameters");
 #endif

@@ -279,7 +279,7 @@ static inline void vbox_write_ioport(u16 index, u16 data)
 }
 
 #ifdef __FreeBSD__
-SYSCTL_DECL(_dev_vboxvideo);
+SYSCTL_DECL(_hw_vboxvideo);
 #endif
 
 #endif
