@@ -1180,6 +1180,11 @@ void i915_ggtt_disable_guc(struct i915_ggtt *ggtt)
 	ggtt->invalidate(ggtt);
 }
 
+static unsigned int clear_bind(struct i915_vma *vma)
+{
+	return atomic_fetch_and(~I915_VMA_BIND_MASK, &vma->flags);
+}
+
 void i915_ggtt_resume(struct i915_ggtt *ggtt)
 {
 	struct i915_vma *vma;
@@ -1198,10 +1203,9 @@ void i915_ggtt_resume(struct i915_ggtt *ggtt)
 	list_for_each_entry(vma, &ggtt->vm.bound_list, vm_link) {
 		struct drm_i915_gem_object *obj = vma->obj;
 
-		if (!i915_vma_is_bound(vma, I915_VMA_GLOBAL_BIND))
+		if (!(clear_bind(vma) & I915_VMA_GLOBAL_BIND))
 			continue;
 
-		clear_bit(I915_VMA_GLOBAL_BIND_BIT, __i915_vma_flags(vma));
 		WARN_ON(i915_vma_bind(vma,
 				      obj ? obj->cache_level : 0,
 				      PIN_GLOBAL, NULL));
