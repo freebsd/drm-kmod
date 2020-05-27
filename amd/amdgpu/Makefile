@@ -335,7 +335,8 @@ SRCS+=	dce_abm.c \
 	dce_stream_encoder.c \
 	dce_transform.c \
 	dmub_abm.c \
-	dmub_psr.c
+	dmub_psr.c \
+	dmub_hw_lock_mgr.c
 
 # display/dc/dce100
 SRCS+=	dce100_hw_sequencer.c \
