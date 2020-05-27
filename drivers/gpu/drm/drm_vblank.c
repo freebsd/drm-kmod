@@ -619,7 +619,7 @@ void drm_calc_timestamping_constants(struct drm_crtc *crtc,
 	int linedur_ns = 0, framedur_ns = 0;
 	int dotclock = mode->crtc_clock;
 
-	if (!dev->num_crtcs)
+	if (!drm_dev_has_vblank(dev))
 		return;
 
 	if (WARN_ON(pipe >= dev->num_crtcs))
@@ -1079,7 +1079,7 @@ void drm_crtc_send_vblank_event(struct drm_crtc *crtc,
 	unsigned int pipe = drm_crtc_index(crtc);
 	ktime_t now;
 
-	if (dev->num_crtcs > 0) {
+	if (drm_dev_has_vblank(dev)) {
 		seq = drm_vblank_count_and_time(dev, pipe, &now);
 	} else {
 		seq = 0;
@@ -1151,7 +1151,7 @@ static int drm_vblank_get(struct drm_device *dev, unsigned int pipe)
 	unsigned long irqflags;
 	int ret = 0;
 
-	if (!dev->num_crtcs)
+	if (!drm_dev_has_vblank(dev))
 		return -EINVAL;
 
 	if (WARN_ON(pipe >= dev->num_crtcs))
@@ -1520,7 +1520,7 @@ static void drm_legacy_vblank_pre_modeset(struct drm_device *dev,
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 
 	/* vblank is not initialized (IRQ not installed ?), or has been freed */
-	if (!dev->num_crtcs)
+	if (!drm_dev_has_vblank(dev))
 		return;
 
 	if (WARN_ON(pipe >= dev->num_crtcs))
@@ -1547,7 +1547,7 @@ static void drm_legacy_vblank_post_modeset(struct drm_device *dev,
 	unsigned long irqflags;
 
 	/* vblank is not initialized (IRQ not installed ?), or has been freed */
-	if (!dev->num_crtcs)
+	if (!drm_dev_has_vblank(dev))
 		return;
 
 	if (WARN_ON(pipe >= dev->num_crtcs))
@@ -1572,7 +1572,7 @@ int drm_legacy_modeset_ctl_ioctl(struct drm_device *dev, void *data,
 	unsigned int pipe;
 
 	/* If drm_vblank_init() hasn't been called yet, just no-op */
-	if (!dev->num_crtcs)
+	if (!drm_dev_has_vblank(dev))
 		return 0;
 
 	/* KMS drivers handle this internally */
@@ -1910,7 +1910,7 @@ bool drm_handle_vblank(struct drm_device *dev, unsigned int pipe)
 	unsigned long irqflags;
 	bool disable_irq;
 
-	if (WARN_ON_ONCE(!dev->num_crtcs))
+	if (WARN_ON_ONCE(!drm_dev_has_vblank(dev)))
 		return false;
 
 	if (WARN_ON(pipe >= dev->num_crtcs))
