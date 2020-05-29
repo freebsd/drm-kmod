@@ -445,6 +445,7 @@ SRCS+=	dcn30_dio_link_encoder.c
 #	irq_service_dcn30.c \
 #	hw_factory_dcn30.c \
 #	hw_translate_dcn30.c \
+#	dmub_dcn30.c \
 #	display_mode_vba_30.c \
 #	display_rq_dlg_calc_30.c
 
