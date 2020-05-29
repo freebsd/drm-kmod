@@ -2261,7 +2261,7 @@ static noinline void dcn30_calculate_wm_and_dlg_fp(
 	/* Set D:
 	 * DCFCLK: Min Required
 	 * FCLK(proportional to UCLK): 1GHz or Max
-	 * sr_enter_exit = 4, sr_exit = 2us
+	 * MALL stutter, sr_enter_exit = 4, sr_exit = 2us
 	 */
 	/*
 	if (dc->clk_mgr->bw_params->wm_table.nv_entries[WM_D].valid) {
