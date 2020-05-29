@@ -196,8 +196,13 @@ static void __notify_execute_cb(struct i915_request *rq)
 
 	lockdep_assert_held(&rq->lock);
 
+#ifdef __linux__
+	GEM_BUG_ON(!i915_request_is_active(rq));
+	if (llist_empty(&rq->execute_cb))
+#elif defined(__FreeBSD__)
 	if (list_empty(&rq->execute_cb))
 		return;
+#endif
 
 	list_for_each_entry(cb, &rq->execute_cb, link)
 		irq_work_queue(&cb->work);
@@ -563,14 +568,16 @@ xfer:	/* We may be recursing from the signal callback of another i915 fence */
 	if (!test_and_set_bit(I915_FENCE_FLAG_ACTIVE, &request->fence.flags)) {
 		list_move_tail(&request->sched.link, &engine->active.requests);
 		clear_bit(I915_FENCE_FLAG_PQUEUE, &request->fence.flags);
+		__notify_execute_cb(request);
 	}
+#ifdef __linux__
+	GEM_BUG_ON(!llist_empty(&request->execute_cb));
+#endif
 
 	if (test_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &request->fence.flags) &&
 	    !test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &request->fence.flags) &&
 	    !i915_request_enable_breadcrumb(request))
 		intel_engine_signal_breadcrumbs(engine);
-
-	__notify_execute_cb(request);
 
 	spin_unlock(&request->lock);
 
