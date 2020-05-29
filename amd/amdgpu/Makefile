@@ -536,6 +536,7 @@ SRCS+=	amd_powerplay.c \
 	pppcielanes.c \
 	process_pptables_v1_0.c \
 	processpptables.c \
+	sienna_cichlid_ppt.c \
 	smu7_baco.c \
 	smu7_clockpowergating.c \
 	smu7_hwmgr.c \
@@ -794,6 +795,7 @@ CWARNFLAGS.fiji_smumgr.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.navi10_ppt.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.ppatomctrl.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.polaris10_smumgr.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.sienna_cichlid_ppt.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.smu7_hwmgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu8_hwmgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu9_smumgr.c=		-Wno-missing-prototypes
