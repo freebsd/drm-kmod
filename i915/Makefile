@@ -113,7 +113,9 @@ SRCS+=	dvo_ch7017.c \
 	vlv_dsi_pll.c
 
 # gt/*
-SRCS+=	gen6_ppgtt.c \
+SRCS+=	gen2_engine_cs.c \
+	gen6_engine_cs.c \
+	gen6_ppgtt.c \
 	gen6_renderstate.c \
 	gen7_renderclear.c \
 	gen7_renderstate.c \
