@@ -10,8 +10,8 @@ SUPPORTED_ARCH=	amd64 \
 		aarch64 \
 		powerpc64
 
-.if empty(SUPPORTED_ARCH:M${MACHINE_CPUARCH})
-.error "Unsupported architetures ${MACHINE_CPUARCH}"
+.if empty(SUPPORTED_ARCH:M${MACHINE_ARCH})
+.error "Unsupported architetures ${MACHINE_ARCH}"
 .endif
 
 DEFAULT_KMODS=	linuxkpi	\
@@ -20,7 +20,7 @@ DEFAULT_KMODS=	linuxkpi	\
 		amd		\
 		radeon
 
-.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386"
+.if ${MACHINE_ARCH} == "amd64" || ${MACHINE_ARCH} == "i386"
 DEFAULT_KMODS+=	i915 \
 		vboxvideo \
 		vmwgfx
