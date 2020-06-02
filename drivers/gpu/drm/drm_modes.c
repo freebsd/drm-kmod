@@ -1810,8 +1810,10 @@ bool drm_mode_parse_command_line_for_connector(const char *mode_option,
 	if (named_mode) {
 		if (mode_end + 1 > DRM_DISPLAY_MODE_LEN)
 			return false;
+
 		if (!drm_named_mode_is_in_whitelist(name, mode_end))
 			return false;
+
 #ifdef __linux__
 		strscpy(mode->name, name, mode_end + 1);
 #elif defined(__FreeBSD__)
