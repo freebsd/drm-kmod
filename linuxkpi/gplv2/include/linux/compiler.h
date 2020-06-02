@@ -136,9 +136,6 @@ static inline uint64_t mul_u64_u32_div(uint64_t a, uint32_t mul, uint32_t diviso
 /* Naive impl... */
 #define	array_size(a,b) ((a) * (b))
 
-#define struct_size(p, member, n)			\
-	((n) * sizeof(*(p)->member) + sizeof(*(p)))
-
 /* Copied from Linux */
 static inline unsigned long array_index_mask_nospec(unsigned long index,
 						    unsigned long size)
