@@ -22,6 +22,7 @@
 
 #include <linux/firmware.h>
 #include <linux/module.h>
+#include <linux/pci.h>
 
 #include "pp_debug.h"
 #include "amdgpu.h"
@@ -29,11 +30,6 @@
 #include "atomfirmware.h"
 #include "amdgpu_atomfirmware.h"
 #include "smu_v11_0.h"
-#ifdef __notyet__
-#include "smu_11_0_driver_if.h"
-#else
-#include "smu11_driver_if.h"
-#endif
 #include "soc15_common.h"
 #include "atom.h"
 #include "vega20_ppt.h"
