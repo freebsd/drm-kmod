@@ -470,15 +470,4 @@ int drm_client_debugfs_init(struct drm_minor *minor)
 					ARRAY_SIZE(drm_client_debugfs_list),
 					minor->debugfs_root, minor);
 }
-
-#ifdef __FreeBSD__
-/* BSDFIXME: REMOVE ME! */
-int drm_client_new(struct drm_device *dev, struct drm_client_dev *client,
-		   const char *name, const struct drm_client_funcs *funcs)
-{
-
-	// dummy
-	return 0;
-}
-#endif
 #endif
