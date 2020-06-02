@@ -46,7 +46,6 @@
 #ifdef __FreeBSD__
 /* BSD: Make sure we get out[bwl] redefines */
 #include <linux/compiler.h>
-#include <linux/mm.h>
 SYSCTL_DECL(_hw_vmwgfx);
 
 static inline void
@@ -122,7 +121,6 @@ struct vmw_fpriv {
  * @dx_query_ctx: DX context if this buffer object is used as a DX query MOB
  * @map: Kmap object for semi-persistent mappings
  * @res_prios: Eviction priority counts for attached resources
- * @dirty: structure for user-space dirty-tracking
  */
 struct vmw_buffer_object {
 	struct ttm_buffer_object base;
@@ -133,7 +131,6 @@ struct vmw_buffer_object {
 	/* Protected by reservation */
 	struct ttm_bo_kmap_obj map;
 	u32 res_prios[TTM_MAX_BO_PRIORITY];
-	struct vmw_bo_dirty *dirty;
 };
 
 /**
@@ -164,8 +161,7 @@ struct vmw_res_func;
  * @res_dirty: Resource contains data not yet in the backup buffer. Protected
  * by resource reserved.
  * @backup_dirty: Backup buffer contains data not yet in the HW resource.
- * Protected by resource reserved.
- * @coherent: Emulate coherency by tracking vm accesses.
+ * Protecte by resource reserved.
  * @backup: The backup buffer if any. Protected by resource reserved.
  * @backup_offset: Offset into the backup buffer if any. Protected by resource
  * reserved. Note that only a few resource types can have a @backup_offset
@@ -182,16 +178,14 @@ struct vmw_res_func;
  * @hw_destroy: Callback to destroy the resource on the device, as part of
  * resource destruction.
  */
-struct vmw_resource_dirty;
 struct vmw_resource {
 	struct kref kref;
 	struct vmw_private *dev_priv;
 	int id;
 	u32 used_prio;
 	unsigned long backup_size;
-	u32 res_dirty : 1;
-	u32 backup_dirty : 1;
-	u32 coherent : 1;
+	bool res_dirty;
+	bool backup_dirty;
 	struct vmw_buffer_object *backup;
 	unsigned long backup_offset;
 	unsigned long pin_count;
@@ -199,7 +193,6 @@ struct vmw_resource {
 	struct list_head lru_head;
 	struct list_head mob_head;
 	struct list_head binding_head;
-	struct vmw_resource_dirty *dirty;
 	void (*res_free) (struct vmw_resource *res);
 	void (*hw_destroy) (struct vmw_resource *res);
 };
@@ -645,9 +638,6 @@ struct vmw_private {
 
 	/* Validation memory reservation */
 	struct vmw_validation_mem vvm;
-
-	/* VM operations */
-	struct vm_operations_struct vm_ops;
 };
 
 static inline struct vmw_surface *vmw_res_to_srf(struct vmw_resource *res)
@@ -780,8 +770,6 @@ extern void vmw_resource_evict_all(struct vmw_private *dev_priv);
 extern void vmw_resource_unbind_list(struct vmw_buffer_object *vbo);
 void vmw_resource_mob_attach(struct vmw_resource *res);
 void vmw_resource_mob_detach(struct vmw_resource *res);
-void vmw_resource_dirty_update(struct vmw_resource *res, pgoff_t start,
-			       pgoff_t end);
 
 /**
  * vmw_resource_mob_attached - Whether a resource currently has a mob attached
@@ -1469,19 +1457,6 @@ int vmw_host_log(const char *log);
  */
 #define VMW_DEBUG_USER(fmt, ...)                                              \
 	DRM_DEBUG_DRIVER(fmt, ##__VA_ARGS__)
-
-/* Resource dirtying - vmwgfx_page_dirty.c */
-void vmw_bo_dirty_scan(struct vmw_buffer_object *vbo);
-int vmw_bo_dirty_add(struct vmw_buffer_object *vbo);
-void vmw_bo_dirty_transfer_to_res(struct vmw_resource *res);
-void vmw_bo_dirty_clear_res(struct vmw_resource *res);
-void vmw_bo_dirty_release(struct vmw_buffer_object *vbo);
-#ifdef __linux__
-vm_fault_t vmw_bo_vm_fault(struct vm_fault *vmf);
-#elif defined(__FreeBSD__)
-vm_fault_t vmw_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf);
-#endif
-vm_fault_t vmw_bo_vm_mkwrite(struct vm_fault *vmf);
 
 /**
  * Inline helper functions
