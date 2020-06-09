@@ -58,7 +58,7 @@ static vm_fault_t ttm_bo_vm_fault_idle(struct ttm_buffer_object *bo,
 		goto out_clear;
 
 	/*
-	 * If possible, avoid waiting for GPU with mmap_sem
+	 * If possible, avoid waiting for GPU with mmap_lock
 	 * held.  We only do this if the fault allows retry and this
 	 * is the first attempt.
 	 */
