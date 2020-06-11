@@ -150,7 +150,7 @@ SRCS+=	i915_gem_busy.c \
 	i915_gem_userptr.c \
 	i915_gem_wait.c
 
-.if !empty(KCONFIG:MDRM_COMPAT)
+.if !empty(KCONFIG:MCOMPAT)
 SRCS+=	i915_ioc32.c
 .endif
 
