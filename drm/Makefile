@@ -91,7 +91,7 @@ SRCS+=	ati_pcigart.c \
 	drm_lock.c
 .endif
 
-.if !empty(KCONFIG:MDRM_COMPAT)
+.if !empty(KCONFIG:MCOMPAT)
 SRCS+=	drm_ioc32.c
 .endif
 
