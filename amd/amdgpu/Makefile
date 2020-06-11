@@ -598,6 +598,7 @@ CWARNFLAGS.dce_v6_0.c=	-Wno-unused-const-variable -Wno-missing-prototypes
 CWARNFLAGS.dce_v8_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_v10_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce_v11_0.c=	-Wno-missing-prototypes
+CWARNFLAGS.dce_clock_source.c=	-Wno-unused-variable
 CWARNFLAGS.dce100_resource.c=	-Wno-missing-prototypes	-Wno-initializer-overrides
 CWARNFLAGS.dce100_hw_sequencer.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce110_compressor.c=	-Wno-missing-prototypes -Wno-unused-variable
