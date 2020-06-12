@@ -269,7 +269,6 @@ SRCS+=	dc_debug.c \
 	dc_link_dp.c \
 	dc_link_hwss.c \
 	dc_link.c \
-	dc_vm_helper.c \
 	dc_resource.c \
 	dc_sink.c \
 	dc_stream.c \
@@ -333,8 +332,7 @@ SRCS+=	clk_mgr.c \
 	dce120_clk_mgr.c \
 	rv1_clk_mgr.c \
 	rv1_clk_mgr_vbios_smu.c \
-	rv2_clk_mgr.c \
-	dcn20_clk_mgr.c
+	rv2_clk_mgr.c
 
 # display/dc/dcn10
 .if ${MACHINE_CPUARCH} == "amd64"
@@ -372,6 +370,13 @@ SRCS+=	dcn20_dccg.c \
 	dcn20_resource.c \
 	dcn20_stream_encoder.c \
 	dcn20_vmid.c
+
+# display/dc/core
+SRCS+=	dc_vm_helper.c
+
+# display/dc/clk_mgr
+SRCS+=	dcn20_clk_mgr.c
+
 .endif
 
 # display/dc/dml
