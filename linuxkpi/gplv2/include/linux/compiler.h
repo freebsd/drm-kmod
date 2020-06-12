@@ -133,6 +133,11 @@ static inline uint64_t mul_u64_u32_div(uint64_t a, uint32_t mul, uint32_t diviso
 	return rl.ll;
 }
 
+static inline uint64_t mul_u64_u32_shr(uint64_t a, uint32_t mul, unsigned int shift)
+{
+	return (uint64_t)((a * mul) >> shift);
+}
+
 /* Naive impl... */
 #define	array_size(a,b) ((a) * (b))
 
