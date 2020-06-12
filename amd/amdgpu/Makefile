@@ -8,7 +8,8 @@ KMOD=	amdgpu
 .include "../../kconfig.mk"
 
 .if ${MACHINE_CPUARCH} == "amd64"
-_dml=	${SRCDIR}/display/dc/dml
+_dml=	${SRCDIR}/display/dc/dml \
+	${SRCDIR}/display/dc/dml/dcn20
 .endif
 
 .PATH:	${SRCDIR}/acp \
@@ -30,6 +31,7 @@ _dml=	${SRCDIR}/display/dc/dml
 	${SRCDIR}/display/dc/clk_mgr/dce112 \
 	${SRCDIR}/display/dc/clk_mgr/dce120 \
 	${SRCDIR}/display/dc/clk_mgr/dcn10 \
+	${SRCDIR}/display/dc/clk_mgr/dcn20 \
 	${SRCDIR}/display/dc/dce \
 	${SRCDIR}/display/dc/dce100 \
 	${SRCDIR}/display/dc/dce110 \
@@ -37,12 +39,14 @@ _dml=	${SRCDIR}/display/dc/dml
 	${SRCDIR}/display/dc/dce120 \
 	${SRCDIR}/display/dc/dce80 \
 	${SRCDIR}/display/dc/dcn10 \
+	${SRCDIR}/display/dc/dcn20 \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
 	${SRCDIR}/display/dc/gpio/dce110 \
 	${SRCDIR}/display/dc/gpio/dce120 \
 	${SRCDIR}/display/dc/gpio/dce80 \
 	${SRCDIR}/display/dc/gpio/dcn10 \
+	${SRCDIR}/display/dc/gpio/dcn20 \
 	${SRCDIR}/display/dc/gpio/diagnostics \
 	${SRCDIR}/display/dc/i2caux \
 	${SRCDIR}/display/dc/i2caux/dce100 \
@@ -59,6 +63,7 @@ _dml=	${SRCDIR}/display/dc/dml
 	${SRCDIR}/display/dc/irq/dce120 \
 	${SRCDIR}/display/dc/irq/dce80 \
 	${SRCDIR}/display/dc/irq/dcn10 \
+	${SRCDIR}/display/dc/irq/dcn20 \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/modules \
 	${SRCDIR}/display/modules/color \
@@ -264,6 +269,7 @@ SRCS+=	dc_debug.c \
 	dc_link_dp.c \
 	dc_link_hwss.c \
 	dc_link.c \
+	dc_vm_helper.c \
 	dc_resource.c \
 	dc_sink.c \
 	dc_stream.c \
@@ -327,7 +333,8 @@ SRCS+=	clk_mgr.c \
 	dce120_clk_mgr.c \
 	rv1_clk_mgr.c \
 	rv1_clk_mgr_vbios_smu.c \
-	rv2_clk_mgr.c
+	rv2_clk_mgr.c \
+	dcn20_clk_mgr.c
 
 # display/dc/dcn10
 .if ${MACHINE_CPUARCH} == "amd64"
@@ -346,12 +353,34 @@ SRCS+=	dcn10_cm_common.c \
 	dcn10_optc.c \
 	dcn10_resource.c \
 	dcn10_stream_encoder.c
+
+# display/dc/dcn20
+SRCS+=	dcn20_dccg.c \
+	dcn20_dpp_cm.c \
+	dcn20_dpp.c \
+	dcn20_dsc.c \
+	dcn20_dwb_scl.c \
+	dcn20_dwb.c \
+	dcn20_hubbub.c \
+	dcn20_hubp.c \
+	dcn20_hwseq.c \
+	dcn20_link_encoder.c \
+	dcn20_mmhubbub.c \
+	dcn20_mpc.c \
+	dcn20_opp.c \
+	dcn20_optc.c \
+	dcn20_resource.c \
+	dcn20_stream_encoder.c \
+	dcn20_vmid.c
 .endif
 
 # display/dc/dml
 .if ${MACHINE_CPUARCH} == "amd64"
 SRCS+=	display_mode_lib.c \
+	display_mode_vba.c \
+	display_mode_vba_20.c \
 	display_rq_dlg_helpers.c \
+	display_rq_dlg_calc_20.c \
 	dml_common_defs.c \
 	dml1_display_rq_dlg_calc.c
 .endif
@@ -368,11 +397,13 @@ SRCS+=	gpio_base.c \
 	hw_factory_dce120.c \
 	hw_factory_dce80.c \
 	hw_factory_dcn10.c \
+	hw_factory_dcn20.c \
 	hw_factory_diag.c \
 	hw_translate_dce110.c \
 	hw_translate_dce120.c \
 	hw_translate_dce80.c \
 	hw_translate_dcn10.c \
+	hw_translate_dcn20.c \
 	hw_translate_diag.c
 
 # display/dc/irq/*
@@ -380,7 +411,8 @@ SRCS+=	irq_service.c \
 	irq_service_dce110.c \
 	irq_service_dce120.c \
 	irq_service_dce80.c \
-	irq_service_dcn10.c
+	irq_service_dcn10.c \
+	irq_service_dcn20.c
 
 # display/dc/virtual
 SRCS+=	virtual_link_encoder.c \
@@ -510,11 +542,15 @@ CFLAGS.gcc+= -Wno-redundant-decls -Wno-unused-but-set-variable
 CFLAGS.dcn_calcs.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_auto.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_math.c= -msse -mstack-alignment=4 -Wno-tautological-compare
+CFLAGS.dcn20_resource.c= -msse -mstack-alignment=4
 
 CFLAGS.display_mode_lib.c= -msse -mstack-alignment=4
+CFLAGS.display_mode_vba.c= -msse -mstack-alignment=4
+CFLAGS.display_mode_vba_20.c= -msse -mstack-alignment=4
 CFLAGS.display_pipe_clocks.c= -msse -mstack-alignment=4
 CFLAGS.dml1_display_rq_dlg_calc.c= -msse -mstack-alignment=4
 CFLAGS.display_rq_dlg_helpers.c= -msse -mstack-alignment=4
+CFLAGS.display_rq_dlg_calc_20.c= -msse -mstack-alignment=4
 CFLAGS.soc_bounding_box.c= -msse -mstack-alignment=4
 CFLAGS.dml_common_defs.c= -msse -mstack-alignment=4
 
@@ -628,6 +664,13 @@ CWARNFLAGS.dcn10_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_opp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_optc.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn10_resource.c=	-Wno-missing-prototypes	-Wno-initializer-overrides -Wno-unused-variable
+CWARNFLAGS.dcn20_dpp.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn20_dwb_scl.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn20_hwseq.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn20_mpc.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn20_optc.c=	-Wno-missing-prototypes
+CWARNFLAGS.dcn20_resource.c=	-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
+CWARNFLAGS.dcn20_clk_mgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn_calcs.c=		 -Wno-missing-prototypes -Wno-unused-variable
 CWARNFLAGS.dcn_calc_auto.c=	 -Wno-parentheses-equality
 CWARNFLAGS.eventtasks.c=	-Wno-missing-prototypes
@@ -656,6 +699,7 @@ CWARNFLAGS.i2caux_dce120.c=	-Wno-missing-prototypes
 CWARNFLAGS.i2caux_dcn10.c=	-Wno-missing-prototypes
 CWARNFLAGS.irq_service.c=	-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn10.c=	-Wno-missing-prototypes
+CWARNFLAGS.irq_service_dcn20.c=	-Wno-missing-prototypes
 CWARNFLAGS.iceland_hwmgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.iceland_smumgr.c=	-Wno-missing-prototypes
 CWARNFLAGS.iceland_thermal.c=	-Wno-missing-prototypes
