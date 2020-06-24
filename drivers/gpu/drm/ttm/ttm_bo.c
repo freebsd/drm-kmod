@@ -86,10 +86,8 @@ static void ttm_mem_type_debug(struct ttm_bo_device *bdev, struct drm_printer *p
 	drm_printf(p, "    use_type: %d\n", man->use_type);
 	drm_printf(p, "    flags: 0x%08X\n", man->flags);
 #ifdef __linux__
-	drm_printf(p, "    gpu_offset: 0x%08llX\n", man->gpu_offset);
 	drm_printf(p, "    size: %llu\n", man->size);
 #elif defined(__FreeBSD__)
-	drm_printf(p, "    gpu_offset: 0x%08zX\n", man->gpu_offset);
 	drm_printf(p, "    size: %zu\n", man->size);
 #endif
 	drm_printf(p, "    available_caching: 0x%08X\n", man->available_caching);
@@ -347,12 +345,6 @@ static int ttm_bo_handle_move_mem(struct ttm_buffer_object *bo,
 
 moved:
 	bo->evicted = false;
-
-	if (bo->mem.mm_node)
-		bo->offset = (bo->mem.start << PAGE_SHIFT) +
-		    bdev->man[bo->mem.mem_type].gpu_offset;
-	else
-		bo->offset = 0;
 
 	ctx->bytes_moved += bo->num_pages << PAGE_SHIFT;
 	return 0;
