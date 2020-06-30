@@ -1916,8 +1916,6 @@ static int psp_hw_fini(void *handle)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct psp_context *psp = &adev->psp;
-	void *tmr_buf;
-	void **pptr;
 	int ret;
 
 	if (psp->adev->psp.ta_fw) {
@@ -1985,6 +1983,12 @@ static int psp_suspend(void *handle)
 	ret = psp_asd_unload(psp);
 	if (ret) {
 		DRM_ERROR("Failed to unload asd\n");
+		return ret;
+	}
+
+	ret = psp_tmr_terminate(psp);
+	if (ret) {
+		DRM_ERROR("Falied to terminate tmr\n");
 		return ret;
 	}
 
