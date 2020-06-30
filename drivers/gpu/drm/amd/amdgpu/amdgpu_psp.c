@@ -1988,12 +1988,6 @@ static int psp_suspend(void *handle)
 		return ret;
 	}
 
-	ret = psp_tmr_terminate(psp);
-	if (ret) {
-		DRM_ERROR("Falied to terminate tmr\n");
-		return ret;
-	}
-
 	ret = psp_ring_stop(psp, PSP_RING_TYPE__KM);
 	if (ret) {
 		DRM_ERROR("PSP ring stop failed\n");
