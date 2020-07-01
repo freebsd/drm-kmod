@@ -230,6 +230,7 @@ struct amdgpu_ring {
 	struct amdgpu_bo	*ring_obj;
 	volatile uint32_t	*ring;
 	unsigned		rptr_offs;
+	u64			rptr_gpu_addr;
 	u64			wptr;
 	u64			wptr_old;
 	unsigned		ring_size;
@@ -250,6 +251,7 @@ struct amdgpu_ring {
 	bool			use_doorbell;
 	bool			use_pollmem;
 	unsigned		wptr_offs;
+	u64			wptr_gpu_addr;
 	unsigned		fence_offs;
 	uint64_t		current_ctx;
 	char			name[16];
@@ -368,6 +370,8 @@ int amdgpu_ring_test_helper(struct amdgpu_ring *ring);
 
 void amdgpu_debugfs_ring_init(struct amdgpu_device *adev,
 			      struct amdgpu_ring *ring);
+
+int amdgpu_ring_init_mqd(struct amdgpu_ring *ring);
 
 static inline u32 amdgpu_ib_get_value(struct amdgpu_ib *ib, int idx)
 {
