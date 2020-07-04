@@ -2035,6 +2035,7 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 	if (!pipes)
 		return false;
 
+	kernel_fpu_begin();
 	for (i = 0; i < dc->res_pool->pipe_count; i++) {
 		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
 		struct pipe_ctx *hsplit_pipe = pipe->bottom_pipe;
@@ -2397,6 +2398,7 @@ validate_fail:
 	out = false;
 
 validate_out:
+	kernel_fpu_end();
 	kfree(pipes);
 
 	BW_VAL_TRACE_FINISH();
@@ -3017,6 +3019,7 @@ static bool construct(
 
 			ranges.num_reader_wm_sets = 1;
 		} else if (dcn2_0_soc.num_states > 1) {
+			kernel_fpu_begin();
 			for (i = 0; i < 4 && i < dcn2_0_soc.num_states; i++) {
 				ranges.reader_wm_sets[i].wm_inst = i;
 				ranges.reader_wm_sets[i].min_drain_clk_mhz = PP_SMU_WM_SET_RANGE_CLK_UNCONSTRAINED_MIN;
@@ -3026,7 +3029,7 @@ static bool construct(
 
 				ranges.num_reader_wm_sets = i + 1;
 			}
-
+			kernel_fpu_end();
 			ranges.reader_wm_sets[0].min_fill_clk_mhz = PP_SMU_WM_SET_RANGE_CLK_UNCONSTRAINED_MIN;
 			ranges.reader_wm_sets[ranges.num_reader_wm_sets - 1].max_fill_clk_mhz = PP_SMU_WM_SET_RANGE_CLK_UNCONSTRAINED_MAX;
 		}
