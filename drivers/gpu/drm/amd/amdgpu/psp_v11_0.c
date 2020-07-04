@@ -299,7 +299,7 @@ static int psp_v11_0_bootloader_load_sos(struct psp_context *psp)
 	       psp_gfxdrv_command_reg);
 
 	/* there might be handshake issue with hardware which needs delay */
-	mdelay(20);
+	mdelay(200);
 	ret = psp_wait_for(psp, SOC15_REG_OFFSET(MP0, 0, mmMP0_SMN_C2PMSG_81),
 			   RREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_81),
 			   0, true);
