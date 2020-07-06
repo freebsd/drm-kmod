@@ -588,6 +588,7 @@ SRCS+=	amd_powerplay.c \
 	smu9_smumgr.c \
 	smu10_hwmgr.c \
 	smu10_smumgr.c \
+	smu_cmn.c \
 	smu_v11_0.c \
 	smu_v11_0_i2c.c \
 	smu_v12_0.c \
