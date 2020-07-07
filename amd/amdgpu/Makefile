@@ -841,6 +841,7 @@ CWARNFLAGS.smu7_hwmgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu8_hwmgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu9_smumgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu10_hwmgr.c=		-Wno-missing-prototypes -Wno-initializer-overrides
+CWARNFLAGS.smu_cmn.c=			-Wno-implicit-function-declaration
 CWARNFLAGS.smu_v11_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.tonga_smumgr.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.vega10_hwmgr.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
