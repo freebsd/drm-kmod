@@ -827,7 +827,7 @@ CWARNFLAGS.dmub_srv.c=			-Wno-unused-but-set-variable
 
 # powerplay/*
 CWARNFLAGS.arcturus_ppt.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-sometimes-uninitialized
-CWARNFLAGS.amdgpu_smu.c=		-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_smu.c=		-Wno-missing-prototypes -Wno-implicit-function-declaration
 CWARNFLAGS.ci_smumgr.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.hardwaremanager.c=		-Wno-missing-prototypes
 CWARNFLAGS.pp_psm.c=			-Wno-unused-but-set-variable
