@@ -2548,16 +2548,11 @@ int i915_gem_object_unbind(struct drm_i915_gem_object *obj);
 
 void i915_gem_runtime_suspend(struct drm_i915_private *dev_priv);
 
-#ifdef __linux__
 static inline int __must_check
 i915_mutex_lock_interruptible(struct drm_device *dev)
 {
 	return mutex_lock_interruptible(&dev->struct_mutex);
 }
-#elif defined(__FreeBSD__)
-/* We still need the old func (manu 20200602) */
-int __must_check i915_mutex_lock_interruptible(struct drm_device *dev);
-#endif
 
 int i915_gem_dumb_create(struct drm_file *file_priv,
 			 struct drm_device *dev,
@@ -2572,13 +2567,6 @@ void i915_gem_track_fb(struct drm_i915_gem_object *old,
 
 int __must_check i915_gem_set_global_seqno(struct drm_device *dev, u32 seqno);
 
-#ifdef __FreeBSD__
-/* We still need the old reset (manu 20200602) */
-static inline bool i915_reset_backoff(struct i915_gpu_error *error)
-{
-       return unlikely(test_bit(I915_RESET_BACKOFF, &error->flags));
-}
-#endif
 static inline bool __i915_wedged(struct i915_gpu_error *error)
 {
 	return unlikely(test_bit(I915_WEDGED, &error->flags));

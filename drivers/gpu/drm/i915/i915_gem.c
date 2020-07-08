@@ -80,47 +80,6 @@ remove_mappable_node(struct drm_mm_node *node)
 	drm_mm_remove_node(node);
 }
 
-static int
-i915_gem_wait_for_error(struct i915_gpu_error *error)
-{
-	int ret;
-
-	might_sleep();
-
-	/*
-	 * Only wait 10 seconds for the gpu reset to complete to avoid hanging
-	 * userspace. If it takes that long something really bad is going on and
-	 * we should simply try to bail out and fail as gracefully as possible.
-	 */
-	ret = wait_event_interruptible_timeout(error->reset_queue,
-					       !i915_reset_backoff(error),
-					       I915_RESET_TIMEOUT);
-	if (ret == 0) {
-		DRM_ERROR("Timed out waiting for the gpu reset to complete\n");
-		return -EIO;
-	} else if (ret < 0) {
-		return ret;
-	} else {
-		return 0;
-	}
-}
-
-int i915_mutex_lock_interruptible(struct drm_device *dev)
-{
-	struct drm_i915_private *dev_priv = to_i915(dev);
-	int ret;
-
-	ret = i915_gem_wait_for_error(&dev_priv->gpu_error);
-	if (ret)
-		return ret;
-
-	ret = mutex_lock_interruptible(&dev->struct_mutex);
-	if (ret)
-		return ret;
-
-	return 0;
-}
-
 int
 i915_gem_get_aperture_ioctl(struct drm_device *dev, void *data,
 			    struct drm_file *file)
