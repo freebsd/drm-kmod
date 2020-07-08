@@ -205,7 +205,8 @@ SRCS+=	debugfs_engines.c \
 	debugfs_gt_pm.c \
 	intel_guc_debugfs.c \
 	intel_guc_log_debugfs.c \
-	intel_uc_debugfs.c
+	intel_uc_debugfs.c \
+	intel_sseu_debugfs.c
 .endif
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
