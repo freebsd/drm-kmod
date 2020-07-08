@@ -268,7 +268,7 @@ void dma_fence_release(struct kref *kref)
 #elif defined(__FreeBSD__)
 		/* unsigned long vs unsigned long long (manu 20200525) */
 	if (WARN(!list_empty(&fence->cb_list),
-		 "Fence %s:%s:%lx:%lx released with pending signals!\n",
+		 "Fence %s:%s:%jx:%jx released with pending signals!\n",
 		 fence->ops->get_driver_name(fence),
 		 fence->ops->get_timeline_name(fence),
 		 fence->context, fence->seqno)) {
