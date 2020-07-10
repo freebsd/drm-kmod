@@ -18,6 +18,7 @@
 
 #ifdef __FreeBSD__
 #include <linux/lockdep.h>	/* For lockdep_assert_held* */
+#include <linux/overflow.h>	/* For array_size */
 #endif
 
 #define drm_for_each_lessee(lessee, lessor) \

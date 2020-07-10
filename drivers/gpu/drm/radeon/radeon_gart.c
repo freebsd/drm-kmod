@@ -28,6 +28,10 @@
 
 #include <linux/vmalloc.h>
 
+#ifdef __FreeBSD__
+#include <linux/overflow.h>	/* For array_size */
+#endif
+
 #include <drm/drm_pci.h>
 #include <drm/radeon_drm.h>
 #ifdef CONFIG_X86
