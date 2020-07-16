@@ -7194,6 +7194,10 @@ static void cfl_init_clock_gating(struct drm_i915_private *dev_priv)
 	cnp_init_clock_gating(dev_priv);
 	gen9_init_clock_gating(dev_priv);
 
+	/* WAC6entrylatency:cfl */
+	I915_WRITE(FBC_LLC_READ_CTRL, I915_READ(FBC_LLC_READ_CTRL) |
+		   FBC_LLC_FULLY_OPEN);
+
 	/*
 	 * WaFbcTurnOffFbcWatermark:cfl
 	 * Display WA #0562: cfl
@@ -7212,6 +7216,10 @@ static void cfl_init_clock_gating(struct drm_i915_private *dev_priv)
 static void kbl_init_clock_gating(struct drm_i915_private *dev_priv)
 {
 	gen9_init_clock_gating(dev_priv);
+
+	/* WAC6entrylatency:kbl */
+	I915_WRITE(FBC_LLC_READ_CTRL, I915_READ(FBC_LLC_READ_CTRL) |
+		   FBC_LLC_FULLY_OPEN);
 
 	/* WaDisableSDEUnitClockGating:kbl */
 	if (IS_KBL_GT_REVID(dev_priv, 0, KBL_REVID_B0))
