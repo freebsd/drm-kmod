@@ -2292,6 +2292,19 @@ int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
 		fbi->fbdefio = &drm_fbdev_defio;
 
 		fb_deferred_io_init(fbi);
+	} else {
+		/* buffer is mapped for HW framebuffer */
+		vaddr = drm_client_buffer_vmap(fb_helper->buffer);
+		if (IS_ERR(vaddr))
+			return PTR_ERR(vaddr);
+
+		fbi->screen_buffer = vaddr;
+		/* Shamelessly leak the physical address to user-space */
+#if IS_ENABLED(CONFIG_DRM_FBDEV_LEAK_PHYS_SMEM)
+		if (drm_leak_fbdev_smem && fbi->fix.smem_start == 0)
+			fbi->fix.smem_start =
+				page_to_phys(virt_to_page(fbi->screen_buffer));
+#endif
 #endif
 	}
 
