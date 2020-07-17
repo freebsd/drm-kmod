@@ -26,6 +26,7 @@
 #include <linux/prefetch.h>
 #include <linux/dma-fence-array.h>
 #include <linux/irq_work.h>
+#include <linux/prefetch.h>
 #include <linux/sched.h>
 #include <linux/sched/clock.h>
 #include <linux/sched/signal.h>
