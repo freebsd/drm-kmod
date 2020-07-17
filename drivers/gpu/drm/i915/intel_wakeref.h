@@ -13,10 +13,6 @@
 #include <linux/stackdepot.h>
 #include <linux/timer.h>
 
-#ifdef __FreeBSD__
-#include <linux/lockdep.h>	/* For struct lock_class_key */
-#endif
-
 struct intel_runtime_pm;
 
 typedef depot_stack_handle_t intel_wakeref_t;
