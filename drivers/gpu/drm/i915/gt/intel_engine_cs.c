@@ -1400,7 +1400,7 @@ static void intel_engine_print_registers(struct intel_engine_cs *engine,
 
 #ifdef __linux__
 		/* BSDFIXME: We don't have a tasklet.state or tasklet.count */
-		drm_printf(m, "\tExeclist CSB read %d, write %d [mmio:%d], tasklet queued? %s (%s)\n",
+		drm_printf(m, "\tExeclist CSB read %d, write %d, tasklet queued? %s (%s)\n",
 			   read, write,
 			   yesno(test_bit(TASKLET_STATE_SCHED,
 					  &engine->execlists.tasklet.state)),
