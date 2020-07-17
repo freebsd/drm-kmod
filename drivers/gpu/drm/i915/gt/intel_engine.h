@@ -9,11 +9,6 @@
 #include <linux/random.h>
 #include <linux/seqlock.h>
 
-#ifdef __FreeBSD__
-/* For tasklet_struct */
-#include <linux/interrupt.h>
-#endif
-
 #include "i915_gem_batch_pool.h"
 #include "i915_pmu.h"
 #include "i915_reg.h"
