@@ -40,10 +40,6 @@
 #include "intel_reset.h"
 #include "intel_workarounds.h"
 
-#ifdef __FreeBSD__
-#include <linux/sizes.h>	/* Needed for SZ_* */
-#endif
-
 /* Rough estimate of the typical request size, performing a flush,
  * set-context and then emitting the batch.
  */

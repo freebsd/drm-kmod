@@ -59,10 +59,6 @@
 #include "intel_drv.h"
 #include "intel_pm.h"
 
-#ifdef __FreeBSD__
-#include <linux/sizes.h>	/* Needed for SZ_1M */
-#endif
-
 static int
 insert_mappable_node(struct i915_ggtt *ggtt,
                      struct drm_mm_node *node, u32 size)

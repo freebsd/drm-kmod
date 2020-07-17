@@ -27,10 +27,6 @@
 #include "intel_guc_submission.h"
 #include "i915_drv.h"
 
-#ifdef __FreeBSD__
-#include <linux/sizes.h>	/* Needed for SZ_* */
-#endif
-
 static void gen8_guc_raise_irq(struct intel_guc *guc)
 {
 	struct drm_i915_private *dev_priv = guc_to_i915(guc);

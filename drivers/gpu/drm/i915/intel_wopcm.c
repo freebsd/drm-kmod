@@ -7,10 +7,6 @@
 #include "intel_wopcm.h"
 #include "i915_drv.h"
 
-#ifdef __FreeBSD__
-#include <linux/sizes.h>	/* For SZ_* */
-#endif
-
 /**
  * DOC: WOPCM Layout
  *

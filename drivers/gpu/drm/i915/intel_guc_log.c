@@ -28,7 +28,6 @@
 #include "i915_drv.h"
 
 #ifdef __FreeBSD__
-#include <linux/sizes.h>	/* Needed for SZ_* */
 bool intel_guc_log_relay_enabled(const struct intel_guc_log *log);
 #endif
 
