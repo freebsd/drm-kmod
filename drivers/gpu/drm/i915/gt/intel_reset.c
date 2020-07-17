@@ -1082,9 +1082,7 @@ taint:
 	 * rather than continue on into oblivion. For everyone else,
 	 * the system should still plod along, but they have been warned!
 	 */
-#ifdef __linux__
 	add_taint_for_CI(TAINT_WARN);
-#endif
 error:
 	__i915_gem_set_wedged(i915);
 	goto finish;

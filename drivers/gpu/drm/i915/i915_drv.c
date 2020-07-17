@@ -145,9 +145,7 @@ __i915_printk(struct drm_i915_private *dev_priv, const char *level,
 		 * if they may have caused the bug by fiddling with unsafe
 		 * module parameters.
 		 */
-#ifdef __linux__
 		if (!test_taint(TAINT_USER))
-#endif
 			dev_notice(kdev, "%s", FDO_BUG_MSG);
 		shown_bug_once = true;
 	}
@@ -920,9 +918,7 @@ static void intel_detect_preproduction_hw(struct drm_i915_private *dev_priv)
 	if (pre) {
 		DRM_ERROR("This is a pre-production stepping. "
 			  "It may not be fully functional.\n");
-#ifdef __linux__
 		add_taint(TAINT_MACHINE_CHECK, LOCKDEP_STILL_OK);
-#endif
 	}
 }
 
