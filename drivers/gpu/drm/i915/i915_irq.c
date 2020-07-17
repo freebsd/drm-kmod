@@ -49,8 +49,6 @@
 #include "intel_pm.h"
 
 #ifdef __FreeBSD__
-// drm/drm_os_freebsd.c:
-extern int drm_panic_on_error;
 #undef BUILD_BUG_ON
 #define	BUILD_BUG_ON(x)
 #endif
