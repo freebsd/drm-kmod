@@ -3064,11 +3064,7 @@ gen11_gt_engine_identity(struct drm_i915_private * const i915,
 	do {
 		ident = raw_reg_read(regs, GEN11_INTR_IDENTITY_REG(bank));
 	} while (!(ident & GEN11_INTR_DATA_VALID) &&
-#ifdef __linux__
 		 !time_after32(local_clock() >> 10, timeout_ts));
-#elif defined(__FreeBSD__)
-		 !time_after(local_clock() >> 10, timeout_ts));
-#endif
 
 	if (unlikely(!(ident & GEN11_INTR_DATA_VALID))) {
 		DRM_ERROR("INTR_IDENTITY_REG%u:%u 0x%08x not valid!\n",
