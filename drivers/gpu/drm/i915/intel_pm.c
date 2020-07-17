@@ -41,7 +41,6 @@
 #include "i915_irq.h"
 #include "intel_drv.h"
 #include "intel_pm.h"
-#include "intel_sprite.h"
 
 #ifdef __FreeBSD__
 #include <machine/clock.h>
