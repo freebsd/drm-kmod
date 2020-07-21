@@ -84,8 +84,8 @@ static void ttm_mem_type_debug(struct ttm_bo_device *bdev, struct drm_printer *p
 
 	drm_printf(p, "    has_type: %d\n", man->has_type);
 	drm_printf(p, "    use_type: %d\n", man->use_type);
-	drm_printf(p, "    flags: 0x%08X\n", man->flags);
 #ifdef __linux__
+	drm_printf(p, "    use_tt: %d\n", man->use_tt);
 	drm_printf(p, "    size: %llu\n", man->size);
 #elif defined(__FreeBSD__)
 	drm_printf(p, "    size: %zu\n", man->size);
@@ -163,7 +163,7 @@ static void ttm_bo_add_mem_to_lru(struct ttm_buffer_object *bo,
 	man = &bdev->man[mem->mem_type];
 	list_add_tail(&bo->lru, &man->lru[bo->priority]);
 
-	if (!(man->flags & TTM_MEMTYPE_FLAG_FIXED) && bo->ttm &&
+	if (man->use_tt && bo->ttm &&
 	    !(bo->ttm->page_flags & (TTM_PAGE_FLAG_SG |
 				     TTM_PAGE_FLAG_SWAPPED))) {
 		list_add_tail(&bo->swap, &ttm_bo_glob.swap_lru[bo->priority]);
@@ -290,13 +290,13 @@ static int ttm_bo_handle_move_mem(struct ttm_buffer_object *bo,
 	 * Create and bind a ttm if required.
 	 */
 
-	if (!(new_man->flags & TTM_MEMTYPE_FLAG_FIXED)) {
-		if (bo->ttm == NULL) {
-			bool zero = !(old_man->flags & TTM_MEMTYPE_FLAG_FIXED);
-			ret = ttm_tt_create(bo, zero);
-			if (ret)
-				goto out_err;
-		}
+	if (new_man->use_tt) {
+		/* Zero init the new TTM structure if the old location should
+		 * have used one as well.
+		 */
+		ret = ttm_tt_create(bo, old_man->use_tt);
+		if (ret)
+			goto out_err;
 
 		ret = ttm_tt_set_placement_caching(bo->ttm, mem->placement);
 		if (ret)
@@ -319,8 +319,7 @@ static int ttm_bo_handle_move_mem(struct ttm_buffer_object *bo,
 	if (bdev->driver->move_notify)
 		bdev->driver->move_notify(bo, evict, mem);
 
-	if (!(old_man->flags & TTM_MEMTYPE_FLAG_FIXED) &&
-	    !(new_man->flags & TTM_MEMTYPE_FLAG_FIXED))
+	if (old_man->use_tt && new_man->use_tt)
 		ret = ttm_bo_move_ttm(bo, ctx, mem);
 	else if (bdev->driver->move)
 		ret = bdev->driver->move(bo, evict, ctx, mem);
@@ -345,7 +344,7 @@ moved:
 
 out_err:
 	new_man = &bdev->man[bo->mem.mem_type];
-	if (new_man->flags & TTM_MEMTYPE_FLAG_FIXED) {
+	if (!new_man->use_tt) {
 		ttm_tt_destroy(bo->ttm);
 		bo->ttm = NULL;
 	}
@@ -1697,6 +1696,7 @@ int ttm_bo_device_init(struct ttm_bo_device *bdev,
 	 * Initialize the system memory buffer type.
 	 * Other types need to be driver / IOCTL initialized.
 	 */
+	bdev->man[TTM_PL_SYSTEM].use_tt = true;
 	bdev->man[TTM_PL_SYSTEM].available_caching = TTM_PL_MASK_CACHING;
 	bdev->man[TTM_PL_SYSTEM].default_caching = TTM_PL_FLAG_CACHED;
 	ret = ttm_bo_init_mm(bdev, TTM_PL_SYSTEM, 0);
