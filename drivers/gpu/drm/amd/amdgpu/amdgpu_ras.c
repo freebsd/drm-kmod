@@ -1849,6 +1849,7 @@ int amdgpu_ras_recovery_init(struct amdgpu_device *adev)
 #ifdef __linux__
 	uint32_t max_eeprom_records_len = 0;
 #endif
+	bool exc_err_limit = false;
 	int ret;
 
 	if (con)
@@ -1872,8 +1873,12 @@ int amdgpu_ras_recovery_init(struct amdgpu_device *adev)
 	amdgpu_ras_validate_threshold(adev, max_eeprom_records_len);
 #endif
 
-	ret = amdgpu_ras_eeprom_init(&con->eeprom_control);
-	if (ret)
+	ret = amdgpu_ras_eeprom_init(&con->eeprom_control, &exc_err_limit);
+	/*
+	 * This calling fails when exc_err_limit is true or
+	 * ret != 0.
+	 */
+	if (exc_err_limit || ret)
 		goto free;
 
 	if (con->eeprom_control.num_recs) {
@@ -1896,6 +1901,15 @@ free:
 	con->eh_data = NULL;
 out:
 	dev_warn(adev->dev, "Failed to initialize ras recovery!\n");
+
+	/*
+	 * Except error threshold exceeding case, other failure cases in this
+	 * function would not fail amdgpu driver init.
+	 */
+	if (!exc_err_limit)
+		ret = 0;
+	else
+		ret = -EINVAL;
 
 	return ret;
 }
