@@ -169,7 +169,11 @@ int drm_vram_mm_init(struct drm_vram_mm *vmm, struct drm_device *dev,
 	vmm->funcs = funcs;
 
 	ret = ttm_bo_device_init(&vmm->bdev, &bo_driver,
+#ifdef __linux__
 				 dev->anon_inode->i_mapping,
+#elif defined(__FreeBSD__)
+				 NULL,
+#endif
 				 true);
 	if (ret)
 		return ret;
