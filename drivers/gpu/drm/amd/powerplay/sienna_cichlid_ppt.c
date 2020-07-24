@@ -73,6 +73,8 @@
 
 #define SMU_11_0_7_GFX_BUSY_THRESHOLD 15
 
+#define SMU_11_0_7_GFX_BUSY_THRESHOLD 15
+
 static struct cmn2asic_msg_mapping sienna_cichlid_message_map[SMU_MSG_MAX_COUNT] = {
 	MSG_MAP(TestMessage,			PPSMC_MSG_TestMessage,                 1),
 	MSG_MAP(GetSmuVersion,			PPSMC_MSG_GetSmuVersion,               1),
