@@ -40,6 +40,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dce80 \
 	${SRCDIR}/display/dc/dcn10 \
 	${SRCDIR}/display/dc/dcn20 \
+	${SRCDIR}/display/dc/dsc \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
 	${SRCDIR}/display/dc/gpio/dce110 \
@@ -382,6 +383,10 @@ SRCS+=	dc_vm_helper.c
 
 # display/dc/clk_mgr
 SRCS+=	dcn20_clk_mgr.c
+
+# display/dc/dsc
+SRCS+=	rc_calc.c \
+	rc_calc_dpi.c
 
 .endif
 
@@ -738,6 +743,7 @@ CWARNFLAGS.processpptables.c=	-Wno-missing-prototypes -Wno-sometimes-uninitializ
 CWARNFLAGS.process_pptables_v1_0.c=	-Wno-missing-prototypes
 CWARNFLAGS.psp_v3_1.c=
 CWARNFLAGS.psp_v10_0.c=
+CWARNFLAGS.rc_calc.c=		-Wno-missing-prototypes
 CWARNFLAGS.sdma_v3_0.c=		-Wno-missing-prototypes
 CWARNFLAGS.sdma_v4_0.c=		-Wno-missing-prototypes  -Wno-sometimes-uninitialized
 CWARNFLAGS.si.c=		-Wno-missing-prototypes
