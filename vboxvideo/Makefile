@@ -2,7 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/vboxvideo
 
-.PATH:	${SRCDIR}
+.PATH:	${SRCDIR} ${SRCDIR}/../
 
 .include "../kconfig.mk"
 
@@ -18,7 +18,9 @@ SRCS= 	\
 	vbox_mode.c \
 	vbox_prime.c \
 	vbox_ttm.c \
-	vbva_base.c
+	vbva_base.c \
+	drm_gem_vram_helper.c \
+	drm_vram_mm_helper.c
 
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
