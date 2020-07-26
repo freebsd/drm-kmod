@@ -44,12 +44,8 @@
 #include <linux/slab.h>
 #include <linux/seqlock.h>
 #include <linux/rcupdate.h>
-#include <linux/atomic.h>
-#include <linux/radix-tree.h>
 
 extern struct ww_class reservation_ww_class;
-extern struct lock_class_key reservation_seqcount_class;
-extern const char reservation_seqcount_string[];
 
 /**
  * struct reservation_object_list - a list of shared fences
@@ -84,6 +80,25 @@ struct reservation_object {
 	lockdep_assert_held(&(obj)->lock.base)
 
 /**
+ * reservation_object_get_excl - get the reservation object's
+ * exclusive fence, with update-side lock held
+ * @obj: the reservation object
+ *
+ * Returns the exclusive fence (if any).  Does NOT take a
+ * reference. Writers must hold obj->lock, readers may only
+ * hold a RCU read side lock.
+ *
+ * RETURNS
+ * The exclusive fence or NULL
+ */
+static inline struct dma_fence *
+reservation_object_get_excl(struct reservation_object *obj)
+{
+	return rcu_dereference_protected(obj->fence_excl,
+					 reservation_object_held(obj));
+}
+
+/**
  * reservation_object_get_list - get the reservation object's
  * shared fence list, with update-side lock held
  * @obj: the reservation object
@@ -96,6 +111,55 @@ reservation_object_get_list(struct reservation_object *obj)
 {
 	return rcu_dereference_protected(obj->fence,
 					 reservation_object_held(obj));
+}
+
+/**
+ * reservation_object_fences - read consistent fence pointers
+ * @obj: reservation object where we get the fences from
+ * @excl: pointer for the exclusive fence
+ * @list: pointer for the shared fence list
+ *
+ * Make sure we have a consisten exclusive fence and shared fence list.
+ * Must be called with rcu read side lock held.
+ */
+static inline void
+reservation_object_fences(struct reservation_object *obj,
+			  struct dma_fence **excl,
+			  struct reservation_object_list **list,
+			  u32 *shared_count)
+{
+	do {
+		*excl = rcu_dereference(obj->fence_excl);
+		*list = rcu_dereference(obj->fence);
+		*shared_count = *list ? (*list)->shared_count : 0;
+		smp_rmb(); /* See reservation_object_add_excl_fence */
+	} while (rcu_access_pointer(obj->fence_excl) != *excl);
+}
+
+/**
+ * reservation_object_get_excl_rcu - get the reservation object's
+ * exclusive fence, without lock held.
+ * @obj: the reservation object
+ *
+ * If there is an exclusive fence, this atomically increments it's
+ * reference count and returns it.
+ *
+ * RETURNS
+ * The exclusive fence or NULL if none
+ */
+static inline struct dma_fence *
+reservation_object_get_excl_rcu(struct reservation_object *obj)
+{
+	struct dma_fence *fence;
+
+	if (!rcu_access_pointer(obj->fence_excl))
+		return NULL;
+
+	rcu_read_lock();
+	fence = dma_fence_get_rcu_safe(&obj->fence_excl);
+	rcu_read_unlock();
+
+	return fence;
 }
 
 /**
@@ -239,51 +303,6 @@ reservation_object_unlock(struct reservation_object *obj)
 	}
 #endif
 	ww_mutex_unlock(&obj->lock);
-}
-
-/**
- * reservation_object_get_excl - get the reservation object's
- * exclusive fence, with update-side lock held
- * @obj: the reservation object
- *
- * Returns the exclusive fence (if any).  Does NOT take a
- * reference. Writers must hold obj->lock, readers may only
- * hold a RCU read side lock.
- *
- * RETURNS
- * The exclusive fence or NULL
- */
-static inline struct dma_fence *
-reservation_object_get_excl(struct reservation_object *obj)
-{
-	return rcu_dereference_protected(obj->fence_excl,
-					 reservation_object_held(obj));
-}
-
-/**
- * reservation_object_get_excl_rcu - get the reservation object's
- * exclusive fence, without lock held.
- * @obj: the reservation object
- *
- * If there is an exclusive fence, this atomically increments it's
- * reference count and returns it.
- *
- * RETURNS
- * The exclusive fence or NULL if none
- */
-static inline struct dma_fence *
-reservation_object_get_excl_rcu(struct reservation_object *obj)
-{
-	struct dma_fence *fence;
-
-	if (!rcu_access_pointer(obj->fence_excl))
-		return NULL;
-
-	rcu_read_lock();
-	fence = dma_fence_get_rcu_safe(&obj->fence_excl);
-	rcu_read_unlock();
-
-	return fence;
 }
 
 void reservation_object_init(struct reservation_object *obj);
