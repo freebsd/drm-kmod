@@ -1,4 +1,4 @@
-.PATH:	${.CURDIR}/gplv2/src
+.PATH:	${.CURDIR}/gplv2/src ${.CURDIR:H}/drivers/dma-buf/
 
 .include "../kconfig.mk"
 
@@ -12,10 +12,6 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_compat.c		\
 	linux_component.c	\
 	linux_device.c		\
-	linux_dmabuf.c		\
-	linux_dmafence.c	\
-	linux_dma-fence-array.c	\
-	linux_dma-fence-chain.c	\
 	linux_dmi.c		\
 	linux_firmware.c	\
 	linux_fs.c		\
@@ -30,10 +26,14 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_page.c		\
 	linux_rbtree.c		\
 	linux_relay.c		\
-	linux_reservation.c	\
 	linux_sort.c		\
 	linux_sync_file.c
 
+SRCS+=	dma-buf.c \
+	dma-fence-array.c \
+	dma-fence-chain.c \
+	dma-fence.c \
+	reservation.c
 
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
 SRCS+=	linux_acpi.c	\
