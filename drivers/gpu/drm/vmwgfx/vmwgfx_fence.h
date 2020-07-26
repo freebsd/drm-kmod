@@ -32,11 +32,8 @@
 
 #define VMW_FENCE_WAIT_TIMEOUT (5*HZ)
 
-struct drm_device;
-struct drm_file;
-struct drm_pending_event;
-
 struct vmw_private;
+
 struct vmw_fence_manager;
 
 /**
