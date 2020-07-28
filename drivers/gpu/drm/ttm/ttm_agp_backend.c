@@ -108,22 +108,25 @@ static int ttm_agp_bind(struct ttm_tt *ttm, struct ttm_mem_reg *bo_mem)
 	return ret;
 }
 
-static int ttm_agp_unbind(struct ttm_tt *ttm)
+static void ttm_agp_unbind(struct ttm_tt *ttm)
 {
 	struct ttm_agp_backend *agp_be = container_of(ttm, struct ttm_agp_backend, ttm);
 
 #ifdef __linux__
 	if (agp_be->mem) {
-		if (agp_be->mem->is_bound)
-			return agp_unbind_memory(agp_be->mem);
+		if (agp_be->mem->is_bound) {
+			agp_unbind_memory(agp_be->mem);
+			return;
+		}
 		agp_free_memory(agp_be->mem);
 		agp_be->mem = NULL;
 	}
-	return 0;
 #elif defined(__FreeBSD__)
-	return -agp_unbind_pages(agp_be->bridge, ttm->num_pages << PAGE_SHIFT,
+	agp_unbind_pages(agp_be->bridge, ttm->num_pages << PAGE_SHIFT,
 	    agp_be->offset);
 #endif
+=======
+>>>>>>> drm/ttm: make ttm_tt unbind function return void.
 }
 
 static void ttm_agp_destroy(struct ttm_tt *ttm)
