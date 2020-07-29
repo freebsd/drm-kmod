@@ -83,8 +83,6 @@ int i915_ggtt_init_hw(struct drm_i915_private *i915)
 {
 	int ret;
 
-	stash_init(&i915->mm.wc_stash);
-
 	/*
 	 * Note that we use page colouring to enforce a guard page at the
 	 * end of the address space. This is required as the CS may prefetch
@@ -237,7 +235,7 @@ static void gen8_ggtt_insert_entries(struct i915_address_space *vm,
 
 	/* Fill the allocated but "unused" space beyond the end of the buffer */
 	while (gte < end)
-		gen8_set_pte(gte++, vm->scratch[0].encode);
+		gen8_set_pte(gte++, vm->scratch[0]->encode);
 
 	/*
 	 * We want to flush the TLBs only after we're certain all the PTE
@@ -288,7 +286,7 @@ static void gen6_ggtt_insert_entries(struct i915_address_space *vm,
 
 	/* Fill the allocated but "unused" space beyond the end of the buffer */
 	while (gte < end)
-		iowrite32(vm->scratch[0].encode, gte++);
+		iowrite32(vm->scratch[0]->encode, gte++);
 
 	/*
 	 * We want to flush the TLBs only after we're certain all the PTE
@@ -308,7 +306,7 @@ static void gen8_ggtt_clear_range(struct i915_address_space *vm,
 	struct i915_ggtt *ggtt = i915_vm_to_ggtt(vm);
 	unsigned int first_entry = start / I915_GTT_PAGE_SIZE;
 	unsigned int num_entries = length / I915_GTT_PAGE_SIZE;
-	const gen8_pte_t scratch_pte = vm->scratch[0].encode;
+	const gen8_pte_t scratch_pte = vm->scratch[0]->encode;
 	gen8_pte_t __iomem *gtt_base =
 		(gen8_pte_t __iomem *)ggtt->gsm + first_entry;
 	const int max_entries = ggtt_total_entries(ggtt) - first_entry;
@@ -406,7 +404,7 @@ static void gen6_ggtt_clear_range(struct i915_address_space *vm,
 		 first_entry, num_entries, max_entries))
 		num_entries = max_entries;
 
-	scratch_pte = vm->scratch[0].encode;
+	scratch_pte = vm->scratch[0]->encode;
 	for (i = 0; i < num_entries; i++)
 		iowrite32(scratch_pte, &gtt_base[i]);
 }
@@ -627,6 +625,10 @@ static int init_aliasing_ppgtt(struct i915_ggtt *ggtt)
 	if (err)
 		goto err_ppgtt;
 
+	err = i915_vm_pin_pt_stash(&ppgtt->vm, &stash);
+	if (err)
+		goto err_stash;
+
 	/*
 	 * Note we only pre-allocate as far as the end of the global
 	 * GTT. On 48b / 4-level page-tables, the difference is very,
@@ -647,6 +649,8 @@ static int init_aliasing_ppgtt(struct i915_ggtt *ggtt)
 	i915_vm_free_pt_stash(&ppgtt->vm, &stash);
 	return 0;
 
+err_stash:
+	i915_vm_free_pt_stash(&ppgtt->vm, &stash);
 err_ppgtt:
 	i915_vm_put(&ppgtt->vm);
 	return err;
@@ -722,18 +726,11 @@ static void ggtt_cleanup_hw(struct i915_ggtt *ggtt)
 void i915_ggtt_driver_release(struct drm_i915_private *i915)
 {
 	struct i915_ggtt *ggtt = &i915->ggtt;
-	struct pagevec *pvec;
 
 	fini_aliasing_ppgtt(ggtt);
 
 	intel_ggtt_fini_fences(ggtt);
 	ggtt_cleanup_hw(ggtt);
-
-	pvec = &i915->mm.wc_stash.pvec;
-	if (pvec->nr) {
-		set_pages_array_wb(pvec->pages, pvec->nr);
-		__pagevec_release(pvec);
-	}
 }
 
 static unsigned int gen6_get_total_gtt_size(u16 snb_gmch_ctl)
@@ -796,7 +793,7 @@ static int ggtt_probe_common(struct i915_ggtt *ggtt, u64 size)
 		return -ENOMEM;
 	}
 
-	ret = setup_scratch_page(&ggtt->vm, GFP_DMA32);
+	ret = setup_scratch_page(&ggtt->vm);
 	if (ret) {
 		drm_err(&i915->drm, "Scratch setup failed\n");
 		/* iounmap will also get called at remove, but meh */
@@ -804,8 +801,8 @@ static int ggtt_probe_common(struct i915_ggtt *ggtt, u64 size)
 		return ret;
 	}
 
-	ggtt->vm.scratch[0].encode =
-		ggtt->vm.pte_encode(px_dma(&ggtt->vm.scratch[0]),
+	ggtt->vm.scratch[0]->encode =
+		ggtt->vm.pte_encode(px_dma(ggtt->vm.scratch[0]),
 				    I915_CACHE_NONE, 0);
 
 	return 0;
@@ -831,7 +828,7 @@ static void gen6_gmch_remove(struct i915_address_space *vm)
 	struct i915_ggtt *ggtt = i915_vm_to_ggtt(vm);
 
 	iounmap(ggtt->gsm);
-	cleanup_scratch_page(vm);
+	free_scratch(vm);
 }
 
 static struct resource pci_resource(struct pci_dev *pdev, int bar)
@@ -858,6 +855,8 @@ static int gen8_gmch_probe(struct i915_ggtt *ggtt)
 		size = chv_get_total_gtt_size(snb_gmch_ctl);
 	else
 		size = gen8_get_total_gtt_size(snb_gmch_ctl);
+
+	ggtt->vm.alloc_pt_dma = alloc_pt_dma;
 
 	ggtt->vm.total = (size / sizeof(gen8_pte_t)) * I915_GTT_PAGE_SIZE;
 	ggtt->vm.cleanup = gen6_gmch_remove;
@@ -1007,6 +1006,8 @@ static int gen6_gmch_probe(struct i915_ggtt *ggtt)
 	size = gen6_get_total_gtt_size(snb_gmch_ctl);
 	ggtt->vm.total = (size / sizeof(gen6_pte_t)) * I915_GTT_PAGE_SIZE;
 
+	ggtt->vm.alloc_pt_dma = alloc_pt_dma;
+
 	ggtt->vm.clear_range = nop_clear_range;
 	if (!HAS_FULL_PPGTT(i915) || intel_scanout_needs_vtd_wa(i915))
 		ggtt->vm.clear_range = gen6_ggtt_clear_range;
@@ -1065,6 +1066,8 @@ static int i915_gmch_probe(struct i915_ggtt *ggtt)
 
 	ggtt->gmadr =
 		(struct resource)DEFINE_RES_MEM(gmadr_base, ggtt->mappable_end);
+
+	ggtt->vm.alloc_pt_dma = alloc_pt_dma;
 
 	ggtt->do_idle_maps = needs_idle_maps(i915);
 	ggtt->vm.insert_page = i915_ggtt_insert_page;
