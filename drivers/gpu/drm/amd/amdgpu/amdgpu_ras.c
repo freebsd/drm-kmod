@@ -1035,6 +1035,35 @@ static ssize_t amdgpu_ras_sysfs_features_read(struct device *dev,
 	return scnprintf(buf, PAGE_SIZE, "feature mask: 0x%x\n", con->features);
 }
 
+static void amdgpu_ras_sysfs_add_bad_page_node(struct amdgpu_device *adev)
+{
+#ifdef __linux__
+	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
+	struct attribute_group group;
+	struct bin_attribute *bin_attrs[] = {
+		&con->badpages_attr,
+		NULL,
+	};
+
+	con->badpages_attr = (struct bin_attribute) {
+		.attr = {
+			.name = "gpu_vram_bad_pages",
+			.mode = S_IRUGO,
+		},
+		.size = 0,
+		.private = NULL,
+		.read = amdgpu_ras_sysfs_badpages_read,
+	};
+
+	group.name = RAS_FS_NAME;
+	group.bin_attrs = bin_attrs;
+
+	sysfs_bin_attr_init(bin_attrs[0]);
+
+	sysfs_update_group(&adev->dev->kobj, &group);
+#endif
+}
+
 static int amdgpu_ras_sysfs_create_feature_node(struct amdgpu_device *adev)
 {
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
@@ -1042,18 +1071,9 @@ static int amdgpu_ras_sysfs_create_feature_node(struct amdgpu_device *adev)
 		&con->features_attr.attr,
 		NULL
 	};
-#ifdef __linux__
-	struct bin_attribute *bin_attrs[] = {
-		&con->badpages_attr,
-		NULL
-	};
-#endif
 	struct attribute_group group = {
 		.name = RAS_FS_NAME,
 		.attrs = attrs,
-#ifdef __linux__
-		.bin_attrs = bin_attrs,
-#endif
 	};
 
 	con->features_attr = (struct device_attribute) {
@@ -1064,24 +1084,20 @@ static int amdgpu_ras_sysfs_create_feature_node(struct amdgpu_device *adev)
 			.show = amdgpu_ras_sysfs_features_read,
 	};
 
-#ifdef __linux__
-	con->badpages_attr = (struct bin_attribute) {
-		.attr = {
-			.name = "gpu_vram_bad_pages",
-			.mode = S_IRUGO,
-		},
-		.size = 0,
-		.private = NULL,
-		.read = amdgpu_ras_sysfs_badpages_read,
-	};
-#endif
-
 	sysfs_attr_init(attrs[0]);
-#ifdef __linux__
-	sysfs_bin_attr_init(bin_attrs[0]);
-#endif
 
 	return sysfs_create_group(&adev->dev->kobj, &group);
+}
+
+static void amdgpu_ras_sysfs_remove_bad_page_node(struct amdgpu_device *adev)
+{
+#ifdef __linux__
+	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
+
+	sysfs_remove_file_from_group(&adev->dev->kobj,
+				&con->badpages_attr.attr,
+				RAS_FS_NAME);
+#endif
 }
 
 static int amdgpu_ras_sysfs_remove_feature_node(struct amdgpu_device *adev)
@@ -1091,18 +1107,9 @@ static int amdgpu_ras_sysfs_remove_feature_node(struct amdgpu_device *adev)
 		&con->features_attr.attr,
 		NULL
 	};
-#ifdef __linux__
-	struct bin_attribute *bin_attrs[] = {
-		&con->badpages_attr,
-		NULL
-	};
-#endif
 	struct attribute_group group = {
 		.name = RAS_FS_NAME,
 		.attrs = attrs,
-#ifdef __linux__
-		.bin_attrs = bin_attrs,
-#endif
 	};
 
 	sysfs_remove_group(&adev->dev->kobj, &group);
@@ -1174,6 +1181,9 @@ static int amdgpu_ras_sysfs_remove_all(struct amdgpu_device *adev)
 	list_for_each_entry_safe(obj, tmp, &con->head, node) {
 		amdgpu_ras_sysfs_remove(adev, &obj->head);
 	}
+
+	if (amdgpu_bad_page_threshold != 0)
+		amdgpu_ras_sysfs_remove_bad_page_node(adev);
 
 	amdgpu_ras_sysfs_remove_feature_node(adev);
 
@@ -1301,6 +1311,9 @@ static void amdgpu_ras_debugfs_remove_all(struct amdgpu_device *adev)
 static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 {
 	amdgpu_ras_sysfs_create_feature_node(adev);
+
+	if (amdgpu_bad_page_threshold != 0)
+		amdgpu_ras_sysfs_add_bad_page_node(adev);
 
 	return 0;
 }
