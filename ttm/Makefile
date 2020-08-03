@@ -16,6 +16,7 @@ SRCS=	ttm_bo.c \
 	ttm_page_alloc.c \
 	ttm_page_alloc_dma.c \
 	ttm_range_manager.c \
+	ttm_resource.c \
 	ttm_tt.c
 
 .if !empty(KCONFIG:MAGP)
