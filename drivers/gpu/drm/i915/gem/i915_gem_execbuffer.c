@@ -26,6 +26,7 @@
 #include "i915_gem_ioctls.h"
 #include "i915_sw_fence_work.h"
 #include "i915_trace.h"
+#include "i915_user_extensions.h"
 
 #ifdef __FreeBSD__
 /* CEM: Make sure we got the Linux version */
@@ -295,6 +296,13 @@ struct i915_execbuffer {
 	int lut_size;
 	struct hlist_head *buckets; /** ht for relocation handles */
 	struct eb_vma_array *array;
+
+	struct i915_eb_fence {
+		struct drm_syncobj *syncobj; /* Use with ptr_mask_bits() */
+	} *fences;
+	u32 n_fences;
+
+	u64 extension_flags; /** Available extensions parameters */
 };
 
 static inline bool eb_use_cmdparser(const struct i915_execbuffer *eb)
@@ -1899,7 +1907,8 @@ static int i915_gem_check_execbuffer(struct drm_i915_gem_execbuffer2 *exec)
 		return -EINVAL;
 
 	/* Kernel clipping was a DRI1 misfeature */
-	if (!(exec->flags & I915_EXEC_FENCE_ARRAY)) {
+	if (!(exec->flags & (I915_EXEC_FENCE_ARRAY |
+			     I915_EXEC_USE_EXTENSIONS))) {
 		if (exec->num_cliprects || exec->cliprects_ptr)
 			return -EINVAL;
 	}
@@ -2478,41 +2487,41 @@ eb_pin_engine(struct i915_execbuffer *eb,
 }
 
 static void
-__free_fence_array(struct drm_syncobj **fences, unsigned int n)
+__free_fence_array(struct i915_eb_fence *fences, unsigned int n)
 {
 	while (n--)
-		drm_syncobj_put(ptr_mask_bits(fences[n], 2));
+		drm_syncobj_put(ptr_mask_bits(fences[n].syncobj, 2));
 	kvfree(fences);
 }
 
-static struct drm_syncobj **
+static int
 get_fence_array(struct drm_i915_gem_execbuffer2 *args,
-		struct drm_file *file)
+		struct i915_execbuffer *eb)
 {
 	const unsigned long nfences = args->num_cliprects;
 	struct drm_i915_gem_exec_fence __user *user;
-	struct drm_syncobj **fences;
+	struct i915_eb_fence *fences;
 	unsigned long n;
 	int err;
 
 	if (!(args->flags & I915_EXEC_FENCE_ARRAY))
-		return NULL;
+		return 0;
 
 	/* Check multiplication overflow for access_ok() and kvmalloc_array() */
 	BUILD_BUG_ON(sizeof(size_t) > sizeof(unsigned long));
 	if (nfences > min_t(unsigned long,
 			    ULONG_MAX / sizeof(*user),
 			    SIZE_MAX / sizeof(*fences)))
-		return ERR_PTR(-EINVAL);
+		return -EINVAL;
 
 	user = u64_to_user_ptr(args->cliprects_ptr);
 	if (!access_ok(user, nfences * sizeof(*user)))
-		return ERR_PTR(-EFAULT);
+		return -EFAULT;
 
 	fences = kvmalloc_array(nfences, sizeof(*fences),
 				__GFP_NOWARN | GFP_KERNEL);
 	if (!fences)
-		return ERR_PTR(-ENOMEM);
+		return -ENOMEM;
 
 	for (n = 0; n < nfences; n++) {
 		struct drm_i915_gem_exec_fence fence;
@@ -2528,7 +2537,7 @@ get_fence_array(struct drm_i915_gem_execbuffer2 *args,
 			goto err;
 		}
 
-		syncobj = drm_syncobj_find(file, fence.handle);
+		syncobj = drm_syncobj_find(eb->file, fence.handle);
 		if (!syncobj) {
 			DRM_DEBUG("Invalid syncobj handle provided\n");
 			err = -ENOENT;
@@ -2538,38 +2547,31 @@ get_fence_array(struct drm_i915_gem_execbuffer2 *args,
 		BUILD_BUG_ON(~(ARCH_KMALLOC_MINALIGN - 1) &
 			     ~__I915_EXEC_FENCE_UNKNOWN_FLAGS);
 
-		fences[n] = ptr_pack_bits(syncobj, fence.flags, 2);
+		fences[n].syncobj = ptr_pack_bits(syncobj, fence.flags, 2);
 	}
 
-	return fences;
+	eb->fences = fences;
+	eb->n_fences = nfences;
+
+	return 0;
 
 err:
 	__free_fence_array(fences, n);
-	return ERR_PTR(err);
-}
-
-static void
-put_fence_array(struct drm_i915_gem_execbuffer2 *args,
-		struct drm_syncobj **fences)
-{
-	if (fences)
-		__free_fence_array(fences, args->num_cliprects);
+	return err;
 }
 
 static int
-await_fence_array(struct i915_execbuffer *eb,
-		  struct drm_syncobj **fences)
+await_fence_array(struct i915_execbuffer *eb)
 {
-	const unsigned int nfences = eb->args->num_cliprects;
 	unsigned int n;
 	int err;
 
-	for (n = 0; n < nfences; n++) {
+	for (n = 0; n < eb->n_fences; n++) {
 		struct drm_syncobj *syncobj;
 		struct dma_fence *fence;
 		unsigned int flags;
 
-		syncobj = ptr_unpack_bits(fences[n], &flags, 2);
+		syncobj = ptr_unpack_bits(eb->fences[n].syncobj, &flags, 2);
 		if (!(flags & I915_EXEC_FENCE_WAIT))
 			continue;
 
@@ -2587,18 +2589,16 @@ await_fence_array(struct i915_execbuffer *eb,
 }
 
 static void
-signal_fence_array(struct i915_execbuffer *eb,
-		   struct drm_syncobj **fences)
+signal_fence_array(struct i915_execbuffer *eb)
 {
-	const unsigned int nfences = eb->args->num_cliprects;
 	struct dma_fence * const fence = &eb->request->fence;
 	unsigned int n;
 
-	for (n = 0; n < nfences; n++) {
+	for (n = 0; n < eb->n_fences; n++) {
 		struct drm_syncobj *syncobj;
 		unsigned int flags;
 
-		syncobj = ptr_unpack_bits(fences[n], &flags, 2);
+		syncobj = ptr_unpack_bits(eb->fences[n].syncobj, &flags, 2);
 		if (!(flags & I915_EXEC_FENCE_SIGNAL))
 			continue;
 
@@ -2647,12 +2647,38 @@ static void eb_request_add(struct i915_execbuffer *eb)
 	mutex_unlock(&tl->mutex);
 }
 
+static const i915_user_extension_fn execbuf_extensions[] = {
+};
+
+static int
+parse_execbuf2_extensions(struct drm_i915_gem_execbuffer2 *args,
+			  struct i915_execbuffer *eb)
+{
+	eb->extension_flags = 0;
+
+	if (!(args->flags & I915_EXEC_USE_EXTENSIONS))
+		return 0;
+
+	/* The execbuf2 extension mechanism reuses cliprects_ptr. So we cannot
+	 * have another flag also using it at the same time.
+	 */
+	if (eb->args->flags & I915_EXEC_FENCE_ARRAY)
+		return -EINVAL;
+
+	if (args->num_cliprects != 0)
+		return -EINVAL;
+
+	return i915_user_extensions(u64_to_user_ptr(args->cliprects_ptr),
+				    execbuf_extensions,
+				    ARRAY_SIZE(execbuf_extensions),
+				    eb);
+}
+
 static int
 i915_gem_do_execbuffer(struct drm_device *dev,
 		       struct drm_file *file,
 		       struct drm_i915_gem_execbuffer2 *args,
-		       struct drm_i915_gem_exec_object2 *exec,
-		       struct drm_syncobj **fences)
+		       struct drm_i915_gem_exec_object2 *exec)
 {
 	struct drm_i915_private *i915 = to_i915(dev);
 	struct i915_execbuffer eb;
@@ -2681,6 +2707,9 @@ i915_gem_do_execbuffer(struct drm_device *dev,
 	eb.batch_start_offset = args->batch_start_offset;
 	eb.batch_len = args->batch_len;
 	eb.trampoline = NULL;
+
+	eb.fences = NULL;
+	eb.n_fences = 0;
 
 	eb.batch_flags = 0;
 	if (args->flags & I915_EXEC_SECURE) {
@@ -2718,9 +2747,17 @@ i915_gem_do_execbuffer(struct drm_device *dev,
 		}
 	}
 
-	err = eb_create(&eb);
+	err = parse_execbuf2_extensions(args, &eb);
 	if (err)
 		goto err_out_fence;
+
+	err = get_fence_array(args, &eb);
+	if (err)
+		goto err_arr_fence;
+
+	err = eb_create(&eb);
+	if (err)
+		goto err_arr_fence;
 
 	GEM_BUG_ON(!eb.lut_size);
 
@@ -2816,8 +2853,8 @@ i915_gem_do_execbuffer(struct drm_device *dev,
 			goto err_request;
 	}
 
-	if (fences) {
-		err = await_fence_array(&eb, fences);
+	if (eb.n_fences) {
+		err = await_fence_array(&eb);
 		if (err)
 			goto err_request;
 	}
@@ -2848,8 +2885,8 @@ err_request:
 	i915_request_get(eb.request);
 	eb_request_add(&eb);
 
-	if (fences)
-		signal_fence_array(&eb, fences);
+	if (eb.n_fences)
+		signal_fence_array(&eb);
 
 	if (out_fence) {
 		if (err == 0) {
@@ -2877,6 +2914,8 @@ err_context:
 	i915_gem_context_put(eb.gem_context);
 err_destroy:
 	eb_destroy(&eb);
+err_arr_fence:
+	__free_fence_array(eb.fences, eb.n_fences);
 err_out_fence:
 	if (out_fence_fd != -1)
 		put_unused_fd(out_fence_fd);
@@ -2976,7 +3015,7 @@ i915_gem_execbuffer_ioctl(struct drm_device *dev, void *data,
 			exec2_list[i].flags = 0;
 	}
 
-	err = i915_gem_do_execbuffer(dev, file, &exec2, exec2_list, NULL);
+	err = i915_gem_do_execbuffer(dev, file, &exec2, exec2_list);
 	if (exec2.flags & __EXEC_HAS_RELOC) {
 		struct drm_i915_gem_exec_object __user *user_exec_list =
 			u64_to_user_ptr(args->buffers_ptr);
@@ -3008,7 +3047,6 @@ i915_gem_execbuffer2_ioctl(struct drm_device *dev, void *data,
 	struct drm_i915_private *i915 = to_i915(dev);
 	struct drm_i915_gem_execbuffer2 *args = data;
 	struct drm_i915_gem_exec_object2 *exec2_list;
-	struct drm_syncobj **fences = NULL;
 	const size_t count = args->buffer_count;
 	int err;
 
@@ -3036,15 +3074,7 @@ i915_gem_execbuffer2_ioctl(struct drm_device *dev, void *data,
 		return -EFAULT;
 	}
 
-	if (args->flags & I915_EXEC_FENCE_ARRAY) {
-		fences = get_fence_array(args, file);
-		if (IS_ERR(fences)) {
-			kvfree(exec2_list);
-			return PTR_ERR(fences);
-		}
-	}
-
-	err = i915_gem_do_execbuffer(dev, file, args, exec2_list, fences);
+	err = i915_gem_do_execbuffer(dev, file, args, exec2_list);
 
 	/*
 	 * Now that we have begun execution of the batchbuffer, we ignore
@@ -3085,7 +3115,6 @@ end:;
 	}
 
 	args->flags &= ~__I915_EXEC_UNKNOWN_FLAGS;
-	put_fence_array(args, fences);
 	kvfree(exec2_list);
 	return err;
 }
