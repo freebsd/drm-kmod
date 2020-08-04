@@ -717,6 +717,18 @@ static inline void ttm_mem_type_manager_cleanup(struct ttm_mem_type_manager *man
 }
 
 /*
+ * ttm_mem_type_manager_force_list_clean
+ *
+ * @bdev - device to use
+ * @man - manager to use
+ *
+ * Force all the objects out of a memory manager until clean.
+ * Part of memory manager cleanup sequence.
+ */
+int ttm_mem_type_manager_force_list_clean(struct ttm_bo_device *bdev,
+					  struct ttm_mem_type_manager *man);
+
+/*
  * ttm_bo_util.c
  */
 
@@ -846,6 +858,17 @@ int ttm_range_man_init(struct ttm_bo_device *bdev,
 		       unsigned long p_size);
 
 /**
+ * ttm_range_man_fini
+ *
+ * @bdev: ttm device
+ * @type: memory manager type
+ *
+ * Remove the generic range manager from a slot and tear it down.
+ */
+int ttm_range_man_fini(struct ttm_bo_device *bdev,
+		       struct ttm_mem_type_manager *man);
+
+/**
  * ttm_mem_type_manager_debug
  *
  * @man: manager type to dump.
@@ -853,4 +876,5 @@ int ttm_range_man_init(struct ttm_bo_device *bdev,
  */
 void ttm_mem_type_manager_debug(struct ttm_mem_type_manager *man,
 				struct drm_printer *p);
+
 #endif
