@@ -8,7 +8,6 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/ttm
 
 KMOD=	ttm
 SRCS=	ttm_bo.c \
-	ttm_bo_manager.c \
 	ttm_bo_util.c \
 	ttm_bo_vm.c \
 	ttm_execbuf_util.c \
@@ -16,6 +15,7 @@ SRCS=	ttm_bo.c \
 	ttm_module.c \
 	ttm_page_alloc.c \
 	ttm_page_alloc_dma.c \
+	ttm_range_manager.c \
 	ttm_tt.c
 
 .if !empty(KCONFIG:MAGP)
