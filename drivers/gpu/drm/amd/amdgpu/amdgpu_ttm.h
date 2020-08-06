@@ -41,6 +41,22 @@
 
 #define AMDGPU_POISON	0xd0bed0be
 
+struct amdgpu_vram_mgr {
+	struct ttm_resource_manager manager;
+	struct drm_mm mm;
+	spinlock_t lock;
+	atomic64_t usage;
+	atomic64_t vis_usage;
+	struct amdgpu_device *adev;
+};
+
+struct amdgpu_gtt_mgr {
+	struct ttm_resource_manager manager;
+	struct drm_mm mm;
+	spinlock_t lock;
+	atomic64_t available;
+};
+
 struct amdgpu_mman {
 	struct ttm_bo_device		bdev;
 	bool				mem_global_referenced;
@@ -76,6 +92,9 @@ struct amdgpu_mman {
 	u64		fw_vram_usage_size;
 	struct amdgpu_bo	*fw_vram_usage_reserved_bo;
 	void		*fw_vram_usage_va;
+
+	struct amdgpu_vram_mgr vram_mgr;
+	struct amdgpu_gtt_mgr gtt_mgr;
 };
 
 struct amdgpu_copy_mem {
