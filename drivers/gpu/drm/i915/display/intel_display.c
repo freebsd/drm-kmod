@@ -33,6 +33,10 @@
 #include <linux/slab.h>
 #include <linux/vgaarb.h>
 
+#ifdef __FreeBSD__
+#include <linux/wait_bit.h>
+#endif
+
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_atomic_uapi.h>

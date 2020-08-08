@@ -4,9 +4,7 @@
  * Copyright © 2019 Intel Corporation
  */
 
-#ifdef __linux__
 #include <linux/wait_bit.h>
-#endif
 
 #include "intel_runtime_pm.h"
 #include "intel_wakeref.h"
