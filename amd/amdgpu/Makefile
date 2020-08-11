@@ -792,6 +792,7 @@ CWARNFLAGS.gfx_v7_0.c=				-Wno-unused-const-variable
 CWARNFLAGS.gfx_v9_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gfx_v10_0.c=				-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.kv_dpm.c=				-Wno-unused-but-set-variable
+CWARNFLAGS.mmhub_v1_7.c=			-Wno-missing-prototypes
 CWARNFLAGS.psp_v11_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.si_dpm.c=				-Wno-gnu-variable-sized-type-not-at-end
 CWARNFLAGS.si_smc.c=				-Wno-gnu-variable-sized-type-not-at-end
