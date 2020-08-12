@@ -17,6 +17,10 @@
 #include "i915_gem_object.h"
 #include "i915_scatterlist.h"
 
+#ifdef __FreeBSD__
+#include <linux/capability.h>
+#endif
+
 struct i915_mm_struct {
 	struct mm_struct *mm;
 	struct drm_i915_private *i915;

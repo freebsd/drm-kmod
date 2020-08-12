@@ -34,6 +34,7 @@
 /* CEM: Make sure we got the Linux version */
 CTASSERT(PAGE_MASK != (PAGE_SIZE - 1));
 #define clflushopt linux_clflushopt
+#include <linux/capability.h>
 #endif
 
 enum {

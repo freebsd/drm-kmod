@@ -77,6 +77,10 @@
 #include "i915_trace.h"
 #include "i915_user_extensions.h"
 
+#ifdef __FreeBSD__
+#include <linux/capability.h>
+#endif
+
 #define ALL_L3_SLICES(dev) (1 << NUM_L3_SLICES(dev)) - 1
 
 static struct i915_global_gem_context {
