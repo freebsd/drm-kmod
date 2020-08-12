@@ -36,6 +36,10 @@
 #include <drm/ttm/ttm_bo_driver.h>
 #include <drm/ttm/ttm_module.h>
 
+#ifdef __FreeBSD__
+#include <linux/capability.h>
+#endif
+
 #define VMWGFX_DRIVER_DESC "Linux drm driver for VMware graphics devices"
 #define VMWGFX_CHIP_SVGAII 0
 #define VMW_FB_RESERVATION 0
