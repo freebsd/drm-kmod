@@ -103,7 +103,9 @@ struct intel_fbdev {
 	struct intel_framebuffer *fb;
 	struct i915_vma *vma;
 	unsigned long vma_flags;
+#ifdef __linux__
 	async_cookie_t cookie;
+#endif
 	int preferred_bpp;
 
 	/* Whether or not fbdev hpd processing is temporarily suspended */
