@@ -24,7 +24,6 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_notifier.c	\
 	linux_page.c		\
 	linux_rbtree.c		\
-	linux_relay.c		\
 	linux_sort.c		\
 	linux_sync_file.c
 
