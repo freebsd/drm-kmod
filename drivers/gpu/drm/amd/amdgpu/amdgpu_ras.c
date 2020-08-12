@@ -2101,7 +2101,7 @@ int amdgpu_ras_late_init(struct amdgpu_device *adev,
 			amdgpu_ras_request_reset_on_boot(adev,
 					ras_block->block);
 			return 0;
-		} else if (adev->in_suspend || amdgpu_in_reset(adev)) {
+		} else if (adev->in_suspend || adev->in_gpu_reset) {
 			/* in resume phase, if fail to enable ras,
 			 * clean up all ras fs nodes, and disable ras */
 			goto cleanup;
@@ -2110,7 +2110,7 @@ int amdgpu_ras_late_init(struct amdgpu_device *adev,
 	}
 
 	/* in resume phase, no need to create ras fs node */
-	if (adev->in_suspend || amdgpu_in_reset(adev))
+	if (adev->in_suspend || adev->in_gpu_reset)
 		return 0;
 
 	if (ih_info->cb) {
