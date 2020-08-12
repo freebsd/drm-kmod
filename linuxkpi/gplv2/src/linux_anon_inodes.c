@@ -7,13 +7,14 @@
 #include <sys/namei.h>
 #include <sys/vnode.h>
 #include <sys/libkern.h>
+#include <sys/stat.h>
 
 // Linux
 #include <linux/anon_inodes.h>
 #include <linux/anon_inodefs.h>
 #include <linux/file.h>
 #include <linux/fs.h>
-
+#include <linux/err.h>
 
 struct file *
 anon_inode_getfile(const char *name, const struct file_operations *fops,

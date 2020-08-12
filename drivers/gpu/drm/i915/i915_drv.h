@@ -106,6 +106,8 @@
 #include <linux/typecheck.h>
 #include <linux/ratelimit.h>
 #include <linux/poll.h>
+#include <linux/shrinker.h>
+#include <linux/uuid.h>
 #define resource linux_resource
 #endif
 

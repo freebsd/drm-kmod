@@ -48,6 +48,10 @@
 #include "drm_internal.h"
 #include "drm_legacy.h"
 
+#ifdef __FreeBSD__
+#include <linux/capability.h>
+#endif
+
 /**
  * DOC: getunique and setversion story
  *
