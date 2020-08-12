@@ -105,6 +105,7 @@
 #include <linux/compiler.h>
 #include <linux/typecheck.h>
 #include <linux/ratelimit.h>
+#include <linux/poll.h>
 #define resource linux_resource
 #endif
 
