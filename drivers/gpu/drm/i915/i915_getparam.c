@@ -6,6 +6,10 @@
 
 #include "i915_drv.h"
 
+#ifdef __FreeBSD__
+#include <linux/capability.h>
+#endif
+
 int i915_getparam_ioctl(struct drm_device *dev, void *data,
 			struct drm_file *file_priv)
 {

@@ -46,6 +46,10 @@
 #include "drm_internal.h"
 #include "drm_legacy.h"
 
+#ifdef __FreeBSD__
+#include <linux/capability.h>
+#endif
+
 /* from BKL pushdown */
 DEFINE_MUTEX(drm_global_mutex);
 
@@ -322,7 +326,9 @@ static int drm_open_helper(struct file *filp, struct drm_minor *minor)
 	}
 
 	filp->private_data = priv;
+#ifdef __linux__
 	filp->f_mode |= FMODE_UNSIGNED_OFFSET;
+#endif
 	priv->filp = filp;
 
 	mutex_lock(&dev->filelist_mutex);

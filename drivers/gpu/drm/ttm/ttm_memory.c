@@ -39,6 +39,10 @@
 #include <linux/slab.h>
 #include <linux/swap.h>
 
+#ifdef __FreeBSD__
+#include <linux/capability.h>
+#endif
+
 #define TTM_MEMORY_ALLOC_RETRIES 4
 
 struct ttm_mem_global ttm_mem_glob;
