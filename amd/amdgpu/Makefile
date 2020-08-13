@@ -83,10 +83,14 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/modules/info_packet \
 	${SRCDIR}/display/modules/power \
 	${SRCDIR}/lib \
-	${SRCDIR}/powerplay \
-	${SRCDIR}/powerplay/hwmgr \
-	${SRCDIR}/powerplay/inc \
-	${SRCDIR}/powerplay/smumgr \
+	${SRCDIR}/pm \
+	${SRCDIR}/pm/inc \
+	${SRCDIR}/pm/powerplay \
+	${SRCDIR}/pm/powerplay/hwmgr \
+	${SRCDIR}/pm/powerplay/smumgr \
+	${SRCDIR}/pm/swsmu \
+	${SRCDIR}/pm/swsmu/smu11 \
+	${SRCDIR}/pm/swsmu/smu12 \
 	${DRM}/scheduler
 
 # acp
@@ -637,9 +641,14 @@ CFLAGS+= -I${SRCDIR}/display/include
 CFLAGS+= -I${SRCDIR}/display/modules/inc
 CFLAGS+= -I${SRCDIR}/include
 CFLAGS+= -I${SRCDIR}/include/asic_reg
-CFLAGS+= -I${SRCDIR}/powerplay/hwmgr
-CFLAGS+= -I${SRCDIR}/powerplay/inc
-CFLAGS+= -I${SRCDIR}/powerplay/smumgr
+CFLAGS+= -I${SRCDIR}/pm
+CFLAGS+= -I${SRCDIR}/pm/inc
+CFLAGS+= -I${SRCDIR}/pm/powerplay
+CFLAGS+= -I${SRCDIR}/pm/powerplay/hwmgr
+CFLAGS+= -I${SRCDIR}/pm/powerplay/smumgr
+CFLAGS+= -I${SRCDIR}/pm/swsmu
+CFLAGS+= -I${SRCDIR}/pm/swsmu/smu11
+CFLAGS+= -I${SRCDIR}/pm/swsmu/smu12
 CFLAGS+= -I${DRM}/scheduler
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
