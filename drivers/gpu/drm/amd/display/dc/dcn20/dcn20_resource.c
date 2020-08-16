@@ -2783,14 +2783,22 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 	bool voltage_supported = false;
 	bool full_pstate_supported = false;
 	bool dummy_pstate_supported = false;
+#ifdef __FreeBSD__
+	kernel_fpu_begin();
+#endif
 	double p_state_latency_us = context->bw_ctx.dml.soc.dram_clock_change_latency_us;
+#ifdef __FreeBSD__
+	kernel_fpu_end();
+#endif
 
 	if (fast_validate)
 		return dcn20_validate_bandwidth_internal(dc, context, true);
 
-
 	// Best case, we support full UCLK switch latency
 	voltage_supported = dcn20_validate_bandwidth_internal(dc, context, false);
+#ifdef __FreeBSD__
+	kernel_fpu_begin();
+#endif
 	full_pstate_supported = context->bw_ctx.bw.dcn.clk.p_state_change_support;
 
 	if (context->bw_ctx.dml.soc.dummy_pstate_latency_us == 0 ||
@@ -2816,7 +2824,9 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 restore_dml_state:
 	memcpy(&context->bw_ctx.dml, &dc->dml, sizeof(struct display_mode_lib));
 	context->bw_ctx.dml.soc.dram_clock_change_latency_us = p_state_latency_us;
-
+#ifdef __FreeBSD__
+	kernel_fpu_end();
+#endif
 	return voltage_supported;
 }
 
