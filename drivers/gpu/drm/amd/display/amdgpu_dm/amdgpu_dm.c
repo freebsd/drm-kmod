@@ -579,14 +579,16 @@ static void amdgpu_dm_audio_component_unbind(struct device *kdev,
 	adev->dm.audio_component = NULL;
 }
 
+#ifdef __linux__
 static const struct component_ops amdgpu_dm_audio_component_bind_ops = {
 	.bind	= amdgpu_dm_audio_component_bind,
 	.unbind	= amdgpu_dm_audio_component_unbind,
 };
+#endif
 
 static int amdgpu_dm_audio_init(struct amdgpu_device *adev)
 {
-	int i, ret;
+	int i;
 
 	if (!amdgpu_audio)
 		return 0;
@@ -607,9 +609,11 @@ static int amdgpu_dm_audio_init(struct amdgpu_device *adev)
 		adev->mode_info.audio.pin[i].offset = 0;
 	}
 
+#ifdef __linux__
 	ret = component_add(adev->dev, &amdgpu_dm_audio_component_bind_ops);
 	if (ret < 0)
 		return ret;
+#endif
 
 	adev->dm.audio_registered = true;
 
@@ -625,7 +629,9 @@ static void amdgpu_dm_audio_fini(struct amdgpu_device *adev)
 		return;
 
 	if (adev->dm.audio_registered) {
+#ifdef __linux__
 		component_del(adev->dev, &amdgpu_dm_audio_component_bind_ops);
+#endif
 		adev->dm.audio_registered = false;
 	}
 
