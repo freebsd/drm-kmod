@@ -1482,6 +1482,7 @@ static DEVICE_ATTR(pp_features, S_IRUGO | S_IWUSR,
 		amdgpu_set_pp_feature_status);
 static DEVICE_ATTR(unique_id, S_IRUGO, amdgpu_get_unique_id, NULL);
 
+#ifdef __linux__
 static ssize_t amdgpu_hwmon_show_temp(struct device *dev,
 				      struct device_attribute *attr,
 				      char *buf)
@@ -2441,6 +2442,7 @@ static const struct attribute_group *hwmon_groups[] = {
 	&hwmon_attrgroup,
 	NULL
 };
+#endif
 
 void amdgpu_dpm_thermal_work_handler(struct work_struct *work)
 {
@@ -2797,6 +2799,7 @@ int amdgpu_pm_sysfs_init(struct amdgpu_device *adev)
 	if (adev->pm.dpm_enabled == 0)
 		return 0;
 
+#ifdef __linux__
 	adev->pm.int_hwmon_dev = hwmon_device_register_with_groups(adev->dev,
 								   DRIVER_NAME, adev,
 								   hwmon_groups);
@@ -2806,6 +2809,7 @@ int amdgpu_pm_sysfs_init(struct amdgpu_device *adev)
 			"Unable to register hwmon device: %d\n", ret);
 		return ret;
 	}
+#endif
 
 	ret = device_create_file(adev->dev, &dev_attr_power_dpm_state);
 	if (ret) {
@@ -2966,8 +2970,10 @@ void amdgpu_pm_sysfs_fini(struct amdgpu_device *adev)
 	if (adev->pm.dpm_enabled == 0)
 		return;
 
+#ifdef __linux__
 	if (adev->pm.int_hwmon_dev)
 		hwmon_device_unregister(adev->pm.int_hwmon_dev);
+#endif
 	device_remove_file(adev->dev, &dev_attr_power_dpm_state);
 	device_remove_file(adev->dev, &dev_attr_power_dpm_force_performance_level);
 

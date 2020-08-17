@@ -598,6 +598,7 @@ CWARNFLAGS.amdgpu_device.c=	-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_atpx_handler.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_dma_buf.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ioc32.c=			-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_pm.c=				-Wno-unused-const-variable
 CWARNFLAGS.amdgpu_ras.c=			-Wno-missing-prototypes -Wno-unused-function
 CWARNFLAGS.amdgpu_sched.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ttm.c=			-Wno-missing-prototypes
