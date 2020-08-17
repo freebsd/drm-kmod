@@ -1721,6 +1721,7 @@ static void intel_hdcp_check_work(struct work_struct *work)
 				      DRM_HDCP_CHECK_PERIOD_MS);
 }
 
+#ifdef __linux__
 static int i915_hdcp_component_bind(struct device *i915_kdev,
 				    struct device *mei_kdev, void *data)
 {
@@ -1750,6 +1751,7 @@ static const struct component_ops i915_hdcp_component_ops = {
 	.bind   = i915_hdcp_component_bind,
 	.unbind = i915_hdcp_component_unbind,
 };
+#endif
 
 static inline int initialize_hdcp_port_data(struct intel_connector *connector,
 					    const struct intel_hdcp_shim *shim)
@@ -1935,7 +1937,9 @@ void intel_hdcp_component_fini(struct drm_i915_private *dev_priv)
 	dev_priv->hdcp_comp_added = false;
 	mutex_unlock(&dev_priv->hdcp_comp_mutex);
 
+#ifdef __linux__
 	component_del(dev_priv->drm.dev, &i915_hdcp_component_ops);
+#endif
 }
 
 void intel_hdcp_cleanup(struct intel_connector *connector)

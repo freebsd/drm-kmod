@@ -1034,6 +1034,7 @@ static int i915_audio_component_get_eld(struct device *kdev, int port,
 	return ret;
 }
 
+#ifdef __linux__
 static const struct drm_audio_component_ops i915_audio_component_ops = {
 	.owner		= THIS_MODULE,
 	.get_power	= i915_audio_component_get_power,
@@ -1088,6 +1089,7 @@ static const struct component_ops i915_audio_component_bind_ops = {
 	.bind	= i915_audio_component_bind,
 	.unbind	= i915_audio_component_unbind,
 };
+#endif
 
 /**
  * i915_audio_component_init - initialize and register the audio component
@@ -1135,7 +1137,9 @@ static void i915_audio_component_cleanup(struct drm_i915_private *dev_priv)
 	if (!dev_priv->audio_component_registered)
 		return;
 
+#ifdef __linux__
 	component_del(dev_priv->drm.dev, &i915_audio_component_bind_ops);
+#endif
 	dev_priv->audio_component_registered = false;
 }
 

@@ -614,7 +614,7 @@ CWARNFLAGS.vcn_v2_0.c=				-Wno-missing-prototypes
 # display/amdgpu_dm
 CWARNFLAGS.amdgpu_dm_pp_smu.c=		-Wno-missing-prototypes -Wno-incompatible-function-pointer-types
 CWARNFLAGS.amdgpu_dm_services.c=	-Wno-missing-prototypes
-CWARNFLAGS.amdgpu_dm.c=			-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_dm.c=			-Wno-missing-prototypes -Wno-unused-function
 
 # display/dc
 CWARNFLAGS.conversion.c=		-Wno-missing-prototypes
