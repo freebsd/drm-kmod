@@ -660,6 +660,7 @@ static ssize_t radeon_hwmon_get_pwm1(struct device *dev,
 	return sprintf(buf, "%i\n", speed);
 }
 
+#ifdef __linux__
 static DEVICE_ATTR(power_profile, S_IRUGO | S_IWUSR, radeon_get_pm_profile, radeon_set_pm_profile);
 static DEVICE_ATTR(power_method, S_IRUGO | S_IWUSR, radeon_get_pm_method, radeon_set_pm_method);
 static DEVICE_ATTR(power_dpm_state, S_IRUGO | S_IWUSR, radeon_get_dpm_state, radeon_set_dpm_state);
@@ -818,6 +819,7 @@ static void radeon_hwmon_fini(struct radeon_device *rdev)
 	if (rdev->pm.int_hwmon_dev)
 		hwmon_device_unregister(rdev->pm.int_hwmon_dev);
 }
+#endif /* __linux__ */
 
 static void radeon_dpm_thermal_work_handler(struct work_struct *work)
 {
@@ -1299,7 +1301,9 @@ void radeon_pm_resume(struct radeon_device *rdev)
 
 static int radeon_pm_init_old(struct radeon_device *rdev)
 {
+#ifdef __linux__
 	int ret;
+#endif
 
 	rdev->pm.profile = PM_PROFILE_DEFAULT;
 	rdev->pm.dynpm_state = DYNPM_STATE_DISABLED;
@@ -1336,10 +1340,12 @@ static int radeon_pm_init_old(struct radeon_device *rdev)
 		}
 	}
 
+#ifdef __linux__
 	/* set up the internal thermal sensor if applicable */
 	ret = radeon_hwmon_init(rdev);
 	if (ret)
 		return ret;
+#endif
 
 	INIT_DELAYED_WORK(&rdev->pm.dynpm_idle_work, radeon_dynpm_idle_work_handler);
 
@@ -1384,9 +1390,11 @@ static int radeon_pm_init_dpm(struct radeon_device *rdev)
 		return -EINVAL;
 
 	/* set up the internal thermal sensor if applicable */
+#ifdef __linux__
 	ret = radeon_hwmon_init(rdev);
 	if (ret)
 		return ret;
+#endif
 
 	INIT_WORK(&rdev->pm.dpm.thermal.work, radeon_dpm_thermal_work_handler);
 	mutex_lock(&rdev->pm.mutex);
@@ -1542,6 +1550,7 @@ int radeon_pm_late_init(struct radeon_device *rdev)
 
 	if (rdev->pm.pm_method == PM_METHOD_DPM) {
 		if (rdev->pm.dpm_enabled) {
+#ifdef __linux__
 			if (!rdev->pm.sysfs_initialized) {
 				ret = device_create_file(rdev->dev, &dev_attr_power_dpm_state);
 				if (ret)
@@ -1558,6 +1567,7 @@ int radeon_pm_late_init(struct radeon_device *rdev)
 					DRM_ERROR("failed to create device file for power method\n");
 				rdev->pm.sysfs_initialized = true;
 			}
+#endif
 
 			mutex_lock(&rdev->pm.mutex);
 			ret = radeon_dpm_late_enable(rdev);
@@ -1573,6 +1583,7 @@ int radeon_pm_late_init(struct radeon_device *rdev)
 			}
 		}
 	} else {
+#ifdef __linux__
 		if ((rdev->pm.num_power_states > 1) &&
 		    (!rdev->pm.sysfs_initialized)) {
 			/* where's the best place to put these? */
@@ -1585,6 +1596,7 @@ int radeon_pm_late_init(struct radeon_device *rdev)
 			if (!ret)
 				rdev->pm.sysfs_initialized = true;
 		}
+#endif
 	}
 	return ret;
 }
@@ -1607,11 +1619,15 @@ static void radeon_pm_fini_old(struct radeon_device *rdev)
 
 		cancel_delayed_work_sync(&rdev->pm.dynpm_idle_work);
 
+#ifdef __linux__
 		device_remove_file(rdev->dev, &dev_attr_power_profile);
 		device_remove_file(rdev->dev, &dev_attr_power_method);
+#endif
 	}
 
+#ifdef __linux__
 	radeon_hwmon_fini(rdev);
+#endif
 	kfree(rdev->pm.power_state);
 }
 
@@ -1622,15 +1638,19 @@ static void radeon_pm_fini_dpm(struct radeon_device *rdev)
 		radeon_dpm_disable(rdev);
 		mutex_unlock(&rdev->pm.mutex);
 
+#ifdef __linux__
 		device_remove_file(rdev->dev, &dev_attr_power_dpm_state);
 		device_remove_file(rdev->dev, &dev_attr_power_dpm_force_performance_level);
 		/* XXX backwards compat */
 		device_remove_file(rdev->dev, &dev_attr_power_profile);
 		device_remove_file(rdev->dev, &dev_attr_power_method);
+#endif
 	}
 	radeon_dpm_fini(rdev);
 
+#ifdef __linux__
 	radeon_hwmon_fini(rdev);
+#endif
 	kfree(rdev->pm.power_state);
 }
 

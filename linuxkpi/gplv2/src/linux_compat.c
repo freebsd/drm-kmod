@@ -22,13 +22,9 @@ struct linux_resource intel_graphics_stolen_res;
 struct cpuinfo_x86 boot_cpu_data;
 #endif
 
-struct ida *hwmon_idap;
-DEFINE_IDA(hwmon_ida);
-
 static void
 linux_compat_init(void *arg __unused)
 {
-	hwmon_idap = &hwmon_ida;
 
 #if defined(__i386__) || defined(__amd64__)
 	if ((cpu_feature & CPUID_CLFSH) != 0)
