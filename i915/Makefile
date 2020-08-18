@@ -91,6 +91,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_ddi.c \
 	intel_dp.c \
 	intel_dp_aux_backlight.c \
+	intel_dp_hdcp.c \
 	intel_dp_link_training.c \
 	intel_dp_mst.c \
 	intel_dsi.c \
