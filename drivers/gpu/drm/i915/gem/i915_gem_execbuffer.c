@@ -1150,9 +1150,10 @@ static void reloc_cache_reset(struct reloc_cache *cache)
 
 static void *reloc_kmap(struct drm_i915_gem_object *obj,
 			struct reloc_cache *cache,
-			unsigned long page)
+			unsigned long pageno)
 {
 	void *vaddr;
+	struct page *page;
 
 	if (cache->vaddr) {
 		kunmap_atomic(unmask_page(cache->vaddr));
@@ -1173,9 +1174,13 @@ static void *reloc_kmap(struct drm_i915_gem_object *obj,
 			mb();
 	}
 
-	vaddr = kmap_atomic(i915_gem_object_get_dirty_page(obj, page));
+	page = i915_gem_object_get_page(obj, pageno);
+	if (!obj->mm.dirty)
+		set_page_dirty(page);
+
+	vaddr = kmap_atomic(page);
 	cache->vaddr = unmask_flags(cache->vaddr) | (unsigned long)vaddr;
-	cache->page = page;
+	cache->page = pageno;
 
 	return vaddr;
 }
