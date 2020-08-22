@@ -7,7 +7,6 @@ KMOD=	linuxkpi_gplv2
 SRCS=	linux_kmod_gplv2.c	\
 	linux_anon_inodefs.c 	\
 	linux_anon_inodes.c 	\
-	linux_backlight.c	\
 	linux_compat.c		\
 	linux_device.c		\
 	linux_firmware.c	\
@@ -31,7 +30,6 @@ SRCS+=	dma-buf.c \
 
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
 SRCS+=	linux_acpi.c	\
-	linux_video.c 	\
 	opt_acpi.h
 .endif
 
