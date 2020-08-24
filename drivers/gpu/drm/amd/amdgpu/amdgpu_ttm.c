@@ -569,7 +569,7 @@ static int amdgpu_move_vram_ram(struct ttm_buffer_object *bo, bool evict,
 	}
 
 	/* Bind the memory to the GTT space */
-	r = ttm_tt_bind(bo->ttm, &tmp_mem, ctx);
+	r = ttm_tt_bind(bo->bdev, bo->ttm, &tmp_mem, ctx);
 	if (unlikely(r)) {
 		goto out_cleanup;
 	}
@@ -995,9 +995,10 @@ void amdgpu_ttm_tt_set_user_pages(struct ttm_tt *ttm, struct page **pages)
  *
  * Called by amdgpu_ttm_backend_bind()
  **/
-static int amdgpu_ttm_tt_pin_userptr(struct ttm_tt *ttm)
+static int amdgpu_ttm_tt_pin_userptr(struct ttm_bo_device *bdev,
+				     struct ttm_tt *ttm)
 {
-	struct amdgpu_device *adev = amdgpu_ttm_adev(ttm->bdev);
+	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	int r;
 
@@ -1032,9 +1033,10 @@ release_sg:
 /**
  * amdgpu_ttm_tt_unpin_userptr - Unpin and unmap userptr pages
  */
-static void amdgpu_ttm_tt_unpin_userptr(struct ttm_tt *ttm)
+static void amdgpu_ttm_tt_unpin_userptr(struct ttm_bo_device *bdev,
+					struct ttm_tt *ttm)
 {
-	struct amdgpu_device *adev = amdgpu_ttm_adev(ttm->bdev);
+	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 
 	int write = !(gtt->userflags & AMDGPU_GEM_USERPTR_READONLY);
@@ -1115,16 +1117,17 @@ gart_bind_fail:
  * Called by ttm_tt_bind() on behalf of ttm_bo_handle_move_mem().
  * This handles binding GTT memory to the device address space.
  */
-static int amdgpu_ttm_backend_bind(struct ttm_tt *ttm,
+static int amdgpu_ttm_backend_bind(struct ttm_bo_device *bdev,
+				   struct ttm_tt *ttm,
 				   struct ttm_resource *bo_mem)
 {
-	struct amdgpu_device *adev = amdgpu_ttm_adev(ttm->bdev);
+	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void*)ttm;
 	uint64_t flags;
 	int r = 0;
 
 	if (gtt->userptr) {
-		r = amdgpu_ttm_tt_pin_userptr(ttm);
+		r = amdgpu_ttm_tt_pin_userptr(bdev, ttm);
 		if (r) {
 			DRM_ERROR("failed to pin userptr\n");
 			return r;
@@ -1242,15 +1245,16 @@ int amdgpu_ttm_recover_gart(struct ttm_buffer_object *tbo)
  * Called by ttm_tt_unbind() on behalf of ttm_bo_move_ttm() and
  * ttm_tt_destroy().
  */
-static void amdgpu_ttm_backend_unbind(struct ttm_tt *ttm)
+static void amdgpu_ttm_backend_unbind(struct ttm_bo_device *bdev,
+				      struct ttm_tt *ttm)
 {
-	struct amdgpu_device *adev = amdgpu_ttm_adev(ttm->bdev);
+	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	int r;
 
 	/* if the pages have userptr pinning then clear that first */
 	if (gtt->userptr)
-		amdgpu_ttm_tt_unpin_userptr(ttm);
+		amdgpu_ttm_tt_unpin_userptr(bdev, ttm);
 
 	if (gtt->offset == AMDGPU_BO_INVALID_OFFSET)
 		return;
@@ -1262,7 +1266,8 @@ static void amdgpu_ttm_backend_unbind(struct ttm_tt *ttm)
 			  gtt->ttm.ttm.num_pages, gtt->offset);
 }
 
-static void amdgpu_ttm_backend_destroy(struct ttm_tt *ttm)
+static void amdgpu_ttm_backend_destroy(struct ttm_bo_device *bdev,
+				       struct ttm_tt *ttm)
 {
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 
@@ -1312,10 +1317,11 @@ static struct ttm_tt *amdgpu_ttm_tt_create(struct ttm_buffer_object *bo,
  * Map the pages of a ttm_tt object to an address space visible
  * to the underlying device.
  */
-static int amdgpu_ttm_tt_populate(struct ttm_tt *ttm,
-			struct ttm_operation_ctx *ctx)
+static int amdgpu_ttm_tt_populate(struct ttm_bo_device *bdev,
+				  struct ttm_tt *ttm,
+				  struct ttm_operation_ctx *ctx)
 {
-	struct amdgpu_device *adev = amdgpu_ttm_adev(ttm->bdev);
+	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 
 	/* user pages are bound by amdgpu_ttm_tt_pin_userptr() */
@@ -1366,7 +1372,7 @@ static int amdgpu_ttm_tt_populate(struct ttm_tt *ttm,
  * Unmaps pages of a ttm_tt object from the device address space and
  * unpopulates the page array backing it.
  */
-static void amdgpu_ttm_tt_unpopulate(struct ttm_tt *ttm)
+static void amdgpu_ttm_tt_unpopulate(struct ttm_bo_device *bdev, struct ttm_tt *ttm)
 {
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	struct amdgpu_device *adev;
@@ -1390,7 +1396,7 @@ static void amdgpu_ttm_tt_unpopulate(struct ttm_tt *ttm)
 	if (ttm->page_flags & TTM_PAGE_FLAG_SG)
 		return;
 
-	adev = amdgpu_ttm_adev(ttm->bdev);
+	adev = amdgpu_ttm_adev(bdev);
 
 #ifdef CONFIG_SWIOTLB
 	if (adev->need_swiotlb && swiotlb_nr_tbl()) {

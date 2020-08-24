@@ -80,8 +80,9 @@ struct ttm_bo_driver {
 	 * Returns:
 	 * -ENOMEM: Out of memory.
 	 */
-	int (*ttm_tt_populate)(struct ttm_tt *ttm,
-			struct ttm_operation_ctx *ctx);
+	int (*ttm_tt_populate)(struct ttm_bo_device *bdev,
+			       struct ttm_tt *ttm,
+			       struct ttm_operation_ctx *ctx);
 
 	/**
 	 * ttm_tt_unpopulate
@@ -90,7 +91,7 @@ struct ttm_bo_driver {
 	 *
 	 * Free all backing page
 	 */
-	void (*ttm_tt_unpopulate)(struct ttm_tt *ttm);
+	void (*ttm_tt_unpopulate)(struct ttm_bo_device *bdev, struct ttm_tt *ttm);
 
 	/**
 	 * struct ttm_bo_driver member eviction_valuable
