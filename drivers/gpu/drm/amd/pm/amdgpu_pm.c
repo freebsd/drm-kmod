@@ -117,7 +117,7 @@ static ssize_t amdgpu_get_power_dpm_state(struct device *dev,
 					  char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	enum amd_pm_state_type pm;
 	int ret;
 
@@ -155,7 +155,7 @@ static ssize_t amdgpu_set_power_dpm_state(struct device *dev,
 					  size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	enum amd_pm_state_type  state;
 	int ret;
 
@@ -261,7 +261,7 @@ static ssize_t amdgpu_get_power_dpm_force_performance_level(struct device *dev,
 							    char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	enum amd_dpm_forced_level level = 0xff;
 	int ret;
 
@@ -302,7 +302,7 @@ static ssize_t amdgpu_set_power_dpm_force_performance_level(struct device *dev,
 							    size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	enum amd_dpm_forced_level level;
 	enum amd_dpm_forced_level current_level = 0xff;
 	int ret = 0;
@@ -407,7 +407,7 @@ static ssize_t amdgpu_get_pp_num_states(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	struct pp_states_info data;
 	int i, buf_len, ret;
 
@@ -454,7 +454,7 @@ static ssize_t amdgpu_get_pp_cur_state(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	struct pp_states_info data;
 	struct smu_context *smu = &adev->smu;
 	enum amd_pm_state_type pm = 0;
@@ -499,7 +499,7 @@ static ssize_t amdgpu_get_pp_force_state(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 
 	if (amdgpu_in_reset(adev))
 		return -EPERM;
@@ -516,7 +516,7 @@ static ssize_t amdgpu_set_pp_force_state(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	enum amd_pm_state_type state = 0;
 	unsigned long idx;
 	int ret;
@@ -577,7 +577,7 @@ static ssize_t amdgpu_get_pp_table(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	char *table = NULL;
 	int size, ret;
 
@@ -622,7 +622,7 @@ static ssize_t amdgpu_set_pp_table(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int ret = 0;
 
 	if (amdgpu_in_reset(adev))
@@ -768,7 +768,7 @@ static ssize_t amdgpu_set_pp_od_clk_voltage(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int ret;
 	uint32_t parameter_size = 0;
 	long parameter[64];
@@ -868,7 +868,7 @@ static ssize_t amdgpu_get_pp_od_clk_voltage(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	ssize_t size;
 	int ret;
 
@@ -922,7 +922,7 @@ static ssize_t amdgpu_set_pp_features(struct device *dev,
 				      size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	uint64_t featuremask;
 	int ret;
 
@@ -967,7 +967,7 @@ static ssize_t amdgpu_get_pp_features(struct device *dev,
 				      char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	ssize_t size;
 	int ret;
 
@@ -1028,7 +1028,7 @@ static ssize_t amdgpu_get_pp_dpm_sclk(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	ssize_t size;
 	int ret;
 
@@ -1096,7 +1096,7 @@ static ssize_t amdgpu_set_pp_dpm_sclk(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int ret;
 	uint32_t mask = 0;
 
@@ -1132,7 +1132,7 @@ static ssize_t amdgpu_get_pp_dpm_mclk(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	ssize_t size;
 	int ret;
 
@@ -1164,7 +1164,7 @@ static ssize_t amdgpu_set_pp_dpm_mclk(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	uint32_t mask = 0;
 	int ret;
 
@@ -1200,7 +1200,7 @@ static ssize_t amdgpu_get_pp_dpm_socclk(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	ssize_t size;
 	int ret;
 
@@ -1232,7 +1232,7 @@ static ssize_t amdgpu_set_pp_dpm_socclk(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int ret;
 	uint32_t mask = 0;
 
@@ -1270,7 +1270,7 @@ static ssize_t amdgpu_get_pp_dpm_fclk(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	ssize_t size;
 	int ret;
 
@@ -1302,7 +1302,7 @@ static ssize_t amdgpu_set_pp_dpm_fclk(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int ret;
 	uint32_t mask = 0;
 
@@ -1340,7 +1340,7 @@ static ssize_t amdgpu_get_pp_dpm_dcefclk(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	ssize_t size;
 	int ret;
 
@@ -1372,7 +1372,7 @@ static ssize_t amdgpu_set_pp_dpm_dcefclk(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int ret;
 	uint32_t mask = 0;
 
@@ -1410,7 +1410,7 @@ static ssize_t amdgpu_get_pp_dpm_pcie(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	ssize_t size;
 	int ret;
 
@@ -1442,7 +1442,7 @@ static ssize_t amdgpu_set_pp_dpm_pcie(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int ret;
 	uint32_t mask = 0;
 
@@ -1480,7 +1480,7 @@ static ssize_t amdgpu_get_pp_sclk_od(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	uint32_t value = 0;
 	int ret;
 
@@ -1510,7 +1510,7 @@ static ssize_t amdgpu_set_pp_sclk_od(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int ret;
 	long int value;
 
@@ -1553,7 +1553,7 @@ static ssize_t amdgpu_get_pp_mclk_od(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	uint32_t value = 0;
 	int ret;
 
@@ -1583,7 +1583,7 @@ static ssize_t amdgpu_set_pp_mclk_od(struct device *dev,
 		size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int ret;
 	long int value;
 
@@ -1646,7 +1646,7 @@ static ssize_t amdgpu_get_pp_power_profile_mode(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	ssize_t size;
 	int ret;
 
@@ -1680,7 +1680,7 @@ static ssize_t amdgpu_set_pp_power_profile_mode(struct device *dev,
 {
 	int ret;
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	uint32_t parameter_size = 0;
 	long parameter[64];
 	char *sub_str, buf_cpy[128];
@@ -1751,7 +1751,7 @@ static ssize_t amdgpu_get_gpu_busy_percent(struct device *dev,
 					   char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int r, value, size = sizeof(value);
 
 	if (amdgpu_in_reset(adev))
@@ -1789,7 +1789,7 @@ static ssize_t amdgpu_get_mem_busy_percent(struct device *dev,
 					   char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int r, value, size = sizeof(value);
 
 	if (amdgpu_in_reset(adev))
@@ -1831,7 +1831,7 @@ static ssize_t amdgpu_get_pcie_bw(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	uint64_t count0 = 0, count1 = 0;
 	int ret;
 
@@ -1874,7 +1874,7 @@ static ssize_t amdgpu_get_unique_id(struct device *dev,
 		char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 
 	if (amdgpu_in_reset(adev))
 		return -EPERM;
@@ -1906,7 +1906,7 @@ static ssize_t amdgpu_get_thermal_throttling_logging(struct device *dev,
 {
 #ifdef __linux__
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 
 	return snprintf(buf, PAGE_SIZE, "%s: thermal throttling logging %s, with interval %d seconds\n",
 			adev->ddev->unique,
@@ -1923,7 +1923,7 @@ static ssize_t amdgpu_set_thermal_throttling_logging(struct device *dev,
 						     size_t count)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	long throttling_logging_interval;
 	unsigned long flags;
 	int ret = 0;
@@ -1977,7 +1977,7 @@ static ssize_t amdgpu_get_gpu_metrics(struct device *dev,
 				      char *buf)
 {
 	struct drm_device *ddev = dev_get_drvdata(dev);
-	struct amdgpu_device *adev = ddev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(ddev);
 	void *gpu_metrics;
 	ssize_t size = 0;
 	int ret;
@@ -3573,7 +3573,7 @@ static int amdgpu_debugfs_pm_info(struct seq_file *m, void *data)
 {
 	struct drm_info_node *node = (struct drm_info_node *) m->private;
 	struct drm_device *dev = node->minor->dev;
-	struct amdgpu_device *adev = dev->dev_private;
+	struct amdgpu_device *adev = drm_to_adev(dev);
 	u32 flags = 0;
 	int r;
 
