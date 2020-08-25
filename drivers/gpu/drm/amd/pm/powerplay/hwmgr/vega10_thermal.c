@@ -371,8 +371,9 @@ static int vega10_thermal_set_temperature_range(struct pp_hwmgr *hwmgr,
 	int high = VEGA10_THERMAL_MAXIMUM_ALERT_TEMP;
 	uint32_t val;
 
-	if (low < range->min)
-		low = range->min;
+	/* compare them in unit celsius degree */
+	if (low < range->min / PP_TEMPERATURE_UNITS_PER_CENTIGRADES)
+		low = range->min / PP_TEMPERATURE_UNITS_PER_CENTIGRADES;
 	if (high > tdp_table->usSoftwareShutdownTemp)
 		high = tdp_table->usSoftwareShutdownTemp;
 
