@@ -230,6 +230,7 @@ SRCS+=	amdgpu_afmt.c \
 	nbio_v2_3.c \
 	nbio_v6_1.c \
 	nbio_v7_0.c \
+	nbio_v7_2.c \
 	nbio_v7_4.c \
 	navi10_ih.c \
 	nv.c \
