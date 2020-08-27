@@ -613,6 +613,7 @@ SRCS+=	amd_powerplay.c \
 	smumgr.c \
 	tonga_baco.c \
 	tonga_smumgr.c \
+	vangogh_ppt.c \
 	vega10_baco.c \
 	vega10_hwmgr.c \
 	vega10_powertune.c \
