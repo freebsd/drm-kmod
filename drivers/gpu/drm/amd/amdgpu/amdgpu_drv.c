@@ -1175,7 +1175,7 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
 	if (ret)
 		goto err_free;
 
-	drmm_add_final_kfree(ddev, ddev);
+	drmm_add_final_kfree(ddev, adev);
 
 	if (!supports_atomic)
 		ddev->driver_features &= ~DRIVER_ATOMIC;
@@ -1229,13 +1229,6 @@ amdgpu_pci_remove(struct pci_dev *pdev)
 	pci_disable_device(pdev);
 	pci_set_drvdata(pdev, NULL);
 	drm_dev_put(dev);
-}
-
-static void amdgpu_driver_release(struct drm_device *ddev)
-{
-	struct amdgpu_device *adev = drm_to_adev(ddev);
-
-	kfree(adev);
 }
 
 static void
@@ -1537,7 +1530,6 @@ static struct drm_driver kms_driver = {
 	.open = amdgpu_driver_open_kms,
 	.postclose = amdgpu_driver_postclose_kms,
 	.lastclose = amdgpu_driver_lastclose_kms,
-	.release   = amdgpu_driver_release,
 	.irq_handler = amdgpu_irq_handler,
 	.ioctls = amdgpu_ioctls_kms,
 	.gem_free_object_unlocked = amdgpu_gem_object_free,
