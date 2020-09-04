@@ -1344,7 +1344,11 @@ int intel_backlight_device_register(struct intel_connector *connector)
 	 */
 	panel->backlight.device =
 		backlight_device_register("intel_backlight",
+#ifdef __linux__
 					  connector->base.kdev,
+#elif defined(__FreeBSD__)
+					  connector->base.dev->dev,
+#endif
 					  connector,
 					  &intel_backlight_device_ops, &props);
 
