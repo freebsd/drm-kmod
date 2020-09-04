@@ -804,6 +804,7 @@ CWARNFLAGS.dmub_reg.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_srv.c=			-Wno-unused-but-set-variable
 
 # powerplay/*
+CWARNFLAGS.amdgpu_smu.c=		-Wno-unused-function
 CWARNFLAGS.ci_smumgr.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.hardwaremanager.c=		-Wno-missing-prototypes
 CWARNFLAGS.pp_psm.c=			-Wno-unused-but-set-variable
