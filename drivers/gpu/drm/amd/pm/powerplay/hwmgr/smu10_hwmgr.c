@@ -650,7 +650,7 @@ static int smu10_dpm_force_dpm_level(struct pp_hwmgr *hwmgr,
 						NULL);
 		smum_send_msg_to_smc_with_parameter(hwmgr,
 						PPSMC_MSG_SetHardMinVcn,
-						SMU10_UMD_PSTATE_VCE,
+						SMU10_UMD_PSTATE_PROFILE_VCE,
 						NULL);
 
 		smum_send_msg_to_smc_with_parameter(hwmgr,
@@ -667,7 +667,7 @@ static int smu10_dpm_force_dpm_level(struct pp_hwmgr *hwmgr,
 						NULL);
 		smum_send_msg_to_smc_with_parameter(hwmgr,
 						PPSMC_MSG_SetSoftMaxVcn,
-						SMU10_UMD_PSTATE_VCE,
+						SMU10_UMD_PSTATE_PROFILE_VCE,
 						NULL);
 		break;
 	case AMD_DPM_FORCED_LEVEL_AUTO:
