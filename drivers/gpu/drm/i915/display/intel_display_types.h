@@ -1384,6 +1384,11 @@ struct intel_dp {
 	/* Displayport compliance testing */
 	struct intel_dp_compliance compliance;
 
+	/* Downstream facing port caps */
+	struct {
+		u8 max_bpc;
+	} dfp;
+
 	/* Display stream compression testing */
 	bool force_dsc_en;
 
