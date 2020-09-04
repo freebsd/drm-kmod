@@ -3,6 +3,12 @@
 
 #include <sys/param.h>
 #include <sys/ktr.h>
+#include <drm/drm_connector.h>
+#include <drm/drm_crtc.h>
+#include <drm/drm_plane.h>
+#include <drm/drm_fourcc.h>
+#include <drm/drm_encoder.h>
+#include <drm/drm_atomic.h>
 #include <drm/drm_os_freebsd.h>	/* KTR_DRM */
 
 /* TRACE_EVENT(amdgpu_dc_rreg, */
@@ -32,6 +38,330 @@ trace_amdgpu_dc_performance(unsigned long read_count, unsigned long write_count,
 {
 	CTR6(KTR_DRM, "amdgpu_dc_performance %u %u %p %p %s %u", read_count,
 	    write_count, last_read, last_write, func, line);
+}
+
+/* TRACE_EVENT(amdgpu_dm_connector_atomic_check, */
+/* 	    TP_PROTO(const struct drm_connector_state *state), */
+
+static inline void
+trace_amdgpu_dm_connector_atomic_check(const struct drm_connector_state *state)
+{
+#ifdef KTR
+	uint32_t conn_id;
+	const struct drm_connector_state * conn_state;
+	const struct drm_atomic_state * state_state;
+	const struct drm_crtc_commit * commit;
+	uint32_t crtc_id;
+	uint32_t best_encoder_id;
+	enum drm_link_status link_status;
+	bool self_refresh_aware;
+	enum hdmi_picture_aspect picture_aspect_ratio;
+	unsigned int content_type;
+	unsigned int hdcp_content_type;
+	unsigned int content_protection;
+	unsigned int scaling_mode;
+	u32 colorspace;
+	u8 max_requested_bpc;
+	u8 max_bpc;
+
+	conn_id = state->connector->base.id;
+	conn_state = state;
+	state_state = state->state;
+	commit = state->commit;
+	crtc_id = state->crtc ? state->crtc->base.id : 0;
+	best_encoder_id = state->best_encoder ?
+	    state->best_encoder->base.id : 0;
+	link_status = state->link_status;
+	self_refresh_aware = state->self_refresh_aware;
+	picture_aspect_ratio = state->picture_aspect_ratio;
+	content_type = state->content_type;
+	hdcp_content_type = state->hdcp_content_type;
+	content_protection = state->content_protection;
+	scaling_mode = state->scaling_mode;
+	colorspace = state->colorspace;
+	max_requested_bpc = state->max_requested_bpc;
+	max_bpc = state->max_bpc;
+#endif
+
+	CTR5(KTR_DRM,
+	    "amdgpu_dm_connector_atomic_check [1/3] "
+	    "conn_id=%u conn_state=%p state=%p commit=%p crtc_id=%u",
+	    conn_id, conn_state, state_state, commit, crtc_id);
+	CTR5(KTR_DRM,
+	    "amdgpu_dm_connector_atomic_check [2/3] "
+	    "best_encoder_id=%u link_status=%d self_refresh_aware=%d "
+	    "picture_aspect_ratio=%d content_type=%u", best_encoder_id,
+	    link_status, self_refresh_aware,
+	    picture_aspect_ratio, content_type);
+	CTR6(KTR_DRM,
+	    "amdgpu_dm_connector_atomic_check [3/3] "
+	    "hdcp_content_type=%u content_protection=%u scaling_mode=%u "
+	    "colorspace=%u max_requested_bpc=%u max_bpc=%u",
+	    hdcp_content_type, content_protection,
+	    scaling_mode, colorspace,
+	    max_requested_bpc, max_bpc);
+}
+
+/* TRACE_EVENT(amdgpu_dm_crtc_atomic_check, */
+/* 	    TP_PROTO(const struct drm_crtc_state *state), */
+
+static inline void
+trace_amdgpu_dm_crtc_atomic_check(const struct drm_crtc_state *state)
+{
+#ifdef KTR
+	const struct drm_atomic_state * state_state;
+	const struct drm_crtc_state * crtc_state;
+	const struct drm_crtc_commit * commit;
+	uint32_t crtc_id;
+	bool enable;
+	bool active;
+	bool planes_changed;
+	bool mode_changed;
+	bool active_changed;
+	bool connectors_changed;
+	bool zpos_changed;
+	bool color_mgmt_changed;
+	bool no_vblank;
+	bool async_flip;
+	bool vrr_enabled;
+	bool self_refresh_active;
+	u32 plane_mask;
+	u32 connector_mask;
+	u32 encoder_mask;
+
+	state_state = state->state;
+	crtc_state = state;
+	crtc_id = state->crtc->base.id;
+	commit = state->commit;
+	enable = state->enable;
+	active = state->active;
+	planes_changed = state->planes_changed;
+	mode_changed = state->mode_changed;
+	active_changed = state->active_changed;
+	connectors_changed = state->connectors_changed;
+	zpos_changed = state->zpos_changed;
+	color_mgmt_changed = state->color_mgmt_changed;
+	no_vblank = state->no_vblank;
+	async_flip = state->async_flip;
+	vrr_enabled = state->vrr_enabled;
+	self_refresh_active = state->self_refresh_active;
+	plane_mask = state->plane_mask;
+	connector_mask = state->connector_mask;
+	encoder_mask = state->encoder_mask;
+#endif
+
+	CTR4(KTR_DRM,
+	    "amdgpu_dm_crtc_atomic_check[1/4] "
+	    "crtc_id=%u crtc_state=%p state=%p commit=%p",
+	    crtc_id, crtc_state, state_state, commit);
+	CTR6(KTR_DRM,
+	    "amdgpu_dm_crtc_atomic_check[2/4] "
+	    "changed("
+	    "planes=%d mode=%d active=%d conn=%d zpos=%d color_mgmt=%d)",
+	    planes_changed, mode_changed, active_changed,
+	    connectors_changed, zpos_changed, color_mgmt_changed);
+	CTR6(KTR_DRM,
+	    "amdgpu_dm_crtc_atomic_check[3/4] "
+	    "state(enable=%d active=%d async_flip=%d vrr_enabled=%d "
+	    "self_refresh_active=%d no_vblank=%d)",
+	    enable, active, async_flip, vrr_enabled, self_refresh_active,
+	    no_vblank);
+	CTR3(KTR_DRM,
+	    "amdgpu_dm_crtc_atomic_check[4/4] "
+	    "mask(plane=%x conn=%x enc=%x)",
+	    plane_mask, connector_mask, encoder_mask);
+}
+
+/* DECLARE_EVENT_CLASS(amdgpu_dm_plane_state_template, */
+/* 	    TP_PROTO(const struct drm_plane_state *state), */
+
+#ifdef KTR
+#define trace_amdgpu_dm_plane_state_template(name) \
+static inline void trace_ ## name(const struct drm_plane_state *state) \
+{ \
+	uint32_t plane_id; \
+	enum drm_plane_type plane_type; \
+	const struct drm_plane_state * plane_state; \
+	const struct drm_atomic_state * state_state; \
+	uint32_t crtc_id; \
+	uint32_t fb_id; \
+	uint32_t fb_format; \
+	uint8_t fb_planes; \
+	uint64_t fb_modifier; \
+	const struct dma_fence * fence; \
+	int32_t crtc_x; \
+	int32_t crtc_y; \
+	uint32_t crtc_w; \
+	uint32_t crtc_h; \
+	uint32_t src_x; \
+	uint32_t src_y; \
+	uint32_t src_w; \
+	uint32_t src_h; \
+	u32 alpha; \
+	uint32_t pixel_blend_mode; \
+	unsigned int rotation; \
+	unsigned int zpos; \
+	unsigned int normalized_zpos; \
+	enum drm_color_encoding color_encoding; \
+	enum drm_color_range color_range; \
+	bool visible; \
+\
+	plane_id = state->plane->base.id; \
+	plane_type = state->plane->type; \
+	plane_state = state; \
+	state_state = state->state; \
+	crtc_id = state->crtc ? state->crtc->base.id : 0; \
+	fb_id = state->fb ? state->fb->base.id : 0; \
+	fb_format = state->fb ? state->fb->format->format : 0; \
+	fb_planes = state->fb ? state->fb->format->num_planes : 0; \
+	fb_modifier = state->fb ? state->fb->modifier : 0; \
+	fence = state->fence; \
+	crtc_x = state->crtc_x; \
+	crtc_y = state->crtc_y; \
+	crtc_w = state->crtc_w; \
+	crtc_h = state->crtc_h; \
+	src_x = state->src_x >> 16; \
+	src_y = state->src_y >> 16; \
+	src_w = state->src_w >> 16; \
+	src_h = state->src_h >> 16; \
+	alpha = state->alpha; \
+	pixel_blend_mode = state->pixel_blend_mode; \
+	rotation = state->rotation; \
+	zpos = state->zpos; \
+	normalized_zpos = state->normalized_zpos; \
+	color_encoding = state->color_encoding; \
+	color_range = state->color_range; \
+	visible = state->visible; \
+\
+	CTR5(KTR_DRM, \
+	    #name "[1/6] " \
+	    "plane_id=%u plane_type=%d plane_state=%p state=%p " \
+	    "crtc_id=%u", \
+	    plane_id, plane_type, plane_state, state_state, crtc_id); \
+	CTR5(KTR_DRM, \
+	    #name "[2/6] " \
+	    "fb(id=%u fmt=%c%c%c%c)", \
+	    fb_id, \
+	    (fb_format & 0xff) ? (fb_format & 0xff) : 'N', \
+	    ((fb_format >> 8) & 0xff) ? ((fb_format >> 8) & 0xff) : 'O', \
+	    ((fb_format >> 16) & 0xff) ? ((fb_format >> 16) & 0xff) : 'N', \
+	    ((fb_format >> 24) & 0x7f) ? ((fb_format >> 24) & 0x7f) : 'E'); \
+	CTR2(KTR_DRM, \
+	    #name "[3/6] " \
+	    "fb(planes=%u mod=%llu)", \
+	    fb_planes, fb_modifier); \
+	CTR5(KTR_DRM, \
+	    #name "[4/6] " \
+	    "fence=%p crtc_x=%d crtc_y=%d crtc_w=%u crtc_h=%u", \
+	    fence, crtc_x, crtc_y, crtc_w, crtc_h); \
+	CTR6(KTR_DRM, \
+	    #name "[5/6] " \
+	    "src_x=%u src_y=%u src_w=%u src_h=%u alpha=%u " \
+	    "pixel_blend_mode=%u", \
+	    src_x, src_y, src_w, src_h, alpha, pixel_blend_mode); \
+	CTR6(KTR_DRM, \
+	    #name "[6/6] " \
+	    "rotation=%u zpos=%u " \
+	    "normalized_zpos=%u color_encoding=%d color_range=%d " \
+	    "visible=%d", \
+	    rotation, zpos, normalized_zpos, color_encoding, color_range, \
+	    visible); \
+}
+#else
+#define trace_amdgpu_dm_plane_state_template(name) \
+static inline void trace_ ## name(const struct drm_plane_state *state) \
+{ \
+}
+#endif
+
+/* DEFINE_EVENT(amdgpu_dm_plane_state_template, amdgpu_dm_plane_atomic_check, */
+/* 	     TP_PROTO(const struct drm_plane_state *state), */
+
+trace_amdgpu_dm_plane_state_template(amdgpu_dm_plane_atomic_check);
+
+/* DEFINE_EVENT(amdgpu_dm_plane_state_template, amdgpu_dm_atomic_update_cursor, */
+/* 	     TP_PROTO(const struct drm_plane_state *state), */
+
+trace_amdgpu_dm_plane_state_template(amdgpu_dm_atomic_update_cursor);
+
+/* TRACE_EVENT(amdgpu_dm_atomic_state_template, */
+/* 	    TP_PROTO(const struct drm_atomic_state *state), */
+
+#ifdef KTR
+#define trace_amdgpu_dm_atomic_state_template(name) \
+static inline void trace_ ## name(const struct drm_atomic_state *state) \
+{ \
+	const struct drm_atomic_state * state_state; \
+	bool allow_modeset; \
+	bool legacy_cursor_update; \
+	bool async_update; \
+	bool duplicated; \
+	int num_connector; \
+	int num_private_objs; \
+ \
+	state_state = state; \
+	allow_modeset = state->allow_modeset; \
+	legacy_cursor_update = state->legacy_cursor_update; \
+	async_update = state->async_update; \
+	duplicated = state->duplicated; \
+	num_connector = state->num_connector; \
+	num_private_objs = state->num_private_objs; \
+ \
+	CTR3(KTR_DRM, \
+	    #name "[1/2] " \
+	    "state=%p allow_modeset=%d legacy_cursor_update=%d", \
+	    state, allow_modeset, legacy_cursor_update); \
+	CTR4(KTR_DRM, \
+	    #name "[2/2] " \
+	    "async_update=%d duplicated=%d num_connector=%d " \
+	    "num_private_objs=%d", \
+	    async_update, duplicated, num_connector, num_private_objs); \
+}
+#else
+#define trace_amdgpu_dm_atomic_state_template(name) \
+static inline void trace_ ## name(const struct drm_atomic_state *state) \
+{ \
+}
+#endif
+
+/* DEFINE_EVENT(amdgpu_dm_atomic_state_template, amdgpu_dm_atomic_commit_tail_begin, */
+/* 	     TP_PROTO(const struct drm_atomic_state *state), */
+
+trace_amdgpu_dm_atomic_state_template(amdgpu_dm_atomic_commit_tail_begin);
+
+/* DEFINE_EVENT(amdgpu_dm_atomic_state_template, amdgpu_dm_atomic_commit_tail_finish, */
+/* 	     TP_PROTO(const struct drm_atomic_state *state), */
+
+trace_amdgpu_dm_atomic_state_template(amdgpu_dm_atomic_commit_tail_finish);
+
+/* DEFINE_EVENT(amdgpu_dm_atomic_state_template, amdgpu_dm_atomic_check_begin, */
+/* 	     TP_PROTO(const struct drm_atomic_state *state), */
+
+trace_amdgpu_dm_atomic_state_template(amdgpu_dm_atomic_check_begin);
+
+/* TRACE_EVENT(amdgpu_dm_atomic_check_finish, */
+/* 	    TP_PROTO(const struct drm_atomic_state *state, int res), */
+
+static inline void
+trace_amdgpu_dm_atomic_check_finish(
+    const struct drm_atomic_state *state, int res)
+{
+#ifdef KTR
+	const struct drm_atomic_state * state_state;
+	int res;
+	bool async_update;
+	bool allow_modeset;
+
+	state_state = state;
+	res = res;
+	async_update = state->async_update;
+	allow_modeset = state->allow_modeset;
+#endif
+
+	CTR4(KTR_DRM, \
+	    "amdgpu_dm_atomic_check_finish " \
+	    "state=%p res=%d async_update=%d allow_modeset=%d",
+	    state, res, async_update, allow_modeset);
 }
 
 #endif /* _AMDGPU_DM_TRACE_FREEBSD_H_ */
