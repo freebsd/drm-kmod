@@ -218,6 +218,7 @@ SRCS+=	amdgpu_afmt.c \
 	gmc_v10_0.c \
 	hdp_v4_0.c \
 	hdp_v5_0.c \
+	aldebaran_reg_init.c \
 	iceland_ih.c \
 	jpeg_v1_0.c \
 	jpeg_v2_0.c \
