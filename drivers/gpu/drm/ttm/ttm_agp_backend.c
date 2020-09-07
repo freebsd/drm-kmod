@@ -58,8 +58,7 @@ struct ttm_agp_backend {
 #endif
 };
 
-int ttm_agp_bind(struct ttm_bo_device *bdev,
-		 struct ttm_tt *ttm, struct ttm_resource *bo_mem)
+int ttm_agp_bind(struct ttm_tt *ttm, struct ttm_resource *bo_mem)
 {
 	struct ttm_agp_backend *agp_be = container_of(ttm, struct ttm_agp_backend, ttm);
 	struct page *dummy_read_page = ttm_bo_glob.dummy_read_page;
@@ -110,8 +109,7 @@ int ttm_agp_bind(struct ttm_bo_device *bdev,
 }
 EXPORT_SYMBOL(ttm_agp_bind);
 
-void ttm_agp_unbind(struct ttm_bo_device *bdev,
-		    struct ttm_tt *ttm)
+void ttm_agp_unbind(struct ttm_tt *ttm)
 {
 	struct ttm_agp_backend *agp_be = container_of(ttm, struct ttm_agp_backend, ttm);
 
@@ -131,14 +129,13 @@ void ttm_agp_unbind(struct ttm_bo_device *bdev,
 }
 EXPORT_SYMBOL(ttm_agp_unbind);
 
-void ttm_agp_destroy(struct ttm_bo_device *bdev,
-		     struct ttm_tt *ttm)
+void ttm_agp_destroy(struct ttm_tt *ttm)
 {
 	struct ttm_agp_backend *agp_be = container_of(ttm, struct ttm_agp_backend, ttm);
 
 #ifdef __linux__
 	if (agp_be->mem)
-		ttm_agp_unbind(bdev, ttm);
+		ttm_agp_unbind(ttm);
 #elif defined(__FreeBSD__)
 	kfree(agp_be->pages);
 #endif
