@@ -147,12 +147,6 @@ void ttm_agp_destroy(struct ttm_bo_device *bdev,
 }
 EXPORT_SYMBOL(ttm_agp_destroy);
 
-static struct ttm_backend_func ttm_agp_func = {
-	.bind = ttm_agp_bind,
-	.unbind = ttm_agp_unbind,
-	.destroy = ttm_agp_destroy,
-};
-
 struct ttm_tt *ttm_agp_tt_create(struct ttm_buffer_object *bo,
 #ifdef __linux__
 				 struct agp_bridge_data *bridge,
@@ -171,7 +165,6 @@ struct ttm_tt *ttm_agp_tt_create(struct ttm_buffer_object *bo,
 	agp_be->mem = NULL;
 #endif
 	agp_be->bridge = bridge;
-	agp_be->ttm.func = &ttm_agp_func;
 
 	if (ttm_tt_init(&agp_be->ttm, bo, page_flags)) {
 		kfree(agp_be);
