@@ -238,7 +238,17 @@ static int __init ast_init(void)
 
 	if (ast_modeset == 0)
 		return -EINVAL;
+#ifdef __linux__
 	return pci_register_driver(&ast_pci_driver);
+#elif defined(__FreeBSD__)
+	int ret;
+	vbox_pci_driver.bsdclass = drm_devclass;
+	ret = linux_pci_register_drm_driver(&ast_pci_driver);
+	if (ret)
+		DRM_ERROR("Failed initializing DRM.\n");
+	return ret;
+#endif
+
 }
 static void __exit ast_exit(void)
 {
