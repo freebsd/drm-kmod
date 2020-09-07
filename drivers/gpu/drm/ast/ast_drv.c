@@ -39,6 +39,12 @@
 
 #include "ast_drv.h"
 
+#ifdef __FreeBSD__
+SYSCTL_NODE(_hw, OID_AUTO, ast,
+    CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
+    DRIVER_DESC " parameters");
+#endif
+
 int ast_modeset = -1;
 
 MODULE_PARM_DESC(modeset, "Disable/Enable modesetting");
