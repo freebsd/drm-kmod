@@ -682,7 +682,7 @@ EXPORT_SYMBOL(drm_calc_timestamping_constants);
  *
  * Note that atomic drivers must call drm_calc_timestamping_constants() before
  * enabling a CRTC. The atomic helpers already take care of that in
- * drm_atomic_helper_update_legacy_modeset_state().
+ * drm_atomic_helper_calc_timestamping_constants().
  *
  * Returns:
  *
@@ -827,7 +827,7 @@ EXPORT_SYMBOL(drm_crtc_vblank_helper_get_vblank_timestamp_internal);
  *
  * Note that atomic drivers must call drm_calc_timestamping_constants() before
  * enabling a CRTC. The atomic helpers already take care of that in
- * drm_atomic_helper_update_legacy_modeset_state().
+ * drm_atomic_helper_calc_timestamping_constants().
  *
  * Returns:
  *
