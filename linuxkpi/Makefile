@@ -33,7 +33,7 @@ SRCS+=	dma-buf.c \
 	dma-fence-array.c \
 	dma-fence-chain.c \
 	dma-fence.c \
-	reservation.c
+	dma-resv.c
 
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
 SRCS+=	linux_acpi.c	\
