@@ -11,6 +11,8 @@
 #include <drm/drm_atomic.h>
 #include <drm/drm_os_freebsd.h>	/* KTR_DRM */
 
+#include "dc/inc/core_types.h"
+
 /* TRACE_EVENT(amdgpu_dc_rreg, */
 /* 	TP_PROTO(unsigned long *read_count, uint32_t reg, uint32_t value), */
 static inline void
@@ -362,6 +364,109 @@ trace_amdgpu_dm_atomic_check_finish(
 	    "amdgpu_dm_atomic_check_finish " \
 	    "state=%p res=%d async_update=%d allow_modeset=%d",
 	    state, res, async_update, allow_modeset);
+}
+
+/* TRACE_EVENT(amdgpu_dm_dc_pipe_state, */
+/* 	    TP_PROTO(int pipe_idx, const struct dc_plane_state *plane_state, */
+/*		     const struct dc_stream_state *stream, */
+/*		     const struct plane_resource *plane_res, */
+/*		     int update_flags), */
+
+static inline void
+trace_amdgpu_dm_dc_pipe_state(
+    int pipe_idx, const struct dc_plane_state *plane_state,
+    const struct dc_stream_state *stream,
+    const struct plane_resource *plane_res,
+    int update_flags)
+{
+#ifdef KTR
+	int pipe_idx;
+	const void * stream;
+	int stream_w;
+	int stream_h;
+	int dst_x;
+	int dst_y;
+	int dst_w;
+	int dst_h;
+	int src_x;
+	int src_y;
+	int src_w;
+	int src_h;
+	int clip_x;
+	int clip_y;
+	int clip_w;
+	int clip_h;
+	int recout_x;
+	int recout_y;
+	int recout_w;
+	int recout_h;
+	int viewport_x;
+	int viewport_y;
+	int viewport_w;
+	int viewport_h;
+	int flip_immediate;
+	int surface_pitch;
+	int format;
+	int swizzle;
+	unsigned int update_flags;
+
+	stream_w = stream->timing.h_addressable;
+	stream_h = stream->timing.v_addressable;
+	dst_x = plane_state->dst_rect.x;
+	dst_y = plane_state->dst_rect.y;
+	dst_w = plane_state->dst_rect.width;
+	dst_h = plane_state->dst_rect.height;
+	src_x = plane_state->src_rect.x;
+	src_y = plane_state->src_rect.y;
+	src_w = plane_state->src_rect.width;
+	src_h = plane_state->src_rect.height;
+	clip_x = plane_state->clip_rect.x;
+	clip_y = plane_state->clip_rect.y;
+	clip_w = plane_state->clip_rect.width;
+	clip_h = plane_state->clip_rect.height;
+	recout_x = plane_res->scl_data.recout.x;
+	recout_y = plane_res->scl_data.recout.y;
+	recout_w = plane_res->scl_data.recout.width;
+	recout_h = plane_res->scl_data.recout.height;
+	viewport_x = plane_res->scl_data.viewport.x;
+	viewport_y = plane_res->scl_data.viewport.y;
+	viewport_w = plane_res->scl_data.viewport.width;
+	viewport_h = plane_res->scl_data.viewport.height;
+	flip_immediate = plane_state->flip_immediate;
+	surface_pitch = plane_state->plane_size.surface_pitch;
+	format = plane_state->format;
+	swizzle = plane_state->tiling_info.gfx9.swizzle;
+#endif
+
+	CTR4(KTR_DRM,
+	    "amdgpu_dm_dc_pipe_state[1/7] "
+	    "pipe_idx=%d stream=%p rct(%d,%d)",
+	    pipe_idx, stream, stream_w, stream_h);
+	CTR4(KTR_DRM,
+	    "amdgpu_dm_dc_pipe_state[2/7] "
+	    "dst=(%d,%d,%d,%d)",
+	    dst_x, dst_y, dst_w, dst_h);
+	CTR4(KTR_DRM,
+	    "amdgpu_dm_dc_pipe_state[3/7] "
+	    "src=(%d,%d,%d,%d)",
+	    src_x, src_y, src_w, src_h);
+	CTR4(KTR_DRM,
+	    "amdgpu_dm_dc_pipe_state[4/7] "
+	    "clip=(%d,%d,%d,%d)",
+	    clip_x, clip_y, clip_w, clip_h);
+	CTR4(KTR_DRM,
+	    "amdgpu_dm_dc_pipe_state[5/7] "
+	    "recout=(%d,%d,%d,%d)",
+	    recout_x, recout_y, recout_w, recout_h);
+	CTR4(KTR_DRM,
+	    "amdgpu_dm_dc_pipe_state[6/7] "
+	    "viewport=(%d,%d,%d,%d)",
+	    viewport_x, viewport_y, viewport_w, viewport_h);
+	CTR5(KTR_DRM,
+	    "amdgpu_dm_dc_pipe_state[7/7] "
+	    "flip_immediate=%d pitch=%d "
+	    "format=%d swizzle=%d update_flags=%x",
+	    flip_immediate, surface_pitch, format, swizzle, update_flags);
 }
 
 #endif /* _AMDGPU_DM_TRACE_FREEBSD_H_ */
