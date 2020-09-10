@@ -1461,7 +1461,7 @@ static int __reloc_entry_gpu(struct i915_execbuffer *eb,
 
 	batch = reloc_gpu(eb, vma, len);
 	if (batch == ERR_PTR(-EDEADLK))
-		return (s64)-EDEADLK;
+		return -EDEADLK;
 	else if (IS_ERR(batch))
 		return false;
 
