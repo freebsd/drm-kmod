@@ -469,4 +469,118 @@ trace_amdgpu_dm_dc_pipe_state(
 	    flip_immediate, surface_pitch, format, swizzle, update_flags);
 }
 
+/* TRACE_EVENT(amdgpu_dm_dc_clocks_state, */
+/* 	    TP_PROTO(const struct dc_clocks *clk), */
+
+static inline void
+trace_amdgpu_dm_dc_clocks_state(const struct dc_clocks *clk)
+{
+#ifdef KTR
+	int dispclk_khz;
+	int dppclk_khz;
+	int disp_dpp_voltage_level_khz;
+	int dcfclk_khz;
+	int socclk_khz;
+	int dcfclk_deep_sleep_khz;
+	int fclk_khz;
+	int phyclk_khz;
+	int dramclk_khz;
+	int p_state_change_support;
+	int prev_p_state_change_support;
+	int pwr_state;
+	int dtm_level;
+	int max_supported_dppclk_khz;
+	int max_supported_dispclk_khz;
+	int bw_dppclk_khz;
+	int bw_dispclk_khz;
+
+	dispclk_khz = clk->dispclk_khz;
+	dppclk_khz = clk->dppclk_khz;
+	dcfclk_khz = clk->dcfclk_khz;
+	socclk_khz = clk->socclk_khz;
+	dcfclk_deep_sleep_khz = clk->dcfclk_deep_sleep_khz;
+	fclk_khz = clk->fclk_khz;
+	phyclk_khz = clk->phyclk_khz;
+	dramclk_khz = clk->dramclk_khz;
+	p_state_change_support = clk->p_state_change_support;
+	prev_p_state_change_support = clk->prev_p_state_change_support;
+	pwr_state = clk->pwr_state;
+	prev_p_state_change_support = clk->prev_p_state_change_support;
+	dtm_level = clk->dtm_level;
+	max_supported_dppclk_khz = clk->max_supported_dppclk_khz;
+	max_supported_dispclk_khz = clk->max_supported_dispclk_khz;
+	bw_dppclk_khz = clk->bw_dppclk_khz;
+	bw_dispclk_khz = clk->bw_dispclk_khz;
+#endif
+
+	CTR5(KTR_DRM,
+	    "amdgpu_dm_dc_clocks_state[1/4] "
+	    "dispclk_khz=%d dppclk_khz=%d disp_dpp_voltage_level_khz=%d "
+	    "dcfclk_khz=%d socclk_khz=%d",
+	    dispclk_khz, dppclk_khz, disp_dpp_voltage_level_khz, dcfclk_khz,
+	    socclk_khz);
+	CTR5(KTR_DRM,
+	    "amdgpu_dm_dc_clocks_state[2/4] "
+	    "dcfclk_deep_sleep_khz=%d fclk_khz=%d phyclk_khz=%d "
+	    "dramclk_khz=%d p_state_change_support=%d",
+	    dcfclk_deep_sleep_khz, fclk_khz, phyclk_khz, dramclk_khz,
+	    p_state_change_support);
+	CTR6(KTR_DRM,
+	    "amdgpu_dm_dc_clocks_state[3/4] "
+	    "prev_p_state_change_support=%d pwr_state=%d prev_p_state_change_support=%d "
+	    "dtm_level=%d max_supported_dppclk_khz=%d max_supported_dispclk_khz=%d",
+	    prev_p_state_change_support, pwr_state,
+	    prev_p_state_change_support, dtm_level, max_supported_dppclk_khz,
+	    max_supported_dispclk_khz);
+	CTR2(KTR_DRM,
+	    "amdgpu_dm_dc_clocks_state[4/4] "
+	    "bw_dppclk_khz=%d bw_dispclk_khz=%d",
+	    bw_dppclk_khz, bw_dispclk_khz);
+}
+
+/* TRACE_EVENT(amdgpu_dm_dce_clocks_state, */
+/* 	    TP_PROTO(const struct dce_bw_output *clk), */
+
+static inline void
+trace_amdgpu_dm_dce_clocks_state(const struct dce_bw_output *clk)
+{
+#ifdef KTR
+	bool cpuc_state_change_enable;
+	bool cpup_state_change_enable;
+	bool stutter_mode_enable;
+	bool nbp_state_change_enable;
+	bool all_displays_in_sync;
+	int sclk_khz;
+	int sclk_deep_sleep_khz;
+	int yclk_khz;
+	int dispclk_khz;
+	int blackout_recovery_time_us;
+
+	cpuc_state_change_enable = clk->cpuc_state_change_enable;
+	cpup_state_change_enable = clk->cpup_state_change_enable;
+	stutter_mode_enable = clk->stutter_mode_enable;
+	nbp_state_change_enable = clk->nbp_state_change_enable;
+	all_displays_in_sync = clk->all_displays_in_sync;
+	sclk_khz = clk->sclk_khz;
+	sclk_deep_sleep_khz = clk->sclk_deep_sleep_khz;
+	yclk_khz = clk->yclk_khz;
+	dispclk_khz = clk->dispclk_khz;
+	blackout_recovery_time_us = clk->blackout_recovery_time_us;
+#endif
+
+	CTR5(KTR_DRM,
+	    "amdgpu_dm_dce_clocks_state[1/2] "
+	    "cpuc_state_change_enable=%d cpup_state_change_enable=%d stutter_mode_enable=%d "
+	    "nbp_state_change_enable=%d all_displays_in_sync=%d",
+	    cpuc_state_change_enable, cpup_state_change_enable,
+	    stutter_mode_enable, nbp_state_change_enable,
+	    all_displays_in_sync);
+	CTR5(KTR_DRM,
+	    "amdgpu_dm_dce_clocks_state[2/2] "
+	    "sclk_khz=%d sclk_deep_sleep_khz=%d "
+	    "yclk_khz=%d dispclk_khz=%d blackout_recovery_time_us=%d",
+	    sclk_khz, sclk_deep_sleep_khz, yclk_khz, dispclk_khz,
+	    blackout_recovery_time_us);
+}
+
 #endif /* _AMDGPU_DM_TRACE_FREEBSD_H_ */
