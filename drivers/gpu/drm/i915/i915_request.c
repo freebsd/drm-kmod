@@ -492,7 +492,9 @@ void __i915_request_unsubmit(struct i915_request *request)
 #endif
 
 	GEM_BUG_ON(!irqs_disabled());
+#ifdef __freebsd__notyet__
 	lockdep_assert_held(&engine->active.lock);
+#endif
 
 	/*
 	 * Only unwind in reverse order, required so that the per-context list
