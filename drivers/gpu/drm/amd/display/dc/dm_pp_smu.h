@@ -30,7 +30,7 @@
  * interface to PPLIB/SMU to setup clocks and pstate requirements on SoC
  */
 
-#ifdef __linux__
+#if !defined(__i386__) && !defined(__amd64__) && !defined(__aarch64__)
 typedef bool BOOLEAN;
 #endif
 
