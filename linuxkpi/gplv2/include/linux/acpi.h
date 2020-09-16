@@ -21,13 +21,8 @@
 #ifndef _LINUX_GPLV2_ACPI_H_
 #define _LINUX_GPLV2_ACPI_H_
 
-#include <linux/errno.h>
-#include <linux/resource_ext.h>
 #include <linux/device.h>
 #include <linux/property.h>
-#include <linux/notifier.h>
-#include <linux/list.h>
-#include <linux/mod_devicetable.h>
 
 #include <contrib/dev/acpica/include/acpi.h>
 #include <acpi/acpi.h>

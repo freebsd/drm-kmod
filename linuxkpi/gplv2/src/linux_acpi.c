@@ -1,5 +1,4 @@
 #include <linux/acpi.h>
-#include <acpi/button.h>
 #include <linux/pci.h>
 
 ACPI_MODULE_NAME("linux_acpi")
