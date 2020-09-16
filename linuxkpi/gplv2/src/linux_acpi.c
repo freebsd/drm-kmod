@@ -205,26 +205,6 @@ acpi_scan_drop_device(acpi_handle handle, void *context)
 	mutex_unlock(&acpi_device_del_lock);
 }
 
-struct pci_dev *
-acpi_get_pci_dev(acpi_handle handle)
-{
-	device_t dev;
-	struct pci_dev *pdev;
-
-	if ((dev = acpi_get_device(handle)) == NULL)
-		return (NULL);
-
-	spin_lock(&pci_lock);
-	list_for_each_entry(pdev, &pci_devices, links) {
-		if (pdev->dev.bsddev == dev)
-			break;
-	}
-	spin_unlock(&pci_lock);
-	if (&pdev->links == &pci_devices)
-		return (NULL);
-	return (pdev);
-}
-
 static acpi_status
 acpi_backlight_cap_match(acpi_handle handle, u32 level, void *context,
 			  void **return_value)

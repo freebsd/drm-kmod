@@ -17,6 +17,4 @@
 
 struct pci_bus;
 
-struct pci_dev *acpi_get_pci_dev(acpi_handle);
-
 #endif /*__ACPI_DRIVERS_H__*/
