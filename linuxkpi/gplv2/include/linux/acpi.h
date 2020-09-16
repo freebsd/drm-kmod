@@ -70,7 +70,5 @@ void acpi_scan_drop_device(acpi_handle handle, void *context);
 
 struct pci_dev *acpi_get_pci_dev(acpi_handle handle);
 
-int acpi_bus_get_device(acpi_handle handle, struct acpi_device **device);
-
 #endif /* _LINUX_GPLV2_ACPI_H_ */
 #endif /* x86 */

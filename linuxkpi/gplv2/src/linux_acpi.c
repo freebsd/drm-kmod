@@ -205,23 +205,6 @@ acpi_scan_drop_device(acpi_handle handle, void *context)
 	mutex_unlock(&acpi_device_del_lock);
 }
 
-int
-acpi_bus_get_device(acpi_handle handle, struct acpi_device **device)
-{
-	acpi_status status;
-
-	if (!device)
-		return -EINVAL;
-
-	status = acpi_get_data(handle, acpi_scan_drop_device, (void **)device);
-	if (ACPI_FAILURE(status) || !*device) {
-		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "No context for object [%p]\n",
-				  handle));
-		return -ENODEV;
-	}
-	return 0;
-}
-
 struct pci_dev *
 acpi_get_pci_dev(acpi_handle handle)
 {
