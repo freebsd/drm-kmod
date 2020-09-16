@@ -143,29 +143,14 @@ struct acpi_device_pnp {
 #define acpi_device_name(d)	((d)->pnp.device_name)
 #define acpi_device_class(d)	((d)->pnp.device_class)
 
-struct acpi_device_physical_node {
-	unsigned int node_id;
-	struct list_head node;
-	struct device *dev;
-	bool put_online:1;
-};
-
 /* Device */
 struct acpi_device {
-	int device_type;
 	acpi_handle handle;		/* no handle for fixed hardware */
 	struct fwnode_handle fwnode;
-	struct acpi_device *parent;
-	struct list_head children;
-	struct list_head node;
-	struct list_head wakeup_list;
 	struct list_head del_list;
 	struct acpi_device_status status;
 	struct acpi_device_pnp pnp;
-	struct acpi_driver *driver;
-	void *driver_data;
 	struct device dev;
-	/* void (*remove)(struct acpi_device *); */
 };
 
 static inline bool is_acpi_device_node(struct fwnode_handle *fwnode)
@@ -194,7 +179,6 @@ struct acpi_bus_event {
 	u32 data;
 };
 
-extern struct kobject *acpi_kobj;
 extern int register_acpi_notifier(struct notifier_block *);
 extern int unregister_acpi_notifier(struct notifier_block *);
 
