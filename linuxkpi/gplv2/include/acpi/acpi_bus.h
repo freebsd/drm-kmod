@@ -69,17 +69,6 @@ struct acpi_hotplug_profile {
 	bool demand_offline:1;
 };
 
-struct acpi_scan_handler {
-	const struct acpi_device_id *ids;
-	struct list_head list_node;
-	bool (*match)(const char *idstr, const struct acpi_device_id **matchid);
-	int (*attach)(struct acpi_device *dev, const struct acpi_device_id *id);
-	void (*detach)(struct acpi_device *dev);
-	void (*bind)(struct device *phys_dev);
-	void (*unbind)(struct device *phys_dev);
-	struct acpi_hotplug_profile hotplug;
-};
-
 /*
  * ACPI Hotplug Context
  * --------------------
@@ -133,14 +122,6 @@ struct acpi_device_status {
 	u32 reserved:27;
 };
 
-/* File System */
-
-struct acpi_device_dir {
-	struct proc_dir_entry *entry;
-};
-
-#define acpi_device_dir(d)	((d)->dir.entry)
-
 /* Plug and Play */
 
 typedef char acpi_bus_id[8];
@@ -174,42 +155,11 @@ struct acpi_device_pnp {
 #define acpi_device_name(d)	((d)->pnp.device_name)
 #define acpi_device_class(d)	((d)->pnp.device_class)
 
-/* Performance Management */
-
-struct acpi_device_perf_flags {
-	u8 reserved:8;
-};
-
-struct acpi_device_perf_state {
-	struct {
-		u8 valid:1;
-		u8 reserved:7;
-	} flags;
-	u8 power;		/* % Power (compared to P0) */
-	u8 performance;		/* % Performance (    "   ) */
-	int latency;		/* Px->P0 time (microseconds) */
-};
-
-struct acpi_device_perf {
-	int state;
-	struct acpi_device_perf_flags flags;
-	int state_count;
-	struct acpi_device_perf_state *states;
-};
-
 struct acpi_device_physical_node {
 	unsigned int node_id;
 	struct list_head node;
 	struct device *dev;
 	bool put_online:1;
-};
-
-/* ACPI Device Specific Data (_DSD) */
-struct acpi_device_data {
-	const union acpi_object *pointer;
-	const union acpi_object *properties;
-	const union acpi_object *of_compatible;
-	struct list_head subnodes;
 };
 
 struct acpi_gpio_mapping;
@@ -226,10 +176,6 @@ struct acpi_device {
 	struct list_head del_list;
 	struct acpi_device_status status;
 	struct acpi_device_pnp pnp;
-	struct acpi_device_perf performance;
-	struct acpi_device_dir dir;
-	struct acpi_device_data data;
-	struct acpi_scan_handler *handler;
 	struct acpi_hotplug_context *hp;
 	struct acpi_driver *driver;
 	const struct acpi_gpio_mapping *driver_gpios;
@@ -240,17 +186,6 @@ struct acpi_device {
 	struct list_head physical_node_list;
 	struct mutex physical_node_lock;
 	void (*remove)(struct acpi_device *);
-};
-
-/* Non-device subnode */
-struct acpi_data_node {
-	const char *name;
-	acpi_handle handle;
-	struct fwnode_handle fwnode;
-	struct acpi_device_data data;
-	struct list_head sibling;
-	struct kobject kobj;
-	struct completion kobj_done;
 };
 
 static inline bool is_acpi_device_node(struct fwnode_handle *fwnode)
