@@ -3,12 +3,6 @@
 
 ACPI_MODULE_NAME("linux_acpi")
 
-char empty_zero_page[PAGE_SIZE] __aligned(PAGE_SIZE);
-
-#define INVALID_ACPI_HANDLE	((acpi_handle)empty_zero_page)
-
-#define acpi_handle_warn(handle, fmt, ...)
-
 union acpi_object *
 acpi_evaluate_dsm(acpi_handle handle, const u8 *uuid, int rev, int func,
 		  union acpi_object *argv4)
@@ -39,10 +33,6 @@ acpi_evaluate_dsm(acpi_handle handle, const u8 *uuid, int rev, int func,
 	ret = acpi_evaluate_object(handle, "_DSM", &input, &buf);
 	if (ACPI_SUCCESS(ret))
 		return (union acpi_object *)buf.Pointer;
-
-	if (ret != AE_NOT_FOUND)
-		acpi_handle_warn(handle,
-				"failed to evaluate _DSM (0x%x)\n", ret);
 
 	return NULL;
 }
@@ -89,9 +79,6 @@ acpi_check_dsm(acpi_handle handle, const u8 *uuid, int rev, u64 funcs)
 
 	return false;
 }
-
-static LINUX_LIST_HEAD(acpi_device_del_list);
-static DEFINE_MUTEX(acpi_device_del_lock);
 
 #ifdef CONFIG_ACPI_SLEEP
 u32 linuxkpi_acpi_target_sleep_state = ACPI_STATE_S0;
