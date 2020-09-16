@@ -64,7 +64,5 @@ static inline const char *acpi_dev_name(struct acpi_device *adev)
 	return dev_name(&adev->dev);
 }
 
-void acpi_scan_drop_device(acpi_handle handle, void *context);
-
 #endif /* _LINUX_GPLV2_ACPI_H_ */
 #endif /* x86 */

@@ -150,37 +150,8 @@ acpi_check_dsm(acpi_handle handle, const u8 *uuid, int rev, u64 funcs)
 	return false;
 }
 
-void acpi_fake_objhandler(acpi_handle h, void *data);
-
-DEFINE_MUTEX(acpi_device_lock);
-extern struct list_head acpi_bus_id_list;
-
-struct acpi_device_bus_id {
-	char bus_id[15];
-	unsigned int instance_no;
-	struct list_head node;
-};
-
 static LINUX_LIST_HEAD(acpi_device_del_list);
 static DEFINE_MUTEX(acpi_device_del_lock);
-
-void
-acpi_scan_drop_device(acpi_handle handle, void *context)
-{
-#if 0
-	static DECLARE_WORK(work, acpi_device_del_work_fn);
-#endif
-	struct acpi_device *adev = context;
-
-	mutex_lock(&acpi_device_del_lock);
-#ifdef notyet
-	if (list_empty(&acpi_device_del_list))
-		acpi_queue_hotplug_work(&work);
-#endif
-	list_add_tail(&adev->del_list, &acpi_device_del_list);
-	adev->handle = INVALID_ACPI_HANDLE;
-	mutex_unlock(&acpi_device_del_lock);
-}
 
 #ifdef CONFIG_ACPI_SLEEP
 u32 linuxkpi_acpi_target_sleep_state = ACPI_STATE_S0;
