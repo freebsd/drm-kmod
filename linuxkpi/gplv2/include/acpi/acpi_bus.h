@@ -191,18 +191,6 @@ struct of_device_id;
 const struct acpi_device_id *linux_acpi_match_device(struct acpi_device *device, const struct acpi_device_id *ids,
     const struct of_device_id *of_ids);
 
-struct acpi_pci_root {
-	struct acpi_device * device;
-	struct pci_bus *bus;
-	u16 segment;
-
-	u32 osc_support_set;	/* _OSC state of support bits */
-	u32 osc_control_set;	/* _OSC state of control bits */
-	phys_addr_t mcfg_addr;
-};
-
-/* helper */
-
 #ifdef CONFIG_ACPI_SLEEP
 u32 acpi_target_system_state(void);
 #else
