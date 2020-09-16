@@ -24,8 +24,6 @@
 
 struct device;
 
-bool acpi_has_method(acpi_handle handle, char *name);
-
 bool acpi_check_dsm(acpi_handle handle, const u8 *uuid, int rev, u64 funcs);
 union acpi_object *acpi_evaluate_dsm(acpi_handle handle, const u8 *uuid,
 			int rev, int func, union acpi_object *argv4);

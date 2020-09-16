@@ -61,14 +61,6 @@ AcpiGetTable(acpi_string signature, u32 instance, struct acpi_table_header **out
 extern const char *
 AcpiFormatException(acpi_status status);
 
-bool
-acpi_has_method(acpi_handle handle, char *name)
-{
-	acpi_handle tmp;
-
-	return ACPI_SUCCESS(acpi_get_handle(handle, name, &tmp));
-}
-
 union acpi_object *
 acpi_evaluate_dsm(acpi_handle handle, const u8 *uuid, int rev, int func,
 		  union acpi_object *argv4)
