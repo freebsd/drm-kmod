@@ -205,54 +205,6 @@ acpi_scan_drop_device(acpi_handle handle, void *context)
 	mutex_unlock(&acpi_device_del_lock);
 }
 
-static acpi_status
-acpi_backlight_cap_match(acpi_handle handle, u32 level, void *context,
-			  void **return_value)
-{
-	long *cap = context;
-
-	if (acpi_has_method(handle, "_BCM") &&
-	    acpi_has_method(handle, "_BCL")) {
-		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Found generic backlight "
-				  "support\n"));
-		*cap |= ACPI_VIDEO_BACKLIGHT;
-		if (!acpi_has_method(handle, "_BQC"))
-			log(LOG_WARNING, "%s: No _BQC method, "
-			    "cannot determine initial brightness\n", __FUNCTION__);
-		/* We have backlight support, no need to scan further */
-		return AE_CTRL_TERMINATE;
-	}
-	return (0);
-}
-
-long
-acpi_is_video_device(acpi_handle handle)
-{
-	long video_caps = 0;
-
-	/* Is this device able to support video switching ? */
-	if (acpi_has_method(handle, "_DOD") || acpi_has_method(handle, "_DOS"))
-		video_caps |= ACPI_VIDEO_OUTPUT_SWITCHING;
-
-	/* Is this device able to retrieve a video ROM ? */
-	if (acpi_has_method(handle, "_ROM"))
-		video_caps |= ACPI_VIDEO_ROM_AVAILABLE;
-
-	/* Is this device able to configure which video head to be POSTed ? */
-	if (acpi_has_method(handle, "_VPO") &&
-	    acpi_has_method(handle, "_GPD") &&
-	    acpi_has_method(handle, "_SPD"))
-		video_caps |= ACPI_VIDEO_DEVICE_POSTING;
-
-	/* Only check for backlight functionality if one of the above hit. */
-	if (video_caps)
-		AcpiWalkNamespace(ACPI_TYPE_DEVICE, handle,
-				    ACPI_UINT32_MAX, acpi_backlight_cap_match, NULL,
-				    &video_caps, NULL);
-
-	return (video_caps);
-}
-
 static bool
 linux_acpi_match_device_cls(const struct acpi_device_id *id, struct acpi_hardware_id *hwid)
 {
