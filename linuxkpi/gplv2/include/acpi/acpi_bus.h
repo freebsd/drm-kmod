@@ -70,18 +70,6 @@ struct acpi_hotplug_profile {
 };
 
 /*
- * ACPI Hotplug Context
- * --------------------
- */
-
-struct acpi_hotplug_context {
-	struct acpi_device *self;
-	int (*notify)(struct acpi_device *, u32);
-	void (*uevent)(struct acpi_device *, u32);
-	void (*fixup)(struct acpi_device *);
-};
-
-/*
  * ACPI Driver
  * -----------
  */
@@ -162,8 +150,6 @@ struct acpi_device_physical_node {
 	bool put_online:1;
 };
 
-struct acpi_gpio_mapping;
-
 /* Device */
 struct acpi_device {
 	int device_type;
@@ -176,16 +162,10 @@ struct acpi_device {
 	struct list_head del_list;
 	struct acpi_device_status status;
 	struct acpi_device_pnp pnp;
-	struct acpi_hotplug_context *hp;
 	struct acpi_driver *driver;
-	const struct acpi_gpio_mapping *driver_gpios;
 	void *driver_data;
 	struct device dev;
-	unsigned int physical_node_count;
-	unsigned int dep_unmet;
-	struct list_head physical_node_list;
-	struct mutex physical_node_lock;
-	void (*remove)(struct acpi_device *);
+	/* void (*remove)(struct acpi_device *); */
 };
 
 static inline bool is_acpi_device_node(struct fwnode_handle *fwnode)
