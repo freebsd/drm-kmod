@@ -10,14 +10,11 @@ typedef ACPI_STRING		acpi_string;
 typedef ACPI_SIZE		acpi_size;
 typedef ACPI_WALK_CALLBACK	acpi_walk_callback;
 
-#define	acpi_gbl_FADT		AcpiGbl_FADT
-
 #define	acpi_evaluate_object	AcpiEvaluateObject
 #define	acpi_format_exception	AcpiFormatException
 #define	acpi_get_handle		AcpiGetHandle
 #define	acpi_get_data		AcpiGetData
 #define	acpi_get_name		AcpiGetName
 #define	acpi_get_table		AcpiGetTable
-#define	acpi_walk_namespace	AcpiWalkNamespace
 
 #endif /* _ACPI_ACPI_H_ */
