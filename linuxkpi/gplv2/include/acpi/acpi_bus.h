@@ -24,12 +24,6 @@
 
 struct device;
 
-/* acpi_utils.h */
-acpi_status
-acpi_evaluate_integer(acpi_handle handle,
-		      acpi_string pathname,
-		      struct acpi_object_list *arguments, unsigned long long *data);
-
 bool acpi_has_method(acpi_handle handle, char *name);
 
 bool acpi_check_dsm(acpi_handle handle, const u8 *uuid, int rev, u64 funcs);

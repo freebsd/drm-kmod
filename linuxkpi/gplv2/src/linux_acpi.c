@@ -75,38 +75,6 @@ acpi_util_eval_error(acpi_handle h, acpi_string p, acpi_status s)
 #endif
 }
 
-acpi_status
-acpi_evaluate_integer(acpi_handle handle,
-		      acpi_string pathname,
-		      struct acpi_object_list *arguments, unsigned long long *data)
-{
-	acpi_status status = AE_OK;
-	union acpi_object element;
-	struct acpi_buffer buffer = { 0, NULL };
-
-	if (!data)
-		return AE_BAD_PARAMETER;
-
-	buffer.Length = sizeof(union acpi_object);
-	buffer.Pointer = &element;
-	status = AcpiEvaluateObject(handle, pathname, arguments, &buffer);
-	if (ACPI_FAILURE(status)) {
-		acpi_util_eval_error(handle, pathname, status);
-		return status;
-	}
-
-	if (element.Type != ACPI_TYPE_INTEGER) {
-		acpi_util_eval_error(handle, pathname, AE_BAD_DATA);
-		return AE_BAD_DATA;
-	}
-
-	*data = element.Integer.Value;
-
-	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Return value [%llu]\n", *data));
-
-	return AE_OK;
-}
-
 bool
 acpi_has_method(acpi_handle handle, char *name)
 {
