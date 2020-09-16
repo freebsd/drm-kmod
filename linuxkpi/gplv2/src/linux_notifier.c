@@ -165,20 +165,6 @@ unregister_reboot_notifier(struct notifier_block *nb)
 
 #ifdef CONFIG_ACPI
 int
-acpi_lid_notifier_register(struct notifier_block *nb)
-{
-	WARN_NOT();
-	return (0);
-}
-
-int
-acpi_lid_notifier_unregister(struct notifier_block *nb)
-{
-	WARN_NOT();
-	return (0);
-}
-
-int
 register_acpi_notifier(struct notifier_block *nb)
 {
 	WARN_NOT();
