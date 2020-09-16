@@ -205,57 +205,6 @@ acpi_scan_drop_device(acpi_handle handle, void *context)
 	mutex_unlock(&acpi_device_del_lock);
 }
 
-static bool
-linux_acpi_match_device_cls(const struct acpi_device_id *id, struct acpi_hardware_id *hwid)
-{
-	int i, msk, byte_shift;
-	char buf[3];
-
-	if (!id->cls)
-		return false;
-
-	/* Apply class-code bitmask, before checking each class-code byte */
-	for (i = 1; i <= 3; i++) {
-		byte_shift = 8 * (3 - i);
-		msk = (id->cls_msk >> byte_shift) & 0xFF;
-		if (!msk)
-			continue;
-
-		sprintf(buf, "%02x", (id->cls >> byte_shift) & msk);
-		if (strncmp(buf, &hwid->id[(i - 1) * 2], 2))
-			return (false);
-	}
-	return (true);
-}
-
-const struct acpi_device_id *
-linux_acpi_match_device(struct acpi_device *device, const struct acpi_device_id *ids,
-    const struct of_device_id *of_ids)
-{
-	const struct acpi_device_id *id;
-	struct acpi_hardware_id *hwid;
-
-	if (device == NULL || !device->status.present)
-		return NULL;
-
-	list_for_each_entry(hwid, &device->pnp.ids, list) {
-		/* First, check the ACPI/PNP IDs provided by the caller. */
-		for (id = ids; id->id[0] || id->cls; id++) {
-			if (id->id[0] && !strcmp((char *) id->id, hwid->id))
-				return id;
-			else if (id->cls && linux_acpi_match_device_cls(id, hwid))
-				return id;
-		}
-
-#ifdef __notyet__
-		if (!strcmp(ACPI_DT_NAMESPACE_HID, hwid->id)
-		    && acpi_of_match_device(device, of_ids))
-			return id;
-#endif		
-	}
-	return NULL;
-}
-
 #ifdef CONFIG_ACPI_SLEEP
 u32 linuxkpi_acpi_target_sleep_state = ACPI_STATE_S0;
 
