@@ -2,64 +2,13 @@
 #include <acpi/button.h>
 #include <linux/pci.h>
 
-
-#define	_COMPONENT	ACPI_OS_SERVICES
-
 ACPI_MODULE_NAME("linux_acpi")
-
 
 char empty_zero_page[PAGE_SIZE] __aligned(PAGE_SIZE);
 
-
 #define INVALID_ACPI_HANDLE	((acpi_handle)empty_zero_page)
 
-extern acpi_handle acpi_lid_handle;
-
 #define acpi_handle_warn(handle, fmt, ...)
-
-acpi_status
-AcpiGetData(acpi_handle obj_handle, acpi_object_handler handler, void **data);
-
-
-extern acpi_status
-AcpiEvaluateObjectTyped(acpi_handle handle,
-			acpi_string pathname,
-			struct acpi_object_list *external_params,
-			struct acpi_buffer *return_buffer,
-			acpi_object_type return_type);
-
-extern acpi_status
-AcpiEvaluateObject(acpi_handle handle,
-		   acpi_string pathname,
-		   struct acpi_object_list *external_params,
-		   struct acpi_buffer *return_buffer);
-extern acpi_status
-AcpiWalkNamespace(acpi_object_type type,
-		    acpi_handle start_object,
-		    u32 max_depth,
-		    acpi_walk_callback
-		    descending_callback,
-		    acpi_walk_callback
-		    ascending_callback,
-		    void *context,
-		    void **return_value);
-
-
-acpi_status
-AcpiGetName(acpi_handle handle, u32 name_type, struct acpi_buffer * buffer);
-
-acpi_status
-AcpiGetHandle(acpi_handle parent,
-    acpi_string pathname, acpi_handle * ret_handle);
-
-acpi_status
-AcpiGetTable(acpi_string signature, u32 instance, struct acpi_table_header **out_table);
-
-
-
-
-extern const char *
-AcpiFormatException(acpi_status status);
 
 union acpi_object *
 acpi_evaluate_dsm(acpi_handle handle, const u8 *uuid, int rev, int func,
