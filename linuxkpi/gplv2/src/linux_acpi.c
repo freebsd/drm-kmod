@@ -61,20 +61,6 @@ AcpiGetTable(acpi_string signature, u32 instance, struct acpi_table_header **out
 extern const char *
 AcpiFormatException(acpi_status status);
 
-static void
-acpi_util_eval_error(acpi_handle h, acpi_string p, acpi_status s)
-{
-#ifdef ACPI_DEBUG_OUTPUT
-	char prefix[80] = {'\0'};
-	struct acpi_buffer buffer = {sizeof(prefix), prefix};
-	acpi_get_name(h, ACPI_FULL_PATHNAME, &buffer);
-	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Evaluate [%s.%s]: %s\n",
-		(char *) prefix, p, acpi_format_exception(s)));
-#else
-	return;
-#endif
-}
-
 bool
 acpi_has_method(acpi_handle handle, char *name)
 {
@@ -165,15 +151,6 @@ acpi_check_dsm(acpi_handle handle, const u8 *uuid, int rev, u64 funcs)
 }
 
 void acpi_fake_objhandler(acpi_handle h, void *data);
-
-static device_t
-acpi_get_device(acpi_handle handle)
-{
-	void *dev = NULL;
-	AcpiGetData(handle, acpi_fake_objhandler, &dev);
-
-	return ((device_t)dev);
-}
 
 DEFINE_MUTEX(acpi_device_lock);
 extern struct list_head acpi_bus_id_list;
