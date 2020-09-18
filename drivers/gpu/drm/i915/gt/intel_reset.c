@@ -664,7 +664,7 @@ static intel_engine_mask_t reset_prepare(struct intel_gt *gt)
 	enum intel_engine_id id;
 
 	for_each_engine(engine, gt->i915, id) {
-		if (intel_engine_pm_is_awake(engine))
+		if (intel_engine_pm_get_if_awake(engine))
 			awake |= engine->mask;
 		reset_prepare_engine(engine);
 	}

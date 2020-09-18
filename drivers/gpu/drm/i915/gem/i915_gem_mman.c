@@ -290,6 +290,9 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	intel_wakeref_t wakeref;
 	struct i915_vma *vma;
 	pgoff_t page_offset;
+#ifdef __freebsd_notyet__
+	int srcu;
+#endif
 	int ret;
 
 	/* Sanity check that we allow writing into this object */
