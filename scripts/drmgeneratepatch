@@ -63,6 +63,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_mipi*' \
     ':!drivers/gpu/drm/drm_of*' \
     ':!drivers/gpu/drm/drm_simple*' \
+    ':!drivers/gpu/drm/drm_trace*' \
     ':!include/drm/bridge/*' \
     ':!include/drm/tinydrm/*' \
     ':!include/drm/drm_fb_cma_helper.h*' \
