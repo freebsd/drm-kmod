@@ -288,8 +288,24 @@ struct hdcp_srm_header {
 struct drm_device;
 struct drm_connector;
 
+#ifdef __linux__
 bool drm_hdcp_check_ksvs_revoked(struct drm_device *dev,
 				 u8 *ksvs, u32 ksv_count);
 int drm_connector_attach_content_protection_property(
 		struct drm_connector *connector);
+#elif defined(__FreeBSD__)
+static inline bool
+drm_hdcp_check_ksvs_revoked(struct drm_device *dev,
+  u8 *ksvs, u32 ksv_count) {
+
+	return (false);
+}
+
+static inline int
+drm_connector_attach_content_protection_property(
+	struct drm_connector *connector) {
+
+	return (0);
+}
+#endif
 #endif
