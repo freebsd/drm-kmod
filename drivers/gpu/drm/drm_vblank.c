@@ -34,7 +34,9 @@
 #include <drm/drm_vblank.h>
 
 #include "drm_internal.h"
+#ifdef __linux__
 #include "drm_trace.h"
+#endif
 
 /**
  * DOC: vblank handling
@@ -861,7 +863,9 @@ static void send_vblank_event(struct drm_device *dev,
 		e->event.seq.time_ns = ktime_to_ns(now);
 		break;
 	}
+#ifdef __linux__
 	trace_drm_vblank_event_delivered(e->base.file_priv, e->pipe, seq);
+#endif
 	drm_send_event_locked(dev, &e->base);
 }
 
@@ -1510,7 +1514,9 @@ static int drm_queue_vblank_event(struct drm_device *dev, unsigned int pipe,
 	DRM_DEBUG("event on vblank count %llu, current %llu, crtc %u\n",
 		  req_seq, seq, pipe);
 
+#ifdef __linux__
 	trace_drm_vblank_event_queued(file_priv, pipe, req_seq);
+#endif
 
 	e->sequence = req_seq;
 	if (vblank_passed(seq, req_seq)) {
@@ -1741,7 +1747,9 @@ static void drm_handle_vblank_events(struct drm_device *dev, unsigned int pipe)
 		send_vblank_event(dev, e, seq, now);
 	}
 
+#ifdef __linux__
 	trace_drm_vblank_event(pipe, seq);
+#endif
 }
 
 /**
