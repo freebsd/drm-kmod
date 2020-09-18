@@ -1103,7 +1103,9 @@ struct intel_hdmi {
 	bool has_hdmi_sink;
 	bool has_audio;
 	struct intel_connector *attached_connector;
+#ifdef __linux__
 	struct cec_notifier *cec_notifier;
+#endif
 };
 
 struct intel_dp_mst_encoder;
