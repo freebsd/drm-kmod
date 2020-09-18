@@ -230,5 +230,18 @@ void drm_framebuffer_print_info(struct drm_printer *p, unsigned int indent,
 int drm_framebuffer_debugfs_init(struct drm_minor *minor);
 
 /* drm_hdcp.c */
+#ifdef  __linux__
 int drm_setup_hdcp_srm(struct class *drm_class);
 void drm_teardown_hdcp_srm(struct class *drm_class);
+#elif defined(__FreeBSD__)
+static inline int
+drm_setup_hdcp_srm(struct class *drm_class)
+{
+
+	return (0);
+}
+static inline void
+drm_teardown_hdcp_srm(struct class *drm_class)
+{
+}
+#endif
