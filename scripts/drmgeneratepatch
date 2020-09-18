@@ -53,6 +53,10 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     include/linux/dma-fence-chain.h \
     ':!drivers/gpu/drm/i915/gvt/*' \
     ':!drivers/gpu/drm/i915/selftests/*' \
+    ':!drivers/gpu/drm/i915/gt/selftest*' \
+    ':!drivers/gpu/drm/i915/gem/selftests/*' \
+    ':!drivers/gpu/drm/selftests/*' \
+    ':!drivers/gpu/drm/drm_dp_cec*' \
     ':!drivers/gpu/drm/drm_gem_cma_helper*' \
     ':!drivers/gpu/drm/drm_hdcp*' \
     ':!drivers/gpu/drm/drm_kms_helper*' \
