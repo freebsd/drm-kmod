@@ -837,17 +837,23 @@ struct drm_mode_config {
 	struct drm_property *writeback_out_fence_ptr_property;
 
 	/**
+	 * @hdr_output_metadata_property: Connector property containing hdr
+	 * metatada. This will be provided by userspace compositors based
+	 * on HDR content
+	 */
+	struct drm_property *hdr_output_metadata_property;
+
+	/**
 	 * @content_protection_property: DRM ENUM property for content
 	 * protection. See drm_connector_attach_content_protection_property().
 	 */
 	struct drm_property *content_protection_property;
 
 	/**
-	 * @hdr_output_metadata_property: Connector property containing hdr
-	 * metatada. This will be provided by userspace compositors based
-	 * on HDR content
+	 * @hdcp_content_type_property: DRM ENUM property for type of
+	 * Protected Content.
 	 */
-	struct drm_property *hdr_output_metadata_property;
+	struct drm_property *hdcp_content_type_property;
 
 	/* dumb ioctl parameters */
 	uint32_t preferred_depth, prefer_shadow;
