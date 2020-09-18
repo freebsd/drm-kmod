@@ -2531,7 +2531,9 @@ intel_hdmi_set_edid(struct drm_connector *connector)
 		connected = true;
 	}
 
+#ifdef __linux__
 	cec_notifier_set_phys_addr_from_edid(intel_hdmi->cec_notifier, edid);
+#endif
 
 	return connected;
 }
@@ -2562,8 +2564,10 @@ intel_hdmi_detect(struct drm_connector *connector, bool force)
 out:
 	intel_display_power_put(dev_priv, POWER_DOMAIN_GMBUS, wakeref);
 
+#ifdef __linux__
 	if (status != connector_status_connected)
 		cec_notifier_phys_addr_invalidate(intel_hdmi->cec_notifier);
+#endif
 
 	/*
 	 * Make sure the refs for power wells enabled during detect are
@@ -2761,8 +2765,10 @@ intel_hdmi_connector_register(struct drm_connector *connector)
 
 static void intel_hdmi_destroy(struct drm_connector *connector)
 {
+#ifdef __linux__
 	if (intel_attached_hdmi(connector)->cec_notifier)
 		cec_notifier_put(intel_attached_hdmi(connector)->cec_notifier);
+#endif
 
 	intel_connector_destroy(connector);
 }
@@ -3129,10 +3135,12 @@ void intel_hdmi_init_connector(struct intel_digital_port *intel_dig_port,
 		I915_WRITE(PEG_BAND_GAP_DATA, (temp & ~0xf) | 0xd);
 	}
 
+#ifdef __linux__
 	intel_hdmi->cec_notifier = cec_notifier_get_conn(dev->dev,
 							 port_identifier(port));
 	if (!intel_hdmi->cec_notifier)
 		DRM_DEBUG_KMS("CEC notifier get failed\n");
+#endif
 }
 
 static enum intel_hotplug_state
