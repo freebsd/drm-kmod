@@ -190,11 +190,7 @@ static ssize_t auxdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
 	iocb->ki_pos = pos;
 
 	if (atomic_dec_and_test(&aux_dev->usecount))
-#ifdef __linux__
 		wake_up_var(&aux_dev->usecount);
-#else
-		wake_up_atomic_t(&aux_dev->usecount);
-#endif
 
 	return res;
 }
@@ -241,11 +237,7 @@ static ssize_t auxdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	iocb->ki_pos = pos;
 
 	if (atomic_dec_and_test(&aux_dev->usecount))
-#ifdef __linux__
 		wake_up_var(&aux_dev->usecount);
-#else
-		wake_up_atomic_t(&aux_dev->usecount);
-#endif
 
 	return res;
 }
