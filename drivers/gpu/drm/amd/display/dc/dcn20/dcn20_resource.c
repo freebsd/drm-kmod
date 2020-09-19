@@ -2794,6 +2794,7 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 	if (fast_validate)
 		return dcn20_validate_bandwidth_internal(dc, context, true);
 
+
 	// Best case, we support full UCLK switch latency
 	voltage_supported = dcn20_validate_bandwidth_internal(dc, context, false);
 #ifdef __FreeBSD__
@@ -2824,6 +2825,7 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 restore_dml_state:
 	memcpy(&context->bw_ctx.dml, &dc->dml, sizeof(struct display_mode_lib));
 	context->bw_ctx.dml.soc.dram_clock_change_latency_us = p_state_latency_us;
+
 #ifdef __FreeBSD__
 	kernel_fpu_end();
 #endif
@@ -3488,6 +3490,7 @@ static bool construct(
 
 				ranges.num_reader_wm_sets = i + 1;
 			}
+
 #ifdef __FreeBSD__
 			kernel_fpu_end();
 #endif

@@ -720,20 +720,6 @@ static int navi10_print_clk_levels(struct smu_context *smu,
 			ret = smu_get_dpm_freq_by_index(smu, clk_type, count - 1, &freq_values[2]);
 			if (ret)
 				return size;
-			ret = smu_get_dpm_freq_by_index(smu, clk_type, count - 1, &freq_values[2]);
-			if (ret)
-				return size;
-
-			freq_values[1] = cur_value;
-			mark_index = cur_value == freq_values[0] ? 0 :
-				     cur_value == freq_values[2] ? 2 : 1;
-			if (mark_index != 1)
-				freq_values[1] = (freq_values[0] + freq_values[2]) / 2;
-
-			for (i = 0; i < 3; i++) {
-				size += sprintf(buf + size, "%d: %uMhz %s\n", i, freq_values[i],
-						i == mark_index ? "*" : "");
-			}
 
 			freq_values[1] = cur_value;
 			mark_index = cur_value == freq_values[0] ? 0 :

@@ -847,6 +847,7 @@ static int amdgpu_ras_sysfs_create_feature_node(struct amdgpu_device *adev)
 #ifdef __linux__
 	sysfs_bin_attr_init(bin_attrs[0]);
 #endif
+
 	return sysfs_create_group(&adev->dev->kobj, &group);
 }
 
