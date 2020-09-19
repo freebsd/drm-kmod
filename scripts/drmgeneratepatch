@@ -71,6 +71,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_fb_cma_helper.h*' \
     ':!include/drm/drm_gem_cma*' \
     ':!include/drm/drm_gem_shmem*' \
+    ':!include/drm/drm_mipi_dsi*' \
     ':!include/drm/drm_of*' \
     ':!include/drm/gma*' \
     ':!include/uapi/drm/etnaviv*' \
