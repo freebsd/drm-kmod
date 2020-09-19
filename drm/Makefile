@@ -160,14 +160,8 @@ SRCS+=	device_if.h \
 .if ${MACHINE_CPUARCH} == "powerpc"
 CWARNFLAGS+=-Wno-cast-qual
 .endif
-CWARNFLAGS+= -Wno-pointer-arith -Wno-pointer-sign -Wno-format
-CWARNFLAGS+= -Wno-expansion-to-defined
+CWARNFLAGS+= -Wno-pointer-sign -Wno-format
 
-CWARNFLAGS.drm_mipi_dsi.c+=	-Wno-incompatible-pointer-types-discards-qualifiers -Wno-int-conversion
-CWARNFLAGS.drm_cache.c+=	-Wno-int-conversion
-CWARNFLAGS.drm_info.c+=		-Wno-tautological-compare
 CWARNFLAGS.drm_ioc32.c+=	-Wno-address-of-packed-member
-CWARNFLAGS.drm_debugfs.c+=	-Wno-format-security
-CWARNFLAGS.drm_scatter.c+=	-Wno-int-conversion
 
 .include <bsd.kmod.mk>
