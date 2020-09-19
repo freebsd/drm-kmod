@@ -1691,11 +1691,13 @@ int intel_hdmi_hdcp2_capable(struct intel_digital_port *intel_dig_port,
 	return ret;
 }
 
+#ifdef __linux__
 static inline
 enum hdcp_wired_protocol intel_hdmi_hdcp2_protocol(void)
 {
 	return HDCP_PROTOCOL_HDMI;
 }
+#endif
 
 static const struct intel_hdcp_shim intel_hdmi_hdcp_shim = {
 	.write_an_aksv = intel_hdmi_hdcp_write_an_aksv,
@@ -2709,6 +2711,7 @@ static void chv_hdmi_pre_enable(struct intel_encoder *encoder,
 	chv_phy_release_cl2_override(encoder);
 }
 
+#ifdef __linux__
 static struct i2c_adapter *
 intel_hdmi_get_i2c_adapter(struct drm_connector *connector)
 {
@@ -2717,6 +2720,7 @@ intel_hdmi_get_i2c_adapter(struct drm_connector *connector)
 
 	return intel_gmbus_get_adapter(dev_priv, intel_hdmi->ddc_bus);
 }
+#endif
 
 static void intel_hdmi_create_i2c_symlink(struct drm_connector *connector)
 {

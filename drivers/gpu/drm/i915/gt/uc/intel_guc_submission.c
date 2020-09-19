@@ -508,10 +508,12 @@ static void guc_submit(struct intel_engine_cs *engine,
 	spin_unlock(&client->wq_lock);
 }
 
+#ifdef __linux__
 static inline int rq_prio(const struct i915_request *rq)
 {
 	return rq->sched.attr.priority | __NO_PREEMPTION;
 }
+#endif
 
 static struct i915_request *schedule_in(struct i915_request *rq, int idx)
 {
@@ -879,6 +881,7 @@ static void guc_client_free(struct intel_guc_client *client)
 	kfree(client);
 }
 
+#ifdef __linux__
 static inline bool ctx_save_restore_disabled(struct intel_context *ce)
 {
 	u32 sr = ce->lrc_reg_state[CTX_CONTEXT_CONTROL + 1];
@@ -891,6 +894,7 @@ static inline bool ctx_save_restore_disabled(struct intel_context *ce)
 
 #undef SR_DISABLED
 }
+#endif
 
 static int guc_clients_create(struct intel_guc *guc)
 {
