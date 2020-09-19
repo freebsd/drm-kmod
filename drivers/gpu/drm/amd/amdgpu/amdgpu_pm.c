@@ -2775,7 +2775,6 @@ int amdgpu_pm_load_smu_firmware(struct amdgpu_device *adev, uint32_t *smu_versio
 {
 	int r;
 
-
 	if (adev->powerplay.pp_funcs && adev->powerplay.pp_funcs->load_firmware) {
 		r = adev->powerplay.pp_funcs->load_firmware(adev->powerplay.pp_handle);
 		if (r) {

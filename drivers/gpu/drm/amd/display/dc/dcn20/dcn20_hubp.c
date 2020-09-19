@@ -187,7 +187,7 @@ void hubp2_vready_at_or_After_vsync(struct hubp *hubp,
 	REG_UPDATE(DCHUBP_CNTL, HUBP_VREADY_AT_OR_AFTER_VSYNC, value);
 }
 
-static void hubp2_program_requestor(
+void hubp2_program_requestor(
 		struct hubp *hubp,
 		struct _vcs_dpi_display_rq_regs_st *rq_regs)
 {

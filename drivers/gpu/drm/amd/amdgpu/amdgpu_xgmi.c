@@ -183,6 +183,7 @@ static int amdgpu_xgmi_sysfs_add_dev_info(struct amdgpu_device *adev,
 	if (ret)
 		pr_err("failed to create xgmi_error\n");
 
+
 #ifdef __linux__
 	/* Create sysfs link to hive info folder on the first device */
 	if (adev != hive->adev) {

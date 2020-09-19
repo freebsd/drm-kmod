@@ -45,47 +45,10 @@
 
 #include <linux/firmware.h>
 #include <linux/module.h>
-#include <linux/hmm.h>
-#include <linux/interval_tree.h>
-
 #include <drm/drm.h>
 
 #include "amdgpu.h"
 #include "amdgpu_amdkfd.h"
-
-/**
- * struct amdgpu_mn
- *
- * @adev: amdgpu device pointer
- * @mm: process address space
- * @type: type of MMU notifier
- * @work: destruction work item
- * @node: hash table node to find structure by adev and mn
- * @lock: rw semaphore protecting the notifier nodes
- * @objects: interval tree containing amdgpu_mn_nodes
- * @mirror: HMM mirror function support
- *
- * Data for each amdgpu device and process address space.
- */
-struct amdgpu_mn {
-	/* constant after initialisation */
-	struct amdgpu_device	*adev;
-	struct mm_struct	*mm;
-	enum amdgpu_mn_type	type;
-
-	/* only used on destruction */
-	struct work_struct	work;
-
-	/* protected by adev->mn_lock */
-	struct hlist_node	node;
-
-	/* objects protected by lock */
-	struct rw_semaphore	lock;
-	struct rb_root_cached	objects;
-
-	/* HMM mirror */
-	struct hmm_mirror	mirror;
-};
 
 /**
  * struct amdgpu_mn_node
@@ -220,8 +183,6 @@ static void amdgpu_mn_invalidate_node(struct amdgpu_mn_node *node,
 			true, false, MAX_SCHEDULE_TIMEOUT);
 		if (r <= 0)
 			DRM_ERROR("(%ld) failed to wait for user bo\n", r);
-
-		amdgpu_ttm_tt_mark_user_pages(bo->tbo.ttm);
 	}
 }
 
@@ -504,3 +465,24 @@ void amdgpu_mn_unregister(struct amdgpu_bo *bo)
 	mutex_unlock(&adev->mn_lock);
 }
 
+/* flags used by HMM internal, not related to CPU/GPU PTE flags */
+static const uint64_t hmm_range_flags[HMM_PFN_FLAG_MAX] = {
+		(1 << 0), /* HMM_PFN_VALID */
+		(1 << 1), /* HMM_PFN_WRITE */
+		0 /* HMM_PFN_DEVICE_PRIVATE */
+};
+
+static const uint64_t hmm_range_values[HMM_PFN_VALUE_MAX] = {
+		0xfffffffffffffffeUL, /* HMM_PFN_ERROR */
+		0, /* HMM_PFN_NONE */
+		0xfffffffffffffffcUL /* HMM_PFN_SPECIAL */
+};
+
+void amdgpu_hmm_init_range(struct hmm_range *range)
+{
+	if (range) {
+		range->flags = hmm_range_flags;
+		range->values = hmm_range_values;
+		range->pfn_shift = PAGE_SHIFT;
+	}
+}
