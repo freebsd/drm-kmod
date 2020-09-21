@@ -80,8 +80,6 @@
 #include "radeon_mode.h"
 #include "radeon_reg.h"
 
-#define firmware linux_firmware
-
 /*
  * Modules parameters.
  */
