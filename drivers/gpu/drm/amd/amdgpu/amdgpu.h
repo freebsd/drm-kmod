@@ -89,7 +89,6 @@
 #include "amdgpu_umc.h"
 #include "amdgpu_mmhub.h"
 
-#define firmware linux_firmware
 #define MAX_GPU_INSTANCE		16
 
 struct amdgpu_gpu_instance
