@@ -70,13 +70,8 @@ static struct dma_resv_list *dma_resv_list_alloc(unsigned int shared_max)
 	if (!list)
 		return NULL;
 
-#ifdef __linux__
 	list->shared_max = (ksize(list) - offsetof(typeof(*list), shared)) /
 		sizeof(*list->shared);
-#elif defined(__FreeBSD__)
-	list->shared_max = (offsetof(typeof(*list), shared[shared_max]) - offsetof(typeof(*list), shared)) /
-		sizeof(*list->shared);
-#endif
 
 	return list;
 }
