@@ -25,6 +25,7 @@
 #ifndef _LINUX_GPLV2_DMA_BUF_H_
 #define _LINUX_GPLV2_DMA_BUF_H_
 
+#include <linux/dma-buf-map.h>
 #include <linux/file.h>
 #include <linux/err.h>
 #include <linux/scatterlist.h>
@@ -111,7 +112,7 @@ struct dma_buf {
 	/* mutex to serialize list manipulation, attach/detach and vmap/unmap */
 	struct mutex lock;
 	unsigned vmapping_counter;
-	void *vmap_ptr;
+	struct dma_buf_map vmap_ptr;
 	const char *exp_name;
 	struct module *owner;
 	struct list_head list_node;
