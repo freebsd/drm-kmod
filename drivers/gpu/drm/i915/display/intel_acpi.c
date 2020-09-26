@@ -109,17 +109,11 @@ static acpi_handle intel_dsm_pci_probe(struct pci_dev *pdev)
 {
 	acpi_handle dhandle;
 
-	dhandle = ACPI_HANDLE_GET(&pdev->dev);
+	dhandle = ACPI_HANDLE(&pdev->dev);
 	if (!dhandle)
 		return NULL;
 
-	if (!acpi_check_dsm(dhandle,
-#ifdef __linux__
-	        &intel_dsm_guid,
-#elif defined(__FreeBSD__)
-	        (const u8 *)&intel_dsm_guid,
-#endif
-	        INTEL_DSM_REVISION_ID,
+	if (!acpi_check_dsm(dhandle, &intel_dsm_guid, INTEL_DSM_REVISION_ID,
 			    1 << INTEL_DSM_FN_PLATFORM_MUX_INFO)) {
 		DRM_DEBUG_KMS("no _DSM method for intel device\n");
 		return NULL;
