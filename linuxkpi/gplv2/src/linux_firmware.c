@@ -1,3 +1,4 @@
+#if !defined(LINUXKPI_COOKIE) || (LINUXKPI_COOKIE < 1600256818)
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/kernel.h>
@@ -121,3 +122,4 @@ release_firmware(const struct linux_firmware *lkfw)
 	free(__DECONST(void *, lkfw), M_LKPI_FW);
 	firmware_put(fw, 0);
 }
+#endif

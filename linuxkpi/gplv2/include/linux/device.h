@@ -25,6 +25,7 @@ struct devres_group {
 	int				color;
 };
 
+#if !defined(LINUXKPI_COOKIE) || (LINUXKPI_COOKIE < 1600256818)
 static inline void *
 devm_kmalloc(struct device *dev, size_t size, gfp_t gfp)
 {
@@ -47,6 +48,7 @@ devm_kcalloc(struct device *dev, size_t n, size_t size, gfp_t gfp)
 {
 	return devm_kmalloc(dev, n * size, gfp | __GFP_ZERO);
 }
+#endif
 
 /*
  * drivers/base/devres.c - device resource management

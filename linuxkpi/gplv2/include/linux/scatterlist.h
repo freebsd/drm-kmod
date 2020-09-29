@@ -31,6 +31,7 @@
 
 #include_next <linux/scatterlist.h>
 
+#if !defined(LINUXKPI_COOKIE) || (LINUXKPI_COOKIE < 1600256818)
 static inline size_t
 sg_pcopy_from_buffer(struct scatterlist *sgl, unsigned int nents,
     const void *buf, size_t buflen, off_t offset)
@@ -68,6 +69,7 @@ sg_pcopy_from_buffer(struct scatterlist *sgl, unsigned int nents,
 	}
 	return (total);
 }
+#endif
 
 static inline size_t
 sg_copy_from_buffer(struct scatterlist *sgl, unsigned int nents,

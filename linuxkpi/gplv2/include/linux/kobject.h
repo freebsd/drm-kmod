@@ -3,6 +3,7 @@
 
 #include_next <linux/kobject.h>
 
+#if !defined(LINUXKPI_COOKIE) || (LINUXKPI_COOKIE < 1600256818)
 enum kobject_action {
 	KOBJ_ADD,
 	KOBJ_REMOVE,
@@ -22,5 +23,6 @@ kobject_uevent_env(struct kobject *kobj __unused,
 
 	return (0);
 }
+#endif
 
 #endif

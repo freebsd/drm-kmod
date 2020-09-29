@@ -1,6 +1,7 @@
 #ifndef _LINUX_FIRMWARE_H
 #define _LINUX_FIRMWARE_H
 
+#if !defined(LINUXKPI_COOKIE) || (LINUXKPI_COOKIE < 1600256818)
 #include <linux/types.h>
 #include <linux/compiler.h>
 #include <linux/gfp.h>
@@ -49,4 +50,12 @@ int request_firmware_nowait(
 
 void release_firmware(const struct linux_firmware *fw);
 #define firmware linux_firmware
+#else
+
+#include_next <linux/firmware.h>
+
+#define	request_firmware_direct(f,n,d) request_firmware(f,n,d)
+#endif
+
+
 #endif

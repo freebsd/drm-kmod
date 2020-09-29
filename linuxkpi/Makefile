@@ -48,6 +48,9 @@ CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR}/dummy/include
 CFLAGS+= -I${.CURDIR}/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
+.if exists(${SYSDIR}/compat/linuxkpi/common/linuxkpi.h)
+CFLAGS+= -include ${SYSDIR}/compat/linuxkpi/common/linuxkpi.h
+.endif
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"' -DLINUXKPI_VERSION=50000
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 CFLAGS.gcc+= -Wno-cast-qual

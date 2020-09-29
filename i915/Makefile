@@ -201,6 +201,9 @@ CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
+.if exists(${SYSDIR}/compat/linuxkpi/common/linuxkpi.h)
+CFLAGS+= -include ${SYSDIR}/compat/linuxkpi/common/linuxkpi.h
+.endif
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 
 CFLAGS+= -I${.CURDIR:H}/include

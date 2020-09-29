@@ -120,12 +120,22 @@ pci_get_bus_and_slot(unsigned int bus, unsigned int devfn)
 	pdev = malloc(sizeof(*pdev), M_DEVBUF, M_WAITOK|M_ZERO);
 	pdev->devfn = devfn;
 	pdev->dev.bsddev = dev;
+#if defined(LINUXKPI_COOKIE) && (LINUXKPI_COOKIE >= 1600256818)
+	kobject_init(&pdev->dev.kobj, &linux_dev_ktype);
+	kobject_set_name(&pdev->dev.kobj, device_get_nameunit(dev));
+	kobject_add(&pdev->dev.kobj, &linux_root_device.kobj,
+	    kobject_name(&pdev->dev.kobj));
+	get_device(&pdev->dev);
+
+	TAILQ_INIT(&pdev->mmio);
+#endif
 	pbus = malloc(sizeof(*pbus), M_DEVBUF, M_WAITOK|M_ZERO);
 	pbus->self = pdev;
 	pdev->bus = pbus;
 	return (pdev);
 }
 
+#if !defined(LINUXKPI_COOKIE) || (LINUXKPI_COOKIE < 1600256818)
 void
 pci_dev_put(struct pci_dev *pdev)
 {
@@ -137,6 +147,7 @@ pci_dev_put(struct pci_dev *pdev)
 	free(pdev->bus, M_DEVBUF);
 	free(pdev, M_DEVBUF);
 }
+#endif
 
 struct pci_dev *
 linux_pci_get_class(unsigned int class, struct pci_dev *from)
@@ -175,6 +186,17 @@ linux_pci_get_class(unsigned int class, struct pci_dev *from)
 	pdev->vendor = pci_get_vendor(dev);
 	pdev->device = pci_get_device(dev);
 	pdev->dev.bsddev = dev;
+#if defined(LINUXKPI_COOKIE) && (LINUXKPI_COOKIE >= 1600256818)
+	pdev->class = class;
+	pdev->revision = pci_get_revid(dev);
+	kobject_init(&pdev->dev.kobj, &linux_dev_ktype);
+	kobject_set_name(&pdev->dev.kobj, device_get_nameunit(dev));
+	kobject_add(&pdev->dev.kobj, &linux_root_device.kobj,
+	    kobject_name(&pdev->dev.kobj));
+	get_device(&pdev->dev);
+
+	TAILQ_INIT(&pdev->mmio);
+#endif
 	pbus = malloc(sizeof(*pbus), M_DEVBUF, M_WAITOK|M_ZERO);
 	pbus->self = pdev;
 	pdev->bus = pbus;

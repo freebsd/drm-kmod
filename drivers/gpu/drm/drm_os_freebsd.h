@@ -104,6 +104,7 @@ do {								\
 	({ __typeof__(*(ptr)) __tmp;                                    \
 	  memcpy(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
 
+#if !defined(LINUXKPI_COOKIE) || (LINUXKPI_COOKIE < 1600256818)
 #if _BYTE_ORDER == _LITTLE_ENDIAN
 /* Taken from linux/include/linux/unaligned/le_struct.h. */
 struct __una_u32 { u32 x; } __packed;
@@ -137,6 +138,7 @@ get_unaligned_le32(const void *p)
 
 	return (__get_unaligned_le32((const u8 *)p));
 }
+#endif
 #endif
 
 #define	page_to_phys(x) VM_PAGE_TO_PHYS(x)

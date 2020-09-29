@@ -28,6 +28,9 @@
 #include <linux/wait.h>
 #include <linux/timer.h>
 #include <linux/completion.h>
+#if defined(LINUXKPI_COOKIE) && (LINUXKPI_COOKIE >= 1600256818)
+#include_next <linux/pm.h>
+#endif
 
 #define	DPM_FLAG_NEVER_SKIP	BIT(0)
 #define	DPM_FLAG_SMART_PREPARE	BIT(1)
@@ -37,6 +40,7 @@ struct device;
 
 extern const char power_group_name[];		/* = "power" */
 
+#if !defined(LINUXKPI_COOKIE) || (LINUXKPI_COOKIE < 1600256818)
 /*
  * Use this if you want to use the same suspend and resume callbacks for suspend
  * to RAM and hibernation.
@@ -58,6 +62,7 @@ extern const char power_group_name[];		/* = "power" */
 const struct dev_pm_ops name = { \
 	SET_SYSTEM_SLEEP_PM_OPS(suspend_fn, resume_fn) \
 }
+#endif
 
 struct dev_pm_domain {
         struct dev_pm_ops       ops;

@@ -1,5 +1,7 @@
 #ifndef __LINUX_KCONFIG_H
 #define __LINUX_KCONFIG_H
+
+#if !defined(LINUXKPI_COOKIE) || (LINUXKPI_COOKIE < 1600256818)
 #if 0
 #include <generated/autoconf.h>
 #endif
@@ -51,5 +53,6 @@
  */
 #define IS_ENABLED(option) \
 	(IS_BUILTIN(option) || IS_MODULE(option))
+#endif
 
 #endif /* __LINUX_KCONFIG_H */
