@@ -627,7 +627,7 @@ i2c_check_addr_busy(struct i2c_adapter *adapter, int addr)
 static void i2c_dev_set_name(struct i2c_adapter *adap,
 			     struct i2c_client *client)
 {
-#if defined(__i386__) || defined(__amd64__) || defined(__aarch64__)
+#ifdef __linux__
 	struct acpi_device *adev = ACPI_COMPANION(&client->dev);
 
 	if (adev) {

@@ -28,11 +28,6 @@ SRCS+=	dma-buf.c \
 	dma-fence.c \
 	reservation.c
 
-.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
-SRCS+=	linux_acpi.c	\
-	opt_acpi.h
-.endif
-
 SRCS+=	bus_if.h		\
 	device_if.h		\
 	pci_if.h		\
