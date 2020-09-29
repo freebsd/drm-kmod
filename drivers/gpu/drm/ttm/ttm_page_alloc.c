@@ -495,13 +495,15 @@ static int ttm_set_pages_caching(struct page **pages,
  * pool.
  */
 #ifdef __linux__
-static void ttm_handle_caching_state_failure(struct list_head *pages,
+static void ttm_handle_caching_failure(struct page **failed_pages,
+				       unsigned cpages)
 #elif defined(__FreeBSD__)
-static void ttm_handle_caching_state_failure(struct pglist *pages,
+static void ttm_handle_caching_failure(struct pglist *pages,
+				       struct page **failed_pages,
+				       unsigned cpages)
 #endif
-		int ttm_flags, enum ttm_caching_state cstate,
-		struct page **failed_pages, unsigned cpages)
 {
+
 	unsigned i;
 	/* Failed pages have to be freed */
 	for (i = 0; i < cpages; ++i) {
@@ -556,9 +558,14 @@ static int ttm_alloc_new_pages(struct pglist *pages, gfp_t gfp_flags,
 				r = ttm_set_pages_caching(caching_array,
 							  cstate, cpages);
 				if (r)
-					ttm_handle_caching_state_failure(pages,
-						ttm_flags, cstate,
-						caching_array, cpages);
+#ifdef __linux__
+					ttm_handle_caching_failure(caching_array,
+								   cpages);
+#elif defined(__FreeBSD__)
+					ttm_handle_caching_failure(pages,
+					    			   caching_array,
+								   cpages);
+#endif
 			}
 			r = -ENOMEM;
 			goto out;
@@ -585,9 +592,14 @@ static int ttm_alloc_new_pages(struct pglist *pages, gfp_t gfp_flags,
 				r = ttm_set_pages_caching(caching_array,
 						cstate, cpages);
 				if (r) {
-					ttm_handle_caching_state_failure(pages,
-						ttm_flags, cstate,
-						caching_array, cpages);
+#ifdef __linux__
+					ttm_handle_caching_failure(caching_array,
+								   cpages);
+#elif defined(__FreeBSD__)
+					ttm_handle_caching_failure(pages,
+					    			   caching_array,
+								   cpages);
+#endif
 					goto out;
 				}
 				cpages = 0;
@@ -598,9 +610,11 @@ static int ttm_alloc_new_pages(struct pglist *pages, gfp_t gfp_flags,
 	if (cpages) {
 		r = ttm_set_pages_caching(caching_array, cstate, cpages);
 		if (r)
-			ttm_handle_caching_state_failure(pages,
-					ttm_flags, cstate,
-					caching_array, cpages);
+#ifdef __linux__
+			ttm_handle_caching_failure(caching_array, cpages);
+#elif defined(__FreeBSD__)
+			ttm_handle_caching_failure(pages, caching_array, cpages);
+#endif
 	}
 out:
 	kfree(caching_array);
