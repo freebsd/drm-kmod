@@ -50,6 +50,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn21 \
 	${SRCDIR}/display/dc/dcn30 \
 	${SRCDIR}/display/dc/dcn301 \
+	${SRCDIR}/display/dc/dcn302 \
 	${SRCDIR}/display/dc/dsc \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
@@ -81,6 +82,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn20 \
 	${SRCDIR}/display/dc/irq/dcn21 \
 	${SRCDIR}/display/dc/irq/dcn30 \
+	${SRCDIR}/display/dc/irq/dcn302 \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
@@ -484,6 +486,13 @@ SRCS+=	dcn301_init.c \
 	dcn301_smu.c \
 	dmub_dcn301.c
 
+# display/dc/dcn302
+SRCS+=	dcn302_init.c \
+	dcn302_hwseq.c \
+	dcn302_resource.c \
+	irq_service_dcn302.c \
+	dmub_dcn302.c
+
 # display/dc/core
 SRCS+=	dc_vm_helper.c
 
@@ -847,6 +856,8 @@ CWARNFLAGS.dcn301_panel_cntl.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn301_resource.c=		-Wno-initializer-overrides -Wno-missing-prototypes
 CWARNFLAGS.dcn301_smu.c=		-Wno-missing-prototypes
 CWARNFLAGS.vg_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types
+CWARNFLAGS.dcn302_init.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn302_resource.c=		-Wno-initializer-overrides
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.hw_factory.c=		-Wno-missing-prototypes
