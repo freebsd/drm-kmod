@@ -37,6 +37,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/clk_mgr/dcn20 \
 	${SRCDIR}/display/dc/clk_mgr/dcn21 \
 	${SRCDIR}/display/dc/clk_mgr/dcn30 \
+	${SRCDIR}/display/dc/clk_mgr/dcn301 \
 	${SRCDIR}/display/dc/dce \
 	${SRCDIR}/display/dc/dce100 \
 	${SRCDIR}/display/dc/dce110 \
@@ -48,6 +49,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn20 \
 	${SRCDIR}/display/dc/dcn21 \
 	${SRCDIR}/display/dc/dcn30 \
+	${SRCDIR}/display/dc/dcn301 \
 	${SRCDIR}/display/dc/dsc \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
@@ -469,12 +471,23 @@ SRCS+=	dcn30_dio_link_encoder.c \
 	display_rq_dlg_calc_30.c
 .endif
 
+# display/dc/dcn301
+SRCS+=	dcn301_init.c \
+	dcn301_resource.c \
+	dcn301_dccg.c \
+	dcn301_dio_link_encoder.c \
+	dcn301_hwseq.c \
+	dcn301_panel_cntl.c \
+	dcn301_hubbub.c \
+	vg_clk_mgr.c \
+	dcn301_smu.c \
+	dmub_dcn301.c
+
 # display/dc/core
 SRCS+=	dc_vm_helper.c
 
 # display/dc/clk_mgr
-SRCS+=	dcn20_clk_mgr.c \
-	rn_clk_mgr.c \
+SRCS+=	rn_clk_mgr.c \
 	rn_clk_mgr_vbios_smu.c
 
 # display/dc/dsc
@@ -695,6 +708,7 @@ CFLAGS.dcn_calc_math.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-tautological-compar
 CFLAGS.dcn20_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn21_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn30_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn301_resource.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_mode_lib.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba.c= ${FPUFLAGS} -mstack-alignment=4
@@ -827,6 +841,11 @@ CWARNFLAGS.dcn30_hwseq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn30_resource.c=		-Wno-initializer-overrides -Wno-missing-prototypes
 CWARNFLAGS.dcn30_afmt.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn30_init.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn301_init.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn301_panel_cntl.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn301_resource.c=		-Wno-initializer-overrides -Wno-missing-prototypes
+CWARNFLAGS.dcn301_smu.c=		-Wno-missing-prototypes
+CWARNFLAGS.vg_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.hw_factory.c=		-Wno-missing-prototypes
