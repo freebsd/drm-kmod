@@ -47,7 +47,8 @@
 
 #include <drm/ttm/ttm_bo_driver.h>
 #include <drm/ttm/ttm_page_alloc.h>
-#include <drm/ttm/ttm_set_memory.h>
+
+#include "ttm_set_memory.h"
 
 #ifdef __FreeBSD__
 #include <linux/shrinker.h>
