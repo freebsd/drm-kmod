@@ -39,8 +39,6 @@
 
 #ifdef __FreeBSD__
 #include <asm/mtrr.h>	/* Needed for arch_phys_wc_* */
-#define aper_base ai_aperture_base
-#define aper_size ai_aperture_size
 
 static void
 drm_pci_busdma_callback(void *arg, bus_dma_segment_t *segs, int nsegs, int error)

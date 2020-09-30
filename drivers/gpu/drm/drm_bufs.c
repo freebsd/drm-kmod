@@ -74,8 +74,6 @@
 #endif
 
 #include "drm_legacy.h"
-#define aper_size ai_aperture_size
-
 
 static struct drm_map_list *drm_find_matching_map(struct drm_device *dev,
 						  struct drm_local_map *map)

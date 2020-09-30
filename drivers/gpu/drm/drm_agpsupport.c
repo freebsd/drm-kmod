@@ -59,22 +59,26 @@
  */
 int drm_agp_info(struct drm_device *dev, struct drm_agp_info *info)
 {
-	DRM_AGP_KERN *kern;
+	struct agp_kern_info *kern;
 
 	if (!dev->agp || !dev->agp->acquired)
 		return -EINVAL;
 
 	kern = &dev->agp->agp_info;
-	agp_get_info(dev->agp->bridge, kern);
-	info->agp_version_major = 1;
-	info->agp_version_minor = 0;
-	info->mode              = kern->ai_mode;
-	info->aperture_base     = kern->ai_aperture_base;
-	info->aperture_size     = kern->ai_aperture_size;
-	info->memory_allowed    = kern->ai_memory_allowed;
-	info->memory_used       = kern->ai_memory_used;
-	info->id_vendor         = kern->ai_devid & 0xffff;
-	info->id_device         = kern->ai_devid >> 16;
+	info->agp_version_major = kern->version.major;
+	info->agp_version_minor = kern->version.minor;
+	info->mode = kern->mode;
+	info->aperture_base = kern->aper_base;
+	info->aperture_size = kern->aper_size * 1024 * 1024;
+	info->memory_allowed = kern->max_memory << PAGE_SHIFT;
+	info->memory_used = kern->current_memory << PAGE_SHIFT;
+#ifdef __linux__
+	info->id_vendor = kern->device->vendor;
+	info->id_device = kern->device->device;
+#else
+	info->id_vendor = kern->vendor;
+	info->id_device = kern->device;
+#endif
 
 	return 0;
 }
@@ -418,15 +422,37 @@ int drm_agp_free_ioctl(struct drm_device *dev, void *data,
  */
 struct drm_agp_head *drm_agp_init(struct drm_device *dev)
 {
+#ifdef __FreeBSD__
+	struct agp_info agp_info;
+#endif
 	struct drm_agp_head *head = NULL;
 
 	head = kzalloc(sizeof(*head), GFP_KERNEL);
 	if (!head)
 		return NULL;
 
+#ifdef __FreeBSD__
 	head->bridge = agp_find_device();
 	if (!head->bridge) {
-#ifdef __linux__
+		kfree(head);
+		return NULL;
+	} else {
+		agp_get_info(head->bridge, &agp_info);
+		head->agp_info.version.major = 1;
+		head->agp_info.version.minor = 0;
+		head->agp_info.vendor = agp_info.ai_devid & 0xffff;
+		head->agp_info.device = agp_info.ai_devid >> 16;
+		head->agp_info.mode = agp_info.ai_mode;
+		head->agp_info.aper_base = agp_info.ai_aperture_base;
+		head->agp_info.aper_size = agp_info.ai_aperture_size >> 20;
+		head->agp_info.max_memory = agp_info.ai_memory_allowed >> PAGE_SHIFT;
+		head->agp_info.current_memory = agp_info.ai_memory_used >> PAGE_SHIFT;
+		head->agp_info.cant_use_aperture = 0;
+		head->agp_info.page_mask = ~0UL;
+	}
+#else
+	head->bridge = agp_find_bridge(dev->pdev);
+	if (!head->bridge) {
 		head->bridge = agp_backend_acquire(dev->pdev);
 		if (!head->bridge) {
 			kfree(head);
@@ -438,15 +464,14 @@ struct drm_agp_head *drm_agp_init(struct drm_device *dev)
 		agp_copy_info(head->bridge, &head->agp_info);
 	}
 	if (head->agp_info.chipset == NOT_SUPPORTED) {
-#endif
 		kfree(head);
 		return NULL;
-	} else {
-		agp_get_info(head->bridge, &head->agp_info);
 	}
+#endif
 	INIT_LIST_HEAD(&head->memory);
-	head->cant_use_aperture = 0;
-	head->base = head->agp_info.ai_aperture_base;
+	head->cant_use_aperture = head->agp_info.cant_use_aperture;
+	head->page_mask = head->agp_info.page_mask;
+	head->base = head->agp_info.aper_base;
 	return head;
 }
 

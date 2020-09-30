@@ -97,7 +97,6 @@ do {								\
 #define	KTR_DRM		KTR_DEV
 #define	KTR_DRM_REG	KTR_SPARE3
 
-#define	DRM_AGP_KERN	struct agp_info
 #define	DRM_AGP_MEM	void
 
 #define	get_unaligned(ptr)                                              \
