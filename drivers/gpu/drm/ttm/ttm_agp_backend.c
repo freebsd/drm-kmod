@@ -182,7 +182,7 @@ struct ttm_tt *ttm_agp_tt_create(struct ttm_buffer_object *bo,
 #endif
 	agp_be->bridge = bridge;
 
-	if (ttm_tt_init(&agp_be->ttm, bo, page_flags)) {
+	if (ttm_tt_init(&agp_be->ttm, bo, page_flags, ttm_write_combined)) {
 		kfree(agp_be);
 		return NULL;
 	}
