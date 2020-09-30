@@ -53,8 +53,8 @@
 #include "radeon_drv.h"
 
 #ifdef __FreeBSD__
-#define	aper_base ai_aperture_base
-#define	aper_size ai_aperture_size
+#include <vm/vm_phys.h>
+
 SYSCTL_NODE(_hw, OID_AUTO, radeonkms,
     CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
     DRIVER_DESC " parameters");
@@ -385,10 +385,18 @@ static int radeon_pci_probe(struct pci_dev *pdev,
 	if (pci_find_capability(dev->pdev, PCI_CAP_ID_AGP))
 		dev->agp = drm_agp_init(dev);
 	if (dev->agp) {
+#ifdef __linux__
 		dev->agp->agp_mtrr = arch_phys_wc_add(
 			dev->agp->agp_info.aper_base,
 			dev->agp->agp_info.aper_size *
 			1024 * 1024);
+#elif defined(__FreeBSD__)
+		vm_phys_fictitious_reg_range(
+			dev->agp->agp_info.ai_aperture_base,
+			dev->agp->agp_info.ai_aperture_base +
+			dev->agp->agp_info.ai_aperture_size,
+			VM_MEMATTR_WRITE_COMBINING);
+#endif
 	}
 
 	ret = drm_dev_register(dev, ent->driver_data);
@@ -399,7 +407,14 @@ static int radeon_pci_probe(struct pci_dev *pdev,
 
 err_agp:
 	if (dev->agp)
+#ifdef __linux__
 		arch_phys_wc_del(dev->agp->agp_mtrr);
+#elif defined(__FreeBSD__)
+		vm_phys_fictitious_unreg_range(
+			dev->agp->agp_info.ai_aperture_base,
+			dev->agp->agp_info.ai_aperture_base +
+			dev->agp->agp_info.ai_aperture_size);
+#endif
 	kfree(dev->agp);
 	pci_disable_device(pdev);
 err_free:
