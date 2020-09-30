@@ -30,9 +30,7 @@
  * interface to PPLIB/SMU to setup clocks and pstate requirements on SoC
  */
 
-#if !defined(__i386__) && !defined(__amd64__) && !defined(__aarch64__)
 typedef bool BOOLEAN;
-#endif
 
 enum pp_smu_ver {
 	/*
@@ -246,13 +244,8 @@ struct pp_smu_funcs_nv {
 	 * request to go un-acked.  Only when the call completes should such a state be applied to
 	 * DC hardware
 	 */
-#ifdef __linux__
 	enum pp_smu_status (*set_pstate_handshake_support)(struct pp_smu *pp,
 			BOOLEAN pstate_handshake_supported);
-#elif defined(__FreeBSD__)
-	enum pp_smu_status (*set_pstate_handshake_support)(struct pp_smu *pp,
-			bool pstate_handshake_supported);
-#endif
 };
 #endif
 

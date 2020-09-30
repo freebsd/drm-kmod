@@ -29,10 +29,14 @@
 #include <linux/list.h>
 #include <linux/mod_devicetable.h>
 
+/* FreeBSD ACPI code has a typedef for BOOLEAN which conflicts with amdgpu,
+ * so let's change it to defining something else */
+#define BOOLEAN ACPI_BOOLEAN
 #include <contrib/dev/acpica/include/acpi.h>
 #include <acpi/acpi.h>
 #include <acpi/acpi_bus.h>
 #include <acpi/acpi_drivers.h>
+#undef BOOLEAN
 
 static inline acpi_handle acpi_device_handle(struct acpi_device *adev)
 {
