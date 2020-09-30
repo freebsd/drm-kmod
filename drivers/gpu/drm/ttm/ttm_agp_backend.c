@@ -66,7 +66,7 @@ int ttm_agp_bind(struct ttm_tt *ttm, struct ttm_resource *bo_mem)
 	unsigned i;
 #ifdef __linux__
 	struct agp_memory *mem;
-	int ret, cached = (bo_mem->placement & TTM_PL_FLAG_CACHED);
+	int ret, cached = ttm->caching == ttm_cached;
 
 	if (agp_be->mem)
 		return 0;
