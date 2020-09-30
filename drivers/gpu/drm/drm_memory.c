@@ -58,6 +58,9 @@
 #  define PAGE_AGP	PAGE_KERNEL
 # endif
 #endif
+#ifdef __FreeBSD__
+#include <dev/agp/agpvar.h>
+#endif
 
 static void *agp_remap(unsigned long offset, unsigned long size,
 		       struct drm_device *dev)

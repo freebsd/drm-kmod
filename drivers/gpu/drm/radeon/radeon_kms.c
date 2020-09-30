@@ -87,9 +87,9 @@ void radeon_driver_unload_kms(struct drm_device *dev)
 		arch_phys_wc_del(dev->agp->agp_mtrr);
 #elif defined(__FreeBSD__)
 		vm_phys_fictitious_unreg_range(
-			dev->agp->agp_info.ai_aperture_base,
-			dev->agp->agp_info.ai_aperture_base +
-			dev->agp->agp_info.ai_aperture_size);
+			dev->agp->agp_info.aper_base,
+			dev->agp->agp_info.aper_base +
+			(dev->agp->agp_info.aper_size << 20));
 #endif
 	kfree(dev->agp);
 	dev->agp = NULL;

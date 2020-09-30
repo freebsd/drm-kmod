@@ -10,20 +10,11 @@
 #include <linux/types.h>
 #include <uapi/drm/drm.h>
 
-#ifdef __FreeBSD__
-#include <dev/agp/agpvar.h>
-#include <sys/agpio.h>
-#endif
-
 struct drm_device;
 struct drm_file;
 
 struct drm_agp_head {
-#ifdef __linux__
 	struct agp_kern_info agp_info;
-#elif defined(__FreeBSD__)
-	DRM_AGP_KERN agp_info;
-#endif
 	struct list_head memory;
 	unsigned long mode;
 #ifdef __linux__

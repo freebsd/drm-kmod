@@ -154,7 +154,6 @@ int radeon_agp_init(struct radeon_device *rdev)
 		return ret;
 	}
 
-#ifdef __linux__
 	if (rdev->ddev->agp->agp_info.aper_size < 32) {
 		drm_agp_release(rdev->ddev);
 		dev_warn(rdev->dev, "AGP aperture too small (%zuM) "
@@ -162,7 +161,6 @@ int radeon_agp_init(struct radeon_device *rdev)
 			rdev->ddev->agp->agp_info.aper_size);
 		return -EINVAL;
 	}
-#endif
 
 	mode.mode = info.mode;
 	/* chips with the agp to pcie bridge don't have the AGP_STATUS register
@@ -248,13 +246,8 @@ int radeon_agp_init(struct radeon_device *rdev)
 		return ret;
 	}
 
-#ifdef __linux__
 	rdev->mc.agp_base = rdev->ddev->agp->agp_info.aper_base;
 	rdev->mc.gtt_size = rdev->ddev->agp->agp_info.aper_size << 20;
-#elif defined(__FreeBSD__)
-	rdev->mc.agp_base = rdev->ddev->agp->agp_info.ai_aperture_base;
-	rdev->mc.gtt_size = rdev->ddev->agp->agp_info.ai_aperture_size;
-#endif
 	rdev->mc.gtt_start = rdev->mc.agp_base;
 	rdev->mc.gtt_end = rdev->mc.gtt_start + rdev->mc.gtt_size - 1;
 	dev_info(rdev->dev, "GTT: %lluM 0x%08llX - 0x%08llX\n",
