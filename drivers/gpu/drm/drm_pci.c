@@ -36,8 +36,7 @@
 #include "drm_legacy.h"
 
 #ifdef __FreeBSD__
-#define aper_base ai_aperture_base
-#define aper_size ai_aperture_size
+#include <vm/vm_phys.h>
 #endif
 
 #ifdef CONFIG_DRM_LEGACY
@@ -269,7 +268,14 @@ drm_getpciinfo(struct drm_device *dev, void *data, struct drm_file *file_priv)
 void drm_pci_agp_destroy(struct drm_device *dev)
 {
 	if (dev->agp) {
+#ifdef __linux__
 		arch_phys_wc_del(dev->agp->agp_mtrr);
+#elif defined(__FreeBSD__)
+		vm_phys_fictitious_unreg_range(
+			dev->agp->agp_info.ai_aperture_base,
+			dev->agp->agp_info.ai_aperture_base +
+			dev->agp->agp_info.ai_aperture_size);
+#endif
 		drm_legacy_agp_clear(dev);
 		kfree(dev->agp);
 		dev->agp = NULL;
@@ -284,10 +290,18 @@ static void drm_pci_agp_init(struct drm_device *dev)
 		if (pci_find_capability(dev->pdev, PCI_CAP_ID_AGP))
 			dev->agp = drm_agp_init(dev);
 		if (dev->agp) {
+#ifdef __linux__
 			dev->agp->agp_mtrr = arch_phys_wc_add(
 				dev->agp->agp_info.aper_base,
 				dev->agp->agp_info.aper_size *
 				1024 * 1024);
+#elif defined(__FreeBSD__)
+			vm_phys_fictitious_reg_range(
+				dev->agp->agp_info.ai_aperture_base,
+				dev->agp->agp_info.ai_aperture_base +
+				dev->agp->agp_info.ai_aperture_size,
+				VM_MEMATTR_WRITE_COMBINING);
+#endif
 		}
 	}
 }
