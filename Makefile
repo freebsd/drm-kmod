@@ -8,7 +8,8 @@ _VALID_KMODS=	linuxkpi ttm drm dummygfx i915 amd radeon vboxvideo vmwgfx
 SUPPORTED_ARCH=	amd64 \
 		i386 \
 		aarch64 \
-		powerpc64
+		powerpc64 \
+		powerpc64le
 
 .if empty(SUPPORTED_ARCH:M${MACHINE_ARCH})
 .error "Unsupported architetures ${MACHINE_ARCH}"
