@@ -392,9 +392,9 @@ static int radeon_pci_probe(struct pci_dev *pdev,
 			1024 * 1024);
 #elif defined(__FreeBSD__)
 		vm_phys_fictitious_reg_range(
-			dev->agp->agp_info.ai_aperture_base,
-			dev->agp->agp_info.ai_aperture_base +
-			dev->agp->agp_info.ai_aperture_size,
+			dev->agp->agp_info.aper_base,
+			dev->agp->agp_info.aper_base +
+			(dev->agp->agp_info.aper_size << 20),
 			VM_MEMATTR_WRITE_COMBINING);
 #endif
 	}
@@ -411,9 +411,9 @@ err_agp:
 		arch_phys_wc_del(dev->agp->agp_mtrr);
 #elif defined(__FreeBSD__)
 		vm_phys_fictitious_unreg_range(
-			dev->agp->agp_info.ai_aperture_base,
-			dev->agp->agp_info.ai_aperture_base +
-			dev->agp->agp_info.ai_aperture_size);
+			dev->agp->agp_info.aper_base,
+			dev->agp->agp_info.aper_base +
+			(dev->agp->agp_info.aper_size << 20));
 #endif
 	kfree(dev->agp);
 	pci_disable_device(pdev);

@@ -18,8 +18,8 @@
 #include "intel_gtt.h"
 
 #ifdef __FreeBSD__
+#include <dev/agp/agpvar.h>
 #include <dev/agp/agp_i810.h>
-#include <drm/drm_agpsupport.h>
 #endif
 
 static int
