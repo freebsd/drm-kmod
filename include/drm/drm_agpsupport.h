@@ -34,7 +34,9 @@ struct drm_agp_head {
 	int enabled;
 	int acquired;
 	unsigned long base;
+#ifdef __linux__
 	int agp_mtrr;
+#endif
 	int cant_use_aperture;
 	unsigned long page_mask;
 };
