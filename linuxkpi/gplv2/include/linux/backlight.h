@@ -5,6 +5,10 @@
  *
  */
 
+#include <sys/param.h>
+
+#if __FreeBSD_version < 1300118
+
 #ifndef _LINUX_BACKLIGHT_H
 #define _LINUX_BACKLIGHT_H
 
@@ -172,3 +176,5 @@ of_find_backlight_by_node(struct device_node *node)
 #endif
 
 #endif
+
+#endif /* __FreeBSD_version */

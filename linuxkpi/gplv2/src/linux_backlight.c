@@ -5,6 +5,10 @@
  *
  */
 
+#include <sys/param.h>
+
+#if __FreeBSD_version < 1300118
+
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
 #include <linux/module.h>
@@ -600,3 +604,6 @@ backlight_class_exit(void)
  */
 postcore_initcall(backlight_class_init);
 module_exit(backlight_class_exit);
+
+
+#endif /* __FreeBSD_version */

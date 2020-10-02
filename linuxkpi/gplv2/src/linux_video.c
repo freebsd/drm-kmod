@@ -25,6 +25,10 @@
  * always return acpi_backlight_vendor.
  */
 
+#include <sys/param.h>
+
+#if __FreeBSD_version < 1300118
+
 #include <linux/acpi.h>
 #include <linux/backlight.h>
 #include <linux/dmi.h>
@@ -384,3 +388,5 @@ acpi_video_get_backlight_type(void)
 
 	return acpi_backlight_video;
 }
+
+#endif /* __FreeBSD_version */
