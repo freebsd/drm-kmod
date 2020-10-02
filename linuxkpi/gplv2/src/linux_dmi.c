@@ -1,3 +1,8 @@
+
+#include <sys/param.h>
+
+#if __FreeBSD_version < 1300118
+
 #include <linux/dmi.h>
 
 bool
@@ -90,3 +95,4 @@ dmi_check_system(const struct dmi_system_id *sysid)
 	return (res);
 }
 
+#endif /* __FreeBSD_version */
