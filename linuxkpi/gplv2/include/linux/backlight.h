@@ -177,4 +177,6 @@ of_find_backlight_by_node(struct device_node *node)
 
 #endif
 
+#else
+#include_next <linux/backlight.h>
 #endif /* __FreeBSD_version */

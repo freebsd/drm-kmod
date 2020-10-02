@@ -57,4 +57,8 @@ static inline const struct dmi_system_id *
 #endif
 
 #endif
+
+#else
+
+#include_next <linux/dmi.h>
 #endif /* __FreeBSD_version */
