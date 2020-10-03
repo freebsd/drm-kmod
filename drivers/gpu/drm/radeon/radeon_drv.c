@@ -57,7 +57,7 @@ SYSCTL_NODE(_hw, OID_AUTO, radeonkms,
     CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
     DRIVER_DESC " parameters");
 
-
+#include <vm/vm_phys.h>
 #include <asm/mtrr.h>	/* Needed for arch_phys_wc_* */
 #endif
 
@@ -389,6 +389,13 @@ static int radeon_pci_probe(struct pci_dev *pdev,
 	if (pci_find_capability(dev->pdev, PCI_CAP_ID_AGP))
 		dev->agp = drm_agp_init(dev);
 	if (dev->agp) {
+#ifdef __FreeBSD__
+		vm_phys_fictitious_reg_range(
+			dev->agp->agp_info.aper_base,
+			dev->agp->agp_info.aper_base +
+			dev->agp->agp_info.aper_size * 1024 * 1024,
+			VM_MEMATTR_WRITE_COMBINING);
+#endif
 		dev->agp->agp_mtrr = arch_phys_wc_add(
 			dev->agp->agp_info.aper_base,
 			dev->agp->agp_info.aper_size *
@@ -403,7 +410,17 @@ static int radeon_pci_probe(struct pci_dev *pdev,
 
 err_agp:
 	if (dev->agp)
+#ifdef __FreeBSD__
+	{
+#endif
 		arch_phys_wc_del(dev->agp->agp_mtrr);
+#ifdef __FreeBSD__
+		vm_phys_fictitious_unreg_range(
+			dev->agp->agp_info.aper_base,
+			dev->agp->agp_info.aper_base +
+			dev->agp->agp_info.aper_size * 1024 * 1024);
+	}
+#endif
 	kfree(dev->agp);
 	pci_disable_device(pdev);
 err_free:

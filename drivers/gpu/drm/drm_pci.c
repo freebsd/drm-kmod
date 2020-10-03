@@ -38,6 +38,7 @@
 
 
 #ifdef __FreeBSD__
+#include <vm/vm_phys.h>
 #include <asm/mtrr.h>	/* Needed for arch_phys_wc_* */
 
 static void
@@ -271,6 +272,13 @@ static void drm_pci_agp_init(struct drm_device *dev)
 		if (pci_find_capability(dev->pdev, PCI_CAP_ID_AGP))
 			dev->agp = drm_agp_init(dev);
 		if (dev->agp) {
+#ifdef __FreeBSD__
+			vm_phys_fictitious_reg_range(
+				dev->agp->agp_info.aper_base,
+				dev->agp->agp_info.aper_base +
+				dev->agp->agp_info.aper_size * 1024 * 1024,
+				VM_MEMATTR_WRITE_COMBINING);
+#endif
 			dev->agp->agp_mtrr = arch_phys_wc_add(
 				dev->agp->agp_info.aper_base,
 				dev->agp->agp_info.aper_size *
@@ -283,6 +291,12 @@ void drm_pci_agp_destroy(struct drm_device *dev)
 {
 	if (dev->agp) {
 		arch_phys_wc_del(dev->agp->agp_mtrr);
+#ifdef __FreeBSD__
+		vm_phys_fictitious_unreg_range(
+			dev->agp->agp_info.aper_base,
+			dev->agp->agp_info.aper_base +
+			dev->agp->agp_info.aper_size * 1024 * 1024);
+#endif
 		drm_legacy_agp_clear(dev);
 		kfree(dev->agp);
 		dev->agp = NULL;
