@@ -1,3 +1,5 @@
+#include <sys/param.h>
+#if __FreeBSD_version < 1300118
 #include <linux/acpi.h>
 #include <linux/pci.h>
 
@@ -88,4 +90,5 @@ u32 acpi_target_system_state(void)
 
         return linuxkpi_acpi_target_sleep_state;
 }
+#endif
 #endif

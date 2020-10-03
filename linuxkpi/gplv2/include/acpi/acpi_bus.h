@@ -1,3 +1,5 @@
+#include <sys/param.h>
+#if __FreeBSD_version < 1300118
 /*
  *  acpi_bus.h - ACPI Bus Driver ($Revision: 22 $)
  *
@@ -194,3 +196,6 @@ static inline u32 acpi_target_system_state(void) { return ACPI_STATE_S0; }
 #endif	/* CONFIG_ACPI */
 
 #endif /*__ACPI_BUS_H__*/
+#else
+#include_next <acpi/acpi_bus.h>
+#endif

@@ -1,3 +1,5 @@
+#include <sys/param.h>
+#if __FreeBSD_version < 1300118
 #ifndef _ACPI_ACPI_H_
 #define _ACPI_ACPI_H_
 
@@ -18,3 +20,6 @@ typedef ACPI_WALK_CALLBACK	acpi_walk_callback;
 #define	acpi_get_table		AcpiGetTable
 
 #endif /* _ACPI_ACPI_H_ */
+#else
+#include_next <acpi/acpi.h>
+#endif
