@@ -1,3 +1,5 @@
+#include <sys/param.h>
+#if __FreeBSD_version < 1300128
 /*
  * acpi.h - ACPI Interface
  *
@@ -50,3 +52,6 @@ static inline const char *acpi_dev_name(struct acpi_device *adev)
 
 #endif /* _LINUX_GPLV2_ACPI_H_ */
 #endif /* x86 */
+#else
+#include_next <linux/acpi.h>
+#endif

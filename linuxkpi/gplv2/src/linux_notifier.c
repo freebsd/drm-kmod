@@ -150,6 +150,7 @@ atomic_notifier_call_chain(struct atomic_notifier_head *nh,
 }
 
 #ifdef CONFIG_ACPI
+#if __FreeBSD_version < 1300128
 int
 register_acpi_notifier(struct notifier_block *nb)
 {
@@ -163,6 +164,7 @@ unregister_acpi_notifier(struct notifier_block *nb)
 	WARN_NOT();
 	return (0);
 }
+#endif
 #endif
 
 int
@@ -298,6 +300,7 @@ linuxkpi_vm_lowmem(void *arg __unused)
 static eventhandler_tag lowmem_tag;
 
 #ifdef CONFIG_ACPI_SLEEP
+#if __FreeBSD_version < 1300128
 extern u32 linuxkpi_acpi_target_sleep_state;
 static void
 linuxkpi_event_suspend(void *arg __unused)
@@ -320,6 +323,7 @@ linuxkpi_event_resume(void *arg __unused)
 static eventhandler_tag resume_tag = NULL;
 static eventhandler_tag suspend_tag = NULL;
 #endif
+#endif
 
 
 
@@ -330,6 +334,7 @@ linuxkpi_register_eventhandlers(void *arg __unused)
 
 	lowmem_tag = EVENTHANDLER_REGISTER(vm_lowmem, linuxkpi_vm_lowmem, NULL, EVENTHANDLER_PRI_FIRST);
 #ifdef CONFIG_ACPI_SLEEP
+#if __FreeBSD_version < 1300128
 	// acpi_{sleep,wakeup}_event can't be trusted, use power_{suspend_early,resume}
 	// 'acpiconf -s 3' or 'zzz' will not generate acpi_sleep_event...
 	// lid open or wake on button generates acpi_wakeup_event on one of my
@@ -337,6 +342,7 @@ linuxkpi_register_eventhandlers(void *arg __unused)
 	//   is this a general thing?
 	resume_tag = EVENTHANDLER_REGISTER(power_resume, linuxkpi_event_resume, NULL, EVENTHANDLER_PRI_FIRST);
 	suspend_tag = EVENTHANDLER_REGISTER(power_suspend_early, linuxkpi_event_suspend, NULL, EVENTHANDLER_PRI_FIRST);
+#endif
 #endif
 }
 
@@ -346,8 +352,10 @@ linuxkpi_deregister_eventhandlers(void *arg __unused)
 
 	EVENTHANDLER_DEREGISTER(vm_lowmem, lowmem_tag);
 #ifdef CONFIG_ACPI_SLEEP
+#if __FreeBSD_version < 1300128
 	EVENTHANDLER_DEREGISTER(power_resume, resume_tag);
 	EVENTHANDLER_DEREGISTER(power_suspend_early, suspend_tag);
+#endif
 #endif
 }
 
