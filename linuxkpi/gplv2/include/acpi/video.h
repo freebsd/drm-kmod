@@ -1,3 +1,5 @@
+#include <sys/param.h>
+#if __FreeBSD_version < 1300128
 #ifndef _LINUX_ACPI_VIDEO_H_
 #define _LINUX_ACPI_VIDEO_H_
 
@@ -15,4 +17,7 @@ enum acpi_backlight_type {
 
 enum acpi_backlight_type acpi_video_get_backlight_type(void);
 
+#endif
+#else
+#include_next <acpi/video.h>
 #endif
