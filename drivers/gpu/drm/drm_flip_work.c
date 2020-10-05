@@ -23,6 +23,10 @@
 
 #include <linux/slab.h>
 
+#ifdef __FreeBSD__
+#include <linux/list.h>
+#endif
+
 #include <drm/drm_flip_work.h>
 #include <drm/drm_print.h>
 #include <drm/drm_util.h>

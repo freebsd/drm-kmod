@@ -270,8 +270,10 @@ struct amdgpu_vm {
 	/* Flag to indicate ATS support from PTE for GFX9 */
 	bool			pte_support_ats;
 
+#ifdef __linux__
 	/* Up to 128 pending retry page faults */
 	DECLARE_KFIFO(faults, u64, 128);
+#endif
 
 	/* Points to the KFD process VM info */
 	struct amdkfd_process_info *process_info;
