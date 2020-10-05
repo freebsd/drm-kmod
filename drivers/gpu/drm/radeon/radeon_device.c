@@ -662,10 +662,12 @@ bool radeon_card_posted(struct radeon_device *rdev)
 		return false;
 
 	/* required for EFI mode on macbook2,1 which uses an r5xx asic */
+#ifdef __linux__
 	if (efi_enabled(EFI_BOOT) &&
 	    (rdev->pdev->subsystem_vendor == PCI_VENDOR_ID_APPLE) &&
 	    (rdev->family < CHIP_R600))
 		return false;
+#endif
 
 	if (ASIC_IS_NODCE(rdev))
 		goto check_memsize;
