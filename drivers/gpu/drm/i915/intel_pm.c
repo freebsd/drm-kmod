@@ -7489,18 +7489,22 @@ static void gen6_update_ring_freq(struct drm_i915_private *dev_priv)
 	unsigned int gpu_freq;
 	unsigned int max_ia_freq, min_ring_freq;
 	unsigned int max_gpu_freq, min_gpu_freq;
+#ifdef __linux__
 	struct cpufreq_policy *policy;
+#endif
 
 	lockdep_assert_held(&rps->lock);
 
 	if (rps->max_freq <= rps->min_freq)
 		return;
 
+#ifdef __linux__
 	policy = cpufreq_cpu_get(0);
 	if (policy) {
 		max_ia_freq = policy->cpuinfo.max_freq;
 		cpufreq_cpu_put(policy);
 	} else {
+#endif
 		/*
 		 * Default to measured freq if none found, PCU will ensure we
 		 * don't go over
@@ -7510,7 +7514,9 @@ static void gen6_update_ring_freq(struct drm_i915_private *dev_priv)
 #else
 		max_ia_freq = tsc_khz;
 #endif
+#ifdef __linux__
 	}
+#endif
 
 	/* Convert from kHz to MHz */
 	max_ia_freq /= 1000;
