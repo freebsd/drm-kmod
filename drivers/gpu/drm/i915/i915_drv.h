@@ -1369,11 +1369,15 @@ struct drm_i915_private {
 	bool display_irqs_enabled;
 
 	/* To control wakeup latency, e.g. for irq-driven dp aux transfers. */
+#ifdef __linux__
 	struct pm_qos_request pm_qos;
+#endif
 
 	/* Sideband mailbox protection */
 	struct mutex sb_lock;
+#ifdef __linux__
 	struct pm_qos_request sb_qos;
+#endif
 
 	/** Cached value of IMR to avoid reads in updating the bitfield */
 	union {
@@ -1741,7 +1745,9 @@ struct drm_i915_private {
 	/* For i945gm vblank irq vs. C3 workaround */
 	struct {
 		struct work_struct work;
+#ifdef __linux__
 		struct pm_qos_request pm_qos;
+#endif
 		u8 c3_disable_latency;
 		u8 enabled;
 	} i945gm_vblank;
