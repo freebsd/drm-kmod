@@ -149,20 +149,6 @@ atomic_notifier_call_chain(struct atomic_notifier_head *nh,
 	return __atomic_notifier_call_chain(nh, val, v, -1, NULL);
 }
 
-int
-register_reboot_notifier(struct notifier_block *nb)
-{
-	WARN_NOT();
-	return (0);
-}
-
-int
-unregister_reboot_notifier(struct notifier_block *nb)
-{
-	WARN_NOT();
-	return (0);
-}
-
 #ifdef CONFIG_ACPI
 int
 register_acpi_notifier(struct notifier_block *nb)

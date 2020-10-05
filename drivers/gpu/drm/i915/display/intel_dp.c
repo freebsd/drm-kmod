@@ -1063,6 +1063,7 @@ _pp_stat_reg(struct intel_dp *intel_dp)
 	return regs.pp_stat;
 }
 
+#ifdef __linux__
 /* Reboot notifier handler to shutdown panel power to guarantee T12 timing
    This function only applicable when panel PM state is not to be tracked */
 static int edp_notify_handler(struct notifier_block *this, unsigned long code,
@@ -1096,6 +1097,7 @@ static int edp_notify_handler(struct notifier_block *this, unsigned long code,
 
 	return 0;
 }
+#endif
 
 static bool edp_have_panel_power(struct intel_dp *intel_dp)
 {
@@ -5555,7 +5557,9 @@ void intel_dp_encoder_flush_work(struct drm_encoder *encoder)
 			edp_panel_vdd_off_sync(intel_dp);
 
 		if (intel_dp->edp_notifier.notifier_call) {
+#ifdef __linux__
 			unregister_reboot_notifier(&intel_dp->edp_notifier);
+#endif
 			intel_dp->edp_notifier.notifier_call = NULL;
 		}
 	}
@@ -7068,8 +7072,10 @@ static bool intel_edp_init_connector(struct intel_dp *intel_dp,
 	mutex_unlock(&dev->mode_config.mutex);
 
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv)) {
+#ifdef __linux__
 		intel_dp->edp_notifier.notifier_call = edp_notify_handler;
 		register_reboot_notifier(&intel_dp->edp_notifier);
+#endif
 
 		/*
 		 * Figure out the current pipe for the initial backlight setup.
