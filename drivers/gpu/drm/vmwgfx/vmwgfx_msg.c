@@ -294,7 +294,9 @@ static int vmw_send_msg(struct rpc_channel *channel, const char *msg)
 
 	return -EINVAL;
 }
+#ifdef __linux__
 STACK_FRAME_NON_STANDARD(vmw_send_msg);
+#endif
 
 
 /**
@@ -397,7 +399,9 @@ static int vmw_recv_msg(struct rpc_channel *channel, void **msg,
 
 	return 0;
 }
+#ifdef __linux__
 STACK_FRAME_NON_STANDARD(vmw_recv_msg);
+#endif
 
 
 /**
