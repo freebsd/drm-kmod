@@ -45,7 +45,9 @@ struct i915_pmu {
 	/**
 	 * @base: PMU base.
 	 */
+#ifdef __linux__
 	struct pmu base;
+#endif
 	/**
 	 * @lock: Lock protecting enable mask and ref count handling.
 	 */
