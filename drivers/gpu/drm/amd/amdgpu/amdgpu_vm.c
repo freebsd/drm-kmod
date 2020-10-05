@@ -2747,7 +2747,9 @@ int amdgpu_vm_init(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 		vm->pasid = pasid;
 	}
 
+#ifdef __linux__
 	INIT_KFIFO(vm->faults);
+#endif
 
 	return 0;
 
