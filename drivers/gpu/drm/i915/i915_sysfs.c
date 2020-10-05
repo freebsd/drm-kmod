@@ -588,7 +588,6 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 	int ret;
 
 #ifdef CONFIG_PM
-#if LKPI_HAVE_SYSFS_GROUPS
 	if (HAS_RC6(dev_priv)) {
 		ret = sysfs_merge_group(&kdev->kobj,
 					&rc6_attr_group);
@@ -607,7 +606,6 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 		if (ret)
 			DRM_ERROR("Media RC6 residency sysfs setup failed\n");
 	}
-#endif /* LKPI_HAVE_SYSFS_GROUPS */
 #endif
 #ifdef __linux__
 	/* Missing sysfs bin files support */
@@ -626,12 +624,10 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 #endif /* __linux__ */
 
 	ret = 0;
-#if LKPI_HAVE_SYSFS_GROUPS
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
 		ret = sysfs_create_files(&kdev->kobj, vlv_attrs);
 	else if (INTEL_GEN(dev_priv) >= 6)
 		ret = sysfs_create_files(&kdev->kobj, gen6_attrs);
-#endif
 	if (ret)
 		DRM_ERROR("RPS sysfs setup failed\n");
 
@@ -650,21 +646,17 @@ void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
 	i915_teardown_error_capture(kdev);
 #endif
 
-#if LKPI_HAVE_SYSFS_GROUPS
 	if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv))
 		sysfs_remove_files(&kdev->kobj, vlv_attrs);
 	else
 		sysfs_remove_files(&kdev->kobj, gen6_attrs);
-#endif
 #ifdef __linux__
 	/* Missing sysfs bin files support */
 	device_remove_bin_file(kdev,  &dpf_attrs_1);
 	device_remove_bin_file(kdev,  &dpf_attrs);
 #endif
 #ifdef CONFIG_PM
-#if LKPI_HAVE_SYSFS_GROUPS
 	sysfs_unmerge_group(&kdev->kobj, &rc6_attr_group);
 	sysfs_unmerge_group(&kdev->kobj, &rc6p_attr_group);
-#endif
 #endif
 }

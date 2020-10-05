@@ -6,8 +6,6 @@
 #include <sys/syslog.h>
 #include <linux/types.h>
 
-#define LKPI_HAVE_SYSFS_GROUPS ((__FreeBSD_version > 1200517 && __FreeBSD_version < 1300000) || (__FreeBSD_version > 1300045))
-
 #define	outb(a,b) outb(b,a)
 #define	outw(a,b) outw(b,a)
 #define	outl(a,b) outl(b,a)

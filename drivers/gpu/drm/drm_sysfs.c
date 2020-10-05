@@ -125,7 +125,6 @@ static ssize_t status_store(struct device *device,
 
 	old_force = connector->force;
 
-#if LKPI_HAVE_SYSFS_GROUPS
 	if (sysfs_streq(buf, "detect"))
 		connector->force = 0;
 	else if (sysfs_streq(buf, "on"))
@@ -135,7 +134,6 @@ static ssize_t status_store(struct device *device,
 	else if (sysfs_streq(buf, "off"))
 		connector->force = DRM_FORCE_OFF;
 	else
-#endif
 		ret = -EINVAL;
 
 	if (old_force != connector->force || !connector->force) {
