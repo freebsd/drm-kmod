@@ -54,7 +54,7 @@ enum {
 
 
 struct irq_domain_ops {
-	int (*match)(struct irq_domain *d, struct device_node *node,
+	int (*match)(struct irq_domain *d, void *node,
 		     enum irq_domain_bus_token bus_token);
 	int (*map)(struct irq_domain *d, unsigned int virq, irq_hw_number_t hw);
 	void (*unmap)(struct irq_domain *d, unsigned int virq);
@@ -89,12 +89,6 @@ irq_domain_check_hierarchy(struct irq_domain *domain)
 		domain->flags |= IRQ_DOMAIN_FLAG_HIERARCHY;
 }
 
-static inline struct device_node *
-irq_domain_get_of_node(struct irq_domain *d)
-{
-	return to_of_node(d->fwnode);
-}
-
 static inline int
 irq_domain_alloc_descs(int virq, unsigned int cnt, irq_hw_number_t hwirq,
 			   int node)
@@ -122,16 +116,11 @@ __irq_domain_add(struct fwnode_handle *fwnode, int size,
 		 void *host_data)
 {
 	struct irq_domain *domain;
-	struct device_node *of_node;
-
-	of_node = to_of_node(fwnode);
 
 	domain = kzalloc_node(sizeof(*domain) + (sizeof(unsigned int) * size),
 			      GFP_KERNEL, of_node_to_nid(of_node));
 	if (WARN_ON(!domain))
 		return (NULL);
-
-	of_node_get(of_node);
 
 	/* Fill structure */
 	INIT_RADIX_TREE(&domain->revmap_tree, GFP_KERNEL);
@@ -150,12 +139,12 @@ __irq_domain_add(struct fwnode_handle *fwnode, int size,
 }
 
 static inline struct irq_domain *
-irq_domain_add_linear(struct device_node *of_node,
+irq_domain_add_linear(void *of_node,
 		      unsigned int size,
 		      const struct irq_domain_ops *ops,
 		      void *host_data)
 {
-	return __irq_domain_add(of_node_to_fwnode(of_node), size, size, 0, ops, host_data);
+	return __irq_domain_add(NULL, size, size, 0, ops, host_data);
 }
 
 static inline void
@@ -169,7 +158,6 @@ irq_domain_remove(struct irq_domain *domain)
 		irq_default_domain = NULL;
 	mutex_unlock(&irq_domain_mutex);
 
-	of_node_put(irq_domain_get_of_node(domain));
 	kfree(domain);
 }
 
@@ -244,7 +232,6 @@ irq_find_mapping(struct irq_domain *domain, irq_hw_number_t hwirq)
 static inline unsigned int
 irq_create_mapping(struct irq_domain *domain, irq_hw_number_t hwirq)
 {
-	struct device_node *of_node;
 	int virq;
 
 	if (domain == NULL)
@@ -253,12 +240,11 @@ irq_create_mapping(struct irq_domain *domain, irq_hw_number_t hwirq)
 		WARN(1, "%s(, %lx) called with NULL domain\n", __func__, hwirq);
 		return 0;
 	}
-	of_node = irq_domain_get_of_node(domain);
 
 	virq = irq_find_mapping(domain, hwirq);
 	if (virq) 
 		return (virq);
-	virq = irq_domain_alloc_descs(-1, 1, hwirq, of_node_to_nid(of_node));
+	virq = irq_domain_alloc_descs(-1, 1, hwirq, 0);
 	if (virq <= 0)
 		return (0);
 	if (irq_domain_associate(domain, virq, hwirq)) {
