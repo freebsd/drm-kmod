@@ -326,7 +326,9 @@ static struct sysrq_key_op sysrq_drm_fb_helper_restore_op = {
 	.action_msg = "Restore framebuffer console",
 };
 #else
+#ifdef __linux__
 static struct sysrq_key_op sysrq_drm_fb_helper_restore_op = { };
+#endif
 #endif
 
 static void drm_fb_helper_dpms(struct fb_info *info, int dpms_mode)
@@ -596,8 +598,11 @@ void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 	mutex_lock(&kernel_fb_helper_lock);
 	if (!list_empty(&fb_helper->kernel_fb_list)) {
 		list_del(&fb_helper->kernel_fb_list);
-		if (list_empty(&kernel_fb_helper_list))
+		if (list_empty(&kernel_fb_helper_list)) {
+#ifdef __linux__
 			unregister_sysrq_key('v', &sysrq_drm_fb_helper_restore_op);
+#endif
+		}
 	}
 	mutex_unlock(&kernel_fb_helper_lock);
 
@@ -1871,8 +1876,10 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
 		 info->node, info->fix.id);
 
 	mutex_lock(&kernel_fb_helper_lock);
+#ifdef __linux__
 	if (list_empty(&kernel_fb_helper_list))
 		register_sysrq_key('v', &sysrq_drm_fb_helper_restore_op);
+#endif
 
 	list_add(&fb_helper->kernel_fb_list, &kernel_fb_helper_list);
 	mutex_unlock(&kernel_fb_helper_lock);
