@@ -271,6 +271,7 @@ SRCS+=	amdgpu_afmt.c \
 	mmhub_v1_7.c \
 	mmhub_v2_0.c \
 	mmhub_v2_3.c \
+	mmhub_v3_0.c \
 	mmhub_v9_4.c \
 	mxgpu_ai.c \
 	mxgpu_nv.c \
