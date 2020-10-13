@@ -1424,6 +1424,7 @@ static void vlv_display_power_well_init(struct drm_i915_private *dev_priv)
 		return;
 
 	intel_hpd_init(dev_priv);
+	intel_hpd_poll_disable(dev_priv);
 
 	/* Re-enable the ADPA, if we have one */
 	for_each_intel_encoder(&dev_priv->drm, encoder) {
@@ -1451,7 +1452,7 @@ static void vlv_display_power_well_deinit(struct drm_i915_private *dev_priv)
 #ifdef __linux__
 	// BSDFIXME: No dev->power on BSD
 	if (!dev_priv->drm.dev->power.is_suspended)
-		intel_hpd_poll_init(dev_priv);
+		intel_hpd_poll_enable(dev_priv);
 #endif
 }
 
