@@ -26,6 +26,12 @@
  *
  */
 
+#if defined(__FreeBSD__)
+#include <sys/sysent.h>
+#define	LINUX_O_RDWR		00000002
+#define	LINUX_O_CLOEXEC		02000000
+#endif
+
 #include <linux/export.h>
 #include <linux/dma-buf.h>
 #include <linux/rbtree.h>
@@ -519,6 +525,11 @@ int drm_prime_handle_to_fd_ioctl(struct drm_device *dev, void *data,
 		return -ENOSYS;
 
 	/* check flags are valid */
+#if defined(__FreeBSD__) && defined(SV_ABI_LINUX)
+	if (SV_CURPROC_ABI() == SV_ABI_LINUX)
+		args->flags = ((args->flags & LINUX_O_CLOEXEC) ? DRM_CLOEXEC : 0)
+			| ((args->flags & LINUX_O_RDWR) ? DRM_RDWR : 0);
+#endif
 	if (args->flags & ~(DRM_CLOEXEC | DRM_RDWR))
 		return -EINVAL;
 
