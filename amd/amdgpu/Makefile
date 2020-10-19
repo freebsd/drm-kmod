@@ -785,7 +785,7 @@ CWARNFLAGS.vangogh_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 # display/amdgpu_dm
 CWARNFLAGS.amdgpu_dm_pp_smu.c=		-Wno-missing-prototypes -Wno-incompatible-function-pointer-types
 CWARNFLAGS.amdgpu_dm_services.c=	-Wno-missing-prototypes
-CWARNFLAGS.amdgpu_dm.c=			-Wno-missing-prototypes -Wno-unused-function -Wno-unused-but-set-variable
+CWARNFLAGS.amdgpu_dm.c=			-Wno-missing-prototypes -Wno-unused-function -Wno-unused-but-set-variable -Wno-unused-variable
 
 # display/dc
 CWARNFLAGS.command_table2.c=		-Wno-unused-but-set-variable
