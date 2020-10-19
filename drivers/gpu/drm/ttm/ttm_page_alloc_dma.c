@@ -984,7 +984,6 @@ skip_huge:
 		}
 	}
 
-	ttm_tt_set_populated(ttm);
 	return 0;
 }
 EXPORT_SYMBOL_GPL(ttm_dma_populate);
@@ -1078,7 +1077,6 @@ void ttm_dma_unpopulate(struct ttm_dma_tt *ttm_dma, struct device *dev)
 	/* shrink pool if necessary (only on !is_cached pools)*/
 	if (npages)
 		ttm_dma_page_pool_free(pool, npages, false);
-	ttm_tt_set_unpopulated(ttm);
 }
 EXPORT_SYMBOL_GPL(ttm_dma_unpopulate);
 

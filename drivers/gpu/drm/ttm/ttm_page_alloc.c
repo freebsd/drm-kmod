@@ -1180,7 +1180,6 @@ ttm_pool_unpopulate_helper(struct ttm_tt *ttm, unsigned mem_count_update)
 put_pages:
 	ttm_put_pages(ttm->pages, ttm->num_pages, ttm->page_flags,
 		      ttm->caching);
-	ttm_tt_set_unpopulated(ttm);
 }
 
 int ttm_pool_populate(struct ttm_tt *ttm, struct ttm_operation_ctx *ctx)
@@ -1219,7 +1218,6 @@ int ttm_pool_populate(struct ttm_tt *ttm, struct ttm_operation_ctx *ctx)
 		}
 	}
 
-	ttm_tt_set_populated(ttm);
 	return 0;
 }
 EXPORT_SYMBOL(ttm_pool_populate);
