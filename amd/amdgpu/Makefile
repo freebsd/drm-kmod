@@ -100,6 +100,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/pm/swsmu \
 	${SRCDIR}/pm/swsmu/smu11 \
 	${SRCDIR}/pm/swsmu/smu12 \
+	${SRCDIR}/pm/swsmu/smu13 \
 	${DRM}/scheduler
 
 # acp
@@ -615,6 +616,7 @@ SRCS+=	dcn_calc_auto.c \
 # powerplay
 SRCS+=	amd_powerplay.c \
 	amdgpu_smu.c \
+	aldebaran_ppt.c \
 	arcturus_ppt.c \
 	common_baco.c \
 	ci_smumgr.c \
@@ -652,6 +654,7 @@ SRCS+=	amd_powerplay.c \
 	smu_v11_0.c \
 	smu_v11_0_i2c.c \
 	smu_v12_0.c \
+	smu_v13_0.c \
 	smu_helper.c \
 	smumgr.c \
 	tonga_baco.c \
@@ -714,6 +717,7 @@ CFLAGS+= -I${SRCDIR}/pm/powerplay/smumgr
 CFLAGS+= -I${SRCDIR}/pm/swsmu
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu11
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu12
+CFLAGS+= -I${SRCDIR}/pm/swsmu/smu13
 CFLAGS+= -I${DRM}/scheduler
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
@@ -784,6 +788,7 @@ CWARNFLAGS.amdgpu_sched.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ttm.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_virt.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_vram_mgr.c=			-Wno-unused-variable
+CWARNFLAGS.aldebaran_ppt.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.atombios_encoders.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dce_v6_0.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.dce_v8_0.c=				-Wno-unused-but-set-variable
