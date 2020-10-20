@@ -44,7 +44,7 @@ struct i915_pmu {
 	struct {
 		struct hlist_node node;
 #ifdef __linux__
-		enum cpuhp_state slot;
+		unsigned int cpu;
 #endif
 	} cpuhp;
 	/**
@@ -130,11 +130,15 @@ struct i915_pmu {
 };
 
 #ifdef CONFIG_PERF_EVENTS
+void i915_pmu_init(void);
+void i915_pmu_exit(void);
 void i915_pmu_register(struct drm_i915_private *i915);
 void i915_pmu_unregister(struct drm_i915_private *i915);
 void i915_pmu_gt_parked(struct drm_i915_private *i915);
 void i915_pmu_gt_unparked(struct drm_i915_private *i915);
 #else
+static inline void i915_pmu_init(void) {}
+static inline void i915_pmu_exit(void) {}
 static inline void i915_pmu_register(struct drm_i915_private *i915) {}
 static inline void i915_pmu_unregister(struct drm_i915_private *i915) {}
 static inline void i915_pmu_gt_parked(struct drm_i915_private *i915) {}

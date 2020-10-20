@@ -1151,14 +1151,18 @@ static int __init i915_init(void)
 		return 0;
 	}
 
+	i915_pmu_init();
+
 #ifdef __FreeBSD__
 	i915_pci_driver.bsdclass = drm_devclass;
 	err = linux_pci_register_drm_driver(&i915_pci_driver);
 #else
 	err = pci_register_driver(&i915_pci_driver);
 #endif
-	if (err)
+	if (err) {
+		i915_pmu_exit();
 		return err;
+	}
 
 #ifdef __linux__
 	i915_perf_sysctl_register();
@@ -1180,6 +1184,7 @@ static void __exit i915_exit(void)
 	pci_unregister_driver(&i915_pci_driver);
 #endif
 	i915_globals_exit();
+	i915_pmu_exit();
 }
 
 #ifdef __linux__
