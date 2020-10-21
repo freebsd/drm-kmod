@@ -2012,7 +2012,8 @@ static int amdgpu_ras_check_asic_type(struct amdgpu_device *adev)
 {
 	if (adev->asic_type != CHIP_VEGA10 &&
 		adev->asic_type != CHIP_VEGA20 &&
-		adev->asic_type != CHIP_ARCTURUS)
+		adev->asic_type != CHIP_ARCTURUS &&
+		adev->asic_type != CHIP_SIENNA_CICHLID)
 		return 1;
 	else
 		return 0;
@@ -2056,7 +2057,6 @@ static void amdgpu_ras_check_supported(struct amdgpu_device *adev,
 
 	*supported = amdgpu_ras_enable == 0 ?
 			0 : *hw_supported & amdgpu_ras_mask;
-
 	adev->ras_features = *supported;
 }
 
