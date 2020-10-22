@@ -85,23 +85,44 @@ int ttm_tt_create(struct ttm_buffer_object *bo, bool zero_alloc)
  */
 static int ttm_tt_alloc_page_directory(struct ttm_tt *ttm)
 {
+#ifdef __linux__
 	ttm->pages = kvmalloc_array(ttm->num_pages, sizeof(void*),
 			GFP_KERNEL | __GFP_ZERO);
+#elif defined(__FreeBSD__)
+	ttm->pages = kvmalloc_array(ttm->num_pages,
+				    sizeof(*ttm->pages) +
+				    sizeof(*ttm->orders),
+				    GFP_KERNEL | __GFP_ZERO);
+#endif
 	if (!ttm->pages)
 		return -ENOMEM;
+#ifdef __FreeBSD__
+	ttm->orders = (void *)(ttm->pages + ttm->num_pages);
+#endif
 	return 0;
 }
 
 static int ttm_dma_tt_alloc_page_directory(struct ttm_tt *ttm)
 {
+#ifdef __linux__
 	ttm->pages = kvmalloc_array(ttm->num_pages,
 				    sizeof(*ttm->pages) +
 				    sizeof(*ttm->dma_address),
 				    GFP_KERNEL | __GFP_ZERO);
+#elif defined(__FreeBSD__)
+	ttm->pages = kvmalloc_array(ttm->num_pages,
+				    sizeof(*ttm->pages) +
+				    sizeof(*ttm->dma_address) +
+				    sizeof(*ttm->orders),
+				    GFP_KERNEL | __GFP_ZERO);
+#endif
 	if (!ttm->pages)
 		return -ENOMEM;
 
 	ttm->dma_address = (void *)(ttm->pages + ttm->num_pages);
+#ifdef __FreeBSD__
+	ttm->orders = (void *)(ttm->dma_address + ttm->num_pages);
+#endif
 	return 0;
 }
 

@@ -15,6 +15,7 @@ SRCS=	ttm_bo.c \
 	ttm_module.c \
 	ttm_page_alloc.c \
 	ttm_page_alloc_dma.c \
+	ttm_pool.c \
 	ttm_range_manager.c \
 	ttm_resource.c \
 	ttm_tt.c
@@ -36,7 +37,7 @@ CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=ttm_' -DLINUXKPI_VERSION=50000
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=ttm_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD} -DLINUXKPI_VERSION=50000
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 SRCS+=	device_if.h \

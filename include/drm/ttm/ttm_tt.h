@@ -61,6 +61,12 @@ struct ttm_operation_ctx;
  */
 struct ttm_tt {
 	struct page **pages;
+#ifdef __FreeBSD__
+	/* On Linux, `struct page` has a private field. It is used by
+	 * `ttm_pool` to store private data. FreeBSD's `struct vm_page` does
+	 * not have that, so we use an extra field in `struct ttm_tt` */
+	unsigned int *orders;
+#endif
 	uint32_t page_flags;
 	uint32_t num_pages;
 	struct sg_table *sg;

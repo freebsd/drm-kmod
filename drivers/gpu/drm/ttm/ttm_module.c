@@ -38,6 +38,12 @@
 #ifdef __FreeBSD__
 #include <linux/completion.h>
 #include <linux/wait.h>
+
+#include <drm/ttm/ttm_sysctl_freebsd.h>
+
+SYSCTL_NODE(_hw, OID_AUTO, ttm,
+    CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
+    "TTM memory manager parameters");
 #endif
 
 static DECLARE_WAIT_QUEUE_HEAD(exit_q);
