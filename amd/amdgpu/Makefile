@@ -265,6 +265,7 @@ SRCS+=	amdgpu_afmt.c \
 	smuio_v9_0.c \
 	smuio_v11_0.c \
 	smuio_v11_0_6.c \
+	smuio_v13_0.c \
 	tonga_ih.c \
 	umc_v6_0.c \
 	umc_v6_1.c \
@@ -797,6 +798,7 @@ CWARNFLAGS.si_smc.c=				-Wno-gnu-variable-sized-type-not-at-end
 CWARNFLAGS.si.c=				-Wno-gnu-variable-sized-type-not-at-end
 CWARNFLAGS.smuio_v9_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.smuio_v11_0.c=			-Wno-missing-prototypes
+CWARNFLAGS.smuio_v13_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.vangogh_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.vcn_v3_0.c=				-Wno-missing-prototypes
 
