@@ -848,16 +848,18 @@ int radeon_ttm_init(struct radeon_device *rdev)
 	int r;
 
 	/* No others user of address space so set it to 0 */
-	r = ttm_bo_device_init(&rdev->mman.bdev,
-			       &radeon_bo_driver,
-#ifdef __FreeBSD__
-			       NULL,
-			       rdev->ddev->vma_offset_manager,
-			       false);
-#else
+	r = ttm_bo_device_init(&rdev->mman.bdev, &radeon_bo_driver, rdev->dev,
+#ifdef __linux__
 			       rdev->ddev->anon_inode->i_mapping,
+#elif defined(__FreeBSD__)
+			       NULL,
+#endif
 			       rdev->ddev->vma_offset_manager,
+			       rdev->need_swiotlb,
+#ifdef __linux__
 			       dma_addressing_limited(&rdev->pdev->dev));
+#elif defined(__FreeBSD__)
+			       false);
 #endif
 	if (r) {
 		DRM_ERROR("failed initializing buffer object driver(%d).\n", r);

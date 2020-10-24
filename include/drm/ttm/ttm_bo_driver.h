@@ -45,6 +45,7 @@
 #include "ttm_module.h"
 #include "ttm_placement.h"
 #include "ttm_tt.h"
+#include "ttm_pool.h"
 
 /**
  * struct ttm_bo_driver
@@ -299,6 +300,7 @@ struct ttm_bo_device {
 	 * Protected by the vm lock.
 	 */
 	struct drm_vma_offset_manager *vma_manager;
+	struct ttm_pool pool;
 
 	/*
 	 * Protected by the global:lru lock.
@@ -412,11 +414,11 @@ int ttm_bo_device_release(struct ttm_bo_device *bdev);
  * @bdev: A pointer to a struct ttm_bo_device to initialize.
  * @glob: A pointer to an initialized struct ttm_bo_global.
  * @driver: A pointer to a struct ttm_bo_driver set up by the caller.
+ * @dev: The core kernel device pointer for DMA mappings and allocations.
  * @mapping: The address space to use for this bo.
  * @vma_manager: A pointer to a vma manager.
- * @file_page_offset: Offset into the device address space that is available
- * for buffer data. This ensures compatibility with other users of the
- * address space.
+ * @use_dma_alloc: If coherent DMA allocation API should be used.
+ * @use_dma32: If we should use GFP_DMA32 for device memory allocations.
  *
  * Initializes a struct ttm_bo_device:
  * Returns:
@@ -424,13 +426,14 @@ int ttm_bo_device_release(struct ttm_bo_device *bdev);
  */
 int ttm_bo_device_init(struct ttm_bo_device *bdev,
 		       struct ttm_bo_driver *driver,
+		       struct device *dev,
 #ifdef __linux__
 		       struct address_space *mapping,
 #elif defined(__FreeBSD__)
 		       void *dummy,
 #endif
 		       struct drm_vma_offset_manager *vma_manager,
-		       bool need_dma32);
+		       bool use_dma_alloc, bool use_dma32);
 
 /**
  * ttm_bo_unmap_virtual

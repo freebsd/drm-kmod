@@ -1924,15 +1924,17 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 	mutex_init(&adev->mman.gtt_window_lock);
 
 	/* No others user of address space so set it to 0 */
-	r = ttm_bo_device_init(&adev->mman.bdev,
-			       &amdgpu_bo_driver,
+	r = ttm_bo_device_init(&adev->mman.bdev, &amdgpu_bo_driver, adev->dev,
 #ifdef __linux__
 			       adev_to_drm(adev)->anon_inode->i_mapping,
-			       adev_to_drm(adev)->vma_offset_manager,
-			       dma_addressing_limited(adev->dev));
 #elif defined(__FreeBSD__)
 			       NULL, /* Dummy on BSD */
+#endif
 			       adev_to_drm(adev)->vma_offset_manager,
+			       adev->need_swiotlb,
+#ifdef __linux__
+			       dma_addressing_limited(adev->dev));
+#elif defined(__FreeBSD__)
 			       false);
 #endif
 	if (r) {
