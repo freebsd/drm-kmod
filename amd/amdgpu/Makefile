@@ -438,7 +438,8 @@ SRCS+=	dcn20_dccg.c \
 	display_mode_vba_20v2.c
 
 # display/dc/dcn21
-SRCS+=	dcn21_hubbub.c \
+SRCS+=	dcn21_dccg.c \
+	dcn21_hubbub.c \
 	dcn21_hubp.c \
 	dcn21_hwseq.c \
 	dcn21_init.c \
@@ -840,6 +841,7 @@ CWARNFLAGS.dcn20_mpc.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn20_optc.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn20_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
 CWARNFLAGS.dcn20_clk_mgr.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn21_dccg.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hubp.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn21_hubbub.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hwseq.c=		-Wno-unused-but-set-variable
