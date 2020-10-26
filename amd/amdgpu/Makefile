@@ -132,6 +132,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_fence.c \
 	amdgpu_freebsd.c \
 	amdgpu_fru_eeprom.c \
+	amdgpu_fw_attestation.c \
 	amdgpu_gart.c \
 	amdgpu_gem.c \
 	amdgpu_gfx.c \
