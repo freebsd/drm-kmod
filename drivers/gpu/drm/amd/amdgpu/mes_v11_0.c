@@ -348,7 +348,7 @@ static int mes_v11_0_set_hw_resources(struct amdgpu_mes *mes)
 
 	for (i = 0; i < AMD_PRIORITY_NUM_LEVELS; i++)
 		mes_set_hw_res_pkt.aggregated_doorbells[i] =
-			mes->agreegated_doorbells[i];
+			mes->aggregated_doorbells[i];
 
 	for (i = 0; i < 5; i++) {
 		mes_set_hw_res_pkt.gc_base[i] = adev->reg_offset[GC_HWIP][0][i];
