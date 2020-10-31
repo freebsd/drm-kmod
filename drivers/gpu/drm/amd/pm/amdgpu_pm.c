@@ -2523,22 +2523,18 @@ static ssize_t amdgpu_hwmon_get_pwm1_enable(struct device *dev,
 		return ret;
 	}
 
-	if (is_support_sw_smu(adev)) {
-		pwm_mode = smu_get_fan_control_mode(&adev->smu);
-	} else {
-		if (!adev->powerplay.pp_funcs->get_fan_control_mode) {
-			pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
-			pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
-			return -EINVAL;
-		}
-
-		pwm_mode = amdgpu_dpm_get_fan_control_mode(adev);
+	if (!adev->powerplay.pp_funcs->get_fan_control_mode) {
+		pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
+		pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
+		return -EINVAL;
 	}
+
+	pwm_mode = amdgpu_dpm_get_fan_control_mode(adev);
 
 	pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
 	pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
 
-	return sprintf(buf, "%i\n", pwm_mode);
+	return sprintf(buf, "%u\n", pwm_mode);
 }
 
 static ssize_t amdgpu_hwmon_set_pwm1_enable(struct device *dev,
@@ -2563,17 +2559,13 @@ static ssize_t amdgpu_hwmon_set_pwm1_enable(struct device *dev,
 		return ret;
 	}
 
-	if (is_support_sw_smu(adev)) {
-		smu_set_fan_control_mode(&adev->smu, value);
-	} else {
-		if (!adev->powerplay.pp_funcs->set_fan_control_mode) {
-			pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
-			pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
-			return -EINVAL;
-		}
-
-		amdgpu_dpm_set_fan_control_mode(adev, value);
+	if (!adev->powerplay.pp_funcs->set_fan_control_mode) {
+		pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
+		pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
+		return -EINVAL;
 	}
+
+	amdgpu_dpm_set_fan_control_mode(adev, value);
 
 	pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
 	pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
@@ -2613,11 +2605,7 @@ static ssize_t amdgpu_hwmon_set_pwm1(struct device *dev,
 		return err;
 	}
 
-	if (is_support_sw_smu(adev))
-		pwm_mode = smu_get_fan_control_mode(&adev->smu);
-	else
-		pwm_mode = amdgpu_dpm_get_fan_control_mode(adev);
-
+	pwm_mode = amdgpu_dpm_get_fan_control_mode(adev);
 	if (pwm_mode != AMD_FAN_CTRL_MANUAL) {
 		pr_info("manual fan speed control should be enabled first\n");
 		pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
@@ -2634,9 +2622,7 @@ static ssize_t amdgpu_hwmon_set_pwm1(struct device *dev,
 
 	value = (value * 100) / 255;
 
-	if (is_support_sw_smu(adev))
-		err = smu_set_fan_speed_percent(&adev->smu, value);
-	else if (adev->powerplay.pp_funcs->set_fan_speed_percent)
+	if (adev->powerplay.pp_funcs->set_fan_speed_percent)
 		err = amdgpu_dpm_set_fan_speed_percent(adev, value);
 	else
 		err = -EINVAL;
@@ -2667,9 +2653,7 @@ static ssize_t amdgpu_hwmon_get_pwm1(struct device *dev,
 		return err;
 	}
 
-	if (is_support_sw_smu(adev))
-		err = smu_get_fan_speed_percent(&adev->smu, &speed);
-	else if (adev->powerplay.pp_funcs->get_fan_speed_percent)
+	if (adev->powerplay.pp_funcs->get_fan_speed_percent)
 		err = amdgpu_dpm_get_fan_speed_percent(adev, &speed);
 	else
 		err = -EINVAL;
@@ -2702,9 +2686,7 @@ static ssize_t amdgpu_hwmon_get_fan1_input(struct device *dev,
 		return err;
 	}
 
-	if (is_support_sw_smu(adev))
-		err = smu_get_fan_speed_rpm(&adev->smu, &speed);
-	else if (adev->powerplay.pp_funcs->get_fan_speed_rpm)
+	if (adev->powerplay.pp_funcs->get_fan_speed_rpm)
 		err = amdgpu_dpm_get_fan_speed_rpm(adev, &speed);
 	else
 		err = -EINVAL;
@@ -2795,9 +2777,7 @@ static ssize_t amdgpu_hwmon_get_fan1_target(struct device *dev,
 		return err;
 	}
 
-	if (is_support_sw_smu(adev))
-		err = smu_get_fan_speed_rpm(&adev->smu, &rpm);
-	else if (adev->powerplay.pp_funcs->get_fan_speed_rpm)
+	if (adev->powerplay.pp_funcs->get_fan_speed_rpm)
 		err = amdgpu_dpm_get_fan_speed_rpm(adev, &rpm);
 	else
 		err = -EINVAL;
@@ -2829,10 +2809,7 @@ static ssize_t amdgpu_hwmon_set_fan1_target(struct device *dev,
 		return err;
 	}
 
-	if (is_support_sw_smu(adev))
-		pwm_mode = smu_get_fan_control_mode(&adev->smu);
-	else
-		pwm_mode = amdgpu_dpm_get_fan_control_mode(adev);
+	pwm_mode = amdgpu_dpm_get_fan_control_mode(adev);
 
 	if (pwm_mode != AMD_FAN_CTRL_MANUAL) {
 		pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
@@ -2847,9 +2824,7 @@ static ssize_t amdgpu_hwmon_set_fan1_target(struct device *dev,
 		return err;
 	}
 
-	if (is_support_sw_smu(adev))
-		err = smu_set_fan_speed_rpm(&adev->smu, value);
-	else if (adev->powerplay.pp_funcs->set_fan_speed_rpm)
+	if (adev->powerplay.pp_funcs->set_fan_speed_rpm)
 		err = amdgpu_dpm_set_fan_speed_rpm(adev, value);
 	else
 		err = -EINVAL;
@@ -2880,17 +2855,13 @@ static ssize_t amdgpu_hwmon_get_fan1_enable(struct device *dev,
 		return ret;
 	}
 
-	if (is_support_sw_smu(adev)) {
-		pwm_mode = smu_get_fan_control_mode(&adev->smu);
-	} else {
-		if (!adev->powerplay.pp_funcs->get_fan_control_mode) {
-			pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
-			pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
-			return -EINVAL;
-		}
-
-		pwm_mode = amdgpu_dpm_get_fan_control_mode(adev);
+	if (!adev->powerplay.pp_funcs->get_fan_control_mode) {
+		pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
+		pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
+		return -EINVAL;
 	}
+
+	pwm_mode = amdgpu_dpm_get_fan_control_mode(adev);
 
 	pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
 	pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
@@ -2928,16 +2899,12 @@ static ssize_t amdgpu_hwmon_set_fan1_enable(struct device *dev,
 		return err;
 	}
 
-	if (is_support_sw_smu(adev)) {
-		smu_set_fan_control_mode(&adev->smu, pwm_mode);
-	} else {
-		if (!adev->powerplay.pp_funcs->set_fan_control_mode) {
-			pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
-			pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
-			return -EINVAL;
-		}
-		amdgpu_dpm_set_fan_control_mode(adev, pwm_mode);
+	if (!adev->powerplay.pp_funcs->set_fan_control_mode) {
+		pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
+		pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
+		return -EINVAL;
 	}
+	amdgpu_dpm_set_fan_control_mode(adev, pwm_mode);
 
 	pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
 	pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
