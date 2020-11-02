@@ -67,8 +67,8 @@ typedef struct {
 } atom_exec_context;
 
 int amdgpu_atom_debug = 0;
-static int amdgpu_atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t * params);
-int amdgpu_atom_execute_table(struct atom_context *ctx, int index, uint32_t * params);
+static int amdgpu_atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t *params);
+int amdgpu_atom_execute_table(struct atom_context *ctx, int index, uint32_t *params);
 
 static uint32_t atom_arg_mask[8] =
 	{ 0xFFFFFFFF, 0xFFFF, 0xFFFF00, 0xFFFF0000, 0xFF, 0xFF00, 0xFF0000,
@@ -1204,7 +1204,7 @@ static struct {
 	atom_op_div32, ATOM_ARG_WS},
 };
 
-static int amdgpu_atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t * params)
+static int amdgpu_atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t *params)
 {
 	int base = CU16(ctx->cmd_table + 4 + 2 * index);
 	int len, ws, ps, ptr;
@@ -1265,7 +1265,7 @@ free:
 	return ret;
 }
 
-int amdgpu_atom_execute_table(struct atom_context *ctx, int index, uint32_t * params)
+int amdgpu_atom_execute_table(struct atom_context *ctx, int index, uint32_t *params)
 {
 	int r;
 
@@ -1391,8 +1391,8 @@ void amdgpu_atom_destroy(struct atom_context *ctx)
 }
 
 bool amdgpu_atom_parse_data_header(struct atom_context *ctx, int index,
-			    uint16_t * size, uint8_t * frev, uint8_t * crev,
-			    uint16_t * data_start)
+			    uint16_t *size, uint8_t *frev, uint8_t *crev,
+			    uint16_t *data_start)
 {
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->data_table + offset);
@@ -1411,8 +1411,8 @@ bool amdgpu_atom_parse_data_header(struct atom_context *ctx, int index,
 	return true;
 }
 
-bool amdgpu_atom_parse_cmd_header(struct atom_context *ctx, int index, uint8_t * frev,
-			   uint8_t * crev)
+bool amdgpu_atom_parse_cmd_header(struct atom_context *ctx, int index, uint8_t *frev,
+			   uint8_t *crev)
 {
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->cmd_table + offset);
