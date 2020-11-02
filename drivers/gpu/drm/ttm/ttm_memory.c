@@ -546,7 +546,8 @@ ttm_check_under_lowerlimit(struct ttm_mem_global *glob,
 {
 	int64_t available;
 
-	if (ctx->flags & TTM_OPT_FLAG_FORCE_ALLOC)
+	/* We allow over commit during suspend */
+	if (ctx->force_alloc)
 		return false;
 
 #ifdef __linux__
