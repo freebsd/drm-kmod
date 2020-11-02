@@ -781,6 +781,7 @@ CWARNFLAGS.si.c=				-Wno-gnu-variable-sized-type-not-at-end
 CWARNFLAGS.smuio_v9_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.smuio_v11_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.vangogh_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.vcn_v3_0.c=				-Wno-missing-prototypes
 
 # display/amdgpu_dm
 CWARNFLAGS.amdgpu_dm_pp_smu.c=		-Wno-missing-prototypes -Wno-incompatible-function-pointer-types
