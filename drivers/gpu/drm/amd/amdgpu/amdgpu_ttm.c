@@ -1143,7 +1143,7 @@ static int amdgpu_ttm_backend_bind(struct ttm_bo_device *bdev,
 				   struct ttm_resource *bo_mem)
 {
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
-	struct amdgpu_ttm_tt *gtt = (void*)ttm;
+	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	uint64_t flags;
 	int r = 0;
 
@@ -1202,7 +1202,7 @@ int amdgpu_ttm_alloc_gart(struct ttm_buffer_object *bo)
 {
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->bdev);
 	struct ttm_operation_ctx ctx = { false, false };
-	struct amdgpu_ttm_tt *gtt = (void*)bo->ttm;
+	struct amdgpu_ttm_tt *gtt = (void *)bo->ttm;
 	struct ttm_resource tmp;
 	struct ttm_placement placement;
 	struct ttm_place placements;
@@ -1453,7 +1453,7 @@ int amdgpu_ttm_tt_set_userptr(struct ttm_buffer_object *bo,
 			return -ENOMEM;
 	}
 
-	gtt = (void*)bo->ttm;
+	gtt = (void *)bo->ttm;
 	gtt->userptr = addr;
 	gtt->userflags = flags;
 
