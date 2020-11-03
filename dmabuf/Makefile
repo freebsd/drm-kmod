@@ -28,4 +28,6 @@ CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= -DLINUXKPI_VERSION=50000
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
+CWARNFLAGS.dma-buf.c+=	-Wno-pointer-arith
+
 .include <bsd.kmod.mk>
