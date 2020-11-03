@@ -47,6 +47,20 @@ static inline void dma_buf_map_set_vaddr(struct dma_buf_map *map, void *vaddr)
 }
 
 /**
+ * dma_buf_map_set_vaddr_iomem - Sets a dma-buf mapping structure to an address in I/O memory
+ * @map:		The dma-buf mapping structure
+ * @vaddr_iomem:	An I/O-memory address
+ *
+ * Sets the address and the I/O-memory flag.
+ */
+static inline void dma_buf_map_set_vaddr_iomem(struct dma_buf_map *map,
+					       void __iomem *vaddr_iomem)
+{
+	map->vaddr_iomem = vaddr_iomem;
+	map->is_iomem = true;
+}
+
+/**
  * dma_buf_map_is_equal - Compares two dma-buf mapping structures for equality
  * @lhs:	The dma-buf mapping structure
  * @rhs:	A dma-buf mapping structure to compare with
