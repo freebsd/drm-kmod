@@ -513,6 +513,13 @@ static void nv_get_pcie_usage(struct amdgpu_device *adev,
 	/*TODO*/
 }
 
+
+static uint64_t nv_get_pcie_replay_count(struct amdgpu_device *adev)
+{
+	/*TODO*/
+	return 0;	
+}
+
 static bool nv_need_reset_on_init(struct amdgpu_device *adev)
 {
 #if 0
@@ -579,6 +586,7 @@ static const struct amdgpu_asic_funcs nv_asic_funcs =
 	.need_full_reset = &nv_need_full_reset,
 	.get_pcie_usage = &nv_get_pcie_usage,
 	.need_reset_on_init = &nv_need_reset_on_init,
+	.get_pcie_replay_count = &nv_get_pcie_replay_count,
 };
 
 static int nv_common_early_init(void *handle)
