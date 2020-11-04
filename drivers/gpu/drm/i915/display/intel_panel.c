@@ -1344,11 +1344,7 @@ int intel_backlight_device_register(struct intel_connector *connector)
 	 */
 	panel->backlight.device =
 		backlight_device_register("intel_backlight",
-#if __FreeBSD_version < 1300118
-					  connector->base.kdev,
-#else
 					  connector->base.dev->dev,
-#endif
 					  connector,
 					  &intel_backlight_device_ops, &props);
 
