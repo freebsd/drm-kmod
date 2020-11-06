@@ -864,6 +864,7 @@ CWARNFLAGS.dcn301_smu.c=		-Wno-missing-prototypes
 CWARNFLAGS.vg_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types
 CWARNFLAGS.dcn302_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn302_resource.c=		-Wno-initializer-overrides
+CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.hw_factory.c=		-Wno-missing-prototypes
