@@ -40,6 +40,7 @@
 
 #include "radeon.h"
 #include "radeon_asic.h"
+#include "radeon_drv.h"
 
 #ifdef __FreeBSD__
 #include <vm/vm_phys.h>
