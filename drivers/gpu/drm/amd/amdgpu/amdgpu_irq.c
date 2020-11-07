@@ -109,6 +109,10 @@ void amdgpu_irq_disable_all(struct amdgpu_device *adev)
 	unsigned i, j, k;
 	int r;
 
+#ifdef __FreeBSD__
+	if (adev->irq.installed == false)
+		return;
+#endif
 	spin_lock_irqsave(&adev->irq.lock, irqflags);
 	for (i = 0; i < AMDGPU_IRQ_CLIENTID_MAX; ++i) {
 		if (!adev->irq.client[i].sources)
