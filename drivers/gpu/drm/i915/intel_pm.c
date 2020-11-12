@@ -901,12 +901,12 @@ static void pnv_update_wm(struct intel_crtc *unused_crtc)
 
 	crtc = single_enabled_crtc(dev_priv);
 	if (crtc) {
-		const struct drm_display_mode *adjusted_mode =
-			&crtc->config->hw.adjusted_mode;
+		const struct drm_display_mode *pipe_mode =
+			&crtc->config->hw.pipe_mode;
 		const struct drm_framebuffer *fb =
 			crtc->base.primary->state->fb;
 		int cpp = fb->format->cpp[0];
-		int clock = adjusted_mode->crtc_clock;
+		int clock = pipe_mode->crtc_clock;
 
 		/* Display SR */
 		wm = intel_calculate_wm(clock, &pnv_display_wm,
@@ -1137,8 +1137,8 @@ static u16 g4x_compute_wm(const struct intel_crtc_state *crtc_state,
 {
 	struct intel_plane *plane = to_intel_plane(plane_state->uapi.plane);
 	struct drm_i915_private *dev_priv = to_i915(plane->base.dev);
-	const struct drm_display_mode *adjusted_mode =
-		&crtc_state->hw.adjusted_mode;
+	const struct drm_display_mode *pipe_mode =
+		&crtc_state->hw.pipe_mode;
 	unsigned int latency = dev_priv->wm.pri_latency[level] * 10;
 	unsigned int clock, htotal, cpp, width, wm;
 
@@ -1165,8 +1165,8 @@ static u16 g4x_compute_wm(const struct intel_crtc_state *crtc_state,
 	    level != G4X_WM_LEVEL_NORMAL)
 		cpp = max(cpp, 4u);
 
-	clock = adjusted_mode->crtc_clock;
-	htotal = adjusted_mode->crtc_htotal;
+	clock = pipe_mode->crtc_clock;
+	htotal = pipe_mode->crtc_htotal;
 
 	width = drm_rect_width(&plane_state->uapi.dst);
 
@@ -1662,8 +1662,8 @@ static u16 vlv_compute_wm_level(const struct intel_crtc_state *crtc_state,
 {
 	struct intel_plane *plane = to_intel_plane(plane_state->uapi.plane);
 	struct drm_i915_private *dev_priv = to_i915(plane->base.dev);
-	const struct drm_display_mode *adjusted_mode =
-		&crtc_state->hw.adjusted_mode;
+	const struct drm_display_mode *pipe_mode =
+		&crtc_state->hw.pipe_mode;
 	unsigned int clock, htotal, cpp, width, wm;
 
 	if (dev_priv->wm.pri_latency[level] == 0)
@@ -1673,8 +1673,8 @@ static u16 vlv_compute_wm_level(const struct intel_crtc_state *crtc_state,
 		return 0;
 
 	cpp = plane_state->hw.fb->format->cpp[0];
-	clock = adjusted_mode->crtc_clock;
-	htotal = adjusted_mode->crtc_htotal;
+	clock = pipe_mode->crtc_clock;
+	htotal = pipe_mode->crtc_htotal;
 	width = crtc_state->pipe_src_w;
 
 	if (plane->id == PLANE_CURSOR) {
@@ -2263,12 +2263,12 @@ static void i965_update_wm(struct intel_crtc *unused_crtc)
 	if (crtc) {
 		/* self-refresh has much higher latency */
 		static const int sr_latency_ns = 12000;
-		const struct drm_display_mode *adjusted_mode =
-			&crtc->config->hw.adjusted_mode;
+		const struct drm_display_mode *pipe_mode =
+			&crtc->config->hw.pipe_mode;
 		const struct drm_framebuffer *fb =
 			crtc->base.primary->state->fb;
-		int clock = adjusted_mode->crtc_clock;
-		int htotal = adjusted_mode->crtc_htotal;
+		int clock = pipe_mode->crtc_clock;
+		int htotal = pipe_mode->crtc_htotal;
 		int hdisplay = crtc->config->pipe_src_w;
 		int cpp = fb->format->cpp[0];
 		int entries;
@@ -2347,8 +2347,8 @@ static void i9xx_update_wm(struct intel_crtc *unused_crtc)
 	fifo_size = dev_priv->display.get_fifo_size(dev_priv, PLANE_A);
 	crtc = intel_get_crtc_for_plane(dev_priv, PLANE_A);
 	if (intel_crtc_active(crtc)) {
-		const struct drm_display_mode *adjusted_mode =
-			&crtc->config->hw.adjusted_mode;
+		const struct drm_display_mode *pipe_mode =
+			&crtc->config->hw.pipe_mode;
 		const struct drm_framebuffer *fb =
 			crtc->base.primary->state->fb;
 		int cpp;
@@ -2358,7 +2358,7 @@ static void i9xx_update_wm(struct intel_crtc *unused_crtc)
 		else
 			cpp = fb->format->cpp[0];
 
-		planea_wm = intel_calculate_wm(adjusted_mode->crtc_clock,
+		planea_wm = intel_calculate_wm(pipe_mode->crtc_clock,
 					       wm_info, fifo_size, cpp,
 					       pessimal_latency_ns);
 		enabled = crtc;
@@ -2374,8 +2374,8 @@ static void i9xx_update_wm(struct intel_crtc *unused_crtc)
 	fifo_size = dev_priv->display.get_fifo_size(dev_priv, PLANE_B);
 	crtc = intel_get_crtc_for_plane(dev_priv, PLANE_B);
 	if (intel_crtc_active(crtc)) {
-		const struct drm_display_mode *adjusted_mode =
-			&crtc->config->hw.adjusted_mode;
+		const struct drm_display_mode *pipe_mode =
+			&crtc->config->hw.pipe_mode;
 		const struct drm_framebuffer *fb =
 			crtc->base.primary->state->fb;
 		int cpp;
@@ -2385,7 +2385,7 @@ static void i9xx_update_wm(struct intel_crtc *unused_crtc)
 		else
 			cpp = fb->format->cpp[0];
 
-		planeb_wm = intel_calculate_wm(adjusted_mode->crtc_clock,
+		planeb_wm = intel_calculate_wm(pipe_mode->crtc_clock,
 					       wm_info, fifo_size, cpp,
 					       pessimal_latency_ns);
 		if (enabled == NULL)
@@ -2423,12 +2423,12 @@ static void i9xx_update_wm(struct intel_crtc *unused_crtc)
 	if (HAS_FW_BLC(dev_priv) && enabled) {
 		/* self-refresh has much higher latency */
 		static const int sr_latency_ns = 6000;
-		const struct drm_display_mode *adjusted_mode =
-			&enabled->config->hw.adjusted_mode;
+		const struct drm_display_mode *pipe_mode =
+			&enabled->config->hw.pipe_mode;
 		const struct drm_framebuffer *fb =
 			enabled->base.primary->state->fb;
-		int clock = adjusted_mode->crtc_clock;
-		int htotal = adjusted_mode->crtc_htotal;
+		int clock = pipe_mode->crtc_clock;
+		int htotal = pipe_mode->crtc_htotal;
 		int hdisplay = enabled->config->pipe_src_w;
 		int cpp;
 		int entries;
@@ -2476,7 +2476,7 @@ static void i845_update_wm(struct intel_crtc *unused_crtc)
 {
 	struct drm_i915_private *dev_priv = to_i915(unused_crtc->base.dev);
 	struct intel_crtc *crtc;
-	const struct drm_display_mode *adjusted_mode;
+	const struct drm_display_mode *pipe_mode;
 	u32 fwater_lo;
 	int planea_wm;
 
@@ -2484,8 +2484,8 @@ static void i845_update_wm(struct intel_crtc *unused_crtc)
 	if (crtc == NULL)
 		return;
 
-	adjusted_mode = &crtc->config->hw.adjusted_mode;
-	planea_wm = intel_calculate_wm(adjusted_mode->crtc_clock,
+	pipe_mode = &crtc->config->hw.pipe_mode;
+	planea_wm = intel_calculate_wm(pipe_mode->crtc_clock,
 				       &i845_wm_info,
 				       dev_priv->display.get_fifo_size(dev_priv, PLANE_A),
 				       4, pessimal_latency_ns);
@@ -2575,7 +2575,7 @@ static u32 ilk_compute_pri_wm(const struct intel_crtc_state *crtc_state,
 		return method1;
 
 	method2 = ilk_wm_method2(crtc_state->pixel_rate,
-				 crtc_state->hw.adjusted_mode.crtc_htotal,
+				 crtc_state->hw.pipe_mode.crtc_htotal,
 				 drm_rect_width(&plane_state->uapi.dst),
 				 cpp, mem_value);
 
@@ -2603,7 +2603,7 @@ static u32 ilk_compute_spr_wm(const struct intel_crtc_state *crtc_state,
 
 	method1 = ilk_wm_method1(crtc_state->pixel_rate, cpp, mem_value);
 	method2 = ilk_wm_method2(crtc_state->pixel_rate,
-				 crtc_state->hw.adjusted_mode.crtc_htotal,
+				 crtc_state->hw.pipe_mode.crtc_htotal,
 				 drm_rect_width(&plane_state->uapi.dst),
 				 cpp, mem_value);
 	return min(method1, method2);
@@ -2628,7 +2628,7 @@ static u32 ilk_compute_cur_wm(const struct intel_crtc_state *crtc_state,
 	cpp = plane_state->hw.fb->format->cpp[0];
 
 	return ilk_wm_method2(crtc_state->pixel_rate,
-			      crtc_state->hw.adjusted_mode.crtc_htotal,
+			      crtc_state->hw.pipe_mode.crtc_htotal,
 			      drm_rect_width(&plane_state->uapi.dst),
 			      cpp, mem_value);
 }
@@ -3885,7 +3885,7 @@ static bool skl_crtc_can_enable_sagv(const struct intel_crtc_state *crtc_state)
 	if (!crtc_state->hw.active)
 		return true;
 
-	if (crtc_state->hw.adjusted_mode.flags & DRM_MODE_FLAG_INTERLACE)
+	if (crtc_state->hw.pipe_mode.flags & DRM_MODE_FLAG_INTERLACE)
 		return false;
 
 	intel_atomic_crtc_state_for_each_plane_state(plane, plane_state, crtc_state) {
@@ -4176,8 +4176,8 @@ skl_ddb_get_pipe_allocation_limits(struct drm_i915_private *dev_priv,
 	 */
 	total_slice_mask = dbuf_slice_mask;
 	for_each_new_intel_crtc_in_state(intel_state, crtc, crtc_state, i) {
-		const struct drm_display_mode *adjusted_mode =
-			&crtc_state->hw.adjusted_mode;
+		const struct drm_display_mode *pipe_mode =
+			&crtc_state->hw.pipe_mode;
 		enum pipe pipe = crtc->pipe;
 		int hdisplay, vdisplay;
 		u32 pipe_dbuf_slice_mask;
@@ -4207,7 +4207,7 @@ skl_ddb_get_pipe_allocation_limits(struct drm_i915_private *dev_priv,
 		if (dbuf_slice_mask != pipe_dbuf_slice_mask)
 			continue;
 
-		drm_mode_get_hv_timing(adjusted_mode, &hdisplay, &vdisplay);
+		drm_mode_get_hv_timing(pipe_mode, &hdisplay, &vdisplay);
 
 		total_width_in_range += hdisplay;
 
@@ -5095,7 +5095,7 @@ intel_get_linetime_us(const struct intel_crtc_state *crtc_state)
 	if (drm_WARN_ON(&dev_priv->drm, pixel_rate == 0))
 		return u32_to_fixed16(0);
 
-	crtc_htotal = crtc_state->hw.adjusted_mode.crtc_htotal;
+	crtc_htotal = crtc_state->hw.pipe_mode.crtc_htotal;
 	linetime_us = div_fixed16(crtc_htotal * 1000, pixel_rate);
 
 	return linetime_us;
@@ -5284,14 +5284,14 @@ static void skl_compute_plane_wm(const struct intel_crtc_state *crtc_state,
 	method1 = skl_wm_method1(dev_priv, wp->plane_pixel_rate,
 				 wp->cpp, latency, wp->dbuf_block_size);
 	method2 = skl_wm_method2(wp->plane_pixel_rate,
-				 crtc_state->hw.adjusted_mode.crtc_htotal,
+				 crtc_state->hw.pipe_mode.crtc_htotal,
 				 latency,
 				 wp->plane_blocks_per_line);
 
 	if (wp->y_tiled) {
 		selected_result = max_fixed16(method2, wp->y_tile_minimum);
 	} else {
-		if ((wp->cpp * crtc_state->hw.adjusted_mode.crtc_htotal /
+		if ((wp->cpp * crtc_state->hw.pipe_mode.crtc_htotal /
 		     wp->dbuf_block_size < 1) &&
 		     (wp->plane_bytes_per_line / wp->dbuf_block_size < 1)) {
 			selected_result = method2;
