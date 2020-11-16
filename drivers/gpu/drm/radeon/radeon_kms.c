@@ -41,6 +41,7 @@
 #include "radeon.h"
 #include "radeon_asic.h"
 #include "radeon_drv.h"
+#include "radeon_kms.h"
 
 #ifdef __FreeBSD__
 #include <vm/vm_phys.h>
