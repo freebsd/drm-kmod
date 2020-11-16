@@ -1,3 +1,5 @@
+#include <sys/param.h>
+#if __FreeBSD_version < 1300128
 /*
  * Lock-less NULL terminated single linked list
  *
@@ -99,3 +101,4 @@ struct llist_node *llist_reverse_order(struct llist_node *head)
 
 	return new_head;
 }
+#endif

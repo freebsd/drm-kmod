@@ -1,3 +1,5 @@
+#include <sys/param.h>
+#if __FreeBSD_version < 1300128
 #ifndef _LINUX_GPLV2_LLIST_H
 #define _LINUX_GPLV2_LLIST_H
 /*
@@ -223,3 +225,6 @@ struct llist_node *llist_reverse_order(struct llist_node *head);
 
 #endif /* _LINUX_GPLV2_LLIST_H */
 
+#else
+#include_next <linux/llist.h>
+#endif
