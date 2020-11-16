@@ -51,6 +51,7 @@
 #include <drm/radeon_drm.h>
 
 #include "radeon_drv.h"
+#include "radeon_ttm.h"
 #include "radeon_device.h"
 #include "radeon.h"
 
@@ -133,7 +134,6 @@ extern int radeon_get_crtc_scanoutpos(struct drm_device *dev, unsigned int crtc,
 				      ktime_t *stime, ktime_t *etime,
 				      const struct drm_display_mode *mode);
 extern bool radeon_is_px(struct drm_device *dev);
-int radeon_mmap(struct file *filp, struct vm_area_struct *vma);
 int radeon_mode_dumb_mmap(struct drm_file *filp,
 			  struct drm_device *dev,
 			  uint32_t handle, uint64_t *offset_p);
