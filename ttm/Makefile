@@ -11,7 +11,6 @@ SRCS=	ttm_bo.c \
 	ttm_bo_util.c \
 	ttm_bo_vm.c \
 	ttm_execbuf_util.c \
-	ttm_memory.c \
 	ttm_module.c \
 	ttm_pool.c \
 	ttm_device.c \
