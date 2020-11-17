@@ -32,6 +32,7 @@
 #include <linux/module.h>
 #include <linux/device.h>
 #include <linux/sched.h>
+#include <linux/debugfs.h>
 #include <drm/drm_sysfs.h>
 
 #ifdef __FreeBSD__
@@ -49,6 +50,7 @@ SYSCTL_NODE(_hw, OID_AUTO, ttm,
 
 static DECLARE_WAIT_QUEUE_HEAD(exit_q);
 static atomic_t device_released;
+struct dentry *ttm_debugfs_root;
 
 static struct device_type ttm_drm_class_type = {
 	.name = "ttm",
@@ -88,6 +90,7 @@ static int __init ttm_init(void)
 	if (unlikely(ret != 0))
 		goto out_no_dev_reg;
 
+	ttm_debugfs_root = debugfs_create_dir("ttm", NULL);
 	return 0;
 out_no_dev_reg:
 	atomic_set(&device_released, 1);
@@ -105,6 +108,7 @@ static void __exit ttm_exit(void)
 	 */
 
 	wait_event(exit_q, atomic_read(&device_released) == 1);
+	debugfs_remove(ttm_debugfs_root);
 }
 
 #ifdef __linux__
@@ -124,4 +128,7 @@ MODULE_DEPEND(ttm, drmn, 2, 2, 2);
 MODULE_DEPEND(ttm, linuxkpi, 1, 1, 1);
 MODULE_DEPEND(ttm, linuxkpi_gplv2, 1, 1, 1);
 MODULE_DEPEND(ttm, dmabuf, 1, 1, 1);
+#ifdef CONFIG_DEBUG_FS
+MODULE_DEPEND(amdgpu, lindebugfs, 1, 1, 1);
+#endif
 #endif
