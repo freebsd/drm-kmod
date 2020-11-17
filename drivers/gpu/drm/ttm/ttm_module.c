@@ -32,7 +32,6 @@
 #include <linux/module.h>
 #include <linux/device.h>
 #include <linux/sched.h>
-#include <drm/ttm/ttm_module.h>
 #include <drm/drm_sysfs.h>
 
 #ifdef __FreeBSD__
@@ -45,6 +44,8 @@ SYSCTL_NODE(_hw, OID_AUTO, ttm,
     CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
     "TTM memory manager parameters");
 #endif
+
+#include "ttm_module.h"
 
 static DECLARE_WAIT_QUEUE_HEAD(exit_q);
 static atomic_t device_released;
