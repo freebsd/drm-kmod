@@ -573,10 +573,12 @@ void ttm_pool_init(struct ttm_pool *pool, struct device *dev,
 	pool->use_dma_alloc = use_dma_alloc;
 	pool->use_dma32 = use_dma32;
 
-	for (i = 0; i < TTM_NUM_CACHING_TYPES; ++i)
-		for (j = 0; j < MAX_ORDER; ++j)
-			ttm_pool_type_init(&pool->caching[i].orders[j],
-					   pool, i, j);
+	if (use_dma_alloc) {
+		for (i = 0; i < TTM_NUM_CACHING_TYPES; ++i)
+			for (j = 0; j < MAX_ORDER; ++j)
+				ttm_pool_type_init(&pool->caching[i].orders[j],
+						   pool, i, j);
+	}
 }
 
 /**
@@ -591,9 +593,11 @@ void ttm_pool_fini(struct ttm_pool *pool)
 {
 	unsigned int i, j;
 
-	for (i = 0; i < TTM_NUM_CACHING_TYPES; ++i)
-		for (j = 0; j < MAX_ORDER; ++j)
-			ttm_pool_type_fini(&pool->caching[i].orders[j]);
+	if (pool->use_dma_alloc) {
+		for (i = 0; i < TTM_NUM_CACHING_TYPES; ++i)
+			for (j = 0; j < MAX_ORDER; ++j)
+				ttm_pool_type_fini(&pool->caching[i].orders[j]);
+	}
 }
 
 /* As long as pages are available make sure to release at least one */
@@ -705,6 +709,11 @@ DEFINE_SHOW_ATTRIBUTE(ttm_pool_debugfs_globals);
 int ttm_pool_debugfs(struct ttm_pool *pool, struct seq_file *m)
 {
 	unsigned int i;
+
+	if (!pool->use_dma_alloc) {
+		seq_puts(m, "unused\n");
+		return 0;
+	}
 
 	ttm_pool_debugfs_header(m);
 
