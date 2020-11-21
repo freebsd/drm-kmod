@@ -1802,7 +1802,7 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 			       adev->need_dma32);
 #elif defined(__FreeBSD__)
 			       NULL, /* Dummy on BSD */
-				       NULL,
+			       adev->ddev->vma_offset_manager,
 			       false);
 #endif
 	if (r) {
