@@ -9,7 +9,8 @@ KMOD=	amdgpu
 
 .if ${MACHINE_CPUARCH} == "amd64"
 _dml=	${SRCDIR}/display/dc/dml \
-	${SRCDIR}/display/dc/dml/dcn20
+	${SRCDIR}/display/dc/dml/dcn20 \
+	${SRCDIR}/display/dc/dml/dcn21
 .endif
 
 .PATH:	${SRCDIR}/acp \
@@ -32,6 +33,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/clk_mgr/dce120 \
 	${SRCDIR}/display/dc/clk_mgr/dcn10 \
 	${SRCDIR}/display/dc/clk_mgr/dcn20 \
+	${SRCDIR}/display/dc/clk_mgr/dcn21 \
 	${SRCDIR}/display/dc/dce \
 	${SRCDIR}/display/dc/dce100 \
 	${SRCDIR}/display/dc/dce110 \
@@ -49,6 +51,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/gpio/dce80 \
 	${SRCDIR}/display/dc/gpio/dcn10 \
 	${SRCDIR}/display/dc/gpio/dcn20 \
+	${SRCDIR}/display/dc/gpio/dcn21 \
 	${SRCDIR}/display/dc/gpio/diagnostics \
 	${SRCDIR}/display/dc/i2caux \
 	${SRCDIR}/display/dc/i2caux/dce100 \
@@ -66,11 +69,13 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dce80 \
 	${SRCDIR}/display/dc/irq/dcn10 \
 	${SRCDIR}/display/dc/irq/dcn20 \
+	${SRCDIR}/display/dc/irq/dcn21 \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/modules \
 	${SRCDIR}/display/modules/color \
 	${SRCDIR}/display/modules/freesync \
 	${SRCDIR}/display/modules/inc \
+	${SRCDIR}/display/modules/info_packet \
 	${SRCDIR}/display/modules/power \
 	${SRCDIR}/lib \
 	${SRCDIR}/powerplay \
@@ -138,6 +143,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_psp.c \
 	amdgpu_ring.c \
 	amdgpu_ras.c \
+	amdgpu_ras_eeprom.c \
 	amdgpu_rlc.c \
 	amdgpu_sa.c \
 	amdgpu_sched.c \
@@ -399,7 +405,9 @@ SRCS+=	dcn21_hubbub.c \
 SRCS+=	dc_vm_helper.c
 
 # display/dc/clk_mgr
-SRCS+=	dcn20_clk_mgr.c
+SRCS+=	dcn20_clk_mgr.c \
+	rn_clk_mgr.c \
+	rn_clk_mgr_vbios_smu.c
 
 # display/dc/dsc
 SRCS+=	rc_calc.c \
@@ -413,8 +421,10 @@ SRCS+=	rc_calc.c \
 SRCS+=	display_mode_lib.c \
 	display_mode_vba.c \
 	display_mode_vba_20.c \
+	display_mode_vba_21.c \
 	display_rq_dlg_helpers.c \
 	display_rq_dlg_calc_20.c \
+	display_rq_dlg_calc_21.c \
 	dml_common_defs.c \
 	dml1_display_rq_dlg_calc.c
 .endif
@@ -433,12 +443,14 @@ SRCS+=	gpio_base.c \
 	hw_factory_dce80.c \
 	hw_factory_dcn10.c \
 	hw_factory_dcn20.c \
+	hw_factory_dcn21.c \
 	hw_factory_diag.c \
 	hw_translate_dce110.c \
 	hw_translate_dce120.c \
 	hw_translate_dce80.c \
 	hw_translate_dcn10.c \
 	hw_translate_dcn20.c \
+	hw_translate_dcn21.c \
 	hw_translate_diag.c
 
 # display/dc/irq/*
@@ -447,7 +459,8 @@ SRCS+=	irq_service.c \
 	irq_service_dce120.c \
 	irq_service_dce80.c \
 	irq_service_dcn10.c \
-	irq_service_dcn20.c
+	irq_service_dcn20.c \
+	irq_service_dcn21.c
 
 # display/dc/virtual
 SRCS+=	virtual_link_encoder.c \
@@ -456,6 +469,7 @@ SRCS+=	virtual_link_encoder.c \
 # display/modules/*
 SRCS+=	color_gamma.c \
 	freesync.c \
+	info_packet.c \
 	power_helpers.c
 
 # display/dc
@@ -513,6 +527,7 @@ SRCS+=	amd_powerplay.c \
 	smu10_hwmgr.c \
 	smu10_smumgr.c \
 	smu_v11_0.c \
+	smu_v11_0_i2c.c \
 	smu_v12_0.c \
 	smu_helper.c \
 	smumgr.c \
@@ -591,10 +606,12 @@ CFLAGS.dcn21_resource.c= -msse -mstack-alignment=4
 CFLAGS.display_mode_lib.c= -msse -mstack-alignment=4
 CFLAGS.display_mode_vba.c= -msse -mstack-alignment=4
 CFLAGS.display_mode_vba_20.c= -msse -mstack-alignment=4
+CFLAGS.display_mode_vba_21.c= -msse -mstack-alignment=4
 CFLAGS.display_pipe_clocks.c= -msse -mstack-alignment=4
 CFLAGS.dml1_display_rq_dlg_calc.c= -msse -mstack-alignment=4
 CFLAGS.display_rq_dlg_helpers.c= -msse -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_20.c= -msse -mstack-alignment=4
+CFLAGS.display_rq_dlg_calc_21.c= -msse -mstack-alignment=4 -Wno-missing-prototypes
 CFLAGS.soc_bounding_box.c= -msse -mstack-alignment=4
 CFLAGS.dml_common_defs.c= -msse -mstack-alignment=4
 
@@ -661,6 +678,8 @@ CWARNFLAGS.dce120_resource.c=		-Wno-missing-prototypes -Wno-initializer-override
 CWARNFLAGS.dce120_timing_generator.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce80_hw_sequencer.c=	-Wno-unused-const-variable
 CWARNFLAGS.dce80_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
+CWARNFLAGS.rn_clk_mgr_vbios_smu.c=	-Wno-missing-prototypes
+CWARNFLAGS.rn_clk_mgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.rv1_clk_mgr_vbios_smu.c=	-Wno-missing-prototypes
 CWARNFLAGS.rv1_clk_mgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp.c=			-Wno-missing-prototypes
@@ -690,6 +709,7 @@ CWARNFLAGS.hw_translate_diag.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn10.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn20.c=		-Wno-missing-prototypes
+CWARNFLAGS.irq_service_dcn21.c=		-Wno-missing-prototypes
 CWARNFLAGS.power_helpers.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes -Wno-unused-variable
