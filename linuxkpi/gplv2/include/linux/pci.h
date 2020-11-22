@@ -9,8 +9,8 @@
 
 #include_next <linux/pci.h>
 
-/* LKPI_TODO */
-#define	pci_free_irq_vectors(dev) 0
+#define	pci_free_irq_vectors(pdev) \
+	linux_pci_disable_msi(pdev)
 
 #define	DEFINE_RES_MEM(_start, _size)		\
 	{					\
