@@ -18,6 +18,7 @@ SRCS= 	\
 	vbox_mode.c \
 	vbox_ttm.c \
 	vbva_base.c \
+	drm_gem_ttm_helper.c \
 	drm_gem_vram_helper.c \
 	drm_vram_mm_helper.c
 
