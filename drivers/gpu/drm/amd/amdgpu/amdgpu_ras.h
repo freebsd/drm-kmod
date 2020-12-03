@@ -609,27 +609,7 @@ int amdgpu_ras_sysfs_create(struct amdgpu_device *adev,
 int amdgpu_ras_sysfs_remove(struct amdgpu_device *adev,
 		struct ras_common_if *head);
 
-#ifdef CONFIG_DEBUG_FS
-void amdgpu_ras_debugfs_create(struct amdgpu_device *adev,
-		struct ras_fs_if *head);
-
 void amdgpu_ras_debugfs_create_all(struct amdgpu_device *adev);
-
-void amdgpu_ras_debugfs_remove(struct amdgpu_device *adev,
-		struct ras_common_if *head);
-#else
-static inline int amdgpu_ras_debugfs_create(struct amdgpu_device *adev,
-		struct ras_fs_if *head)
-{
-	return 0;
-}
-
-static inline void amdgpu_ras_debugfs_remove(struct amdgpu_device *adev,
-		struct ras_common_if *head)
-{
-
-}
-#endif
 
 int amdgpu_ras_error_query(struct amdgpu_device *adev,
 		struct ras_query_if *info);
