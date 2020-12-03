@@ -637,6 +637,7 @@ SRCS+=	dcn_calc_auto.c \
 SRCS+=	amd_powerplay.c \
 	amdgpu_smu.c \
 	aldebaran_ppt.c \
+	yellow_carp_ppt.c \
 	arcturus_ppt.c \
 	common_baco.c \
 	ci_smumgr.c \
