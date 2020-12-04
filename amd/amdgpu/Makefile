@@ -579,7 +579,8 @@ SRCS+=	color_gamma.c \
 
 # display/dc
 SRCS+=	dc_helper.c \
-	dc_dmub_srv.c
+	dc_dmub_srv.c \
+	dc_edid_parser.c
 
 # display/dmub/src
 SRCS+=	dmub_dcn20.c \
