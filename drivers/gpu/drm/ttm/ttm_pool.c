@@ -267,26 +267,6 @@ static struct page *ttm_pool_type_take(struct ttm_pool_type *pt)
 	return p;
 }
 
-/* Count the number of pages available in a pool_type */
-static unsigned int ttm_pool_type_count(struct ttm_pool_type *pt)
-{
-	unsigned int count = 0;
-	struct page *p;
-
-	spin_lock(&pt->lock);
-	/* Only used for debugfs, the overhead doesn't matter */
-#ifdef __linux__
-	list_for_each_entry(p, &pt->pages, lru)
-		++count;
-#elif defined(__FreeBSD__)
-	TAILQ_FOREACH(p, &pt->pages, plinks.q)
-		++count;
-#endif
-	spin_unlock(&pt->lock);
-
-	return count;
-}
-
 /* Initialize and add a pool type to the global shrinker list */
 static void ttm_pool_type_init(struct ttm_pool_type *pt, struct ttm_pool *pool,
 			       enum ttm_caching caching, unsigned int order)
@@ -607,6 +587,25 @@ void ttm_pool_fini(struct ttm_pool *pool)
 EXPORT_SYMBOL(ttm_pool_fini);
 
 #ifdef CONFIG_DEBUG_FS
+/* Count the number of pages available in a pool_type */
+static unsigned int ttm_pool_type_count(struct ttm_pool_type *pt)
+{
+	unsigned int count = 0;
+	struct page *p;
+
+	spin_lock(&pt->lock);
+	/* Only used for debugfs, the overhead doesn't matter */
+#ifdef __linux__
+	list_for_each_entry(p, &pt->pages, lru)
+		++count;
+#elif defined(__FreeBSD__)
+	TAILQ_FOREACH(p, &pt->pages, plinks.q)
+		++count;
+#endif
+	spin_unlock(&pt->lock);
+
+	return count;
+}
 
 /* Dump information about the different pool types */
 static void ttm_pool_debugfs_orders(struct ttm_pool_type *pt,
