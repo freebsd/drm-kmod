@@ -130,6 +130,7 @@ SRCS+=	gen2_engine_cs.c \
 	intel_engine_heartbeat.c \
 	intel_engine_pm.c \
 	intel_engine_user.c \
+	intel_execlists_submission.c \
 	intel_ggtt.c \
 	intel_ggtt_fencing.c \
 	intel_gt.c \
@@ -141,7 +142,6 @@ SRCS+=	gen2_engine_cs.c \
 	intel_gt_requests.c \
 	intel_gtt.c \
 	intel_llc.c \
-	intel_lrc.c \
 	intel_mocs.c \
 	intel_ppgtt.c \
 	intel_rc6.c \
