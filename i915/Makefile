@@ -119,6 +119,7 @@ SRCS+=	gen2_engine_cs.c \
 	gen6_renderstate.c \
 	gen7_renderclear.c \
 	gen7_renderstate.c \
+	gen8_engine_cs.c \
 	gen8_ppgtt.c \
 	gen8_renderstate.c \
 	gen9_renderstate.c \
