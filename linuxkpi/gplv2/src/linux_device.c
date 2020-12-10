@@ -138,7 +138,6 @@ pci_dev_put(struct pci_dev *pdev)
 	free(pdev->bus, M_DEVBUF);
 	free(pdev, M_DEVBUF);
 }
-#endif
 
 struct pci_dev *
 linux_pci_get_class(unsigned int class, struct pci_dev *from)
@@ -183,3 +182,4 @@ linux_pci_get_class(unsigned int class, struct pci_dev *from)
 	pdev->bus->number = pci_get_bus(dev);
 	return (pdev);
 }
+#endif
