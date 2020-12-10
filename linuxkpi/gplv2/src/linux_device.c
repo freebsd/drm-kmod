@@ -106,6 +106,7 @@ devres_free(void *res)
 	}
 }
 
+#if __FreeBSD_version < 1300135
 struct pci_dev *
 pci_get_bus_and_slot(unsigned int bus, unsigned int devfn)
 {
@@ -137,6 +138,7 @@ pci_dev_put(struct pci_dev *pdev)
 	free(pdev->bus, M_DEVBUF);
 	free(pdev, M_DEVBUF);
 }
+#endif
 
 struct pci_dev *
 linux_pci_get_class(unsigned int class, struct pci_dev *from)
