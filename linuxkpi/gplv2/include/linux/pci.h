@@ -47,6 +47,7 @@ resource_contains(struct linux_resource *a, struct linux_resource *b)
 	return a->start <= b->start && a->end >= b->end;
 }
 
+#if __FreeBSD_version < 1300135
 static inline int
 pci_bus_read_config(struct pci_bus *bus, unsigned int devfn,
 		    int where, uint32_t *val, int size)
@@ -123,6 +124,9 @@ pci_is_root_bus(struct pci_bus *pbus)
 	return (pbus->self == NULL);
 }
 
+#endif
+
+
 static inline struct pci_dev *
 pci_upstream_bridge(struct pci_dev *dev)
 {
@@ -146,6 +150,7 @@ pci_platform_rom(struct pci_dev *pdev, size_t *size)
 	return (NULL);
 }
 
+#if __FreeBSD_version < 1300135
 static inline void
 linux_pci_save_state(struct pci_dev *pdev)
 {
@@ -159,6 +164,7 @@ linux_pci_restore_state(struct pci_dev *pdev)
 
 	pci_restore_state(pdev->dev.bsddev);
 }
+#endif
 
 static inline void
 pci_ignore_hotplug(struct pci_dev *pdev)
@@ -187,7 +193,9 @@ pcie_get_readrq(struct pci_dev *dev)
 }
 
 #define	pci_get_class(class, dev)	linux_pci_get_class(class, dev)
+#if __FreeBSD_version < 1300135
 #define	pci_save_state(dev)	linux_pci_save_state(dev)
 #define	pci_restore_state(dev)	linux_pci_restore_state(dev)
+#endif
 
 #endif /* _LINUX_GPLV2_PCI_H_ */
