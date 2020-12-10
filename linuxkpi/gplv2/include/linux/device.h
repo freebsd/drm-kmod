@@ -5,6 +5,7 @@
 
 #include <linux/numa.h>
 #include <linux/pm.h>
+#include <linux/idr.h>
 
 typedef void (*dr_release_t)(struct device *dev, void *res);
 typedef int (*dr_match_t)(struct device *dev, void *res, void *match_data);
@@ -262,28 +263,6 @@ devres_release_group(struct device *dev, void *id)
 	}
 
 	return cnt;
-}
-
-#include <linux/idr.h>
-
-#define DL_FLAG_STATELESS		BIT(0)
-#define DL_FLAG_AUTOREMOVE_CONSUMER	BIT(1)
-#define DL_FLAG_PM_RUNTIME		BIT(2)
-#define DL_FLAG_RPM_ACTIVE		BIT(3)
-#define DL_FLAG_AUTOREMOVE_SUPPLIER	BIT(4)
-
-static inline struct device_link *
-device_link_add(struct device *consumer, struct device *supplier, u32 flags)
-{
-
-	UNIMPLEMENTED();
-	return NULL;
-}
-
-static inline void
-device_link_remove(void *consumer, struct device *supplier)
-{
-	UNIMPLEMENTED();
 }
 
 #endif /* _LINUX_GPLV2_DEVICE_H_ */
