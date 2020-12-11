@@ -114,9 +114,11 @@ pci_get_domain_bus_and_slot(int domain, unsigned int bus, unsigned int devfn)
 
 	return (pci_get_bus_and_slot(bus, devfn));
 }
+#endif
 
 void pci_dev_put(struct pci_dev *pdev);
 
+#if 0
 static inline bool
 pci_is_root_bus(struct pci_bus *pbus)
 {
