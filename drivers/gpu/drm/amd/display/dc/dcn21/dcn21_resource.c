@@ -1141,6 +1141,9 @@ bool dcn21_validate_bandwidth(struct dc *dc, struct dc_state *context,
 		bool fast_validate)
 {
 	bool out = false;
+#ifdef __FreeBSD__
+	kernel_fpu_begin();
+#endif
 
 	BW_VAL_TRACE_SETUP();
 
@@ -1183,6 +1186,9 @@ validate_fail:
 
 validate_out:
 	kfree(pipes);
+#ifdef __FreeBSD__
+	kernel_fpu_end();
+#endif
 
 	BW_VAL_TRACE_FINISH();
 
