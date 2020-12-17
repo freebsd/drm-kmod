@@ -327,11 +327,14 @@ void intel_breadcrumbs_reset(struct intel_breadcrumbs *b)
 	spin_unlock_irqrestore(&b->irq_lock, flags);
 }
 
-void intel_breadcrumbs_park(struct intel_breadcrumbs *b)
+void __intel_breadcrumbs_park(struct intel_breadcrumbs *b)
 {
-	/* Kick the work once more to drain the signalers */
+	if (!READ_ONCE(b->irq_armed))
+		return;
+
+	/* Kick the work once more to drain the signalers, and disarm the irq */
 	irq_work_sync(&b->irq_work);
-	while (unlikely(READ_ONCE(b->irq_armed))) {
+	while (READ_ONCE(b->irq_armed) && !atomic_read(&b->active)) {
 #ifdef __linux__
 		local_irq_disable();
 #endif
@@ -341,7 +344,6 @@ void intel_breadcrumbs_park(struct intel_breadcrumbs *b)
 #endif
 		cond_resched();
 	}
-	GEM_BUG_ON(!list_empty(&b->signalers));
 }
 
 void intel_breadcrumbs_free(struct intel_breadcrumbs *b)
