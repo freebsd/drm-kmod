@@ -33,7 +33,7 @@
 
 #include <linux/module.h>
 #include <linux/dma-mapping.h>
-#include <linux/highmem.h>
+#include <linux/sched/mm.h>
 
 #ifdef CONFIG_X86
 #include <asm/set_memory.h>
@@ -596,6 +596,32 @@ void ttm_pool_fini(struct ttm_pool *pool)
 			ttm_pool_type_fini(&pool->caching[i].orders[j]);
 }
 
+/* As long as pages are available make sure to release at least one */
+static unsigned long ttm_pool_shrinker_scan(struct shrinker *shrink,
+					    struct shrink_control *sc)
+{
+	unsigned long num_freed = 0;
+
+	do
+		num_freed += ttm_pool_shrink();
+	while (!num_freed && atomic_long_read(&allocated_pages));
+
+	return num_freed;
+}
+
+/* Return the number of pages available or SHRINK_EMPTY if we have none */
+static unsigned long ttm_pool_shrinker_count(struct shrinker *shrink,
+					     struct shrink_control *sc)
+{
+	unsigned long num_pages = atomic_long_read(&allocated_pages);
+
+#ifdef __linux__
+	return num_pages ? num_pages : SHRINK_EMPTY;
+#elif defined(__FreeBSD__)
+	return num_pages ? num_pages : 0;
+#endif
+}
+
 #ifdef CONFIG_DEBUG_FS
 /* Count the number of pages available in a pool_type */
 static unsigned int ttm_pool_type_count(struct ttm_pool_type *pt)
@@ -705,33 +731,21 @@ int ttm_pool_debugfs(struct ttm_pool *pool, struct seq_file *m)
 }
 EXPORT_SYMBOL(ttm_pool_debugfs);
 
-#endif
-
-/* As long as pages are available make sure to release at least one */
-static unsigned long ttm_pool_shrinker_scan(struct shrinker *shrink,
-					    struct shrink_control *sc)
+/* Test the shrinker functions and dump the result */
+static int ttm_pool_debugfs_shrink_show(struct seq_file *m, void *data)
 {
-	unsigned long num_freed = 0;
+	struct shrink_control sc = { .gfp_mask = GFP_NOFS };
 
-	do
-		num_freed += ttm_pool_shrink();
-	while (!num_freed && atomic_long_read(&allocated_pages));
+	fs_reclaim_acquire(GFP_KERNEL);
+	seq_printf(m, "%lu/%lu\n", ttm_pool_shrinker_count(&mm_shrinker, &sc),
+		   ttm_pool_shrinker_scan(&mm_shrinker, &sc));
+	fs_reclaim_release(GFP_KERNEL);
 
-	return num_freed;
+	return 0;
 }
+DEFINE_SHOW_ATTRIBUTE(ttm_pool_debugfs_shrink);
 
-/* Return the number of pages available or SHRINK_EMPTY if we have none */
-static unsigned long ttm_pool_shrinker_count(struct shrinker *shrink,
-					     struct shrink_control *sc)
-{
-	unsigned long num_pages = atomic_long_read(&allocated_pages);
-
-#ifdef __linux__
-	return num_pages ? num_pages : SHRINK_EMPTY;
-#elif defined(__FreeBSD__)
-	return num_pages ? num_pages : 0;
 #endif
-}
 
 /**
  * ttm_pool_mgr_init - Initialize globals
@@ -764,6 +778,8 @@ int ttm_pool_mgr_init(unsigned long num_pages)
 #ifdef CONFIG_DEBUG_FS
 	debugfs_create_file("page_pool", 0444, ttm_debugfs_root, NULL,
 			    &ttm_pool_debugfs_globals_fops);
+	debugfs_create_file("page_pool_shrink", 0400, ttm_debugfs_root, NULL,
+			    &ttm_pool_debugfs_shrink_fops);
 #endif
 
 	mm_shrinker.count_objects = ttm_pool_shrinker_count;
