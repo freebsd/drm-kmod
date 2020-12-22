@@ -1,3 +1,4 @@
+#if __FreeBSD_version < 1300135
 #ifndef _LINUX_SHRINKER_H
 #define _LINUX_SHRINKER_H
 
@@ -52,4 +53,7 @@ struct shrinker {
 extern int register_shrinker(struct shrinker *);
 extern void unregister_shrinker(struct shrinker *);
 
+#endif
+#else
+#include_next <linux/shrinker.h>
 #endif
