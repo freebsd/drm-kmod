@@ -149,24 +149,6 @@ atomic_notifier_call_chain(struct atomic_notifier_head *nh,
 	return __atomic_notifier_call_chain(nh, val, v, -1, NULL);
 }
 
-#ifdef CONFIG_ACPI
-#if __FreeBSD_version < 1300128
-int
-register_acpi_notifier(struct notifier_block *nb)
-{
-	WARN_NOT();
-	return (0);
-}
-
-int
-unregister_acpi_notifier(struct notifier_block *nb)
-{
-	WARN_NOT();
-	return (0);
-}
-#endif
-#endif
-
 int
 register_oom_notifier(struct notifier_block *nb)
 {
@@ -300,51 +282,12 @@ linuxkpi_vm_lowmem(void *arg __unused)
 
 static eventhandler_tag lowmem_tag;
 
-#ifdef CONFIG_ACPI_SLEEP
-#if __FreeBSD_version < 1300128
-extern u32 linuxkpi_acpi_target_sleep_state;
-static void
-linuxkpi_event_suspend(void *arg __unused)
-{
-
-	// Only support S3 for now.
-	// acpi_sleep_event isn't always called so we use
-	// power_suspend_early instead which means we don't
-	// know what state we're switching to.
-	// TODO: Make acpi_sleep_event consistent
-	linuxkpi_acpi_target_sleep_state = ACPI_STATE_S3;
-}
-static void
-linuxkpi_event_resume(void *arg __unused)
-{
-
-	linuxkpi_acpi_target_sleep_state = ACPI_STATE_S0;
-}
-
-static eventhandler_tag resume_tag = NULL;
-static eventhandler_tag suspend_tag = NULL;
-#endif
-#endif
-
-
-
 static void
 linuxkpi_register_eventhandlers(void *arg __unused)
 {
 	DIPRINTF("registering linuxkpi event handlers\n");
 
 	lowmem_tag = EVENTHANDLER_REGISTER(vm_lowmem, linuxkpi_vm_lowmem, NULL, EVENTHANDLER_PRI_FIRST);
-#ifdef CONFIG_ACPI_SLEEP
-#if __FreeBSD_version < 1300128
-	// acpi_{sleep,wakeup}_event can't be trusted, use power_{suspend_early,resume}
-	// 'acpiconf -s 3' or 'zzz' will not generate acpi_sleep_event...
-	// lid open or wake on button generates acpi_wakeup_event on one of my
-	// dell laptops but not the other (but it does power on)...
-	//   is this a general thing?
-	resume_tag = EVENTHANDLER_REGISTER(power_resume, linuxkpi_event_resume, NULL, EVENTHANDLER_PRI_FIRST);
-	suspend_tag = EVENTHANDLER_REGISTER(power_suspend_early, linuxkpi_event_suspend, NULL, EVENTHANDLER_PRI_FIRST);
-#endif
-#endif
 }
 
 static void
@@ -352,12 +295,6 @@ linuxkpi_deregister_eventhandlers(void *arg __unused)
 {
 
 	EVENTHANDLER_DEREGISTER(vm_lowmem, lowmem_tag);
-#ifdef CONFIG_ACPI_SLEEP
-#if __FreeBSD_version < 1300128
-	EVENTHANDLER_DEREGISTER(power_resume, resume_tag);
-	EVENTHANDLER_DEREGISTER(power_suspend_early, suspend_tag);
-#endif
-#endif
 }
 
 SYSINIT(linuxkpi_events, SI_SUB_DRIVERS, SI_ORDER_ANY, linuxkpi_register_eventhandlers, NULL);
