@@ -455,17 +455,18 @@ void i915_request_cancel_breadcrumb(struct i915_request *rq)
 {
 	struct intel_breadcrumbs *b = READ_ONCE(rq->engine)->breadcrumbs;
 	struct intel_context *ce = rq->context;
+	unsigned long flags;
 	bool release;
 
-	spin_lock(&ce->signal_lock);
+	spin_lock_irqsave(&ce->signal_lock, flags);
 	if (!test_and_clear_bit(I915_FENCE_FLAG_SIGNAL, &rq->fence.flags)) {
-		spin_unlock(&ce->signal_lock);
+		spin_unlock_irqrestore(&ce->signal_lock, flags);
 		return;
 	}
 
 	list_del_rcu(&rq->signal_link);
 	release = remove_signaling_context(b, ce);
-	spin_unlock(&ce->signal_lock);
+	spin_unlock_irqrestore(&ce->signal_lock, flags);
 	if (release)
 		intel_context_put(ce);
 
