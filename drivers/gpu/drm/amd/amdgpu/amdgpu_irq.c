@@ -312,7 +312,7 @@ int amdgpu_irq_init(struct amdgpu_device *adev)
 	/* Use vector 0 for MSI-X */
 	r = drm_irq_install(adev_to_drm(adev), pci_irq_vector(adev->pdev, 0));
 #elif defined(__FreeBSD__)
-	r = drm_irq_install(adev_to_drm(adev), adev_to_drm(adev)->pdev->irq);
+	r = drm_irq_install(adev_to_drm(adev), adev->pdev->irq);
 #endif
 	if (r) {
 		adev->irq.installed = false;
