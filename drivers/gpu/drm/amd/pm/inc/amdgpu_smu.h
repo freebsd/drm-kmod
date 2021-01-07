@@ -1126,6 +1126,7 @@ typedef enum {
 	METRICS_CURR_DCLK1,
 	METRICS_CURR_FCLK,
 	METRICS_CURR_DCEFCLK,
+	METRICS_AVERAGE_CPUCLK,
 	METRICS_AVERAGE_GFXCLK,
 	METRICS_AVERAGE_SOCCLK,
 	METRICS_AVERAGE_FCLK,
@@ -1254,6 +1255,7 @@ extern const struct amdgpu_ip_block_version smu_v11_0_ip_block;
 extern const struct amdgpu_ip_block_version smu_v12_0_ip_block;
 
 bool is_support_sw_smu(struct amdgpu_device *adev);
+bool is_support_cclk_dpm(struct amdgpu_device *adev);
 int smu_reset(struct smu_context *smu);
 int smu_sys_get_pp_table(struct smu_context *smu, void **table);
 int smu_sys_set_pp_table(struct smu_context *smu,  void *buf, size_t size);
