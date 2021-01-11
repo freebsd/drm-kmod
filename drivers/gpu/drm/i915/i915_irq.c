@@ -2058,6 +2058,9 @@ static void ilk_display_irq_handler(struct drm_i915_private *dev_priv,
 		if (de_iir & DE_PIPE_VBLANK(pipe))
 			intel_handle_vblank(dev_priv, pipe);
 
+		if (de_iir & DE_PLANE_FLIP_DONE(pipe))
+			flip_done_handler(dev_priv, pipe);
+
 		if (de_iir & DE_PIPE_FIFO_UNDERRUN(pipe))
 			intel_cpu_fifo_underrun_irq_handler(dev_priv, pipe);
 
@@ -3606,6 +3609,8 @@ static void ilk_irq_postinstall(struct drm_i915_private *dev_priv)
 				DE_PIPEA_CRC_DONE | DE_POISON);
 		extra_mask = (DE_PIPEA_VBLANK | DE_PIPEB_VBLANK |
 			      DE_PIPEB_FIFO_UNDERRUN | DE_PIPEA_FIFO_UNDERRUN |
+			      DE_PLANE_FLIP_DONE(PLANE_A) |
+			      DE_PLANE_FLIP_DONE(PLANE_B) |
 			      DE_DP_A_HOTPLUG);
 	}
 
