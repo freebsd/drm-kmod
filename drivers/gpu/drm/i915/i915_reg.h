@@ -6586,6 +6586,7 @@ enum {
 #define TGL_CURSOR_D_OFFSET 0x73080
 
 /* Display A control */
+#define _DSPAADDR_VLV				0x7017C /* vlv/chv */
 #define _DSPACNTR				0x70180
 #define   DISPLAY_PLANE_ENABLE			(1 << 31)
 #define   DISPLAY_PLANE_DISABLE			0
@@ -6634,6 +6635,7 @@ enum {
 #define _DSPASURFLIVE				0x701AC
 #define _DSPAGAMC				0x701E0
 
+#define DSPADDR_VLV(plane)	_MMIO_PIPE2(plane, _DSPAADDR_VLV)
 #define DSPCNTR(plane)		_MMIO_PIPE2(plane, _DSPACNTR)
 #define DSPADDR(plane)		_MMIO_PIPE2(plane, _DSPAADDR)
 #define DSPSTRIDE(plane)	_MMIO_PIPE2(plane, _DSPASTRIDE)
