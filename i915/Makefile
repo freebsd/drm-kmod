@@ -22,6 +22,7 @@ SRCS=	\
 	i915_globals.c \
 	i915_irq.c \
 	i915_memcpy.c \
+	i915_mitigations.c \
 	i915_mm.c \
 	i915_params.c \
 	i915_pci.c \
@@ -277,4 +278,5 @@ CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides
 CWARNFLAGS.i915_active.c=	-Wno-unused-function
 CWARNFLAGS.i915_sw_fence.c=	-Wno-unused-function
 CWARNFLAGS.i915_vma.c=		-Wno-unused-function -Wno-unused-but-set-variable
+CWARNFLAGS.i915_mitigations.c=	-Wno-unused-variable
 CWARNFLAGS.vlv_dsi.c=		-Wno-unused-but-set-variable
