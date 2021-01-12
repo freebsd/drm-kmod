@@ -37,9 +37,6 @@
 #include <linux/highmem.h>
 #include <linux/pci.h>
 #include <linux/vmalloc.h>
-#ifdef __linux__
-#include <xen/xen.h>
-#endif
 
 #include <drm/drm_agpsupport.h>
 #include <drm/drm_cache.h>
@@ -190,41 +187,3 @@ void drm_legacy_ioremapfree(struct drm_local_map *map, struct drm_device *dev)
 		iounmap(map->handle);
 }
 EXPORT_SYMBOL(drm_legacy_ioremapfree);
-
-bool drm_need_swiotlb(int dma_bits)
-{
-#ifdef __linux__
-	struct resource *tmp;
-	resource_size_t max_iomem = 0;
-
-	/*
-	 * Xen paravirtual hosts require swiotlb regardless of requested dma
-	 * transfer size.
-	 *
-	 * NOTE: Really, what it requires is use of the dma_alloc_coherent
-	 *       allocator used in ttm_dma_populate() instead of
-	 *       ttm_populate_and_map_pages(), which bounce buffers so much in
-	 *       Xen it leads to swiotlb buffer exhaustion.
-	 */
-	if (xen_pv_domain())
-		return true;
-
-	/*
-	 * Enforce dma_alloc_coherent when memory encryption is active as well
-	 * for the same reasons as for Xen paravirtual hosts.
-	 */
-	if (mem_encrypt_active())
-		return true;
-
-	for (tmp = iomem_resource.child; tmp; tmp = tmp->sibling) {
-		max_iomem = max(max_iomem,  tmp->end);
-	}
-
-	return max_iomem > ((u64)1 << dma_bits);
-#elif defined(__FreeBSD__)
-	// Only used in combination with CONFIG_SWIOTLB in v4.17
-	// BSDFIXME: Let's say we can dma all physical memory...
-	return false;
-#endif
-}
-EXPORT_SYMBOL(drm_need_swiotlb);
