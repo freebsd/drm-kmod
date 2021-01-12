@@ -70,7 +70,6 @@ SRCS=	\
 	intel_pm.c \
 	intel_psr.c \
 	intel_quirks.c \
-	intel_region_lmem.c \
 	intel_runtime_pm.c \
 	intel_sideband.c \
 	intel_sprite.c \
@@ -150,6 +149,7 @@ SRCS+=	gen2_engine_cs.c \
 	intel_mocs.c \
 	intel_ppgtt.c \
 	intel_rc6.c \
+	intel_region_lmem.c \
 	intel_renderstate.c \
 	intel_reset.c \
 	intel_ring.c \
