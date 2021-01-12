@@ -317,7 +317,11 @@ int drm_agp_unbind(struct drm_device *dev, struct drm_agp_binding *request)
 	entry = drm_agp_lookup_entry(dev, request->handle);
 	if (!entry || !entry->bound)
 		return -EINVAL;
+#ifdef __linux__
+	ret = agp_unbind_memory(entry->memory);
+#elif defined(__FreeBSD__)
 	ret = drm_unbind_agp(entry->memory);
+#endif
 	if (ret == 0)
 		entry->bound = 0;
 	return ret;
@@ -358,7 +362,11 @@ int drm_agp_bind(struct drm_device *dev, struct drm_agp_binding *request)
 	if (!entry || entry->bound)
 		return -EINVAL;
 	page = DIV_ROUND_UP(request->offset, PAGE_SIZE);
+#ifdef __linux__
+	retcode = agp_bind_memory(entry->memory, page);
+#elif defined(__FreeBSD__)
 	retcode = drm_bind_agp(entry->memory, page);
+#endif
 	if (retcode)
 		return retcode;
 	entry->bound = dev->agp->base + (page << PAGE_SHIFT);
@@ -401,11 +409,19 @@ int drm_agp_free(struct drm_device *dev, struct drm_agp_buffer *request)
 	if (!entry)
 		return -EINVAL;
 	if (entry->bound)
+#ifdef __linux__
+		agp_unbind_memory(entry->memory);
+#elif defined(__FreeBSD__)
 		drm_unbind_agp(entry->memory);
+#endif
 
 	list_del(&entry->head);
 
+#ifdef __linux__
+	agp_free_memory(entry->memory);
+#elif defined(__FreeBSD__)
 	drm_free_agp(entry->memory, entry->pages);
+#endif
 	kfree(entry);
 	return 0;
 }
@@ -508,8 +524,13 @@ void drm_legacy_agp_clear(struct drm_device *dev)
 
 	list_for_each_entry_safe(entry, tempe, &dev->agp->memory, head) {
 		if (entry->bound)
+#ifdef __linux__
+			agp_unbind_memory(entry->memory);
+		agp_free_memory(entry->memory);
+#elif defined(__FreeBSD__)
 			drm_unbind_agp(entry->memory);
 		drm_free_agp(entry->memory, entry->pages);
+#endif
 		kfree(entry);
 	}
 	INIT_LIST_HEAD(&dev->agp->memory);
