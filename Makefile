@@ -22,9 +22,7 @@ DEFAULT_KMODS=	linuxkpi	\
 		radeon
 
 .if ${MACHINE_ARCH} == "amd64" || ${MACHINE_ARCH} == "i386"
-DEFAULT_KMODS+=	i915 \
-		vboxvideo \
-		vmwgfx
+DEFAULT_KMODS+=	i915
 .endif
 
 .if defined(DUMMYGFX)
