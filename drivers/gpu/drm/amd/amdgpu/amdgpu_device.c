@@ -1114,7 +1114,6 @@ int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 	UNIMPLEMENTED();
 	return 0;
 #else
-	u64 space_needed = roundup_pow_of_two(adev->gmc.real_vram_size);
 	int rbar_size = pci_rebar_bytes_to_size(adev->gmc.real_vram_size);
 	struct pci_bus *root;
 	struct resource *res;
