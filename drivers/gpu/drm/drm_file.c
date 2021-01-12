@@ -369,6 +369,7 @@ static int drm_open_helper(struct file *filp, struct drm_minor *minor)
 	list_add(&priv->lhead, &dev->filelist);
 	mutex_unlock(&dev->filelist_mutex);
 
+#ifdef CONFIG_DRM_LEGACY
 #ifdef __alpha__
 	/*
 	 * Default the hose
@@ -388,6 +389,7 @@ static int drm_open_helper(struct file *filp, struct drm_minor *minor)
 				dev->hose = b->sysdata;
 		}
 	}
+#endif
 #endif
 
 	return 0;
