@@ -140,7 +140,7 @@ pci_dev_put(struct pci_dev *pdev)
 	free(pdev, M_DEVBUF);
 }
 
-#if 0
+#if __FreeBSD_version < 1300135
 struct pci_dev *
 linux_pci_get_class(unsigned int class, struct pci_dev *from)
 {
