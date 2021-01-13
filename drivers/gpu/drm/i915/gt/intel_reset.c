@@ -1117,7 +1117,7 @@ error:
 	goto finish;
 }
 
-static inline int intel_gt_reset_engine(struct intel_engine_cs *engine)
+static int intel_gt_reset_engine(struct intel_engine_cs *engine)
 {
 	return __intel_gt_reset(engine->gt, engine->mask);
 }
