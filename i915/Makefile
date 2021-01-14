@@ -60,6 +60,7 @@ SRCS=	\
 	intel_dpll_mgr.c \
 	intel_dram.c \
 	intel_fbc.c \
+	intel_fdi.c \
 	intel_fifo_underrun.c \
 	intel_freebsd.c \
 	intel_frontbuffer.c \
