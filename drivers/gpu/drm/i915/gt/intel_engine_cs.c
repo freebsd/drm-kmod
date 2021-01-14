@@ -1834,7 +1834,7 @@ intel_engine_find_active_request(struct intel_engine_cs *engine)
 		struct intel_timeline *tl = request->context->timeline;
 
 		list_for_each_entry_from_reverse(request, &tl->requests, link) {
-			if (i915_request_completed(request))
+			if (__i915_request_is_complete(request))
 				break;
 
 			active = request;
@@ -1845,10 +1845,10 @@ intel_engine_find_active_request(struct intel_engine_cs *engine)
 		return active;
 
 	list_for_each_entry(request, &engine->active.requests, sched.link) {
-		if (i915_request_completed(request))
+		if (__i915_request_is_complete(request))
 			continue;
 
-		if (!i915_request_started(request))
+		if (!__i915_request_has_started(request))
 			continue;
 
 		/* More than one preemptible request may match! */
