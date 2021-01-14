@@ -31,6 +31,7 @@
 #include <linux/export.h>
 #include <linux/highmem.h>
 #ifdef __linux__
+#include <linux/mem_encrypt.h>
 #include <xen/xen.h>
 #endif
 
