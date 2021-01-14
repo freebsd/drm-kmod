@@ -78,7 +78,7 @@
  *                |↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓|   updates the
  *                |                                        |   frame as it
  *                |                                        |   travels down
- *                |                                        |   ("sacn out")
+ *                |                                        |   ("scan out")
  *                |               Old frame                |
  *                |                                        |
  *                |                                        |
