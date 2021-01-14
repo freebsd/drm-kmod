@@ -178,6 +178,7 @@ SRCS+=	intel_guc.c \
 SRCS+=	i915_gem_busy.c \
 	i915_gem_clflush.c \
 	i915_gem_context.c \
+	i915_gem_create.c \
 	i915_gem_domain.c \
 	i915_gem_dmabuf.c \
 	i915_gem_execbuffer.c \
