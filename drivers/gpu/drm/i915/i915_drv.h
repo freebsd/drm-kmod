@@ -1778,6 +1778,15 @@ tgl_revids_get(struct drm_i915_private *dev_priv)
 #define INTEL_DISPLAY_ENABLED(dev_priv) \
 	(drm_WARN_ON(&(dev_priv)->drm, !HAS_DISPLAY(dev_priv)), !(dev_priv)->params.disable_display)
 
+static inline bool run_as_guest(void)
+{
+#ifdef __linux__
+	return !hypervisor_is_type(X86_HYPER_NATIVE);
+#elif defined(__FreeBSD__)
+	return false;
+#endif
+}
+
 static inline bool intel_vtd_active(void)
 {
 #ifdef CONFIG_INTEL_IOMMU
@@ -1785,12 +1794,8 @@ static inline bool intel_vtd_active(void)
 		return true;
 #endif
 
-#ifdef __linux__
 	/* Running as a guest, we assume the host is enforcing VT'd */
-	return !hypervisor_is_type(X86_HYPER_NATIVE);
-#elif defined(__FreeBSD__)
-	return false;
-#endif
+	return run_as_guest();
 }
 
 static inline bool intel_scanout_needs_vtd_wa(struct drm_i915_private *dev_priv)
