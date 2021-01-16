@@ -22,10 +22,12 @@
 #define DIPRINTF(...)
 #endif
 
+#if __FreeBSD_version < 1300135
 static struct sx shrinker_list_sx;
 SX_SYSINIT(shrinker_list_lock, &shrinker_list_sx, "shrinker list lock");
 
 static LIST_HEAD(shrinker_list);
+#endif
 
 static int
 notifier_chain_register(struct notifier_block **nl,
