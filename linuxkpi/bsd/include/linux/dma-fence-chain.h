@@ -40,6 +40,8 @@ struct dma_fence_chain {
 	struct irq_work work;
 };
 
+extern const struct dma_fence_ops dma_fence_chain_ops;
+
 #define dma_fence_chain_for_each(iter, head)	\
 	for (iter = dma_fence_get(head); iter; \
 	     iter = dma_fence_chain_walk(iter))
