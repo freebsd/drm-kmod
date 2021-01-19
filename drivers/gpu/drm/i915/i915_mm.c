@@ -109,7 +109,7 @@ static int remap_sg(pte_t *pte, unsigned long addr, void *data)
 {
 	struct remap_pfn *r = data;
 
-	if (GEM_WARN_ON(!r->sgt.pfn))
+	if (GEM_WARN_ON(!r->sgt.sgp))
 		return -EINVAL;
 
 #ifdef __linux__
