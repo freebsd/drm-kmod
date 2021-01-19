@@ -16,6 +16,9 @@ Paste the output of `uname -a`
 **PCI Info**
 Paste the output of `pciconf -vl`
 
+**DRM KMOD version**
+Paste the output of `pkg query -x '%n %v' 'drm.*kmod'`
+
 **To Reproduce**
 Steps to reproduce the behavior:
 
