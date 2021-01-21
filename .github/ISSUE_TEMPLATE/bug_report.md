@@ -14,7 +14,13 @@ A clear and concise description of what the bug is.
 Paste the output of `uname -a`
 
 **PCI Info**
+
+<details>
+  <summary>pciconf -lv</summary>
+  
 Paste the output of `pciconf -vl`
+
+</details>
 
 **DRM KMOD version**
 Paste the output of `pkg query -x '%n %v' 'drm.*kmod'`
