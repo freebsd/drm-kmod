@@ -631,29 +631,31 @@ static int flush_lazy_signals(struct i915_active *ref)
 
 int __i915_active_wait(struct i915_active *ref, int state)
 {
-	int err;
-
 	might_sleep();
 
-	if (!i915_active_acquire_if_busy(ref))
-		return 0;
-
 	/* Any fence added after the wait begins will not be auto-signaled */
-	err = flush_lazy_signals(ref);
-	i915_active_release(ref);
-	if (err)
-		return err;
+	if (i915_active_acquire_if_busy(ref)) {
+		int err;
 
-	if (!i915_active_is_idle(ref) &&
+		err = flush_lazy_signals(ref);
+		i915_active_release(ref);
+		if (err)
+			return err;
+
 #ifdef __linux__
-	    ___wait_var_event(ref, i915_active_is_idle(ref),
-			      state, 0, 0, schedule()))
+		if (___wait_var_event(ref, i915_active_is_idle(ref),
+				      state, 0, 0, schedule()))
 #elif defined(__FreeBSD__)
-	    __wait_event_common(linux_var_waitq, i915_active_is_idle(ref),
-				MAX_SCHEDULE_TIMEOUT, state, NULL))
+		if (__wait_event_common(linux_var_waitq, i915_active_is_idle(ref),
+					MAX_SCHEDULE_TIMEOUT, state, NULL))
 #endif
-		return -EINTR;
+			return -EINTR;
+	}
 
+	/*
+	 * After the wait is complete, the caller may free the active.
+	 * We have to flush any concurrent retirement before returning.
+	 */
 	flush_work(&ref->work);
 	return 0;
 }
