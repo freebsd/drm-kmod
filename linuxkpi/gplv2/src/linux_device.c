@@ -106,28 +106,6 @@ devres_free(void *res)
 	}
 }
 
-#if __FreeBSD_version < 1300135
-struct pci_dev *
-pci_get_bus_and_slot(unsigned int bus, unsigned int devfn)
-{
-	device_t dev;
-	struct pci_dev *pdev;
-	struct pci_bus *pbus;
-
-	dev = pci_find_bsf(bus, devfn >> 16, devfn & 0xffff);
-	if (dev == NULL)
-		return (NULL);
-
-	pdev = malloc(sizeof(*pdev), M_DEVBUF, M_WAITOK|M_ZERO);
-	pdev->devfn = devfn;
-	pdev->dev.bsddev = dev;
-	pbus = malloc(sizeof(*pbus), M_DEVBUF, M_WAITOK|M_ZERO);
-	pbus->self = pdev;
-	pdev->bus = pbus;
-	return (pdev);
-}
-#endif
-
 void
 pci_dev_put(struct pci_dev *pdev)
 {
@@ -139,49 +117,3 @@ pci_dev_put(struct pci_dev *pdev)
 	free(pdev->bus, M_DEVBUF);
 	free(pdev, M_DEVBUF);
 }
-
-#if __FreeBSD_version < 1300135
-struct pci_dev *
-linux_pci_get_class(unsigned int class, struct pci_dev *from)
-{
-	device_t dev;
-	struct pci_dev *pdev;
-	struct pci_bus *pbus;
-	int pcic, pcis;
-
-	/* Only return one device for now. */
-	if (from != NULL)
-		return (NULL);
-
-	class >>= 8;
-	if (class == PCI_CLASS_BRIDGE_ISA) {
-		pcis = PCIS_BRIDGE_ISA;
-		pcic = PCIC_BRIDGE;
-	} else if (class == PCI_CLASS_DISPLAY_VGA) {
-		pcis = PCIS_DISPLAY_VGA;
-		pcic = PCIC_DISPLAY;
-	} else if (class == PCI_CLASS_DISPLAY_OTHER) {
-		pcis = PCIS_DISPLAY_OTHER;
-		pcic = PCIC_DISPLAY;
-	} else {
-		log(LOG_WARNING, "unrecognized class %x in %s\n", class, __FUNCTION__);
-		return (NULL);
-	}
-
-	dev = pci_find_class(pcic, pcis);
-	if (dev == NULL)
-		return (NULL);
-
-	pdev = malloc(sizeof(*pdev), M_DEVBUF, M_WAITOK|M_ZERO);
-	/* XXX do we need to initialize pdev more here ? */
-	pdev->devfn = PCI_DEVFN(pci_get_slot(dev), pci_get_function(dev));
-	pdev->vendor = pci_get_vendor(dev);
-	pdev->device = pci_get_device(dev);
-	pdev->dev.bsddev = dev;
-	pbus = malloc(sizeof(*pbus), M_DEVBUF, M_WAITOK|M_ZERO);
-	pbus->self = pdev;
-	pdev->bus = pbus;
-	pdev->bus->number = pci_get_bus(dev);
-	return (pdev);
-}
-#endif

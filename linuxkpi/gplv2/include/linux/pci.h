@@ -47,87 +47,7 @@ resource_contains(struct linux_resource *a, struct linux_resource *b)
 	return a->start <= b->start && a->end >= b->end;
 }
 
-#if __FreeBSD_version < 1300135
-static inline int
-pci_bus_read_config(struct pci_bus *bus, unsigned int devfn,
-		    int where, uint32_t *val, int size)
-{
-	device_t dev;
-	int dom, busid, slot, func;
-
-	dom = pci_get_domain(bus->self->dev.bsddev);
-	busid = pci_get_bus(bus->self->dev.bsddev);
-	slot = ((devfn >> 3) & 0x1f);
-	func = devfn & 0x7;
-	dev = pci_find_dbsf(dom, busid, slot, func);
-	*val = pci_read_config(dev, where, size);
-	return (0);
-}
-
-static inline int
-pci_bus_read_config_word(struct pci_bus *bus, unsigned int devfn, int where, u16 *val)
-{
-	return (pci_bus_read_config(bus, devfn, where, (uint32_t *)val, 2));
-}
-
-static inline int
-pci_bus_read_config_byte(struct pci_bus *bus, unsigned int devfn, int where, u8 *val)
-{
-	return (pci_bus_read_config(bus, devfn, where, (uint32_t *)val, 1));
-}
-
-static inline int
-pci_bus_write_config(struct pci_bus *bus, unsigned int devfn, int where,
-    uint32_t val, int size)
-{
-	device_t dev;
-	int dom, busid, slot, func;
-
-	dom = pci_get_domain(bus->self->dev.bsddev);
-	busid = pci_get_bus(bus->self->dev.bsddev);
-	slot = ((devfn >> 3) & 0x1f);
-	func = devfn & 0x7;
-	dev = pci_find_dbsf(dom, busid, slot, func);
-	pci_write_config(dev, where, val, size);
-	return (0);
-}
-
-static inline int
-pci_bus_write_config_byte(struct pci_bus *bus, unsigned int devfn, int where,
-    uint8_t val)
-{
-	return (pci_bus_write_config(bus, devfn, where, val, 1));
-}
-
-static inline int
-pci_domain_nr(struct pci_bus *bus)
-{
-
-	return (0);
-}
-
-extern struct pci_dev *pci_get_bus_and_slot(unsigned int bus, unsigned int devfn);
-
-static inline struct pci_dev *
-pci_get_domain_bus_and_slot(int domain, unsigned int bus, unsigned int devfn)
-{
-
-	return (pci_get_bus_and_slot(bus, devfn));
-}
-#endif
-
 void pci_dev_put(struct pci_dev *pdev);
-
-#if __FreeBSD_version < 1300135
-static inline bool
-pci_is_root_bus(struct pci_bus *pbus)
-{
-
-	return (pbus->self == NULL);
-}
-
-#endif
-
 
 static inline struct pci_dev *
 pci_upstream_bridge(struct pci_dev *dev)
@@ -151,22 +71,6 @@ pci_platform_rom(struct pci_dev *pdev, size_t *size)
 	UNIMPLEMENTED();
 	return (NULL);
 }
-
-#if __FreeBSD_version < 1300135
-static inline void
-linux_pci_save_state(struct pci_dev *pdev)
-{
-
-	pci_save_state(pdev->dev.bsddev);
-}
-
-static inline void
-linux_pci_restore_state(struct pci_dev *pdev)
-{
-
-	pci_restore_state(pdev->dev.bsddev);
-}
-#endif
 
 static inline void
 pci_ignore_hotplug(struct pci_dev *pdev)
@@ -193,11 +97,5 @@ pcie_get_readrq(struct pci_dev *dev)
 
 	return 128 << ((ctl & PCI_EXP_DEVCTL_READRQ) >> 12);
 }
-
-#if __FreeBSD_version < 1300135
-#define	pci_get_class(class, dev)	linux_pci_get_class(class, dev)
-#define	pci_save_state(dev)	linux_pci_save_state(dev)
-#define	pci_restore_state(dev)	linux_pci_restore_state(dev)
-#endif
 
 #endif /* _LINUX_GPLV2_PCI_H_ */
