@@ -50,6 +50,7 @@
 #include "intel_dsi.h"
 #include "intel_sprite.h"
 #include "i9xx_plane.h"
+#include "intel_vrr.h"
 
 int intel_usecs_to_scanlines(const struct drm_display_mode *adjusted_mode,
 			     int usecs)
@@ -277,6 +278,9 @@ void intel_pipe_update_end(struct intel_crtc_state *new_crtc_state)
 #ifdef __linux__
 	local_irq_enable();
 #endif
+
+	/* Send VRR Push to terminate Vblank */
+	intel_vrr_send_push(new_crtc_state);
 
 	if (intel_vgpu_active(dev_priv))
 		return;
