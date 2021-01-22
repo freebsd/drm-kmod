@@ -364,12 +364,7 @@ __i915_request_await_execution(struct i915_request *rq,
 	if (hook) {
 		cb->hook = hook;
 		cb->signal = i915_request_get(signal);
-#if defined(__linux__) || (defined(__FreeBSD__) && __FreeBSD_version >= 1300136)
 		cb->work.func = irq_execute_cb_hook;
-#elif defined(__FreeBSD__)
-		/* irq_work is just a workqueue for us */
-		cb->work.work.func = (work_func_t)irq_execute_cb_hook;
-#endif
 	}
 
 	spin_lock_irq(&signal->lock);

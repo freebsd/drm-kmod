@@ -555,11 +555,7 @@ static bool radeon_atpx_detect(void)
 	bool d3_supported = false;
 	struct pci_dev *parent_pdev;
 
-#if __FreeBSD_version < 1300135
-	while ((pdev = linux_pci_get_class(PCI_CLASS_DISPLAY_VGA << 8, pdev)) != NULL) {
-#else
 	while ((pdev = pci_get_class(PCI_CLASS_DISPLAY_VGA << 8, pdev)) != NULL) {
-#endif
 		vga_count++;
 
 		has_atpx |= (radeon_atpx_pci_probe_handle(pdev) == true);
@@ -571,11 +567,7 @@ static bool radeon_atpx_detect(void)
 	}
 
 	/* some newer PX laptops mark the dGPU as a non-VGA display device */
-#if __FreeBSD_version < 1300135
-	while ((pdev = linux_pci_get_class(PCI_CLASS_DISPLAY_OTHER << 8, pdev)) != NULL) {
-#else
 	while ((pdev = pci_get_class(PCI_CLASS_DISPLAY_OTHER << 8, pdev)) != NULL) {
-#endif
 		vga_count++;
 
 		has_atpx |= (radeon_atpx_pci_probe_handle(pdev) == true);

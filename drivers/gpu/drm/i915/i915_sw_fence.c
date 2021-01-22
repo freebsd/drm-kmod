@@ -384,7 +384,7 @@ static void dma_i915_sw_fence_wake(struct dma_fence *dma,
 
 	i915_sw_fence_set_error_once(cb->fence, dma->error);
 	i915_sw_fence_complete(cb->fence);
-#if defined(__FreeBSD__) && __FreeBSD_version > 1300136
+#if defined(__FreeBSD__)
 	kfree_async(cb);
 #else
 	kfree(cb);
