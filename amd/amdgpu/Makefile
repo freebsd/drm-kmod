@@ -334,7 +334,8 @@ SRCS+=	dc_debug.c \
 	dc_sink.c \
 	dc_stream.c \
 	dc_surface.c \
-	dc.c
+	dc.c \
+	dc_stat.c
 
 # display/dc/dce
 SRCS+=	dce_abm.c \
@@ -356,7 +357,8 @@ SRCS+=	dce_abm.c \
 	dce_transform.c \
 	dmub_abm.c \
 	dmub_psr.c \
-	dmub_hw_lock_mgr.c
+	dmub_hw_lock_mgr.c \
+	dmub_outbox.c
 
 # display/dc/dce100
 SRCS+=	dce100_hw_sequencer.c \
@@ -587,7 +589,8 @@ SRCS+=	dc_helper.c \
 SRCS+=	dmub_dcn20.c \
 	dmub_dcn21.c \
 	dmub_reg.c \
-	dmub_srv.c
+	dmub_srv.c \
+	dmub_srv_stat.c
 
 # Debug files, not handled for now
 SRCS_DEBUG=	amdgpu_dm_crc.c \
