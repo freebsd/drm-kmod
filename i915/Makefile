@@ -114,6 +114,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_tc.c \
 	intel_tv.c \
 	intel_vdsc.c \
+	intel_vrr.c \
 	intel_vga.c \
 	i9xx_plane.c \
 	vlv_dsi.c \
