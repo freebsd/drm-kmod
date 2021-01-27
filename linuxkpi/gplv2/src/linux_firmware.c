@@ -1,4 +1,5 @@
 #include <sys/param.h>
+#if __FreeBSD_version < 1400003
 #include <sys/systm.h>
 #include <sys/kernel.h>
 #include <sys/linker.h>
@@ -121,3 +122,4 @@ release_firmware(const struct linux_firmware *lkfw)
 	free(__DECONST(void *, lkfw), M_LKPI_FW);
 	firmware_put(fw, 0);
 }
+#endif
