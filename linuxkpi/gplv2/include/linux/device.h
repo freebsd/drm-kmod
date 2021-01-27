@@ -7,6 +7,7 @@
 #include <linux/pm.h>
 #include <linux/idr.h>
 
+#if __FreeBSD_version < 1400003
 typedef void (*dr_release_t)(struct device *dev, void *res);
 typedef int (*dr_match_t)(struct device *dev, void *res, void *match_data);
 
@@ -264,5 +265,6 @@ devres_release_group(struct device *dev, void *id)
 
 	return cnt;
 }
+#endif
 
 #endif /* _LINUX_GPLV2_DEVICE_H_ */

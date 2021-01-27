@@ -1,3 +1,5 @@
+#include <sys/param.h>
+#if __FreeBSD_version < 1400003
 #ifndef __LINUX_KCONFIG_H
 #define __LINUX_KCONFIG_H
 #if 0
@@ -53,3 +55,4 @@
 	(IS_BUILTIN(option) || IS_MODULE(option))
 
 #endif /* __LINUX_KCONFIG_H */
+#endif
