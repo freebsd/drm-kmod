@@ -3,6 +3,7 @@
 
 #undef resource
 
+#if __FreeBSD_version < 1400003
 static MALLOC_DEFINE(M_DEVRES, "devres", "Linux compat devres");
 
 static struct devres *
@@ -117,3 +118,4 @@ pci_dev_put(struct pci_dev *pdev)
 	free(pdev->bus, M_DEVBUF);
 	free(pdev, M_DEVBUF);
 }
+#endif
