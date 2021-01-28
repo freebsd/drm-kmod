@@ -1277,7 +1277,7 @@ bool intel_engine_is_idle(struct intel_engine_cs *engine)
 	/* Waiting to drain ELSP? */
 	if (execlists_active(&engine->execlists)) {
 #ifdef __linux__
-		synchronize_hardirq(engine->i915->drm.pdev->irq);
+		synchronize_hardirq(to_pci_dev(engine->i915->drm.dev)->irq);
 #elif defined(__FreeBSD__)
 		/* BSDFIXME: Is it enough to wait that all cpu have context-switched ? */
 		synchronize_rcu();
