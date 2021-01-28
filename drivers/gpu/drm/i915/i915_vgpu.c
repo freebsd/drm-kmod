@@ -62,7 +62,7 @@
 void intel_vgpu_detect(struct drm_i915_private *dev_priv)
 {
 #ifdef __linux__
-	struct pci_dev *pdev = dev_priv->drm.pdev;
+	struct pci_dev *pdev = to_pci_dev(dev_priv->drm.dev);
 	u64 magic;
 	u16 version_major;
 	void __iomem *shared_area;
