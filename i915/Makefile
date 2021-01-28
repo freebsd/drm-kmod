@@ -192,7 +192,6 @@ SRCS+=	i915_gem_busy.c \
 	i915_gem_domain.c \
 	i915_gem_dmabuf.c \
 	i915_gem_execbuffer.c \
-	i915_gem_fence.c \
 	i915_gem_internal.c \
 	i915_gem_lmem.c \
 	i915_gem_mman.c \
