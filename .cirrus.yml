@@ -4,4 +4,4 @@ freebsd_task:
         matrix:
                 - name: freebsd13-amd64
                   freebsd_instance:
-                     image_family: freebsd-13-0-alpha3-amd64
+                     image_family: freebsd-13-0-alpha3
