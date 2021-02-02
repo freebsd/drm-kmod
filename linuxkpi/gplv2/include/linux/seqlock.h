@@ -54,7 +54,8 @@ typedef struct seqcount {
 } seqcount_t;
 
 
-#if __FreeBSD_version < 1400003
+#if (__FreeBSD_version >= 1400000 && __FreeBSD_version < 1400003) || \
+    (__FreeBSD_version < 1300139)
 #define lockdep_init_map(a, b, c, d)
 #endif
 

@@ -3,7 +3,8 @@
 
 #include_next <linux/kobject.h>
 
-#if __FreeBSD_version < 1400003
+#if (__FreeBSD_version >= 1400000 && __FreeBSD_version < 1400003) || \
+    (__FreeBSD_version < 1300139)
 enum kobject_action {
 	KOBJ_ADD,
 	KOBJ_REMOVE,
