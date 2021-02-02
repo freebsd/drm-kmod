@@ -1,5 +1,6 @@
 #include <sys/param.h>
-#if __FreeBSD_version < 1400003
+#if (__FreeBSD_version >= 1400000 && __FreeBSD_version < 1400003) || \
+    (__FreeBSD_version < 1300139)
 #ifndef _LINUX_FIRMWARE_H
 #define _LINUX_FIRMWARE_H
 

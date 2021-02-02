@@ -1,5 +1,6 @@
 #include <sys/param.h>
-#if __FreeBSD_version < 1400003
+#if (__FreeBSD_version >= 1400000 && __FreeBSD_version < 1400003) || \
+    (__FreeBSD_version < 1300139)
 #ifndef __LINUX_KCONFIG_H
 #define __LINUX_KCONFIG_H
 #if 0

@@ -104,7 +104,8 @@ do {								\
 	({ __typeof__(*(ptr)) __tmp;                                    \
 	  memcpy(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
 
-#if __FreeBSD_version < 1400003
+#if (__FreeBSD_version >= 1400000 && __FreeBSD_version < 1400003) || \
+    (__FreeBSD_version < 1300139)
 #if _BYTE_ORDER == _LITTLE_ENDIAN
 /* Taken from linux/include/linux/unaligned/le_struct.h. */
 struct __una_u32 { u32 x; } __packed;
