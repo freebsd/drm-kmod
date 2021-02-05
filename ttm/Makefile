@@ -14,6 +14,7 @@ SRCS=	ttm_bo.c \
 	ttm_module.c \
 	ttm_pool.c \
 	ttm_device.c \
+	ttm_sys_manager.c \
 	ttm_range_manager.c \
 	ttm_resource.c \
 	ttm_tt.c \
