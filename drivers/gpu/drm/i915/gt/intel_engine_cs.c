@@ -1268,19 +1268,8 @@ bool intel_engine_is_idle(struct intel_engine_cs *engine)
 		return true;
 
 	/* Waiting to drain ELSP? */
-	if (execlists_active(&engine->execlists)) {
-#ifdef __linux__
-		synchronize_hardirq(to_pci_dev(engine->i915->drm.dev)->irq);
-#elif defined(__FreeBSD__)
-		/* BSDFIXME: Is it enough to wait that all cpu have context-switched ? */
-		synchronize_rcu();
-#endif
-
-		intel_engine_flush_submission(engine);
-
-		if (execlists_active(&engine->execlists))
-			return false;
-	}
+	synchronize_hardirq(to_pci_dev(engine->i915->drm.dev)->irq);
+	intel_engine_flush_submission(engine);
 
 	/* ELSP is empty, but there are ready requests? E.g. after reset */
 	if (!RB_EMPTY_ROOT(&engine->execlists.queue.rb_root))
