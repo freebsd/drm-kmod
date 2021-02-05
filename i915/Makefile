@@ -279,6 +279,7 @@ CWARNFLAGS.intel_ddi.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.intel_dp.c=		-Wno-unused-variable -Wno-sometimes-uninitialized -Wno-constant-logical-operand
 CWARNFLAGS.intel_dpll_mgr.c=	-Wno-compare-distinct-pointer-types
 CWARNFLAGS.intel_display.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.intel_dpll.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_fbdev.c=	-Wno-initializer-overrides
 CWARNFLAGS.intel_freebsd.c=	-Wno-unused-function
 CWARNFLAGS.intel_hdmi.c=	-Wno-unused-but-set-variable
