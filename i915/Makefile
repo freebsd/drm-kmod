@@ -118,6 +118,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_vrr.c \
 	intel_vga.c \
 	i9xx_plane.c \
+	skl_universal_plane.c \
 	vlv_dsi.c \
 	vlv_dsi_pll.c
 
@@ -294,4 +295,5 @@ CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides
 CWARNFLAGS.i915_active.c=	-Wno-unused-function
 CWARNFLAGS.i915_sw_fence.c=	-Wno-unused-function
 CWARNFLAGS.i915_vma.c=		-Wno-unused-function -Wno-unused-but-set-variable
+CWARNFLAGS.skl_universal_plane.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.vlv_dsi.c=		-Wno-unused-but-set-variable
