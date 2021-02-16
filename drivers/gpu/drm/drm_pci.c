@@ -286,6 +286,26 @@ int drm_irq_by_busid(struct drm_device *dev, void *data,
 	return drm_pci_irq_by_busid(dev, p);
 }
 
+#ifdef __FreeBSD__
+int
+drm_getpciinfo(struct drm_device *dev, void *data, struct drm_file *file_priv)
+{
+	struct drm_pciinfo *info = data;
+
+	info->domain = pci_get_domain(dev->dev->bsddev);
+	info->bus = pci_get_bus(dev->dev->bsddev);
+	info->dev = pci_get_slot(dev->dev->bsddev);
+	info->func = pci_get_function(dev->dev->bsddev);
+	info->vendor_id = pci_get_vendor(dev->dev->bsddev);
+	info->device_id = pci_get_device(dev->dev->bsddev);
+	info->subvendor_id = pci_get_subvendor(dev->dev->bsddev);
+	info->subdevice_id = pci_get_subdevice(dev->dev->bsddev);
+	info->revision_id = pci_get_revid(dev->dev->bsddev);
+
+	return 0;
+}
+#endif
+
 static void drm_pci_agp_init(struct drm_device *dev)
 {
 	if (drm_core_check_feature(dev, DRIVER_USE_AGP)) {
