@@ -973,8 +973,6 @@ int amdgpu_ttm_alloc_gart(struct ttm_buffer_object *bo)
 	} else {
 
 		/* allocate GART space */
-		tmp = bo->mem;
-		tmp.mm_node = NULL;
 		placement.num_placement = 1;
 		placement.placement = &placements;
 		placement.num_busy_placement = 1;
