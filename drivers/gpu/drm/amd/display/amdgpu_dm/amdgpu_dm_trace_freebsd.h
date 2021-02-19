@@ -350,12 +350,10 @@ trace_amdgpu_dm_atomic_check_finish(
 {
 #ifdef KTR
 	const struct drm_atomic_state * state_state;
-	int res;
 	bool async_update;
 	bool allow_modeset;
 
 	state_state = state;
-	res = res;
 	async_update = state->async_update;
 	allow_modeset = state->allow_modeset;
 #endif
@@ -380,8 +378,6 @@ trace_amdgpu_dm_dc_pipe_state(
     int update_flags)
 {
 #ifdef KTR
-	int pipe_idx;
-	const void * stream;
 	int stream_w;
 	int stream_h;
 	int dst_x;
@@ -408,7 +404,6 @@ trace_amdgpu_dm_dc_pipe_state(
 	int surface_pitch;
 	int format;
 	int swizzle;
-	unsigned int update_flags;
 
 	stream_w = stream->timing.h_addressable;
 	stream_h = stream->timing.v_addressable;
@@ -581,6 +576,21 @@ trace_amdgpu_dm_dce_clocks_state(const struct dce_bw_output *clk)
 	    "yclk_khz=%d dispclk_khz=%d blackout_recovery_time_us=%d",
 	    sclk_khz, sclk_deep_sleep_khz, yclk_khz, dispclk_khz,
 	    blackout_recovery_time_us);
+}
+
+/* TRACE_EVENT(amdgpu_dmub_trace_high_irq, */
+/*          TP_PROTO(uint32_t trace_code, uint32_t tick_count, uint32_t param0, */
+/*                   uint32_t param1), */
+
+static inline void
+trace_amdgpu_dmub_trace_high_irq(uint32_t trace_code, uint32_t tick_count,
+    uint32_t param0, uint32_t param1)
+{
+	CTR4(KTR_DRM,
+	    "amdgpu_dmub_trace_high_irq "
+	    "trace_code=%u tick_count=%u param0=%u param1=%u",
+	    trace_code, tick_count,
+	    param0, param1);
 }
 
 #endif /* _AMDGPU_DM_TRACE_FREEBSD_H_ */
