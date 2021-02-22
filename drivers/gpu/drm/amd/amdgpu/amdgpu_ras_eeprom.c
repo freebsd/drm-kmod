@@ -624,7 +624,11 @@ free_buff:
 	return ret == num ? 0 : -EIO;
 }
 
+#ifdef __linux__
 inline uint32_t amdgpu_ras_eeprom_get_record_max_length(void)
+#elif defined(__FreeBSD__)
+uint32_t amdgpu_ras_eeprom_get_record_max_length(void)
+#endif
 {
 	return EEPROM_MAX_RECORD_NUM;
 }
