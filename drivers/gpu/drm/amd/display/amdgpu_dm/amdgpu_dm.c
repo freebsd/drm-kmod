@@ -9705,7 +9705,7 @@ static bool is_dp_capable_without_timing_msa(struct dc *dc,
 void amdgpu_dm_update_freesync_caps(struct drm_connector *connector,
 					struct edid *edid)
 {
-	int i;
+	int i = 0;
 	bool edid_check_required;
 	struct detailed_timing *timing;
 	struct detailed_non_pixel *data;
