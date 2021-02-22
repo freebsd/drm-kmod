@@ -2889,24 +2889,24 @@ intel_display_power_put_mask_in_set(struct drm_i915_private *i915,
 	BIT_ULL(POWER_DOMAIN_PIPE_B) |			\
 	BIT_ULL(POWER_DOMAIN_TRANSCODER_B) |		\
 	BIT_ULL(POWER_DOMAIN_PIPE_B_PANEL_FITTER) |	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_D_LANES) |	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_E_LANES) |	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_F_LANES) |	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_G_LANES) |	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_H_LANES) |	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_I_LANES) |	\
-	BIT_ULL(POWER_DOMAIN_AUX_D) |			\
-	BIT_ULL(POWER_DOMAIN_AUX_E) |			\
-	BIT_ULL(POWER_DOMAIN_AUX_F) |			\
-	BIT_ULL(POWER_DOMAIN_AUX_G) |			\
-	BIT_ULL(POWER_DOMAIN_AUX_H) |			\
-	BIT_ULL(POWER_DOMAIN_AUX_I) |			\
-	BIT_ULL(POWER_DOMAIN_AUX_D_TBT) |		\
-	BIT_ULL(POWER_DOMAIN_AUX_E_TBT) |		\
-	BIT_ULL(POWER_DOMAIN_AUX_F_TBT) |		\
-	BIT_ULL(POWER_DOMAIN_AUX_G_TBT) |		\
-	BIT_ULL(POWER_DOMAIN_AUX_H_TBT) |		\
-	BIT_ULL(POWER_DOMAIN_AUX_I_TBT) |		\
+	BIT_ULL(POWER_DOMAIN_PORT_DDI_LANES_TC1) |	\
+	BIT_ULL(POWER_DOMAIN_PORT_DDI_LANES_TC2) |	\
+	BIT_ULL(POWER_DOMAIN_PORT_DDI_LANES_TC3) |	\
+	BIT_ULL(POWER_DOMAIN_PORT_DDI_LANES_TC4) |	\
+	BIT_ULL(POWER_DOMAIN_PORT_DDI_LANES_TC5) |	\
+	BIT_ULL(POWER_DOMAIN_PORT_DDI_LANES_TC6) |	\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC1) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC2) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC3) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC4) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC5) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC6) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT1) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT2) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT3) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT4) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT5) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT6) |		\
 	BIT_ULL(POWER_DOMAIN_VGA) |			\
 	BIT_ULL(POWER_DOMAIN_AUDIO) |			\
 	BIT_ULL(POWER_DOMAIN_INIT))
@@ -2924,18 +2924,12 @@ intel_display_power_put_mask_in_set(struct drm_i915_private *i915,
 	BIT_ULL(POWER_DOMAIN_AUX_C) |			\
 	BIT_ULL(POWER_DOMAIN_INIT))
 
-#define TGL_DDI_IO_D_TC1_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_D_IO))
-#define TGL_DDI_IO_E_TC2_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_E_IO))
-#define TGL_DDI_IO_F_TC3_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_F_IO))
-#define TGL_DDI_IO_G_TC4_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_G_IO))
-#define TGL_DDI_IO_H_TC5_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_H_IO))
-#define TGL_DDI_IO_I_TC6_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_I_IO))
+#define TGL_DDI_IO_TC1_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_PORT_DDI_IO_TC1)
+#define TGL_DDI_IO_TC2_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_PORT_DDI_IO_TC2)
+#define TGL_DDI_IO_TC3_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_PORT_DDI_IO_TC3)
+#define TGL_DDI_IO_TC4_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_PORT_DDI_IO_TC4)
+#define TGL_DDI_IO_TC5_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_PORT_DDI_IO_TC5)
+#define TGL_DDI_IO_TC6_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_PORT_DDI_IO_TC6)
 
 #define TGL_AUX_A_IO_POWER_DOMAINS (		\
 	BIT_ULL(POWER_DOMAIN_AUX_IO_A) |	\
@@ -2944,44 +2938,34 @@ intel_display_power_put_mask_in_set(struct drm_i915_private *i915,
 	BIT_ULL(POWER_DOMAIN_AUX_B))
 #define TGL_AUX_C_IO_POWER_DOMAINS (		\
 	BIT_ULL(POWER_DOMAIN_AUX_C))
-#define TGL_AUX_D_TC1_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_D))
-#define TGL_AUX_E_TC2_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_E))
-#define TGL_AUX_F_TC3_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_F))
-#define TGL_AUX_G_TC4_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_G))
-#define TGL_AUX_H_TC5_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_H))
-#define TGL_AUX_I_TC6_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_I))
-#define TGL_AUX_D_TBT1_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_D_TBT))
-#define TGL_AUX_E_TBT2_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_E_TBT))
-#define TGL_AUX_F_TBT3_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_F_TBT))
-#define TGL_AUX_G_TBT4_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_G_TBT))
-#define TGL_AUX_H_TBT5_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_H_TBT))
-#define TGL_AUX_I_TBT6_IO_POWER_DOMAINS (	\
-	BIT_ULL(POWER_DOMAIN_AUX_I_TBT))
+
+#define TGL_AUX_IO_USBC1_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_USBC1)
+#define TGL_AUX_IO_USBC2_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_USBC2)
+#define TGL_AUX_IO_USBC3_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_USBC3)
+#define TGL_AUX_IO_USBC4_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_USBC4)
+#define TGL_AUX_IO_USBC5_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_USBC5)
+#define TGL_AUX_IO_USBC6_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_USBC6)
+
+#define TGL_AUX_IO_TBT1_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_TBT1)
+#define TGL_AUX_IO_TBT2_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_TBT2)
+#define TGL_AUX_IO_TBT3_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_TBT3)
+#define TGL_AUX_IO_TBT4_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_TBT4)
+#define TGL_AUX_IO_TBT5_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_TBT5)
+#define TGL_AUX_IO_TBT6_POWER_DOMAINS	BIT_ULL(POWER_DOMAIN_AUX_TBT6)
 
 #define TGL_TC_COLD_OFF_POWER_DOMAINS (		\
-	BIT_ULL(POWER_DOMAIN_AUX_D)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_E)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_F)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_G)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_H)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_I)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_D_TBT)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_E_TBT)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_F_TBT)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_G_TBT)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_H_TBT)	|	\
-	BIT_ULL(POWER_DOMAIN_AUX_I_TBT)	|	\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC1)	|	\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC2)	|	\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC3)	|	\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC4)	|	\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC5)	|	\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC6)	|	\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT1) |	\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT2) |	\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT3) |	\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT4) |	\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT5) |	\
+	BIT_ULL(POWER_DOMAIN_AUX_TBT6) |	\
 	BIT_ULL(POWER_DOMAIN_TC_COLD_OFF))
 
 #define RKL_PW_4_POWER_DOMAINS (			\
@@ -2997,10 +2981,10 @@ intel_display_power_put_mask_in_set(struct drm_i915_private *i915,
 	BIT_ULL(POWER_DOMAIN_AUDIO) |			\
 	BIT_ULL(POWER_DOMAIN_VGA) |			\
 	BIT_ULL(POWER_DOMAIN_TRANSCODER_B) |		\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_D_LANES) |	\
-	BIT_ULL(POWER_DOMAIN_PORT_DDI_E_LANES) |	\
-	BIT_ULL(POWER_DOMAIN_AUX_D) |			\
-	BIT_ULL(POWER_DOMAIN_AUX_E) |			\
+	BIT_ULL(POWER_DOMAIN_PORT_DDI_LANES_TC1) |	\
+	BIT_ULL(POWER_DOMAIN_PORT_DDI_LANES_TC2) |	\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC1) |		\
+	BIT_ULL(POWER_DOMAIN_AUX_USBC2) |		\
 	BIT_ULL(POWER_DOMAIN_INIT))
 
 /*
@@ -4148,8 +4132,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		}
 	},
 	{
-		.name = "DDI D TC1 IO",
-		.domains = TGL_DDI_IO_D_TC1_POWER_DOMAINS,
+		.name = "DDI IO TC1",
+		.domains = TGL_DDI_IO_TC1_POWER_DOMAINS,
 		.ops = &hsw_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4158,8 +4142,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "DDI E TC2 IO",
-		.domains = TGL_DDI_IO_E_TC2_POWER_DOMAINS,
+		.name = "DDI IO TC2",
+		.domains = TGL_DDI_IO_TC2_POWER_DOMAINS,
 		.ops = &hsw_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4168,8 +4152,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "DDI F TC3 IO",
-		.domains = TGL_DDI_IO_F_TC3_POWER_DOMAINS,
+		.name = "DDI IO TC3",
+		.domains = TGL_DDI_IO_TC3_POWER_DOMAINS,
 		.ops = &hsw_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4178,8 +4162,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "DDI G TC4 IO",
-		.domains = TGL_DDI_IO_G_TC4_POWER_DOMAINS,
+		.name = "DDI IO TC4",
+		.domains = TGL_DDI_IO_TC4_POWER_DOMAINS,
 		.ops = &hsw_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4188,8 +4172,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "DDI H TC5 IO",
-		.domains = TGL_DDI_IO_H_TC5_POWER_DOMAINS,
+		.name = "DDI IO TC5",
+		.domains = TGL_DDI_IO_TC5_POWER_DOMAINS,
 		.ops = &hsw_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4198,8 +4182,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "DDI I TC6 IO",
-		.domains = TGL_DDI_IO_I_TC6_POWER_DOMAINS,
+		.name = "DDI IO TC6",
+		.domains = TGL_DDI_IO_TC6_POWER_DOMAINS,
 		.ops = &hsw_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4244,8 +4228,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX D TC1",
-		.domains = TGL_AUX_D_TC1_IO_POWER_DOMAINS,
+		.name = "AUX USBC1",
+		.domains = TGL_AUX_IO_USBC1_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4255,8 +4239,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX E TC2",
-		.domains = TGL_AUX_E_TC2_IO_POWER_DOMAINS,
+		.name = "AUX USBC2",
+		.domains = TGL_AUX_IO_USBC2_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4266,8 +4250,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX F TC3",
-		.domains = TGL_AUX_F_TC3_IO_POWER_DOMAINS,
+		.name = "AUX USBC3",
+		.domains = TGL_AUX_IO_USBC3_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4277,8 +4261,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX G TC4",
-		.domains = TGL_AUX_G_TC4_IO_POWER_DOMAINS,
+		.name = "AUX USBC4",
+		.domains = TGL_AUX_IO_USBC4_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4288,8 +4272,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX H TC5",
-		.domains = TGL_AUX_H_TC5_IO_POWER_DOMAINS,
+		.name = "AUX USBC5",
+		.domains = TGL_AUX_IO_USBC5_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4299,8 +4283,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX I TC6",
-		.domains = TGL_AUX_I_TC6_IO_POWER_DOMAINS,
+		.name = "AUX USBC6",
+		.domains = TGL_AUX_IO_USBC6_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4310,8 +4294,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX D TBT1",
-		.domains = TGL_AUX_D_TBT1_IO_POWER_DOMAINS,
+		.name = "AUX TBT1",
+		.domains = TGL_AUX_IO_TBT1_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4321,8 +4305,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX E TBT2",
-		.domains = TGL_AUX_E_TBT2_IO_POWER_DOMAINS,
+		.name = "AUX TBT2",
+		.domains = TGL_AUX_IO_TBT2_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4332,8 +4316,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX F TBT3",
-		.domains = TGL_AUX_F_TBT3_IO_POWER_DOMAINS,
+		.name = "AUX TBT3",
+		.domains = TGL_AUX_IO_TBT3_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4343,8 +4327,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX G TBT4",
-		.domains = TGL_AUX_G_TBT4_IO_POWER_DOMAINS,
+		.name = "AUX TBT4",
+		.domains = TGL_AUX_IO_TBT4_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4354,8 +4338,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX H TBT5",
-		.domains = TGL_AUX_H_TBT5_IO_POWER_DOMAINS,
+		.name = "AUX TBT5",
+		.domains = TGL_AUX_IO_TBT5_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4365,8 +4349,8 @@ static const struct i915_power_well_desc tgl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX I TBT6",
-		.domains = TGL_AUX_I_TBT6_IO_POWER_DOMAINS,
+		.name = "AUX TBT6",
+		.domains = TGL_AUX_IO_TBT6_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4474,8 +4458,8 @@ static const struct i915_power_well_desc rkl_power_wells[] = {
 		}
 	},
 	{
-		.name = "DDI D TC1 IO",
-		.domains = TGL_DDI_IO_D_TC1_POWER_DOMAINS,
+		.name = "DDI IO TC1",
+		.domains = TGL_DDI_IO_TC1_POWER_DOMAINS,
 		.ops = &hsw_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4484,8 +4468,8 @@ static const struct i915_power_well_desc rkl_power_wells[] = {
 		},
 	},
 	{
-		.name = "DDI E TC2 IO",
-		.domains = TGL_DDI_IO_E_TC2_POWER_DOMAINS,
+		.name = "DDI IO TC2",
+		.domains = TGL_DDI_IO_TC2_POWER_DOMAINS,
 		.ops = &hsw_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4514,8 +4498,8 @@ static const struct i915_power_well_desc rkl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX D TC1",
-		.domains = TGL_AUX_D_TC1_IO_POWER_DOMAINS,
+		.name = "AUX USBC1",
+		.domains = TGL_AUX_IO_USBC1_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
@@ -4524,8 +4508,8 @@ static const struct i915_power_well_desc rkl_power_wells[] = {
 		},
 	},
 	{
-		.name = "AUX E TC2",
-		.domains = TGL_AUX_E_TC2_IO_POWER_DOMAINS,
+		.name = "AUX USBC2",
+		.domains = TGL_AUX_IO_USBC2_POWER_DOMAINS,
 		.ops = &icl_aux_power_well_ops,
 		.id = DISP_PW_ID_NONE,
 		{
