@@ -5,3 +5,6 @@ freebsd_task:
                 - name: freebsd13-amd64
                   freebsd_instance:
                      image_family: freebsd-13-0
+                - name: freebsd14-amd64
+                  freebsd_instance:
+                     image_family: freebsd-14-0-snap
