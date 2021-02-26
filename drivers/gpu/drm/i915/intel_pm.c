@@ -4747,7 +4747,7 @@ icl_get_total_relative_data_rate(struct intel_atomic_state *state,
 	return total_data_rate;
 }
 
-static const struct skl_wm_level *
+const struct skl_wm_level *
 skl_plane_wm_level(const struct skl_pipe_wm *pipe_wm,
 		   enum plane_id plane_id,
 		   int level)
@@ -4760,7 +4760,7 @@ skl_plane_wm_level(const struct skl_pipe_wm *pipe_wm,
 	return &wm->wm[level];
 }
 
-static const struct skl_wm_level *
+const struct skl_wm_level *
 skl_plane_trans_wm(const struct skl_pipe_wm *pipe_wm,
 		   enum plane_id plane_id)
 {
