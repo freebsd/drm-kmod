@@ -391,7 +391,7 @@ static int psp_tmr_init(struct psp_context *psp)
 	 * Note: this memory need be reserved till the driver
 	 * uninitializes.
 	 */
-	tmr_size = PSP_TMR_SIZE;
+	tmr_size = PSP_TMR_SIZE(psp->adev);
 
 	/* For ASICs support RLC autoload, psp will parse the toc
 	 * and calculate the total size of TMR needed */
@@ -407,7 +407,7 @@ static int psp_tmr_init(struct psp_context *psp)
 	}
 
 	pptr = amdgpu_sriov_vf(psp->adev) ? &tmr_buf : NULL;
-	ret = amdgpu_bo_create_kernel(psp->adev, tmr_size, PSP_TMR_SIZE,
+	ret = amdgpu_bo_create_kernel(psp->adev, tmr_size, PSP_TMR_SIZE(psp->adev),
 				      AMDGPU_GEM_DOMAIN_VRAM,
 				      &psp->tmr_bo, &psp->tmr_mc_addr, pptr);
 
