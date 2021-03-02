@@ -147,6 +147,9 @@ SRCS+=	device_if.h \
 	pci_iov_if.h \
 	device_if.h \
 	iicbus_if.h \
+	opt_teken.h \
+	opt_splash.h \
+	opt_syscons.h \
 	opt_drm.h \
 	opt_vm.h \
 	opt_compat.h \
