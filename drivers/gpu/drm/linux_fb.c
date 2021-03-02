@@ -9,6 +9,39 @@ __FBSDID("$FreeBSD$");
 #include <sys/kdb.h>
 #include <sys/param.h>
 #include <sys/systm.h>
+#include <dev/vt/vt.h>
+
+extern struct vt_device *main_vd;
+
+static void
+vt_dummy_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
+    const uint8_t *pattern, const uint8_t *mask,
+    unsigned int width, unsigned int height,
+    unsigned int x, unsigned int y, term_color_t fg, term_color_t bg)
+{
+}
+
+static void
+vt_dummy_bitblt_text(struct vt_device *vd, const struct vt_window *vw,
+    const term_rect_t *area)
+{
+}
+
+static int
+vt_dummy_init(struct vt_device *vd)
+{
+	return (CN_INTERNAL);
+}
+
+static struct vt_driver vt_dummy_driver = {
+	.vd_name = "dummy",
+	.vd_init = vt_dummy_init,
+	.vd_bitblt_text = vt_dummy_bitblt_text,
+	.vd_bitblt_bmp = vt_dummy_bitblt_bitmap,
+	.vd_priority = VD_PRIORITY_GENERIC + 9, /* > efifb, < fb */
+	.vd_suspend = vt_suspend,
+	.vd_resume = vt_resume,
+};
 
 #define FB_MAJOR		29   /* /dev/fb* framebuffers */
 #define FBPIXMAPSIZE	(1024 * 8)
@@ -356,6 +389,29 @@ __remove_conflicting(struct apertures_struct *a, const char *name, bool primary)
 			__unregister_framebuffer(registered_fb[i]);
 		}
 	}
+
+#ifdef __FreeBSD__
+	// Native drivers are not registered in LinuxKPI so they
+	// would never be removed by the code above!
+	if (main_vd && main_vd->vd_driver && main_vd->vd_softc &&
+	    /* For these, we know the softc (or its first field) is of type fb_info */
+	    (strcmp(main_vd->vd_driver->vd_name, "efifb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "vbefb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "ofwfb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "fb") == 0)) {
+		struct fb_info *fb = main_vd->vd_softc;
+		struct apertures_struct *fb_ap = alloc_apertures(1);
+		if (!fb_ap) {
+			DRM_ERROR("Could not allocate an apertures_struct");
+			return;
+		}
+		fb_ap->ranges[0].base = fb->fb_pbase;
+		fb_ap->ranges[0].size = fb->fb_size;
+		if (check_overlap(fb_ap, a))
+			vt_allocate(&vt_dummy_driver, &vt_dummy_driver /* any non-NULL softc */);
+		kfree(fb_ap);
+	}
+#endif
 }
 
 int
