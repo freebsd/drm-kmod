@@ -182,6 +182,7 @@ CWARNFLAGS.rv770.c=			-Wno-missing-prototypes
 CWARNFLAGS.rv770_dpm.c=			-Wno-missing-prototypes
 CWARNFLAGS.si.c=			-Wno-missing-prototypes -Wno-cast-qual -Wno-unused-but-set-variable
 CWARNFLAGS.si_dpm.c=			-Wno-missing-prototypes -Wno-unused-const-variable -Wno-gnu-variable-sized-type-not-at-end
+CWARNFLAGS.si_smc.c=			-Wno-gnu-variable-sized-type-not-at-end
 CWARNFLAGS.sumo_dpm.c=			-Wno-missing-prototypes
 CWARNFLAGS.trinity_dpm.c=		-Wno-unused-const-variable
 CWARNFLAGS.vce_v1_0.c=			-Wno-missing-prototypes -Wno-cast-qual
