@@ -1341,7 +1341,7 @@ static noinline bool dcn21_validate_bandwidth_fp(struct dc *dc,
 	int pipe_cnt = 0;
 
 #ifdef __linux__
-	display_e2e_pipe_params_st *pipes = kzalloc(dc->res_pool->pipe_count * sizeof(display_e2e_pipe_params_st), GFP_KERNEL);
+	display_e2e_pipe_params_st *pipes = kzalloc(dc->res_pool->pipe_count * sizeof(display_e2e_pipe_params_st), GFP_ATOMIC);
 #elif defined(__FreeBSD__)
 	DC_FP_END();
 	/* We do not need in GFP_ATOMIC introduced in 5.12 after exiting from FPU context */
