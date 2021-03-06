@@ -1,3 +1,5 @@
+#include <sys/param.h>
+#if __FreeBSD_version < 1400003
 #ifndef _LINUX_FIRMWARE_H
 #define _LINUX_FIRMWARE_H
 
@@ -49,4 +51,7 @@ int request_firmware_nowait(
 
 void release_firmware(const struct linux_firmware *fw);
 #define firmware linux_firmware
+#endif
+#else
+#include_next <linux/firmware.h>
 #endif

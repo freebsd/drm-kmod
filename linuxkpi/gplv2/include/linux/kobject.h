@@ -3,6 +3,7 @@
 
 #include_next <linux/kobject.h>
 
+#if __FreeBSD_version < 1400003
 enum kobject_action {
 	KOBJ_ADD,
 	KOBJ_REMOVE,
@@ -22,5 +23,6 @@ kobject_uevent_env(struct kobject *kobj __unused,
 
 	return (0);
 }
+#endif
 
 #endif
