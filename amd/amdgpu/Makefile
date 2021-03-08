@@ -772,13 +772,10 @@ CWARNFLAGS+=	-Wno-pointer-arith -Wno-format -Wno-cast-qual
 CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
 
 # amdgpu/
-.if ${MACHINE_CPUARCH} == "powerpc"
-CWARNFLAGS.amdgpu_device.c=	-Wno-missing-prototypes
-.endif
 CWARNFLAGS.amdgpu_atpx_handler.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_bo_list.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_csa.c=			-Wno-unused-but-set-variable
-CWARNFLAGS.amdgpu_device.c=			-Wno-unused-but-set-variable
+CWARNFLAGS.amdgpu_device.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_ioc32.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_pm.c=				-Wno-unused-const-variable
 CWARNFLAGS.amdgpu_fw_attestation.c=		-Wno-missing-prototypes
