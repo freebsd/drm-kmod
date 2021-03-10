@@ -903,7 +903,7 @@ void amdgpu_acpi_fini(struct amdgpu_device *adev)
  */
 bool amdgpu_acpi_is_s0ix_supported(struct amdgpu_device *adev)
 {
-#if defined(CONFIG_AMD_PMC)
+#if defined(CONFIG_AMD_PMC) || defined(CONFIG_AMD_PMC_MODULE)
 #ifdef __linux__
 	if (acpi_gbl_FADT.flags & ACPI_FADT_LOW_POWER_S0) {
 #elif defined(__FreeBSD__)
