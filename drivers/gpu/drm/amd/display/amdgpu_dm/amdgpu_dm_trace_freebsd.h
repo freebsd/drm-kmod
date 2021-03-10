@@ -593,4 +593,17 @@ trace_amdgpu_dmub_trace_high_irq(uint32_t trace_code, uint32_t tick_count,
 	    param0, param1);
 }
 
+/* TRACE_EVENT(amdgpu_refresh_rate_track, */
+/*          TP_PROTO(int crtc_index, ktime_t refresh_rate_ns, uint32_t refresh_rate_hz), */
+
+static inline void
+trace_amdgpu_refresh_rate_track(int crtc_index, ktime_t refresh_rate_ns,
+    uint32_t refresh_rate_hz)
+{
+	CTR3(KTR_DRM,
+	    "amdgpu_refresh_rate_track "
+	    "crtc_index=%d refresh_rate=%dHz (%lld)",
+	    crtc_index, refresh_rate_hz, refresh_rate_ns);
+}
+
 #endif /* _AMDGPU_DM_TRACE_FREEBSD_H_ */
