@@ -160,6 +160,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_rap.c \
 	amdgpu_ras.c \
 	amdgpu_ras_eeprom.c \
+	amdgpu_reset.c \
 	amdgpu_rlc.c \
 	amdgpu_sa.c \
 	amdgpu_sched.c \
