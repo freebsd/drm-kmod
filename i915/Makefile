@@ -90,6 +90,7 @@ SRCS+=	dvo_ch7017.c \
 	dvo_sil164.c \
 	dvo_tfp410.c \
 	g4x_dp.c \
+	g4x_hdmi.c \
 	icl_dsi.c \
 	intel_crt.c \
 	intel_ddi.c \
