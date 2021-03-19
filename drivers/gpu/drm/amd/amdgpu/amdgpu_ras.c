@@ -805,11 +805,13 @@ int amdgpu_ras_query_error_status(struct amdgpu_device *adev,
 			adev->gfx.funcs->query_ras_error_status(adev);
 		break;
 	case AMDGPU_RAS_BLOCK__MMHUB:
-		if (adev->mmhub.funcs->query_ras_error_count)
-			adev->mmhub.funcs->query_ras_error_count(adev, &err_data);
+		if (adev->mmhub.ras_funcs &&
+		    adev->mmhub.ras_funcs->query_ras_error_count)
+			adev->mmhub.ras_funcs->query_ras_error_count(adev, &err_data);
 
-		if (adev->mmhub.funcs->query_ras_error_status)
-			adev->mmhub.funcs->query_ras_error_status(adev);
+		if (adev->mmhub.ras_funcs &&
+		    adev->mmhub.ras_funcs->query_ras_error_status)
+			adev->mmhub.ras_funcs->query_ras_error_status(adev);
 		break;
 	case AMDGPU_RAS_BLOCK__PCIE_BIF:
 		if (adev->nbio.ras_funcs &&
@@ -863,8 +865,9 @@ int amdgpu_ras_reset_error_status(struct amdgpu_device *adev,
 			adev->gfx.funcs->reset_ras_error_status(adev);
 		break;
 	case AMDGPU_RAS_BLOCK__MMHUB:
-		if (adev->mmhub.funcs->reset_ras_error_count)
-			adev->mmhub.funcs->reset_ras_error_count(adev);
+		if (adev->mmhub.ras_funcs &&
+		    adev->mmhub.ras_funcs->reset_ras_error_count)
+			adev->mmhub.ras_funcs->reset_ras_error_count(adev);
 		break;
 	case AMDGPU_RAS_BLOCK__SDMA:
 		if (adev->sdma.funcs->reset_ras_error_count)
@@ -1533,8 +1536,9 @@ static void amdgpu_ras_error_status_query(struct amdgpu_device *adev,
 			adev->gfx.funcs->query_ras_error_status(adev);
 		break;
 	case AMDGPU_RAS_BLOCK__MMHUB:
-		if (adev->mmhub.funcs->query_ras_error_status)
-			adev->mmhub.funcs->query_ras_error_status(adev);
+		if (adev->mmhub.ras_funcs &&
+		    adev->mmhub.ras_funcs->query_ras_error_status)
+			adev->mmhub.ras_funcs->query_ras_error_status(adev);
 		break;
 	default:
 		break;
