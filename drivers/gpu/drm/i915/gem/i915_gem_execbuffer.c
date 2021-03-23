@@ -1354,6 +1354,7 @@ static int __reloc_gpu_alloc(struct i915_execbuffer *eb,
 		err = PTR_ERR(cmd);
 		goto err_pool;
 	}
+	intel_gt_buffer_pool_mark_used(pool);
 
 	memset32(cmd, 0, pool->obj->base.size / sizeof(u32));
 
@@ -2658,6 +2659,7 @@ static int eb_parse(struct i915_execbuffer *eb)
 		err = PTR_ERR(shadow);
 		goto err;
 	}
+	intel_gt_buffer_pool_mark_used(pool);
 	i915_gem_object_set_readonly(shadow->obj);
 	shadow->private = pool;
 
