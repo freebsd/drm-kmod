@@ -1992,8 +1992,10 @@ repeat:
 		err = 0;
 	}
 
+#ifdef CONFIG_MMU_NOTIFIER
 	if (!err)
 		flush_workqueue(eb->i915->mm.userptr_wq);
+#endif
 
 err_relock:
 	i915_gem_ww_ctx_init(&eb->ww, true);
