@@ -122,6 +122,9 @@ int dma_fence_get_status_locked(struct dma_fence *fence);
 void dma_fence_set_error(struct dma_fence *fence, int error);
 signed long dma_fence_wait(struct dma_fence *fence, bool intr);
 
+#define	dma_fence_begin_signalling() true
+#define	dma_fence_end_signalling(cookie) do {} while (0)
+
 #define	__dma_fence_might_wait	(void)
 
 #define DMA_FENCE_TRACE(f, fmt, args...) \
