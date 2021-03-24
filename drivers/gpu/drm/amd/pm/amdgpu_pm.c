@@ -146,9 +146,9 @@ static ssize_t amdgpu_get_power_dpm_state(struct device *dev,
 	pm_runtime_mark_last_busy(ddev->dev);
 	pm_runtime_put_autosuspend(ddev->dev);
 
-	return snprintf(buf, PAGE_SIZE, "%s\n",
-			(pm == POWER_STATE_TYPE_BATTERY) ? "battery" :
-			(pm == POWER_STATE_TYPE_BALANCED) ? "balanced" : "performance");
+	return sysfs_emit(buf, "%s\n",
+			  (pm == POWER_STATE_TYPE_BATTERY) ? "battery" :
+			  (pm == POWER_STATE_TYPE_BALANCED) ? "balanced" : "performance");
 }
 
 static ssize_t amdgpu_set_power_dpm_state(struct device *dev,
@@ -288,17 +288,17 @@ static ssize_t amdgpu_get_power_dpm_force_performance_level(struct device *dev,
 	pm_runtime_mark_last_busy(ddev->dev);
 	pm_runtime_put_autosuspend(ddev->dev);
 
-	return snprintf(buf, PAGE_SIZE, "%s\n",
-			(level == AMD_DPM_FORCED_LEVEL_AUTO) ? "auto" :
-			(level == AMD_DPM_FORCED_LEVEL_LOW) ? "low" :
-			(level == AMD_DPM_FORCED_LEVEL_HIGH) ? "high" :
-			(level == AMD_DPM_FORCED_LEVEL_MANUAL) ? "manual" :
-			(level == AMD_DPM_FORCED_LEVEL_PROFILE_STANDARD) ? "profile_standard" :
-			(level == AMD_DPM_FORCED_LEVEL_PROFILE_MIN_SCLK) ? "profile_min_sclk" :
-			(level == AMD_DPM_FORCED_LEVEL_PROFILE_MIN_MCLK) ? "profile_min_mclk" :
-			(level == AMD_DPM_FORCED_LEVEL_PROFILE_PEAK) ? "profile_peak" :
-			(level == AMD_DPM_FORCED_LEVEL_PERF_DETERMINISM) ? "perf_determinism" :
-			"unknown");
+	return sysfs_emit(buf, "%s\n",
+			  (level == AMD_DPM_FORCED_LEVEL_AUTO) ? "auto" :
+			  (level == AMD_DPM_FORCED_LEVEL_LOW) ? "low" :
+			  (level == AMD_DPM_FORCED_LEVEL_HIGH) ? "high" :
+			  (level == AMD_DPM_FORCED_LEVEL_MANUAL) ? "manual" :
+			  (level == AMD_DPM_FORCED_LEVEL_PROFILE_STANDARD) ? "profile_standard" :
+			  (level == AMD_DPM_FORCED_LEVEL_PROFILE_MIN_SCLK) ? "profile_min_sclk" :
+			  (level == AMD_DPM_FORCED_LEVEL_PROFILE_MIN_MCLK) ? "profile_min_mclk" :
+			  (level == AMD_DPM_FORCED_LEVEL_PROFILE_PEAK) ? "profile_peak" :
+			  (level == AMD_DPM_FORCED_LEVEL_PERF_DETERMINISM) ? "perf_determinism" :
+			  "unknown");
 }
 
 static ssize_t amdgpu_set_power_dpm_force_performance_level(struct device *dev,
@@ -488,7 +488,7 @@ static ssize_t amdgpu_get_pp_cur_state(struct device *dev,
 	if (i == data.nums)
 		i = -EINVAL;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", i);
+	return sysfs_emit(buf, "%d\n", i);
 }
 
 static ssize_t amdgpu_get_pp_force_state(struct device *dev,
@@ -506,7 +506,7 @@ static ssize_t amdgpu_get_pp_force_state(struct device *dev,
 	if (adev->pp_force_state_enabled)
 		return amdgpu_get_pp_cur_state(dev, attr, buf);
 	else
-		return snprintf(buf, PAGE_SIZE, "\n");
+		return sysfs_emit(buf, "\n");
 }
 
 static ssize_t amdgpu_set_pp_force_state(struct device *dev,
@@ -1285,7 +1285,7 @@ static ssize_t amdgpu_get_pp_sclk_od(struct device *dev,
 	pm_runtime_mark_last_busy(ddev->dev);
 	pm_runtime_put_autosuspend(ddev->dev);
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", value);
+	return sysfs_emit(buf, "%d\n", value);
 }
 
 static ssize_t amdgpu_set_pp_sclk_od(struct device *dev,
@@ -1362,7 +1362,7 @@ static ssize_t amdgpu_get_pp_mclk_od(struct device *dev,
 	pm_runtime_mark_last_busy(ddev->dev);
 	pm_runtime_put_autosuspend(ddev->dev);
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", value);
+	return sysfs_emit(buf, "%d\n", value);
 }
 
 static ssize_t amdgpu_set_pp_mclk_od(struct device *dev,
@@ -1566,7 +1566,7 @@ static ssize_t amdgpu_get_gpu_busy_percent(struct device *dev,
 	if (r)
 		return r;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", value);
+	return sysfs_emit(buf, "%d\n", value);
 }
 
 /**
@@ -1606,7 +1606,7 @@ static ssize_t amdgpu_get_mem_busy_percent(struct device *dev,
 	if (r)
 		return r;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", value);
+	return sysfs_emit(buf, "%d\n", value);
 }
 
 /**
@@ -1652,8 +1652,8 @@ static ssize_t amdgpu_get_pcie_bw(struct device *dev,
 	pm_runtime_mark_last_busy(ddev->dev);
 	pm_runtime_put_autosuspend(ddev->dev);
 
-	return snprintf(buf, PAGE_SIZE,	"%llu %llu %i\n",
-			count0, count1, pcie_get_mps(adev->pdev));
+	return sysfs_emit(buf, "%llu %llu %i\n",
+			  count0, count1, pcie_get_mps(adev->pdev));
 }
 
 /**
@@ -1679,7 +1679,7 @@ static ssize_t amdgpu_get_unique_id(struct device *dev,
 		return -EPERM;
 
 	if (adev->unique_id)
-		return snprintf(buf, PAGE_SIZE, "%016llx\n", adev->unique_id);
+		return sysfs_emit(buf, "%016llx\n", adev->unique_id);
 
 	return 0;
 }
@@ -1707,10 +1707,10 @@ static ssize_t amdgpu_get_thermal_throttling_logging(struct device *dev,
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 
-	return snprintf(buf, PAGE_SIZE, "%s: thermal throttling logging %s, with interval %d seconds\n",
-			adev_to_drm(adev)->unique,
-			atomic_read(&adev->throttling_logging_enabled) ? "enabled" : "disabled",
-			adev->throttling_logging_rs.interval / HZ + 1);
+	return sysfs_emit(buf, "%s: thermal throttling logging %s, with interval %d seconds\n",
+			  adev_to_drm(adev)->unique,
+			  atomic_read(&adev->throttling_logging_enabled) ? "enabled" : "disabled",
+			  adev->throttling_logging_rs.interval / HZ + 1);
 #elif defined(__FreeBSD__)
 	return 0;
 #endif
@@ -2053,7 +2053,7 @@ static ssize_t amdgpu_hwmon_show_temp(struct device *dev,
 	if (r)
 		return r;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", temp);
+	return sysfs_emit(buf, "%d\n", temp);
 }
 
 static ssize_t amdgpu_hwmon_show_temp_thresh(struct device *dev,
@@ -2069,7 +2069,7 @@ static ssize_t amdgpu_hwmon_show_temp_thresh(struct device *dev,
 	else
 		temp = adev->pm.dpm.thermal.max_temp;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", temp);
+	return sysfs_emit(buf, "%d\n", temp);
 }
 
 static ssize_t amdgpu_hwmon_show_hotspot_temp_thresh(struct device *dev,
@@ -2085,7 +2085,7 @@ static ssize_t amdgpu_hwmon_show_hotspot_temp_thresh(struct device *dev,
 	else
 		temp = adev->pm.dpm.thermal.max_hotspot_crit_temp;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", temp);
+	return sysfs_emit(buf, "%d\n", temp);
 }
 
 static ssize_t amdgpu_hwmon_show_mem_temp_thresh(struct device *dev,
@@ -2101,7 +2101,7 @@ static ssize_t amdgpu_hwmon_show_mem_temp_thresh(struct device *dev,
 	else
 		temp = adev->pm.dpm.thermal.max_mem_crit_temp;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", temp);
+	return sysfs_emit(buf, "%d\n", temp);
 }
 
 static ssize_t amdgpu_hwmon_show_temp_label(struct device *dev,
@@ -2113,7 +2113,7 @@ static ssize_t amdgpu_hwmon_show_temp_label(struct device *dev,
 	if (channel >= PP_TEMP_MAX)
 		return -EINVAL;
 
-	return snprintf(buf, PAGE_SIZE, "%s\n", temp_label[channel].label);
+	return sysfs_emit(buf, "%s\n", temp_label[channel].label);
 }
 
 static ssize_t amdgpu_hwmon_show_temp_emergency(struct device *dev,
@@ -2139,7 +2139,7 @@ static ssize_t amdgpu_hwmon_show_temp_emergency(struct device *dev,
 		break;
 	}
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", temp);
+	return sysfs_emit(buf, "%d\n", temp);
 }
 
 static ssize_t amdgpu_hwmon_get_pwm1_enable(struct device *dev,
@@ -2375,7 +2375,7 @@ static ssize_t amdgpu_hwmon_get_fan1_min(struct device *dev,
 	if (r)
 		return r;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", min_rpm);
+	return sysfs_emit(buf, "%d\n", min_rpm);
 }
 
 static ssize_t amdgpu_hwmon_get_fan1_max(struct device *dev,
@@ -2407,7 +2407,7 @@ static ssize_t amdgpu_hwmon_get_fan1_max(struct device *dev,
 	if (r)
 		return r;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", max_rpm);
+	return sysfs_emit(buf, "%d\n", max_rpm);
 }
 
 static ssize_t amdgpu_hwmon_get_fan1_target(struct device *dev,
@@ -2599,14 +2599,14 @@ static ssize_t amdgpu_hwmon_show_vddgfx(struct device *dev,
 	if (r)
 		return r;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", vddgfx);
+	return sysfs_emit(buf, "%d\n", vddgfx);
 }
 
 static ssize_t amdgpu_hwmon_show_vddgfx_label(struct device *dev,
 					      struct device_attribute *attr,
 					      char *buf)
 {
-	return snprintf(buf, PAGE_SIZE, "vddgfx\n");
+	return sysfs_emit(buf, "vddgfx\n");
 }
 
 static ssize_t amdgpu_hwmon_show_vddnb(struct device *dev,
@@ -2642,14 +2642,14 @@ static ssize_t amdgpu_hwmon_show_vddnb(struct device *dev,
 	if (r)
 		return r;
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", vddnb);
+	return sysfs_emit(buf, "%d\n", vddnb);
 }
 
 static ssize_t amdgpu_hwmon_show_vddnb_label(struct device *dev,
 					      struct device_attribute *attr,
 					      char *buf)
 {
-	return snprintf(buf, PAGE_SIZE, "vddnb\n");
+	return sysfs_emit(buf, "vddnb\n");
 }
 
 static ssize_t amdgpu_hwmon_show_power_avg(struct device *dev,
@@ -2685,7 +2685,7 @@ static ssize_t amdgpu_hwmon_show_power_avg(struct device *dev,
 	/* convert to microwatts */
 	uw = (query >> 8) * 1000000 + (query & 0xff) * 1000;
 
-	return snprintf(buf, PAGE_SIZE, "%u\n", uw);
+	return sysfs_emit(buf, "%u\n", uw);
 }
 
 static ssize_t amdgpu_hwmon_show_power_cap_min(struct device *dev,
@@ -2818,7 +2818,7 @@ static ssize_t amdgpu_hwmon_show_power_label(struct device *dev,
 {
 	int limit_type = to_sensor_dev_attr(attr)->index;
 
-	return snprintf(buf, PAGE_SIZE, "%s\n",
+	return sysfs_emit(buf, "%s\n",
 		limit_type == SMU_FAST_PPT_LIMIT ? "fastPPT" : "slowPPT");
 }
 
@@ -2897,14 +2897,14 @@ static ssize_t amdgpu_hwmon_show_sclk(struct device *dev,
 	if (r)
 		return r;
 
-	return snprintf(buf, PAGE_SIZE, "%u\n", sclk * 10 * 1000);
+	return sysfs_emit(buf, "%u\n", sclk * 10 * 1000);
 }
 
 static ssize_t amdgpu_hwmon_show_sclk_label(struct device *dev,
 					    struct device_attribute *attr,
 					    char *buf)
 {
-	return snprintf(buf, PAGE_SIZE, "sclk\n");
+	return sysfs_emit(buf, "sclk\n");
 }
 
 static ssize_t amdgpu_hwmon_show_mclk(struct device *dev,
@@ -2936,14 +2936,14 @@ static ssize_t amdgpu_hwmon_show_mclk(struct device *dev,
 	if (r)
 		return r;
 
-	return snprintf(buf, PAGE_SIZE, "%u\n", mclk * 10 * 1000);
+	return sysfs_emit(buf, "%u\n", mclk * 10 * 1000);
 }
 
 static ssize_t amdgpu_hwmon_show_mclk_label(struct device *dev,
 					    struct device_attribute *attr,
 					    char *buf)
 {
-	return snprintf(buf, PAGE_SIZE, "mclk\n");
+	return sysfs_emit(buf, "mclk\n");
 }
 
 /**
