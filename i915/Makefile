@@ -106,6 +106,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_dsi_dcs_backlight.c \
 	intel_dsi_vbt.c \
 	intel_dsb.c \
+	intel_fb.c \
 	intel_dvo.c \
 	intel_global_state.c \
 	intel_gmbus.c \
