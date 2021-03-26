@@ -359,6 +359,8 @@ static void __rq_arm_watchdog(struct i915_request *rq)
 	if (!ce->watchdog.timeout_us)
 		return;
 
+	i915_request_get(rq);
+
 	hrtimer_init(&wdg->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	wdg->timer.function = __rq_watchdog_expired;
 	hrtimer_start_range_ns(&wdg->timer,
@@ -366,7 +368,6 @@ static void __rq_arm_watchdog(struct i915_request *rq)
 					   NSEC_PER_USEC),
 			       NSEC_PER_MSEC,
 			       HRTIMER_MODE_REL);
-	i915_request_get(rq);
 }
 
 static void __rq_cancel_watchdog(struct i915_request *rq)
