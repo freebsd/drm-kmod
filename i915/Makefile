@@ -75,6 +75,7 @@ SRCS=	\
 	intel_quirks.c \
 	intel_runtime_pm.c \
 	intel_sideband.c \
+	intel_step.c \
 	intel_sprite.c \
 	intel_uncore.c \
 	i915_utils.c \
