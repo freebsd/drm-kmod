@@ -89,9 +89,9 @@ int amdgpu_ras_eeprom_write(struct amdgpu_ras_eeprom_control *control,
 			    struct eeprom_table_record *records, const u32 num);
 
 #ifdef __linux__
-inline uint32_t amdgpu_ras_eeprom_get_record_max_length(void);
+inline uint32_t amdgpu_ras_eeprom_max_record_count(void);
 #elif defined(__FreeBSD__)
-uint32_t amdgpu_ras_eeprom_get_record_max_length(void);
+uint32_t amdgpu_ras_eeprom_max_record_count(void);
 #endif
 
 void amdgpu_ras_eeprom_test(struct amdgpu_ras_eeprom_control *control);
