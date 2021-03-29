@@ -47,10 +47,12 @@ of_node_get(struct device_node *node)
 
 static inline void of_node_put(struct device_node *node) { }
 
+#ifndef of_node_to_nid
 static inline int
 of_node_to_nid(struct device_node *device)
 {
 	return (-1);
 }
+#endif
 
 #endif
