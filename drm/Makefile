@@ -29,6 +29,7 @@ SRCS=	drm_atomic.c \
 	drm_dsc.c \
 	drm_dumb_buffers.c \
 	drm_edid.c \
+	drm_displayid.c \
 	drm_encoder.c \
 	drm_file.c \
 	drm_flip_work.c \
