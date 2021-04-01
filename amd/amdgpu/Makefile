@@ -586,7 +586,8 @@ SRCS+=	dcn31_afmt.c \
 	irq_service_dcn31.c
 
 # display/dc/core
-SRCS+=	dc_vm_helper.c
+SRCS+=	dc_link_dpia.c \
+	dc_vm_helper.c
 
 # display/dc/clk_mgr
 SRCS+=	rn_clk_mgr.c \
