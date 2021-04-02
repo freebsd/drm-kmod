@@ -83,13 +83,31 @@ static void intel_dsm_platform_mux_info(acpi_handle dhandle)
 		return;
 	}
 
+	if (!pkg->Package.Count) {
+		DRM_DEBUG_DRIVER("no connection in _DSM\n");
+		return;
+	}
+
 	connector_count = &pkg->Package.Elements[0];
 	DRM_DEBUG_DRIVER("MUX info connectors: %lld\n",
 		  (unsigned long long)connector_count->Integer.Value);
 	for (i = 1; i < pkg->Package.Count; i++) {
 		union acpi_object *obj = &pkg->Package.Elements[i];
-		union acpi_object *connector_id = &obj->Package.Elements[0];
-		union acpi_object *info = &obj->Package.Elements[1];
+		union acpi_object *connector_id;
+		union acpi_object *info;
+
+		if (obj->Type != ACPI_TYPE_PACKAGE || obj->Package.Count < 2) {
+			DRM_DEBUG_DRIVER("Invalid object for MUX #%d\n", i);
+			continue;
+		}
+
+		connector_id = &obj->Package.Elements[0];
+		info = &obj->Package.Elements[1];
+		if (info->Type != ACPI_TYPE_BUFFER || info->Buffer.Length < 4) {
+			DRM_DEBUG_DRIVER("Invalid info for MUX obj #%d\n", i);
+			continue;
+		}
+
 		DRM_DEBUG_DRIVER("Connector id: 0x%016llx\n",
 			  (unsigned long long)connector_id->Integer.Value);
 		DRM_DEBUG_DRIVER("  port id: %s\n",
