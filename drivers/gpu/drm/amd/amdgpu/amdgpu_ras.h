@@ -320,6 +320,7 @@ struct amdgpu_ras {
 #ifdef __linux__
 	struct bin_attribute badpages_attr;
 #endif
+	struct dentry *de_ras_eeprom_table;
 	/* block array */
 	struct ras_manager *objs;
 

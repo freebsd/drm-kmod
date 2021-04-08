@@ -29,9 +29,10 @@
 struct amdgpu_device;
 
 enum amdgpu_ras_eeprom_err_type {
-	AMDGPU_RAS_EEPROM_ERR_PLACE_HOLDER,
+	AMDGPU_RAS_EEPROM_ERR_NA,
 	AMDGPU_RAS_EEPROM_ERR_RECOVERABLE,
-	AMDGPU_RAS_EEPROM_ERR_NON_RECOVERABLE
+	AMDGPU_RAS_EEPROM_ERR_NON_RECOVERABLE,
+	AMDGPU_RAS_EEPROM_ERR_COUNT,
 };
 
 struct amdgpu_ras_eeprom_table_header {
@@ -124,5 +125,10 @@ inline uint32_t amdgpu_ras_eeprom_max_record_count(void);
 #elif defined(__FreeBSD__)
 uint32_t amdgpu_ras_eeprom_max_record_count(void);
 #endif
+
+void amdgpu_ras_debugfs_set_ret_size(struct amdgpu_ras_eeprom_control *control);
+
+extern const struct file_operations amdgpu_ras_debugfs_eeprom_size_ops;
+extern const struct file_operations amdgpu_ras_debugfs_eeprom_table_ops;
 
 #endif // _AMDGPU_RAS_EEPROM_H
