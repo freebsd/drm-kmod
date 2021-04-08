@@ -25,7 +25,7 @@ CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include # fallback to dummy
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -DLINUXKPI_VERSION=50000
+CFLAGS+= -DLINUXKPI_VERSION=51300
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 CWARNFLAGS.dma-buf.c+=	-Wno-pointer-arith
