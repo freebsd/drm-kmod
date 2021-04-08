@@ -63,6 +63,21 @@ dma_fence_get_stub(void)
 	return (dma_fence_get(&dma_fence_stub));
 }
 
+struct dma_fence *dma_fence_allocate_private_stub(void)
+{
+	struct dma_fence *fence;
+
+	fence = kzalloc(sizeof(*fence), GFP_KERNEL);
+	if (fence == NULL)
+		return (ERR_PTR(-ENOMEM));
+
+	dma_fence_init(fence,
+	    &dma_fence_stub_ops, &dma_fence_stub_lock, 0, 0);
+	dma_fence_signal(fence);
+
+	return (fence);
+}
+
 static atomic64_t dma_fence_context_counter = ATOMIC64_INIT(1);
 
 /*
