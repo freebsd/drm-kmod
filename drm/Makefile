@@ -135,5 +135,6 @@ CWARNFLAGS+=-Wno-cast-qual
 CWARNFLAGS+= -Wno-pointer-sign -Wno-format
 
 CWARNFLAGS.drm_ioc32.c+=	-Wno-address-of-packed-member
+CWARNFLAGS.drm_modes.c+=	-Wno-incompatible-function-pointer-types
 
 .include <bsd.kmod.mk>

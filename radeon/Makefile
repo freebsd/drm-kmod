@@ -165,6 +165,7 @@ CWARNFLAGS.r600_cs.c=			-Wno-missing-prototypes
 CWARNFLAGS.r600_hdmi.c=			-Wno-missing-prototypes
 CWARNFLAGS.radeon_atombios.c=		-Wno-missing-prototypes
 CWARNFLAGS.radeon_connectors.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.radeon_cs.c=			-Wno-incompatible-function-pointer-types
 CWARNFLAGS.radeon_display.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.radeon_device.c=		-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.radeon_dp_mst.c=		-Wno-unused-but-set-variable
