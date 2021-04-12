@@ -11,6 +11,7 @@ SRCS=	drm_atomic.c \
 	drm_atomic_helper.c \
 	drm_atomic_state_helper.c \
 	drm_atomic_uapi.c \
+	drm_aperture.c \
 	drm_auth.c \
 	drm_blend.c \
 	drm_bridge.c \
