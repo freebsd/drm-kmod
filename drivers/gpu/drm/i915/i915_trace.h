@@ -281,6 +281,20 @@ trace_i915_pipe_update_end(void *crtc, u32 end_vbl_count, int scanline_end)
 	CTR3(KTR_DRM, "pipe_update_end %p end_vbl_count %d scanline_end %d", crtc, end_vbl_count, scanline_end);
 }
 
+/* frontbuffer tracking */
+
+static inline void
+trace_intel_frontbuffer_invalidate(unsigned int frontbuffer_bits, unsigned int origin)
+{
+	CTR2(KTR_DRM, "frontbuffer_bits=0x%08x, origin=%u", frontbuffer_bits, origin);
+}
+
+static inline void
+trace_intel_frontbuffer_flush(unsigned int frontbuffer_bits, unsigned int origin)
+{
+	CTR2(KTR_DRM, "frontbuffer_bits=0x%08x, origin=%u", frontbuffer_bits, origin);
+}
+
 static inline void
 trace_i915_request_add(void *req)
 {
