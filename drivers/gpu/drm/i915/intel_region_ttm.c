@@ -4,6 +4,7 @@
  */
 #include <drm/ttm/ttm_bo_driver.h>
 #include <drm/ttm/ttm_device.h>
+#include <drm/ttm/ttm_range_manager.h>
 
 #include "i915_drv.h"
 #include "i915_scatterlist.h"
