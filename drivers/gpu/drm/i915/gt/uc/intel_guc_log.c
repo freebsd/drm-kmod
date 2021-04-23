@@ -11,7 +11,9 @@
 #include "intel_guc_log.h"
 
 #ifdef __FreeBSD__
-bool intel_guc_log_relay_enabled(const struct intel_guc_log *log);
+static bool intel_guc_log_relay_enabled(const struct intel_guc_log *log) {
+	return false;
+}
 #endif
 
 static void guc_log_capture_logs(struct intel_guc_log *log);
