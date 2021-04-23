@@ -14,9 +14,11 @@ SRCS=	\
 	i915_drv.c \
 	i915_getparam.c \
 	i915_gem.c \
+	i915_gem_client_blt.c \
 	i915_gem_evict.c \
 	i915_gem_fence_reg.c \
 	i915_gem_gtt.c \
+	i915_gem_object_blt.c \
 	i915_globals.c \
 	i915_irq.c \
 	i915_memcpy.c \
@@ -121,11 +123,14 @@ SRCS+=	gen6_renderstate.c \
 	intel_gt_pm.c \
 	intel_gt_pm_irq.c \
 	intel_gt_requests.c \
+	intel_llc.c \
 	intel_lrc.c \
 	intel_mocs.c \
+	intel_rc6.c \
 	intel_renderstate.c \
 	intel_reset.c \
 	intel_ring.c \
+	intel_ring_submission.c \
 	intel_rps.c \
 	intel_sseu.c \
 	intel_timeline.c \
