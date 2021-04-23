@@ -13,7 +13,16 @@
 	(__p == __o);							\
 })
 
-/* LKPI_TODO */
-#define	atomic_try_cmpxchg(a, b, c) 0
+#define __atomic_try_cmpxchg(type, _p, _po, _n)				\
+({									\
+	typeof(_po) __po = (_po);					\
+	typeof(*(_po)) __r, __o = *__po;				\
+	__r = atomic_cmpxchg##type((_p), __o, (_n));			\
+	if (unlikely(__r != __o))					\
+		*__po = __r;						\
+	likely(__r == __o);						\
+})
+
+#define atomic_try_cmpxchg(_p, _po, _n)	__atomic_try_cmpxchg(, _p, _po, _n)
 
 #endif

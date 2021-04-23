@@ -55,4 +55,9 @@ static inline u32 hash_32(u32 val, unsigned int bits)
 #define hash_long(val, bits) hash_32(val, bits)
 #endif
 
+static inline u32 hash_ptr(const void *ptr, unsigned int bits)
+{
+	return hash_long((unsigned long)ptr, bits);
+}
+
 #endif	/* _LINUX_HASH_H_ */
