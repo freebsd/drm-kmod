@@ -5,6 +5,10 @@
  */
 
 #include <linux/cpufreq.h>
+#if defined(__FreeBSD__)
+#include <sys/types.h>
+#include <machine/clock.h>
+#endif
 
 #include "i915_drv.h"
 #include "intel_gt.h"
