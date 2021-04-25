@@ -47,11 +47,6 @@ resource_contains(struct linux_resource *a, struct linux_resource *b)
 	return a->start <= b->start && a->end >= b->end;
 }
 
-#if (__FreeBSD_version >= 1400000 && __FreeBSD_version < 1400003) || \
-    (__FreeBSD_version < 1300139)
-void pci_dev_put(struct pci_dev *pdev);
-#endif
-
 static inline struct pci_dev *
 pci_upstream_bridge(struct pci_dev *dev)
 {
