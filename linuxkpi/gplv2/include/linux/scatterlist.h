@@ -31,47 +31,6 @@
 
 #include_next <linux/scatterlist.h>
 
-#if (__FreeBSD_version >= 1400000 && __FreeBSD_version < 1400003) || \
-    (__FreeBSD_version < 1300139)
-static inline size_t
-sg_pcopy_from_buffer(struct scatterlist *sgl, unsigned int nents,
-    const void *buf, size_t buflen, off_t offset)
-{
-	struct sg_page_iter iter;
-	struct scatterlist *sg;
-	struct page *page;
-	void *vaddr;
-	size_t total = 0;
-	size_t len;
-
-	for_each_sg_page(sgl, &iter, nents, 0) {
-		sg = iter.sg;
-
-		if (offset >= sg->length) {
-			offset -= sg->length;
-			continue;
-		}
-		len = min(buflen, sg->length - offset);
-		if (len == 0)
-			break;
-
-		page = sg_page_iter_page(&iter);
-		vaddr = ((caddr_t)kmap(page)) + sg->offset + offset;
-		memcpy(vaddr, buf, len);
-		kunmap(page);
-
-		/* start at beginning of next page */
-		offset = 0;
-
-		/* advance buffer */
-		buf = (const char *)buf + len;
-		buflen -= len;
-		total += len;
-	}
-	return (total);
-}
-#endif
-
 static inline size_t
 sg_copy_from_buffer(struct scatterlist *sgl, unsigned int nents,
     const void *buf, size_t buflen)

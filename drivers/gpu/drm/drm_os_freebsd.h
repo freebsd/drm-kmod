@@ -103,44 +103,6 @@ do {								\
 	({ __typeof__(*(ptr)) __tmp;                                    \
 	  memcpy(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
 
-#if (__FreeBSD_version >= 1400000 && __FreeBSD_version < 1400003) || \
-    (__FreeBSD_version < 1300139)
-#if _BYTE_ORDER == _LITTLE_ENDIAN
-/* Taken from linux/include/linux/unaligned/le_struct.h. */
-struct __una_u32 { u32 x; } __packed;
-
-static inline u32
-__get_unaligned_cpu32(const void *p)
-{
-	const struct __una_u32 *ptr = (const struct __una_u32 *)p;
-
-	return (ptr->x);
-}
-
-static inline u32
-get_unaligned_le32(const void *p)
-{
-
-	return (__get_unaligned_cpu32((const u8 *)p));
-}
-#else
-/* Taken from linux/include/linux/unaligned/le_byteshift.h. */
-static inline u32
-__get_unaligned_le32(const u8 *p)
-{
-
-	return (p[0] | p[1] << 8 | p[2] << 16 | p[3] << 24);
-}
-
-static inline u32
-get_unaligned_le32(const void *p)
-{
-
-	return (__get_unaligned_le32((const u8 *)p));
-}
-#endif
-#endif
-
 #define	page_to_phys(x) VM_PAGE_TO_PHYS(x)
 
 #define	drm_get_device_from_kdev(_kdev)	(((struct drm_minor *)(_kdev)->si_drv1)->dev)
