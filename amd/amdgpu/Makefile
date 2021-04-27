@@ -917,6 +917,7 @@ CWARNFLAGS.dc_link.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_link_ddc.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dc_link_enc_cfg.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dc_link_dp.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.dc_link_dpia.c=		-Wno-sometimes-uninitialized
 CWARNFLAGS.dc_resource.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_stat.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dce_aux.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
