@@ -813,6 +813,8 @@ i915_gem_stolen_lmem_setup(struct drm_i915_private *i915)
 
 	intel_memory_region_set_name(mem, "stolen-local");
 
+	mem->private = true;
+
 	return mem;
 }
 
@@ -830,6 +832,8 @@ i915_gem_stolen_smem_setup(struct drm_i915_private *i915)
 		return mem;
 
 	intel_memory_region_set_name(mem, "stolen-system");
+
+	mem->private = true;
 
 	return mem;
 }
