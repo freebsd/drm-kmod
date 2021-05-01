@@ -122,7 +122,9 @@ static inline void i915_oa_config_put(struct i915_oa_config *oa_config)
 	if (!oa_config)
 		return;
 
+#ifdef FREEBSD_NOTYET
 	kref_put(&oa_config->ref, i915_oa_config_release);
+#endif
 }
 
 #endif /* __I915_PERF_H__ */
