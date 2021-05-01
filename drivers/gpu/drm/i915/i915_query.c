@@ -266,7 +266,11 @@ static int query_perf_config_data(struct drm_i915_private *i915,
 		if (__get_user(config_id, &user_query_config_ptr->config))
 			return -EFAULT;
 
+#ifdef __linux__
 		oa_config = i915_perf_get_oa_config(perf, config_id);
+#elif defined(__FreeBSD__)
+		oa_config = NULL;
+#endif
 	}
 	if (!oa_config)
 		return -ENOENT;
