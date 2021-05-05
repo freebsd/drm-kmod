@@ -54,4 +54,18 @@ int dma_fence_chain_find_seqno(struct dma_fence **fence, uint64_t seqno);
 void dma_fence_chain_init(struct dma_fence_chain *chain, struct dma_fence *prev,
   struct dma_fence *fence, uint64_t seqno);
 
+MALLOC_DECLARE(M_DMABUF);
+
+static inline struct dma_fence_chain *
+dma_fence_chain_alloc()
+{
+	return malloc(sizeof(struct dma_fence_chain), M_DMABUF, M_WAITOK | M_ZERO);
+}
+
+static inline void
+dma_fence_chain_free(struct dma_fence_chain *chain)
+{
+	free(chain, M_DMABUF);
+}
+
 #endif /* _LINUX_DMA_FENCE_CHAIN_H_ */
