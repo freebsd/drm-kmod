@@ -144,6 +144,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_gfx.c \
 	amdgpu_gmc.c \
 	amdgpu_gtt_mgr.c \
+	amdgpu_preempt_mgr.c \
 	amdgpu_i2c.c \
 	amdgpu_ib.c \
 	amdgpu_ids.c \
