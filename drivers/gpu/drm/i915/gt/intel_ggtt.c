@@ -18,6 +18,7 @@
 #include "i915_vgpu.h"
 
 #include "intel_gtt.h"
+#include "gen8_ppgtt.h"
 
 #ifdef __FreeBSD__
 #include <dev/agp/agpvar.h>
@@ -192,9 +193,9 @@ static void gmch_ggtt_invalidate(struct i915_ggtt *ggtt)
 	intel_gtt_chipset_flush();
 }
 
-static u64 gen8_ggtt_pte_encode(dma_addr_t addr,
-				enum i915_cache_level level,
-				u32 flags)
+u64 gen8_ggtt_pte_encode(dma_addr_t addr,
+			 enum i915_cache_level level,
+			 u32 flags)
 {
 	gen8_pte_t pte = addr | _PAGE_PRESENT;
 
