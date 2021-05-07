@@ -278,9 +278,6 @@ struct drm_device {
 	 */
 	spinlock_t event_lock;
 
-	/** @agp: AGP data */
-	struct drm_agp_head *agp;
-
 	/** @num_crtcs: Number of CRTCs on this device */
 	unsigned int num_crtcs;
 
@@ -337,6 +334,9 @@ struct drm_device {
 	/** @hose: PCI hose, only used on ALPHA platforms. */
 	struct pci_controller *hose;
 #endif
+
+	/* AGP data */
+	struct drm_agp_head *agp;
 
 	/* Context handle management - linked list of context handles */
 	struct list_head ctxlist;

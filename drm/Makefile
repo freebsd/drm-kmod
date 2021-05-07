@@ -43,7 +43,6 @@ SRCS=	drm_atomic.c \
 	drm_irq.c \
 	drm_lease.c \
 	drm_managed.c \
-	drm_memory.c \
 	drm_mm.c \
 	drm_modes.c \
 	drm_mode_config.c \
@@ -74,8 +73,9 @@ SRCS=	drm_atomic.c \
 SRCS+=	drm_fb_helper.c
 .endif
 
-.if !empty(KCONFIG:MAGP)
-SRCS+=	drm_agpsupport.c
+.if !empty(KCONFIG:MDRM_LEGACY)
+SRCS+=	drm_agpsupport.c \
+	drm_memory.c
 .endif
 
 .if !empty(KCONFIG:MCOMPAT)

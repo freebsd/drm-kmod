@@ -30,7 +30,6 @@
 #include <linux/slab.h>
 
 #include <drm/drm.h>
-#include <drm/drm_agpsupport.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_print.h>
 
@@ -178,7 +177,7 @@ static void drm_legacy_pci_agp_init(struct drm_device *dev)
 {
 	if (drm_core_check_feature(dev, DRIVER_USE_AGP)) {
 		if (pci_find_capability(to_pci_dev(dev->dev), PCI_CAP_ID_AGP))
-			dev->agp = drm_agp_init(dev);
+			dev->agp = drm_legacy_agp_init(dev);
 		if (dev->agp) {
 #ifdef __linux__
 			dev->agp->agp_mtrr = arch_phys_wc_add(
