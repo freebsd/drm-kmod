@@ -1,6 +1,8 @@
 #ifndef _BSD_LKPI_LINUX_AGP_BACKEND_H_
 #define	_BSD_LKPI_LINUX_AGP_BACKEND_H_
 
+#include <sys/types.h>
+
 struct agp_version {
 	uint16_t	major;
 	uint16_t	minor;
