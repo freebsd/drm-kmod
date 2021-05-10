@@ -35,7 +35,9 @@
 #include <linux/pci.h>
 #include <linux/slab.h>
 
+#if IS_ENABLED(CONFIG_AGP)
 #include <asm/agp.h>
+#endif
 #ifdef __FreeBSD__
 #include <dev/agp/agpvar.h>
 #endif
