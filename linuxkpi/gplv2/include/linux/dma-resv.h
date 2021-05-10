@@ -53,8 +53,6 @@
 #endif
 
 extern struct ww_class reservation_ww_class;
-extern struct lock_class_key reservation_seqcount_class;
-extern const char reservation_seqcount_string[];
 
 /**
  * struct dma_resv_list - a list of shared fences
@@ -78,7 +76,7 @@ struct dma_resv_list {
  */
 struct dma_resv {
 	struct ww_mutex lock;
-	seqcount_t seq;
+	seqcount_ww_mutex_t seq;
 #ifdef __FreeBSD__
 	struct rwlock rw;
 #endif
@@ -103,6 +101,12 @@ static inline struct dma_resv_list *dma_resv_get_list(struct dma_resv *obj)
 	return rcu_dereference_protected(obj->fence,
 					 dma_resv_held(obj));
 }
+
+#ifdef CONFIG_DEBUG_MUTEXES
+void dma_resv_reset_shared_max(struct dma_resv *obj);
+#else
+static inline void dma_resv_reset_shared_max(struct dma_resv *obj) {}
+#endif
 
 /**
  * dma_resv_lock - lock the reservation object
@@ -227,34 +231,25 @@ static inline struct ww_acquire_ctx *dma_resv_locking_ctx(struct dma_resv *obj)
  */
 static inline void dma_resv_unlock(struct dma_resv *obj)
 {
-#ifdef CONFIG_DEBUG_MUTEXES
-	/* Test shared fence slot reservation */
-	if (rcu_access_pointer(obj->fence)) {
-		struct dma_resv_list *fence = dma_resv_get_list(obj);
-
-		fence->shared_max = fence->shared_count;
-	}
-#endif
+	dma_resv_reset_shared_max(obj);
 	ww_mutex_unlock(&obj->lock);
 }
 
 /**
- * dma_resv_get_excl - get the reservation object's
- * exclusive fence, with update-side lock held
+ * dma_resv_exclusive - return the object's exclusive fence
  * @obj: the reservation object
  *
- * Returns the exclusive fence (if any).  Does NOT take a
- * reference. Writers must hold obj->lock, readers may only
- * hold a RCU read side lock.
+ * Returns the exclusive fence (if any). Caller must either hold the objects
+ * through dma_resv_lock() or the RCU read side lock through rcu_read_lock(),
+ * or one of the variants of each
  *
  * RETURNS
  * The exclusive fence or NULL
  */
 static inline struct dma_fence *
-dma_resv_get_excl(struct dma_resv *obj)
+dma_resv_excl_fence(struct dma_resv *obj)
 {
-	return rcu_dereference_protected(obj->fence_excl,
-					 dma_resv_held(obj));
+	return rcu_dereference_check(obj->fence_excl, dma_resv_held(obj));
 }
 
 /**

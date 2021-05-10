@@ -50,7 +50,7 @@
  * write-side updates.
  */
 
-DEFINE_WW_CLASS(reservation_ww_class);
+DEFINE_WD_CLASS(reservation_ww_class);
 EXPORT_SYMBOL(reservation_ww_class);
 
 /**
@@ -103,7 +103,7 @@ void dma_resv_init(struct dma_resv *obj)
 #ifdef __FreeBSD__
 	rw_init_flags(&obj->rw, "dma_resv_rw", RW_NEW);
 #endif
-	seqcount_init(&obj->seq);
+	seqcount_ww_mutex_init(&obj->seq, &obj->lock);
 
 	RCU_INIT_POINTER(obj->fence, NULL);
 	RCU_INIT_POINTER(obj->fence_excl, NULL);
@@ -304,7 +304,7 @@ EXPORT_SYMBOL(dma_resv_add_shared_fence);
  */
 void dma_resv_add_excl_fence(struct dma_resv *obj, struct dma_fence *fence)
 {
-	struct dma_fence *old_fence = dma_resv_get_excl(obj);
+	struct dma_fence *old_fence = dma_resv_excl_fence(obj);
 	struct dma_resv_list *old;
 	u32 i = 0;
 
@@ -317,14 +317,12 @@ void dma_resv_add_excl_fence(struct dma_resv *obj, struct dma_fence *fence)
 	if (fence)
 		dma_fence_get(fence);
 
-	preempt_disable();
 	write_seqcount_begin(&obj->seq);
 	/* write_seqcount_begin provides the necessary memory barrier */
 	RCU_INIT_POINTER(obj->fence_excl, fence);
 	if (old)
 		old->shared_count = 0;
 	write_seqcount_end(&obj->seq);
-	preempt_enable();
 
 	/* inplace update, no shared fences */
 	while (i--)
@@ -402,15 +400,13 @@ retry:
 	rcu_read_unlock();
 
 	src_list = dma_resv_get_list(dst);
-	old = dma_resv_get_excl(dst);
+	old = dma_resv_excl_fence(dst);
 
-	preempt_disable();
 	write_seqcount_begin(&dst->seq);
 	/* write_seqcount_begin provides the necessary memory barrier */
 	RCU_INIT_POINTER(dst->fence_excl, new);
 	RCU_INIT_POINTER(dst->fence, dst_list);
 	write_seqcount_end(&dst->seq);
-	preempt_enable();
 
 	dma_resv_list_free(src_list);
 	dma_fence_put(old);
@@ -452,7 +448,7 @@ int dma_resv_get_fences_rcu(struct dma_resv *obj,
 		rcu_read_lock();
 		seq = read_seqcount_begin(&obj->seq);
 
-		fence_excl = rcu_dereference(obj->fence_excl);
+		fence_excl = dma_resv_excl_fence(obj);
 		if (fence_excl && !dma_fence_get_rcu(fence_excl))
 			goto unlock;
 
@@ -558,7 +554,7 @@ retry:
 	rcu_read_lock();
 	i = -1;
 
-	fence = rcu_dereference(obj->fence_excl);
+	fence = dma_resv_excl_fence(obj);
 	if (fence && !test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags)) {
 		if (!dma_fence_get_rcu(fence))
 			goto unlock_retry;
@@ -694,7 +690,7 @@ retry:
 	}
 
 	if (!shared_count) {
-		struct dma_fence *fence_excl = rcu_dereference(obj->fence_excl);
+		struct dma_fence *fence_excl = dma_resv_excl_fence(obj);
 
 		if (fence_excl) {
 			ret = dma_resv_test_signaled_single(fence_excl);
