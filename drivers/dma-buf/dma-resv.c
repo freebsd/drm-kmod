@@ -155,8 +155,7 @@ int dma_resv_reserve_shared(struct dma_resv *obj, unsigned int num_fences)
 
 	dma_resv_assert_held(obj);
 
-	old = dma_resv_get_list(obj);
-
+	old = dma_resv_shared_list(obj);
 	if (old && old->shared_max) {
 		if ((old->shared_count + num_fences) <= old->shared_max)
 			return 0;
@@ -225,12 +224,13 @@ EXPORT_SYMBOL(dma_resv_reserve_shared);
  */
 void dma_resv_reset_shared_max(struct dma_resv *obj)
 {
-	/* Test shared fence slot reservation */
-	if (rcu_access_pointer(obj->fence)) {
-		struct dma_resv_list *fence = dma_resv_get_list(obj);
+	struct dma_resv_list *fences = dma_resv_shared_list(obj);
 
-		fence->shared_max = fence->shared_count;
-	}
+	dma_resv_assert_held(obj);
+
+	/* Test shared fence slot reservation */
+	if (fences)
+		fences->shared_max = fences->shared_count;
 }
 EXPORT_SYMBOL(dma_resv_reset_shared_max);
 #endif
@@ -253,7 +253,7 @@ void dma_resv_add_shared_fence(struct dma_resv *obj, struct dma_fence *fence)
 
 	dma_resv_assert_held(obj);
 
-	fobj = dma_resv_get_list(obj);
+	fobj = dma_resv_shared_list(obj);
 	count = fobj->shared_count;
 
 #ifdef __linux__
@@ -310,7 +310,7 @@ void dma_resv_add_excl_fence(struct dma_resv *obj, struct dma_fence *fence)
 
 	dma_resv_assert_held(obj);
 
-	old = dma_resv_get_list(obj);
+	old = dma_resv_shared_list(obj);
 	if (old)
 		i = old->shared_count;
 
@@ -349,7 +349,7 @@ int dma_resv_copy_fences(struct dma_resv *dst, struct dma_resv *src)
 	dma_resv_assert_held(dst);
 
 	rcu_read_lock();
-	src_list = rcu_dereference(src->fence);
+	src_list = dma_resv_shared_list(src);
 
 retry:
 	if (src_list) {
@@ -362,7 +362,7 @@ retry:
 			return -ENOMEM;
 
 		rcu_read_lock();
-		src_list = rcu_dereference(src->fence);
+		src_list = dma_resv_shared_list(src);
 		if (!src_list || src_list->shared_count > shared_count) {
 			kfree(dst_list);
 			goto retry;
@@ -380,7 +380,7 @@ retry:
 
 			if (!dma_fence_get_rcu(fence)) {
 				dma_resv_list_free(dst_list);
-				src_list = rcu_dereference(src->fence);
+				src_list = dma_resv_shared_list(src);
 				goto retry;
 			}
 
@@ -399,7 +399,7 @@ retry:
 	new = dma_fence_get_rcu_safe(&src->fence_excl);
 	rcu_read_unlock();
 
-	src_list = dma_resv_get_list(dst);
+	src_list = dma_resv_shared_list(dst);
 	old = dma_resv_excl_fence(dst);
 
 	write_seqcount_begin(&dst->seq);
@@ -452,7 +452,7 @@ int dma_resv_get_fences_rcu(struct dma_resv *obj,
 		if (fence_excl && !dma_fence_get_rcu(fence_excl))
 			goto unlock;
 
-		fobj = rcu_dereference(obj->fence);
+		fobj = dma_resv_shared_list(obj);
 		if (fobj)
 			sz += sizeof(*shared) * fobj->shared_max;
 
@@ -569,7 +569,7 @@ retry:
 	}
 
 	if (wait_all) {
-		struct dma_resv_list *fobj = rcu_dereference(obj->fence);
+		struct dma_resv_list *fobj = dma_resv_shared_list(obj);
 
 		if (fobj)
 			shared_count = fobj->shared_count;
@@ -658,7 +658,7 @@ retry:
 	seq = read_seqcount_begin(&obj->seq);
 
 	if (test_all) {
-		struct dma_resv_list *fobj = rcu_dereference(obj->fence);
+		struct dma_resv_list *fobj = dma_resv_shared_list(obj);
 		unsigned int i;
 
 		if (fobj)
