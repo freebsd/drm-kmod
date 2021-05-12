@@ -795,6 +795,7 @@ CWARNFLAGS.amdgpu_bo_list.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_csa.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_device.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_dm_debugfs.c=			-Wno-pointer-bool-conversion
+CWARNFLAGS.amdgpu_fence.c=			-Wno-unused-variable
 CWARNFLAGS.amdgpu_ioc32.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_pm.c=				-Wno-unused-const-variable
 CWARNFLAGS.amdgpu_fw_attestation.c=		-Wno-missing-prototypes
