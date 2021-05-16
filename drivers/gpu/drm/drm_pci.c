@@ -88,7 +88,29 @@ int drm_pci_set_busid(struct drm_device *dev, struct drm_master *master)
 	return 0;
 }
 
-static int drm_pci_irq_by_busid(struct drm_device *dev, struct drm_irq_busid *p)
+#ifdef __FreeBSD__
+int
+drm_getpciinfo(struct drm_device *dev, void *data, struct drm_file *file_priv)
+{
+	struct drm_pciinfo *info = data;
+
+	info->domain = pci_get_domain(dev->dev->bsddev);
+	info->bus = pci_get_bus(dev->dev->bsddev);
+	info->dev = pci_get_slot(dev->dev->bsddev);
+	info->func = pci_get_function(dev->dev->bsddev);
+	info->vendor_id = pci_get_vendor(dev->dev->bsddev);
+	info->device_id = pci_get_device(dev->dev->bsddev);
+	info->subvendor_id = pci_get_subvendor(dev->dev->bsddev);
+	info->subdevice_id = pci_get_subdevice(dev->dev->bsddev);
+	info->revision_id = pci_get_revid(dev->dev->bsddev);
+
+	return 0;
+}
+#endif
+
+#ifdef CONFIG_DRM_LEGACY
+
+static int drm_legacy_pci_irq_by_busid(struct drm_device *dev, struct drm_irq_busid *p)
 {
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
@@ -131,30 +153,8 @@ int drm_legacy_irq_by_busid(struct drm_device *dev, void *data,
 	if (!drm_core_check_feature(dev, DRIVER_HAVE_IRQ))
 		return -EOPNOTSUPP;
 
-	return drm_pci_irq_by_busid(dev, p);
+	return drm_legacy_pci_irq_by_busid(dev, p);
 }
-
-#ifdef __FreeBSD__
-int
-drm_getpciinfo(struct drm_device *dev, void *data, struct drm_file *file_priv)
-{
-	struct drm_pciinfo *info = data;
-
-	info->domain = pci_get_domain(dev->dev->bsddev);
-	info->bus = pci_get_bus(dev->dev->bsddev);
-	info->dev = pci_get_slot(dev->dev->bsddev);
-	info->func = pci_get_function(dev->dev->bsddev);
-	info->vendor_id = pci_get_vendor(dev->dev->bsddev);
-	info->device_id = pci_get_device(dev->dev->bsddev);
-	info->subvendor_id = pci_get_subvendor(dev->dev->bsddev);
-	info->subdevice_id = pci_get_subdevice(dev->dev->bsddev);
-	info->revision_id = pci_get_revid(dev->dev->bsddev);
-
-	return 0;
-}
-#endif
-
-#ifdef CONFIG_DRM_LEGACY
 
 void drm_legacy_pci_agp_destroy(struct drm_device *dev)
 {
