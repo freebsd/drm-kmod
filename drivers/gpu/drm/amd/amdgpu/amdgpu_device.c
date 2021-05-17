@@ -3704,6 +3704,29 @@ failed_unmap:
 	return r;
 }
 
+static void amdgpu_device_unmap_mmio(struct amdgpu_device *adev)
+{
+#ifdef __linux__
+	/* Clear all CPU mappings pointing to this device */
+	unmap_mapping_range(adev->ddev.anon_inode->i_mapping, 0, 0, 1);
+#endif
+
+	/* Unmap all mapped bars - Doorbell, registers and VRAM */
+	amdgpu_device_doorbell_fini(adev);
+
+	iounmap(adev->rmmio);
+	adev->rmmio = NULL;
+	if (adev->mman.aper_base_kaddr)
+		iounmap(adev->mman.aper_base_kaddr);
+	adev->mman.aper_base_kaddr = NULL;
+
+	/* Memory manager related */
+	if (!adev->gmc.xgmi.connected_to_cpu) {
+		arch_phys_wc_del(adev->gmc.vram_mtrr);
+		arch_io_free_memtype_wc(adev->gmc.aper_base, adev->gmc.aper_size);
+	}
+}
+
 /**
  * amdgpu_device_fini - tear down the driver
  *
@@ -3750,6 +3773,8 @@ void amdgpu_device_fini_hw(struct amdgpu_device *adev)
 	amdgpu_device_ip_fini_early(adev);
 
 	amdgpu_gart_dummy_page_fini(adev);
+
+	amdgpu_device_unmap_mmio(adev);
 }
 
 void amdgpu_device_fini_sw(struct amdgpu_device *adev)
@@ -3777,9 +3802,6 @@ void amdgpu_device_fini_sw(struct amdgpu_device *adev)
 	}
 	if ((adev->pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA)
 		vga_client_register(adev->pdev, NULL, NULL, NULL);
-	iounmap(adev->rmmio);
-	adev->rmmio = NULL;
-	amdgpu_device_doorbell_fini(adev);
 
 	if (IS_ENABLED(CONFIG_PERF_EVENTS))
 		amdgpu_pmu_fini(adev);
