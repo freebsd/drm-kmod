@@ -802,6 +802,8 @@ CWARNFLAGS.gfx_v7_0.c=				-Wno-unused-const-variable
 CWARNFLAGS.gfx_v9_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gfx_v9_4_2.c=			-Wno-missing-prototypes
 CWARNFLAGS.gfx_v10_0.c=				-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.jpeg_v2_5.c=				-Wno-unused-but-set-variable
+CWARNFLAGS.jpeg_v3_0.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.kv_dpm.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.mmhub_v1_7.c=			-Wno-missing-prototypes
 CWARNFLAGS.psp_v11_0.c=				-Wno-missing-prototypes
@@ -812,7 +814,7 @@ CWARNFLAGS.smuio_v9_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.smuio_v11_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.smuio_v13_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.vangogh_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
-CWARNFLAGS.vcn_v3_0.c=				-Wno-missing-prototypes
+CWARNFLAGS.vcn_v3_0.c=				-Wno-missing-prototypes -Wno-unused-but-set-variable
 
 # display/amdgpu_dm
 CWARNFLAGS.amdgpu_dm_pp_smu.c=		-Wno-missing-prototypes -Wno-incompatible-function-pointer-types
