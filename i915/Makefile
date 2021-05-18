@@ -50,11 +50,11 @@ SRCS=	\
 	intel_combo_phy.c \
 	intel_connector.c \
 	intel_crtc.c \
-	intel_csr.c \
 	intel_cursor.c \
 	intel_device_info.c \
 	intel_display.c \
 	intel_display_power.c \
+	intel_dmc.c \
 	intel_dpio_phy.c \
 	intel_dpll.c \
 	intel_dpll_mgr.c \
