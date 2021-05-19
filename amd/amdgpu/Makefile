@@ -11,7 +11,8 @@ KMOD=	amdgpu
 _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn20 \
 	${SRCDIR}/display/dc/dml/dcn21 \
-	${SRCDIR}/display/dc/dml/dcn30
+	${SRCDIR}/display/dc/dml/dcn30 \
+	${SRCDIR}/display/dc/dml/dcn31
 .endif
 
 .PATH:	${SRCDIR}/acp \
@@ -542,6 +543,8 @@ SRCS+=	dcn31_smu.c \
 	dcn31_hubp.c \
 	dcn31_hubbub.c \
 	dcn31_optc.c \
+	display_mode_vba_31.c \
+	display_rq_dlg_calc_31.c \
 	dmub_dcn31.c
 
 # display/dc/core
@@ -790,11 +793,13 @@ CFLAGS.dml1_display_rq_dlg_calc.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_helpers.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_20.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_21.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-missing-prototypes
+CFLAGS.display_rq_dlg_calc_31.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.soc_bounding_box.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_rq_dlg_calc_20v2.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_20v2.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_30.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_rq_dlg_calc_31.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.rc_calc.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.rc_calc_dpi.c= ${FPUFLAGS} -mstack-alignment=4
