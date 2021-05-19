@@ -38,6 +38,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/clk_mgr/dcn21 \
 	${SRCDIR}/display/dc/clk_mgr/dcn30 \
 	${SRCDIR}/display/dc/clk_mgr/dcn301 \
+	${SRCDIR}/display/dc/clk_mgr/dcn31 \
 	${SRCDIR}/display/dc/dce \
 	${SRCDIR}/display/dc/dce100 \
 	${SRCDIR}/display/dc/dce110 \
@@ -532,6 +533,11 @@ SRCS+=	dcn303_hwseq.c \
 	irq_service_dcn303.c \
 	dmub_dcn303.c
 
+# display/dc/clk_mgr/dcn31
+SRCS+=	dcn31_smu.c \
+	dcn31_clk_mgr.c
+
+
 # display/dc/core
 SRCS+=	dc_vm_helper.c
 
@@ -925,6 +931,8 @@ CWARNFLAGS.dcn302_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn302_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn303_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn303_resource.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn31_clk_mgr.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn31_smu.c=			-Wno-missing-prototypes
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
