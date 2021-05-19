@@ -544,6 +544,8 @@ SRCS+=	dcn31_smu.c \
 	dcn31_hubp.c \
 	dcn31_hubbub.c \
 	dcn31_optc.c \
+	dcn31_panel_cntl.c \
+	dcn31_resource.c \
 	display_mode_vba_31.c \
 	display_rq_dlg_calc_31.c \
 	dmub_dcn31.c \
@@ -784,24 +786,25 @@ CFLAGS.dcn20_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn21_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn30_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn301_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn31_resource.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_mode_lib.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_20.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_21.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_30.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_mode_vba_31.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_pipe_clocks.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml1_display_rq_dlg_calc.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_helpers.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_20.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_21.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-missing-prototypes
-CFLAGS.display_rq_dlg_calc_31.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.soc_bounding_box.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_rq_dlg_calc_20v2.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_20v2.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_30.c= ${FPUFLAGS} -mstack-alignment=4
-CFLAGS.display_rq_dlg_calc_31.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_rq_dlg_calc_31.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-unused-but-set-variable
 
 CFLAGS.rc_calc.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.rc_calc_dpi.c= ${FPUFLAGS} -mstack-alignment=4
@@ -944,9 +947,13 @@ CWARNFLAGS.dcn302_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn302_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn303_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn303_resource.c=		-Wno-initializer-overrides
-CWARNFLAGS.dcn31_clk_mgr.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn31_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types
 CWARNFLAGS.dcn31_dccg.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn31_dio_link_encoder.c=	-Wno-missing-prototypes
+CWARNFLAGS.dcn31_hwseq.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dcn31_init.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn31_panel_cntl.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn31_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dcn31_smu.c=			-Wno-missing-prototypes
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
