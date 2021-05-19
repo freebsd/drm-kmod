@@ -88,6 +88,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn30 \
 	${SRCDIR}/display/dc/irq/dcn302 \
 	${SRCDIR}/display/dc/irq/dcn303 \
+	${SRCDIR}/display/dc/irq/dcn31 \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
@@ -545,7 +546,8 @@ SRCS+=	dcn31_smu.c \
 	dcn31_optc.c \
 	display_mode_vba_31.c \
 	display_rq_dlg_calc_31.c \
-	dmub_dcn31.c
+	dmub_dcn31.c \
+	irq_service_dcn31.c
 
 # display/dc/core
 SRCS+=	dc_vm_helper.c
@@ -958,6 +960,7 @@ CWARNFLAGS.irq_service_dcn10.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn20.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn21.c=		-Wno-missing-prototypes -Wno-unused-const-variable -Wno-initializer-overrides
 CWARNFLAGS.irq_service_dcn30.c=		-Wno-missing-prototypes -Wno-unused-const-variable
+CWARNFLAGS.irq_service_dcn31.c=		-Wno-missing-prototypes
 CWARNFLAGS.power_helpers.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes
