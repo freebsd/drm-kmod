@@ -539,6 +539,7 @@ SRCS+=	dcn31_smu.c \
 	dcn31_clk_mgr.c \
 	dcn31_dccg.c \
 	dcn31_dio_link_encoder.c \
+	dcn31_optc.c \
 	dmub_dcn31.c
 
 # display/dc/core
