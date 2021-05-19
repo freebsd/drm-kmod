@@ -543,6 +543,8 @@ SRCS+=	dcn31_smu.c \
 	dcn31_dio_link_encoder.c \
 	dcn31_hubp.c \
 	dcn31_hubbub.c \
+	dcn31_hwseq.c \
+	dcn31_init.c \
 	dcn31_optc.c \
 	dcn31_panel_cntl.c \
 	dcn31_resource.c \
