@@ -53,6 +53,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn301 \
 	${SRCDIR}/display/dc/dcn302 \
 	${SRCDIR}/display/dc/dcn303 \
+	${SRCDIR}/display/dc/dcn31 \
 	${SRCDIR}/display/dc/dsc \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
@@ -536,6 +537,7 @@ SRCS+=	dcn303_hwseq.c \
 # display/dc/clk_mgr/dcn31
 SRCS+=	dcn31_smu.c \
 	dcn31_clk_mgr.c \
+	dcn31_dccg.c \
 	dmub_dcn31.c
 
 # display/dc/core
@@ -932,6 +934,7 @@ CWARNFLAGS.dcn302_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn303_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn303_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn31_clk_mgr.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn31_dccg.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn31_smu.c=			-Wno-missing-prototypes
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
