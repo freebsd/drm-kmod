@@ -1799,7 +1799,7 @@ void drm_fb_helper_fill_info(struct fb_info *info,
 
 	info->par = fb_helper;
 #ifdef __linux__
-	snprintf(info->fix.id, sizeof(info->fix.id), "%sdrmfb",
+	snprintf(info->fix.id, sizeof(info->fix.id), "%s",
 		 fb_helper->dev->driver->name);
 #endif
 
