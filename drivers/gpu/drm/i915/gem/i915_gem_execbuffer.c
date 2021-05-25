@@ -1489,7 +1489,7 @@ static int eb_relocate_vma(struct i915_execbuffer *eb, struct i915_vma *vma)
 	struct drm_i915_gem_relocation_entry stack[N_RELOC(512)];
 	struct drm_i915_gem_relocation_entry __user *urelocs;
 	const struct drm_i915_gem_exec_object2 *entry = exec_entry(eb, vma);
-	unsigned int remain;
+	uintmax_t remain;
 
 	urelocs = u64_to_user_ptr(entry->relocs_ptr);
 	remain = entry->relocation_count;

@@ -23,7 +23,9 @@
  * Rob Clark <robdclark@gmail.com>
  */
 
+#ifndef	DEBUG
 #define DEBUG /* for pr_debug() */
+#endif
 
 #ifdef __FreeBSD__
 #include <machine/stdarg.h>

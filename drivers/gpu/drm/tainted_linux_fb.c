@@ -1006,7 +1006,9 @@ tainted_cfb_copyarea(struct linux_fb_info *p, const struct fb_copyarea *area)
 	}
 }
 
+#ifndef DEBUG
 #define DEBUG
+#endif
 
 #ifdef DEBUG
 #define DPRINTK(fmt, args...) printk(KERN_DEBUG "%s: " fmt,__func__,## args)
