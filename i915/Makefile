@@ -10,7 +10,6 @@ KMOD=	i915kms
 SRCS=	\
 	dma_resv_utils.c \
 	i915_active.c \
-	i915_buddy.c \
 	i915_cmd_parser.c \
 	i915_config.c \
 	i915_drv.c \
@@ -73,6 +72,7 @@ SRCS=	\
 	intel_pm.c \
 	intel_psr.c \
 	intel_quirks.c \
+	intel_region_ttm.c \
 	intel_runtime_pm.c \
 	intel_sideband.c \
 	intel_step.c \

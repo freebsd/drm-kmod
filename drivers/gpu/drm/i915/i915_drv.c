@@ -84,6 +84,7 @@
 #include "intel_gvt.h"
 #include "intel_memory_region.h"
 #include "intel_pm.h"
+#include "intel_region_ttm.h"
 #include "intel_sideband.h"
 #include "vlv_suspend.h"
 
@@ -367,6 +368,10 @@ static int i915_driver_early_probe(struct drm_i915_private *dev_priv)
 	if (ret < 0)
 		goto err_workqueues;
 
+	ret = intel_region_ttm_device_init(dev_priv);
+	if (ret)
+		goto err_ttm;
+
 	intel_wopcm_init_early(&dev_priv->wopcm);
 
 	intel_gt_init_early(&dev_priv->gt, dev_priv);
@@ -391,6 +396,8 @@ static int i915_driver_early_probe(struct drm_i915_private *dev_priv)
 err_gem:
 	i915_gem_cleanup_early(dev_priv);
 	intel_gt_driver_late_release(&dev_priv->gt);
+	intel_region_ttm_device_fini(dev_priv);
+err_ttm:
 	vlv_suspend_cleanup(dev_priv);
 err_workqueues:
 	i915_workqueues_cleanup(dev_priv);
@@ -408,6 +415,7 @@ static void i915_driver_late_release(struct drm_i915_private *dev_priv)
 	intel_power_domains_cleanup(dev_priv);
 	i915_gem_cleanup_early(dev_priv);
 	intel_gt_driver_late_release(&dev_priv->gt);
+	intel_region_ttm_device_fini(dev_priv);
 	vlv_suspend_cleanup(dev_priv);
 	i915_workqueues_cleanup(dev_priv);
 

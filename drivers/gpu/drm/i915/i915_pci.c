@@ -1243,6 +1243,7 @@ MODULE_LICENSE("GPL and additional rights");
 LKPI_DRIVER_MODULE(i915kms, i915_init, i915_exit);
 LKPI_PNP_INFO(pci, i915kms, pciidlist);
 MODULE_DEPEND(i915kms, drmn, 2, 2, 2);
+MODULE_DEPEND(amdgpu, ttm, 1, 1, 1);
 MODULE_DEPEND(i915kms, agp, 1, 1, 1);
 MODULE_DEPEND(i915kms, linuxkpi, 1, 1, 1);
 MODULE_DEPEND(i915kms, linuxkpi_gplv2, 1, 1, 1);
