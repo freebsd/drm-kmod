@@ -10,6 +10,7 @@
 
 #ifdef __FreeBSD__
 #include <linux/wait_bit.h>
+#include <linux/llist.h>
 #endif
 
 #include "gt/intel_engine_pm.h"
@@ -130,6 +131,47 @@ static inline void debug_active_assert(struct i915_active *ref) { }
 
 #endif
 
+#if defined(__FreeBSD__)
+static struct llist_head linux_kmem_cache_async_list = LLIST_HEAD_INIT();
+static struct llist_head linux_kmem_cache_addr_async_list = LLIST_HEAD_INIT();
+
+static void
+linux_kmem_cache_free_async_fn(struct irq_work *irqw)
+{
+	struct llist_node *freed_cache, *freed_addr;
+
+	while ((freed_cache = llist_del_first(&linux_kmem_cache_async_list)) != NULL &&
+		(freed_addr = llist_del_first(&linux_kmem_cache_addr_async_list)) != NULL)
+		kmem_cache_free((struct linux_kmem_cache*) freed_cache, freed_addr);
+}
+static DEFINE_IRQ_WORK(linux_kmem_cache_free_async_work,
+	linux_kmem_cache_free_async_fn);
+
+static void
+linux_kmem_cache_free_async(struct linux_kmem_cache *c, void *m)
+{
+	if (m == NULL)
+		return;
+
+	llist_add((void*) c, &linux_kmem_cache_async_list);
+	llist_add(m, &linux_kmem_cache_addr_async_list);
+	irq_work_queue(&linux_kmem_cache_free_async_work);
+}
+
+/*
+ * Critical section-friendly version of kmem_cache_free().
+ * Requires knowledge of the allocation size at build time.
+ */
+#define	KMEM_CACHE_FREE(cache, addr)	do {				\
+	BUILD_BUG_ON(sizeof(*(addr)) < sizeof(struct llist_node));	\
+	if (curthread->td_critnest != 0)				\
+		linux_kmem_cache_free_async(cache, addr);		\
+	else								\
+		kmem_cache_free(cache, addr);				\
+} while (0);
+
+#endif
+
 static void
 __active_retire(struct i915_active *ref)
 {
@@ -162,7 +204,11 @@ __active_retire(struct i915_active *ref)
 
 	rbtree_postorder_for_each_entry_safe(it, n, &root, node) {
 		GEM_BUG_ON(i915_active_fence_isset(&it->base));
+#if defined(__FreeBSD__)
+		KMEM_CACHE_FREE(global.slab_cache, it);
+#else
 		kmem_cache_free(global.slab_cache, it);
+#endif
 	}
 }
 
