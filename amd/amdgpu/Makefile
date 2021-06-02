@@ -535,8 +535,8 @@ SRCS+=	dcn303_hwseq.c \
 
 # display/dc/clk_mgr/dcn31
 SRCS+=	dcn31_smu.c \
-	dcn31_clk_mgr.c
-
+	dcn31_clk_mgr.c \
+	dmub_dcn31.c
 
 # display/dc/core
 SRCS+=	dc_vm_helper.c
