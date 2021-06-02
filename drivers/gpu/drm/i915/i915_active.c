@@ -132,17 +132,22 @@ static inline void debug_active_assert(struct i915_active *ref) { }
 #endif
 
 #if defined(__FreeBSD__)
-static struct llist_head linux_kmem_cache_async_list = LLIST_HEAD_INIT();
-static struct llist_head linux_kmem_cache_addr_async_list = LLIST_HEAD_INIT();
+static struct llist_head linux_kmem_cache_list = LLIST_HEAD_INIT();
+
+struct cache_addr {
+	struct linux_kmem_cache *cache;
+	struct llist_node *next;
+};
 
 static void
 linux_kmem_cache_free_async_fn(struct irq_work *irqw)
 {
-	struct llist_node *freed_cache, *freed_addr;
+	struct llist_node *freed_addr;
 
-	while ((freed_cache = llist_del_first(&linux_kmem_cache_async_list)) != NULL &&
-		(freed_addr = llist_del_first(&linux_kmem_cache_addr_async_list)) != NULL)
-		kmem_cache_free((struct linux_kmem_cache*) freed_cache, freed_addr);
+	while ((freed_addr = llist_del_first(&linux_kmem_cache_list)) != NULL) {
+		struct cache_addr *caddr = (struct cache_addr *) freed_addr;
+		kmem_cache_free(caddr->cache, freed_addr);
+	}
 }
 static DEFINE_IRQ_WORK(linux_kmem_cache_free_async_work,
 	linux_kmem_cache_free_async_fn);
@@ -150,11 +155,14 @@ static DEFINE_IRQ_WORK(linux_kmem_cache_free_async_work,
 static void
 linux_kmem_cache_free_async(struct linux_kmem_cache *c, void *m)
 {
+	struct cache_addr *ca = (struct cache_addr *)m;
+
 	if (m == NULL)
 		return;
 
-	llist_add((void*) c, &linux_kmem_cache_async_list);
-	llist_add(m, &linux_kmem_cache_addr_async_list);
+	ca->cache = c;
+
+	llist_add((void *)m, &linux_kmem_cache_list);
 	irq_work_queue(&linux_kmem_cache_free_async_work);
 }
 
