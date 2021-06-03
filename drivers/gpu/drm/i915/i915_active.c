@@ -136,7 +136,7 @@ static struct llist_head linux_kmem_cache_list = LLIST_HEAD_INIT();
 
 struct cache_addr {
 	struct linux_kmem_cache *cache;
-	struct llist_node *next;
+	struct llist_node *member;
 };
 
 static void
@@ -145,8 +145,8 @@ linux_kmem_cache_free_async_fn(struct irq_work *irqw)
 	struct llist_node *freed_addr;
 
 	while ((freed_addr = llist_del_first(&linux_kmem_cache_list)) != NULL) {
-		struct cache_addr *caddr = (struct cache_addr *) freed_addr;
-		kmem_cache_free(caddr->cache, freed_addr);
+		struct cache_addr *c = container_of(&freed_addr, struct cache_addr, member);
+		kmem_cache_free(c->cache, freed_addr);
 	}
 }
 static DEFINE_IRQ_WORK(linux_kmem_cache_free_async_work,
@@ -162,7 +162,7 @@ linux_kmem_cache_free_async(struct linux_kmem_cache *c, void *m)
 
 	ca->cache = c;
 
-	llist_add((void *)m, &linux_kmem_cache_list);
+	llist_add(ca->member, &linux_kmem_cache_list);
 	irq_work_queue(&linux_kmem_cache_free_async_work);
 }
 
@@ -171,7 +171,9 @@ linux_kmem_cache_free_async(struct linux_kmem_cache *c, void *m)
  * Requires knowledge of the allocation size at build time.
  */
 #define	KMEM_CACHE_FREE(cache, addr)	do {				\
-	BUILD_BUG_ON(sizeof(*(addr)) < sizeof(struct llist_node));	\
+	BUILD_BUG_ON(sizeof(*(addr)) < sizeof(struct cache_addr));	\
+	KASSERT(unlikely(cache->cache_flags & SLAB_TYPESAFE_BY_RCU),	\
+	    "RCU cache has been passed in");				\
 	if (curthread->td_critnest != 0)				\
 		linux_kmem_cache_free_async(cache, addr);		\
 	else								\
