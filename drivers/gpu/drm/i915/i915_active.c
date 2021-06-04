@@ -135,8 +135,8 @@ static inline void debug_active_assert(struct i915_active *ref) { }
 static struct llist_head linux_kmem_cache_list = LLIST_HEAD_INIT();
 
 struct cache_addr {
+	struct llist_node member;
 	struct linux_kmem_cache *cache;
-	struct llist_node *member;
 };
 
 static void
@@ -145,8 +145,8 @@ linux_kmem_cache_free_async_fn(struct irq_work *irqw)
 	struct llist_node *freed_addr;
 
 	while ((freed_addr = llist_del_first(&linux_kmem_cache_list)) != NULL) {
-		struct cache_addr *c = container_of(&freed_addr, struct cache_addr, member);
-		kmem_cache_free(c->cache, freed_addr);
+		struct cache_addr *c = container_of(freed_addr, struct cache_addr, member);
+		kmem_cache_free(c->cache, c);
 	}
 }
 static DEFINE_IRQ_WORK(linux_kmem_cache_free_async_work,
@@ -162,7 +162,7 @@ linux_kmem_cache_free_async(struct linux_kmem_cache *c, void *m)
 
 	ca->cache = c;
 
-	llist_add(ca->member, &linux_kmem_cache_list);
+	llist_add(&ca->member, &linux_kmem_cache_list);
 	irq_work_queue(&linux_kmem_cache_free_async_work);
 }
 
