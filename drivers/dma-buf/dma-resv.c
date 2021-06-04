@@ -232,6 +232,7 @@ void dma_resv_reset_shared_max(struct dma_resv *obj)
 		fence->shared_max = fence->shared_count;
 	}
 }
+EXPORT_SYMBOL(dma_resv_reset_shared_max);
 #endif
 
 /**
