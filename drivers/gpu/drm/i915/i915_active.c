@@ -172,7 +172,7 @@ linux_kmem_cache_free_async(struct linux_kmem_cache *c, void *m)
  */
 #define	KMEM_CACHE_FREE(cache, addr)	do {				\
 	BUILD_BUG_ON(sizeof(*(addr)) < sizeof(struct cache_addr));	\
-	KASSERT(unlikely(cache->cache_flags & SLAB_TYPESAFE_BY_RCU),	\
+	WARN(unlikely(cache->cache_flags & SLAB_TYPESAFE_BY_RCU),	\
 	    "RCU cache has been passed in");				\
 	if (curthread->td_critnest != 0)				\
 		linux_kmem_cache_free_async(cache, addr);		\
