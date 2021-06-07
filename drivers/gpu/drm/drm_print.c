@@ -330,7 +330,7 @@ void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 	struct va_format vaf;
 	va_list args;
 
-	if (!(drm_debug & category))
+	if (!drm_debug_enabled(category))
 		return;
 
 	va_start(args, format);
@@ -371,7 +371,7 @@ void drm_dbg(enum drm_debug_category category, const char *function_name,
 	struct va_format vaf;
 	va_list args;
 
-	if (!(drm_debug & category))
+	if (!drm_debug_enabled(category))
 		return;
 
 	va_start(args, format);
@@ -412,7 +412,7 @@ void __drm_err(const char *format, ...)
 }
 EXPORT_SYMBOL(drm_err);
 #elif defined(__FreeBSD__)
-void drm_err(const char *function_name, const char *format, ...)
+void drm_errk(const char *function_name, const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
