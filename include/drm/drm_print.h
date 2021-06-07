@@ -371,8 +371,11 @@ void drm_errk(const char *function_name, const char *format, ...);
 #define drm_err(drm, fmt, ...)					\
 	drm_dev_printk(drm->dev, KERN_ERR, __func__, "*ERROR* " fmt, ##__VA_ARGS__)
 
+#define drm_info(drm, fmt, ...)					\
+	drm_dev_printk(drm->dev, KERN_INFO, __func__, fmt, ##__VA_ARGS__)
+
 #define drm_dbg_kms(drm, fmt, ...)					\
-	drm_dev_dbg((drm)->dev, DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
+	drm_dev_dbg(drm->dev, DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
 
 #define DRM_DEV_ERROR(dev, fmt, ...)					\
 	drm_dev_printk(dev, KERN_ERR, __func__, "*ERROR* " fmt, ##__VA_ARGS__)
@@ -409,6 +412,9 @@ void drm_errk(const char *function_name, const char *format, ...);
 
 #define DRM_DEBUG_LEASE(fmt, ...)					\
 	drm_dbg(DRM_UT_LEASE, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEBUG_VBL(fmt, ...)					\
+	drm_dbg(DRM_UT_VBL, __func__, fmt, ##__VA_ARGS__)
 
 #endif
 
