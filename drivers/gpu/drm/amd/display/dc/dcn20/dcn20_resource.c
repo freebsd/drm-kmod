@@ -3091,11 +3091,7 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 restore_dml_state:
 	context->bw_ctx.dml.soc.dram_clock_change_latency_us = p_state_latency_us;
 
-#ifdef __FreeBSD__
-	kernel_fpu_end();
-#endif
 	DC_FP_END();
->>>>>>> amdgpu: Wrap FPU dependent functions in dc20
 	return voltage_supported;
 }
 
@@ -3908,10 +3904,6 @@ static bool dcn20_resource_construct(
 		dc->caps.planes[i] = plane_cap;
 
 	dc->cap_funcs = cap_funcs;
-
-#ifdef __FreeBSD__
-	kernel_fpu_end();
-#endif
 
 	if (dc->ctx->dc_bios->fw_info.oem_i2c_present) {
 		ddc_init_data.ctx = dc->ctx;
