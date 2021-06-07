@@ -881,7 +881,8 @@ struct file *mock_drm_getfile(struct drm_minor *minor, unsigned int flags)
 	}
 
 	/* Everyone shares a single global address space */
-	file->f_mapping = dev->anon_inode->i_mapping;
+	// TODO: Enable file mapping
+	//file->f_mapping = dev->anon_inode->i_mapping;
 
 	drm_dev_get(dev);
 	priv->filp = file;
