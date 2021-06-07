@@ -90,13 +90,19 @@ struct amdgpu_prt_cb {
 static inline void amdgpu_vm_eviction_lock(struct amdgpu_vm *vm)
 {
 	mutex_lock(&vm->eviction_lock);
+#ifdef __linux__
 	vm->saved_flags = memalloc_nofs_save();
+// FreeBSD: we might need this when we add MMU notifiers?
+#endif
 }
 
 static inline int amdgpu_vm_eviction_trylock(struct amdgpu_vm *vm)
 {
 	if (mutex_trylock(&vm->eviction_lock)) {
+#ifdef __linux__
 		vm->saved_flags = memalloc_nofs_save();
+// FreeBSD: we might need this when we add MMU notifiers?
+#endif
 		return 1;
 	}
 	return 0;
@@ -104,7 +110,10 @@ static inline int amdgpu_vm_eviction_trylock(struct amdgpu_vm *vm)
 
 static inline void amdgpu_vm_eviction_unlock(struct amdgpu_vm *vm)
 {
+#ifdef __linux__
 	memalloc_nofs_restore(vm->saved_flags);
+// FreeBSD: we might need this when we add MMU notifiers?
+#endif
 	mutex_unlock(&vm->eviction_lock);
 }
 
