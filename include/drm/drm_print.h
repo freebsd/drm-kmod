@@ -355,27 +355,7 @@ void drm_dbg(enum drm_debug_category category, const char *function_name,
 __printf(2, 3)
 void drm_err(const char *function_name, const char *format, ...);
 #endif
-/* Macros to make printk easier */
 
-#define _DRM_PRINTK(once, level, fmt, ...)				\
-	printk##once(KERN_##level "[" DRM_NAME "] " fmt, ##__VA_ARGS__)
-
-#define DRM_INFO(fmt, ...)						\
-	_DRM_PRINTK(, INFO, fmt, ##__VA_ARGS__)
-#define DRM_NOTE(fmt, ...)						\
-	_DRM_PRINTK(, NOTICE, fmt, ##__VA_ARGS__)
-#define DRM_WARN(fmt, ...)						\
-	_DRM_PRINTK(, WARNING, fmt, ##__VA_ARGS__)
-
-#define DRM_INFO_ONCE(fmt, ...)						\
-	_DRM_PRINTK(_once, INFO, fmt, ##__VA_ARGS__)
-#define DRM_NOTE_ONCE(fmt, ...)						\
-	_DRM_PRINTK(_once, NOTICE, fmt, ##__VA_ARGS__)
-#define DRM_WARN_ONCE(fmt, ...)						\
-	_DRM_PRINTK(_once, WARNING, fmt, ##__VA_ARGS__)
-
-=======
->>>>>>> drm/print: group logging functions by prink or device based
 /**
  * Error output.
  *
@@ -498,7 +478,6 @@ void drm_err(const char *function_name, const char *format, ...);
 #define drm_dbg_dp(drm, fmt, ...)					\
 	drm_dev_dbg((drm)->dev, DRM_UT_DP, fmt, ##__VA_ARGS__)
 
-
 /*
  * printk based logging
  *
@@ -597,5 +576,7 @@ void __drm_err(const char *format, ...);
 #define drm_WARN_ON_ONCE(drm, x)					\
 	drm_WARN_ONCE((drm), (x), "%s",					\
 		      "drm_WARN_ON_ONCE(" __stringify(x) ")")
+
+#endif
 
 #endif /* DRM_PRINT_H_ */
