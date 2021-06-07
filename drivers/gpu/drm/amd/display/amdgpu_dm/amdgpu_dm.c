@@ -92,6 +92,10 @@
 #include "modules/power/power_helpers.h"
 #include "modules/inc/mod_info_packet.h"
 
+#ifdef __FreeBSD__
+#define strscpy strlcpy
+#endif
+
 #define FIRMWARE_RENOIR_DMUB "amdgpu/renoir_dmcub.bin"
 MODULE_FIRMWARE(FIRMWARE_RENOIR_DMUB);
 
