@@ -571,8 +571,15 @@ struct drm_dp_mst_topology_mgr {
 	struct mutex lock;
 
 	/**
-	 * @mst_state: If this manager is enabled for an MST capable port.
-	 * False if no MST sink/branch devices is connected.
+	 * @probe_lock: Prevents @work and @up_req_work, the only writers of
+	 * &drm_dp_mst_port.mstb and &drm_dp_mst_branch.ports, from racing
+	 * while they update the topology.
+	 */
+	struct mutex probe_lock;
+
+	/**
+	 * @mst_state: If this manager is enabled for an MST capable port. False
+	 * if no MST sink/branch devices is connected.
 	 */
 	bool mst_state : 1;
 

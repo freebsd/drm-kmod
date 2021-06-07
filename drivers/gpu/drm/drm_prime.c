@@ -259,7 +259,9 @@ struct dma_buf *drm_gem_dmabuf_export(struct drm_device *dev,
 
 	drm_dev_get(dev);
 	drm_gem_object_get(obj);
+#ifdef __linux__
 	dma_buf->file->f_mapping = obj->dev->anon_inode->i_mapping;
+#endif
 
 	return dma_buf;
 }

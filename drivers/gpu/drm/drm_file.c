@@ -38,6 +38,9 @@
 #include <linux/pci.h>
 #include <linux/poll.h>
 #include <linux/slab.h>
+#ifdef __FreeBSD__
+#include <linux/capability.h>
+#endif
 
 #include <drm/drm_client.h>
 #include <drm/drm_drv.h>
@@ -877,7 +880,9 @@ struct file *mock_drm_getfile(struct drm_minor *minor, unsigned int flags)
 	}
 
 	/* Everyone shares a single global address space */
+#ifdef __linux__
 	file->f_mapping = dev->anon_inode->i_mapping;
+#endif
 
 	drm_dev_get(dev);
 	priv->filp = file;
