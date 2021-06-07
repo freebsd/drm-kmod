@@ -1806,7 +1806,7 @@ static void vcn_v1_0_idle_work_handler(struct work_struct *work)
 	}
 }
 
-void vcn_v1_0_ring_begin_use(struct amdgpu_ring *ring)
+static void vcn_v1_0_ring_begin_use(struct amdgpu_ring *ring)
 {
 	struct amdgpu_device *adev = ring->adev;
 	bool set_clocks = !cancel_delayed_work_sync(&adev->vcn.idle_work);
