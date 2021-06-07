@@ -45,6 +45,11 @@ trace_drm_sched_process_job(void *s_fence) {
 	CTR1(KTR_DRM, "drm_process_sched_job %p", s_fence);
 }
 
+static inline void
+trace_drm_run_job(void *run_job, void *entity) {
+	CTR2(KTR_DRM, "drm_run_job %p, entity %p", run_job, entity);
+}
+
 #else
 
 #undef TRACE_SYSTEM
