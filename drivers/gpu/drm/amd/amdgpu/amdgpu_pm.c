@@ -71,7 +71,6 @@ static const struct cg_flag_name clocks[] = {
 	{AMD_CG_SUPPORT_ATHUB_LS, "Address Translation Hub Light Sleep"},
 	{0, NULL},
 };
-#endif
 
 static const struct hwmon_temp_label {
 	enum PP_HWMON_TEMP channel;
