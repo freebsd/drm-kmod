@@ -353,7 +353,7 @@ __printf(3, 4)
 void drm_dbg(enum drm_debug_category category, const char *function_name,
 	     const char *format, ...);
 __printf(2, 3)
-void drm_err(const char *function_name, const char *format, ...);
+void drm_errk(const char *function_name, const char *format, ...);
 #endif
 
 /**
@@ -368,11 +368,47 @@ void drm_err(const char *function_name, const char *format, ...);
 
 #elif defined(__FreeBSD__)
 
+#define drm_err(drm, fmt, ...)					\
+	drm_dev_printk(drm->dev, KERN_ERR, __func__, "*ERROR* " fmt, ##__VA_ARGS__)
+
+#define drm_dbg_kms(drm, fmt, ...)					\
+	drm_dev_dbg((drm)->dev, DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
+
 #define DRM_DEV_ERROR(dev, fmt, ...)					\
-	drm_dev_printk(dev, KERN_ERR, "*ERROR* ", __func__, fmt, ##__VA_ARGS__)
+	drm_dev_printk(dev, KERN_ERR, __func__, "*ERROR* " fmt, ##__VA_ARGS__)
 
 #define DRM_ERROR(fmt, ...)			\
-	drm_err(__func__, fmt, ##__VA_ARGS__)
+	drm_errk(__func__, fmt, ##__VA_ARGS__)
+
+#define DRM_INFO(fmt, ...)			\
+	printk(KERN_INFO "[" DRM_NAME "] " fmt, ##__VA_ARGS__)
+
+#define DRM_NOTE(fmt, ...)			\
+	printk(KERN_NOTICE "[" DRM_NAME "] " fmt, ##__VA_ARGS__)
+
+#define DRM_DEBUG(fmt, ...)					\
+	drm_dbg(DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEBUG_ATOMIC(fmt, ...)					\
+	drm_dbg(DRM_UT_ATOMIC, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEBUG_DP(fmt, ...)					\
+	drm_dbg(DRM_UT_DP, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEBUG_KMS(fmt, ...)					\
+	drm_dbg(DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEBUG_KMS_RATELIMITED(fmt, ...)				\
+({									\
+	static DEFINE_RATELIMIT_STATE(_rs,				\
+				      DEFAULT_RATELIMIT_INTERVAL,       \
+				      DEFAULT_RATELIMIT_BURST);         \
+	if (__ratelimit(&_rs))						\
+		drm_dbg(DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__);	\
+})
+
+#define DRM_DEBUG_LEASE(fmt, ...)					\
+	drm_dbg(DRM_UT_LEASE, __func__, fmt, ##__VA_ARGS__)
 
 #endif
 
@@ -393,7 +429,7 @@ void drm_err(const char *function_name, const char *format, ...);
 })
 
 #define DRM_DEV_INFO(dev, fmt, ...)				\
-	drm_dev_printk(dev, KERN_INFO, fmt, ##__VA_ARGS__)
+	drm_dev_printk(dev, KERN_INFO, __func__, fmt, ##__VA_ARGS__)
 
 #define DRM_DEV_INFO_ONCE(dev, fmt, ...)				\
 ({									\
