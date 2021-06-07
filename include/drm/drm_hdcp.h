@@ -288,6 +288,8 @@ struct hdcp_srm_header {
 struct drm_device;
 struct drm_connector;
 
+#ifdef __linux__
+
 int drm_hdcp_check_ksvs_revoked(struct drm_device *dev,
 				u8 *ksvs, u32 ksv_count);
 int drm_connector_attach_content_protection_property(
