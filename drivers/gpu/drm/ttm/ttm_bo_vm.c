@@ -443,7 +443,7 @@ retry:
 			vm_page_valid(page);
 		}
 		pmap_page_set_memattr(page,
-		    pgprot2cachemode(cvma.vm_page_prot));
+		    pgprot2cachemode(vma->vm_page_prot));
 		vma->vm_pfn_count++;
 		continue;
 fail:
@@ -460,9 +460,9 @@ out_io_unlock:
 EXPORT_SYMBOL(ttm_bo_vm_fault_reserved);
 
 #ifdef __linux__
-static vm_fault_t ttm_bo_vm_fault(struct vm_fault *vmf)
+vm_fault_t ttm_bo_vm_fault(struct vm_fault *vmf)
 #elif defined (__FreeBSD__)
-static vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
+vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 #endif
 {
 	struct vm_area_struct *vma = vmf->vma;
