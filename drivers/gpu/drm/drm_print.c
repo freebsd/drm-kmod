@@ -279,7 +279,7 @@ void drm_dev_printk(const struct device *dev, const char *level,
 }
 EXPORT_SYMBOL(drm_dev_printk);
 #elif defined(__FreeBSD__)
-void drm_dev_printk(const struct device *dev, const char *level,
+void _drm_dev_printk(const struct device *dev, const char *level,
 		    const char *function_name, const char *format, ...)
 {
 	struct va_format vaf;
@@ -295,6 +295,7 @@ void drm_dev_printk(const struct device *dev, const char *level,
 	vprintf(format, args);
 	va_end(args);
 }
+EXPORT_SYMBOL(_drm_dev_printk);
 #endif
 
 #ifdef __linux__
@@ -322,13 +323,13 @@ void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 }
 EXPORT_SYMBOL(drm_dev_dbg);
 #elif defined(__FreeBSD__)
-void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
+void _drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 		 const char *function_name, const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
 
-	if (!(drm_debug & category))
+	if (!(__drm_debug & category))
 		return;
 
 	va_start(args, format);
@@ -361,15 +362,15 @@ void __drm_dbg(enum drm_debug_category category, const char *format, ...)
 
 	va_end(args);
 }
-EXPORT_SYMBOL(drm_dbg);
+EXPORT_SYMBOL(__drm_dbg);
 #elif defined(__FreeBSD__)
-void drm_dbg(enum drm_debug_category category, const char *function_name,
+void ___drm_dbg(enum drm_debug_category category, const char *function_name,
 	     const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
 
-	if (!(drm_debug & category))
+	if (!(__drm_debug & category))
 		return;
 
 	va_start(args, format);
@@ -388,12 +389,10 @@ void drm_dbg(enum drm_debug_category category, const char *function_name,
 
 	va_end(args);
 }
+EXPORT_SYMBOL(___drm_dbg);
 #endif
 
 #ifdef __linux__
-void drm_err(const char *format, ...)
-EXPORT_SYMBOL(__drm_dbg);
-
 void __drm_err(const char *format, ...)
 {
 	struct va_format vaf;
@@ -408,9 +407,9 @@ void __drm_err(const char *format, ...)
 
 	va_end(args);
 }
-EXPORT_SYMBOL(drm_err);
+EXPORT_SYMBOL(__drm_err);
 #elif defined(__FreeBSD__)
-void drm_err(const char *function_name, const char *format, ...)
+void ___drm_err(const char *function_name, const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -431,8 +430,8 @@ void drm_err(const char *function_name, const char *format, ...)
 
 	va_end(args);
 }
+EXPORT_SYMBOL(___drm_err);
 #endif
-EXPORT_SYMBOL(__drm_err);
 
 #ifdef CONFIG_DEBUGSFS
 /**
