@@ -41,6 +41,7 @@
 #include "hwmgr.h"
 #define WIDTH_4K 3840
 
+#ifdef __linux__
 static const struct cg_flag_name clocks[] = {
 	{AMD_CG_SUPPORT_GFX_MGCG, "Graphics Medium Grain Clock Gating"},
 	{AMD_CG_SUPPORT_GFX_MGLS, "Graphics Medium Grain memory Light Sleep"},
