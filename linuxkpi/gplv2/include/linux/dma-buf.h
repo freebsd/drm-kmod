@@ -125,6 +125,7 @@ struct dma_buf {
 
 struct dma_buf_attachment {
 	struct dma_buf *dmabuf;
+	struct drm_gem_object *importer_priv;
 	struct device *dev;
 	struct list_head node;
 	void *priv;
