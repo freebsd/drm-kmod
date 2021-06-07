@@ -1282,10 +1282,13 @@ bool dcn_validate_bandwidth(
 		return true;
 	else
 		return false;
-#else
+#elif defined(__FreeBSD__)
 	PERFORMANCE_TRACE_END();
-	bool ret = bw_limit_pass && v->voltage_level != 5;
-	kernel_fpu_end();
+	BW_VAL_TRACE_FINISH();
+
+	bool ret = bw_limit_pass && v->voltage_level <= get_highest_allowed_voltage_level(dc->ctx->asic_id.hw_internal_rev);
+	DC_FP_END();
+
 	return ret;
 #endif
 }
@@ -1387,11 +1390,6 @@ unsigned int dcn_find_dcfclk_suits_all(
 	unsigned vdd_level, vdd_level_temp;
 	unsigned dcf_clk;
 
-#ifdef __FreeBSD__
-	/*  FreeBSD claim access to FPU here */
-	kernel_fpu_begin();
-#endif
-
 	/*find a common supported voltage level*/
 	vdd_level = dcn_find_normalized_clock_vdd_Level(
 		dc, DM_PP_CLOCK_TYPE_DISPLAY_CLK, clocks->dispclk_khz);
@@ -1422,10 +1420,6 @@ unsigned int dcn_find_dcfclk_suits_all(
 		dcf_clk =  dc->dcn_soc->dcfclkv_mid0p72*1000;
 	else
 		dcf_clk =  dc->dcn_soc->dcfclkv_min0p65*1000;
-
-#ifdef __FreeBSD__
-	kernel_fpu_end();
-#endif
 
 	DC_LOG_BANDWIDTH_CALCS("\tdcf_clk for voltage = %d\n", dcf_clk);
 	return dcf_clk;
