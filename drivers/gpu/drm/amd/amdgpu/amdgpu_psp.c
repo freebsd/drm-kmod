@@ -1864,6 +1864,8 @@ static ssize_t psp_usbc_pd_fw_sysfs_write(struct device *dev,
 						       const char *buf,
 						       size_t count)
 {
+	return -ENOSYS;
+#ifdef notyet
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = ddev->dev_private;
 	void *cpu_addr;
@@ -1916,6 +1918,7 @@ fail:
 	}
 
 	return count;
+#endif
 }
 
 static DEVICE_ATTR(usbc_pd_fw, S_IRUGO | S_IWUSR,

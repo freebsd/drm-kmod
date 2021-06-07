@@ -271,6 +271,58 @@ static void amdgpu_dma_buf_unpin(struct dma_buf_attachment *attach)
 /**
  * amdgpu_dma_buf_map - &dma_buf_ops.map_dma_buf implementation
  * @attach: DMA-buf attachment
+ * @dir: DMA direction
+ *
+ * Makes sure that the shared DMA buffer can be accessed by the target device.
+ * For now, simply pins it to the GTT domain, where it should be accessible by
+ * all DMA devices.
+ *
+ * Returns:
+ * sg_table filled with the DMA addresses to use or ERR_PRT with negative error
+ * code.
+ */
+static struct sg_table *amdgpu_dma_buf_map(struct dma_buf_attachment *attach,
+					   enum dma_data_direction dir)
+{
+	struct dma_buf *dma_buf = attach->dmabuf;
+	struct drm_gem_object *obj = dma_buf->priv;
+	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
+	struct sg_table *sgt;
+	long r;
+
+	if (!bo->pin_count) {
+		/* move buffer into GTT */
+		struct ttm_operation_ctx ctx = { false, false };
+
+		amdgpu_bo_placement_from_domain(bo, AMDGPU_GEM_DOMAIN_GTT);
+		r = ttm_bo_validate(&bo->tbo, &bo->placement, &ctx);
+		if (r)
+			return ERR_PTR(r);
+
+	} else if (!(amdgpu_mem_type_to_domain(bo->tbo.mem.mem_type) &
+		     AMDGPU_GEM_DOMAIN_GTT)) {
+		return ERR_PTR(-EBUSY);
+	}
+
+	sgt = drm_prime_pages_to_sg(bo->tbo.ttm->pages, bo->tbo.num_pages);
+	if (IS_ERR(sgt))
+		return sgt;
+
+	if (!dma_map_sg_attrs(attach->dev, sgt->sgl, sgt->nents, dir,
+			      DMA_ATTR_SKIP_CPU_SYNC))
+		goto error_free;
+
+	return sgt;
+
+error_free:
+	sg_free_table(sgt);
+	kfree(sgt);
+	return ERR_PTR(-ENOMEM);
+}
+
+/**
+ * amdgpu_dma_buf_map - &dma_buf_ops.map_dma_buf implementation
+ * @attach: DMA-buf attachment
  *
  * Makes sure that the shared DMA buffer can be accessed by the target device.
  * For now, simply pins it to the GTT domain, where it should be accessible by
@@ -319,15 +371,17 @@ error_detach:
 }
 
 /**
- * amdgpu_dma_buf_map_detach - &dma_buf_ops.detach implementation
- * @dma_buf: Shared DMA buffer
+ * amdgpu_dma_buf_unmap - &dma_buf_ops.unmap_dma_buf implementation
  * @attach: DMA-buf attachment
+ * @sgt: sg_table to unmap
+ * @dir: DMA direction
  *
  * This is called when a shared DMA buffer no longer needs to be accessible by
  * another device. For now, simply unpins the buffer from GTT.
  */
-static void amdgpu_dma_buf_map_detach(struct dma_buf *dma_buf,
-				      struct dma_buf_attachment *attach)
+static void amdgpu_dma_buf_unmap(struct dma_buf_attachment *attach,
+				 struct sg_table *sgt,
+				 enum dma_data_direction dir)
 {
 	dma_unmap_sg(attach->dev, sgt->sgl, sgt->nents, dir);
 	sg_free_table(sgt);
@@ -377,8 +431,6 @@ static int amdgpu_dma_buf_begin_cpu_access(struct dma_buf *dma_buf,
 const struct dma_buf_ops amdgpu_dmabuf_ops = {
 	.attach = amdgpu_dma_buf_attach,
 	.detach = amdgpu_dma_buf_detach,
-	.pin = amdgpu_dma_buf_pin,
-	.unpin = amdgpu_dma_buf_unpin,
 	.map_dma_buf = amdgpu_dma_buf_map,
 	.unmap_dma_buf = amdgpu_dma_buf_unmap,
 	.release = drm_gem_dmabuf_release,
@@ -567,12 +619,16 @@ struct drm_gem_object *amdgpu_gem_prime_import(struct drm_device *dev,
 	if (IS_ERR(obj))
 		return obj;
 
+#ifdef notyet
 	attach = dma_buf_dynamic_attach(dma_buf, dev->dev,
 					&amdgpu_dma_buf_attach_ops, obj);
 	if (IS_ERR(attach)) {
 		drm_gem_object_put(obj);
 		return ERR_CAST(attach);
 	}
+#else
+	attach = NULL
+#endif
 
 	get_dma_buf(dma_buf);
 	obj->import_attach = attach;

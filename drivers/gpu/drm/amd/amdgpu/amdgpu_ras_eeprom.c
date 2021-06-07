@@ -64,9 +64,7 @@ static bool __get_eeprom_i2c_addr_arct(struct amdgpu_device *adev,
 	if (!i2c_addr || !atom_ctx)
 		return false;
 
-	if (strnstr(atom_ctx->vbios_version,
-	            "D342",
-		    sizeof(atom_ctx->vbios_version)))
+	if (strstr(atom_ctx->vbios_version, "D342"))
 		*i2c_addr = EEPROM_I2C_TARGET_ADDR_ARCTURUS_D342;
 	else
 		*i2c_addr = EEPROM_I2C_TARGET_ADDR_ARCTURUS;
