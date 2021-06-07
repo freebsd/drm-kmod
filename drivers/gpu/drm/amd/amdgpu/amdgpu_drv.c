@@ -1119,9 +1119,11 @@ retry_init:
 		goto err_pci;
 
 	adev = dev->dev_private;
+#ifdef __linux__
 	ret = amdgpu_debugfs_init(adev);
 	if (ret)
 		DRM_ERROR("Creating debugfs files failed (%d).\n", ret);
+#endif
 
 	return 0;
 
