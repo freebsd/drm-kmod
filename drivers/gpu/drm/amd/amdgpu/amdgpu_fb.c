@@ -243,7 +243,7 @@ static int amdgpufb_create(struct drm_fb_helper *helper,
 	/* setup helper */
 	rfbdev->helper.fb = fb;
 
-	info->fbops = &amdgpufb_ops;
+	info->fbops = (struct fb_ops *) &amdgpufb_ops;
 
 	tmp = amdgpu_bo_gpu_offset(abo) - adev->gmc.vram_start;
 	info->fix.smem_start = adev->gmc.aper_base + tmp;
