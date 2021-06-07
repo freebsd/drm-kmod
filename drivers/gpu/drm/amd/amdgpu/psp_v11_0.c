@@ -241,7 +241,7 @@ out:
 	return err;
 }
 
-int psp_v11_0_wait_for_bootloader(struct psp_context *psp)
+static int psp_v11_0_wait_for_bootloader(struct psp_context *psp)
 {
 	struct amdgpu_device *adev = psp->adev;
 
