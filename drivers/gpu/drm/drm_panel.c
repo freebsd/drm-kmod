@@ -201,10 +201,12 @@ int drm_panel_enable(struct drm_panel *panel)
 			return ret;
 	}
 
+#ifndef __FreeBSD__
 	ret = backlight_enable(panel->backlight);
 	if (ret < 0)
 		DRM_DEV_INFO(panel->dev, "failed to enable backlight: %d\n",
 			     ret);
+#endif
 
 	return 0;
 }
@@ -227,10 +229,12 @@ int drm_panel_disable(struct drm_panel *panel)
 	if (!panel)
 		return -EINVAL;
 
+#ifndef __FreeBSD__
 	ret = backlight_disable(panel->backlight);
 	if (ret < 0)
 		DRM_DEV_INFO(panel->dev, "failed to disable backlight: %d\n",
 			     ret);
+#endif
 
 	if (panel->funcs && panel->funcs->disable)
 		return panel->funcs->disable(panel);
@@ -302,6 +306,8 @@ struct drm_panel *of_drm_find_panel(const struct device_node *np)
 EXPORT_SYMBOL(of_drm_find_panel);
 #endif
 
+#ifndef __FreeBSD__
+
 #if IS_REACHABLE(CONFIG_BACKLIGHT_CLASS_DEVICE)
 /**
  * drm_panel_of_backlight - use backlight device node for backlight
@@ -339,6 +345,8 @@ int drm_panel_of_backlight(struct drm_panel *panel)
 	return 0;
 }
 EXPORT_SYMBOL(drm_panel_of_backlight);
+#endif
+
 #endif
 
 MODULE_AUTHOR("Thierry Reding <treding@nvidia.com>");
