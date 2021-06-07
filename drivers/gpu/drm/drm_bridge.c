@@ -31,6 +31,10 @@
 
 #include "drm_crtc_internal.h"
 
+#ifdef __FreeBSD__ /* TODO: Put in linuxkpi? */
+#define MEDIA_BUS_FMT_FIXED	0x0001
+#endif
+
 /**
  * DOC: overview
  *
