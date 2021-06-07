@@ -90,13 +90,17 @@ struct amdgpu_prt_cb {
 static inline void amdgpu_vm_eviction_lock(struct amdgpu_vm *vm)
 {
 	mutex_lock(&vm->eviction_lock);
+#ifdef notyet
 	vm->saved_flags = memalloc_nofs_save();
+#endif
 }
 
 static inline int amdgpu_vm_eviction_trylock(struct amdgpu_vm *vm)
 {
 	if (mutex_trylock(&vm->eviction_lock)) {
+#ifdef notyet
 		vm->saved_flags = memalloc_nofs_save();
+#endif
 		return 1;
 	}
 	return 0;
