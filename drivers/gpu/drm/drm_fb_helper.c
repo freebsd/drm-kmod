@@ -2094,7 +2094,7 @@ static int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
 	if (IS_ERR(fbi))
 		return PTR_ERR(fbi);
 
-	fbi->fbops = &drm_fbdev_fb_ops;
+	fbi->fbops = (struct fb_ops *) &drm_fbdev_fb_ops;
 	fbi->screen_size = fb->height * fb->pitches[0];
 	fbi->fix.smem_len = fbi->screen_size;
 
