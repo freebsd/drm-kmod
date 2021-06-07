@@ -53,6 +53,10 @@
 #include <drm/drm_vma_manager.h>
 #endif
 
+#ifdef __FreeBSD__
+#include <linux/capability.h>
+#endif
+
 /* from BKL pushdown */
 DEFINE_MUTEX(drm_global_mutex);
 
