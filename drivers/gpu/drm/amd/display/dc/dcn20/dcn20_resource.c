@@ -3953,9 +3953,6 @@ static bool dcn20_resource_construct(
 
 	dc->cap_funcs = cap_funcs;
 
-#ifdef __FreeBSD__
-	kernel_fpu_end();
-#endif
 	if (dc->ctx->dc_bios->fw_info.oem_i2c_present) {
 		ddc_init_data.ctx = dc->ctx;
 		ddc_init_data.link = NULL;
