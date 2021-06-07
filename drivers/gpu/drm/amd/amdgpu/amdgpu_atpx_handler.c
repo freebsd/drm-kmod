@@ -619,7 +619,12 @@ static bool amdgpu_atpx_detect(void)
 		has_atpx |= (amdgpu_atpx_pci_probe_handle(pdev) == true);
 
 		parent_pdev = pci_upstream_bridge(pdev);
+#ifdef __linux__
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
+#elif defined(__FreeBSD__)
+		// BSDFIXME
+		d3_supported |= 1;
+#endif
 		amdgpu_atpx_get_quirks(pdev);
 	}
 
