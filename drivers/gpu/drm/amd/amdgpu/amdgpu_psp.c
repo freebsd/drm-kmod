@@ -1898,7 +1898,9 @@ static ssize_t psp_usbc_pd_fw_sysfs_write(struct device *dev,
 	 * TODO Remove once PSP starts snooping CPU cache
 	 */
 #ifdef CONFIG_X86
+#ifdef __linux__
 	clflush_cache_range(cpu_addr, (usbc_pd_fw->size & ~(L1_CACHE_BYTES - 1)));
+#endif
 #endif
 
 	mutex_lock(&adev->psp.mutex);
