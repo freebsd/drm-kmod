@@ -16,4 +16,10 @@ unlock_page(struct page *page)
 	vm_page_unlock(page);
 }
 
+static inline bool fault_flag_allow_retry_first(unsigned int flags)
+{
+	return (flags & FAULT_FLAG_ALLOW_RETRY) &&
+	    (!(flags & FAULT_FLAG_TRIED));
+}
+
 #endif
