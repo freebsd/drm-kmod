@@ -199,8 +199,13 @@ static bool amdgpu_read_bios_from_rom(struct amdgpu_device *adev)
 
 static bool amdgpu_read_platform_bios(struct amdgpu_device *adev)
 {
+#ifdef __linux__
 	phys_addr_t rom = adev->pdev->rom;
 	size_t romlen = adev->pdev->romlen;
+#elif defined(__FreeBSD__)
+	phys_addr_t rom = 0;
+	size_t romlen = 0;
+#endif
 	void __iomem *bios;
 
 	adev->bios = NULL;
