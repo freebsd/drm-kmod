@@ -386,10 +386,25 @@ void drm_errk(const char *function_name, const char *format, ...);
 #define DRM_INFO(fmt, ...)			\
 	printk(KERN_INFO "[" DRM_NAME "] " fmt, ##__VA_ARGS__)
 
+#define DRM_INFO_ONCE(fmt, ...)			\
+	printkonce(KERN_INFO "[" DRM_NAME "] " fmt, ##__VA_ARGS__)
+
 #define DRM_NOTE(fmt, ...)			\
 	printk(KERN_NOTICE "[" DRM_NAME "] " fmt, ##__VA_ARGS__)
 
-#define DRM_DEBUG(fmt, ...)					\
+#define DRM_NOTE_ONCE(fmt, ...)			\
+	printkonce(KERN_NOTICE "[" DRM_NAME "] " fmt, ##__VA_ARGS__)
+
+#define DRM_WARN(fmt, ...)						\
+	printk(KERN_WARNING "[" DRM_NAME "] " fmt, ##__VA_ARGS__)
+
+#define DRM_WARN_ONCE(fmt, ...)						\
+	printk_once(KERN_WARNING "[" DRM_NAME "] " fmt, ##__VA_ARGS__)
+
+#define drm_debug(fmt, ...)					\
+	drm_dbg(drm_ut_core, __func__, fmt, ##__va_args__)
+
+#define DRM_DEBUG(fmt, ...)						\
 	drm_dbg(DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
 
 #define DRM_DEBUG_ATOMIC(fmt, ...)					\
@@ -397,6 +412,9 @@ void drm_errk(const char *function_name, const char *format, ...);
 
 #define DRM_DEBUG_DP(fmt, ...)					\
 	drm_dbg(DRM_UT_DP, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEBUG_DRIVER(fmt, ...)					\
+	drm_dbg(DRM_UT_DRIVER, __func__, fmt, ##__VA_ARGS__)
 
 #define DRM_DEBUG_KMS(fmt, ...)					\
 	drm_dbg(DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
@@ -415,6 +433,15 @@ void drm_errk(const char *function_name, const char *format, ...);
 
 #define DRM_DEBUG_VBL(fmt, ...)					\
 	drm_dbg(DRM_UT_VBL, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEV_DEBUG(dev, fmt, ...)					\
+	drm_dev_dbg(dev, DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEV_DEBUG_DRIVER(dev, fmt, ...)				\
+	drm_dev_dbg(dev, DRM_UT_DRIVER, __func__, fmt, ##__VA_ARGS__)
+
+#define DRM_DEV_DEBUG_KMS(dev, fmt, ...)				\
+	drm_dev_dbg(dev, DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
 
 #endif
 
