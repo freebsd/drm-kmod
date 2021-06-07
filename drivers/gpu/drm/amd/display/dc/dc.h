@@ -39,6 +39,8 @@
 #include "inc/hw/dmcu.h"
 #include "dml/display_mode_lib.h"
 
+#define CONFIG_DRM_AMD_DC_DCN 1
+
 #define DC_VER "3.2.76"
 
 #define MAX_SURFACES 3
