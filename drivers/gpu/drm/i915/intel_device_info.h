@@ -163,6 +163,8 @@ struct intel_device_info {
 
 	unsigned int page_sizes; /* page sizes supported by the HW */
 
+	u32 memory_regions; /* regions supported by the HW */
+
 	u32 display_mmio_offset;
 
 	u8 pipe_mask;

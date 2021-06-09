@@ -56,6 +56,11 @@
 
 #include "intel_pm.h"
 
+#ifdef __FreeBSD__
+#include "gem/i915_gemfs.h"
+#include "intel_memory_region.h"
+#endif
+
 static int
 insert_mappable_node(struct i915_ggtt *ggtt, struct drm_mm_node *node, u32 size)
 {
