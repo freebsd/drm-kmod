@@ -195,6 +195,21 @@ struct drm_i915_gem_object {
 		atomic_t pages_pin_count;
 		atomic_t shrink_pin;
 
+		/**
+		 * Memory region for this object.
+		 */
+		struct intel_memory_region *region;
+		/**
+		 * List of memory region blocks allocated for this object.
+		 */
+		struct list_head blocks;
+		/**
+		 * Element within memory_region->objects or region->purgeable
+		 * if the object is marked as DONTNEED. Access is protected by
+		 * region->obj_lock.
+		 */
+		struct list_head region_link;
+
 		struct sg_table *pages;
 		void *mapping;
 
