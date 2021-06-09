@@ -62,12 +62,12 @@ static inline int i915_perf_ioctl_version(void)
 
 static inline void i915_perf_sysctl_register(void)
 {
-	return
+	return;
 }
 
 static inline void i915_perf_sysctl_unregister(void)
 {
-	return
+	return;
 }
 
 #endif
