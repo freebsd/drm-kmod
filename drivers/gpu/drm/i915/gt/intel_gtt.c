@@ -264,6 +264,7 @@ void clear_pages(struct i915_vma *vma)
 	memset(&vma->page_sizes, 0, sizeof(vma->page_sizes));
 }
 
+#ifdef __linux__
 static int __setup_page_dma(struct i915_address_space *vm,
 			    struct i915_page_dma *p,
 			    gfp_t gfp)
@@ -284,6 +285,20 @@ static int __setup_page_dma(struct i915_address_space *vm,
 
 	return 0;
 }
+#else
+static int __setup_page_dma(struct i915_address_space *vm,
+			    struct i915_page_dma *p,
+			    gfp_t gfp)
+{
+	p->page = vm_alloc_page(vm, gfp | I915_GFP_ALLOW_FAIL);
+	if (unlikely(!p->page))
+		return -ENOMEM;
+
+	p->daddr = VM_PAGE_TO_PHYS(p->page);
+
+	return 0;
+}
+#endif
 
 int setup_page_dma(struct i915_address_space *vm, struct i915_page_dma *p)
 {
@@ -364,11 +379,15 @@ int setup_scratch_page(struct i915_address_space *vm, gfp_t gfp)
 		 */
 		poison_scratch_page(page, size);
 
+#ifdef __linux__
 		addr = dma_map_page_attrs(vm->dma,
 					  page, 0, size,
 					  PCI_DMA_BIDIRECTIONAL,
 					  DMA_ATTR_SKIP_CPU_SYNC |
 					  DMA_ATTR_NO_WARN);
+#else
+		addr = VM_PAGE_TO_PHYS(page);
+#endif
 		if (unlikely(dma_mapping_error(vm->dma, addr)))
 			goto free_page;
 
