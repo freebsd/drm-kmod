@@ -479,7 +479,11 @@ lrc_descriptor(struct intel_context *ce, struct intel_engine_cs *engine)
 
 static inline unsigned int dword_in_page(void *addr)
 {
+#ifdef __FreeBSD__
+	return offset_in_page((unsigned long) addr) / sizeof(u32);
+#else
 	return offset_in_page(addr) / sizeof(u32);
+#endif
 }
 
 static void set_offsets(u32 *regs,
@@ -2835,6 +2839,32 @@ err_free:
 	i915_gpu_coredump_put(cap->error);
 	kfree(cap);
 	return false;
+}
+
+static void execlists_reset(struct intel_engine_cs *engine, const char *msg)
+{
+	const unsigned int bit = I915_RESET_ENGINE + engine->id;
+	unsigned long *lock = &engine->gt->reset.flags;
+
+	if (!intel_has_reset_engine(engine->gt))
+		return;
+
+	if (test_and_set_bit(bit, lock))
+		return;
+
+	ENGINE_TRACE(engine, "reset for %s\n", msg);
+
+	/* Mark this tasklet as disabled to avoid waiting for it to complete */
+	tasklet_disable_nosync(&engine->execlists.tasklet);
+
+	ring_set_paused(engine, 1); /* Freeze the current request in place */
+	if (execlists_capture(engine))
+		intel_engine_reset(engine, msg);
+	else
+		ring_set_paused(engine, 0);
+
+	tasklet_enable(&engine->execlists.tasklet);
+	clear_and_wake_up_bit(bit, lock);
 }
 
 static noinline void preempt_reset(struct intel_engine_cs *engine)
