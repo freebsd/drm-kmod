@@ -546,7 +546,8 @@ SRCS+=	dcn303_hwseq.c \
 	dmub_dcn303.c
 
 # display/dc/clk_mgr/dcn31
-SRCS+=	dcn31_smu.c \
+SRCS+=	dcn31_apg.c \
+	dcn31_smu.c \
 	dcn31_clk_mgr.c \
 	dcn31_dccg.c \
 	dcn31_dio_link_encoder.c \
@@ -965,6 +966,7 @@ CWARNFLAGS.dcn302_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn302_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn303_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn303_resource.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn31_apg.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dcn31_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types
 CWARNFLAGS.dcn31_dccg.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn31_dio_link_encoder.c=	-Wno-missing-prototypes
