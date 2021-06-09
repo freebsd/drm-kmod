@@ -116,6 +116,10 @@
 #define DRIVER_DATE		"20200313"
 #define DRIVER_TIMESTAMP	1584144591
 
+#ifdef __FreeBSD__
+#define CONFIG_DRM_I915_MAX_REQUEST_BUSYWAIT	8000	/* ns */
+#endif
+
 struct drm_i915_gem_object;
 
 /*

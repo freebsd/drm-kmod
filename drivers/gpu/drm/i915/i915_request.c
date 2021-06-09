@@ -45,6 +45,7 @@
 #ifdef __FreeBSD__
 #undef schedule
 #include <asm/smp.h>
+#include <linux/poison.h>
 #endif
 struct execute_cb {
 	struct list_head link;
