@@ -3026,7 +3026,6 @@ set_redzone(void *vaddr, const struct intel_engine_cs *engine)
 #elif defined(__FreeBSD__)
 	memset(vaddr, 0x5a, I915_GTT_PAGE_SIZE);
 #endif
->>>>>>> drm/i915/gt: Always poison the kernel_context image before unparking
 }
 
 static void
