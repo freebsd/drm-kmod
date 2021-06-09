@@ -49,6 +49,7 @@
 #include <linux/xarray.h>
 
 #ifdef __FreeBSD__
+#include <linux/shrinker.h>
 #include <linux/ratelimit.h>
 #endif
 
