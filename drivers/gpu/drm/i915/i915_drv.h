@@ -108,6 +108,10 @@
 
 #include "intel_region_lmem.h"
 
+#ifdef __FreeBSD__
+#include "intel_memory_region.h"
+#endif
+
 /* General customization:
  */
 
