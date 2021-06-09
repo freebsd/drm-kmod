@@ -25,10 +25,12 @@
  */
 
 #include <linux/gpio/consumer.h>
+#ifdef __freebsd_notyet__
 #include <linux/gpio/machine.h>
 #include <linux/mfd/intel_soc_pmic.h>
 #include <linux/pinctrl/consumer.h>
 #include <linux/pinctrl/machine.h>
+#endif
 #include <linux/slab.h>
 
 #include <asm/intel-mid.h>
@@ -88,7 +90,9 @@ static struct gpio_map vlv_gpio_table[] = {
 struct i2c_adapter_lookup {
 	u16 slave_addr;
 	struct intel_dsi *intel_dsi;
+#ifdef __freebsd_notyet__
 	acpi_handle dev_handle;
+#endif
 };
 
 #define CHV_GPIO_IDX_START_N		0
@@ -392,7 +396,7 @@ static const u8 *mipi_exec_gpio(struct intel_dsi *intel_dsi, const u8 *data)
 	return data;
 }
 
-#ifdef CONFIG_ACPI
+#if defined(CONFIG_ACPI) && defined(__linux__)
 static int i2c_adapter_lookup(struct acpi_resource *ares, void *data)
 {
 	struct i2c_adapter_lookup *lookup = data;
@@ -453,6 +457,9 @@ static inline void i2c_acpi_find_adapter(struct intel_dsi *intel_dsi,
 
 static const u8 *mipi_exec_i2c(struct intel_dsi *intel_dsi, const u8 *data)
 {
+	// STUB
+	return NULL;
+#ifdef __freebsd_notyet__
 	struct drm_device *drm_dev = intel_dsi->base.base.dev;
 	struct device *dev = &drm_dev->pdev->dev;
 	struct i2c_adapter *adapter;
@@ -498,6 +505,7 @@ err_alloc:
 	i2c_put_adapter(adapter);
 err_bus:
 	return data + payload_size + 7;
+#endif
 }
 
 static const u8 *mipi_exec_spi(struct intel_dsi *intel_dsi, const u8 *data)
@@ -832,6 +840,8 @@ bool intel_dsi_vbt_init(struct intel_dsi *intel_dsi, u16 panel_id)
 	return true;
 }
 
+#ifdef __freebsd_notyet__
+
 /*
  * On some BYT/CHT devs some sequences are incomplete and we need to manually
  * control some GPIOs. We need to add a GPIO lookup table before we get these.
@@ -862,8 +872,12 @@ static const struct pinctrl_map soc_pwm_pinctrl_map[] = {
 			  "pwm0_grp", "pwm"),
 };
 
+#endif
+
 void intel_dsi_vbt_gpio_init(struct intel_dsi *intel_dsi, bool panel_is_on)
 {
+	// STUB
+#ifdef __freebsd_notyet__
 	struct drm_device *dev = intel_dsi->base.base.dev;
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	struct mipi_config *mipi_config = dev_priv->vbt.dsi.config;
@@ -915,10 +929,13 @@ void intel_dsi_vbt_gpio_init(struct intel_dsi *intel_dsi, bool panel_is_on)
 			intel_dsi->gpio_backlight = NULL;
 		}
 	}
+#endif
 }
 
 void intel_dsi_vbt_gpio_cleanup(struct intel_dsi *intel_dsi)
 {
+	// STUB
+#ifdef __freebsd_notyet__
 	struct drm_device *dev = intel_dsi->base.base.dev;
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	struct mipi_config *mipi_config = dev_priv->vbt.dsi.config;
@@ -941,4 +958,5 @@ void intel_dsi_vbt_gpio_cleanup(struct intel_dsi *intel_dsi)
 		pinctrl_unregister_mappings(soc_pwm_pinctrl_map);
 		gpiod_remove_lookup_table(&soc_panel_gpio_table);
 	}
+#endif
 }
