@@ -18,6 +18,10 @@
 #include "intel_engine_types.h"
 #include "intel_sseu.h"
 
+#ifdef __FreeBSD__
+#include <linux/poison.h>
+#endif
+
 #define CONTEXT_REDZONE POISON_INUSE
 
 DECLARE_EWMA(runtime, 3, 8);
