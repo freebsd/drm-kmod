@@ -54,25 +54,29 @@ SRCS=	\
 	intel_display_power.c \
 	intel_dpio_phy.c \
 	intel_dpll_mgr.c \
+	intel_dram.c \
 	intel_fbc.c \
 	intel_fifo_underrun.c \
 	intel_freebsd.c \
 	intel_frontbuffer.c \
 	intel_hdcp.c \
 	intel_hotplug.c \
+	intel_memory_region.c \
 	intel_opregion.c \
 	intel_overlay.c \
 	intel_pch.c \
 	intel_pm.c \
 	intel_psr.c \
 	intel_quirks.c \
+	intel_region_lmem.c \
 	intel_runtime_pm.c \
 	intel_sideband.c \
 	intel_sprite.c \
 	intel_uncore.c \
 	i915_utils.c \
 	intel_wakeref.c \
-	intel_wopcm.c
+	intel_wopcm.c \
+	vlv_suspend.c
 
 # display/*
 SRCS+=	dvo_ch7017.c \
@@ -93,6 +97,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_dsi_vbt.c \
 	intel_dsb.c \
 	intel_dvo.c \
+	intel_global_state.c \
 	intel_gmbus.c \
 	intel_hdmi.c \
 	intel_lspcon.c \
@@ -107,25 +112,33 @@ SRCS+=	dvo_ch7017.c \
 	vlv_dsi_pll.c
 
 # gt/*
-SRCS+=	gen6_renderstate.c \
+SRCS+=	gen6_ppgtt.c \
+	gen6_renderstate.c \
+	gen7_renderclear.c \
 	gen7_renderstate.c \
+	gen8_ppgtt.c \
 	gen8_renderstate.c \
 	gen9_renderstate.c \
 	intel_breadcrumbs.c \
 	intel_context.c \
+	intel_context_param.c \
 	intel_engine_cs.c \
 	intel_engine_heartbeat.c \
+	intel_context_sseu.c \
 	intel_engine_pm.c \
 	intel_engine_pool.c \
 	intel_engine_user.c \
+	intel_ggtt.c \
 	intel_gt.c \
 	intel_gt_irq.c \
 	intel_gt_pm.c \
 	intel_gt_pm_irq.c \
 	intel_gt_requests.c \
+	intel_gtt.c \
 	intel_llc.c \
 	intel_lrc.c \
 	intel_mocs.c \
+	intel_ppgtt.c \
 	intel_rc6.c \
 	intel_renderstate.c \
 	intel_reset.c \
@@ -157,11 +170,13 @@ SRCS+=	i915_gem_busy.c \
 	i915_gem_execbuffer.c \
 	i915_gem_fence.c \
 	i915_gem_internal.c \
+	i915_gem_lmem.c \
 	i915_gem_mman.c \
 	i915_gem_object.c \
 	i915_gem_pages.c \
 	i915_gem_phys.c \
 	i915_gem_pm.c \
+	i915_gem_region.c \
 	i915_gem_shmem.c \
 	i915_gem_shrinker.c \
 	i915_gem_stolen.c \
