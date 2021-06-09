@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
-#ifndef _LINUX_XARRAY_H
-#define _LINUX_XARRAY_H
+#ifndef _GPLV2_LINUX_XARRAY_H
+#define _GPLV2_LINUX_XARRAY_H
 /*
  * eXtensible Arrays
  * Copyright (c) 2017 Microsoft Corporation
@@ -9,6 +9,7 @@
  * See Documentation/core-api/xarray.rst for how to use the XArray.
  */
 
+#include_next <linux/xarray.h>
 
 /**
  * xa_mk_value() - Create an XArray entry from an integer.
