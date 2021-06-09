@@ -948,13 +948,6 @@ int i915_gem_context_open(struct drm_i915_private *i915,
 
 	xa_init_flags(&file_priv->context_xa, XA_FLAGS_ALLOC);
 
-#ifdef __linux__
-	mutex_init(&file_priv->vm_idr_lock);
-	idr_init_base(&file_priv->vm_idr, 1);
-#elif defined(__FreeBSD__)
-	idr_init(&file_priv->vm_idr);
-#endif
-
 	ctx = i915_gem_create_context(i915, 0);
 	if (IS_ERR(ctx)) {
 		err = PTR_ERR(ctx);
