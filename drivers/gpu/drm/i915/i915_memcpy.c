@@ -39,6 +39,7 @@ static DEFINE_STATIC_KEY_FALSE(has_movntdqa);
 #include <x86/x86_var.h>
 static bool has_movntdqa = false;
 #define	asm		__asm
+#define CI_BUG_ON(expr) BUG_ON(expr)
 #endif
 
 static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len)
