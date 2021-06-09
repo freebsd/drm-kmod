@@ -7,7 +7,9 @@
 #define __INTEL_MEMORY_REGION_H__
 
 #include <linux/kref.h>
+#ifdef __linux__
 #include <linux/ioport.h>
+#endif
 #include <linux/mutex.h>
 #include <linux/io-mapping.h>
 #include <drm/drm_mm.h>
