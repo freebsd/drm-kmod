@@ -50,7 +50,11 @@ static struct sg_table *i915_gem_map_dma_buf(struct dma_buf_attachment *attachme
 
 	if (!dma_map_sg_attrs(attachment->dev,
 			      st->sgl, st->nents, dir,
+#ifdef __linux__
 			      DMA_ATTR_SKIP_CPU_SYNC)) {
+#else
+			      NULL)) {
+#endif
 		ret = -ENOMEM;
 		goto err_free_sg;
 	}
@@ -75,7 +79,11 @@ static void i915_gem_unmap_dma_buf(struct dma_buf_attachment *attachment,
 
 	dma_unmap_sg_attrs(attachment->dev,
 			   sg->sgl, sg->nents, dir,
+#ifdef __linux__
 			   DMA_ATTR_SKIP_CPU_SYNC);
+#else
+			   NULL);
+#endif
 	sg_free_table(sg);
 	kfree(sg);
 

@@ -34,12 +34,15 @@
 int i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
 			       struct sg_table *pages)
 {
-#ifdef __linux__
 	do {
 		if (dma_map_sg_attrs(&obj->base.dev->pdev->dev,
 				     pages->sgl, pages->nents,
 				     PCI_DMA_BIDIRECTIONAL,
+#ifdef __linux__
 				     DMA_ATTR_NO_WARN))
+#else
+				     NULL))
+#endif
 			return 0;
 
 		/*
@@ -56,9 +59,6 @@ int i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
 				 I915_SHRINK_UNBOUND));
 
 	return -ENOSPC;
-#else
-	return 0;
-#endif
 }
 
 void i915_gem_gtt_finish_pages(struct drm_i915_gem_object *obj,
