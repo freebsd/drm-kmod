@@ -76,7 +76,7 @@ struct intel_memory_region {
 	const struct intel_memory_region_ops *ops;
 
 	struct io_mapping iomap;
-	struct resource region;
+	struct linux_resource region;
 
 	/* For fake LMEM */
 	struct drm_mm_node fake_mappable;

@@ -836,11 +836,19 @@ struct drm_i915_private {
 	 * exactly how much of this we are actually allowed to use, given that
 	 * some portion of it is in fact reserved for use by hardware functions.
 	 */
+#ifdef __FreeBSD__
+	struct linux_resource dsm;
+#else
 	struct resource dsm;
+#endif
 	/**
 	 * Reseved portion of Data Stolen Memory
 	 */
+#ifdef __FreeBSD__
+	struct linux_resource dsm_reserved;
+#else
 	struct resource dsm_reserved;
+#endif
 
 	/*
 	 * Stolen memory is segmented in hardware with different portions
@@ -890,7 +898,11 @@ struct drm_i915_private {
 	struct intel_engine_cs *engine[I915_NUM_ENGINES];
 	struct rb_root uabi_engines;
 
+#ifdef __FreeBSD__
+	struct linux_resource mch_res;
+#else
 	struct resource mch_res;
+#endif
 
 	/* protects the irq masks */
 	spinlock_t irq_lock;
