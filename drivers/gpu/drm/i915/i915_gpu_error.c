@@ -989,7 +989,6 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 	struct i915_vma_coredump *dst;
 	unsigned long num_pages;
 	struct sgt_iter iter;
-	dma_addr_t dma;
 	int ret;
 
 	might_sleep();
@@ -1019,10 +1018,12 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 	dst->unused = 0;
 
 	ret = -EINVAL;
-	for_each_sgt_daddr(dma, iter, vma->pages) {
+	if (drm_mm_node_allocated(&ggtt->error_capture)) {
 		void __iomem *s;
+		dma_addr_t dma;
 
 		for_each_sgt_daddr(dma, iter, vma->pages) {
+			mutex_lock(&ggtt->error_mutex);
 			ggtt->vm.insert_page(&ggtt->vm, dma, slot,
 					     I915_CACHE_NONE, 0);
 			mb();
@@ -1032,6 +1033,10 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 					    (void  __force *)s, dst,
 					    true);
 			io_mapping_unmap(s);
+
+			mb();
+			ggtt->vm.clear_range(&ggtt->vm, slot, PAGE_SIZE);
+			mutex_unlock(&ggtt->error_mutex);
 			if (ret)
 				break;
 		}
@@ -1042,7 +1047,9 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 		for_each_sgt_daddr(dma, iter, vma->pages) {
 			void __iomem *s;
 
-			s = io_mapping_map_wc(&mem->iomap, dma, PAGE_SIZE);
+			s = io_mapping_map_wc(&mem->iomap,
+					      dma - mem->region.start,
+					      PAGE_SIZE);
 			ret = compress_page(compress,
 					    (void __force *)s, dst,
 					    true);
