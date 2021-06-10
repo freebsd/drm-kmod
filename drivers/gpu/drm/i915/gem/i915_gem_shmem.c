@@ -13,6 +13,9 @@
 #include "i915_trace.h"
 
 #ifdef __FreeBSD__
+#include <gem/i915_gem_region.h>
+#include <gem/i915_gemfs.h>
+
 static inline unsigned long totalram_pages() { return physmem; }
 #endif
 
@@ -482,34 +485,13 @@ const struct drm_i915_gem_object_ops i915_gem_shmem_ops = {
 	.release = shmem_release,
 };
 
-static int create_shmem(struct drm_i915_private *i915,
-			struct drm_gem_object *obj,
-			size_t size)
+static struct drm_i915_gem_object *
+create_shmem(struct intel_memory_region *mem,
+	     resource_size_t size,
+	     unsigned int flags)
 {
-	unsigned long flags = VM_NORESERVE;
-	struct file *filp;
-
-	drm_gem_private_object_init(&i915->drm, obj, size);
-
-	if (i915->mm.gemfs)
-#ifdef __linux__
-		filp = shmem_file_setup_with_mnt(i915->mm.gemfs, "i915", size,
-						 flags);
-#elif defined(__FreeBSD__)
-		panic("i915_gem.c: gemfs not supported\n");
-#endif
-	else
-		filp = shmem_file_setup("i915", size, flags);
-	if (IS_ERR(filp))
-		return PTR_ERR(filp);
-
-	obj->filp = filp;
-	return 0;
-}
-
-struct drm_i915_gem_object *
-i915_gem_object_create_shmem(struct drm_i915_private *i915, u64 size)
-{
+	static struct lock_class_key lock_class;
+	struct drm_i915_private *i915 = mem->i915;
 	struct drm_i915_gem_object *obj;
 #ifdef __linux__
 	struct address_space *mapping;
@@ -518,22 +500,15 @@ i915_gem_object_create_shmem(struct drm_i915_private *i915, u64 size)
 	gfp_t mask;
 	int ret;
 
-	/* There is a prevalence of the assumption that we fit the object's
-	 * page count inside a 32bit _signed_ variable. Let's document this and
-	 * catch if we ever need to fix it. In the meantime, if you do spot
-	 * such a local variable, please consider fixing!
-	 */
-	if (size >> PAGE_SHIFT > INT_MAX)
-		return ERR_PTR(-E2BIG);
-
-	if (overflows_type(size, obj->base.size))
-		return ERR_PTR(-E2BIG);
-
 	obj = i915_gem_object_alloc();
 	if (!obj)
 		return ERR_PTR(-ENOMEM);
 
-	ret = create_shmem(i915, &obj->base, size);
+#ifdef __linux__
+	ret = __create_shmem(i915, &obj->base, size);
+#else
+	ret = drm_gem_object_init(&i915->drm, &obj->base, size);
+#endif
 	if (ret)
 		goto fail;
 
@@ -550,7 +525,7 @@ i915_gem_object_create_shmem(struct drm_i915_private *i915, u64 size)
 	GEM_BUG_ON(!(mapping_gfp_mask(mapping) & __GFP_RECLAIM));
 #endif
 
-	i915_gem_object_init(obj, &i915_gem_shmem_ops);
+	i915_gem_object_init(obj, &i915_gem_shmem_ops, &lock_class);
 
 	obj->write_domain = I915_GEM_DOMAIN_CPU;
 	obj->read_domains = I915_GEM_DOMAIN_CPU;
@@ -574,7 +549,7 @@ i915_gem_object_create_shmem(struct drm_i915_private *i915, u64 size)
 
 	i915_gem_object_set_cache_coherency(obj, cache_level);
 
-	trace_i915_gem_object_create(obj);
+	i915_gem_object_init_memory_region(obj, mem, 0);
 
 	return obj;
 
