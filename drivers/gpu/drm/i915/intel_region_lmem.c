@@ -11,6 +11,7 @@
 
 static int init_fake_lmem_bar(struct intel_memory_region *mem)
 {
+#ifdef __freebsd_notyet__
 	struct drm_i915_private *i915 = mem->i915;
 	struct i915_ggtt *ggtt = &i915->ggtt;
 	unsigned long n;
@@ -43,18 +44,18 @@ static int init_fake_lmem_bar(struct intel_memory_region *mem)
 				     I915_CACHE_NONE, 0);
 	}
 
-#ifdef __FreeBSD__
-	mem->region = (struct linux_resource)DEFINE_RES_MEM(mem->remap_addr,
-#else
 	mem->region = (struct resource)DEFINE_RES_MEM(mem->remap_addr,
-#endif
 						      mem->fake_mappable.size);
 
 	return 0;
+#else
+	return -ENOSYS;
+#endif
 }
 
 static void release_fake_lmem_bar(struct intel_memory_region *mem)
 {
+#ifdef __freebsd_notyet__
 	if (!drm_mm_node_allocated(&mem->fake_mappable))
 		return;
 
@@ -65,19 +66,23 @@ static void release_fake_lmem_bar(struct intel_memory_region *mem)
 			   mem->fake_mappable.size,
 			   PCI_DMA_BIDIRECTIONAL,
 			   DMA_ATTR_FORCE_CONTIGUOUS);
+#endif
 }
 
 static void
 region_lmem_release(struct intel_memory_region *mem)
 {
+#ifdef __freebsd_notyet__
 	release_fake_lmem_bar(mem);
 	io_mapping_fini(&mem->iomap);
 	intel_memory_region_release_buddy(mem);
+#endif
 }
 
 static int
 region_lmem_init(struct intel_memory_region *mem)
 {
+#ifdef __freebsd_notyet__
 	int ret;
 
 	if (i915_modparams.fake_lmem_start) {
@@ -97,6 +102,9 @@ region_lmem_init(struct intel_memory_region *mem)
 	intel_memory_region_set_name(mem, "local");
 
 	return ret;
+#else
+	return -ENOSYS;
+#endif
 }
 
 const struct intel_memory_region_ops intel_region_lmem_ops = {
@@ -108,6 +116,7 @@ const struct intel_memory_region_ops intel_region_lmem_ops = {
 struct intel_memory_region *
 intel_setup_fake_lmem(struct drm_i915_private *i915)
 {
+#ifdef __freebsd_notyet__
 	struct pci_dev *pdev = i915->drm.pdev;
 	struct intel_memory_region *mem;
 	resource_size_t mappable_end;
@@ -139,4 +148,7 @@ intel_setup_fake_lmem(struct drm_i915_private *i915)
 	}
 
 	return mem;
+#else
+	return NULL;
+#endif
 }
