@@ -623,9 +623,9 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 #ifdef __linux__
 	/* Missing sysfs bin files support */
 	i915_setup_error_capture(kdev);
-#endif
 
 	intel_engines_add_sysfs(dev_priv);
+#endif
 }
 
 void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
