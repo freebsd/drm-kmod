@@ -997,7 +997,7 @@ eb_get_vma(const struct i915_execbuffer *eb, unsigned long handle)
 	}
 }
 
-static void eb_release_vmas(struct i915_execbuffer *eb, bool final, bool release_userptr)
+static void eb_release_vmas(struct i915_execbuffer *eb, bool final)
 {
 	const unsigned int count = eb->buffer_count;
 	unsigned int i;
@@ -1010,11 +1010,6 @@ static void eb_release_vmas(struct i915_execbuffer *eb, bool final, bool release
 			break;
 
 		eb_unreserve_vma(ev);
-
-		if (release_userptr && ev->flags & __EXEC_OBJECT_USERPTR_INIT) {
-			ev->flags &= ~__EXEC_OBJECT_USERPTR_INIT;
-			i915_gem_object_userptr_submit_fini(vma->obj);
-		}
 
 		if (final)
 			i915_vma_put(vma);
@@ -2006,7 +2001,7 @@ repeat:
 	}
 
 	/* We may process another execbuffer during the unlock... */
-	eb_release_vmas(eb, false, true);
+	eb_release_vmas(eb, false);
 	i915_gem_ww_ctx_fini(&eb->ww);
 
 	if (rq) {
@@ -2110,7 +2105,7 @@ repeat_validate:
 
 err:
 	if (err == -EDEADLK) {
-		eb_release_vmas(eb, false, false);
+		eb_release_vmas(eb, false);
 		err = i915_gem_ww_ctx_backoff(&eb->ww);
 		if (!err)
 			goto repeat_validate;
@@ -2207,7 +2202,7 @@ retry:
 
 err:
 	if (err == -EDEADLK) {
-		eb_release_vmas(eb, false, false);
+		eb_release_vmas(eb, false);
 		err = i915_gem_ww_ctx_backoff(&eb->ww);
 		if (!err)
 			goto retry;
@@ -2284,7 +2279,7 @@ static int eb_move_to_gpu(struct i915_execbuffer *eb)
 
 #ifdef CONFIG_MMU_NOTIFIER
 	if (!err && (eb->args->flags & __EXEC_USERPTR_USED)) {
-		spin_lock(&eb->i915->mm.notifier_lock);
+		read_lock(&eb->i915->mm.notifier_lock);
 
 		/*
 		 * count is always at least 1, otherwise __EXEC_USERPTR_USED
@@ -2302,7 +2297,7 @@ static int eb_move_to_gpu(struct i915_execbuffer *eb)
 				break;
 		}
 
-		spin_unlock(&eb->i915->mm.notifier_lock);
+		read_unlock(&eb->i915->mm.notifier_lock);
 	}
 #endif
 
@@ -3248,7 +3243,7 @@ i915_gem_do_execbuffer(struct drm_device *dev,
 
 	err = eb_lookup_vmas(&eb);
 	if (err) {
-		eb_release_vmas(&eb, true, true);
+		eb_release_vmas(&eb, true);
 		goto err_engine;
 	}
 
@@ -3341,7 +3336,7 @@ err_request:
 	i915_request_put(eb.request);
 
 err_vma:
-	eb_release_vmas(&eb, true, true);
+	eb_release_vmas(&eb, true);
 	if (eb.trampoline)
 		i915_vma_unpin(eb.trampoline);
 	WARN_ON(err == -EDEADLK);
