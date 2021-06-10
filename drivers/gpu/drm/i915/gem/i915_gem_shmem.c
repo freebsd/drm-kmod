@@ -558,6 +558,14 @@ fail:
 	return ERR_PTR(ret);
 }
 
+struct drm_i915_gem_object *
+i915_gem_object_create_shmem(struct drm_i915_private *i915,
+			     resource_size_t size)
+{
+	return i915_gem_object_create_region(i915->mm.regions[INTEL_REGION_SMEM],
+					     size, 0);
+}
+
 /* Allocate a new GEM object and fill it with the supplied data */
 struct drm_i915_gem_object *
 i915_gem_object_create_shmem_from_data(struct drm_i915_private *dev_priv,
