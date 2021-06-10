@@ -18,12 +18,17 @@
 #include "i915_gem_object.h"
 #include "i915_scatterlist.h"
 
+#ifdef __FreeBSD__
+#include <gem/i915_gem_region.h>
+#endif
+
 static int i915_gem_object_get_pages_phys(struct drm_i915_gem_object *obj)
 {
 #ifdef __FreeBSD__
 	vm_object_t mapping = obj->base.filp->f_shmem;
 #else
 	struct address_space *mapping = obj->base.filp->f_mapping;
+#endif
 	struct scatterlist *sg;
 	struct sg_table *st;
 	dma_addr_t dma;
