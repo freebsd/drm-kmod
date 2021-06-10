@@ -1037,9 +1037,20 @@ static int __init i915_init(void)
 		return 0;
 	}
 
+
+#ifdef __FreeBSD__
+	i915_pci_driver.bsdclass = drm_devclass;
+	i915_pci_driver.name = "drmn";
+
+	err = linux_pci_register_drm_driver(&i915_pci_driver);
+	if (err)
+		return err;
+
+#else
 	err = pci_register_driver(&i915_pci_driver);
 	if (err)
 		return err;
+#endif
 
 	i915_perf_sysctl_register();
 	return 0;
