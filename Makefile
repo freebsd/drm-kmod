@@ -19,7 +19,7 @@ DEFAULT_KMODS=	linuxkpi	\
 		ttm		\
 		drm		\
 		amd		\
-		radeon
+#		radeon
 
 .if ${MACHINE_ARCH} == "amd64" || ${MACHINE_ARCH} == "i386"
 DEFAULT_KMODS+=	i915
