@@ -31,6 +31,11 @@
 #include <drm/drm_ioctl.h>
 
 #include "i915_drv.h"
+
+#ifdef __FreeBSD__
+#undef file
+#endif
+
 #include "i915_ioc32.h"
 
 struct drm_i915_getparam32 {
