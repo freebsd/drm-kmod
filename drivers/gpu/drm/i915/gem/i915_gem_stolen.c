@@ -15,7 +15,7 @@
 #include "i915_vgpu.h"
 
 #ifdef __FreeBSD__
-#define	resource linux_resource
+#include <gem/i915_gem_region.h>
 #endif
 
 /*
@@ -112,7 +112,7 @@ static int i915_adjust_stolen(struct drm_i915_private *i915,
 
 		ggtt_res =
 #ifdef __FreeBSD__
-			(struct resource) DEFINE_RES_MEM(ggtt_start,
+			(struct linux_resource) DEFINE_RES_MEM(ggtt_start,
 #else
 			(struct resource) DEFINE_RES_MEM(ggtt_start,
 #endif
@@ -181,7 +181,7 @@ static int i915_adjust_stolen(struct drm_i915_private *i915,
 	return 0;
 }
 
-static void i915_gem_cleanup_stolen(struct drm_i915_private *i915)
+void i915_gem_cleanup_stolen(struct drm_i915_private *i915)
 {
 	if (!drm_mm_initialized(&i915->mm.stolen))
 		return;
@@ -396,7 +396,7 @@ static void icl_get_stolen_reserved(struct drm_i915_private *i915,
 	}
 }
 
-static int i915_gem_init_stolen(struct drm_i915_private *i915)
+int i915_gem_init_stolen(struct drm_i915_private *i915)
 {
 	struct intel_uncore *uncore = &i915->uncore;
 	resource_size_t reserved_base, stolen_top;
@@ -609,6 +609,7 @@ static struct drm_i915_gem_object *
 __i915_gem_object_create_stolen(struct intel_memory_region *mem,
 				struct drm_mm_node *stolen)
 {
+	static struct lock_class_key lock_class;
 	struct drm_i915_gem_object *obj;
 	unsigned int cache_level;
 	int err = -ENOMEM;
@@ -639,9 +640,10 @@ err:
 	return ERR_PTR(err);
 }
 
-struct drm_i915_gem_object *
-i915_gem_object_create_stolen(struct drm_i915_private *dev_priv,
-			      resource_size_t size)
+static struct drm_i915_gem_object *
+_i915_gem_object_create_stolen(struct intel_memory_region *mem,
+			       resource_size_t size,
+			       unsigned int flags)
 {
 	struct drm_i915_private *i915 = mem->i915;
 	struct drm_i915_gem_object *obj;
