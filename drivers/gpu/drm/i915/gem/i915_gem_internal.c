@@ -170,6 +170,7 @@ struct drm_i915_gem_object *
 i915_gem_object_create_internal(struct drm_i915_private *i915,
 				phys_addr_t size)
 {
+	static struct lock_class_key lock_class;
 	struct drm_i915_gem_object *obj;
 	unsigned int cache_level;
 
@@ -184,7 +185,7 @@ i915_gem_object_create_internal(struct drm_i915_private *i915,
 		return ERR_PTR(-ENOMEM);
 
 	drm_gem_private_object_init(&i915->drm, &obj->base, size);
-	i915_gem_object_init(obj, &i915_gem_object_internal_ops);
+	i915_gem_object_init(obj, &i915_gem_object_internal_ops, &lock_class);
 
 	obj->read_domains = I915_GEM_DOMAIN_CPU;
 	obj->write_domain = I915_GEM_DOMAIN_CPU;
