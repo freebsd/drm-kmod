@@ -1325,9 +1325,11 @@ __execlists_schedule_out(struct i915_request *rq,
 	ccid >>= GEN11_SW_CTX_ID_SHIFT - 32;
 	ccid &= GEN12_MAX_CONTEXT_HW_ID;
 	if (ccid < BITS_PER_LONG) {
+#ifdef __linux__
 		GEM_BUG_ON(ccid == 0);
 		GEM_BUG_ON(test_bit(ccid - 1, &engine->context_tag));
 		set_bit(ccid - 1, &engine->context_tag);
+#endif
 	}
 
 	intel_context_update_runtime(ce);
