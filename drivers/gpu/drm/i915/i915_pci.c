@@ -153,6 +153,9 @@
 #define GEN_DEFAULT_PAGE_SIZES \
 	.page_sizes = I915_GTT_PAGE_SIZE_4K
 
+#define GEN_DEFAULT_REGIONS \
+	.memory_regions = REGION_SMEM | REGION_STOLEN
+
 #define I830_FEATURES \
 	GEN(2), \
 	.is_mobile = 1, \
@@ -170,7 +173,8 @@
 	I9XX_PIPE_OFFSETS, \
 	I9XX_CURSOR_OFFSETS, \
 	I9XX_COLORS, \
-	GEN_DEFAULT_PAGE_SIZES
+	GEN_DEFAULT_PAGE_SIZES, \
+	GEN_DEFAULT_REGIONS
 
 #define I845_FEATURES \
 	GEN(2), \
@@ -187,7 +191,8 @@
 	I845_PIPE_OFFSETS, \
 	I845_CURSOR_OFFSETS, \
 	I9XX_COLORS, \
-	GEN_DEFAULT_PAGE_SIZES
+	GEN_DEFAULT_PAGE_SIZES, \
+	GEN_DEFAULT_REGIONS
 
 static const struct intel_device_info i830_info = {
 	I830_FEATURES,
@@ -221,7 +226,8 @@ static const struct intel_device_info i865g_info = {
 	I9XX_PIPE_OFFSETS, \
 	I9XX_CURSOR_OFFSETS, \
 	I9XX_COLORS, \
-	GEN_DEFAULT_PAGE_SIZES
+	GEN_DEFAULT_PAGE_SIZES, \
+	GEN_DEFAULT_REGIONS
 
 static const struct intel_device_info i915g_info = {
 	GEN3_FEATURES,
@@ -306,7 +312,8 @@ static const struct intel_device_info pnv_m_info = {
 	I9XX_PIPE_OFFSETS, \
 	I9XX_CURSOR_OFFSETS, \
 	I965_COLORS, \
-	GEN_DEFAULT_PAGE_SIZES
+	GEN_DEFAULT_PAGE_SIZES, \
+	GEN_DEFAULT_REGIONS
 
 static const struct intel_device_info i965g_info = {
 	GEN4_FEATURES,
@@ -356,7 +363,8 @@ static const struct intel_device_info gm45_info = {
 	I9XX_PIPE_OFFSETS, \
 	I9XX_CURSOR_OFFSETS, \
 	ILK_COLORS, \
-	GEN_DEFAULT_PAGE_SIZES
+	GEN_DEFAULT_PAGE_SIZES, \
+	GEN_DEFAULT_REGIONS
 
 static const struct intel_device_info ilk_d_info = {
 	GEN5_FEATURES,
@@ -386,7 +394,8 @@ static const struct intel_device_info ilk_m_info = {
 	I9XX_PIPE_OFFSETS, \
 	I9XX_CURSOR_OFFSETS, \
 	ILK_COLORS, \
-	GEN_DEFAULT_PAGE_SIZES
+	GEN_DEFAULT_PAGE_SIZES, \
+	GEN_DEFAULT_REGIONS
 
 #define SNB_D_PLATFORM \
 	GEN6_FEATURES, \
@@ -434,7 +443,8 @@ static const struct intel_device_info snb_m_gt2_info = {
 	IVB_PIPE_OFFSETS, \
 	IVB_CURSOR_OFFSETS, \
 	IVB_COLORS, \
-	GEN_DEFAULT_PAGE_SIZES
+	GEN_DEFAULT_PAGE_SIZES, \
+	GEN_DEFAULT_REGIONS
 
 #define IVB_D_PLATFORM \
 	GEN7_FEATURES, \
@@ -495,6 +505,7 @@ static const struct intel_device_info vlv_info = {
 	I9XX_CURSOR_OFFSETS,
 	I965_COLORS,
 	GEN_DEFAULT_PAGE_SIZES,
+	GEN_DEFAULT_REGIONS,
 };
 
 #define G75_FEATURES  \
@@ -589,6 +600,7 @@ static const struct intel_device_info chv_info = {
 	CHV_CURSOR_OFFSETS,
 	CHV_COLORS,
 	GEN_DEFAULT_PAGE_SIZES,
+	GEN_DEFAULT_REGIONS,
 };
 
 #define GEN9_DEFAULT_PAGE_SIZES \
@@ -667,7 +679,8 @@ static const struct intel_device_info skl_gt4_info = {
 	HSW_PIPE_OFFSETS, \
 	IVB_CURSOR_OFFSETS, \
 	IVB_COLORS, \
-	GEN9_DEFAULT_PAGE_SIZES
+	GEN9_DEFAULT_PAGE_SIZES, \
+	GEN_DEFAULT_REGIONS
 
 static const struct intel_device_info bxt_info = {
 	GEN9_LP_FEATURES,
@@ -1036,7 +1049,6 @@ static int __init i915_init(void)
 		DRM_DEBUG_DRIVER("KMS disabled.\n");
 		return 0;
 	}
-
 
 #ifdef __FreeBSD__
 	i915_pci_driver.bsdclass = drm_devclass;
