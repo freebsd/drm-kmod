@@ -948,6 +948,9 @@ int i915_gem_context_open(struct drm_i915_private *i915,
 
 	xa_init_flags(&file_priv->context_xa, XA_FLAGS_ALLOC);
 
+	/* 0 reserved for invalid/unassigned ppgtt */
+	xa_init_flags(&file_priv->vm_xa, XA_FLAGS_ALLOC1);
+
 	ctx = i915_gem_create_context(i915, 0);
 	if (IS_ERR(ctx)) {
 		err = PTR_ERR(ctx);
