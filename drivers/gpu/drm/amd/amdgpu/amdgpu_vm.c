@@ -3390,11 +3390,12 @@ bool amdgpu_vm_handle_fault(struct amdgpu_device *adev, u32 pasid,
 {
 	bool is_compute_context = false;
 	struct amdgpu_bo *root;
+	unsigned long irqflags;
 	uint64_t value, flags;
 	struct amdgpu_vm *vm;
 	int r;
 
-	spin_lock(&adev->vm_manager.pasid_lock);
+	spin_lock_irqsave(&adev->vm_manager.pasid_lock, irqflags);
 	vm = idr_find(&adev->vm_manager.pasid_idr, pasid);
 	if (vm) {
 		root = amdgpu_bo_ref(vm->root.bo);
@@ -3402,7 +3403,7 @@ bool amdgpu_vm_handle_fault(struct amdgpu_device *adev, u32 pasid,
 	} else {
 		root = NULL;
 	}
-	spin_unlock(&adev->vm_manager.pasid_lock);
+	spin_unlock_irqrestore(&adev->vm_manager.pasid_lock, irqflags);
 
 	if (!root)
 		return false;
@@ -3420,11 +3421,11 @@ bool amdgpu_vm_handle_fault(struct amdgpu_device *adev, u32 pasid,
 		goto error_unref;
 
 	/* Double check that the VM still exists */
-	spin_lock(&adev->vm_manager.pasid_lock);
+	spin_lock_irqsave(&adev->vm_manager.pasid_lock, irqflags);
 	vm = idr_find(&adev->vm_manager.pasid_idr, pasid);
 	if (vm && vm->root.bo != root)
 		vm = NULL;
-	spin_unlock(&adev->vm_manager.pasid_lock);
+	spin_unlock_irqrestore(&adev->vm_manager.pasid_lock, irqflags);
 	if (!vm)
 		goto error_unlock;
 
