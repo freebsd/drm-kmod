@@ -322,11 +322,9 @@ static vm_fault_t vm_fault_cpu(struct vm_fault *vmf)
 	}
 
 	/* PTEs are revoked in obj->ops->put_pages() */
-#ifdef __linux__
 	err = remap_io_sg(area,
 			  area->vm_start, area->vm_end - area->vm_start,
 			  obj->mm.pages->sgl, iomap);
-#endif
 
 	if (area->vm_flags & VM_WRITE) {
 		GEM_BUG_ON(!i915_gem_object_has_pinned_pages(obj));

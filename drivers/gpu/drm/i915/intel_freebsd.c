@@ -215,3 +215,53 @@ retry:
 	VM_OBJECT_WUNLOCK(vm_obj);
 	return (rc);
 }
+
+int
+remap_io_sg(struct vm_area_struct *vma, unsigned long addr, unsigned long size,
+    struct scatterlist *sgl, resource_size_t iobase)
+{
+	vm_page_t m;
+	vm_object_t vm_obj;
+	dma_addr_t pa;
+	vm_pindex_t pidx, pidx_start;
+	int count, rc;
+
+	count = size >> PAGE_SHIFT;
+	if (iobase != -1) {
+		pa = sg_dma_address(sgl) + iobase;
+		DRM_WARN("IOBASE %x\n", pa);
+	} else {
+		struct sgt_iter sgt = __sgt_iter(sgl, 0);
+		pa = (sgt.pfn + (sgt.curr >> PAGE_SHIFT)) << PAGE_SHIFT;
+		DRM_WARN("NOIOBASE %x\n", pa);
+	}
+	pidx_start = OFF_TO_IDX(addr);
+	rc = 0;
+	vm_obj = vma->vm_obj;
+
+	vma->vm_pfn_first = pidx_start;
+
+	VM_OBJECT_WLOCK(vm_obj);
+	for (pidx = pidx_start; pidx < pidx_start + count;
+	    pidx++, pa += PAGE_SIZE) {
+retry:
+		m = vm_page_grab(vm_obj, pidx, VM_ALLOC_NOCREAT);
+		if (m == NULL) {
+			m = PHYS_TO_VM_PAGE(pa);
+			if (!vm_page_busy_acquire(m, VM_ALLOC_WAITFAIL))
+				goto retry;
+			if (vm_page_insert(m, vm_obj, pidx)) {
+				vm_page_xunbusy(m);
+				VM_OBJECT_WUNLOCK(vm_obj);
+				vm_wait(NULL);
+				VM_OBJECT_WLOCK(vm_obj);
+				goto retry;
+			}
+			vm_page_valid(m);
+		}
+		vma->vm_pfn_count++;
+	}
+	VM_OBJECT_WUNLOCK(vm_obj);
+	return (rc);
+
+}
