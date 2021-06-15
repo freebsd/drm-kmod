@@ -260,9 +260,10 @@ dma_buf_ioctl(struct file *fp, u_long com, void *data,
 
 
 struct dma_buf_attachment *
-dma_buf_attach(struct dma_buf *db, struct device *dev)
+dma_buf_dynamic_attach(struct dma_buf *db, struct device *dev, bool dm)
 {
 	struct dma_buf_attachment *dba;
+	struct sg_table *sgt;
 	int rc;
 
 	MPASS(db != NULL);
@@ -273,23 +274,43 @@ dma_buf_attach(struct dma_buf *db, struct device *dev)
 	if ((dba = malloc(sizeof(*dba), M_DMABUF, M_NOWAIT|M_ZERO)) == NULL)
 		return (ERR_PTR(-ENOMEM));
 	
-	sx_xlock(&db->lock.sx);
+	dba->dev = dev;
+	dba->dmabuf = db;
+	dba->dynamic_mapping = dm;
+
 	if (db->ops->attach) {
 		if ((rc = db->ops->attach(db, dba)) != 0) {
-			sx_xunlock(&db->lock.sx);
 			free(dba, M_DMABUF);
 			return (ERR_PTR(rc));
 		}
 	}
+	dma_resv_lock(db->resv, NULL);
 	list_add(&dba->node, &db->attachments);
-	sx_xunlock(&db->lock.sx);
+	dma_resv_unlock(db->resv);
+
+	if (dm != db->ops->dynamic_mapping) {
+		if (dba->dmabuf->ops->dynamic_mapping)
+			dma_resv_lock(dba->dmabuf->resv, NULL);
+		sgt = db->ops->map_dma_buf(dba, DMA_BIDIRECTIONAL);
+		if (dba->dmabuf->ops->dynamic_mapping)
+			dma_resv_unlock(dba->dmabuf->resv);
+		if (sgt == NULL)
+			sgt = ERR_PTR(-ENOMEM);
+		if (IS_ERR(sgt)) {
+			dma_buf_detach(db, dba);
+			return (ERR_CAST(sgt));
+		}
+		dba->sgt = sgt;
+		dba->dir = DMA_BIDIRECTIONAL;
+	}
+
 	return (dba);
 }
 
 struct dma_buf_attachment *
-dma_buf_dynamic_attach(struct dma_buf *db, struct device *dev, bool dm)
+dma_buf_attach(struct dma_buf *db, struct device *dev)
 {
-	return (NULL);
+	return (dma_buf_dynamic_attach(db, dev, false));
 }
 
 void
@@ -301,11 +322,19 @@ dma_buf_detach(struct dma_buf *db, struct dma_buf_attachment *dba)
 	if (db == NULL || dba == NULL)
 		return;
 
-	sx_xlock(&db->lock.sx);
+	if (dba->sgt != NULL) {
+		if (dba->dmabuf->ops->dynamic_mapping)
+			dma_resv_lock(dba->dmabuf->resv, NULL);
+		db->ops->unmap_dma_buf(dba, dba->sgt, dba->dir);
+		if (dba->dmabuf->ops->dynamic_mapping)
+			dma_resv_unlock(dba->dmabuf->resv);
+	}
+
+	dma_resv_lock(db->resv, NULL);
 	list_del(&dba->node);
+	dma_resv_unlock(db->resv);
 	if (db->ops->detach)
 		db->ops->detach(db, dba);
-	sx_xunlock(&db->lock.sx);
 	free(dba, M_DMABUF);
 }
 
@@ -358,11 +387,14 @@ dma_buf_fd(struct dma_buf *db, int flags)
 struct dma_buf *
 dma_buf_export(const struct dma_buf_export_info *exp_info)
 {
+	const struct dma_buf_ops *ops = exp_info->ops;
 	struct dma_buf *db;
 	struct file *fp;
 	struct dma_resv *ro;
 	int size, err;
-	
+
+	MPASS(!(ops->cache_sgt_mapping && ops->dynamic_mapping));
+
 	ro = exp_info->resv;
 	size = (ro == NULL) ? sizeof(*db) + sizeof(*ro) : sizeof(*db) + 1;
 	db = malloc(size, M_DMABUF, M_NOWAIT|M_ZERO);
@@ -371,7 +403,7 @@ dma_buf_export(const struct dma_buf_export_info *exp_info)
 		return (ERR_PTR(-ENOENT));
 
 	db->priv = exp_info->priv;
-	db->ops = exp_info->ops;
+	db->ops = ops;
 	db->size = exp_info->size;
 	db->exp_name = exp_info->exp_name;
 	db->owner = exp_info->owner;
@@ -402,6 +434,7 @@ err:
 	free(db, M_DMABUF);
 	return (ERR_PTR(-err));
 }
+
 struct sg_table *
 dma_buf_map_attachment(struct dma_buf_attachment *dba, enum dma_data_direction dir)
 {
@@ -413,9 +446,26 @@ dma_buf_map_attachment(struct dma_buf_attachment *dba, enum dma_data_direction d
 	if (dba == NULL || dba->dmabuf == NULL)
 		return (ERR_PTR(-EINVAL));
 
+	if (dba->dynamic_mapping)
+		dma_resv_assert_held(dba->dmabuf->resv);
+
+	if (dba->sgt != NULL) {
+		if (dba->dir != dir && dba->dir != DMA_BIDIRECTIONAL)
+			return (ERR_PTR(-EBUSY));
+		return (dba->sgt);
+	}
+
+	if (dba->dmabuf->ops->dynamic_mapping)
+		dma_resv_assert_held(dba->dmabuf->resv);
+
 	sgt = dba->dmabuf->ops->map_dma_buf(dba, dir);
 	if (sgt == NULL)
 		return (ERR_PTR(-ENOMEM));
+
+	if (!IS_ERR(sgt) && dba->dmabuf->ops->cache_sgt_mapping) {
+		dba->sgt = sgt;
+		dba->dir = dir;
+	}
 
 	return (sgt);
 }
@@ -425,6 +475,20 @@ dma_buf_unmap_attachment(struct dma_buf_attachment *dba,
 			 struct sg_table *sg_table,
 			 enum dma_data_direction dir)
 {
+	MPASS(dba != NULL);
+	MPASS(dba->dmabuf != NULL);
+	MPASS(sg_table != NULL);
+
+	if (dba == NULL || dba->dmabuf == NULL || sg_table == NULL)
+		return;
+
+	if (dba->dynamic_mapping)
+		dma_resv_assert_held(dba->dmabuf->resv);
+	if (dba->sgt == sg_table)
+		return;
+	if (dba->dmabuf->ops->dynamic_mapping)
+		dma_resv_assert_held(dba->dmabuf->resv);
+
 	dba->dmabuf->ops->unmap_dma_buf(dba, sg_table, dir);
 }
 

@@ -61,6 +61,7 @@ struct dma_buf_export_info {
 					 .owner = THIS_MODULE }
 
 struct dma_buf_ops {
+	bool cache_sgt_mapping;
 	bool dynamic_mapping;
 
 	int (*attach)(struct dma_buf *, struct dma_buf_attachment *);
@@ -129,6 +130,9 @@ struct dma_buf_attachment {
 	struct dma_buf *dmabuf;
 	struct device *dev;
 	struct list_head node;
+	struct sg_table *sgt;
+	enum dma_data_direction dir;
+	bool dynamic_mapping;
 	void *priv;
 };
 #define file linux_file
