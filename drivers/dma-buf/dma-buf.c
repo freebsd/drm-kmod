@@ -286,6 +286,11 @@ dma_buf_attach(struct dma_buf *db, struct device *dev)
 	return (dba);
 }
 
+struct dma_buf_attachment *
+dma_buf_dynamic_attach(struct dma_buf *db, struct device *dev, bool dm)
+{
+	return (NULL);
+}
 
 void
 dma_buf_detach(struct dma_buf *db, struct dma_buf_attachment *dba)

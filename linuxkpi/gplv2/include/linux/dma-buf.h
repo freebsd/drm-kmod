@@ -61,6 +61,8 @@ struct dma_buf_export_info {
 					 .owner = THIS_MODULE }
 
 struct dma_buf_ops {
+	bool dynamic_mapping;
+
 	int (*attach)(struct dma_buf *, struct dma_buf_attachment *);
 
 	void (*detach)(struct dma_buf *, struct dma_buf_attachment *);
@@ -149,6 +151,8 @@ get_dma_buf(struct dma_buf *dmabuf)
 
 struct dma_buf_attachment *dma_buf_attach(struct dma_buf *dmabuf,
 							struct device *dev);
+struct dma_buf_attachment * dma_buf_dynamic_attach(struct dma_buf *db,
+    struct device *dev, bool dm);
 void dma_buf_detach(struct dma_buf *dmabuf,
 				struct dma_buf_attachment *dmabuf_attach);
 
