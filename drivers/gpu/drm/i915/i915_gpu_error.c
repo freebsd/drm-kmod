@@ -57,13 +57,11 @@ static void __sg_set_buf(struct scatterlist *sg,
 	sg->page_link = (unsigned long)virt_to_page(addr);
 #ifdef __linux__
 	sg->offset = offset_in_page(addr);
-	sg->length = len;
-	sg->dma_address = it;
 #elif defined(__FreeBSD__)
 	sg->offset = offset_in_page((unsigned long)addr);
-	sg_dma_len(sg) = len;
-	sg_dma_address(sg) = it;
 #endif
+	sg->length = len;
+	sg->dma_address = it;
 }
 
 static bool __i915_error_grow(struct drm_i915_error_state_buf *e, size_t len)
@@ -865,12 +863,12 @@ ssize_t i915_gpu_state_copy_to_buffer(struct i915_gpu_state *error,
 		return err;
 
 	sg = READ_ONCE(error->fit);
-	if (!sg || off < sg_dma_address(sg))
+	if (!sg || off < sg->dma_address)
 		sg = error->sgl;
 	if (!sg)
 		return 0;
 
-	pos = sg_dma_address(sg);
+	pos = sg->dma_address;
 	count = 0;
 	do {
 		size_t len, start;
@@ -880,7 +878,7 @@ ssize_t i915_gpu_state_copy_to_buffer(struct i915_gpu_state *error,
 			GEM_BUG_ON(sg_is_chain(sg));
 		}
 
-		len = sg_dma_len(sg);
+		len = sg->length;
 		if (pos + len <= off) {
 			pos += len;
 			continue;
@@ -895,7 +893,7 @@ ssize_t i915_gpu_state_copy_to_buffer(struct i915_gpu_state *error,
 		}
 
 		len = min(len, rem);
-		GEM_BUG_ON(!len || len > sg_dma_address(sg));
+		GEM_BUG_ON(!len || len > sg->length);
 
 		memcpy(buf, page_address(sg_page(sg)) + start, len);
 
