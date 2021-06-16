@@ -52,6 +52,9 @@
 #include "radeon_drv.h"
 
 #ifdef __FreeBSD__
+#include <asm/mtrr.h>	/* Needed for arch_phys_wc_* */
+#define	aper_base ai_aperture_base
+#define	aper_size ai_aperture_size
 SYSCTL_NODE(_hw, OID_AUTO, radeonkms,
     CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
     DRIVER_DESC " parameters");
