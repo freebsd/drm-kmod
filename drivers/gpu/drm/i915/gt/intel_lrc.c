@@ -1148,7 +1148,6 @@ execlists_schedule_out(struct i915_request *rq)
 	struct intel_context * const ce = rq->hw_context;
 	struct intel_engine_cs *cur, *old;
 
-	cur = old = NULL;
 	trace_i915_request_out(rq);
 
 	old = READ_ONCE(ce->inflight);

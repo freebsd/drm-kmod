@@ -86,10 +86,6 @@ static int __gt_park(struct intel_wakeref *wf)
 	i915_pmu_gt_parked(i915);
 	intel_rps_park(&gt->rps);
 
-	if (NEEDS_RC6_CTX_CORRUPTION_WA(i915)) {
-		intel_uncore_forcewake_put(&i915->uncore, FORCEWAKE_ALL);
-	}
-
 	/* Everything switched off, flush any residual interrupt just in case */
 	intel_synchronize_irq(i915);
 
