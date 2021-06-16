@@ -537,11 +537,6 @@ void __i915_vma_set_map_and_fenceable(struct i915_vma *vma)
 		clear_bit(I915_VMA_CAN_FENCE_BIT, __i915_vma_flags(vma));
 }
 
-static bool color_differs(struct drm_mm_node *node, unsigned long color)
-{
-	return drm_mm_node_allocated(node) && node->color != color;
-}
-
 bool i915_gem_valid_gtt_space(struct i915_vma *vma, unsigned long color)
 {
 	struct drm_mm_node *node = &vma->node;

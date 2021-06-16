@@ -2580,7 +2580,7 @@ static void i915_ggtt_color_adjust(const struct drm_mm_node *node,
 				   u64 *start,
 				   u64 *end)
 {
-	if (drm_mm_node_allocated(node) && node->color != color)
+	if (i915_node_color_differs(node, color))
 		*start += I915_GTT_PAGE_SIZE;
 
 	/* Also leave a space between the unallocated reserved node after the
