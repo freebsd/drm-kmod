@@ -296,6 +296,7 @@ CWARNFLAGS.intel_hdmi.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_hotplug.c=	-Wno-uninitialized
 CWARNFLAGS.intel_pm.c=		-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.intel_psr.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.intel_region_ttm.c=	-Wno-missing-prototypes
 CWARNFLAGS.intel_reset.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.i915_drv.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.i915_irq.c=		-Wno-unused-but-set-variable
