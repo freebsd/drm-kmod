@@ -10,6 +10,7 @@ KMOD=	i915kms
 SRCS=	\
 	dma_resv_utils.c \
 	i915_active.c \
+	i915_buddy.c \
 	i915_cmd_parser.c \
 	i915_config.c \
 	i915_drv.c \
@@ -38,6 +39,7 @@ SRCS=	\
 	i915_sysfs.c \
 	i915_user_extensions.c \
 	i915_vgpu.c \
+	i915_ttm_buddy_manager.c \
 	i915_vma.c \
 	intel_atomic.c \
 	intel_atomic_plane.c \
