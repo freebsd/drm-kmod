@@ -16,7 +16,6 @@ SRCS=	\
 	i915_drv.c \
 	i915_getparam.c \
 	i915_gem.c \
-	i915_gem_client_blt.c \
 	i915_gem_evict.c \
 	i915_gem_gtt.c \
 	i915_gem_object_blt.c \
