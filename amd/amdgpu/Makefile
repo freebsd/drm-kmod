@@ -265,6 +265,7 @@ SRCS+=	amdgpu_afmt.c \
 	psp_v3_1.c \
 	psp_v10_0.c \
 	psp_v11_0.c \
+	psp_v11_0_8.c \
 	psp_v12_0.c \
 	psp_v13_0.c \
 	sdma_v2_4.c \
