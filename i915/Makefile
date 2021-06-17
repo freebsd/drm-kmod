@@ -163,6 +163,7 @@ SRCS+=	gen2_engine_cs.c \
 	intel_gtt.c \
 	intel_llc.c \
 	intel_lrc.c \
+	intel_migrate.c \
 	intel_mocs.c \
 	intel_ppgtt.c \
 	intel_rc6.c \
