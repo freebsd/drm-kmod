@@ -25,8 +25,28 @@
  * drm helpers anyway.
  */
 
-int amdgpu_vkms_output_init(struct drm_device *dev,
-			    struct amdgpu_vkms_output *output, int index)
+static const struct amd_ip_funcs amdgpu_vkms_ip_funcs = {
+	.name = "amdgpu_vkms",
+	.early_init = NULL,
+	.late_init = NULL,
+	.sw_init = NULL,
+	.sw_fini = NULL,
+	.hw_init = NULL,
+	.hw_fini = NULL,
+	.suspend = NULL,
+	.resume = NULL,
+	.is_idle = NULL,
+	.wait_for_idle = NULL,
+	.soft_reset = NULL,
+	.set_clockgating_state = NULL,
+	.set_powergating_state = NULL,
+};
+
+const struct amdgpu_ip_block_version amdgpu_vkms_ip_block =
 {
-	return -EOPNOTSUPP;
-}
+	.type = AMD_IP_BLOCK_TYPE_DCE,
+	.major = 1,
+	.minor = 0,
+	.rev = 0,
+	.funcs = &amdgpu_vkms_ip_funcs,
+};

@@ -209,7 +209,6 @@ SRCS+=	amdgpu_afmt.c \
 	dce_v11_0.c \
 	dce_v6_0.c \
 	dce_v8_0.c \
-	dce_virtual.c \
 	dimgrey_cavefish_reg_init.c \
 	df_v1_7.c \
 	df_v3_6.c \
