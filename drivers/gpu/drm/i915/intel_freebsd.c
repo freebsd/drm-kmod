@@ -216,25 +216,38 @@ retry:
 	return (rc);
 }
 
+static inline phys_addr_t
+get_pa_addr(struct vm_area_struct *vma, struct scatterlist *sgl,
+    resource_size_t iobase)
+{
+	phys_addr_t pa;
+	struct sgt_iter sgt = __sgt_iter(sgl, iobase != -1);
+
+	if (iobase != -1) {
+		pa = (sgt.dma + sgt.curr + iobase) >> PAGE_SHIFT;
+	} else {
+		struct sgt_iter sgt = __sgt_iter(sgl, 0);
+		pa = (sgt.pfn + (sgt.curr >> PAGE_SHIFT)) << PAGE_SHIFT;
+	}
+
+	pa ^= protnone_mask(pgprot_val(vma->vm_page_prot));
+	pa &= PTE_PFN_MASK;
+
+	return pa;
+}
+
 int
 remap_io_sg(struct vm_area_struct *vma, unsigned long addr, unsigned long size,
     struct scatterlist *sgl, resource_size_t iobase)
 {
 	vm_page_t m;
 	vm_object_t vm_obj;
-	dma_addr_t pa;
+	phys_addr_t pa;
 	vm_pindex_t pidx, pidx_start;
 	int count, rc;
 
 	count = size >> PAGE_SHIFT;
-	if (iobase != -1) {
-		pa = sg_dma_address(sgl) + iobase;
-		DRM_WARN("IOBASE %x\n", pa);
-	} else {
-		struct sgt_iter sgt = __sgt_iter(sgl, 0);
-		pa = (sgt.pfn + (sgt.curr >> PAGE_SHIFT)) << PAGE_SHIFT;
-		DRM_WARN("NOIOBASE %x\n", pa);
-	}
+	pa = get_pa_addr(vma, sgl, iobase);
 	pidx_start = OFF_TO_IDX(addr);
 	rc = 0;
 	vm_obj = vma->vm_obj;
