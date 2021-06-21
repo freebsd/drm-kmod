@@ -224,7 +224,7 @@ get_pa_addr(struct vm_area_struct *vma, struct scatterlist *sgl,
 	struct sgt_iter sgt = __sgt_iter(sgl, iobase != -1);
 
 	if (iobase != -1) {
-		pa = (sgt.dma + sgt.curr + iobase) >> PAGE_SHIFT;
+		pa = sgt.dma + sgt.curr + iobase;
 	} else {
 		struct sgt_iter sgt = __sgt_iter(sgl, 0);
 		pa = (sgt.pfn + (sgt.curr >> PAGE_SHIFT)) << PAGE_SHIFT;
