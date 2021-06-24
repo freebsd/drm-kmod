@@ -245,10 +245,12 @@ remap_io_sg(struct vm_area_struct *vma, unsigned long addr, unsigned long size,
 	phys_addr_t pa;
 	vm_pindex_t pidx, pidx_start;
 	int count, rc;
+	unsigned long real_addr;
 
 	count = size >> PAGE_SHIFT;
 	pa = get_pa_addr(vma, sgl, iobase);
-	pidx_start = OFF_TO_IDX(addr);
+	real_addr = (unsigned long)pmap_mapdev(pa, size);
+	pidx_start = OFF_TO_IDX(real_addr);
 	rc = 0;
 	vm_obj = vma->vm_obj;
 
