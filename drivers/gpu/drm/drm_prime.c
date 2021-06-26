@@ -640,12 +640,7 @@ struct sg_table *drm_gem_map_dma_buf(struct dma_buf_attachment *attach,
 		sgt = obj->dev->driver->gem_prime_get_sg_table(obj);
 
 	if (!dma_map_sg_attrs(attach->dev, sgt->sgl, sgt->nents, dir,
-#ifdef __linux__
-		// linuxkpi's dma_attrs is old and incompatible
-				      DMA_ATTR_SKIP_CPU_SYNC)) {
-#elif defined(__FreeBSD__)
-				      NULL)) {
-#endif
+			      DMA_ATTR_SKIP_CPU_SYNC)) {
 		sg_free_table(sgt);
 		kfree(sgt);
 		sgt = ERR_PTR(-ENOMEM);
@@ -671,12 +666,7 @@ void drm_gem_unmap_dma_buf(struct dma_buf_attachment *attach,
 		return;
 
 	dma_unmap_sg_attrs(attach->dev, sgt->sgl, sgt->nents, dir,
-#ifdef __linux__
-		// linuxkpi's dma_attrs is old and incompatible
 			   DMA_ATTR_SKIP_CPU_SYNC);
-#elif defined(__FreeBSD__)
-			   NULL);
-#endif
 	sg_free_table(sgt);
 	kfree(sgt);
 }
