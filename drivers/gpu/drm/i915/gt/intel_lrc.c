@@ -1483,7 +1483,7 @@ assert_pending_valid(const struct intel_engine_execlists *execlists,
 	}
 
 	for (port = execlists->pending; (rq = *port); port++) {
-		unsigned long flags;
+		unsigned long flags = 0;
 		bool ok = true;
 
 		GEM_BUG_ON(!kref_read(&rq->fence.refcount));
