@@ -230,9 +230,6 @@ get_pa_addr(struct vm_area_struct *vma, struct scatterlist *sgl,
 		pa = (sgt.pfn + (sgt.curr >> PAGE_SHIFT)) << PAGE_SHIFT;
 	}
 
-	pa ^= protnone_mask(pgprot_val(vma->vm_page_prot));
-	pa &= PTE_PFN_MASK;
-
 	return pa;
 }
 

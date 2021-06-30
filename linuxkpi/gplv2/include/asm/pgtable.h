@@ -53,17 +53,6 @@
 
 #define __PAGE_KERNEL_IO		(__PAGE_KERNEL)
 
-#if defined(__amd64__) || defined(PAE)
-#define __PHYSICAL_MASK_SHIFT	52
-#else
-#define __PHYSICAL_MASK_SHIFT	32
-#endif
-
-#define __PHYSICAL_MASK		((phys_addr_t)((1ULL << __PHYSICAL_MASK_SHIFT) - 1))
-#define PHYSICAL_PAGE_MASK	(((signed long)PAGE_MASK) & __PHYSICAL_MASK)
-
-#define PTE_PFN_MASK		((pteval_t)PHYSICAL_PAGE_MASK)
-
 #define pgprot_val(x)	((x))
 #define __pgprot(x)	((pgprot_t) { (x) } )
 
@@ -103,34 +92,6 @@ static inline void native_set_pte_at(struct mm_struct *mm, unsigned long addr,
 {
 	native_set_pte(ptep, pte);
 }
-
-
-#if defined(__amd64__)
-/*
- * A clear pte value is special, and doesn't get inverted.
- *
- * Note that even users that only pass a pgprot_t (rather
- * than a full pte) won't trigger the special zero case,
- * because even PAGE_NONE has _PAGE_PROTNONE | _PAGE_ACCESSED
- * set. So the all zero case really is limited to just the
- * cleared page table entry case.
- */
-static inline bool __pte_needs_invert(u64 val)
-{
-	return val && !(val & _PAGE_PRESENT);
-}
-
-/* Get a mask to xor with the page table entry to get the correct pfn. */
-static inline u64 protnone_mask(u64 val)
-{
-	return __pte_needs_invert(val) ?  ~0ull : 0;
-}
-#else
-static inline u64 protnone_mask(u64 val)
-{
-	return 0;
-}
-#endif
 
 #define set_pte(ptep, pte)		native_set_pte(ptep, pte)
 #define set_pte_at(mm, addr, ptep, pte)	native_set_pte_at(mm, addr, ptep, pte)
