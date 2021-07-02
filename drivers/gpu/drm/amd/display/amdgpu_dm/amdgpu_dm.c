@@ -90,9 +90,6 @@
 #define FIRMWARE_RAVEN_DMCU		"amdgpu/raven_dmcu.bin"
 MODULE_FIRMWARE(FIRMWARE_RAVEN_DMCU);
 
-#ifdef __FreeBSD__
-#define	strscpy strncpy
-#endif
 /**
  * DOC: overview
  *
