@@ -1814,11 +1814,7 @@ bool drm_mode_parse_command_line_for_connector(const char *mode_option,
 		if (!drm_named_mode_is_in_whitelist(name, mode_end))
 			return false;
 
-#ifdef __linux__
 		strscpy(mode->name, name, mode_end + 1);
-#elif defined(__FreeBSD__)
-		strncpy(mode->name, name, mode_end + 1);
-#endif
 	} else {
 		ret = drm_mode_parse_cmdline_res_mode(name, mode_end,
 						      parse_extras,
