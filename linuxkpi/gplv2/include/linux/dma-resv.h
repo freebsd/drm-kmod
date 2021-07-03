@@ -44,6 +44,10 @@
 #include <linux/slab.h>
 #include <linux/seqlock.h>
 #include <linux/rcupdate.h>
+#ifdef __FreeBSD__
+/* On Linux linux/preempt.h is included through linux/seqlock.h */
+#include <linux/preempt.h>
+#endif
 
 extern struct ww_class reservation_ww_class;
 extern struct lock_class_key reservation_seqcount_class;
