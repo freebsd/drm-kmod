@@ -13889,7 +13889,11 @@ static void intel_atomic_helper_free_state(struct drm_i915_private *dev_priv)
 		drm_atomic_state_put(&state->base);
 }
 
+#ifdef __linux__
 static void intel_atomic_helper_free_state_worker(struct work_struct *work)
+#elif defined (__FreeBSD__)
+static void intel_atomic_helper_free_state_worker(struct irq_work *work)
+#endif
 {
 	struct drm_i915_private *dev_priv =
 		container_of(work, typeof(*dev_priv), atomic_helper.free_work);
@@ -14147,7 +14151,11 @@ intel_atomic_commit_ready(struct i915_sw_fence *fence,
 				&to_i915(state->base.dev)->atomic_helper;
 
 			if (llist_add(&state->freed, &helper->free_list))
+#ifdef __linux__
 				schedule_work(&helper->free_work);
+#elif defined (__FreeBSD__)
+				irq_work_queue(&helper->free_work);
+#endif
 			break;
 		}
 	}
@@ -16171,8 +16179,13 @@ int intel_modeset_init(struct drm_device *dev)
 	dev->mode_config.funcs = &intel_mode_funcs;
 
 	init_llist_head(&dev_priv->atomic_helper.free_list);
+#ifdef __linux__
 	INIT_WORK(&dev_priv->atomic_helper.free_work,
 		  intel_atomic_helper_free_state_worker);
+#elif defined (__FreeBSD__)
+	init_irq_work(&dev_priv->atomic_helper.free_work,
+		      intel_atomic_helper_free_state_worker);
+#endif
 
 	intel_init_quirks(dev_priv);
 
@@ -17113,7 +17126,15 @@ void intel_modeset_driver_remove(struct drm_device *dev)
 
 	flush_workqueue(dev_priv->modeset_wq);
 
+#ifdef __linux__
 	flush_work(&dev_priv->atomic_helper.free_work);
+#elif defined (__FreeBSD__)
+#if __FreeBSD_version < 1400025
+#define	irq_work_sync(irqw)	\
+	taskqueue_drain(linux_irq_work_tq, &(irqw)->irq_task)
+#endif
+	irq_work_sync(&dev_priv->atomic_helper.free_work);
+#endif
 	WARN_ON(!llist_empty(&dev_priv->atomic_helper.free_list));
 
 	/*
