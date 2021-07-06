@@ -69,9 +69,15 @@ struct cpuinfo_x86 {
 #define	rmb()	__asm __volatile("lfence;" : : : "memory")
 #endif
 
+#ifndef smp_mb
 #define smp_mb() mb()
+#endif
+#ifndef smp_wmb
 #define smp_wmb() wmb()
+#endif
+#ifndef smp_rmb
 #define smp_rmb() rmb()
+#endif
 
 static __always_inline void cpu_relax(void)
 {
