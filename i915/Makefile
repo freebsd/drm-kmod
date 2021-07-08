@@ -142,7 +142,6 @@ SRCS+=	gen2_engine_cs.c \
 	gen9_renderstate.c \
 	intel_breadcrumbs.c \
 	intel_context.c \
-	intel_context_param.c \
 	intel_context_sseu.c \
 	intel_engine_cs.c \
 	intel_engine_heartbeat.c \
