@@ -291,6 +291,7 @@ CWARNFLAGS.intel_dpll.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_fb.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.intel_fbdev.c=	-Wno-initializer-overrides
 CWARNFLAGS.intel_freebsd.c=	-Wno-unused-function
+CWARNFLAGS.i915_gem_context.c=	-Wno-unused-function
 CWARNFLAGS.intel_hdmi.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_hotplug.c=	-Wno-uninitialized
 CWARNFLAGS.intel_pm.c=		-Wno-incompatible-pointer-types-discards-qualifiers
