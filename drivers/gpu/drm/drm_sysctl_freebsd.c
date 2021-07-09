@@ -124,7 +124,7 @@ drm_sysctl_init(struct drm_device *dev)
 		}
 	}
 	SYSCTL_ADD_INT(&info->ctx, SYSCTL_CHILDREN(drioid), OID_AUTO, "debug",
-	    CTLFLAG_RW, &drm_debug, sizeof(drm_debug),
+	    CTLFLAG_RW, &__drm_debug, sizeof(__drm_debug),
 		       "Enable debugging output");
 #ifdef notyet
 	if (dev->driver->sysctl_init != NULL)

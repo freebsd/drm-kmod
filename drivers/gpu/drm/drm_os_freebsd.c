@@ -17,9 +17,9 @@ MALLOC_DEFINE(DRM_MEM_DRIVER, "drm_driver", "DRM DRIVER Data Structures");
 MALLOC_DEFINE(DRM_MEM_KMS, "drm_kms", "DRM KMS Data Structures");
 
 SYSCTL_NODE(_dev, OID_AUTO, drm, CTLFLAG_RW, 0, "DRM args (compat)");
-SYSCTL_INT(_dev_drm, OID_AUTO, drm_debug, CTLFLAG_RWTUN, &drm_debug, 0, "drm debug flags (compat)");
+SYSCTL_INT(_dev_drm, OID_AUTO, __drm_debug, CTLFLAG_RWTUN, &__drm_debug, 0, "drm debug flags (compat)");
 SYSCTL_NODE(_hw, OID_AUTO, dri, CTLFLAG_RW, 0, "DRI args");
-SYSCTL_INT(_hw_dri, OID_AUTO, drm_debug, CTLFLAG_RWTUN, &drm_debug, 0, "drm debug flags");
+SYSCTL_INT(_hw_dri, OID_AUTO, __drm_debug, CTLFLAG_RWTUN, &__drm_debug, 0, "drm debug flags");
 extern int skip_ddb;
 SYSCTL_INT(_dev_drm, OID_AUTO, skip_ddb, CTLFLAG_RWTUN, &skip_ddb, 0, "go straight to dumping core (compat)");
 SYSCTL_INT(_hw_dri, OID_AUTO, skip_ddb, CTLFLAG_RWTUN, &skip_ddb, 0, "go straight to dumping core");
@@ -42,7 +42,7 @@ static struct callout reset_debug_log_handle;
 static void
 clear_debug_func(void *arg __unused)
 {
-	drm_debug = 0;
+	__drm_debug = 0;
 }
 
 void
@@ -117,7 +117,7 @@ drm_modevent(module_t mod, int type, void *data)
 {
 	switch (type) {
 	case MOD_LOAD:
-		TUNABLE_INT_FETCH("drm.debug", &drm_debug);
+		TUNABLE_INT_FETCH("drm.debug", &__drm_debug);
 		callout_init(&reset_debug_log_handle, 1);
 		break;
 	case MOD_UNLOAD:
