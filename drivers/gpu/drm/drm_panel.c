@@ -201,10 +201,12 @@ int drm_panel_enable(struct drm_panel *panel)
 			return ret;
 	}
 
+#ifdef __linux__
 	ret = backlight_enable(panel->backlight);
 	if (ret < 0)
 		DRM_DEV_INFO(panel->dev, "failed to enable backlight: %d\n",
 			     ret);
+#endif
 
 	return 0;
 }
@@ -227,10 +229,12 @@ int drm_panel_disable(struct drm_panel *panel)
 	if (!panel)
 		return -EINVAL;
 
+#ifdef __linux__
 	ret = backlight_disable(panel->backlight);
 	if (ret < 0)
 		DRM_DEV_INFO(panel->dev, "failed to disable backlight: %d\n",
 			     ret);
+#endif
 
 	if (panel->funcs && panel->funcs->disable)
 		return panel->funcs->disable(panel);
@@ -325,6 +329,7 @@ EXPORT_SYMBOL(of_drm_find_panel);
  */
 int drm_panel_of_backlight(struct drm_panel *panel)
 {
+#ifdef __linux__
 	struct backlight_device *backlight;
 
 	if (!panel || !panel->dev)
@@ -336,6 +341,7 @@ int drm_panel_of_backlight(struct drm_panel *panel)
 		return PTR_ERR(backlight);
 
 	panel->backlight = backlight;
+#endif
 	return 0;
 }
 EXPORT_SYMBOL(drm_panel_of_backlight);

@@ -799,8 +799,10 @@ struct file *mock_drm_getfile(struct drm_minor *minor, unsigned int flags)
 		return file;
 	}
 
+#ifdef __linux__
 	/* Everyone shares a single global address space */
 	file->f_mapping = dev->anon_inode->i_mapping;
+#endif
 
 	drm_dev_get(dev);
 	priv->filp = file;
