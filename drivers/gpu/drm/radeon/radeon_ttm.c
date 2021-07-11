@@ -906,9 +906,9 @@ static vm_fault_t radeon_ttm_fault(struct vm_area_struct *dummy, struct vm_fault
 	rdev = radeon_get_rdev(bo->bdev);
 	down_read(&rdev->pm.mclk_lock);
 #ifdef __linux__
-	ret = ttm_vm_ops->fault(vmf);
+	ret = ttm_bo_vm_fault(vmf);
 #else
-	ret = ttm_vm_ops->fault(dummy, vmf);
+	ret = ttm_bo_vm_fault(dummy, vmf);
 #endif
 	up_read(&rdev->pm.mclk_lock);
 	return ret;
