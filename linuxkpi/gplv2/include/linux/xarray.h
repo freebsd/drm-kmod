@@ -9,6 +9,7 @@
  * See Documentation/core-api/xarray.rst for how to use the XArray.
  */
 
+#include_next <linux/xarray.h>
 
 /**
  * xa_mk_value() - Create an XArray entry from an integer.
