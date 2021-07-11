@@ -43,7 +43,9 @@ struct i915_pmu {
 	 */
 	struct {
 		struct hlist_node node;
+#ifdef __linux__
 		enum cpuhp_state slot;
+#endif
 	} cpuhp;
 	/**
 	 * @base: PMU base.
