@@ -1966,6 +1966,13 @@ bool intel_bios_is_valid_vbt(const void *buf, size_t size)
 	return vbt;
 }
 
+#ifdef __FreeBSD__
+#define	pci_map_rom(pdev, sizep)			\
+	vga_pci_map_bios(device_get_parent(pdev->dev.bsddev), sizep)
+#define	pci_unmap_rom(pdev, bios)			\
+	vga_pci_unmap_bios(device_get_parent(pdev->dev.bsddev), bios)
+#endif
+
 static struct vbt_header *oprom_get_vbt(struct drm_i915_private *dev_priv)
 {
 	struct pci_dev *pdev = dev_priv->drm.pdev;
@@ -2023,13 +2030,6 @@ err_unmap_oprom:
 
 	return NULL;
 }
-
-#ifdef __FreeBSD__
-#define	pci_map_rom(pdev, sizep)			\
-	vga_pci_map_bios(device_get_parent(pdev->dev.bsddev), sizep)
-#define	pci_unmap_rom(pdev, bios)			\
-	vga_pci_unmap_bios(device_get_parent(pdev->dev.bsddev), bios)
-#endif
 
 /**
  * intel_bios_init - find VBT and initialize settings from the BIOS
