@@ -12866,9 +12866,9 @@ pipe_config_mismatch(bool fastset, const struct intel_crtc *crtc,
 	va_end(args);
 #elif defined(__FreeBSD__)
 	if (fastset)
-		drm_dbg(DRM_UT_KMS, "mismatch in %s %s", name, format);
+		DRM_DEBUG_KMS("mismatch in %s %s", name, format);
 	else
-		drm_err("mismatch in %s %s", name, format);
+		DRM_ERROR("mismatch in %s %s", name, format);
 #endif
 }
 
