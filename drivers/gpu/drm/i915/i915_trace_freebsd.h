@@ -371,4 +371,40 @@ trace_vlv_fifo_size(void *crtc, uint32_t sprite0_start, uint32_t sprite1_start, 
 	CTR4(KTR_DRM, "vlv_fifo_size crtc %p sprite0_start %x, sprite1_start %x, fifo_size %x", crtc, sprite0_start, sprite1_start, fifo_size);
 }
 
+static inline void
+trace_intel_fbc_activate(void *crtc)
+{
+	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
+}
+
+static inline void
+trace_intel_fbc_deactivate(void *crtc)
+{
+	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
+}
+
+static inline void
+trace_intel_fbc_nuke(void *crtc)
+{
+	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
+}
+
+static inline void
+trace_intel_pipe_update_start(void *crtc)
+{
+	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
+}
+
+static inline void
+trace_intel_pipe_update_vblank_evaded(void *crtc)
+{
+	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
+}
+
+static inline void
+trace_intel_pipe_update_end(void *crtc, uint32_t frame, int scanline_end)
+{
+	CTR3(KTR_DRM, "gpu_freq_change crtc %p frame %x scanline_end %d", crtc, frame, scanline_end);
+}
+
 #endif /* _I915_TRACE_H_ */
