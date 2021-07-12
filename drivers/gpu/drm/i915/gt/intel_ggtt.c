@@ -8,6 +8,12 @@
 #include <asm/set_memory.h>
 #include <asm/smp.h>
 
+#ifdef __FreeBSD__
+#include <asm/mtrr.h>
+#include <dev/agp/agpvar.h>
+#include <drm/drm_agpsupport.h>
+#endif
+
 #include "intel_gt.h"
 #include "i915_drv.h"
 #include "i915_scatterlist.h"
@@ -416,7 +422,11 @@ static void i915_ggtt_insert_entries(struct i915_address_space *vm,
 	unsigned int flags = (cache_level == I915_CACHE_NONE) ?
 		AGP_USER_MEMORY : AGP_USER_CACHED_MEMORY;
 
+#ifdef __FreeBSD__
+	linux_intel_gtt_insert_sg_entries(vma->pages, vma->node.start >> PAGE_SHIFT,
+#else
 	intel_gtt_insert_sg_entries(vma->pages, vma->node.start >> PAGE_SHIFT,
+#endif
 				    flags);
 }
 
@@ -1071,7 +1081,12 @@ static int i915_gmch_probe(struct i915_ggtt *ggtt)
 		return -EIO;
 	}
 
+#ifdef __FreeBSD__
+	_intel_gtt_get(&ggtt->vm.total, &gmadr_base, &ggtt->mappable_end,
+		       &i915->drm.agp->agp_info);
+#else
 	intel_gtt_get(&ggtt->vm.total, &gmadr_base, &ggtt->mappable_end);
+#endif
 
 	ggtt->gmadr =
 #ifdef __FreeBSD__
