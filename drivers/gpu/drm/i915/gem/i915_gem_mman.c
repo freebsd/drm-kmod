@@ -237,7 +237,11 @@ static unsigned int tile_row_pages(const struct drm_i915_gem_object *obj)
  */
 int i915_gem_mmap_gtt_version(void)
 {
+#ifdef __linux__
 	return 4;
+#else
+	return 3;
+#endif
 }
 
 static inline struct i915_ggtt_view
@@ -725,9 +729,13 @@ i915_gem_dumb_mmap_offset(struct drm_file *file,
 {
 	enum i915_mmap_type mmap_type;
 
+#ifdef __linux__
 	if (boot_cpu_has(X86_FEATURE_PAT))
 		mmap_type = I915_MMAP_TYPE_WC;
 	else if (!i915_ggtt_has_aperture(&to_i915(dev)->ggtt))
+#else
+	if (!i915_ggtt_has_aperture(&to_i915(dev)->ggtt))
+#endif
 		return -ENODEV;
 	else
 		mmap_type = I915_MMAP_TYPE_GTT;
