@@ -293,9 +293,9 @@ static vm_fault_t i915_error_to_vmf_fault(int err)
 }
 
 #ifdef __linux__
-vm_fault_t vm_fault_cpu(struct vm_fault *vmf)
+static vm_fault_t vm_fault_cpu(struct vm_fault *vmf)
 #elif defined(__FreeBSD__)
-vm_fault_t vm_fault_cpu(struct vm_area_struct *dummy, struct vm_fault *vmf)
+static vm_fault_t vm_fault_cpu(struct vm_area_struct *dummy, struct vm_fault *vmf)
 #endif
 {
 	struct vm_area_struct *area = vmf->vma;
@@ -336,9 +336,9 @@ out:
 }
 
 #ifdef __linux__
-vm_fault_t vm_fault_gtt(struct vm_fault *vmf)
+static vm_fault_t vm_fault_gtt(struct vm_fault *vmf)
 #elif defined(__FreeBSD__)
-vm_fault_t vm_fault_gtt(struct vm_area_struct *dummy, struct vm_fault *vmf)
+static vm_fault_t vm_fault_gtt(struct vm_area_struct *dummy, struct vm_fault *vmf)
 #endif
 {
 #define MIN_CHUNK_PAGES (SZ_1M >> PAGE_SHIFT)
@@ -542,7 +542,11 @@ void i915_gem_object_release_mmap_offset(struct drm_i915_gem_object *obj)
 
 		spin_unlock(&obj->mmo.lock);
 		drm_vma_node_unmap(&mmo->vma_node,
+#ifdef __linux__
 				   obj->base.dev->anon_inode->i_mapping);
+#else
+				   NULL);
+#endif
 		spin_lock(&obj->mmo.lock);
 	}
 	spin_unlock(&obj->mmo.lock);
@@ -850,7 +854,11 @@ static struct file *mmap_singleton(struct drm_i915_private *i915)
 
 	rcu_read_lock();
 	file = i915->gem.mmap_singleton;
+#ifdef __linux__
 	if (file && !get_file_rcu(file))
+#else
+	if (file && !get_file(file))
+#endif
 		file = NULL;
 	rcu_read_unlock();
 	if (file)
@@ -861,7 +869,9 @@ static struct file *mmap_singleton(struct drm_i915_private *i915)
 		return file;
 
 	/* Everyone shares a single global address space */
+#ifdef __linux__
 	file->f_mapping = i915->drm.anon_inode->i_mapping;
+#endif
 
 	smp_store_mb(i915->gem.mmap_singleton, file);
 	drm_dev_get(&i915->drm);
@@ -958,7 +968,9 @@ int i915_gem_mmap(struct file *filp, struct vm_area_struct *vma)
 		vma->vm_ops = &vm_ops_gtt;
 		break;
 	}
+#ifdef __linux__
 	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);
+#endif
 
 	return 0;
 }

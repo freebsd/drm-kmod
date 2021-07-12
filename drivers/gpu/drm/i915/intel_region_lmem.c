@@ -57,7 +57,11 @@ static int init_fake_lmem_bar(struct intel_memory_region *mem)
 				     I915_CACHE_NONE, 0);
 	}
 
+#ifdef __FreeBSD__
+	mem->region = (struct linux_resource)DEFINE_RES_MEM(mem->remap_addr,
+#else
 	mem->region = (struct resource)DEFINE_RES_MEM(mem->remap_addr,
+#endif
 						      mem->fake_mappable.size);
 
 	return 0;

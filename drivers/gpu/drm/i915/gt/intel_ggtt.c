@@ -833,11 +833,19 @@ static void gen6_gmch_remove(struct i915_address_space *vm)
 	cleanup_scratch_page(vm);
 }
 
+#ifdef __FreeBSD__
+static struct linux_resource pci_resource(struct pci_dev *pdev, int bar)
+{
+	return (struct linux_resource)DEFINE_RES_MEM(pci_resource_start(pdev, bar),
+						     pci_resource_len(pdev, bar));
+}
+#else
 static struct resource pci_resource(struct pci_dev *pdev, int bar)
 {
 	return (struct resource)DEFINE_RES_MEM(pci_resource_start(pdev, bar),
 					       pci_resource_len(pdev, bar));
 }
+#endif
 
 static int gen8_gmch_probe(struct i915_ggtt *ggtt)
 {
@@ -1066,7 +1074,11 @@ static int i915_gmch_probe(struct i915_ggtt *ggtt)
 	intel_gtt_get(&ggtt->vm.total, &gmadr_base, &ggtt->mappable_end);
 
 	ggtt->gmadr =
+#ifdef __FreeBSD__
+		(struct linux_resource)DEFINE_RES_MEM(gmadr_base, ggtt->mappable_end);
+#else
 		(struct resource)DEFINE_RES_MEM(gmadr_base, ggtt->mappable_end);
+#endif
 
 	ggtt->do_idle_maps = needs_idle_maps(i915);
 	ggtt->vm.insert_page = i915_ggtt_insert_page;
