@@ -495,7 +495,11 @@ lrc_descriptor(struct intel_context *ce, struct intel_engine_cs *engine)
 
 static inline unsigned int dword_in_page(void *addr)
 {
+#ifdef __FreeBSD__
+	return offset_in_page((unsigned long) addr) / sizeof(u32);
+#else
 	return offset_in_page(addr) / sizeof(u32);
+#endif
 }
 
 static void set_offsets(u32 *regs,
