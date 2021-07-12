@@ -311,7 +311,11 @@ struct i915_ggtt {
 	struct i915_address_space vm;
 
 	struct io_mapping iomap;	/* Mapping to our CPU mappable region */
+#ifdef __FreeBSD__
+	struct linux_resource gmadr;    /* GMADR resource */
+#else
 	struct resource gmadr;          /* GMADR resource */
+#endif
 	resource_size_t mappable_end;	/* End offset that we can CPU map */
 
 	/** "Graphics Stolen Memory" holds the global PTEs */

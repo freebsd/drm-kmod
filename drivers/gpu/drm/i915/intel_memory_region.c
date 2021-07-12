@@ -175,7 +175,11 @@ intel_memory_region_create(struct drm_i915_private *i915,
 		return ERR_PTR(-ENOMEM);
 
 	mem->i915 = i915;
+#ifdef __FreeBSD__
+	mem->region = (struct linux_resource)DEFINE_RES_MEM(start, size);
+#else
 	mem->region = (struct resource)DEFINE_RES_MEM(start, size);
+#endif
 	mem->io_start = io_start;
 	mem->min_page_size = min_page_size;
 	mem->ops = ops;

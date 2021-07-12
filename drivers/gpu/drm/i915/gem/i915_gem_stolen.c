@@ -69,11 +69,19 @@ void i915_gem_stolen_remove_node(struct drm_i915_private *i915,
 }
 
 static int i915_adjust_stolen(struct drm_i915_private *i915,
+#ifdef __FreeBSD__
+			      struct linux_resource *dsm)
+#else
 			      struct resource *dsm)
+#endif
 {
 	struct i915_ggtt *ggtt = &i915->ggtt;
 	struct intel_uncore *uncore = ggtt->vm.gt->uncore;
+#ifdef __FreeBSD__
+	struct linux_resource *r;
+#else
 	struct resource *r;
+#endif
 
 	if (dsm->start == 0 || dsm->end <= dsm->start)
 		return -EINVAL;
@@ -86,8 +94,13 @@ static int i915_adjust_stolen(struct drm_i915_private *i915,
 	/* Make sure we don't clobber the GTT if it's within stolen memory */
 	if (INTEL_GEN(i915) <= 4 &&
 	    !IS_G33(i915) && !IS_PINEVIEW(i915) && !IS_G4X(i915)) {
+#ifdef __FreeBSD__
+		struct linux_resource stolen[2] = {*dsm, *dsm};
+		struct linux_resource ggtt_res;
+#else
 		struct resource stolen[2] = {*dsm, *dsm};
 		struct resource ggtt_res;
+#endif
 		resource_size_t ggtt_start;
 
 		ggtt_start = intel_uncore_read(uncore, PGTBL_CTL);
@@ -98,7 +111,11 @@ static int i915_adjust_stolen(struct drm_i915_private *i915,
 			ggtt_start &= PGTBL_ADDRESS_LO_MASK;
 
 		ggtt_res =
+#ifdef __FreeBSD__
+			(struct linux_resource) DEFINE_RES_MEM(ggtt_start,
+#else
 			(struct resource) DEFINE_RES_MEM(ggtt_start,
+#endif
 							 ggtt_total_entries(ggtt) * 4);
 
 		if (ggtt_res.start >= stolen[0].start && ggtt_res.start < stolen[0].end)
@@ -474,7 +491,11 @@ static int i915_gem_init_stolen(struct drm_i915_private *i915)
 	}
 
 	i915->dsm_reserved =
+#ifdef __FreeBSD__
+		(struct linux_resource)DEFINE_RES_MEM(reserved_base, reserved_size);
+#else
 		(struct resource)DEFINE_RES_MEM(reserved_base, reserved_size);
+#endif
 
 	if (!resource_contains(&i915->dsm, &i915->dsm_reserved)) {
 		DRM_ERROR("Stolen reserved area %pR outside stolen memory %pR\n",
