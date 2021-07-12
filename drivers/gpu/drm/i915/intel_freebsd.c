@@ -207,3 +207,63 @@ retry:
 	VM_OBJECT_WUNLOCK(vm_obj);
 	return (rc);
 }
+
+static inline phys_addr_t
+get_pa_addr(struct vm_area_struct *vma, struct scatterlist *sgl,
+    resource_size_t iobase)
+{
+	phys_addr_t pa;
+	struct sgt_iter sgt = __sgt_iter(sgl, iobase != -1);
+
+	if (iobase != -1) {
+		pa = sgt.dma + sgt.curr + iobase;
+	} else {
+		struct sgt_iter sgt = __sgt_iter(sgl, 0);
+		pa = (sgt.pfn + (sgt.curr >> PAGE_SHIFT)) << PAGE_SHIFT;
+	}
+
+	return pa;
+}
+
+int
+remap_io_sg(struct vm_area_struct *vma, unsigned long addr, unsigned long size,
+    struct scatterlist *sgl, resource_size_t iobase)
+{
+	vm_page_t m;
+	vm_object_t vm_obj;
+	phys_addr_t pa;
+	vm_pindex_t pidx, pidx_start;
+	int count, rc;
+
+	count = size >> PAGE_SHIFT;
+	pa = get_pa_addr(vma, sgl, iobase);
+	pidx_start = OFF_TO_IDX(addr);
+	rc = 0;
+	vm_obj = vma->vm_obj;
+
+	vma->vm_pfn_first = pidx_start;
+
+	VM_OBJECT_WLOCK(vm_obj);
+	for (pidx = pidx_start; pidx < pidx_start + count;
+	    pidx++, pa += PAGE_SIZE) {
+retry:
+		m = vm_page_grab(vm_obj, pidx, VM_ALLOC_NOCREAT);
+		if (m == NULL) {
+			m = PHYS_TO_VM_PAGE(pa);
+			if (!vm_page_busy_acquire(m, VM_ALLOC_WAITFAIL))
+				goto retry;
+			if (vm_page_insert(m, vm_obj, pidx)) {
+				vm_page_xunbusy(m);
+				VM_OBJECT_WUNLOCK(vm_obj);
+				vm_wait(NULL);
+				VM_OBJECT_WLOCK(vm_obj);
+				goto retry;
+			}
+			vm_page_valid(m);
+		}
+		vma->vm_pfn_count++;
+	}
+	VM_OBJECT_WUNLOCK(vm_obj);
+
+	return (rc);
+}
