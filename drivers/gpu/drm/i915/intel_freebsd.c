@@ -12,6 +12,9 @@ __FBSDID("$FreeBSD$");
 #include <asm/pgtable.h>
 
 #include "i915_drv.h"
+#ifdef __FreeBSD__
+#include "intel-gtt.h"
+#endif
 #include <linux/console.h>
 #include <linux/module.h>
 #include <linux/pm_runtime.h>
@@ -20,7 +23,9 @@ __FBSDID("$FreeBSD$");
 #include <drm/drm_crtc_helper.h>
 
 void *intel_gtt_get_registers(void);
+#ifdef __linux__
 void _intel_gtt_get(size_t *gtt_total, size_t *stolen_size, unsigned long *mappable_end);
+#endif
 void intel_gtt_install_pte(unsigned int index, vm_paddr_t addr, unsigned int flags);
 uint32_t intel_gtt_read_pte(unsigned int entry);
 
@@ -131,6 +136,14 @@ intel_gtt_insert_page(dma_addr_t addr, unsigned int pg, unsigned int flags)
 
 	intel_gtt_install_pte(pg, addr, flags);
 	(void)intel_gtt_chipset_flush();
+}
+
+void _intel_gtt_get(u64 *gtt_total, phys_addr_t *mappable_base,
+    resource_size_t *mappable_end, struct agp_info *ai)
+{
+	*gtt_total = ai->ai_aperture_size;
+	*mappable_base = ai->ai_aperture_base;
+	*mappable_end = ai->ai_aperture_size;
 }
 
 void
