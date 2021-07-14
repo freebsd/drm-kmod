@@ -3569,6 +3569,8 @@ int drm_panel_dp_aux_backlight(struct drm_panel *panel, struct drm_dp_aux *aux)
 	if (IS_ERR(bl->base))
 		return PTR_ERR(bl->base);
 
+	backlight_disable(bl->base);
+
 	panel->backlight = bl->base;
 
 	return 0;
