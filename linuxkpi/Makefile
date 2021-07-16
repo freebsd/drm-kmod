@@ -23,7 +23,7 @@ CFLAGS+= -I${.CURDIR}/dummy/include
 CFLAGS+= -I${.CURDIR}/gplv2/include
 CFLAGS+= -I${.CURDIR}/bsd/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
-CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"' -DLINUXKPI_VERSION=51500
+CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"' -DLINUXKPI_VERSION=51501
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 CFLAGS.gcc+= -Wno-cast-qual
 CFLAGS.linux_hdmi.c=	-Wno-cast-qual
