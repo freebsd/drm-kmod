@@ -127,7 +127,6 @@ bool i915_memcpy_from_wc(void *dst, const void *src, unsigned long len)
 	if (unlikely(((unsigned long)dst | (unsigned long)src | len) & 15))
 		return false;
 
-#ifdef CONFIG_AS_MOVNTDQA
 #ifdef __linux__
 	if (static_branch_likely(&has_movntdqa)) {
 #elif defined(__FreeBSD__)
