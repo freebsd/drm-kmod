@@ -850,7 +850,10 @@ long drm_ioctl(struct file *filp,
 	if (drm_dev_is_unplugged(dev))
 		return -ENODEV;
 
-#ifdef __FreeBSD__
+#ifdef __linux__
+       if (DRM_IOCTL_TYPE(cmd) != DRM_IOCTL_BASE)
+               return -ENOTTY;
+#elif defined (__FreeBSD__)
 	if (IOCGROUP(cmd) != DRM_IOCTL_BASE) {
 		DRM_DEBUG("bad ioctl group 0x%x\n", (int)IOCGROUP(cmd));
 		return -EINVAL;

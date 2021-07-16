@@ -76,6 +76,7 @@ typedef int drm_ioctl_compat_t(struct file *filp, unsigned int cmd,
 #elif defined(__FreeBSD__)
 #define	DRM_IOCTL_NR(n)                ((n) & 0xff)
 #endif
+#define DRM_IOCTL_TYPE(n)              _IOC_TYPE(n)
 #define DRM_MAJOR       226
 
 /**
