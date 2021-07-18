@@ -128,30 +128,22 @@ static unsigned long ttm_bo_io_mem_pfn(struct ttm_buffer_object *bo,
 vm_fault_t ttm_bo_vm_reserve(struct ttm_buffer_object *bo,
 			     struct vm_fault *vmf)
 {
-	/*
-	 * Work around locking order reversal in fault / nopfn
-	 * between mmap_sem and bo_reserve: Perform a trylock operation
-	 * for reserve, and if it fails, retry the fault after waiting
-	 * for the buffer to become unreserved.
-	 */
 	if (unlikely(!dma_resv_trylock(bo->base.resv))) {
 		if (vmf->flags & FAULT_FLAG_ALLOW_RETRY) {
 			if (!(vmf->flags & FAULT_FLAG_RETRY_NOWAIT)) {
 				ttm_bo_get(bo);
 				up_read(&vmf->vma->vm_mm->mmap_sem);
-				(void) ttm_bo_wait_unreserved(bo);
+				if (!dma_resv_lock_interruptible(bo->base.resv,
+								 NULL))
+					dma_resv_unlock(bo->base.resv);
 				ttm_bo_put(bo);
 			}
 
 			return VM_FAULT_RETRY;
 		}
 
-		/*
-		 * If we'd want to change locking order to
-		 * mmap_sem -> bo::reserve, we'd use a blocking reserve here
-		 * instead of retrying the fault...
-		 */
-		return VM_FAULT_NOPAGE;
+		if (dma_resv_lock_interruptible(bo->base.resv, NULL))
+			return VM_FAULT_NOPAGE;
 	}
 
 	return 0;
@@ -181,7 +173,6 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 				    pgoff_t num_prefault)
 {
 	struct vm_area_struct *vma = vmf->vma;
-	struct vm_area_struct cvma = *vma;
 	struct ttm_buffer_object *bo = vma->vm_private_data;
 	struct ttm_bo_device *bdev = bo->bdev;
 	unsigned long page_offset;
@@ -252,7 +243,7 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 		goto out_io_unlock;
 	}
 
-	cvma.vm_page_prot = ttm_io_prot(bo->mem.placement, prot);
+	prot = ttm_io_prot(bo->mem.placement, prot);
 	if (!bo->mem.bus.is_iomem) {
 		struct ttm_operation_ctx ctx = {
 			.interruptible = false,
@@ -269,7 +260,7 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 	} else {
 		/* Iomem should not be marked encrypted */
 #ifdef __linux__
-		cvma.vm_page_prot = pgprot_decrypted(cvma.vm_page_prot);
+		prot = pgprot_decrypted(prot);
 #endif
 	}
 
@@ -294,11 +285,20 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 			pfn = page_to_pfn(page);
 		}
 
+		/*
+		 * Note that the value of @prot at this point may differ from
+		 * the value of @vma->vm_page_prot in the caching- and
+		 * encryption bits. This is because the exact location of the
+		 * data may not be known at mmap() time and may also change
+		 * at arbitrary times while the data is mmap'ed.
+		 * See vmf_insert_mixed_prot() for a discussion.
+		 */
 		if (vma->vm_flags & VM_MIXEDMAP)
-			ret = vmf_insert_mixed(&cvma, address,
-					__pfn_to_pfn_t(pfn, PFN_DEV));
+			ret = vmf_insert_mixed_prot(vma, address,
+						    __pfn_to_pfn_t(pfn, PFN_DEV),
+						    prot);
 		else
-			ret = vmf_insert_pfn(&cvma, address, pfn);
+			ret = vmf_insert_pfn_prot(vma, address, pfn, prot);
 
 		/* Never error on prefaulted PTEs */
 		if (unlikely((ret & VM_FAULT_ERROR))) {
@@ -345,7 +345,7 @@ retry:
 			vm_page_valid(page);
 		}
 		pmap_page_set_memattr(page,
-		    pgprot2cachemode(cvma.vm_page_prot));
+		    pgprot2cachemode(prot));
 		vma->vm_pfn_count++;
 		continue;
 fail:
@@ -362,9 +362,9 @@ out_io_unlock:
 EXPORT_SYMBOL(ttm_bo_vm_fault_reserved);
 
 #ifdef __linux__
-static vm_fault_t ttm_bo_vm_fault(struct vm_fault *vmf)
+vm_fault_t ttm_bo_vm_fault(struct vm_fault *vmf)
 #elif defined (__FreeBSD__)
-static vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
+vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 #endif
 {
 	struct vm_area_struct *vma = vmf->vma;
@@ -376,7 +376,7 @@ static vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault 
 	if (ret)
 		return ret;
 
-	prot = vm_get_page_prot(vma->vm_flags);
+	prot = vma->vm_page_prot;
 	ret = ttm_bo_vm_fault_reserved(vmf, prot, TTM_BO_VM_NUM_PREFAULT);
 	if (ret == VM_FAULT_RETRY && !(vmf->flags & FAULT_FLAG_RETRY_NOWAIT))
 		return ret;
@@ -385,6 +385,7 @@ static vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault 
 
 	return ret;
 }
+EXPORT_SYMBOL(ttm_bo_vm_fault);
 
 void ttm_bo_vm_open(struct vm_area_struct *vma)
 {
@@ -446,8 +447,8 @@ static int ttm_bo_vm_access_kmap(struct ttm_buffer_object *bo,
 	return len;
 }
 
-static int ttm_bo_vm_access(struct vm_area_struct *vma, unsigned long addr,
-			    void *buf, int len, int write)
+int ttm_bo_vm_access(struct vm_area_struct *vma, unsigned long addr,
+		     void *buf, int len, int write)
 {
 	unsigned long offset = (addr) - vma->vm_start;
 	struct ttm_buffer_object *bo = vma->vm_private_data;
@@ -483,6 +484,7 @@ static int ttm_bo_vm_access(struct vm_area_struct *vma, unsigned long addr,
 
 	return ret;
 }
+EXPORT_SYMBOL(ttm_bo_vm_access);
 
 static const struct vm_operations_struct ttm_bo_vm_ops = {
 	.fault = ttm_bo_vm_fault,
@@ -571,13 +573,6 @@ EXPORT_SYMBOL(ttm_bo_mmap);
 int ttm_bo_mmap_obj(struct vm_area_struct *vma, struct ttm_buffer_object *bo)
 {
 	ttm_bo_get(bo);
-
-	/*
-	 * FIXME: &drm_gem_object_funcs.mmap is called with the fake offset
-	 * removed. Add it back here until the rest of TTM works without it.
-	 */
-	vma->vm_pgoff += drm_vma_node_start(&bo->base.vma_node);
-
 	ttm_bo_mmap_vma_setup(bo, vma);
 	return 0;
 }

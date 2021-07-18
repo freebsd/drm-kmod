@@ -71,6 +71,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn20 \
 	${SRCDIR}/display/dc/irq/dcn21 \
 	${SRCDIR}/display/dc/virtual \
+	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
 	${SRCDIR}/display/modules/color \
 	${SRCDIR}/display/modules/freesync \
@@ -133,6 +134,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_ioc32.c \
 	amdgpu_irq.c \
 	amdgpu_job.c \
+	amdgpu_jpeg.c \
 	amdgpu_kms.c \
 	amdgpu_mmhub.c \
 	amdgpu_nbio.c \
@@ -188,6 +190,7 @@ SRCS+=	amdgpu_afmt.c \
 	gfx_v7_0.c \
 	gfx_v8_0.c \
 	gfx_v9_0.c \
+	gfx_v9_4.c \
 	gfx_v10_0.c \
 	gfxhub_v1_0.c \
 	gfxhub_v1_1.c \
@@ -198,6 +201,9 @@ SRCS+=	amdgpu_afmt.c \
 	gmc_v9_0.c \
 	gmc_v10_0.c \
 	iceland_ih.c \
+	jpeg_v1_0.c \
+	jpeg_v2_0.c \
+	jpeg_v2_5.c \
 	kv_dpm.c \
 	kv_smc.c \
 	mes_v10_1.c \
@@ -259,6 +265,7 @@ SRCS+=	amdgpu_dm_color.c \
 
 # display/dc/basics
 SRCS+=	conversion.c \
+	dc_common.c \
 	fixpt31_32.c \
 	log_helpers.c \
 	vector.c
@@ -365,6 +372,7 @@ SRCS+=	dcn10_cm_common.c \
 	dcn10_hubp.c \
 	dcn10_hw_sequencer.c \
 	dcn10_hw_sequencer_debug.c \
+	dcn10_init.c \
 	dcn10_ipp.c \
 	dcn10_link_encoder.c \
 	dcn10_mpc.c \
@@ -383,6 +391,7 @@ SRCS+=	dcn20_dccg.c \
 	dcn20_hubbub.c \
 	dcn20_hubp.c \
 	dcn20_hwseq.c \
+	dcn20_init.c \
 	dcn20_link_encoder.c \
 	dcn20_mmhubbub.c \
 	dcn20_mpc.c \
@@ -398,6 +407,7 @@ SRCS+=	dcn20_dccg.c \
 SRCS+=	dcn21_hubbub.c \
 	dcn21_hubp.c \
 	dcn21_hwseq.c \
+	dcn21_init.c \
 	dcn21_link_encoder.c \
 	dcn21_resource.c
 
@@ -473,7 +483,14 @@ SRCS+=	color_gamma.c \
 	power_helpers.c
 
 # display/dc
-SRCS+=	dc_helper.c
+SRCS+=	dc_helper.c \
+	dc_dmub_srv.c
+
+# display/dmub/src
+SRCS+=	dmub_dcn20.c \
+	dmub_dcn21.c \
+	dmub_reg.c \
+	dmub_srv.c
 
 # Debug files, not handled for now
 SRCS_DEBUG=	amdgpu_dm_crc.c \
@@ -577,6 +594,7 @@ CFLAGS+= -I${SRCDIR}/display/dc
 CFLAGS+= -I${SRCDIR}/display/dc/clk_mgr/
 CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
+CFLAGS+= -I${SRCDIR}/display/dmub/inc
 CFLAGS+= -I${SRCDIR}/display/include
 CFLAGS+= -I${SRCDIR}/display/modules/inc
 CFLAGS+= -I${SRCDIR}/include
@@ -633,8 +651,10 @@ CWARNFLAGS.amdgpu_device.c=	-Wno-missing-prototypes
 .endif
 CWARNFLAGS.amdgpu_atpx_handler.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_dma_buf.c=			-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_fb.c+=	      -Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.amdgpu_ioc32.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_pm.c=				-Wno-unused-const-variable
+CWARNFLAGS.amdgpu_psp.c=				-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ras.c=			-Wno-missing-prototypes -Wno-unused-function
 CWARNFLAGS.amdgpu_sched.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ttm.c=			-Wno-missing-prototypes
@@ -644,8 +664,13 @@ CWARNFLAGS.gfx_v8_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gfx_v9_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gfx_v10_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gmc_v6_0.c=				-Wno-unused-const-variable
+CWARNFLAGS.jpeg_v1_0.c=				-Wno-missing-prototypes
+CWARNFLAGS.jpeg_v2_0.c=				-Wno-missing-prototypes
+CWARNFLAGS.jpeg_v2_5.c=				-Wno-missing-prototypes
 CWARNFLAGS.mes_v10_1.c=				-Wno-unused-const-variable
 CWARNFLAGS.mmhub_v9_4.c=			-Wno-missing-prototypes
+CWARNFLAGS.psp_v11_0.c=	  		-Wno-missing-prototypes
+CWARNFLAGS.vcn_v1_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.vcn_v2_0.c=				-Wno-missing-prototypes
 
 # display/amdgpu_dm
@@ -658,6 +683,7 @@ CWARNFLAGS.conversion.c=		-Wno-missing-prototypes
 CWARNFLAGS.fixpt31_32.c=		-Wno-incompatible-pointer-types
 CWARNFLAGS.vector.c=			-Wno-missing-prototypes
 CWARNFLAGS.bios_parser.c=		-Wno-missing-prototypes
+CWARNFLAGS.dc.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_hw_sequencer.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_link.c=			-Wno-missing-prototypes -Wno-enum-conversion
 CWARNFLAGS.dc_link_dp.c=		-Wno-missing-prototypes
@@ -685,6 +711,7 @@ CWARNFLAGS.rv1_clk_mgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp_dscl.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_hw_sequencer.c=	-Wno-missing-prototypes
+CWARNFLAGS.dcn10_init.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn10_opp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn10_optc.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
@@ -692,6 +719,7 @@ CWARNFLAGS.dcn20_dpp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn20_dwb_scl.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn20_hwseq.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn20_hubp.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn20_init.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn20_mpc.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn20_optc.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn20_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
@@ -699,6 +727,7 @@ CWARNFLAGS.dcn20_clk_mgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hubbub.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hwseq.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn21_init.c=	-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dcn21_link_encoder.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn21_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
 CWARNFLAGS.rc_calc.c=			-Wno-missing-prototypes

@@ -59,6 +59,8 @@ static inline int i915_perf_ioctl_version(void)
 }
 
 #endif
+void i915_perf_sysctl_register(void);
+void i915_perf_sysctl_unregister(void);
 
 #if defined(CONFIG_I915_PERF)
 int i915_perf_open_ioctl(struct drm_device *dev, void *data,

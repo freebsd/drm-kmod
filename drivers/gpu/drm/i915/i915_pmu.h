@@ -39,9 +39,14 @@ struct i915_pmu_sample {
 
 struct i915_pmu {
 	/**
-	 * @node: List node for CPU hotplug handling.
+	 * @cpuhp: Struct used for CPU hotplug handling.
 	 */
-	struct hlist_node node;
+	struct {
+		struct hlist_node node;
+#ifdef __linux__
+		enum cpuhp_state slot;
+#endif
+	} cpuhp;
 	/**
 	 * @base: PMU base.
 	 */
@@ -106,6 +111,10 @@ struct i915_pmu {
 	 * @sleep_last: Last time GT parked for RC6 estimation.
 	 */
 	ktime_t sleep_last;
+	/**
+	 * @events_attr_group: Device events attribute group.
+	 */
+	struct attribute_group events_attr_group;
 	/**
 	 * @i915_attr: Memory block holding device attributes.
 	 */

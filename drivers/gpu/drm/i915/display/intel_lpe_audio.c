@@ -89,7 +89,11 @@ lpe_audio_platdev_create(struct drm_i915_private *dev_priv)
 {
 	struct drm_device *dev = &dev_priv->drm;
 	struct platform_device_info pinfo = {};
+#ifdef __FreeBSD__
+	struct linux_resource *rsc;
+#else
 	struct resource *rsc;
+#endif
 	struct platform_device *platdev;
 	struct intel_hdmi_lpe_audio_pdata *pdata;
 

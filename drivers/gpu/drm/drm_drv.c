@@ -630,7 +630,8 @@ int drm_dev_init(struct drm_device *dev,
 		return -ENODEV;
 	}
 
-	BUG_ON(!parent);
+	if (WARN_ON(!parent))
+		return -EINVAL;
 
 	kref_init(&dev->ref);
 	dev->dev = get_device(parent);
@@ -745,7 +746,7 @@ int devm_drm_dev_init(struct device *parent,
 {
 	int ret;
 
-	if (WARN_ON(!parent || !driver->release))
+	if (WARN_ON(!driver->release))
 		return -EINVAL;
 
 	ret = drm_dev_init(dev, driver, parent);

@@ -12,6 +12,9 @@ __FBSDID("$FreeBSD$");
 #include <asm/pgtable.h>
 
 #include "i915_drv.h"
+#ifdef __FreeBSD__
+#include "intel-gtt.h"
+#endif
 #include <linux/console.h>
 #include <linux/module.h>
 #include <linux/pm_runtime.h>
@@ -20,7 +23,9 @@ __FBSDID("$FreeBSD$");
 #include <drm/drm_crtc_helper.h>
 
 void *intel_gtt_get_registers(void);
+#ifdef __linux__
 void _intel_gtt_get(size_t *gtt_total, size_t *stolen_size, unsigned long *mappable_end);
+#endif
 void intel_gtt_install_pte(unsigned int index, vm_paddr_t addr, unsigned int flags);
 uint32_t intel_gtt_read_pte(unsigned int entry);
 
@@ -133,6 +138,14 @@ intel_gtt_insert_page(dma_addr_t addr, unsigned int pg, unsigned int flags)
 	(void)intel_gtt_chipset_flush();
 }
 
+void _intel_gtt_get(u64 *gtt_total, phys_addr_t *mappable_base,
+    resource_size_t *mappable_end, struct agp_info *ai)
+{
+	*gtt_total = ai->ai_aperture_size;
+	*mappable_base = ai->ai_aperture_base;
+	*mappable_end = ai->ai_aperture_size;
+}
+
 void
 linux_intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
     unsigned int flags)
@@ -205,5 +218,65 @@ retry:
 		vma->vm_pfn_count++;
 	}
 	VM_OBJECT_WUNLOCK(vm_obj);
+	return (rc);
+}
+
+static inline phys_addr_t
+get_pa_addr(struct vm_area_struct *vma, struct scatterlist *sgl,
+    resource_size_t iobase)
+{
+	phys_addr_t pa;
+	struct sgt_iter sgt = __sgt_iter(sgl, iobase != -1);
+
+	if (iobase != -1) {
+		pa = sgt.dma + sgt.curr + iobase;
+	} else {
+		struct sgt_iter sgt = __sgt_iter(sgl, 0);
+		pa = (sgt.pfn + (sgt.curr >> PAGE_SHIFT)) << PAGE_SHIFT;
+	}
+
+	return pa;
+}
+
+int
+remap_io_sg(struct vm_area_struct *vma, unsigned long addr, unsigned long size,
+    struct scatterlist *sgl, resource_size_t iobase)
+{
+	vm_page_t m;
+	vm_object_t vm_obj;
+	phys_addr_t pa;
+	vm_pindex_t pidx, pidx_start;
+	int count, rc;
+
+	count = size >> PAGE_SHIFT;
+	pa = get_pa_addr(vma, sgl, iobase);
+	pidx_start = OFF_TO_IDX(addr);
+	rc = 0;
+	vm_obj = vma->vm_obj;
+
+	vma->vm_pfn_first = pidx_start;
+
+	VM_OBJECT_WLOCK(vm_obj);
+	for (pidx = pidx_start; pidx < pidx_start + count;
+	    pidx++, pa += PAGE_SIZE) {
+retry:
+		m = vm_page_grab(vm_obj, pidx, VM_ALLOC_NOCREAT);
+		if (m == NULL) {
+			m = PHYS_TO_VM_PAGE(pa);
+			if (!vm_page_busy_acquire(m, VM_ALLOC_WAITFAIL))
+				goto retry;
+			if (vm_page_insert(m, vm_obj, pidx)) {
+				vm_page_xunbusy(m);
+				VM_OBJECT_WUNLOCK(vm_obj);
+				vm_wait(NULL);
+				VM_OBJECT_WLOCK(vm_obj);
+				goto retry;
+			}
+			vm_page_valid(m);
+		}
+		vma->vm_pfn_count++;
+	}
+	VM_OBJECT_WUNLOCK(vm_obj);
+
 	return (rc);
 }

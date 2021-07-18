@@ -8,9 +8,16 @@
 #include <linux/kernel.h>
 
 #ifdef __FreeBSD__
+#include <dev/agp/agpvar.h>
+
 struct agp_bridge_data;
 struct intel_gtt;
 struct intel_gtt *intel_gtt_get(void);
+
+void _intel_gtt_get(u64 *gtt_total,
+		    phys_addr_t *mappable_base,
+		    resource_size_t *mappable_end,
+		    struct agp_info *ai);
 #else
 void intel_gtt_get(u64 *gtt_total,
 		   phys_addr_t *mappable_base,
