@@ -486,6 +486,12 @@ SRCS+=	color_gamma.c \
 SRCS+=	dc_helper.c \
 	dc_dmub_srv.c
 
+# display/dmub/src
+SRCS+=	dmub_dcn20.c \
+	dmub_dcn21.c \
+	dmub_reg.c \
+	dmub_srv.c
+
 # Debug files, not handled for now
 SRCS_DEBUG=	amdgpu_dm_crc.c \
 		amdgpu_debugfs.c \
