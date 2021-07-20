@@ -483,7 +483,8 @@ SRCS+=	color_gamma.c \
 	power_helpers.c
 
 # display/dc
-SRCS+=	dc_helper.c
+SRCS+=	dc_helper.c \
+	dc_dmub_srv.c
 
 # Debug files, not handled for now
 SRCS_DEBUG=	amdgpu_dm_crc.c \
