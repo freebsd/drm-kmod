@@ -391,6 +391,7 @@ SRCS+=	dcn20_dccg.c \
 	dcn20_hubbub.c \
 	dcn20_hubp.c \
 	dcn20_hwseq.c \
+	dcn20_init.c \
 	dcn20_link_encoder.c \
 	dcn20_mmhubbub.c \
 	dcn20_mpc.c \
