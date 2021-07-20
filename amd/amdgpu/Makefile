@@ -265,6 +265,7 @@ SRCS+=	amdgpu_dm_color.c \
 
 # display/dc/basics
 SRCS+=	conversion.c \
+	dc_common.c \
 	fixpt31_32.c \
 	log_helpers.c \
 	vector.c
