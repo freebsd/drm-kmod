@@ -71,6 +71,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn20 \
 	${SRCDIR}/display/dc/irq/dcn21 \
 	${SRCDIR}/display/dc/virtual \
+	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
 	${SRCDIR}/display/modules/color \
 	${SRCDIR}/display/modules/freesync \
