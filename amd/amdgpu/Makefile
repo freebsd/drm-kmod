@@ -407,6 +407,7 @@ SRCS+=	dcn20_dccg.c \
 SRCS+=	dcn21_hubbub.c \
 	dcn21_hubp.c \
 	dcn21_hwseq.c \
+	dcn21_init.c \
 	dcn21_link_encoder.c \
 	dcn21_resource.c
 
