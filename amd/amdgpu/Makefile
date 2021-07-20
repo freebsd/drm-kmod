@@ -372,6 +372,7 @@ SRCS+=	dcn10_cm_common.c \
 	dcn10_hubp.c \
 	dcn10_hw_sequencer.c \
 	dcn10_hw_sequencer_debug.c \
+	dcn10_init.c \
 	dcn10_ipp.c \
 	dcn10_link_encoder.c \
 	dcn10_mpc.c \
