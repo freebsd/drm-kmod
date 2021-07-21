@@ -295,10 +295,26 @@ trace_intel_frontbuffer_flush(unsigned int frontbuffer_bits, unsigned int origin
 	CTR2(KTR_DRM, "frontbuffer_bits=0x%08x, origin=%u", frontbuffer_bits, origin);
 }
 
+#define	trace_i915_request(req) \
+    CTR6(KTR_DRM, \
+	__func__ " dev=%u, engine=%u:%u, ctx=%llu, seqno=%u, tail=%u", \
+	req->engine->i915->drm.primary->index, \
+	req->engine->uabi_class, \
+	req->engine->uabi_instance, \
+	req->fence.context, \
+	req->fence.seqno, \
+	req->tail)
+
 static inline void
-trace_i915_request_add(void *req)
+trace_i915_request_add(struct i915_request *req)
 {
-	CTR1(KTR_DRM, "request_add req %p", req);
+	trace_i915_request(req);
+}
+
+static inline void
+trace_i915_request_guc_submit(struct i915_request *req)
+{
+	trace_i915_request(req);
 }
 
 #define trace_i915_gem_ring_sync_to(to_req, from) \
