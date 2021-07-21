@@ -184,14 +184,104 @@ trace_switch_mm(void *ring, void *to) {
 	CTR2(KTR_DRM, "switch_mm ring %p to %p", ring, to);
 }
 
+#define	trace_i915_context(ctx) \
+    CTR3(KTR_DRM, \
+	__func__ " dev=%u, ctx=%p, ctx_vm=%p", \
+	ctx->i915->drm.primary->index, \
+	ctx, \
+	rcu_access_pointer(ctx->vm))
+
 static inline void
-trace_i915_context_create(void *ctx) {
-	CTR1(KTR_DRM, "context_create ctx %p", ctx);
+trace_i915_context_create(struct i915_gem_context *ctx)
+{
+	trace_i915_context(ctx);
 }
 
 static inline void
-trace_i915_context_free(void *ctx) {
-	CTR1(KTR_DRM, "context_free ctx %p", ctx);
+trace_i915_context_free(struct i915_gem_context *ctx)
+{
+	trace_i915_context(ctx);
+}
+
+#define	trace_intel_context(ctx) \
+    CTR5(KTR_DRM, \
+	__func__ " guc_id=%d, pin_count=%d sched_state=0x%x,0x%x, guc_prio=%u", \
+	ctx->guc_id, \
+	atomic_read(&ctx->pin_count), \
+	ctx->guc_state.sched_state, \
+	atomic_read(&ctx->guc_sched_state_no_lock), \
+	ctx->guc_prio)
+
+static inline void
+trace_intel_context_register(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_deregister(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_deregister_done(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_sched_enable(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_sched_disable(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_sched_done(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_create(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_fence_release(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_free(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_steal_guc_id(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_do_pin(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
+trace_intel_context_do_unpin(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
 }
 
 static inline void
