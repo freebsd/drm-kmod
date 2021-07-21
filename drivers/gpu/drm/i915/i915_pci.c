@@ -1202,6 +1202,7 @@ static int __init i915_init(void)
 #endif
 	if (err) {
 		i915_pmu_exit();
+		i915_globals_exit();
 		return err;
 	}
 
