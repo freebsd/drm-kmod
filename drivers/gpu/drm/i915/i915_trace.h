@@ -219,6 +219,12 @@ trace_intel_context_reset(struct intel_context *ctx)
 }
 
 static inline void
+trace_intel_context_ban(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
 trace_intel_context_register(struct intel_context *ctx)
 {
 	trace_intel_context(ctx);
