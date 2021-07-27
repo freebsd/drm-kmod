@@ -606,4 +606,16 @@ trace_amdgpu_refresh_rate_track(int crtc_index, ktime_t refresh_rate_ns,
 	    crtc_index, refresh_rate_hz, refresh_rate_ns);
 }
 
+/* TRACE_EVENT(dcn_fpu, */
+/*	    TP_PROTO(bool begin, const char *function, const int line), */
+
+static inline void
+trace_dcn_fpu(bool begin, const char *function, const int line)
+{
+	CTR3(KTR_DRM,
+	    "dcn_fpu "
+	    "%s()+%d: %s",
+	    function, line, begin ? "begin" : "end");
+}
+
 #endif /* _AMDGPU_DM_TRACE_FREEBSD_H_ */

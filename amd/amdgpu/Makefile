@@ -320,7 +320,8 @@ SRCS+=	amdgpu_dm_color.c \
 	amdgpu_dm_pp_smu.c \
 	amdgpu_dm_psr.c \
 	amdgpu_dm_services.c \
-	amdgpu_dm.c
+	amdgpu_dm.c \
+	dc_fpu.c
 
 # display/dc/basics
 SRCS+=	conversion.c \

@@ -638,6 +638,27 @@ TRACE_EVENT(amdgpu_refresh_rate_track,
 		  __entry->refresh_rate_ns)
 );
 
+TRACE_EVENT(dcn_fpu,
+	    TP_PROTO(bool begin, const char *function, const int line),
+	    TP_ARGS(begin, function, line),
+
+	    TP_STRUCT__entry(
+			     __field(bool, begin)
+			     __field(const char *, function)
+			     __field(int, line)
+	    ),
+	    TP_fast_assign(
+			   __entry->begin = begin;
+			   __entry->function = function;
+			   __entry->line = line;
+	    ),
+	    TP_printk("%s()+%d: %s",
+		      __entry->function,
+		      __entry->line,
+		      __entry->begin ? "begin" : "end"
+	    )
+);
+
 #else
 #include "amdgpu_dm_trace_freebsd.h"
 #endif /* __linux__ */
