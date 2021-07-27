@@ -13,6 +13,7 @@
 #include <linux/types.h>
 
 #include "i915_active_types.h"
+#include "i915_sw_fence.h"
 #include "i915_utils.h"
 #include "intel_engine_types.h"
 #include "intel_sseu.h"
@@ -45,6 +46,9 @@ struct intel_context_ops {
 	int (*pin)(struct intel_context *ce, void *vaddr);
 	void (*unpin)(struct intel_context *ce);
 	void (*post_unpin)(struct intel_context *ce);
+
+	void (*cancel_request)(struct intel_context *ce,
+			       struct i915_request *rq);
 
 	void (*enter)(struct intel_context *ce);
 	void (*exit)(struct intel_context *ce);
@@ -160,7 +164,7 @@ struct intel_context {
 		 * sched_state: scheduling state of this context using GuC
 		 * submission
 		 */
-		u8 sched_state;
+		u16 sched_state;
 		/*
 		 * fences: maintains of list of requests that have a submit
 		 * fence related to GuC submission
@@ -188,6 +192,9 @@ struct intel_context {
 	 * GuC ID link - in list when unpinned but guc_id still valid in GuC
 	 */
 	struct list_head guc_id_link;
+
+	/* GuC context blocked fence */
+	struct i915_sw_fence guc_blocked;
 };
 
 #endif /* __INTEL_CONTEXT_TYPES__ */
