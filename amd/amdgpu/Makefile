@@ -55,6 +55,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn302 \
 	${SRCDIR}/display/dc/dcn303 \
 	${SRCDIR}/display/dc/dcn31 \
+	${SRCDIR}/display/dc/dml/dcn2x \
 	${SRCDIR}/display/dc/dsc \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
@@ -564,6 +565,9 @@ SRCS+=	dc_vm_helper.c
 # display/dc/clk_mgr
 SRCS+=	rn_clk_mgr.c \
 	rn_clk_mgr_vbios_smu.c
+
+# display/dml/dc/dcn2x
+SRCS+=	dcn2x.c
 
 # display/dc/dsc
 SRCS+=	rc_calc.c \
