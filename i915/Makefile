@@ -19,7 +19,6 @@ SRCS=	\
 	i915_gem_evict.c \
 	i915_gem_gtt.c \
 	i915_gem_ww.c \
-	i915_globals.c \
 	i915_irq.c \
 	i915_memcpy.c \
 	i915_mitigations.c \
