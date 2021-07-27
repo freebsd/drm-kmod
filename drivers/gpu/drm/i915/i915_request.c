@@ -117,6 +117,9 @@ static void i915_fence_release(struct dma_fence *fence)
 {
 	struct i915_request *rq = to_request(fence);
 
+	GEM_BUG_ON(rq->guc_prio != GUC_PRIO_INIT &&
+		   rq->guc_prio != GUC_PRIO_FINI);
+
 	/*
 	 * The request is put onto a RCU freelist (i.e. the address
 	 * is immediately reused), mark the fences as being freed now.
@@ -941,6 +944,8 @@ __i915_request_create(struct intel_context *ce, gfp_t gfp)
 #elif __FreeBSD__
 	smp_mb();
 #endif
+
+	rq->guc_prio = GUC_PRIO_INIT;
 
 	/* We bump the ref for the fence chain */
 	i915_sw_fence_reinit(&i915_request_get(rq)->submit);
