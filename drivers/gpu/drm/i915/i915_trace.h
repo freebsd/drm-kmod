@@ -213,6 +213,12 @@ trace_i915_context_free(struct i915_gem_context *ctx)
 	ctx->guc_prio)
 
 static inline void
+trace_intel_context_reset(struct intel_context *ctx)
+{
+	trace_intel_context(ctx);
+}
+
+static inline void
 trace_intel_context_register(struct intel_context *ctx)
 {
 	trace_intel_context(ctx);
