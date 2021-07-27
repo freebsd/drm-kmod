@@ -22,24 +22,13 @@
  *
  */
 
-#include <linux/console.h>
 #include <linux/vga_switcheroo.h>
 
 #include <drm/drm_drv.h>
 #include <drm/i915_pciids.h>
 
-#include "display/intel_fbdev.h"
-
-#include "i915_active.h"
-#include "i915_buddy.h"
 #include "i915_drv.h"
-#include "gem/i915_gem_context.h"
-#include "gem/i915_gem_object.h"
-#include "i915_request.h"
-#include "i915_perf.h"
-#include "i915_selftest.h"
-#include "i915_scheduler.h"
-#include "i915_vma.h"
+#include "i915_pci.h"
 
 #define PLATFORM(x) .platform = (x)
 #define GEN(x) \
@@ -1142,6 +1131,8 @@ static const struct pci_device_id pciidlist[] = {
 };
 #ifdef __linux__
 MODULE_DEVICE_TABLE(pci, pciidlist);
+#elif defined(__FreeBSD__)
+LKPI_PNP_INFO(pci, i915kms, pciidlist);
 #endif
 
 static void i915_pci_remove(struct pci_dev *pdev)
@@ -1250,31 +1241,6 @@ static void i915_pci_shutdown(struct pci_dev *pdev)
 	i915_driver_shutdown(i915);
 }
 
-static int i915_check_nomodeset(void)
-{
-	bool use_kms = true;
-
-	/*
-	 * Enable KMS by default, unless explicitly overriden by
-	 * either the i915.modeset prarameter or by the
-	 * vga_text_mode_force boot option.
-	 */
-
-	if (i915_modparams.modeset == 0)
-		use_kms = false;
-
-	if (vgacon_text_force() && i915_modparams.modeset == -1)
-		use_kms = false;
-
-	if (!use_kms) {
-		/* Silently fail loading to not upset userspace. */
-		DRM_DEBUG_DRIVER("KMS disabled.\n");
-		return 1;
-	}
-
-	return 0;
-}
-
 static struct pci_driver i915_pci_driver = {
 	.name = DRIVER_NAME,
 	.id_table = pciidlist,
@@ -1284,7 +1250,7 @@ static struct pci_driver i915_pci_driver = {
 	.driver.pm = &i915_pm_ops,
 };
 
-static int i915_register_pci_driver(void)
+int i915_register_pci_driver(void)
 {
 #ifdef __linux__
 	return pci_register_driver(&i915_pci_driver);
@@ -1294,7 +1260,7 @@ static int i915_register_pci_driver(void)
 #endif
 }
 
-static void i915_unregister_pci_driver(void)
+void i915_unregister_pci_driver(void)
 {
 #ifdef __linux__
 	pci_unregister_driver(&i915_pci_driver);
@@ -1303,100 +1269,3 @@ static void i915_unregister_pci_driver(void)
 	vt_unfreeze_main_vd();
 #endif
 }
-
-static const struct {
-   int (*init)(void);
-   void (*exit)(void);
-} init_funcs[] = {
-	{ i915_check_nomodeset, NULL },
-	{ i915_active_module_init, i915_active_module_exit },
-	{ i915_buddy_module_init, i915_buddy_module_exit },
-	{ i915_context_module_init, i915_context_module_exit },
-	{ i915_gem_context_module_init, i915_gem_context_module_exit },
-	{ i915_objects_module_init, i915_objects_module_exit },
-	{ i915_request_module_init, i915_request_module_exit },
-	{ i915_scheduler_module_init, i915_scheduler_module_exit },
-	{ i915_vma_module_init, i915_vma_module_exit },
-	{ i915_mock_selftests, NULL },
-	{ i915_pmu_init, i915_pmu_exit },
-	{ i915_register_pci_driver, i915_unregister_pci_driver },
-#ifdef __linux__
-	{ i915_perf_sysctl_register, i915_perf_sysctl_unregister },
-#endif
-};
-static int init_progress;
-
-static int __init i915_init(void)
-{
-	int err, i;
-
-	for (i = 0; i < ARRAY_SIZE(init_funcs); i++) {
-		err = init_funcs[i].init();
-		if (err < 0) {
-			while (i--) {
-				if (init_funcs[i].exit)
-					init_funcs[i].exit();
-			}
-			return err;
-		} else if (err > 0) {
-			/*
-			 * Early-exit success is reserved for things which
-			 * don't have an exit() function because we have no
-			 * idea how far they got or how to partially tear
-			 * them down.
-			 */
-			WARN_ON(init_funcs[i].exit);
-
-			/*
-			 * We don't want to advertise devices with an only
-			 * partially initialized driver.
-			 */
-#ifdef __linux__
-			WARN_ON(i915_pci_driver.driver.owner);
-#endif
-			break;
-		}
-	}
-
-	init_progress = i;
-
-	return 0;
-}
-
-static void __exit i915_exit(void)
-{
-	int i;
-
-	for (i = init_progress - 1; i >= 0; i--) {
-		GEM_BUG_ON(i >= ARRAY_SIZE(init_funcs));
-		if (init_funcs[i].exit)
-			init_funcs[i].exit();
-	}
-}
-
-#ifdef __linux__
-module_init(i915_init);
-module_exit(i915_exit);
-#endif
-
-MODULE_AUTHOR("Tungsten Graphics, Inc.");
-MODULE_AUTHOR("Intel Corporation");
-
-MODULE_DESCRIPTION(DRIVER_DESC);
-MODULE_LICENSE("GPL and additional rights");
-
-/* BSD stuff */
-#ifdef __FreeBSD__
-LKPI_DRIVER_MODULE(i915kms, i915_init, i915_exit);
-LKPI_PNP_INFO(pci, i915kms, pciidlist);
-MODULE_DEPEND(i915kms, drmn, 2, 2, 2);
-MODULE_DEPEND(i915kms, ttm, 1, 1, 1);
-MODULE_DEPEND(i915kms, agp, 1, 1, 1);
-MODULE_DEPEND(i915kms, linuxkpi, 1, 1, 1);
-MODULE_DEPEND(i915kms, linuxkpi_gplv2, 1, 1, 1);
-MODULE_DEPEND(i915kms, dmabuf, 1, 1, 1);
-MODULE_DEPEND(i915kms, firmware, 1, 1, 1);
-#ifdef CONFIG_DEBUG_FS
-MODULE_DEPEND(i915kms, lindebugfs, 1, 1, 1);
-#endif
-#endif
