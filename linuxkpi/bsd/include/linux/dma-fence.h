@@ -128,16 +128,4 @@ signed long dma_fence_wait(struct dma_fence *fence, bool intr);
 
 #define	__dma_fence_might_wait	(void)
 
-#define DMA_FENCE_TRACE(f, fmt, args...) \
-	do {				\
-	} while (0)
-
-#define DMA_FENCE_WARN(f, fmt, args...) \
-	do {				\
-	} while (0)
-
-#define DMA_FENCE_ERR(f, fmt, args...) \
-	do {				\
-	} while (0)
-
 #endif
