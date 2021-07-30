@@ -31,6 +31,7 @@ KCONFIG+=	ARCH_HAVE_NMI_SAFE_CMPXCHG \
 		MTRR \
 		PCI \
 		PM \
+		PM_SLEEP \
 		SMP
 
 .if ${MACHINE_CPUARCH} == "aarch64"
