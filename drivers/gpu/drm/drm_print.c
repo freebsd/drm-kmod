@@ -27,7 +27,7 @@
 #define DEBUG /* for pr_debug() */
 #endif
 
-#include <stdarg.h>
+#include <linux/stdarg.h>
 
 #include <linux/io.h>
 #include <linux/moduleparam.h>
