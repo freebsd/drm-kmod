@@ -551,6 +551,7 @@ SRCS+=	dcn31_apg.c \
 	dcn31_clk_mgr.c \
 	dcn31_dccg.c \
 	dcn31_dio_link_encoder.c \
+	dcn31_hpo_dp_link_encoder.c \
 	dcn31_hpo_dp_stream_encoder.c \
 	dcn31_hubp.c \
 	dcn31_hubbub.c \
@@ -893,7 +894,7 @@ CWARNFLAGS.vector.c=			-Wno-missing-prototypes
 CWARNFLAGS.bios_parser.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_hw_sequencer.c=		-Wno-missing-prototypes
-CWARNFLAGS.dc_link.c=			-Wno-unused-but-set-variable
+CWARNFLAGS.dc_link.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_link_dp.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_resource.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_aux.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
