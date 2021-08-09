@@ -3047,9 +3047,6 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 	bool dummy_pstate_supported = false;
 	double p_state_latency_us;
 
-#ifdef __FreeBSD__
-	kernel_fpu_begin();
-#endif
 	DC_FP_START();
 	p_state_latency_us = context->bw_ctx.dml.soc.dram_clock_change_latency_us;
 	context->bw_ctx.dml.soc.disable_dram_clock_change_vactive_support =
@@ -3057,9 +3054,6 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 
 	if (fast_validate) {
 		voltage_supported = dcn20_validate_bandwidth_internal(dc, context, true);
-#ifdef __FreeBSD__
-		kernel_fpu_end();
-#endif
 		DC_FP_END();
 		return voltage_supported;
 	}
@@ -3614,9 +3608,6 @@ static bool dcn20_resource_construct(
 	enum dml_project dml_project_version =
 			get_dml_project_version(ctx->asic_id.hw_internal_rev);
 
-#ifdef __FreeBSD__
-	kernel_fpu_begin();
-#endif
 	DC_FP_START();
 
 	ctx->dc_bios->regs = &bios_regs;
@@ -3921,9 +3912,6 @@ static bool dcn20_resource_construct(
 
 create_fail:
 
-#ifdef __FreeBSD__
-	kernel_fpu_end();
-#endif
 	DC_FP_END();
 	dcn20_resource_destruct(pool);
 
