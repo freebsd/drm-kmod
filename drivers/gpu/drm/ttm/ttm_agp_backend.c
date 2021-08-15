@@ -62,7 +62,7 @@ static int ttm_agp_bind(struct ttm_tt *ttm, struct ttm_mem_reg *bo_mem)
 	unsigned i;
 #ifdef __linux__
 	struct agp_memory *mem;
-	int cached = (bo_mem->placement & TTM_PL_FLAG_CACHED);
+	int ret, cached = (bo_mem->placement & TTM_PL_FLAG_CACHED);
 
 	mem = agp_allocate_memory(agp_be->bridge, ttm->num_pages, AGP_USER_MEMORY);
 	if (unlikely(mem == NULL))

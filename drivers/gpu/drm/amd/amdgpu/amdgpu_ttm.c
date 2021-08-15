@@ -1821,7 +1821,7 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
 #ifdef __linux__
 			       adev->ddev->anon_inode->i_mapping,
 			       adev->ddev->vma_offset_manager,
-			       adev->need_dma32);
+			       dma_addressing_limited(adev->dev));
 #elif defined(__FreeBSD__)
 			       NULL, /* Dummy on BSD */
 			       adev->ddev->vma_offset_manager,

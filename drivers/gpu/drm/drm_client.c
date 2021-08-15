@@ -256,7 +256,6 @@ drm_client_buffer_create(struct drm_client_dev *client, u32 width, u32 height, u
 	struct drm_client_buffer *buffer;
 	struct drm_gem_object *obj;
 	int ret;
-	void *vaddr;
 
 	buffer = kzalloc(sizeof(*buffer), GFP_KERNEL);
 	if (!buffer)
