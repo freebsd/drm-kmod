@@ -1144,9 +1144,6 @@ bool dcn21_validate_bandwidth(struct dc *dc, struct dc_state *context,
 		bool fast_validate)
 {
 	bool out = false;
-#ifdef __FreeBSD__
-	kernel_fpu_begin();
-#endif
 
 	BW_VAL_TRACE_SETUP();
 
@@ -1154,6 +1151,10 @@ bool dcn21_validate_bandwidth(struct dc *dc, struct dc_state *context,
 	int pipe_split_from[MAX_PIPES];
 	int pipe_cnt = 0;
 	display_e2e_pipe_params_st *pipes = kzalloc(dc->res_pool->pipe_count * sizeof(display_e2e_pipe_params_st), GFP_KERNEL);
+#ifdef __FreeBSD__
+	// BSDFIXME: keeping alloc/free out of the critical section due to aggressive INVARIANTS
+	kernel_fpu_begin();
+#endif
 	DC_LOGGER_INIT(dc->ctx->logger);
 
 	BW_VAL_TRACE_COUNT();
@@ -1188,10 +1189,11 @@ validate_fail:
 	out = false;
 
 validate_out:
-	kfree(pipes);
 #ifdef __FreeBSD__
+	// BSDFIXME: keeping alloc/free out of the critical section due to aggressive INVARIANTS
 	kernel_fpu_end();
 #endif
+	kfree(pipes);
 
 	BW_VAL_TRACE_FINISH();
 
