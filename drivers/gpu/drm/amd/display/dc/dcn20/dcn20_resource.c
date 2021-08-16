@@ -2996,7 +2996,14 @@ static bool dcn20_validate_bandwidth_internal(struct dc *dc, struct dc_state *co
 	int vlevel = 0;
 	int pipe_split_from[MAX_PIPES];
 	int pipe_cnt = 0;
+#ifdef __linux__
 	display_e2e_pipe_params_st *pipes = kzalloc(dc->res_pool->pipe_count * sizeof(display_e2e_pipe_params_st), GFP_KERNEL);
+#elif defined(__FreeBSD__)
+	DC_FP_END();
+	/* We do not need in GFP_ATOMIC introduced in 5.9 after exiting from FPU context */
+	display_e2e_pipe_params_st *pipes = kzalloc(dc->res_pool->pipe_count * sizeof(display_e2e_pipe_params_st), GFP_KERNEL);
+	DC_FP_START();
+#endif
 	DC_LOGGER_INIT(dc->ctx->logger);
 
 	BW_VAL_TRACE_COUNT();
@@ -3031,7 +3038,13 @@ validate_fail:
 	out = false;
 
 validate_out:
+#ifdef __FreeBSD__
+	DC_FP_END();
+#endif
 	kfree(pipes);
+#ifdef __FreeBSD__
+	DC_FP_START();
+#endif
 
 	BW_VAL_TRACE_FINISH();
 
