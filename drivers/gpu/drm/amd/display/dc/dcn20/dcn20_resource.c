@@ -2881,7 +2881,14 @@ static bool dcn20_validate_bandwidth_internal(struct dc *dc, struct dc_state *co
 	int vlevel = 0;
 	int pipe_split_from[MAX_PIPES];
 	int pipe_cnt = 0;
+	// BSDFIXME: keeping alloc/free out of the critical section due to aggressive INVARIANTS
+#ifdef __FreeBSD__
+	kernel_fpu_end();
+#endif
 	display_e2e_pipe_params_st *pipes = kzalloc(dc->res_pool->pipe_count * sizeof(display_e2e_pipe_params_st), GFP_KERNEL);
+#ifdef __FreeBSD__
+	kernel_fpu_begin();
+#endif
 	DC_LOGGER_INIT(dc->ctx->logger);
 
 	BW_VAL_TRACE_COUNT();
@@ -2916,7 +2923,14 @@ validate_fail:
 	out = false;
 
 validate_out:
+	// BSDFIXME: keeping alloc/free out of the critical section due to aggressive INVARIANTS
+#ifdef __FreeBSD__
+	kernel_fpu_end();
+#endif
 	kfree(pipes);
+#ifdef __FreeBSD__
+	kernel_fpu_begin();
+#endif
 
 	BW_VAL_TRACE_FINISH();
 
