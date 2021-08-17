@@ -712,7 +712,7 @@ static void revoke_mmaps(struct intel_gt *gt)
 				    vma->size,
 				    1);
 #elif defined(__FreeBSD__)
-		unmap_mapping_range(vma->obj,
+		unmap_mapping_range(vma->mmo,
 				    drm_vma_node_offset_addr(node),
 				    drm_vma_node_size(node) << PAGE_SHIFT,
 				    1);

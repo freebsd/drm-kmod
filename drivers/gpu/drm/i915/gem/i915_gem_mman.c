@@ -535,7 +535,11 @@ void i915_gem_object_release_mmap_offset(struct drm_i915_gem_object *obj)
 
 		spin_unlock(&obj->mmo.lock);
 		drm_vma_node_unmap(&mmo->vma_node,
+#ifdef __linux__
 				   obj->base.dev->anon_inode->i_mapping);
+#elif defined(__FreeBSD__)
+				   mmo);
+#endif
 		spin_lock(&obj->mmo.lock);
 	}
 	spin_unlock(&obj->mmo.lock);

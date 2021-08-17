@@ -1125,7 +1125,7 @@ void i915_vma_revoke_mmap(struct i915_vma *vma)
 			    vma->size,
 			    1);
 #elif defined(__FreeBSD__)
-	unmap_mapping_range(vma->obj, drm_vma_node_offset_addr(node),
+	unmap_mapping_range(vma->mmo, drm_vma_node_offset_addr(node),
 	    drm_vma_node_size(node) << PAGE_SHIFT, 1);
 #endif
 
