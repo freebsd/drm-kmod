@@ -38,6 +38,10 @@ static struct device_type drm_sysfs_device_minor = {
 	.name = "drm_minor"
 };
 
+static struct device_type drm_sysfs_device_connector = {
+	.name = "drm_connector",
+};
+
 struct class *drm_class;
 
 static char *drm_devnode(struct device *dev, umode_t *mode)
@@ -101,6 +105,7 @@ int drm_sysfs_connector_add(struct drm_connector *connector)
 	connector->kdev->class = drm_class;
 	connector->kdev->parent = dev->primary->kdev;
 	connector->kdev->release = device_create_release;
+	connector->kdev->type = &drm_sysfs_device_connector;
 	device_initialize(connector->kdev);
 	dev_set_drvdata(connector->kdev, connector);
 	rv = kobject_set_name(&connector->kdev->kobj, "card%d-%s",
