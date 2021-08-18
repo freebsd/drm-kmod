@@ -165,6 +165,7 @@ static void unmap_object(struct drm_i915_gem_object *obj, void *ptr)
 {
 	if (is_vmalloc_addr(ptr))
 		vunmap(ptr);
+	// BSDFIXME: kunmap removed due to a backport from 5.10
 }
 
 struct sg_table *
@@ -237,6 +238,7 @@ unlock:
 	return err;
 }
 
+// BSDFIXME: i915_gem_object_map_page is a backport from 5.10
 /* The 'mapping' part of i915_gem_object_pin_map() below */
 static void *i915_gem_object_map_page(struct drm_i915_gem_object *obj,
 		enum i915_map_type type)
@@ -294,6 +296,7 @@ static void *i915_gem_object_map_page(struct drm_i915_gem_object *obj,
 	return vaddr;
 }
 
+// BSDFIXME: i915_gem_object_map_pfn is a backport from 5.10
 static void *i915_gem_object_map_pfn(struct drm_i915_gem_object *obj,
 		enum i915_map_type type)
 {
@@ -373,6 +376,7 @@ void *i915_gem_object_pin_map(struct drm_i915_gem_object *obj,
 	}
 
 	if (!ptr) {
+		// BSDFIXME: Following 7 lines are a backport from 5.10
 		if (GEM_WARN_ON(type == I915_MAP_WC &&
 				!static_cpu_has(X86_FEATURE_PAT)))
 			ptr = NULL;
