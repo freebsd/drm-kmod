@@ -22,6 +22,7 @@ SRCS=	\
 	i915_globals.c \
 	i915_irq.c \
 	i915_memcpy.c \
+	i915_mm.c \
 	i915_params.c \
 	i915_pci.c \
 	i915_query.c \

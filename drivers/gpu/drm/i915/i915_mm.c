@@ -29,8 +29,17 @@
 
 #include "i915_drv.h"
 
+#ifdef __FreeBSD__
+#include <vm/vm_pageout.h>
+#define	pte_t	linux_pte_t
+#define	apply_to_page_range(dummy, ...)	remap_page_range(__VA_ARGS__)
+#endif
+
 struct remap_pfn {
 	struct mm_struct *mm;
+#ifdef __FreeBSD__
+	struct vm_area_struct *vma;
+#endif
 	unsigned long pfn;
 	pgprot_t prot;
 
@@ -38,12 +47,49 @@ struct remap_pfn {
 	resource_size_t iobase;
 };
 
+#ifdef __FreeBSD__
+static int
+remap_page_range(unsigned long start_addr, unsigned long size,
+    pte_fn_t fn,  struct remap_pfn *r)
+{
+	vm_object_t vm_obj = r->vma->vm_obj;
+	unsigned long addr;
+	int err = 0;
+
+	VM_OBJECT_WLOCK(vm_obj);
+	for (addr = start_addr; addr < start_addr + size; addr += PAGE_SIZE) {
+retry:
+		err = fn(0, addr, r);
+		if (err == -ENOMEM) {
+			VM_OBJECT_WUNLOCK(vm_obj);
+			vm_wait(NULL);
+			VM_OBJECT_WLOCK(vm_obj);
+			goto retry;
+		}
+		if (err != 0)
+			break;
+	}
+	VM_OBJECT_WUNLOCK(vm_obj);
+
+	return (err);
+}
+#endif
+
 static int remap_pfn(pte_t *pte, unsigned long addr, void *data)
 {
 	struct remap_pfn *r = data;
 
+#ifdef __linux__
 	/* Special PTE are not associated with any struct page */
 	set_pte_at(r->mm, addr, pte, pte_mkspecial(pfn_pte(r->pfn, r->prot)));
+#elif defined(__FreeBSD__)
+	vm_fault_t ret;
+	ret = lkpi_vmf_insert_pfn_prot_locked(r->vma, addr, r->pfn, r->prot);
+	if ((ret & VM_FAULT_OOM) != 0)
+		return -ENOMEM;
+	if ((ret & VM_FAULT_ERROR) != 0)
+		return -EFAULT;
+#endif
 	r->pfn++;
 
 	return 0;
@@ -101,8 +147,13 @@ int remap_io_mapping(struct vm_area_struct *vma,
 	/* We rely on prevalidation of the io-mapping to skip track_pfn(). */
 	r.mm = vma->vm_mm;
 	r.pfn = pfn;
+#ifdef __linux__
 	r.prot = __pgprot((pgprot_val(iomap->prot) & _PAGE_CACHE_MASK) |
 			  (pgprot_val(vma->vm_page_prot) & ~_PAGE_CACHE_MASK));
+#elif defined(__FreeBSD__)
+	r.vma = vma;
+	r.prot = cachemode2protval(iomap->attr);
+#endif
 
 	err = apply_to_page_range(r.mm, addr, size, remap_pfn, &r);
 	if (unlikely(err)) {
