@@ -33,6 +33,7 @@
 #include <vm/vm_pageout.h>
 #define	pte_t	linux_pte_t
 #define	apply_to_page_range(dummy, ...)	remap_page_range(__VA_ARGS__)
+#define	flush_cache_range(...)
 #endif
 
 struct remap_pfn {
@@ -112,9 +113,18 @@ static int remap_sg(pte_t *pte, unsigned long addr, void *data)
 	if (GEM_WARN_ON(!r->sgt.pfn))
 		return -EINVAL;
 
+#ifdef __linux__
 	/* Special PTE are not associated with any struct page */
 	set_pte_at(r->mm, addr, pte,
 		   pte_mkspecial(pfn_pte(sgt_pfn(r), r->prot)));
+#elif defined(__FreeBSD__)
+	vm_fault_t ret =
+	    lkpi_vmf_insert_pfn_prot_locked(r->vma, addr, sgt_pfn(r), r->prot);
+	if ((ret & VM_FAULT_OOM) != 0)
+		return -ENOMEM;
+	if ((ret & VM_FAULT_ERROR) != 0)
+		return -EFAULT;
+#endif
 	r->pfn++; /* track insertions in case we need to unwind later */
 
 	r->sgt.curr += PAGE_SIZE;
@@ -180,6 +190,9 @@ int remap_io_sg(struct vm_area_struct *vma,
 {
 	struct remap_pfn r = {
 		.mm = vma->vm_mm,
+#ifdef __FreeBSD__
+		.vma = vma,
+#endif
 		.prot = vma->vm_page_prot,
 		.sgt = __sgt_iter(sgl, use_dma(iobase)),
 		.iobase = iobase,
