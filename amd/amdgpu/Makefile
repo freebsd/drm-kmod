@@ -546,7 +546,8 @@ SRCS+=	dcn303_hwseq.c \
 	dmub_dcn303.c
 
 # display/dc/clk_mgr/dcn31
-SRCS+=	dcn31_apg.c \
+SRCS+=	dcn31_afmt.c \
+	dcn31_apg.c \
 	dcn31_smu.c \
 	dcn31_clk_mgr.c \
 	dcn31_dccg.c \
@@ -560,6 +561,7 @@ SRCS+=	dcn31_apg.c \
 	dcn31_optc.c \
 	dcn31_panel_cntl.c \
 	dcn31_resource.c \
+	dcn31_vpg.c \
 	display_mode_vba_31.c \
 	display_rq_dlg_calc_31.c \
 	dmub_dcn31.c \
