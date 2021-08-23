@@ -55,11 +55,7 @@ static void __sg_set_buf(struct scatterlist *sg,
 			 void *addr, unsigned int len, loff_t it)
 {
 	sg->page_link = (unsigned long)virt_to_page(addr);
-#ifdef __linux__
 	sg->offset = offset_in_page(addr);
-#elif defined(__FreeBSD__)
-	sg->offset = offset_in_page((unsigned long)addr);
-#endif
 	sg->length = len;
 	sg->dma_address = it;
 }
