@@ -60,6 +60,7 @@ SRCS=	\
 	intel_dpio_phy.c \
 	intel_dpll.c \
 	intel_dpll_mgr.c \
+	intel_dpt.c \
 	intel_dram.c \
 	intel_fbc.c \
 	intel_fdi.c \
