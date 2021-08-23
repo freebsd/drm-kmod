@@ -32,6 +32,7 @@ struct linux_resource {
 	/* unsigned long desc; */
 	/* struct resource *parent, *sibling, *child; */
 };
+#define	resource	linux_resource
 
 struct pci_dev *linux_pci_get_class(unsigned int class, struct pci_dev *from);
 
