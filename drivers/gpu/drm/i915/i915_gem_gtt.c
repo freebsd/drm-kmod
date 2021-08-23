@@ -26,10 +26,6 @@
 #include "i915_trace.h"
 #include "i915_vgpu.h"
 
-#ifdef __FreeBSD__
-#include <dev/agp/agp_i810.h>
-#endif
-
 int i915_gem_gtt_prepare_pages(struct drm_i915_gem_object *obj,
 			       struct sg_table *pages)
 {
