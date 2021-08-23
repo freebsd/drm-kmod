@@ -1264,7 +1264,6 @@ out:
 	intel_runtime_pm_put(gt->uncore->rpm, wakeref);
 }
 
-#ifdef __freebsd_notyet__
 int intel_gt_reset_trylock(struct intel_gt *gt, int *srcu)
 {
 	might_lock(&gt->reset.backoff_srcu);
@@ -1292,7 +1291,6 @@ __releases(&gt->reset.backoff_srcu)
 {
 	srcu_read_unlock(&gt->reset.backoff_srcu, tag);
 }
-#endif
 
 int intel_gt_terminally_wedged(struct intel_gt *gt)
 {

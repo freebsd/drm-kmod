@@ -290,9 +290,7 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 	intel_wakeref_t wakeref;
 	struct i915_vma *vma;
 	pgoff_t page_offset;
-#ifdef __freebsd_notyet__
 	int srcu;
-#endif
 	int ret;
 
 	/* Sanity check that we allow writing into this object */
@@ -310,11 +308,9 @@ vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
 
 	wakeref = intel_runtime_pm_get(rpm);
 
-#ifdef __freebsd_notyet__
 	ret = intel_gt_reset_trylock(ggtt->vm.gt, &srcu);
 	if (ret)
 		goto err_rpm;
-#endif
 
 	/* Now pin it into the GTT as needed */
 	vma = i915_gem_object_ggtt_pin(obj, NULL, 0, 0,
@@ -393,10 +389,8 @@ err_fence:
 err_unpin:
 	__i915_vma_unpin(vma);
 err_reset:
-#ifdef __freebsd_notyet__
 	intel_gt_reset_unlock(ggtt->vm.gt, srcu);
 err_rpm:
-#endif
 	intel_runtime_pm_put(rpm, wakeref);
 	i915_gem_object_unpin_pages(obj);
 err:
