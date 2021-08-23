@@ -47,7 +47,6 @@
 
 #ifdef __FreeBSD__
 #include <dev/agp/agp_i810.h>
-#define	resource linux_resource
 #endif
 
 #define I915_GFP_ALLOW_FAIL (GFP_KERNEL | __GFP_RETRY_MAYFAIL | __GFP_NOWARN)

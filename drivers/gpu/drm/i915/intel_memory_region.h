@@ -12,10 +12,6 @@
 #include <linux/io-mapping.h>
 #include <drm/drm_mm.h>
 
-#ifdef __FreeBSD__ // For linux_resource
-#include <linux/pci.h>
-#endif
-
 #include "i915_buddy.h"
 
 struct drm_i915_private;
@@ -74,11 +70,7 @@ struct intel_memory_region {
 	const struct intel_memory_region_ops *ops;
 
 	struct io_mapping iomap;
-#ifdef __linux__
 	struct resource region;
-#elif defined(__FreeBSD__)
-	struct linux_resource region;
-#endif
 
 	/* For fake LMEM */
 	struct drm_mm_node fake_mappable;

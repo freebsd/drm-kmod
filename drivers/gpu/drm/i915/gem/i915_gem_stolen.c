@@ -14,10 +14,6 @@
 #include "i915_drv.h"
 #include "i915_gem_stolen.h"
 
-#ifdef __FreeBSD__
-#define	resource linux_resource
-#endif
-
 /*
  * The BIOS typically reserves some of the system's memory for the exclusive
  * use of the integrated graphics. This memory is no longer available for

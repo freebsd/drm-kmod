@@ -36,8 +36,8 @@ bool i915_gpu_lower(void);
 bool i915_gpu_busy(void);
 bool i915_gpu_turbo_disable(void);
 
-/* Exported from linuxkpi_gplv2/src/linux_kernel.c */
-extern struct linux_resource intel_graphics_stolen_res;
+/* Exported from arch/x86/kernel/early-quirks.c */
+extern struct resource intel_graphics_stolen_res;
 
 /*
  * The Bridge device's PCI config space has information about the

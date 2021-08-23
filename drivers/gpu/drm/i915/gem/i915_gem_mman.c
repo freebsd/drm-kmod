@@ -19,7 +19,6 @@
 
 #ifdef __FreeBSD__
 #include <sys/resourcevar.h>	/* for lim_cur_proc */
-#define	resource linux_resource
 #endif
 
 #ifdef __linux__ /* Mute unused function warning. */

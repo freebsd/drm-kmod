@@ -80,10 +80,6 @@
 #include "intel_memory_region.h"
 #include "intel_pm.h"
 
-#ifdef __FreeBSD__
-#define	resource linux_resource
-#endif
-
 static struct drm_driver driver;
 
 struct vlv_s0ix_state {

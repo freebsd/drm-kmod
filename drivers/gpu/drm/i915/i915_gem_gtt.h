@@ -42,9 +42,6 @@
 
 #include <drm/drm_mm.h>
 
-#ifdef __FreeBSD__ // For linux_resource
-#include <linux/pci.h>
-#endif
 #include "gt/intel_reset.h"
 #include "i915_gem_fence_reg.h"
 #include "i915_request.h"
@@ -400,11 +397,7 @@ struct i915_ggtt {
 	struct i915_address_space vm;
 
 	struct io_mapping iomap;	/* Mapping to our CPU mappable region */
-#ifdef __linux__
 	struct resource gmadr;          /* GMADR resource */
-#elif defined(__FreeBSD__)
-	struct linux_resource gmadr;          /* GMADR resource */
-#endif
 	resource_size_t mappable_end;	/* End offset that we can CPU map */
 
 	/** "Graphics Stolen Memory" holds the global PTEs */
