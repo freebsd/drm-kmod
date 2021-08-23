@@ -268,9 +268,7 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 		}
 	} else {
 		/* Iomem should not be marked encrypted */
-#ifdef __linux__
 		cvma.vm_page_prot = pgprot_decrypted(cvma.vm_page_prot);
-#endif
 	}
 
 	/*
