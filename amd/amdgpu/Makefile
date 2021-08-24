@@ -160,6 +160,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_job.c \
 	amdgpu_jpeg.c \
 	amdgpu_kms.c \
+	amdgpu_mca.c \
 	amdgpu_mmhub.c \
 	amdgpu_nbio.c \
 	amdgpu_object.c \
@@ -244,6 +245,7 @@ SRCS+=	amdgpu_afmt.c \
 	jpeg_v3_0.c \
 	kv_dpm.c \
 	kv_smc.c \
+	mca_v3_0.c \
 	mes_v10_1.c \
 	mmhub_v1_0.c \
 	mmhub_v1_7.c \
