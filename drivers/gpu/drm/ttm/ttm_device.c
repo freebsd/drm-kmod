@@ -225,6 +225,7 @@ int ttm_device_init(struct ttm_device *bdev, struct ttm_device_funcs *funcs,
 	INIT_DELAYED_WORK(&bdev->wq, ttm_device_delayed_workqueue);
 	spin_lock_init(&bdev->lru_lock);
 	INIT_LIST_HEAD(&bdev->ddestroy);
+	INIT_LIST_HEAD(&bdev->pinned);
 #ifdef __linux__
 	bdev->dev_mapping = mapping;
 #endif
