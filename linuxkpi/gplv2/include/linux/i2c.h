@@ -221,6 +221,9 @@ extern int i2c_add_adapter(struct i2c_adapter *adapter);
 
 extern int i2c_del_adapter(struct i2c_adapter *);
 
+struct i2c_adapter *i2c_get_adapter(int nr);
+void i2c_put_adapter(struct i2c_adapter *adap);
+
 extern int i2c_register_driver(struct module *, struct i2c_driver *);
 extern void i2c_del_driver(struct i2c_driver *);
 

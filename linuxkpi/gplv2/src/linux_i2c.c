@@ -546,6 +546,28 @@ i2c_del_adapter(struct i2c_adapter *adap)
 	return (0);
 }
 
+struct i2c_adapter *
+i2c_get_adapter(int nr)
+{
+	struct i2c_adapter *adapter;
+
+	mutex_lock(&i2c_core);
+	adapter = idr_find(&i2c_adapter_idr, nr);
+	if (adapter != NULL)
+		get_device(&adapter->dev);
+	mutex_unlock(&i2c_core);
+	return (adapter);
+}
+
+void
+i2c_put_adapter(struct i2c_adapter *adap)
+{
+	if (!adap)
+		return;
+
+	put_device(&adap->dev);
+}
+
 static int
 linux_i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 {
