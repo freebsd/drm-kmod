@@ -96,6 +96,7 @@ SRCS+=	dvo_ch7017.c \
 	g4x_dp.c \
 	g4x_hdmi.c \
 	icl_dsi.c \
+	intel_backlight.c \
 	intel_crt.c \
 	intel_ddi.c \
 	intel_ddi_buf_trans.c \
@@ -290,6 +291,7 @@ CWARNFLAGS.intel_audio.c=	-Wno-unused-function
 CWARNFLAGS.intel_combo_phy.c=	-Wno-uninitialized
 CWARNFLAGS.intel_ddi.c=		-Wno-unused-but-set-variable -Wno-missing-prototypes
 CWARNFLAGS.intel_dp.c=		-Wno-unused-variable -Wno-sometimes-uninitialized -Wno-constant-logical-operand
+CWARNFLAGS.intel_dp_aux_backlight.c=	-Wno-shift-count-overflow
 CWARNFLAGS.intel_dpll_mgr.c=	-Wno-compare-distinct-pointer-types
 CWARNFLAGS.intel_display.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_dpll.c=	-Wno-unused-but-set-variable
@@ -313,5 +315,6 @@ CWARNFLAGS.i915_active.c=	-Wno-unused-function
 CWARNFLAGS.i915_sw_fence.c=	-Wno-unused-function
 CWARNFLAGS.i915_vma.c=		-Wno-unused-function -Wno-unused-but-set-variable
 CWARNFLAGS.i9xx_plane.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.g4x_dp.c=		-Wno-shift-count-overflow
 CWARNFLAGS.skl_universal_plane.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.vlv_dsi.c=		-Wno-unused-but-set-variable
