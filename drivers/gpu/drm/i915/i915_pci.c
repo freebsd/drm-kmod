@@ -1239,7 +1239,7 @@ static struct pci_driver i915_pci_driver = {
 	.driver.pm = &i915_pm_ops,
 };
 
-int i915_register_pci_driver(void)
+int i915_pci_register_driver(void)
 {
 #ifdef __linux__
 	return pci_register_driver(&i915_pci_driver);
@@ -1249,7 +1249,7 @@ int i915_register_pci_driver(void)
 #endif
 }
 
-void i915_unregister_pci_driver(void)
+void i915_pci_unregister_driver(void)
 {
 #ifdef __linux__
 	pci_unregister_driver(&i915_pci_driver);
