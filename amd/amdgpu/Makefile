@@ -13,7 +13,8 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn20 \
 	${SRCDIR}/display/dc/dml/dcn21 \
 	${SRCDIR}/display/dc/dml/dcn30 \
-	${SRCDIR}/display/dc/dml/dcn31
+	${SRCDIR}/display/dc/dml/dcn31 \
+	${SRCDIR}/display/dc/dml/dsc
 .endif
 
 .PATH:	${SRCDIR}/acp \
@@ -577,6 +578,9 @@ SRCS+=	dcn2x.c
 SRCS+=	rc_calc.c \
 	rc_calc_dpi.c \
 	dc_dsc.c
+
+# display/dc/dml/dsc
+SRCS+=	rc_calc_fpu.c
 
 .endif
 
