@@ -157,12 +157,24 @@ dma_fence_array_next(struct dma_fence *head, unsigned int index)
 	return (NULL);
 }
 
+static void
+dma_fence_array_set_deadline(struct dma_fence *fence, ktime_t deadline)
+{
+	struct dma_fence_array *array;
+	int i;
+
+	array = to_dma_fence_array(fence);
+	for (i = 0; i < array->num_fences; i++)
+		dma_fence_set_deadline(array->fences[i], deadline);
+}
+
 const struct dma_fence_ops dma_fence_array_ops = {
 	.get_driver_name = dma_fence_array_get_driver_name,
 	.get_timeline_name = dma_fence_array_get_timeline_name,
 	.enable_signaling = dma_fence_array_enable_signaling,
 	.signaled = dma_fence_array_signaled,
 	.release = dma_fence_array_release,
+	.set_deadline = dma_fence_array_set_deadline,
 };
 
 /*
