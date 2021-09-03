@@ -132,6 +132,22 @@ dma_fence_chain_release(struct dma_fence *fence)
 	dma_fence_free(fence);
 }
 
+
+static void
+dma_fence_chain_set_deadline(struct dma_fence *fence, ktime_t deadline)
+{
+	struct dma_fence_chain *chain;
+	struct dma_fence *f;
+
+	dma_fence_chain_for_each(fence, fence) {
+		if ((chain = to_dma_fence_chain(fence)) == NULL)
+			f = fence;
+		else
+			f = chain->fence;
+		dma_fence_set_deadline(f, deadline);
+	}
+}
+
 const struct dma_fence_ops dma_fence_chain_ops = {
 	.use_64bit_seqno = true,
 	.get_driver_name = dma_fence_chain_get_driver_name,
@@ -139,6 +155,7 @@ const struct dma_fence_ops dma_fence_chain_ops = {
 	.enable_signaling = dma_fence_chain_enable_signaling,
 	.signaled = dma_fence_chain_signaled,
 	.release = dma_fence_chain_release,
+	.set_deadline = dma_fence_chain_set_deadline,
 };
 
 bool
