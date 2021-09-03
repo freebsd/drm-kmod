@@ -441,6 +441,13 @@ cb_cleanup:
 }
 
 void
+dma_fence_set_deadline(struct dma_fence *fence, ktime_t deadline)
+{
+	if (fence->ops->set_deadline != NULL && !dma_fence_is_signaled(fence))
+		fence->ops->set_deadline(fence, deadline);
+}
+
+void
 dma_fence_describe(struct dma_fence *fence, struct seq_file *seq)
 {
 	seq_printf(seq, "%s %s seq %llu %ssignalled\n",
