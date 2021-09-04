@@ -905,22 +905,20 @@ int psp_reg_program(struct psp_context *psp, enum psp_reg_prog_id reg,
 static void psp_prep_ta_load_cmd_buf(struct psp_gfx_cmd_resp *cmd,
 				     uint64_t ta_bin_mc,
 				     uint32_t ta_bin_size,
-				     uint64_t ta_shared_mc,
-				     uint32_t ta_shared_size)
+				     struct ta_mem_context *mem_ctx)
 {
 	cmd->cmd_id				= GFX_CMD_ID_LOAD_TA;
 	cmd->cmd.cmd_load_ta.app_phy_addr_lo 	= lower_32_bits(ta_bin_mc);
 	cmd->cmd.cmd_load_ta.app_phy_addr_hi	= upper_32_bits(ta_bin_mc);
 	cmd->cmd.cmd_load_ta.app_len		= ta_bin_size;
 
-	cmd->cmd.cmd_load_ta.cmd_buf_phy_addr_lo = lower_32_bits(ta_shared_mc);
-	cmd->cmd.cmd_load_ta.cmd_buf_phy_addr_hi = upper_32_bits(ta_shared_mc);
-	cmd->cmd.cmd_load_ta.cmd_buf_len	 = ta_shared_size;
+	cmd->cmd.cmd_load_ta.cmd_buf_phy_addr_lo = lower_32_bits(mem_ctx->shared_mc_addr);
+	cmd->cmd.cmd_load_ta.cmd_buf_phy_addr_hi = upper_32_bits(mem_ctx->shared_mc_addr);
+	cmd->cmd.cmd_load_ta.cmd_buf_len	 = mem_ctx->shared_mem_size;
 }
 
 static int psp_ta_init_shared_buf(struct psp_context *psp,
-				  struct ta_mem_context *mem_ctx,
-				  uint32_t shared_mem_size)
+				  struct ta_mem_context *mem_ctx)
 {
 	int ret;
 
@@ -928,8 +926,8 @@ static int psp_ta_init_shared_buf(struct psp_context *psp,
 	* Allocate 16k memory aligned to 4k from Frame Buffer (local
 	* physical) for ta to host memory
 	*/
-	ret = amdgpu_bo_create_kernel(psp->adev, shared_mem_size, PAGE_SIZE,
-				      AMDGPU_GEM_DOMAIN_VRAM,
+	ret = amdgpu_bo_create_kernel(psp->adev, mem_ctx->shared_mem_size,
+				      PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM,
 				      &mem_ctx->shared_bo,
 				      &mem_ctx->shared_mc_addr,
 				      &mem_ctx->shared_buf);
@@ -945,8 +943,7 @@ static void psp_ta_free_shared_buf(struct ta_mem_context *mem_ctx)
 
 static int psp_xgmi_init_shared_buf(struct psp_context *psp)
 {
-	return psp_ta_init_shared_buf(psp, &psp->xgmi_context.context.mem_context,
-				      PSP_XGMI_SHARED_MEM_SIZE);
+	return psp_ta_init_shared_buf(psp, &psp->xgmi_context.context.mem_context);
 }
 
 static void psp_prep_ta_invoke_cmd_buf(struct psp_gfx_cmd_resp *cmd,
@@ -975,36 +972,37 @@ static int psp_ta_invoke(struct psp_context *psp,
 	return ret;
 }
 
-static int psp_xgmi_load(struct psp_context *psp)
+static int psp_ta_load(struct psp_context *psp,
+			   struct psp_bin_desc *bin_desc,
+			   struct ta_context *context)
 {
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
-	/*
-	 * TODO: bypass the loading in sriov for now
-	 */
-
 	cmd = acquire_psp_cmd_buf(psp);
 
-	psp_copy_fw(psp, psp->xgmi.start_addr, psp->xgmi.size_bytes);
+	psp_copy_fw(psp, bin_desc->start_addr, bin_desc->size_bytes);
 
 	psp_prep_ta_load_cmd_buf(cmd,
 				 psp->fw_pri_mc_addr,
-				 psp->xgmi.size_bytes,
-				 psp->xgmi_context.context.mem_context.shared_mc_addr,
-				 PSP_XGMI_SHARED_MEM_SIZE);
+				 bin_desc->size_bytes,
+				 &context->mem_context);
 
 	ret = psp_cmd_submit_buf(psp, NULL, cmd,
 				 psp->fence_buf_mc_addr);
 
 	if (!ret) {
-		psp->xgmi_context.context.initialized = true;
-		psp->xgmi_context.context.session_id = cmd->resp.session_id;
+		context->session_id = cmd->resp.session_id;
 	}
 
 	release_psp_cmd_buf(psp);
 
 	return ret;
+}
+
+static int psp_xgmi_load(struct psp_context *psp)
+{
+	return psp_ta_load(psp, &psp->xgmi, &psp->xgmi_context.context);
 }
 
 static int psp_xgmi_unload(struct psp_context *psp)
@@ -1055,6 +1053,8 @@ int psp_xgmi_initialize(struct psp_context *psp, bool set_extended_data, bool lo
 	if (!load_ta)
 		goto invoke;
 
+	psp->xgmi_context.context.mem_context.shared_mem_size = PSP_XGMI_SHARED_MEM_SIZE;
+
 	if (!psp->xgmi_context.context.initialized) {
 		ret = psp_xgmi_init_shared_buf(psp);
 		if (ret)
@@ -1063,7 +1063,9 @@ int psp_xgmi_initialize(struct psp_context *psp, bool set_extended_data, bool lo
 
 	/* Load XGMI TA */
 	ret = psp_xgmi_load(psp);
-	if (ret)
+	if (!ret)
+		psp->xgmi_context.context.initialized = true;
+	else
 		return ret;
 
 invoke:
@@ -1285,57 +1287,12 @@ int psp_xgmi_set_topology_info(struct psp_context *psp,
 // ras begin
 static int psp_ras_init_shared_buf(struct psp_context *psp)
 {
-	return psp_ta_init_shared_buf(psp, &psp->ras_context.context.mem_context,
-				      PSP_RAS_SHARED_MEM_SIZE);
+	return psp_ta_init_shared_buf(psp, &psp->ras_context.context.mem_context);
 }
 
 static int psp_ras_load(struct psp_context *psp)
 {
-	int ret;
-	struct psp_gfx_cmd_resp *cmd;
-	struct ta_ras_shared_memory *ras_cmd;
-
-	/*
-	 * TODO: bypass the loading in sriov for now
-	 */
-	if (amdgpu_sriov_vf(psp->adev))
-		return 0;
-
-	psp_copy_fw(psp, psp->ras.start_addr, psp->ras.size_bytes);
-
-	ras_cmd = (struct ta_ras_shared_memory *)psp->ras_context.context.mem_context.shared_buf;
-
-	if (psp->adev->gmc.xgmi.connected_to_cpu)
-		ras_cmd->ras_in_message.init_flags.poison_mode_en = 1;
-	else
-		ras_cmd->ras_in_message.init_flags.dgpu_mode = 1;
-
-	cmd = acquire_psp_cmd_buf(psp);
-
-	psp_prep_ta_load_cmd_buf(cmd,
-				 psp->fw_pri_mc_addr,
-				 psp->ras.size_bytes,
-				 psp->ras_context.context.mem_context.shared_mc_addr,
-				 PSP_RAS_SHARED_MEM_SIZE);
-
-	ret = psp_cmd_submit_buf(psp, NULL, cmd,
-			psp->fence_buf_mc_addr);
-
-	if (!ret) {
-		psp->ras_context.context.session_id = cmd->resp.session_id;
-
-		if (!ras_cmd->ras_status)
-			psp->ras_context.context.initialized = true;
-		else
-			dev_warn(psp->adev->dev, "RAS Init Status: 0x%X\n", ras_cmd->ras_status);
-	}
-
-	release_psp_cmd_buf(psp);
-
-	if (ret || ras_cmd->ras_status)
-		amdgpu_ras_fini(psp->adev);
-
-	return ret;
+	return psp_ta_load(psp, &psp->ras, &psp->ras_context.context);
 }
 
 static int psp_ras_unload(struct psp_context *psp)
@@ -1462,6 +1419,7 @@ static int psp_ras_initialize(struct psp_context *psp)
 	int ret;
 	uint32_t boot_cfg = 0xFF;
 	struct amdgpu_device *adev = psp->adev;
+	struct ta_ras_shared_memory *ras_cmd;
 
 	/*
 	 * TODO: bypass the initialize in sriov for now
@@ -1516,17 +1474,33 @@ static int psp_ras_initialize(struct psp_context *psp)
 		}
 	}
 
+	psp->ras_context.context.mem_context.shared_mem_size = PSP_RAS_SHARED_MEM_SIZE;
+
 	if (!psp->ras_context.context.initialized) {
 		ret = psp_ras_init_shared_buf(psp);
 		if (ret)
 			return ret;
 	}
 
-	ret = psp_ras_load(psp);
-	if (ret)
-		return ret;
+	ras_cmd = (struct ta_ras_shared_memory *)psp->ras_context.context.mem_context.shared_buf;
+	memset(ras_cmd, 0, sizeof(struct ta_ras_shared_memory));
 
-	return 0;
+	if (psp->adev->gmc.xgmi.connected_to_cpu)
+		ras_cmd->ras_in_message.init_flags.poison_mode_en = 1;
+	else
+		ras_cmd->ras_in_message.init_flags.dgpu_mode = 1;
+
+	ret = psp_ras_load(psp);
+
+	if (!ret && !ras_cmd->ras_status)
+		psp->ras_context.context.initialized = true;
+	else {
+		if (ras_cmd->ras_status)
+			dev_warn(psp->adev->dev, "RAS Init Status: 0x%X\n", ras_cmd->ras_status);
+		amdgpu_ras_fini(psp->adev);
+	}
+
+	return ret;
 }
 
 int psp_ras_trigger_error(struct psp_context *psp,
@@ -1560,43 +1534,12 @@ int psp_ras_trigger_error(struct psp_context *psp,
 // HDCP start
 static int psp_hdcp_init_shared_buf(struct psp_context *psp)
 {
-	return psp_ta_init_shared_buf(psp, &psp->hdcp_context.context.mem_context,
-				      PSP_HDCP_SHARED_MEM_SIZE);
+	return psp_ta_init_shared_buf(psp, &psp->hdcp_context.context.mem_context);
 }
 
 static int psp_hdcp_load(struct psp_context *psp)
 {
-	int ret;
-	struct psp_gfx_cmd_resp *cmd;
-
-	/*
-	 * TODO: bypass the loading in sriov for now
-	 */
-	if (amdgpu_sriov_vf(psp->adev))
-		return 0;
-
-	psp_copy_fw(psp, psp->hdcp.start_addr,
-		    psp->hdcp.size_bytes);
-
-	cmd = acquire_psp_cmd_buf(psp);
-
-	psp_prep_ta_load_cmd_buf(cmd,
-				 psp->fw_pri_mc_addr,
-				 psp->hdcp.size_bytes,
-				 psp->hdcp_context.context.mem_context.shared_mc_addr,
-				 PSP_HDCP_SHARED_MEM_SIZE);
-
-	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
-
-	if (!ret) {
-		psp->hdcp_context.context.initialized = true;
-		psp->hdcp_context.context.session_id = cmd->resp.session_id;
-		mutex_init(&psp->hdcp_context.mutex);
-	}
-
-	release_psp_cmd_buf(psp);
-
-	return ret;
+	return psp_ta_load(psp, &psp->hdcp, &psp->hdcp_context.context);
 }
 static int psp_hdcp_initialize(struct psp_context *psp)
 {
@@ -1614,6 +1557,8 @@ static int psp_hdcp_initialize(struct psp_context *psp)
 		return 0;
 	}
 
+	psp->hdcp_context.context.mem_context.shared_mem_size = PSP_HDCP_SHARED_MEM_SIZE;
+
 	if (!psp->hdcp_context.context.initialized) {
 		ret = psp_hdcp_init_shared_buf(psp);
 		if (ret)
@@ -1621,10 +1566,12 @@ static int psp_hdcp_initialize(struct psp_context *psp)
 	}
 
 	ret = psp_hdcp_load(psp);
-	if (ret)
-		return ret;
+	if (!ret) {
+		psp->hdcp_context.context.initialized = true;
+		mutex_init(&psp->hdcp_context.mutex);
+	}
 
-	return 0;
+	return ret;
 }
 
 static int psp_hdcp_unload(struct psp_context *psp)
@@ -1677,42 +1624,12 @@ out:
 // DTM start
 static int psp_dtm_init_shared_buf(struct psp_context *psp)
 {
-	return psp_ta_init_shared_buf(psp, &psp->dtm_context.context.mem_context,
-				      PSP_DTM_SHARED_MEM_SIZE);
+	return psp_ta_init_shared_buf(psp, &psp->dtm_context.context.mem_context);
 }
 
 static int psp_dtm_load(struct psp_context *psp)
 {
-	int ret;
-	struct psp_gfx_cmd_resp *cmd;
-
-	/*
-	 * TODO: bypass the loading in sriov for now
-	 */
-	if (amdgpu_sriov_vf(psp->adev))
-		return 0;
-
-	psp_copy_fw(psp, psp->dtm.start_addr, psp->dtm.size_bytes);
-
-	cmd = acquire_psp_cmd_buf(psp);
-
-	psp_prep_ta_load_cmd_buf(cmd,
-				 psp->fw_pri_mc_addr,
-				 psp->dtm.size_bytes,
-				 psp->dtm_context.context.mem_context.shared_mc_addr,
-				 PSP_DTM_SHARED_MEM_SIZE);
-
-	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
-
-	if (!ret) {
-		psp->dtm_context.context.initialized = true;
-		psp->dtm_context.context.session_id = cmd->resp.session_id;
-		mutex_init(&psp->dtm_context.mutex);
-	}
-
-	release_psp_cmd_buf(psp);
-
-	return ret;
+	return psp_ta_load(psp, &psp->dtm, &psp->dtm_context.context);
 }
 
 static int psp_dtm_initialize(struct psp_context *psp)
@@ -1731,6 +1648,8 @@ static int psp_dtm_initialize(struct psp_context *psp)
 		return 0;
 	}
 
+	psp->dtm_context.context.mem_context.shared_mem_size = PSP_DTM_SHARED_MEM_SIZE;
+
 	if (!psp->dtm_context.context.initialized) {
 		ret = psp_dtm_init_shared_buf(psp);
 		if (ret)
@@ -1738,10 +1657,12 @@ static int psp_dtm_initialize(struct psp_context *psp)
 	}
 
 	ret = psp_dtm_load(psp);
-	if (ret)
-		return ret;
+	if (!ret) {
+		psp->dtm_context.context.initialized = true;
+		mutex_init(&psp->dtm_context.mutex);
+	}
 
-	return 0;
+	return ret;
 }
 
 static int psp_dtm_unload(struct psp_context *psp)
@@ -1794,36 +1715,12 @@ out:
 // RAP start
 static int psp_rap_init_shared_buf(struct psp_context *psp)
 {
-	return psp_ta_init_shared_buf(psp, &psp->rap_context.context.mem_context,
-				      PSP_RAP_SHARED_MEM_SIZE);
+	return psp_ta_init_shared_buf(psp, &psp->rap_context.context.mem_context);
 }
 
 static int psp_rap_load(struct psp_context *psp)
 {
-	int ret;
-	struct psp_gfx_cmd_resp *cmd;
-
-	psp_copy_fw(psp, psp->rap.start_addr, psp->rap.size_bytes);
-
-	cmd = acquire_psp_cmd_buf(psp);
-
-	psp_prep_ta_load_cmd_buf(cmd,
-				 psp->fw_pri_mc_addr,
-				 psp->rap.size_bytes,
-				 psp->rap_context.context.mem_context.shared_mc_addr,
-				 PSP_RAP_SHARED_MEM_SIZE);
-
-	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
-
-	if (!ret) {
-		psp->rap_context.context.initialized = true;
-		psp->rap_context.context.session_id = cmd->resp.session_id;
-		mutex_init(&psp->rap_context.mutex);
-	}
-
-	release_psp_cmd_buf(psp);
-
-	return ret;
+	return psp_ta_load(psp, &psp->rap, &psp->rap_context.context);
 }
 
 static int psp_rap_unload(struct psp_context *psp)
@@ -1848,6 +1745,8 @@ static int psp_rap_initialize(struct psp_context *psp)
 		return 0;
 	}
 
+	psp->rap_context.context.mem_context.shared_mem_size = PSP_RAP_SHARED_MEM_SIZE;
+
 	if (!psp->rap_context.context.initialized) {
 		ret = psp_rap_init_shared_buf(psp);
 		if (ret)
@@ -1855,7 +1754,10 @@ static int psp_rap_initialize(struct psp_context *psp)
 	}
 
 	ret = psp_rap_load(psp);
-	if (ret)
+	if (!ret) {
+		psp->rap_context.context.initialized = true;
+		mutex_init(&psp->rap_context.mutex);
+	} else
 		return ret;
 
 	ret = psp_rap_invoke(psp, TA_CMD_RAP__INITIALIZE, &status);
@@ -1927,35 +1829,13 @@ out_unlock:
 static int psp_securedisplay_init_shared_buf(struct psp_context *psp)
 {
 	return psp_ta_init_shared_buf(
-		psp, &psp->securedisplay_context.context.mem_context,
-		PSP_SECUREDISPLAY_SHARED_MEM_SIZE);
+		psp, &psp->securedisplay_context.context.mem_context);
 }
 
 static int psp_securedisplay_load(struct psp_context *psp)
 {
-	int ret;
-	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
-
-	memset(psp->fw_pri_buf, 0, PSP_1_MEG);
-	memcpy(psp->fw_pri_buf, psp->securedisplay.start_addr, psp->securedisplay.size_bytes);
-
-	psp_prep_ta_load_cmd_buf(cmd,
-				 psp->fw_pri_mc_addr,
-				 psp->securedisplay.size_bytes,
-				 psp->securedisplay_context.context.mem_context.shared_mc_addr,
-				 PSP_SECUREDISPLAY_SHARED_MEM_SIZE);
-
-	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
-
-	if (!ret) {
-		psp->securedisplay_context.context.initialized = true;
-		psp->securedisplay_context.context.session_id = cmd->resp.session_id;
-		mutex_init(&psp->securedisplay_context.mutex);
-	}
-
-	release_psp_cmd_buf(psp);
-
-	return ret;
+	return psp_ta_load(psp, &psp->securedisplay,
+			   &psp->securedisplay_context.context);
 }
 
 static int psp_securedisplay_unload(struct psp_context *psp)
@@ -1980,6 +1860,9 @@ static int psp_securedisplay_initialize(struct psp_context *psp)
 		return 0;
 	}
 
+	psp->securedisplay_context.context.mem_context.shared_mem_size =
+		PSP_SECUREDISPLAY_SHARED_MEM_SIZE;
+
 	if (!psp->securedisplay_context.context.initialized) {
 		ret = psp_securedisplay_init_shared_buf(psp);
 		if (ret)
@@ -1987,7 +1870,10 @@ static int psp_securedisplay_initialize(struct psp_context *psp)
 	}
 
 	ret = psp_securedisplay_load(psp);
-	if (ret)
+	if (!ret) {
+		psp->securedisplay_context.context.initialized = true;
+		mutex_init(&psp->securedisplay_context.mutex);
+	} else
 		return ret;
 
 	psp_prep_securedisplay_cmd_buf(psp, &securedisplay_cmd,
