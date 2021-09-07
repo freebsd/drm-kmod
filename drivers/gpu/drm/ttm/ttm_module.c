@@ -51,6 +51,18 @@ SYSCTL_NODE(_hw, OID_AUTO, ttm,
 #include "ttm_module.h"
 
 /**
+ * DOC: TTM
+ *
+ * TTM is a memory manager for accelerator devices with dedicated memory.
+ *
+ * The basic idea is that resources are grouped together in buffer objects of
+ * certain size and TTM handles lifetime, movement and CPU mappings of those
+ * objects.
+ *
+ * TODO: Add more design background and information here.
+ */
+
+/**
  * ttm_prot_from_caching - Modify the page protection according to the
  * ttm cacing mode
  * @caching: The ttm caching mode
