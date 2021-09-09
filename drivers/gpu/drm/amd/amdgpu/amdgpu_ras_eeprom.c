@@ -757,11 +757,7 @@ Out:
 	return res;
 }
 
-#ifdef __linux__
-inline uint32_t amdgpu_ras_eeprom_max_record_count(void)
-#elif defined(__FreeBSD__)
 uint32_t amdgpu_ras_eeprom_max_record_count(void)
-#endif
 {
 	return RAS_MAX_RECORD_COUNT;
 }
