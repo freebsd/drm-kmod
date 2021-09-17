@@ -64,7 +64,7 @@ KCONFIG+=	DRM_AMD_DC_DCN \
 .endif
 .endif
 
-.if ${MACHINE_CPUARCH} == "powerpc64"
+.if !empty(${MACHINE_ARCH:Mpowerpc64*})
 KCONFIG+=	64BIT \
 		PPC64
 .endif
