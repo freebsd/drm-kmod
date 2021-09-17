@@ -68,3 +68,11 @@ KCONFIG+=	DRM_AMD_DC_DCN \
 KCONFIG+=	64BIT \
 		PPC64
 .endif
+
+.if ${MACHINE_CPUARCH} == "riscv"
+KCONFIG+=	RISCV
+
+.if !empty(${MACHINE_ARCH:Mriscv64*})
+KCONFIG+=	64BIT
+.endif
+.endif

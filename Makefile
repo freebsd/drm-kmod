@@ -9,7 +9,9 @@ SUPPORTED_ARCH=	amd64 \
 		i386 \
 		aarch64 \
 		powerpc64 \
-		powerpc64le
+		powerpc64le \
+		riscv64 \
+		riscv64sf
 
 .if empty(SUPPORTED_ARCH:M${MACHINE_ARCH})
 .error "Unsupported architetures ${MACHINE_ARCH}"
