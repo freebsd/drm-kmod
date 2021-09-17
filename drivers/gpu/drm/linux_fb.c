@@ -629,7 +629,11 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	vm_phys_fictitious_reg_range(fb_info->apertures->ranges[0].base,
 				     fb_info->apertures->ranges[0].base +
 				     fb_info->apertures->ranges[0].size,
+#ifdef VM_MEMATTR_WRITE_COMBINING
 				     VM_MEMATTR_WRITE_COMBINING);
+#else
+				     VM_MEMATTR_UNCACHEABLE);
+#endif
 	fb_info->dev = device_create(fb_class, fb_info->device,
 				     MKDEV(FB_MAJOR, i), NULL, "fb%d", i);
 	if (IS_ERR(fb_info->dev)) {

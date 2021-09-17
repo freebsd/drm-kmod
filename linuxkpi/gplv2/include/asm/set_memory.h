@@ -40,7 +40,11 @@ set_memory_uc(unsigned long addr, int numpages)
 static inline int
 set_memory_wc(unsigned long addr, int numpages)
 {
+#ifdef VM_MEMATTR_WRITE_COMBINING
 	return (pmap_change_attr(addr, numpages, VM_MEMATTR_WRITE_COMBINING));
+#else
+	return (set_memory_uc(addr, numpages));
+#endif
 }
 
 static inline int
@@ -63,7 +67,11 @@ set_pages_wc(vm_page_t page, int numpages)
 {
 	KASSERT(numpages == 1, ("%s: numpages %d", __func__, numpages));
 
+#ifdef VM_MEMATTR_WRITE_COMBINING
 	pmap_page_set_memattr(page, VM_MEMATTR_WRITE_COMBINING);
+#else
+	return (set_pages_uc(page, numpages));
+#endif
 	return (0);
 }
 
