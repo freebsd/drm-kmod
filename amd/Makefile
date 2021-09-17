@@ -1,6 +1,13 @@
 # $FreeBSD$
 
-.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "aarch64" || ${MACHINE_ARCH} == "powerpc64" || ${MACHINE_ARCH} == "powerpc64le"
+AMDGPU_ARCH=	amd64 \
+		aarch64 \
+		powerpc64 \
+		powerpc64le \
+		riscv64 \
+		riscv64sf
+
+.if !empty(AMDGPU_ARCH:M${MACHINE_ARCH})
 _amdgpu=	amdgpu
 .endif
 
