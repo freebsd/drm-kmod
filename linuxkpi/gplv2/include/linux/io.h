@@ -5,7 +5,7 @@
 
 #include_next <linux/io.h>
  
-#if defined(__amd64__) || defined(__i386__) || defined(__aarch64__) || defined(__powerpc__)
+#if defined(__amd64__) || defined(__i386__) || defined(__aarch64__) || defined(__powerpc__) || defined(__riscv)
 static inline int
 arch_io_reserve_memtype_wc(resource_size_t start, resource_size_t size)
 {
