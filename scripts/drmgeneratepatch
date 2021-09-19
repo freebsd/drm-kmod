@@ -60,6 +60,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_dp_cec*' \
     ':!drivers/gpu/drm/drm_fb_cma_helper*' \
     ':!drivers/gpu/drm/drm_gem_cma_helper*' \
+    ':!drivers/gpu/drm/drm_gem_shmem_helper*' \
     ':!drivers/gpu/drm/drm_hdcp*' \
     ':!drivers/gpu/drm/drm_kms_helper*' \
     ':!drivers/gpu/drm/drm_of*' \
