@@ -228,6 +228,9 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 	if (unlikely(err != 0))
 		return VM_FAULT_NOPAGE;
 	err = ttm_mem_io_reserve_vm(bo);
+#ifdef __FreeBSD__
+	VM_OBJECT_WLOCK(vma->vm_obj);
+#endif
 	if (unlikely(err != 0)) {
 		ret = VM_FAULT_SIGBUS;
 		goto out_io_unlock;
@@ -266,7 +269,6 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 	 * Speculatively prefault a number of pages. Only error on
 	 * first page.
 	 */
-#ifdef __linux__
 	for (i = 0; i < num_prefault; ++i) {
 		if (bo->mem.bus.is_iomem) {
 			pfn = ttm_bo_io_mem_pfn(bo, page_offset);
@@ -278,11 +280,16 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 			} else if (unlikely(!page)) {
 				break;
 			}
+#ifdef __linux__
 			page->index = drm_vma_node_start(&bo->base.vma_node) +
 				page_offset;
+#elif defined(__FreeBSD__)
+			page->oflags &= ~VPO_UNMANAGED;
+#endif
 			pfn = page_to_pfn(page);
 		}
 
+#ifdef __linux__
 		/*
 		 * Note that the value of @prot at this point may differ from
 		 * the value of @vma->vm_page_prot in the caching- and
@@ -297,6 +304,9 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 						    prot);
 		else
 			ret = vmf_insert_pfn_prot(vma, address, pfn, prot);
+#elif defined(__FreeBSD__)
+		ret = lkpi_vmf_insert_pfn_prot_locked(vma, address, pfn, prot);
+#endif
 
 		/* Never error on prefaulted PTEs */
 		if (unlikely((ret & VM_FAULT_ERROR))) {
@@ -310,50 +320,11 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 		if (unlikely(++page_offset >= page_last))
 			break;
 	}
-#elif defined(__FreeBSD__)
-	vm_object_t obj;
-	vm_pindex_t pidx;
-
 	ret = VM_FAULT_NOPAGE;
-	obj = vma->vm_obj;
-	pidx = OFF_TO_IDX(address);
-	vma->vm_pfn_first = pidx;
-
-	VM_OBJECT_WLOCK(obj);
-	for (i = 0; i < TTM_BO_VM_NUM_PREFAULT && page_offset < page_last;
-	    i++, page_offset++, pidx++) {
-retry:
-		page = vm_page_grab(obj, pidx, VM_ALLOC_NOCREAT);
-		if (page == NULL) {
-			if (bo->mem.bus.is_iomem) {
-				pfn = ttm_bo_io_mem_pfn(bo, page_offset);
-				page = PHYS_TO_VM_PAGE(IDX_TO_OFF(pfn));
-			} else {
-				page = ttm->pages[page_offset];
-				if (page == NULL)
-					goto fail;
-				page->oflags &= ~VPO_UNMANAGED;
-			}
-			if (!vm_page_busy_acquire(page, VM_ALLOC_WAITFAIL))
-				goto retry;
-			if (vm_page_insert(page, obj, pidx)) {
-				vm_page_xunbusy(page);
-				goto fail;
-			}
-			vm_page_valid(page);
-		}
-		pmap_page_set_memattr(page,
-		    pgprot2cachemode(prot));
-		vma->vm_pfn_count++;
-		continue;
-fail:
-		if (i == 0)
-			ret = VM_FAULT_OOM;
-		break;
-	}
-	VM_OBJECT_WUNLOCK(obj);
-#endif
 out_io_unlock:
+#ifdef __FreeBSD__
+	VM_OBJECT_WUNLOCK(vma->vm_obj);
+#endif
 	ttm_mem_io_unlock(man);
 	return ret;
 }
