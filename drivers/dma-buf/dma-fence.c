@@ -25,6 +25,7 @@
  */
 
 #include <linux/dma-fence.h>
+#include <linux/seq_file.h>
 
 MALLOC_DECLARE(M_DMABUF);
 
@@ -449,6 +450,15 @@ cb_cleanup:
 		dma_fence_remove_callback(fences[i], &cb[i].base);
 	free(cb, M_DMABUF);
 	return (rv);
+}
+
+void
+dma_fence_describe(struct dma_fence *fence, struct seq_file *seq)
+{
+	seq_printf(seq, "%s %s seq %llu %ssignalled\n",
+		   fence->ops->get_driver_name(fence),
+		   fence->ops->get_timeline_name(fence), fence->seqno,
+		   dma_fence_is_signaled(fence) ? "" : "un");
 }
 
 /*
