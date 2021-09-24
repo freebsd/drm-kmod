@@ -231,6 +231,7 @@ SRCS+=	i915_gem_busy.c \
 .if !empty(KCONFIG:MDRM_I915_PXP)
 SRCS+=	intel_pxp.c \
 	intel_pxp_cmd.c \
+	intel_pxp_debugfs.c \
 	intel_pxp_irq.c \
 	intel_pxp_pm.c \
 	intel_pxp_session.c \
