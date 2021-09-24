@@ -1,0 +1,15 @@
+@@ -2634,12 +2635,14 @@
+ 	struct drm_connector *connector = &aconnector->base;
+ 	struct drm_device *dev = connector->dev;
+ 	struct dc_link *dc_link = aconnector->dc_link;
++	struct drm_modeset_acquire_ctx ctx;
+ 	bool is_mst_root_connector = aconnector->mst_mgr.mst_state;
+ 	bool result = false;
+ 	enum dc_connection_type new_connection_type = dc_connection_none;
+ 	struct amdgpu_device *adev = drm_to_adev(dev);
+ 	union hpd_irq_data hpd_irq_data;
+ 	bool lock_flag = 0;
++	int ret;
+ 
+ 	memset(&hpd_irq_data, 0, sizeof(hpd_irq_data));
+ 
