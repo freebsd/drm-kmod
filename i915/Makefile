@@ -2,7 +2,13 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
-.PATH:	${SRCDIR} ${SRCDIR}/gt ${SRCDIR}/gt/uc ${SRCDIR}/gem ${SRCDIR}/display ${SRCDIR}/oa
+.PATH:	${SRCDIR} \
+	${SRCDIR}/display \
+	${SRCDIR}/gem \
+	${SRCDIR}/gt \
+	${SRCDIR}/gt/uc \
+	${SRCDIR}/oa \
+	${SRCDIR}/pxp
 
 .include "../kconfig.mk"
 
@@ -220,6 +226,11 @@ SRCS+=	i915_gem_busy.c \
 	i915_gem_ttm_pm.c \
 	i915_gem_userptr.c \
 	i915_gem_wait.c
+
+# pxp/*
+.if !empty(KCONFIG:MDRM_I915_PXP)
+SRCS+=	intel_pxp.c
+.endif
 
 .if !empty(KCONFIG:MCOMPAT)
 SRCS+=	i915_ioc32.c
