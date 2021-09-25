@@ -36,6 +36,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/clk_mgr/dce60 \
 	${SRCDIR}/display/dc/clk_mgr/dcn10 \
 	${SRCDIR}/display/dc/clk_mgr/dcn20 \
+	${SRCDIR}/display/dc/clk_mgr/dcn201 \
 	${SRCDIR}/display/dc/clk_mgr/dcn21 \
 	${SRCDIR}/display/dc/clk_mgr/dcn30 \
 	${SRCDIR}/display/dc/clk_mgr/dcn301 \
@@ -49,6 +50,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dce80 \
 	${SRCDIR}/display/dc/dcn10 \
 	${SRCDIR}/display/dc/dcn20 \
+	${SRCDIR}/display/dc/dcn201 \
 	${SRCDIR}/display/dc/dcn21 \
 	${SRCDIR}/display/dc/dcn30 \
 	${SRCDIR}/display/dc/dcn301 \
@@ -85,6 +87,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dce80 \
 	${SRCDIR}/display/dc/irq/dcn10 \
 	${SRCDIR}/display/dc/irq/dcn20 \
+	${SRCDIR}/display/dc/irq/dcn201 \
 	${SRCDIR}/display/dc/irq/dcn21 \
 	${SRCDIR}/display/dc/irq/dcn30 \
 	${SRCDIR}/display/dc/irq/dcn302 \
@@ -479,6 +482,21 @@ SRCS+=	dcn20_clk_mgr.c \
 	dcn20_vmid.c \
 	display_rq_dlg_calc_20v2.c \
 	display_mode_vba_20v2.c
+
+# display/dc/dcn201
+SRCS+=	dcn201_clk_mgr.c \
+	dcn201_dccg.c \
+	dcn201_dpp.c \
+	dcn201_hubbub.c \
+	dcn201_hubp.c \
+	dcn201_hwseq.c \
+	dcn201_init.c \
+	dcn201_link_encoder.c \
+	dcn201_mpc.c \
+	dcn201_opp.c \
+	dcn201_optc.c \
+	dcn201_resource.c \
+	irq_service_dcn201.c
 
 # display/dc/dcn21
 SRCS+=	dcn21_dccg.c \
@@ -949,6 +967,14 @@ CWARNFLAGS.dcn20_mpc.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn20_optc.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn20_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
 CWARNFLAGS.dcn20_clk_mgr.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn201_clk_mgr.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.dcn201_dccg.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn201_dpp.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dcn201_hubp.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn201_hwseq.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dcn201_init.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn201_link_encoder.c=	-Wno-missing-prototypes
+CWARNFLAGS.dcn201_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dcn21_dccg.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hubp.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn21_hubbub.c=		-Wno-missing-prototypes
@@ -994,6 +1020,7 @@ CWARNFLAGS.hw_translate_diag.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn10.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn20.c=		-Wno-missing-prototypes
+CWARNFLAGS.irq_service_dcn201.c=	-Wno-missing-prototypes -Wno-unused-const-variable
 CWARNFLAGS.irq_service_dcn21.c=		-Wno-missing-prototypes -Wno-unused-const-variable -Wno-initializer-overrides
 CWARNFLAGS.irq_service_dcn30.c=		-Wno-missing-prototypes -Wno-unused-const-variable
 CWARNFLAGS.irq_service_dcn31.c=		-Wno-missing-prototypes
