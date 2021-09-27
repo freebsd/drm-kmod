@@ -831,8 +831,10 @@ static void ttm_put_pages(struct page **pages, unsigned npages, int flags,
 			}
 #endif
 
+#ifdef __linux__
 			if (page_count(pages[i]) != 1)
 				pr_err("Erroneous page count. Leaking pages.\n");
+#endif
 			__free_pages(pages[i], order);
 
 			j = 1 << order;
@@ -887,9 +889,9 @@ static void ttm_put_pages(struct page **pages, unsigned npages, int flags,
 	spin_lock_irqsave(&pool->lock, irq_flags);
 	while (i < npages) {
 		if (pages[i]) {
+#ifdef __linux__
 			if (page_count(pages[i]) != 1)
 				pr_err("Erroneous page count. Leaking pages.\n");
-#ifdef __linux__
 			list_add_tail(&pages[i]->lru, &pool->list);
 #elif defined(__FreeBSD__)
 			TAILQ_INSERT_TAIL(&pool->list, pages[i], plinks.q);

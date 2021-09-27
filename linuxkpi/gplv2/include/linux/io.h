@@ -1,11 +1,22 @@
 #ifndef	_LINUX_GPLV2_IO_H_
 #define	_LINUX_GPLV2_IO_H_
 
+#include <asm/set_memory.h>
+
 #include_next <linux/io.h>
  
 #if defined(__amd64__) || defined(__i386__) || defined(__aarch64__) || defined(__powerpc__)
-extern int arch_io_reserve_memtype_wc(resource_size_t start, resource_size_t size);
-extern void arch_io_free_memtype_wc(resource_size_t start, resource_size_t size);
+static inline int
+arch_io_reserve_memtype_wc(resource_size_t start, resource_size_t size)
+{
+	return (set_memory_wc(start, size >> PAGE_SHIFT));
+}
+
+static inline void
+arch_io_free_memtype_wc(resource_size_t start, resource_size_t size)
+{
+	set_memory_wb(start, size >> PAGE_SHIFT);
+}
 #endif
 
 

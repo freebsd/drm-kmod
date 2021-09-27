@@ -104,8 +104,6 @@ do {								\
 	({ __typeof__(*(ptr)) __tmp;                                    \
 	  memcpy(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
 
-#define	page_to_phys(x) VM_PAGE_TO_PHYS(x)
-
 #define	drm_get_device_from_kdev(_kdev)	(((struct drm_minor *)(_kdev)->si_drv1)->dev)
 
 #define DRM_IOC_VOID		IOC_VOID
