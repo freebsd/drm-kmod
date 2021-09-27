@@ -349,10 +349,7 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 			} else if (unlikely(!page)) {
 				break;
 			}
-#ifdef __linux__
-			page->index = drm_vma_node_start(&bo->base.vma_node) +
-				page_offset;
-#elif defined(__FreeBSD__)
+#ifdef __FreeBSD__
 			page->oflags &= ~VPO_UNMANAGED;
 #endif
 			pfn = page_to_pfn(page);
