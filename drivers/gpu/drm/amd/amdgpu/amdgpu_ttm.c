@@ -1123,6 +1123,10 @@ static int amdgpu_ttm_tt_populate(struct ttm_device *bdev,
 {
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
+#ifdef __linux__
+	pgoff_t i;
+#endif
+	int ret;
 
 	/* user pages are bound by amdgpu_ttm_tt_pin_userptr() */
 	if (gtt->userptr) {
@@ -1135,7 +1139,16 @@ static int amdgpu_ttm_tt_populate(struct ttm_device *bdev,
 	if (ttm->page_flags & TTM_PAGE_FLAG_SG)
 		return 0;
 
-	return ttm_pool_alloc(&adev->mman.bdev.pool, ttm, ctx);
+	ret = ttm_pool_alloc(&adev->mman.bdev.pool, ttm, ctx);
+	if (ret)
+		return ret;
+
+#ifdef __linux__
+	for (i = 0; i < ttm->num_pages; ++i)
+		ttm->pages[i]->mapping = bdev->dev_mapping;
+#endif
+
+	return 0;
 }
 
 /*
@@ -1149,6 +1162,9 @@ static void amdgpu_ttm_tt_unpopulate(struct ttm_device *bdev,
 {
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	struct amdgpu_device *adev;
+#ifdef __linux__
+	pgoff_t i;
+#endif
 
 	amdgpu_ttm_backend_unbind(bdev, ttm);
 
@@ -1161,6 +1177,11 @@ static void amdgpu_ttm_tt_unpopulate(struct ttm_device *bdev,
 
 	if (ttm->page_flags & TTM_PAGE_FLAG_SG)
 		return;
+
+#ifdef __linux__
+	for (i = 0; i < ttm->num_pages; ++i)
+		ttm->pages[i]->mapping = NULL;
+#endif
 
 	adev = amdgpu_ttm_adev(bdev);
 	return ttm_pool_free(&adev->mman.bdev.pool, ttm);
