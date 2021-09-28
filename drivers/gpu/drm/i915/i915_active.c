@@ -166,7 +166,11 @@ __active_retire(struct i915_active *ref)
 }
 
 static void
+#ifdef __linux__
 active_work(struct work_struct *wrk)
+#elif defined(__FreeBSD__)
+active_work(struct irq_work *wrk)
+#endif
 {
 	struct i915_active *ref = container_of(wrk, typeof(*ref), work);
 
@@ -185,7 +189,11 @@ active_retire(struct i915_active *ref)
 		return;
 
 	if (ref->flags & I915_ACTIVE_RETIRE_SLEEPS) {
+#ifdef __linux__
 		queue_work(system_unbound_wq, &ref->work);
+#elif defined(__FreeBSD__)
+		irq_work_queue(&ref->work);
+#endif
 		return;
 	}
 
@@ -288,7 +296,11 @@ void __i915_active_init(struct i915_active *ref,
 	atomic_set(&ref->count, 0);
 	__mutex_init(&ref->mutex, "i915_active", key);
 	__i915_active_fence_init(&ref->excl, &ref->mutex, NULL, excl_retire);
+#ifdef __linux__
 	INIT_WORK(&ref->work, active_work);
+#elif defined(__FreeBSD__)
+	init_irq_work(&ref->work, active_work);
+#endif
 }
 
 static bool ____active_del_barrier(struct i915_active *ref,
@@ -496,7 +508,11 @@ void i915_active_fini(struct i915_active *ref)
 {
 	debug_active_fini(ref);
 	GEM_BUG_ON(atomic_read(&ref->count));
+#ifdef __linux__
 	GEM_BUG_ON(work_pending(&ref->work));
+#elif defined(__FreeBSD__)
+	irq_work_sync(&ref->work);
+#endif
 	GEM_BUG_ON(!RB_EMPTY_ROOT(&ref->tree));
 	mutex_destroy(&ref->mutex);
 }
