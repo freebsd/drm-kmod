@@ -273,7 +273,7 @@ compute_partial_view(const struct drm_i915_gem_object *obj,
  * The current feature set supported by i915_gem_fault() and thus GTT mmaps
  * is exposed via I915_PARAM_MMAP_GTT_VERSION (see i915_gem_mmap_gtt_version).
  */
-#ifdef __linux__
+#if defined(__linux__) || __FreeBSD_version > 1400033
 vm_fault_t i915_gem_fault(struct vm_fault *vmf)
 #elif defined(__FreeBSD__)
 vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
