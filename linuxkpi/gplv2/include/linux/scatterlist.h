@@ -31,6 +31,8 @@
 
 #include_next <linux/scatterlist.h>
 
+#include <sys/param.h>
+#if __FreeBSD_version <= 1400033
 static inline size_t
 sg_copy_from_buffer(struct scatterlist *sgl, unsigned int nents,
     const void *buf, size_t buflen)
@@ -75,5 +77,6 @@ sg_pcopy_to_buffer(struct scatterlist *sgl, unsigned int nents,
 	}
 	return (total);
 }
+#endif
 
 #endif					/* _LINUX_GPLV2_SCATTERLIST_H_ */

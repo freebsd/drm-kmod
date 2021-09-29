@@ -1,3 +1,5 @@
+#include <sys/param.h>
+#if __FreeBSD_version <= 1400033
 #ifndef _LINUX_HIGHMEM_H_
 #define _LINUX_HIGHMEM_H_
 
@@ -10,4 +12,7 @@ static inline struct page *kmap_to_page(void *addr)
 	return virt_to_page(addr);
 }
 
+#endif
+#else
+#include_next <linux/highmem.h>
 #endif

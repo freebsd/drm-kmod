@@ -1922,7 +1922,7 @@ void i915_gem_suspend(struct drm_i915_private *dev_priv);
 void i915_gem_suspend_late(struct drm_i915_private *dev_priv);
 void i915_gem_resume(struct drm_i915_private *dev_priv);
 
-#ifdef __linux__
+#if defined(__linux__) || __FreeBSD_version > 1400033
 vm_fault_t i915_gem_fault(struct vm_fault *vmf);
 #elif defined(__FreeBSD__)
 vm_fault_t i915_gem_fault(struct vm_area_struct *dummy, struct vm_fault *vmf);

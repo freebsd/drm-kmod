@@ -36,7 +36,9 @@
 #if defined(CONFIG_X86)
 #include <asm/smp.h>
 
+#if __FreeBSD_version <= 1400033
 #define clflushopt(addr) linux_clflushopt(addr)
+#endif
 
 /*
  * clflushopt is an unordered instruction which needs fencing with mfence or

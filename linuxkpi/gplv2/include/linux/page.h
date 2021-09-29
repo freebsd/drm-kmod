@@ -3,6 +3,8 @@
 
 #include_next <linux/page.h>
 
+#include <sys/param.h>
+#if __FreeBSD_version <= 1400033
 #define PAGE_KERNEL_IO  0x0000
 
 /* XXX note that this is incomplete */
@@ -13,6 +15,7 @@ void kunmap(vm_page_t page);
 void kunmap_atomic(void *vaddr);
 
 void iounmap_atomic(void *vaddr);
+#endif
 
 static inline int
 page_count(vm_page_t page __unused)
@@ -28,6 +31,7 @@ int set_pages_wb(vm_page_t page, int numpages);
 int set_pages_uc(vm_page_t page, int numpages);
 int set_pages_wc(vm_page_t page, int numpages);
 
+#if __FreeBSD_version <= 1400033
 vm_paddr_t page_to_phys(vm_page_t page);
 
 void unmap_mapping_range(void *obj, loff_t const holebegin,
@@ -35,5 +39,6 @@ void unmap_mapping_range(void *obj, loff_t const holebegin,
 
 #define linux_clflushopt(arg) __linux_clflushopt((u_long)(arg))
 extern void __linux_clflushopt(u_long addr);
+#endif
 
 #endif	/* _LINUX_PAGE_H_ */
