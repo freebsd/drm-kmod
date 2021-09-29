@@ -151,18 +151,6 @@ linux_intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
 	intel_gtt_read_pte(pg_start + i - 1);
 }
 
-static void
-i915_locks_destroy(struct drm_i915_private *dev_priv)
-{
-
-	spin_lock_destroy(&dev_priv->irq_lock);
-	spin_lock_destroy(&dev_priv->gpu_error.lock);
-	mutex_destroy(&dev_priv->backlight_lock);
-	spin_lock_destroy(&dev_priv->uncore.lock);
-	mutex_destroy(&dev_priv->sb_lock);
-	mutex_destroy(&dev_priv->av_mutex);
-}
-
 int
 remap_io_mapping(struct vm_area_struct *vma, unsigned long addr,
     unsigned long pfn, unsigned long size, struct io_mapping *iomap)
