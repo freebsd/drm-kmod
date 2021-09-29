@@ -103,7 +103,9 @@ do {								\
 	({ __typeof__(*(ptr)) __tmp;                                    \
 	  memcpy(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
 
+#if __FreeBSD_version <= 1400033
 #define	page_to_phys(x) VM_PAGE_TO_PHYS(x)
+#endif
 
 #define	drm_get_device_from_kdev(_kdev)	(((struct drm_minor *)(_kdev)->si_drv1)->dev)
 

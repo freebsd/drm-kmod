@@ -106,7 +106,7 @@ static unsigned long ttm_bo_io_mem_pfn(struct ttm_buffer_object *bo,
 		+ page_offset;
 }
 
-#ifdef __linux__
+#if defined(__linux__) || __FreeBSD_version > 1400033
 static vm_fault_t ttm_bo_vm_fault(struct vm_fault *vmf)
 #elif defined(__FreeBSD__)
 static vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)

@@ -49,6 +49,7 @@
 
 #include <asm/set_memory.h>
 
+#if __FreeBSD_version <= 1400033
 #if defined(__LP64__)
 #define	LINUXKPI_HAVE_DMAP
 #else
@@ -153,6 +154,7 @@ kunmap_atomic(void *vaddr)
 	sched_unpin();
 #endif
 }
+#endif
 
 int
 set_memory_uc(unsigned long addr, int numpages)
@@ -211,6 +213,7 @@ arch_io_free_memtype_wc(resource_size_t start, resource_size_t size)
 	set_memory_wb(start, size >> PAGE_SHIFT);
 }
 
+#if __FreeBSD_version <= 1400033
 vm_paddr_t
 page_to_phys(vm_page_t page)
 {
@@ -247,6 +250,7 @@ retry:
 		vm_object_deallocate(devobj);
 	}
 }
+#endif
 
 #if defined(__i386__) || defined(__amd64__) || defined(__powerpc__)
 int

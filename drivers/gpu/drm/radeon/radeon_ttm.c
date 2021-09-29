@@ -890,7 +890,7 @@ void radeon_ttm_set_active_vram_size(struct radeon_device *rdev, u64 size)
 static struct vm_operations_struct radeon_ttm_vm_ops;
 static const struct vm_operations_struct *ttm_vm_ops = NULL;
 
-#ifdef __linux__
+#if defined(__linux__) || __FreeBSD_version > 1400033
 static vm_fault_t radeon_ttm_fault(struct vm_fault *vmf)
 #else
 static vm_fault_t radeon_ttm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
@@ -906,7 +906,7 @@ static vm_fault_t radeon_ttm_fault(struct vm_area_struct *dummy, struct vm_fault
 	}
 	rdev = radeon_get_rdev(bo->bdev);
 	down_read(&rdev->pm.mclk_lock);
-#ifdef __linux__
+#if defined(__linux__) || __FreeBSD_version > 1400033
 	ret = ttm_vm_ops->fault(vmf);
 #else
 	ret = ttm_vm_ops->fault(dummy, vmf);
