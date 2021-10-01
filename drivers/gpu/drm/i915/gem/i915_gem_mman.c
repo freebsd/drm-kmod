@@ -236,7 +236,11 @@ static unsigned int tile_row_pages(const struct drm_i915_gem_object *obj)
  */
 int i915_gem_mmap_gtt_version(void)
 {
+#ifdef __FreeBSD__not_yet
 	return 4;
+#else
+	return 3;
+#endif
 }
 
 static inline struct i915_ggtt_view
