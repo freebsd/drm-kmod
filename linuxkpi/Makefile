@@ -13,14 +13,14 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_mtrr.c		\
 	linux_notifier.c	\
 	linux_rbtree.c		\
-	linux_sort.c		\
-	linux_sync_file.c
+	linux_sort.c
 
 SRCS+=	dma-buf.c \
 	dma-fence-array.c \
 	dma-fence-chain.c \
 	dma-fence.c \
-	dma-resv.c
+	dma-resv.c \
+	sync_file.c
 
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
 SRCS+=	opt_acpi.h
