@@ -40,6 +40,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     drivers/dma-buf/dma-fence-array.c \
     drivers/dma-buf/dma-fence-chain.c \
     drivers/dma-buf/dma-resv.c \
+    drivers/dma-buf/sync_file.c \
     drivers/video/hdmi.c \
     include/drm/*.h \
     include/drm/ttm/ \
@@ -48,6 +49,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     include/linux/dma-fence.h \
     include/linux/dma-fence-array.h \
     include/linux/dma-fence-chain.h \
+    include/linux/sync_file.h \
     ':!drivers/gpu/drm/amd/amdkfd/*' \
     ':!drivers/gpu/drm/i915/gvt/*' \
     ':!drivers/gpu/drm/i915/selftests/*' \
