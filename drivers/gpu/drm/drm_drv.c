@@ -43,6 +43,7 @@
 #include <drm/drm_managed.h>
 #include <drm/drm_mode_object.h>
 #include <drm/drm_print.h>
+#include <drm/drm_privacy_screen_machine.h>
 
 #include "drm_crtc_internal.h"
 #include "drm_internal.h"
@@ -1045,6 +1046,7 @@ static const struct file_operations drm_stub_fops = {
 
 static void drm_core_exit(void)
 {
+	drm_privacy_screen_lookup_exit();
 	unregister_chrdev(DRM_MAJOR, "drm");
 #ifdef CONFIG_DEBUG_FS
 	debugfs_remove(drm_debugfs_root);
@@ -1080,6 +1082,8 @@ static int __init drm_core_init(void)
 #endif
 	if (ret < 0)
 		goto error;
+
+	drm_privacy_screen_lookup_init();
 
 	drm_core_init_complete = true;
 
