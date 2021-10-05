@@ -106,6 +106,10 @@ SRCS+=	drm_mipi_dsi.c
 SRCS+=	drm_panel_orientation_quirks.c
 .endif
 
+.if !empty(KCONFIG:MDRM_PRIVACY_SCREEN)
+SRCS+=	drm_privacy_screen.c
+.endif
+
 # drm scheduler (moved from amdgpu)
 SRCS+=	sched_main.c \
 	sched_fence.c \
