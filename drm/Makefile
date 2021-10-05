@@ -107,7 +107,8 @@ SRCS+=	drm_panel_orientation_quirks.c
 .endif
 
 .if !empty(KCONFIG:MDRM_PRIVACY_SCREEN)
-SRCS+=	drm_privacy_screen.c
+SRCS+=	drm_privacy_screen.c \
+	drm_privacy_screen_x86.c
 .endif
 
 # drm scheduler (moved from amdgpu)
