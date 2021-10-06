@@ -12,6 +12,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn20 \
 	${SRCDIR}/display/dc/dml/dcn21 \
 	${SRCDIR}/display/dc/dml/dcn30 \
+	${SRCDIR}/display/dc/dml/dcn301 \
 	${SRCDIR}/display/dc/dml/dcn31 \
 	${SRCDIR}/display/dc/dml/dsc
 .endif
@@ -535,6 +536,7 @@ SRCS+=	dcn301_init.c \
 	dcn301_resource.c \
 	dcn301_dccg.c \
 	dcn301_dio_link_encoder.c \
+	dcn301_fpu.c \
 	dcn301_hwseq.c \
 	dcn301_panel_cntl.c \
 	dcn301_hubbub.c \
@@ -814,6 +816,7 @@ CFLAGS.dcn_calc_math.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-tautological-compar
 CFLAGS.dcn20_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn21_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn30_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn301_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn301_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_resource.c= ${FPUFLAGS} -mstack-alignment=4
 
