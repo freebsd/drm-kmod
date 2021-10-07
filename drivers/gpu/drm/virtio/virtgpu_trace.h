@@ -4,6 +4,20 @@
 
 #include <linux/tracepoint.h>
 
+#ifdef __FreeBSD__
+static inline void
+trace_virtio_gpu_cmd_response(struct virtqueue *vq, struct virtio_gpu_ctrl_hdr *ctrl)
+{
+    CTR2(KTR_DRM, "virtio_gpu_cmd_response %p %p", vq, ctrl);
+}
+
+static inline void
+trace_virtio_gpu_cmd_queue(struct virtqueue *vq, struct virtio_gpu_ctrl_hdr *ctrl)
+{
+    CTR2(KTR_DRM, "virtio_gpu_cmd_queue %p %p", vq, ctrl);
+}
+
+#else
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM virtio_gpu
 #define TRACE_INCLUDE_FILE virtgpu_trace
@@ -50,3 +64,4 @@ DEFINE_EVENT(virtio_gpu_cmd, virtio_gpu_cmd_response,
 #undef TRACE_INCLUDE_PATH
 #define TRACE_INCLUDE_PATH ../../drivers/gpu/drm/virtio
 #include <trace/define_trace.h>
+#endif

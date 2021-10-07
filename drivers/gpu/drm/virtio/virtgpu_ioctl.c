@@ -143,7 +143,12 @@ static int virtio_gpu_execbuffer_ioctl(struct drm_device *dev, void *data,
 			goto out_unused_fd;
 	}
 
+#ifdef __FreeBSD__
+        /* FIXME: kvmalloc() and therefore vmemdup_user doesn't exist yet. */
+	buf = memdup_user(u64_to_user_ptr(exbuf->command), exbuf->size);
+#else
 	buf = vmemdup_user(u64_to_user_ptr(exbuf->command), exbuf->size);
+#endif
 	if (IS_ERR(buf)) {
 		ret = PTR_ERR(buf);
 		goto out_unresv;

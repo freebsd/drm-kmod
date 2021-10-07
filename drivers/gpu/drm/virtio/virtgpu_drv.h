@@ -39,6 +39,10 @@
 #include <drm/drm_ioctl.h>
 #include <drm/drm_probe_helper.h>
 
+#ifdef __FreeBSD__
+SYSCTL_DECL(_hw_virtio_gpu);
+#endif
+
 #define DRIVER_NAME "virtio_gpu"
 #define DRIVER_DESC "virtio GPU"
 #define DRIVER_DATE "0"

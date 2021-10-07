@@ -6,8 +6,9 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/virtio
 
 .include "../kconfig.mk"
 
-KMOD= 	virtio-gpu
+KMOD= 	virtio_gpu
 SRCS= 	\
+	virtgpu_bsdmodule.c \
 	virtgpu_debugfs.c \
 	virtgpu_display.c \
 	virtgpu_drv.c \
@@ -25,6 +26,7 @@ SRCS= 	\
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include/uapi
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include
 
@@ -35,7 +37,7 @@ CFLAGS+= -I${SRCDIR:H:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 kmod_prefix=${KMOD:S/-/_/g}
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=${kmod_prefix}_' '-DDRM_SYSCTL_PARAM_PREFIX=_${kmod_prefix}' -DLINUXKPI_VERSION=50000
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=${KMOD}_' '-DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}' -DLINUXKPI_VERSION=50000
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 # TODO: are any of these needed?
@@ -55,9 +57,7 @@ SRCS	+=			\
 	pci_iov_if.h		\
 	vnode_if.h
 
-# CWARNFLAGS.vbva_base.c= -Wno-cast-qual -Wno-pointer-arith
-#CWARNFLAGS.vbox_hgsmi.c= -Wno-cast-qual
-#CWARNFLAGS.vbox_main.c= -Wno-pointer-arith
-#CWARNFLAGS.vbox_mode.c= -Wno-cast-qual
+# Lots of these, probably not worth fixing
+CWARNFLAGS+=	-Wno-pointer-arith -Wno-pointer-sign -Wno-error=format
 
 .include <bsd.kmod.mk>

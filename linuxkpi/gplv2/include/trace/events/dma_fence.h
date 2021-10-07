@@ -13,5 +13,10 @@ trace_dma_fence_enable_signal(struct dma_fence *fence)
 	CTR1(KTR_DRM, "dma_fence_enable_signal dma_fence %p", fence);
 }
 
+static inline void
+trace_dma_fence_emit(struct dma_fence *f)
+{
+	CTR1(KTR_DRM, "dma_fence_emit dma_fence %p", f);
+}
 
 #endif

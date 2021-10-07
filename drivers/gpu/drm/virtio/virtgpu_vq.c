@@ -330,7 +330,11 @@ retry:
 	ret = virtqueue_add_sgs(vq, sgs, outcnt, incnt, vbuf, GFP_ATOMIC);
 	if (ret == -ENOSPC) {
 		spin_unlock(&vgdev->ctrlq.qlock);
+#ifdef __FreeBSD__
+		wait_event(vgdev->ctrlq.ack_queue, virtqueue_num_free(vq) >= outcnt + incnt);
+#else
 		wait_event(vgdev->ctrlq.ack_queue, vq->num_free >= outcnt + incnt);
+#endif
 		spin_lock(&vgdev->ctrlq.qlock);
 		goto retry;
 	} else {
@@ -378,9 +382,17 @@ again:
 	 * to wait for free space, which can result in fence ids being
 	 * submitted out-of-order.
 	 */
+#ifdef __FreeBSD__
+	if (virtqueue_num_free(vq) < 2 + outcnt) {
+#else
 	if (vq->num_free < 2 + outcnt) {
+#endif
 		spin_unlock(&vgdev->ctrlq.qlock);
+#ifdef __FreeBSD__
+		wait_event(vgdev->ctrlq.ack_queue, virtqueue_num_free(vq) >= 3);
+#else
 		wait_event(vgdev->ctrlq.ack_queue, vq->num_free >= 3);
+#endif
 		goto again;
 	}
 
@@ -429,7 +441,11 @@ retry:
 	ret = virtqueue_add_sgs(vq, sgs, outcnt, 0, vbuf, GFP_ATOMIC);
 	if (ret == -ENOSPC) {
 		spin_unlock(&vgdev->cursorq.qlock);
+#ifdef __FreeBSD__
+		wait_event(vgdev->cursorq.ack_queue, virtqueue_num_free(vq) >= outcnt);
+#else
 		wait_event(vgdev->cursorq.ack_queue, vq->num_free >= outcnt);
+#endif
 		spin_lock(&vgdev->cursorq.qlock);
 		goto retry;
 	} else {

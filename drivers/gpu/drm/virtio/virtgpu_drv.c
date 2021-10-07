@@ -92,8 +92,10 @@ static int virtio_gpu_pci_quirk(struct drm_device *dev, struct virtio_device *vd
 	snprintf(unique, sizeof(unique), "pci:%s", pname);
 	return drm_dev_set_unique(dev, unique);
 }
-
-static int virtio_gpu_probe(struct virtio_device *vdev)
+#ifdef __linux__
+static
+#endif
+int virtio_gpu_probe(struct virtio_device *vdev)
 {
 	struct drm_device *dev;
 	int ret;
@@ -109,11 +111,15 @@ static int virtio_gpu_probe(struct virtio_device *vdev)
 		return PTR_ERR(dev);
 	vdev->priv = dev;
 
+#ifdef __linux__
 	if (!strcmp(vdev->dev.parent->bus->name, "pci")) {
 		ret = virtio_gpu_pci_quirk(dev, vdev);
 		if (ret)
 			goto err_free;
 	}
+#else
+#pragma message("TODO: figure out how to handle vdev->dev.parent->bus")
+#endif
 
 	ret = virtio_gpu_init(dev);
 	if (ret)
@@ -131,7 +137,10 @@ err_free:
 	return ret;
 }
 
-static void virtio_gpu_remove(struct virtio_device *vdev)
+#ifdef __linux__
+static
+#endif
+void virtio_gpu_remove(struct virtio_device *vdev)
 {
 	struct drm_device *dev = vdev->priv;
 
@@ -140,13 +149,18 @@ static void virtio_gpu_remove(struct virtio_device *vdev)
 	drm_put_dev(dev);
 }
 
-static void virtio_gpu_config_changed(struct virtio_device *vdev)
+#ifdef __linux__
+static
+#endif
+void virtio_gpu_config_changed(struct virtio_device *vdev)
 {
 	struct drm_device *dev = vdev->priv;
 	struct virtio_gpu_device *vgdev = dev->dev_private;
 
 	schedule_work(&vgdev->config_changed_work);
 }
+
+#ifdef __linux__
 
 static struct virtio_device_id id_table[] = {
 	{ VIRTIO_ID_GPU, VIRTIO_DEV_ANY_ID },
@@ -183,6 +197,7 @@ MODULE_LICENSE("GPL and additional rights");
 MODULE_AUTHOR("Dave Airlie <airlied@redhat.com>");
 MODULE_AUTHOR("Gerd Hoffmann <kraxel@redhat.com>");
 MODULE_AUTHOR("Alon Levy");
+#endif
 
 DEFINE_DRM_GEM_FOPS(virtio_gpu_driver_fops);
 

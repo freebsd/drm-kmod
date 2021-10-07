@@ -210,7 +210,11 @@ int virtio_gpu_init(struct drm_device *dev)
 err_scanouts:
 	virtio_gpu_free_vbufs(vgdev);
 err_vbufs:
+#ifdef __FreeBSD__
+	virtio_del_vqs(vgdev->vdev);
+#else
 	vgdev->vdev->config->del_vqs(vgdev->vdev);
+#endif
 err_vqs:
 	kfree(vgdev);
 	return ret;
@@ -235,8 +239,13 @@ void virtio_gpu_deinit(struct drm_device *dev)
 	flush_work(&vgdev->ctrlq.dequeue_work);
 	flush_work(&vgdev->cursorq.dequeue_work);
 	flush_work(&vgdev->config_changed_work);
+#ifdef __FreeBSD__
+	virtio_del_vqs(vgdev->vdev);
+	virtio_reset(vgdev->vdev);
+#else
 	vgdev->vdev->config->reset(vgdev->vdev);
 	vgdev->vdev->config->del_vqs(vgdev->vdev);
+#endif
 
 	virtio_gpu_modeset_fini(vgdev);
 	virtio_gpu_free_vbufs(vgdev);
