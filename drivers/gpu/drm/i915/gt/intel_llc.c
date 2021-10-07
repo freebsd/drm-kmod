@@ -3,6 +3,7 @@
  * Copyright © 2019 Intel Corporation
  */
 
+#include <asm/tsc.h>
 #include <linux/cpufreq.h>
 #if defined(__FreeBSD__)
 #include <sys/types.h>
