@@ -106,6 +106,12 @@ find_priolist:
 	if (prio == I915_PRIORITY_NORMAL) {
 		p = &execlists->default_priolist;
 	} else {
+#ifdef __FreeBSD__
+		/* FreeBSD cannot allocate memory from critical section */
+		if (unlikely(curthread->td_critnest != 0))
+			p = NULL;
+		else
+#endif
 		p = kmem_cache_alloc(global.slab_priorities, GFP_ATOMIC);
 		/* Convert an allocation failure to a priority bump */
 		if (unlikely(!p)) {
