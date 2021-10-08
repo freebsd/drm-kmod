@@ -36,9 +36,6 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     drivers/gpu/drm/radeon/ \
     drivers/gpu/drm/scheduler/ \
     drivers/gpu/drm/ttm/ \
-    drivers/gpu/drm/vmwgfx/ \
-    drivers/*/vboxvideo/ \
-    drivers/*/*/vboxvideo/ \
     drivers/dma-buf/dma-fence.c \
     drivers/dma-buf/dma-fence-array.c \
     drivers/dma-buf/dma-fence-chain.c \
