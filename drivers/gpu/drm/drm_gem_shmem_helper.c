@@ -84,6 +84,9 @@ struct drm_gem_shmem_object *drm_gem_shmem_create(struct drm_device *dev, size_t
 	 * why this is required _and_ expected if you're
 	 * going to pin these pages.
 	 */
+#ifdef __FreeBSD__
+#define mapping_set_gfp_mask(mapping, mask) /* not implemented yet */
+#endif
 	mapping_set_gfp_mask(obj->filp->f_mapping, GFP_HIGHUSER |
 			     __GFP_RETRY_MAYFAIL | __GFP_NOWARN);
 
@@ -400,6 +403,9 @@ void drm_gem_shmem_purge_locked(struct drm_gem_object *obj)
 
 	shmem->madv = -1;
 
+#ifdef __FreeBSD__
+	panic("TODO: port these calls to FreeBSD APIs");
+#else
 	drm_vma_node_unmap(&obj->vma_node, dev->anon_inode->i_mapping);
 	drm_gem_free_mmap_offset(obj);
 
@@ -412,6 +418,7 @@ void drm_gem_shmem_purge_locked(struct drm_gem_object *obj)
 
 	invalidate_mapping_pages(file_inode(obj->filp)->i_mapping,
 			0, (loff_t)-1);
+#endif
 }
 EXPORT_SYMBOL(drm_gem_shmem_purge_locked);
 
@@ -481,7 +488,11 @@ static vm_fault_t drm_gem_shmem_fault(struct vm_fault *vmf)
 
 	page = shmem->pages[vmf->pgoff];
 
+#ifdef __FreeBSD__
+	panic("TODO: implement vmf_insert_page");
+#else
 	return vmf_insert_page(vma, vmf->address, page);
+#endif
 }
 
 static void drm_gem_shmem_vm_open(struct vm_area_struct *vma)

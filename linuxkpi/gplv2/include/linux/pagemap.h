@@ -87,4 +87,11 @@ release_pages(struct page **pages, int nr)
 		put_page(pages[i]);
 }
 
+static inline gfp_t
+mapping_gfp_constraint(vm_object_t mapping, gfp_t mask)
+{
+	UNIMPLEMENTED();
+	return (0);
+}
+
 #endif
