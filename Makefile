@@ -3,7 +3,7 @@
 SYSDIR?=/usr/src/sys
 .include "${SYSDIR}/conf/kern.opts.mk"
 
-_VALID_KMODS=	linuxkpi ttm drm dummygfx i915 amd radeon vboxvideo vmwgfx
+_VALID_KMODS=	linuxkpi ttm drm dummygfx i915 amd radeon
 
 SUPPORTED_ARCH=	amd64 \
 		i386 \
