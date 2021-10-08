@@ -28,4 +28,6 @@ If the patch can be avoided by adding functionality to LinuxKPI, please consider
 ### FreeBSD source code
 Folders `lindebugfs`, `linuxkpi`
 
-Code style and rules same as FreeBSD kernel. If a GPL'd file is copy-paste from Linux, it's OK to leave style as is.
+Code style and rules same as FreeBSD kernel.
+No new code should be added there, all new linuxkpi functions should be
+added in FreeBSD base.
