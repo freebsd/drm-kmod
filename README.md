@@ -26,7 +26,7 @@ Unless obvious what your code does, please leave a comment to explain to fellow 
 If the patch can be avoided by adding functionality to LinuxKPI, please consider the latter. Sooner or later, there will be more places where the functionality is used and having it in LinuxKPI mean we don't have to patch twice.
 
 ### FreeBSD source code
-Folders `lindebugfs`, `linuxkpi`
+Folders `linuxkpi`
 
 Code style and rules same as FreeBSD kernel.
 No new code should be added there, all new linuxkpi functions should be
