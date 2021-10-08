@@ -69,8 +69,7 @@ SRCS=	drm_atomic.c \
 	drm_vma_manager.c \
 	drm_writeback.c \
 	linux_fb.c \
-	tainted_linux_fb.c \
-	linux_hdmi.c
+	tainted_linux_fb.c
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
 SRCS+=	drm_fb_helper.c

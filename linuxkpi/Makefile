@@ -6,6 +6,7 @@ KMOD=	linuxkpi_gplv2
 
 SRCS=	linux_kmod_gplv2.c	\
 	linux_compat.c		\
+	linux_hdmi.c		\
 	linux_i2c.c		\
 	linux_interval_tree.c	\
 	linux_irq.c		\
@@ -38,7 +39,7 @@ CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"' -DLINUXKPI_VERSION=50000
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 CFLAGS.gcc+= -Wno-cast-qual
+CFLAGS.linux_hdmi.c=	-Wno-cast-qual
 
 .include <bsd.kmod.mk>
 CWARNFLAGS+=	-Wno-pointer-arith
-
