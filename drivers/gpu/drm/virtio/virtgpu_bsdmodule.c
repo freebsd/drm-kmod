@@ -40,6 +40,9 @@
 
 #include "virtio_if.h"
 
+SYSCTL_NODE(_hw, OID_AUTO, virtio_gpu, CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
+    "VirtIO GPU parameters");
+
 struct vtgpu_softc {
 	struct linux_virtio_device linux_dev;
 };

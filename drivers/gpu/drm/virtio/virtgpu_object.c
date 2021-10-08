@@ -27,8 +27,17 @@
 
 #include "virtgpu_drv.h"
 
+#ifdef __FreeBSD__
+/*
+ * We don't support versions older than 2021, so no need for this workaround.
+ * Also this is missing MODULE_PARM_DESC(), so results in a link_elf_obj error.
+ */
+static const int virtio_gpu_virglrenderer_workaround = 0;
+#else
 static int virtio_gpu_virglrenderer_workaround = 1;
 module_param_named(virglhack, virtio_gpu_virglrenderer_workaround, int, 0400);
+#endif
+
 
 static int virtio_gpu_resource_id_get(struct virtio_gpu_device *vgdev,
 				       uint32_t *resid)
