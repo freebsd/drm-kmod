@@ -266,6 +266,7 @@ SRCS+=	amdgpu_afmt.c \
 	jpeg_v2_0.c \
 	jpeg_v2_5.c \
 	jpeg_v3_0.c \
+	jpeg_v4_0.c \
 	kv_dpm.c \
 	kv_smc.c \
 	legacy_dpm.c \
