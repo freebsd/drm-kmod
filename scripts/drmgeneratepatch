@@ -86,8 +86,5 @@ git format-patch -o ${PATCH_DIR} ${REV} \
 
 # Fixup some paths
 for file in ${PATCH_DIR}/*; do
-	sed -i '' 's/\([ab]\)\/drivers\/dma-buf\/dma-fence/\1\/linuxkpi\/gplv2\/src\/linux_dmafence/' ${file}
-	sed -i '' 's/\([ab]\)\/drivers\/dma-buf\/dma-fence-array/\1\/linuxkpi\/gplv2\/src\/linux_dma-fence-array/' ${file}
-	sed -i '' 's/\([ab]\)\/drivers\/dma-buf\/dma-fence-chain/\1\/linuxkpi\/gplv2\/src\/linux_dma-fence-chain/' ${file}
-	sed -i '' 's/\([ab]\)\/drivers\/video\/hdmi/\1\/drivers\/gpu\/drm\/linux_hdmi/' ${file}
+	sed -i '' 's/\([ab]\)\/drivers\/video\/hdmi/\1\/linuxkpi\/gplv2\/src\/linux_hdmi/' ${file}
 done
