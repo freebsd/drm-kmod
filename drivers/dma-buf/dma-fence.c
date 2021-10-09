@@ -185,6 +185,17 @@ int dma_fence_signal(struct dma_fence *fence)
 	if (!fence)
 		return -EINVAL;
 
+#ifdef __FreeBSD__
+	/*
+	 * Avoid blocking on fence lock within a critical section. It is safe
+	 * to exit from critical section if trylock is failed and use
+	 * ordinary spin_lock() after than, but current code is simpler.
+	 */
+	if (curthread->td_critnest != 0)
+		while (!spin_trylock_irqsave(fence->lock, flags))
+			{}
+	else
+#endif
 	spin_lock_irqsave(fence->lock, flags);
 	ret = dma_fence_signal_locked(fence);
 	spin_unlock_irqrestore(fence->lock, flags);
