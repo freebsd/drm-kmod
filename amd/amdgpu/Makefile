@@ -237,9 +237,6 @@ SRCS+=	amdgpu_afmt.c \
 	hdp_v5_0.c \
 	aldebaran_reg_init.c \
 	aldebaran.c \
-	beige_goby_reg_init.c \
-	yellow_carp_reg_init.c \
-	cyan_skillfish_reg_init.c \
 	iceland_ih.c \
 	jpeg_v1_0.c \
 	jpeg_v2_0.c \
@@ -257,9 +254,6 @@ SRCS+=	amdgpu_afmt.c \
 	mxgpu_ai.c \
 	mxgpu_nv.c \
 	mxgpu_vi.c \
-	navi10_reg_init.c \
-	navi12_reg_init.c \
-	navi14_reg_init.c \
 	nbio_v2_3.c \
 	nbio_v6_1.c \
 	nbio_v7_0.c \
@@ -284,7 +278,6 @@ SRCS+=	amdgpu_afmt.c \
 	si_ih.c \
 	si_smc.c \
 	si.c \
-	sienna_cichlid_reg_init.c \
 	soc15.c \
 	smuio_v9_0.c \
 	smuio_v11_0.c \
@@ -300,7 +293,6 @@ SRCS+=	amdgpu_afmt.c \
 	uvd_v5_0.c \
 	uvd_v6_0.c \
 	uvd_v7_0.c \
-	vangogh_reg_init.c \
 	vce_v2_0.c \
 	vce_v3_0.c \
 	vce_v4_0.c \
@@ -871,6 +863,7 @@ CWARNFLAGS.amdgpu_vram_mgr.c=			-Wno-unused-variable
 CWARNFLAGS.aldebaran_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.aldebaran.c=				-Wno-unused-variable
 CWARNFLAGS.arcturus_ppt.c=			-Wno-uninitialized
+CWARNFLAGS.dimgrey_cavefish_reg_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.yellow_carp_ppt.c=			-Wno-sometimes-uninitialized
 CWARNFLAGS.atombios_encoders.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dce_v6_0.c=				-Wno-unused-but-set-variable
