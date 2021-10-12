@@ -26,4 +26,12 @@ for file in $1/*.patch; do
 		exit 1
 	fi
 	mv $file $1/applied
+	patchfile=$(echo $file | awk -F '/' '{print $NF}')
+	newfiles=$(awk '$0 == "--- /dev/null" { getline; print $2 }' $1/applied/${patchfile} | sed 's/^b\///')
+	if [ -n "${newfiles}" ]; then
+	    echo "New files appeared, makefiles needs modification"
+	    echo "New files in questions : ${newfiles}"
+	    exit 1
+	fi
+	make -sj$(sysctl -n hw.ncpu) || exit 1
 done
