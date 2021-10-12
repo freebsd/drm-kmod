@@ -119,7 +119,7 @@ dma_buf_close(struct file *fp, struct thread *td)
 
 static int
 dma_buf_stat(struct file *fp, struct stat *sb,
-	     struct ucred *active_cred __unused, struct thread *td __unused)
+	     struct ucred *active_cred __unused)
 {
 
 	/* XXX need to define flags for st_mode */
