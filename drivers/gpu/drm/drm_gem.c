@@ -522,7 +522,6 @@ int drm_gem_create_mmap_offset(struct drm_gem_object *obj)
 }
 EXPORT_SYMBOL(drm_gem_create_mmap_offset);
 
-#ifdef __linux__
 /*
  * Move pages to appropriate lru and release the pagevec, decrementing the
  * ref count of those pages.
@@ -557,13 +556,21 @@ static void drm_gem_check_release_pagevec(struct pagevec *pvec)
  */
 struct page **drm_gem_get_pages(struct drm_gem_object *obj)
 {
+#ifdef __FreeBSD__
+	vm_object_t mapping;
+#else
 	struct address_space *mapping;
+#endif
 	struct page *p, **pages;
 	struct pagevec pvec;
 	int i, npages;
 
 	/* This is the shared memory object that backs the GEM resource */
+#ifdef __FreeBSD__
+	mapping = obj->filp->f_shmem;
+#else
 	mapping = obj->filp->f_mapping;
+#endif
 
 	/* We already BUG_ON() for non-page-aligned sizes in
 	 * drm_gem_object_init(), so we should never hit this unless
@@ -622,10 +629,18 @@ void drm_gem_put_pages(struct drm_gem_object *obj, struct page **pages,
 		bool dirty, bool accessed)
 {
 	int i, npages;
+#ifdef __FreeBSD__
+	vm_object_t mapping;
+#else
 	struct address_space *mapping;
+#endif
 	struct pagevec pvec;
 
+#ifdef __FreeBSD__
+	mapping = obj->filp->f_shmem; // FIXME: is this right?
+#else
 	mapping = file_inode(obj->filp)->i_mapping;
+#endif
 	mapping_clear_unevictable(mapping);
 
 	/* We already BUG_ON() for non-page-aligned sizes in
@@ -657,7 +672,6 @@ void drm_gem_put_pages(struct drm_gem_object *obj, struct page **pages,
 	kvfree(pages);
 }
 EXPORT_SYMBOL(drm_gem_put_pages);
-#endif
 
 static int objects_lookup(struct drm_file *filp, u32 *handle, int count,
 			  struct drm_gem_object **objs)

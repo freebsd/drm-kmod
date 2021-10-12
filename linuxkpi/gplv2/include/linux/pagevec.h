@@ -76,5 +76,11 @@ mapping_clear_unevictable(vm_object_t mapping)
 	UNIMPLEMENTED();
 }
 
+static inline void
+mapping_set_unevictable(vm_object_t mapping)
+{
+	UNIMPLEMENTED();
+}
+
 
 #endif /* _LINUX_PAGEVEC_H */
