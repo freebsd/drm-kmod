@@ -13,6 +13,7 @@
 #include "intel_gt_pm_irq.h"
 #include "intel_rps.h"
 #include "intel_sideband.h"
+#include "vlv_sideband.h"
 #ifdef __linux__
 #include "../../../platform/x86/intel_ips.h"
 #endif

@@ -90,6 +90,7 @@ SRCS=	\
 	i915_utils.c \
 	intel_wakeref.c \
 	intel_wopcm.c \
+	vlv_sideband.c \
 	vlv_suspend.c
 
 # display/*
