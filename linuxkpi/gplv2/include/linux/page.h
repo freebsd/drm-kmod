@@ -4,7 +4,8 @@
 #include_next <linux/page.h>
 
 #include <sys/param.h>
-#if __FreeBSD_version <= 1400033
+#if ((__FreeBSD_version <= 1400033) && (__FreeBSD_version >= 1400000) || \
+     (__FreeBSD_version <= 1300516))
 #define PAGE_KERNEL_IO  0x0000
 
 /* XXX note that this is incomplete */
@@ -31,7 +32,8 @@ int set_pages_wb(vm_page_t page, int numpages);
 int set_pages_uc(vm_page_t page, int numpages);
 int set_pages_wc(vm_page_t page, int numpages);
 
-#if __FreeBSD_version <= 1400033
+#if ((__FreeBSD_version <= 1400033) && (__FreeBSD_version >= 1400000) || \
+     (__FreeBSD_version <= 1300516))
 vm_paddr_t page_to_phys(vm_page_t page);
 
 void unmap_mapping_range(void *obj, loff_t const holebegin,

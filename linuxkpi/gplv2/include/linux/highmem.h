@@ -1,5 +1,6 @@
 #include <sys/param.h>
-#if __FreeBSD_version <= 1400033
+#if ((__FreeBSD_version <= 1400033) && (__FreeBSD_version >= 1400000) || \
+     (__FreeBSD_version <= 1300516))
 #ifndef _LINUX_HIGHMEM_H_
 #define _LINUX_HIGHMEM_H_
 
