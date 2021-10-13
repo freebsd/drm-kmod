@@ -103,7 +103,8 @@ do {								\
 	({ __typeof__(*(ptr)) __tmp;                                    \
 	  memcpy(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
 
-#if __FreeBSD_version <= 1400033
+#if ((__FreeBSD_version <= 1400033) && (__FreeBSD_version >= 1400000) || \
+     (__FreeBSD_version <= 1300516))
 #define	page_to_phys(x) VM_PAGE_TO_PHYS(x)
 #endif
 

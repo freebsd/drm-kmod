@@ -49,7 +49,8 @@
 
 #include <asm/set_memory.h>
 
-#if __FreeBSD_version <= 1400033
+#if ((__FreeBSD_version <= 1400033) && (__FreeBSD_version >= 1400000) || \
+     (__FreeBSD_version <= 1300516))
 #if defined(__LP64__)
 #define	LINUXKPI_HAVE_DMAP
 #else
@@ -213,7 +214,8 @@ arch_io_free_memtype_wc(resource_size_t start, resource_size_t size)
 	set_memory_wb(start, size >> PAGE_SHIFT);
 }
 
-#if __FreeBSD_version <= 1400033
+#if ((__FreeBSD_version <= 1400033) && (__FreeBSD_version >= 1400000) || \
+     (__FreeBSD_version <= 1300516))
 vm_paddr_t
 page_to_phys(vm_page_t page)
 {

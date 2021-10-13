@@ -33,7 +33,8 @@
 #ifdef __FreeBSD__
 /* CEM: Make sure we got the Linux version */
 CTASSERT(PAGE_MASK != (PAGE_SIZE - 1));
-#if __FreeBSD_version <= 1400033
+#if ((__FreeBSD_version <= 1400033) && (__FreeBSD_version >= 1400000) || \
+     (__FreeBSD_version <= 1300516))
 #define clflushopt linux_clflushopt
 #endif
 #include <linux/capability.h>

@@ -36,7 +36,8 @@
 #if defined(CONFIG_X86)
 #include <asm/smp.h>
 
-#if __FreeBSD_version <= 1400033
+#if ((__FreeBSD_version <= 1400033) && (__FreeBSD_version >= 1400000) || \
+     (__FreeBSD_version <= 1300516))
 #define clflushopt(addr) linux_clflushopt(addr)
 #endif
 
