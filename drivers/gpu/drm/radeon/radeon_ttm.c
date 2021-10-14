@@ -797,7 +797,7 @@ int radeon_ttm_init(struct radeon_device *rdev)
 			       &radeon_bo_driver,
 #ifdef __FreeBSD__
 			       NULL,
-			       NULL,
+			       rdev->ddev->vma_offset_manager,
 			       false);
 #else
 			       rdev->ddev->anon_inode->i_mapping,
