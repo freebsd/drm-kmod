@@ -77,6 +77,7 @@ SRCS=	\
 	intel_opregion.c \
 	intel_overlay.c \
 	intel_pch.c \
+	intel_pcode.c \
 	intel_pm.c \
 	intel_psr.c \
 	intel_quirks.c \
