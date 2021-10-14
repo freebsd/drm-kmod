@@ -262,6 +262,7 @@ SRCS+=	amdgpu_afmt.c \
 	gfx_v9_0.c \
 	gfx_v9_4.c \
 	gfx_v9_4_2.c \
+	gfx_v9_4_3.c \
 	gfx_v10_0.c \
 	gfx_v11_0.c \
 	gfx_v11_0_3.c \
