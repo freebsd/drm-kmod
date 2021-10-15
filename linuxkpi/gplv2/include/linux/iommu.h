@@ -387,11 +387,6 @@ static inline void iommu_device_set_ops(struct iommu_device *iommu,
 {
 }
 
-static inline void iommu_device_set_fwnode(struct iommu_device *iommu,
-					   struct fwnode_handle *fwnode)
-{
-}
-
 static inline struct iommu_device *dev_to_iommu_device(struct device *dev)
 {
 	return NULL;
@@ -422,13 +417,6 @@ static inline void iommu_device_unlink(struct device *dev, struct device *link)
 {
 }
 
-static inline int iommu_fwspec_init(struct device *dev,
-				    struct fwnode_handle *iommu_fwnode,
-				    const struct iommu_ops *ops)
-{
-	return -ENODEV;
-}
-
 static inline void iommu_fwspec_free(struct device *dev)
 {
 }
@@ -437,12 +425,6 @@ static inline int iommu_fwspec_add_ids(struct device *dev, u32 *ids,
 				       int num_ids)
 {
 	return -ENODEV;
-}
-
-static inline
-const struct iommu_ops *iommu_ops_from_fwnode(struct fwnode_handle *fwnode)
-{
-	return NULL;
 }
 
 #endif /* CONFIG_IOMMU_API */
