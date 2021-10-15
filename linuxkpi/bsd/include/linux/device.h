@@ -3,7 +3,6 @@
 
 #include_next <linux/device.h>
 
-#include <linux/numa.h>
 #include <linux/pm.h>
 #include <linux/idr.h>
 
