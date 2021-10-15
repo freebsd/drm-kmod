@@ -23,9 +23,6 @@ struct irq_domain {
 	void *host_data;
 	unsigned int flags;
 
-	struct fwnode_handle *fwnode;	
-	
-
 	irq_hw_number_t hwirq_max;
 	unsigned int revmap_direct_max_irq;
 	unsigned int revmap_size;
@@ -110,7 +107,7 @@ irq_domain_alloc_descs(int virq, unsigned int cnt, irq_hw_number_t hwirq,
 }
 
 static inline struct irq_domain *
-__irq_domain_add(struct fwnode_handle *fwnode, int size,
+__irq_domain_add(int size,
 		 irq_hw_number_t hwirq_max, int direct_max,
 		 const struct irq_domain_ops *ops,
 		 void *host_data)
@@ -126,7 +123,6 @@ __irq_domain_add(struct fwnode_handle *fwnode, int size,
 	INIT_RADIX_TREE(&domain->revmap_tree, GFP_KERNEL);
 	domain->ops = ops;
 	domain->host_data = host_data;
-	domain->fwnode = fwnode;
 	domain->hwirq_max = hwirq_max;
 	domain->revmap_size = size;
 	domain->revmap_direct_max_irq = direct_max;
@@ -144,7 +140,7 @@ irq_domain_add_linear(void *of_node,
 		      const struct irq_domain_ops *ops,
 		      void *host_data)
 {
-	return __irq_domain_add(NULL, size, size, 0, ops, host_data);
+	return __irq_domain_add(size, size, 0, ops, host_data);
 }
 
 static inline void
