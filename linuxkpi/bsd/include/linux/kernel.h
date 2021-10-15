@@ -1,5 +1,5 @@
-#ifndef _KERNEL_GPLV2_H_
-#define _KERNEL_GPLV2_H_
+#ifndef _BSD_LKPI_LINUX_KERNEL_H_
+#define	_BSD_LKPI_LINUX_KERNEL_H_
 
 #include_next <linux/kernel.h>
 
@@ -15,4 +15,4 @@
 #include <asm/processor.h>
 #include <asm/barrier.h>
 
-#endif /* _KERNEL_GPLV2_H_ */
+#endif /* _BSD_LKPI_LINUX_KERNEL_H_ */

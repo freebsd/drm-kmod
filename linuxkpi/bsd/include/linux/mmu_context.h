@@ -1,6 +1,5 @@
 /*-
- * Copyright (c) 2017 Mark Johnston <markj@FreeBSD.org>
- * All rights reserved.
+ * Copyright (c) 2018 Johannes Lundberg <johalun0@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,10 +25,21 @@
  * $FreeBSD$
  */
 
-#ifndef _LINUX_MMU_NOTIFIER_H_
-#define	_LINUX_MMU_NOTIFIER_H_
+#ifndef _BSD_LKPI_LINUX_MMU_CONTEXT_H
+#define	_BSD_LKPI_LINUX_MMU_CONTEXT_H
 
-struct mmu_notifier {
-};
+struct mm_struct;
 
-#endif /* _LINUX_MMU_NOTIFIER_H_ */
+static inline void
+use_mm(struct mm_struct *mm)
+{
+	/* NOP is deliberate */
+}
+
+static inline void
+unuse_mm(struct mm_struct *mm)
+{
+	/* NOP is deliberate */
+}
+
+#endif	/* _BSD_LKPI_LINUX_MMU_CONTEXT_H */
