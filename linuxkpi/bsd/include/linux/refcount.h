@@ -1,5 +1,5 @@
-#ifndef _LINUX_REFCOUNT_DRM_H
-#define _LINUX_REFCOUNT_DRM_H
+#ifndef _BSD_LKPI_LINUX_REFCOUNT_H_
+#define	_BSD_LKPI_LINUX_REFCOUNT_H_
 
 #include_next <linux/refcount.h>
 
@@ -14,4 +14,4 @@ refcount_dec_and_test(atomic_t *r)
 	return atomic_dec_and_test(r);
 }
 
-#endif /* _LINUX_REFCOUNT_DRM_H */
+#endif /* _BSD_LKPI_LINUX_REFCOUNT_H_ */

@@ -1,5 +1,5 @@
-#ifndef __LINUX_CAPABILITY_H_
-#define __LINUX_CAPABILITY_H_
+#ifndef _BSD_LKPI_LINUX_CAPABILITY_H_
+#define	_BSD_LKPI_LINUX_CAPABILITY_H_
 
 #include <sys/types.h>
 #include <sys/param.h>
@@ -32,4 +32,4 @@ capable(enum __lkpi_capabilities cap)
 	}
 }
 
-#endif
+#endif /* _BSD_LKPI_CAPABILITY_H_ */
