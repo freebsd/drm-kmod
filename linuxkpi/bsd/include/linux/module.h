@@ -1,5 +1,5 @@
-#ifndef _LINUX_GPLV2_MODULE_H_
-#define	_LINUX_GPLV2_MODULE_H_
+#ifndef _BSD_LKPI_LINUX_MODULE_H_
+#define	_BSD_LKPI_LINUX_MODULE_H_
 
 #include <sys/param.h>
 #include <sys/module.h>
@@ -32,4 +32,4 @@
 	MODULE_PNP_INFO("U32:vendor;U32:device;",			\
 	    bus, name, table, nitems(table) - 1);
 
-#endif /* _LINUX_GPLV2_MODULE_H_ */
+#endif /* _BSD_LKPI_LINUX_MODULE_H_ */

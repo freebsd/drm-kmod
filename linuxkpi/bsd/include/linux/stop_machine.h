@@ -1,5 +1,5 @@
-#ifndef _LINUX_STOP_MACHINE
-#define _LINUX_STOP_MACHINE
+#ifndef _BSD_LKPI_LINUX_STOP_MACHINE_H_
+#define	_BSD_LKPI_LINUX_STOP_MACHINE_H_
 
 #include <sys/param.h>
 #include <sys/types.h>
@@ -22,4 +22,4 @@ stop_machine(cpu_stop_fn_t fn, void *data, void *dummy)
 	return (ret);
 }
 
-#endif
+#endif	/* _BSD_LKPI_LINUX_STOP_MACHINE_H_ */
