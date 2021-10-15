@@ -152,7 +152,6 @@ struct i2c_board_info {
 	void		*platform_data;
 	struct dev_archdata	*archdata;
 	struct device_node *of_node;
-	struct fwnode_handle *fwnode;
 	int		irq;
 };
 

@@ -703,7 +703,6 @@ i2c_new_device(struct i2c_adapter *adap, struct i2c_board_info const *info)
 		goto out_err;
 
 	client->dev.parent = &client->adapter->dev;
-	client->dev.fwnode = info->fwnode;
 
 	i2c_dev_set_name(adap, client);
 	status = device_register(&client->dev);
