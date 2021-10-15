@@ -1,5 +1,5 @@
-#ifndef _LINUX_SWAP_H
-#define _LINUX_SWAP_H
+#ifndef _BSD_LKPI_LINUX_SWAP_H_
+#define	_BSD_LKPI_LINUX_SWAP_H_
 
 #include <linux/types.h>
 
@@ -17,4 +17,4 @@ current_is_kswapd(void)
 	return 0;
 }
 
-#endif
+#endif	/* _BSD_LKPI_LINUX_SWAP_H_ */

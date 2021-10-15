@@ -1,5 +1,5 @@
-#ifndef __GPLV2_ATOMIC_H__
-#define	__GPLV2_ATOMIC_H__
+#ifndef _BSD_LKPI_LINUX_ATOMIC_H_
+#define	_BSD_LKPI_LINUX_ATOMIC_H_
 
 #include_next <linux/atomic.h>
 
@@ -25,4 +25,4 @@
 
 #define atomic_try_cmpxchg(_p, _po, _n)	__atomic_try_cmpxchg(, _p, _po, _n)
 
-#endif
+#endif	/* _BSD_LKPI_LINUX_ATOMIC_H_ */
