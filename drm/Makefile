@@ -99,10 +99,6 @@ SRCS_DEBUG=	\
 		drm_debugfs_crc.c
 .endif
 
-.if !empty(KCONFIG:MDRM_LOAD_EDID_FIRMWARE)
-SRCS+=	drm_edid_load.c
-.endif
-
 .if !empty(KCONFIG:MDRM_VM)
 SRCS+=	drm_vm.c
 .endif
