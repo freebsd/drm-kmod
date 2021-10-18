@@ -482,15 +482,27 @@ trace_intel_engine_notify(struct intel_engine_cs *engine, bool waiters)
 }
 
 static inline void
-trace_intel_update_plane(void *plane, void *crtc)
+trace_intel_plane_update_noarm(void *plane, void *crtc)
 {
-	CTR2(KTR_DRM, "update_plane plane %p crtc %p", plane, crtc);
+	CTR2(KTR_DRM, "plane_update_noarm plane %p crtc %p", plane, crtc);
 }
 
 static inline void
-trace_intel_disable_plane(void *plane, void *crtc)
+trace_intel_plane_update_arm(struct drm_plane *plane, struct intel_crtc *crtc)
 {
-	CTR2(KTR_DRM, "disable_plane plane %p crtc %p", plane, crtc);
+	CTR6(KTR_DRM,
+	    "plane_update_arm pipe %c, plane %s, frame=%u, scanline=%u, " DRM_RECT_FP_FMT " -> " DRM_RECT_FMT,
+	    pipe_name(crtc->pipe), plane->name,
+	    intel_crtc_get_vblank_counter(crtc),
+	    intel_get_crtc_scanline(crtc),
+	    DRM_RECT_FP_ARG((const struct drm_rect *)&plane->state->src),
+	    DRM_RECT_ARG((const struct drm_rect *)&plane->state->dst));
+};
+
+static inline void
+trace_intel_plane_disable_arm(void *plane, void *crtc)
+{
+	CTR2(KTR_DRM, "plane_disable_arm plane %p crtc %p", plane, crtc);
 }
 
 static inline void
