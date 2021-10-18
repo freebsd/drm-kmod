@@ -30,11 +30,11 @@ static void check_release_pagevec(struct pagevec *pvec)
 }
 
 #ifdef __FreeBSD__
-static void shmem_free_st(struct sg_table *st, vm_object_t mapping,
-			  bool dirty, bool backup)
+void shmem_free_st(struct sg_table *st, vm_object_t mapping,
+		   bool dirty, bool backup)
 #else
-static void shmem_free_st(struct sg_table *st, struct address_space *mapping,
-			  bool dirty, bool backup)
+void shmem_free_st(struct sg_table *st, struct address_space *mapping,
+		   bool dirty, bool backup)
 #endif
 {
 	struct sgt_iter sgt_iter;
@@ -63,14 +63,14 @@ static void shmem_free_st(struct sg_table *st, struct address_space *mapping,
 	kfree(st);
 }
 
-static struct sg_table *shmem_alloc_st(struct drm_i915_private *i915,
-				       size_t size, struct intel_memory_region *mr,
+struct sg_table *shmem_alloc_st(struct drm_i915_private *i915,
+				size_t size, struct intel_memory_region *mr,
 #ifdef __FreeBSD__
-				       vm_object_t mapping,
+				vm_object_t mapping,
 #else
-				       struct address_space *mapping,
+				struct address_space *mapping,
 #endif
-				       unsigned int max_segment)
+				unsigned int max_segment)
 {
 	const unsigned long page_count = size / PAGE_SIZE;
 	unsigned long i;
@@ -296,7 +296,7 @@ err_st:
 	return ret;
 }
 
-static void
+static int
 shmem_truncate(struct drm_i915_gem_object *obj)
 {
 	/*
@@ -312,10 +312,16 @@ shmem_truncate(struct drm_i915_gem_object *obj)
 #endif
 	obj->mm.madv = __I915_MADV_PURGED;
 	obj->mm.pages = ERR_PTR(-EFAULT);
+
+	return 0;
 }
 
-#ifdef __linux__
-static void __shmem_writeback(size_t size, struct address_space *mapping)
+#ifdef __FreeBSD__
+void __shmem_writeback(size_t size, vm_object_t mapping)
+{
+}
+#else
+void __shmem_writeback(size_t size, struct address_space *mapping)
 {
 	struct writeback_control wbc = {
 		.sync_mode = WB_SYNC_NONE,
@@ -361,7 +367,9 @@ put:
 static void
 shmem_writeback(struct drm_i915_gem_object *obj)
 {
-#ifdef __linux__
+#ifdef __FreeBSD__
+	__shmem_writeback(obj->base.size, obj->base.filp->f_shmem);
+#else
 	__shmem_writeback(obj->base.size, obj->base.filp->f_mapping);
 #endif
 }
