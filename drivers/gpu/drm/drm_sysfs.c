@@ -83,6 +83,20 @@ void drm_sysfs_hotplug_event(struct drm_device *dev)
 	sbuf_delete(sb);
 }
 
+void drm_sysfs_connector_hotplug_event(struct drm_connector *connector)
+{
+	struct drm_device *dev = connector->dev;
+	struct sbuf *sb = sbuf_new_auto();
+
+	DRM_DEBUG("generating hotplug event\n");
+
+	sbuf_printf(sb, "cdev=dri/%s connector_id=%u connector_name=\"%s\"",
+	    dev_name(dev->primary->kdev), connector->base.id, connector->name);
+	sbuf_finish(sb);
+	devctl_notify("DRM", "CONNECTOR", "HOTPLUG", sbuf_data(sb));
+	sbuf_delete(sb);
+}
+
 static void drm_sysfs_release(struct device *dev)
 {
 	kfree(dev);
