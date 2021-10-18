@@ -1120,13 +1120,7 @@ struct drm_i915_private {
 
 	struct intel_atomic_helper {
 		struct llist_head free_list;
-#ifdef __linux__
 		struct work_struct free_work;
-#elif defined (__FreeBSD__)
-		/* On FreeBSD this work is sporadically scheduled
-		 * within a critical section. */
-		struct irq_work free_work;
-#endif
 	} atomic_helper;
 
 	u16 orig_clock;
