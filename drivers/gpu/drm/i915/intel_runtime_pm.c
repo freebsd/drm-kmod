@@ -469,14 +469,18 @@ static void __intel_runtime_pm_put(struct intel_runtime_pm *rpm,
 				   intel_wakeref_t wref,
 				   bool wakelock)
 {
+#ifdef __linux__
 	struct device *kdev = rpm->kdev;
+#endif
 
 	untrack_intel_runtime_pm_wakeref(rpm, wref);
 
 	intel_runtime_pm_release(rpm, wakelock);
 
+#ifdef __linux__
 	pm_runtime_mark_last_busy(kdev);
 	pm_runtime_put_autosuspend(kdev);
+#endif
 }
 
 /**

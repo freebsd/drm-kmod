@@ -65,11 +65,13 @@ radeonfb_open(struct fb_info *info, int user)
 static int
 radeonfb_release(struct fb_info *info, int user)
 {
+#ifdef __linux__
 	struct radeon_fbdev *rfbdev = info->par;
 	struct radeon_device *rdev = rfbdev->rdev;
 
 	pm_runtime_mark_last_busy(rdev->ddev->dev);
 	pm_runtime_put_autosuspend(rdev->ddev->dev);
+#endif
 	return 0;
 }
 

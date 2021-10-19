@@ -62,10 +62,12 @@ amdgpufb_open(struct fb_info *info, int user)
 static int
 amdgpufb_release(struct fb_info *info, int user)
 {
+#ifdef __linux__
 	struct drm_fb_helper *fb_helper = info->par;
 
 	pm_runtime_mark_last_busy(fb_helper->dev->dev);
 	pm_runtime_put_autosuspend(fb_helper->dev->dev);
+#endif
 	return 0;
 }
 

@@ -235,7 +235,9 @@ static void amdgpu_fence_schedule_fallback(struct amdgpu_ring *ring)
 bool amdgpu_fence_process(struct amdgpu_ring *ring)
 {
 	struct amdgpu_fence_driver *drv = &ring->fence_drv;
+#ifdef __linux__
 	struct amdgpu_device *adev = ring->adev;
+#endif
 	uint32_t seq, last_seq;
 	int r;
 
@@ -276,8 +278,10 @@ bool amdgpu_fence_process(struct amdgpu_ring *ring)
 			BUG();
 
 		dma_fence_put(fence);
+#ifdef __linux__
 		pm_runtime_mark_last_busy(adev->ddev->dev);
 		pm_runtime_put_autosuspend(adev->ddev->dev);
+#endif
 	} while (last_seq != seq);
 
 	return true;

@@ -1840,9 +1840,11 @@ int i915_suspend_switcheroo(struct drm_i915_private *i915, pm_message_t state)
 {
 	int error;
 
+#ifdef __linux__
 	if (WARN_ON_ONCE(state.event != PM_EVENT_SUSPEND &&
 			 state.event != PM_EVENT_FREEZE))
 		return -EINVAL;
+#endif
 
 	if (i915->drm.switch_power_state == DRM_SWITCH_POWER_OFF)
 		return 0;
