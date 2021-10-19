@@ -12,8 +12,6 @@
 #include "intel_sideband.h"
 #ifdef __linux__
 #include "../../../platform/x86/intel_ips.h"
-#elif defined(__FreeBSD__)
-#include <platform/x86/intel_ips.h>
 #endif
 
 /*
