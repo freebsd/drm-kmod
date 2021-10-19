@@ -13,6 +13,5 @@
 
 #include <asm/cpufeature.h>
 #include <asm/processor.h>
-#include <asm/barrier.h>
 
 #endif /* _BSD_LKPI_LINUX_KERNEL_H_ */
