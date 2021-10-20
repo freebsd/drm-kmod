@@ -41,7 +41,6 @@ SRCS=	drm_atomic.c \
 	drm_gem_framebuffer_helper.c \
 	drm_hashtab.c \
 	drm_ioctl.c \
-	drm_irq.c \
 	drm_lease.c \
 	drm_managed.c \
 	drm_mm.c \
@@ -77,6 +76,7 @@ SRCS+=	drm_fb_helper.c
 
 .if !empty(KCONFIG:MDRM_LEGACY)
 SRCS+=	drm_agpsupport.c \
+	drm_irq.c \
 	drm_memory.c
 .endif
 
