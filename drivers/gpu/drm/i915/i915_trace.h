@@ -560,6 +560,22 @@ trace_intel_fbc_nuke(void *crtc)
 }
 
 static inline void
+trace_intel_crtc_vblank_work_start(struct intel_crtc *crtc)
+{
+	CTR3(KTR_DRM, "crtc_vblank_work_start pipe %c, frame=%u, scanline=%u",
+	    crtc->pipe, intel_crtc_get_vblank_counter(crtc),
+	    intel_get_crtc_scanline(crtc));
+};
+
+static inline void
+trace_intel_crtc_vblank_work_end(struct intel_crtc *crtc)
+{
+	CTR3(KTR_DRM, "crtc_vblank_work_end pipe %c, frame=%u, scanline=%u",
+	    crtc->pipe, intel_crtc_get_vblank_counter(crtc),
+	    intel_get_crtc_scanline(crtc));
+};
+
+static inline void
 trace_intel_pipe_update_start(void *crtc)
 {
 	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
