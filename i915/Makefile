@@ -15,7 +15,6 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
 KMOD=	i915kms
 SRCS=	\
-	dma_resv_utils.c \
 	i915_active.c \
 	i915_buddy.c \
 	i915_cmd_parser.c \
