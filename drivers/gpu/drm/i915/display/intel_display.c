@@ -15512,6 +15512,9 @@ intel_atomic_commit_ready(struct i915_sw_fence *fence,
 				&to_i915(state->base.dev)->atomic_helper;
 
 			if (llist_add(&state->freed, &helper->free_list))
+#ifdef __FreeBSD__
+			    if (curthread->td_critnest == 0)
+#endif
 				schedule_work(&helper->free_work);
 			break;
 		}
@@ -18492,7 +18495,12 @@ void intel_modeset_driver_remove(struct drm_i915_private *i915)
 	flush_workqueue(i915->modeset_wq);
 
 	flush_work(&i915->atomic_helper.free_work);
+#ifdef __linux__
 	WARN_ON(!llist_empty(&i915->atomic_helper.free_list));
+#elif defined(__FreeBSD__)
+	/* schedule_work() can be skipped if called from critical section */
+	intel_atomic_helper_free_state(i915);
+#endif
 
 	/*
 	 * Interrupts and polling as the first thing to avoid creating havoc.
