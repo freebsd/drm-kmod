@@ -692,6 +692,21 @@ void __drm_err(const char *function_name, const char *format, ...);
  * Prefer drm_device based drm_WARN* over regular WARN*
  */
 
+#ifdef __FreeBSD__
+static inline const char *
+dev_driver_string(const struct device *dev)
+{
+	struct device_driver *drv;
+
+	/* dev->driver can change to NULL underneath us because of unbinding,
+	 * so be careful about accessing it.  dev->bus and dev->class should
+	 * never change once they are set, so they don't need special care.
+	 */
+	drv = READ_ONCE(dev->driver);
+	return drv ? drv->name : "(null)";
+}
+#endif
+
 /* Helper for struct drm_device based WARNs */
 #define drm_WARN(drm, condition, format, arg...)			\
 	WARN(condition, "%s %s: " format,				\
