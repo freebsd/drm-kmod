@@ -1296,7 +1296,7 @@ bool dcn_validate_bandwidth(
 	PERFORMANCE_TRACE_END();
 	BW_VAL_TRACE_FINISH();
 
-	bool ret = bw_limit_pass && v->voltage_level <= get_highest_allowed_voltage_level(dc->ctx->asic_id.hw_internal_rev);
+	bool ret = bw_limit_pass && v->voltage_level <= get_highest_allowed_voltage_level(dc->ctx->asic_id.hw_internal_rev, dc->ctx->asic_id.pci_revision_id);
 	DC_FP_END();
 
 	return ret;
