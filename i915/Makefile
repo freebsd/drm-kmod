@@ -118,6 +118,7 @@ SRCS+=	debugfs_engines.c \
 	debugfs_gt_pm.c \
 	gen6_ppgtt.c \
 	gen6_renderstate.c \
+	gen7_renderclear.c \
 	gen7_renderstate.c \
 	gen8_ppgtt.c \
 	gen8_renderstate.c \
