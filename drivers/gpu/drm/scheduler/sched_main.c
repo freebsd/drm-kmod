@@ -775,7 +775,9 @@ static int drm_sched_main(void *param)
 		atomic_inc(&sched->hw_rq_count);
 		drm_sched_job_begin(sched_job);
 
+#ifdef __linux__
 		trace_drm_run_job(sched_job, entity);
+#endif
 		fence = sched->ops->run_job(sched_job);
 		drm_sched_fence_scheduled(s_fence);
 
