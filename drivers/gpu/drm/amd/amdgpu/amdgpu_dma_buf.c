@@ -222,6 +222,7 @@ static void amdgpu_dma_buf_detach(struct dma_buf *dmabuf,
 		bo->prime_shared_count--;
 }
 
+#ifdef __linux__
 /**
  * amdgpu_dma_buf_pin - &dma_buf_ops.pin implementation
  *
@@ -252,6 +253,7 @@ static void amdgpu_dma_buf_unpin(struct dma_buf_attachment *attach)
 
 	amdgpu_bo_unpin(bo);
 }
+#endif
 
 /**
  * amdgpu_dma_buf_map - &dma_buf_ops.map_dma_buf implementation
