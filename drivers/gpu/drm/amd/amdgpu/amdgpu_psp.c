@@ -1884,8 +1884,15 @@ static ssize_t psp_usbc_pd_fw_sysfs_write(struct device *dev,
 	memcpy_toio(cpu_addr, usbc_pd_fw->data, usbc_pd_fw->size);
 
 #ifdef __linux__
-	/*TODO Remove once PSP starts snooping CPU cache */
+	/*
+	 * x86 specific workaround.
+	 * Without it the buffer is invisible in PSP.
+	 *
+	 * TODO Remove once PSP starts snooping CPU cache
+	 */
+#ifdef CONFIG_X86
 	clflush_cache_range(cpu_addr, (usbc_pd_fw->size & ~(L1_CACHE_BYTES - 1)));
+#endif
 #endif
 
 	mutex_lock(&adev->psp.mutex);
