@@ -175,10 +175,19 @@ struct drm_ioctl_desc {
 	}
 
 int drm_ioctl_permit(u32 flags, struct drm_file *file_priv);
+#ifdef __linux__
 long drm_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
 long drm_ioctl_kernel(struct file *, drm_ioctl_t, void *, u32);
+#elif defined(__FreeBSD__)
+long drm_ioctl(struct linux_file *filp, unsigned int cmd, unsigned long arg);
+long drm_ioctl_kernel(struct linux_file *, drm_ioctl_t, void *, u32);
+#endif
 #ifdef CONFIG_COMPAT
+#ifdef __linux__
 long drm_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
+#elif defined(__FreeBSD__)
+long drm_compat_ioctl(struct linux_file *filp, unsigned int cmd, unsigned long arg);
+#endif
 #else
 /* Let drm_compat_ioctl be assigned to .compat_ioctl unconditionally */
 #define drm_compat_ioctl NULL
