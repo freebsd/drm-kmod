@@ -1599,11 +1599,13 @@ long i915_request_wait(struct i915_request *rq,
 	 * completion. That requires having a good predictor for the request
 	 * duration, which we currently lack.
 	 */
+#ifdef __linux__
 	if (IS_ACTIVE(CONFIG_DRM_I915_MAX_REQUEST_BUSYWAIT) &&
 	    __i915_spin_request(rq, state)) {
 		dma_fence_signal(&rq->fence);
 		goto out;
 	}
+#endif
 
 	/*
 	 * This client is about to stall waiting for the GPU. In many cases
