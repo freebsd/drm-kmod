@@ -38,6 +38,7 @@
 #ifdef __linux__
 #include <asm/ioctl.h>
 #elif defined(__FreeBSD__)
+#include <linux/file.h>	/* Needed for struct file -> struct linux_file */
 #include <linux/ioctl.h>
 #endif
 
