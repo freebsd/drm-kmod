@@ -2511,6 +2511,9 @@ static void cnl_wrpll_params_populate(struct skl_wrpll_params *params,
 	params->dco_fraction = dco & 0x7fff;
 }
 
+#ifdef __FreeBSD__
+static
+#endif
 int cnl_hdmi_pll_ref_clock(struct drm_i915_private *dev_priv)
 {
 	int ref_clock = dev_priv->cdclk.hw.ref;
