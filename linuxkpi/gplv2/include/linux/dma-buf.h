@@ -135,6 +135,35 @@ struct dma_buf_attachment {
 	bool dynamic_mapping;
 	void *priv;
 };
+
+/**
+ * struct dma_buf_attach_ops - importer operations for an attachment
+ *
+ * Attachment operations implemented by the importer.
+ */
+struct dma_buf_attach_ops {
+	/**
+	 * @move_notify: [optional] notification that the DMA-buf is moving
+	 *
+	 * If this callback is provided the framework can avoid pinning the
+	 * backing store while mappings exists.
+	 *
+	 * This callback is called with the lock of the reservation object
+	 * associated with the dma_buf held and the mapping function must be
+	 * called with this lock held as well. This makes sure that no mapping
+	 * is created concurrently with an ongoing move operation.
+	 *
+	 * Mappings stay valid and are not directly affected by this callback.
+	 * But the DMA-buf can now be in a different physical location, so all
+	 * mappings should be destroyed and re-created as soon as possible.
+	 *
+	 * New mappings can be created after this callback returns, and will
+	 * point to the new location of the DMA-buf.
+	 */
+	void (*move_notify)(struct dma_buf_attachment *attach);
+};
+
+
 #define file linux_file
 static inline void
 get_dma_buf(struct dma_buf *dmabuf)
