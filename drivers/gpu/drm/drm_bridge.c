@@ -31,6 +31,10 @@
 
 #include "drm_crtc_internal.h"
 
+#ifdef __FreeBSD__
+#define MEDIA_BUS_FMT_FIXED 1
+#endif
+
 /**
  * DOC: overview
  *
