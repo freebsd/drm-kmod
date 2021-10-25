@@ -318,6 +318,7 @@ SRCS+=	dce_abm.c \
 	dce_mem_input.c \
 	dce_opp.c \
 	dce_scl_filters.c \
+	dce_scl_filters_old.c \
 	dce_stream_encoder.c \
 	dce_transform.c \
 	dmub_psr.c
