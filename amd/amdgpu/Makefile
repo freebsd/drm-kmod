@@ -437,7 +437,6 @@ SRCS+=	display_mode_lib.c \
 	display_rq_dlg_helpers.c \
 	display_rq_dlg_calc_20.c \
 	display_rq_dlg_calc_21.c \
-	dml_common_defs.c \
 	dml1_display_rq_dlg_calc.c
 .endif
 
