@@ -453,6 +453,12 @@ error:
 	return ERR_PTR(ret);
 }
 
+#ifdef __linux__
+static const struct dma_buf_attach_ops amdgpu_dma_buf_attach_ops = {
+	.move_notify = amdgpu_dma_buf_move_notify
+};
+#endif
+
 /**
  * amdgpu_gem_prime_import - &drm_driver.gem_prime_import implementation
  * @dev: DRM device
@@ -485,8 +491,12 @@ struct drm_gem_object *amdgpu_gem_prime_import(struct drm_device *dev,
 	if (IS_ERR(obj))
 		return obj;
 
+#ifdef __linux__
 	attach = dma_buf_dynamic_attach(dma_buf, dev->dev,
-					true);
+					&amdgpu_dma_buf_attach_ops, obj);
+#elif defined(__FreeBSD__)
+	attach = dma_buf_dynamic_attach(dma_buf, dev->dev, true);
+#endif
 	if (IS_ERR(attach)) {
 		drm_gem_object_put(obj);
 		return ERR_CAST(attach);
