@@ -75,7 +75,8 @@ SRCS=	\
 	intel_uncore.c \
 	i915_utils.c \
 	intel_wakeref.c \
-	intel_wopcm.c
+	intel_wopcm.c \
+	vlv_suspend.c
 
 # display/*
 SRCS+=	dvo_ch7017.c \
