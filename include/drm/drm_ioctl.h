@@ -38,6 +38,7 @@
 #ifdef __linux__
 #include <asm/ioctl.h>
 #elif defined(__FreeBSD__)
+#include <linux/file.h>
 #include <linux/ioctl.h>
 #endif
 
