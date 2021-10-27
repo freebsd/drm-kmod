@@ -15,12 +15,13 @@
 
 static inline void intel_engine_context_in(struct intel_engine_cs *engine)
 {
+	struct intel_engine_execlists_stats *stats = &engine->stats.execlists;
 #ifdef __linux__
 	unsigned long flags;
 #endif
 
-	if (engine->stats.active) {
-		engine->stats.active++;
+	if (stats->active) {
+		stats->active++;
 		return;
 	}
 
@@ -28,42 +29,42 @@ static inline void intel_engine_context_in(struct intel_engine_cs *engine)
 #ifdef __linux__
 	local_irq_save(flags);
 #endif
-	write_seqcount_begin(&engine->stats.lock);
+	write_seqcount_begin(&stats->lock);
 
-	engine->stats.start = ktime_get();
-	engine->stats.active++;
+	stats->start = ktime_get();
+	stats->active++;
 
-	write_seqcount_end(&engine->stats.lock);
+	write_seqcount_end(&stats->lock);
 #ifdef __linux__
 	local_irq_restore(flags);
 #endif
 
-	GEM_BUG_ON(!engine->stats.active);
+	GEM_BUG_ON(!stats->active);
 }
 
 static inline void intel_engine_context_out(struct intel_engine_cs *engine)
 {
+	struct intel_engine_execlists_stats *stats = &engine->stats.execlists;
 #ifdef __linux__
 	unsigned long flags;
 #endif
 
-	GEM_BUG_ON(!engine->stats.active);
-	if (engine->stats.active > 1) {
-		engine->stats.active--;
+	GEM_BUG_ON(!stats->active);
+	if (stats->active > 1) {
+		stats->active--;
 		return;
 	}
 
 #ifdef __linux__
 	local_irq_save(flags);
 #endif
-	write_seqcount_begin(&engine->stats.lock);
+	write_seqcount_begin(&stats->lock);
 
-	engine->stats.active--;
-	engine->stats.total =
-		ktime_add(engine->stats.total,
-			  ktime_sub(ktime_get(), engine->stats.start));
+	stats->active--;
+	stats->total = ktime_add(stats->total,
+				 ktime_sub(ktime_get(), stats->start));
 
-	write_seqcount_end(&engine->stats.lock);
+	write_seqcount_end(&stats->lock);
 #ifdef __linux__
 	local_irq_restore(flags);
 #endif
