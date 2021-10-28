@@ -28,6 +28,7 @@
 #include <linux/dma-fence.h>
 #include <linux/completion.h>
 #include <linux/xarray.h>
+#include <linux/irq_work.h>
 
 #ifdef __FreeBSD__
 #include <linux/workqueue.h>
@@ -290,7 +291,16 @@ struct drm_sched_job {
 	struct list_head		list;
 	struct drm_gpu_scheduler	*sched;
 	struct drm_sched_fence		*s_fence;
-	struct dma_fence_cb		finish_cb;
+
+	/*
+	 * work is used only after finish_cb has been used and will not be
+	 * accessed anymore.
+	 */
+	union {
+		struct dma_fence_cb		finish_cb;
+		struct irq_work 		work;
+	};
+
 	uint64_t			id;
 	atomic_t			karma;
 	enum drm_sched_priority		s_priority;
