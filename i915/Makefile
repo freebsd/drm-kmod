@@ -230,6 +230,7 @@ SRCS+=	i915_gem_busy.c \
 	i915_gem_throttle.c \
 	i915_gem_tiling.c \
 	i915_gem_ttm.c \
+	i915_gem_ttm_move.c \
 	i915_gem_ttm_pm.c \
 	i915_gem_userptr.c \
 	i915_gem_wait.c
