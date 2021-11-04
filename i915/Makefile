@@ -336,6 +336,7 @@ CWARNFLAGS.i915_irq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.i915_gem_execbuffer.c=	-Wno-unused-but-set-variable -Wno-sometimes-uninitialized
 CWARNFLAGS.i915_gem_mman.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.i915_gem_shmem.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.i915_gem_ttm_move.c=	-Wno-unused-variable
 CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides
 CWARNFLAGS.i915_active.c=	-Wno-unused-function
 CWARNFLAGS.i915_sw_fence.c=	-Wno-unused-function
