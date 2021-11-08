@@ -39,10 +39,12 @@ struct i915_vma_coredump {
 	u64 gtt_size;
 	u32 gtt_page_sizes;
 
-	int num_pages;
-	int page_count;
 	int unused;
-	u32 *pages[];
+#ifdef __linux__
+	struct list_head page_list;
+#elif defined(__FreeBSD__)
+	struct pglist page_list;
+#endif
 };
 
 struct i915_request_coredump {

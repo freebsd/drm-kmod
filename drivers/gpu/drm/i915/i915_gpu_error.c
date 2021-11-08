@@ -277,16 +277,20 @@ static bool compress_start(struct i915_vma_compress *c)
 static void *compress_next_page(struct i915_vma_compress *c,
 				struct i915_vma_coredump *dst)
 {
-	void *page;
+	void *page_addr;
+	struct page *page;
 
-	if (dst->page_count >= dst->num_pages)
-		return ERR_PTR(-ENOSPC);
-
-	page = pool_alloc(&c->pool, ALLOW_FAIL);
-	if (!page)
+	page_addr = pool_alloc(&c->pool, ALLOW_FAIL);
+	if (!page_addr)
 		return ERR_PTR(-ENOMEM);
 
-	return dst->pages[dst->page_count++] = page;
+	page = virt_to_page(page_addr);
+#ifdef __linux__
+	list_add_tail(&page->lru, &dst->page_list);
+#elif defined(__FreeBSD__)
+	TAILQ_INSERT_TAIL(&dst->page_list, page, plinks.q);
+#endif
+	return page_addr;
 }
 
 static int compress_page(struct i915_vma_compress *c,
@@ -399,7 +403,11 @@ static int compress_page(struct i915_vma_compress *c,
 
 	if (!(wc && i915_memcpy_from_wc(ptr, src, PAGE_SIZE)))
 		memcpy(ptr, src, PAGE_SIZE);
-	dst->pages[dst->page_count++] = ptr;
+#ifdef __linux__
+	list_add_tail(&virt_to_page(ptr)->lru, &dst->page_list);
+#elif defined(__FreeBSD__)
+	TAILQ_INSERT_TAIL(&dst->page_list, virt_to_page(ptr), plinks.q);
+#endif
 	cond_resched();
 
 	return 0;
@@ -619,7 +627,7 @@ static void print_error_vma(struct drm_i915_error_state_buf *m,
 {
 #ifdef __linux__
 	char out[ASCII85_BUFSZ];
-	int page;
+	struct page *page;
 
 	if (!vma)
 		return;
@@ -633,16 +641,25 @@ static void print_error_vma(struct drm_i915_error_state_buf *m,
 		err_printf(m, "gtt_page_sizes = 0x%08x\n", vma->gtt_page_sizes);
 
 	err_compression_marker(m);
-	for (page = 0; page < vma->page_count; page++) {
+#ifdef __linux__
+	list_for_each_entry(page, &vma->page_list, lru) {
+#elif defined(__FreeBSD__)
+	TAILQ_FOREACH(page, &vma->page_list, plinks.q) {
+#endif
 		int i, len;
+		const u32 *addr = page_address(page);
 
 		len = PAGE_SIZE;
-		if (page == vma->page_count - 1)
+#ifdef __linux__
+		if (page == list_last_entry(&vma->page_list, typeof(*page), lru))
+#elif defined(__FreeBSD__)
+		if (page == TAILQ_LAST(&vma->page_list, pglist))
+#endif
 			len -= vma->unused;
 		len = ascii85_encode_len(len);
 
 		for (i = 0; i < len; i++)
-			err_puts(m, ascii85_encode(vma->pages[page][i], out));
+			err_puts(m, ascii85_encode(addr[i], out));
 	}
 	err_puts(m, "\n");
 #endif
@@ -954,10 +971,19 @@ static void i915_vma_coredump_free(struct i915_vma_coredump *vma)
 {
 	while (vma) {
 		struct i915_vma_coredump *next = vma->next;
-		int page;
+		struct page *page, *n;
 
-		for (page = 0; page < vma->page_count; page++)
-			free_page((unsigned long)vma->pages[page]);
+#ifdef __linux__
+		list_for_each_entry_safe(page, n, &vma->page_list, lru) {
+			list_del_init(&page->lru);
+			__free_page(page);
+		}
+#elif defined(__FreeBSD__)
+		TAILQ_FOREACH_SAFE(page, &vma->page_list, plinks.q, n) {
+			TAILQ_REMOVE(&vma->page_list, page, plinks.q);
+			__free_page(page);
+		}
+#endif
 
 		kfree(vma);
 		vma = next;
@@ -1024,7 +1050,6 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 	struct i915_ggtt *ggtt = gt->ggtt;
 	const u64 slot = ggtt->error_capture.start;
 	struct i915_vma_coredump *dst;
-	unsigned long num_pages;
 	struct sgt_iter iter;
 	int ret;
 
@@ -1033,9 +1058,7 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 	if (!vma || !vma->pages || !compress)
 		return NULL;
 
-	num_pages = min_t(u64, vma->size, vma->obj->base.size) >> PAGE_SHIFT;
-	num_pages = DIV_ROUND_UP(10 * num_pages, 8); /* worstcase zlib growth */
-	dst = kmalloc(sizeof(*dst) + num_pages * sizeof(u32 *), ALLOW_FAIL);
+	dst = kmalloc(sizeof(*dst), ALLOW_FAIL);
 	if (!dst)
 		return NULL;
 
@@ -1044,14 +1067,17 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 		return NULL;
 	}
 
+#ifdef __linux__
+	INIT_LIST_HEAD(&dst->page_list);
+#elif defined(__FreeBSD__)
+	TAILQ_INIT(&dst->page_list);
+#endif
 	strcpy(dst->name, name);
 	dst->next = NULL;
 
 	dst->gtt_offset = vma->node.start;
 	dst->gtt_size = vma->node.size;
 	dst->gtt_page_sizes = vma->page_sizes.gtt;
-	dst->num_pages = num_pages;
-	dst->page_count = 0;
 	dst->unused = 0;
 
 	ret = -EINVAL;
@@ -1114,8 +1140,20 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 	}
 
 	if (ret || compress_flush(compress, dst)) {
-		while (dst->page_count--)
-			pool_free(&compress->pool, dst->pages[dst->page_count]);
+		struct page *page, *n;
+
+#ifdef __linux__
+		list_for_each_entry_safe_reverse(page, n, &dst->page_list, lru) {
+			list_del_init(&page->lru);
+			pool_free(&compress->pool, page_address(page));
+		}
+#elif defined(__FreeBSD__)
+		TAILQ_FOREACH_REVERSE_SAFE(page, &dst->page_list, pglist, plinks.q, n) {
+			TAILQ_REMOVE(&dst->page_list, page, plinks.q);
+			pool_free(&compress->pool, page_address(page));
+		}
+#endif
+
 		kfree(dst);
 		dst = NULL;
 	}
