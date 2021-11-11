@@ -20,7 +20,7 @@ SRCS=	\
 	i915_buddy.c \
 	i915_cmd_parser.c \
 	i915_config.c \
-	i915_drv.c \
+	i915_driver.c \
 	i915_getparam.c \
 	i915_gem.c \
 	i915_gem_evict.c \
@@ -331,7 +331,7 @@ CWARNFLAGS.intel_pm.c=		-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.intel_psr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.intel_region_ttm.c=	-Wno-missing-prototypes
 CWARNFLAGS.intel_reset.c=	-Wno-unused-but-set-variable
-CWARNFLAGS.i915_drv.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.i915_driver.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.i915_irq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.i915_gem_execbuffer.c=	-Wno-unused-but-set-variable -Wno-sometimes-uninitialized
 CWARNFLAGS.i915_gem_mman.c=	-Wno-unused-but-set-variable
