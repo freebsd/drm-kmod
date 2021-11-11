@@ -1265,7 +1265,8 @@ out:
 	return ret;
 }
 
-int i915_suspend_switcheroo(struct drm_i915_private *i915, pm_message_t state)
+int i915_driver_suspend_switcheroo(struct drm_i915_private *i915,
+				   pm_message_t state)
 {
 	int error;
 
@@ -1428,7 +1429,7 @@ static int i915_drm_resume_early(struct drm_device *dev)
 	return ret;
 }
 
-int i915_resume_switcheroo(struct drm_i915_private *i915)
+int i915_driver_resume_switcheroo(struct drm_i915_private *i915)
 {
 	int ret;
 
