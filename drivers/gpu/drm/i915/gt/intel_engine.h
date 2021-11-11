@@ -144,15 +144,9 @@ intel_write_status_page(struct intel_engine_cs *engine, int reg, u32 value)
 	 */
 	if (static_cpu_has(X86_FEATURE_CLFLUSH)) {
 		mb();
-#ifdef __linux__
 		clflush(&engine->status_page.addr[reg]);
 		engine->status_page.addr[reg] = value;
 		clflush(&engine->status_page.addr[reg]);
-#elif defined(__FreeBSD__)
-		clflush((u_long)&engine->status_page.addr[reg]);
-		engine->status_page.addr[reg] = value;
-		clflush((u_long)&engine->status_page.addr[reg]);
-#endif
 		mb();
 	} else {
 		WRITE_ONCE(engine->status_page.addr[reg], value);
