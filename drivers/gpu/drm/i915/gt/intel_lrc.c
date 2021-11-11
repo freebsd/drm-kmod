@@ -1224,9 +1224,7 @@ __execlists_schedule_in(struct i915_request *rq)
 		ce->lrc_desc |=
 			(u64)(++engine->context_tag % NUM_CONTEXT_TAG) <<
 			GEN11_SW_CTX_ID_SHIFT;
-#ifdef __linux__
 		BUILD_BUG_ON(NUM_CONTEXT_TAG > GEN12_MAX_CONTEXT_HW_ID);
-#endif
 	}
 
 	__intel_gt_pm_get(engine->gt);
@@ -2846,11 +2844,7 @@ set_redzone(void *vaddr, const struct intel_engine_cs *engine)
 
 	vaddr += engine->context_size;
 
-#ifdef __linux__
 	memset(vaddr, CONTEXT_REDZONE, I915_GTT_PAGE_SIZE);
-#elif defined(__FreeBSD__)
-	memset(vaddr, 0x5a, I915_GTT_PAGE_SIZE);
-#endif
 }
 
 static void
@@ -2861,11 +2855,7 @@ check_redzone(const void *vaddr, const struct intel_engine_cs *engine)
 
 	vaddr += engine->context_size;
 
-#ifdef __linux__
 	if (memchr_inv(vaddr, CONTEXT_REDZONE, I915_GTT_PAGE_SIZE))
-#elif defined(__FreeBSD__)
-	if (memchr_inv(vaddr, 0x5a, I915_GTT_PAGE_SIZE))
-#endif
 		dev_err_once(engine->i915->drm.dev,
 			     "%s context redzone overwritten!\n",
 			     engine->name);
