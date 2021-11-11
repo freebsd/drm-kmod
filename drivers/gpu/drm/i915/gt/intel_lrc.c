@@ -2140,13 +2140,8 @@ cancel_port_requests(struct intel_engine_execlists * const execlists)
 static inline void
 invalidate_csb_entries(const u32 *first, const u32 *last)
 {
-#ifdef __linux__
 	clflush((void *)first);
 	clflush((void *)last);
-#elif defined(__FreeBSD__)
-	clflush((u_long)first);
-	clflush((u_long)last);
-#endif
 }
 
 static inline bool
@@ -3505,11 +3500,7 @@ static void __execlists_reset(struct intel_engine_cs *engine, bool stalled)
 	u32 head;
 
 	mb(); /* paranoia: read the CSB pointers from after the reset */
-#ifdef __linux__
 	clflush(execlists->csb_write);
-#elif __FreeBSD__
-	clflush((u_long)execlists->csb_write);
-#endif
 	mb();
 
 	process_csb(engine); /* drain preemption events */
