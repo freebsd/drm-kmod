@@ -62,11 +62,14 @@ struct dma_buf_export_info {
 
 struct dma_buf_ops {
 	bool cache_sgt_mapping;
-	bool dynamic_mapping;
 
 	int (*attach)(struct dma_buf *, struct dma_buf_attachment *);
 
 	void (*detach)(struct dma_buf *, struct dma_buf_attachment *);
+
+	int (*pin)(struct dma_buf_attachment *attach);
+
+	void (*unpin)(struct dma_buf_attachment *attach);
 
 	/* For {map,unmap}_dma_buf below, any specific buffer attributes
 	 * required should get added to device_dma_parameters accessible
@@ -132,9 +135,15 @@ struct dma_buf_attachment {
 	struct list_head node;
 	struct sg_table *sgt;
 	enum dma_data_direction dir;
-	bool dynamic_mapping;
+	const struct dma_buf_attach_ops *importer_ops;
+	void *importer_priv;
 	void *priv;
 };
+
+struct dma_buf_attach_ops {
+	void (*move_notify)(struct dma_buf_attachment *attach);
+};
+
 #define file linux_file
 static inline void
 get_dma_buf(struct dma_buf *dmabuf)
@@ -153,17 +162,18 @@ get_dma_buf(struct dma_buf *dmabuf)
 }
 
 
-struct dma_buf_attachment *dma_buf_attach(struct dma_buf *dmabuf,
-							struct device *dev);
-struct dma_buf_attachment * dma_buf_dynamic_attach(struct dma_buf *db,
-    struct device *dev, bool dm);
-void dma_buf_detach(struct dma_buf *dmabuf,
-				struct dma_buf_attachment *dmabuf_attach);
+struct dma_buf_attachment *dma_buf_attach(struct dma_buf *, struct device *);
+struct dma_buf_attachment *dma_buf_dynamic_attach(struct dma_buf *,
+    struct device *, const struct dma_buf_attach_ops *, void *);
+void dma_buf_detach(struct dma_buf *, struct dma_buf_attachment *);
+int dma_buf_pin(struct dma_buf_attachment *);
+void dma_buf_unpin(struct dma_buf_attachment *);
 
 struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *,
 					enum dma_data_direction);
 void dma_buf_unmap_attachment(struct dma_buf_attachment *, struct sg_table *,
 				enum dma_data_direction);
+void dma_buf_move_notify(struct dma_buf *);
 void *dma_buf_vmap(struct dma_buf *);
 void dma_buf_vunmap(struct dma_buf *, void *vaddr);
 

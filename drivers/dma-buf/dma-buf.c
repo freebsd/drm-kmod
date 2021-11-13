@@ -58,6 +58,10 @@ __FBSDID("$FreeBSD$");
 #undef file
 #undef fget
 
+#ifdef NOT_YET
+#define	CONFIG_DMABUF_MOVE_NOTIFY
+#endif
+
 struct db_list {
 	struct list_head head;
 	struct sx lock;
@@ -265,7 +269,8 @@ dma_buf_ioctl(struct file *fp, u_long com, void *data,
 
 
 struct dma_buf_attachment *
-dma_buf_dynamic_attach(struct dma_buf *db, struct device *dev, bool dm)
+dma_buf_dynamic_attach(struct dma_buf *db, struct device *dev,
+    const struct dma_buf_attach_ops *iops, void *ipriv)
 {
 	struct dma_buf_attachment *dba;
 	struct sg_table *sgt;
@@ -273,7 +278,9 @@ dma_buf_dynamic_attach(struct dma_buf *db, struct device *dev, bool dm)
 
 	MPASS(db != NULL);
 	MPASS(dev != NULL);
-	if (db == NULL || dev == NULL)
+	MPASS(iops == NULL || iops->move_notify != NULL);
+	if (db == NULL || dev == NULL ||
+	    (iops != NULL && iops->move_notify == NULL))
 		return (ERR_PTR(-EINVAL));
 
 	if ((dba = malloc(sizeof(*dba), M_DMABUF, M_NOWAIT|M_ZERO)) == NULL)
@@ -281,7 +288,8 @@ dma_buf_dynamic_attach(struct dma_buf *db, struct device *dev, bool dm)
 	
 	dba->dev = dev;
 	dba->dmabuf = db;
-	dba->dynamic_mapping = dm;
+	dba->importer_ops = iops;
+	dba->importer_priv = ipriv;
 
 	if (db->ops->attach) {
 		if ((rc = db->ops->attach(db, dba)) != 0) {
@@ -293,14 +301,22 @@ dma_buf_dynamic_attach(struct dma_buf *db, struct device *dev, bool dm)
 	list_add(&dba->node, &db->attachments);
 	dma_resv_unlock(db->resv);
 
-	if (dm != db->ops->dynamic_mapping) {
-		if (dba->dmabuf->ops->dynamic_mapping)
+	if ((iops != NULL) != (db->ops->pin != NULL)) {
+		if (dba->dmabuf->ops->pin != NULL) {
 			dma_resv_lock(dba->dmabuf->resv, NULL);
+			rc = dma_buf_pin(dba);
+			if (rc != 0) {
+				dma_resv_unlock(dba->dmabuf->resv);
+				return (ERR_PTR(rc));
+			}
+		}
 		sgt = db->ops->map_dma_buf(dba, DMA_BIDIRECTIONAL);
-		if (dba->dmabuf->ops->dynamic_mapping)
-			dma_resv_unlock(dba->dmabuf->resv);
 		if (sgt == NULL)
 			sgt = ERR_PTR(-ENOMEM);
+		if (IS_ERR(sgt) && dba->dmabuf->ops->pin != NULL)
+			dma_buf_unpin(dba);
+		if (dba->dmabuf->ops->pin != NULL)
+			dma_resv_unlock(dba->dmabuf->resv);
 		if (IS_ERR(sgt)) {
 			dma_buf_detach(db, dba);
 			return (ERR_CAST(sgt));
@@ -315,7 +331,7 @@ dma_buf_dynamic_attach(struct dma_buf *db, struct device *dev, bool dm)
 struct dma_buf_attachment *
 dma_buf_attach(struct dma_buf *db, struct device *dev)
 {
-	return (dma_buf_dynamic_attach(db, dev, false));
+	return (dma_buf_dynamic_attach(db, dev, NULL, NULL));
 }
 
 void
@@ -328,11 +344,13 @@ dma_buf_detach(struct dma_buf *db, struct dma_buf_attachment *dba)
 		return;
 
 	if (dba->sgt != NULL) {
-		if (dba->dmabuf->ops->dynamic_mapping)
+		if (dba->dmabuf->ops->pin != NULL)
 			dma_resv_lock(dba->dmabuf->resv, NULL);
 		db->ops->unmap_dma_buf(dba, dba->sgt, dba->dir);
-		if (dba->dmabuf->ops->dynamic_mapping)
+		if (dba->dmabuf->ops->pin != NULL) {
+			dma_buf_unpin(dba);
 			dma_resv_unlock(dba->dmabuf->resv);
+		}
 	}
 
 	dma_resv_lock(db->resv, NULL);
@@ -341,6 +359,21 @@ dma_buf_detach(struct dma_buf *db, struct dma_buf_attachment *dba)
 	if (db->ops->detach)
 		db->ops->detach(db, dba);
 	free(dba, M_DMABUF);
+}
+
+int
+dma_buf_pin(struct dma_buf_attachment *dba)
+{
+	dma_resv_assert_held(dba->dmabuf->resv);
+	return (dba->dmabuf->ops->pin != NULL ? dba->dmabuf->ops->pin(dba) :0);
+}
+
+void
+dma_buf_unpin(struct dma_buf_attachment *dba)
+{
+	dma_resv_assert_held(dba->dmabuf->resv);
+	if (dba->dmabuf->ops->unpin != NULL)
+		dba->dmabuf->ops->unpin(dba);
 }
 
 struct dma_buf *
@@ -398,7 +431,9 @@ dma_buf_export(const struct dma_buf_export_info *exp_info)
 	struct dma_resv *ro;
 	int size, err;
 
-	MPASS(!(ops->cache_sgt_mapping && ops->dynamic_mapping));
+	MPASS(!(ops->cache_sgt_mapping &&
+		(ops->pin != NULL || ops->unpin != NULL)));
+	MPASS((ops->pin == NULL) == (ops->unpin == NULL));
 
 	ro = exp_info->resv;
 	size = (ro == NULL) ? sizeof(*db) + sizeof(*ro) : sizeof(*db) + 1;
@@ -444,6 +479,7 @@ struct sg_table *
 dma_buf_map_attachment(struct dma_buf_attachment *dba, enum dma_data_direction dir)
 {
 	struct sg_table *sgt;
+	int rc;
 
 	MPASS(dba != NULL);
 	MPASS(dba->dmabuf != NULL);
@@ -451,7 +487,7 @@ dma_buf_map_attachment(struct dma_buf_attachment *dba, enum dma_data_direction d
 	if (dba == NULL || dba->dmabuf == NULL)
 		return (ERR_PTR(-EINVAL));
 
-	if (dba->dynamic_mapping)
+	if (dba->importer_ops != NULL)
 		dma_resv_assert_held(dba->dmabuf->resv);
 
 	if (dba->sgt != NULL) {
@@ -460,12 +496,23 @@ dma_buf_map_attachment(struct dma_buf_attachment *dba, enum dma_data_direction d
 		return (dba->sgt);
 	}
 
-	if (dba->dmabuf->ops->dynamic_mapping)
+	if (dba->dmabuf->ops->pin != NULL) {
 		dma_resv_assert_held(dba->dmabuf->resv);
+#ifndef CONFIG_DMABUF_MOVE_NOTIFY
+		rc = dma_buf_pin(dba);
+		if (rc != 0)
+			return ERR_PTR(rc);
+#endif
+	}
 
 	sgt = dba->dmabuf->ops->map_dma_buf(dba, dir);
 	if (sgt == NULL)
 		return (ERR_PTR(-ENOMEM));
+
+#ifndef CONFIG_DMABUF_MOVE_NOTIFY
+	if (IS_ERR(sgt) && dba->dmabuf->ops->pin != NULL)
+		dma_buf_unpin(dba);
+#endif
 
 	if (!IS_ERR(sgt) && dba->dmabuf->ops->cache_sgt_mapping) {
 		dba->sgt = sgt;
@@ -487,14 +534,32 @@ dma_buf_unmap_attachment(struct dma_buf_attachment *dba,
 	if (dba == NULL || dba->dmabuf == NULL || sg_table == NULL)
 		return;
 
-	if (dba->dynamic_mapping)
+	if (dba->importer_ops != NULL)
 		dma_resv_assert_held(dba->dmabuf->resv);
 	if (dba->sgt == sg_table)
 		return;
-	if (dba->dmabuf->ops->dynamic_mapping)
+	if (dba->dmabuf->ops->pin != NULL)
 		dma_resv_assert_held(dba->dmabuf->resv);
 
 	dba->dmabuf->ops->unmap_dma_buf(dba, sg_table, dir);
+
+#ifndef CONFIG_DMABUF_MOVE_NOTIFY
+	if (dba->dmabuf->ops->pin != NULL)
+		dma_buf_unpin(dba);
+#endif
+}
+
+void
+dma_buf_move_notify(struct dma_buf *db)
+{
+	struct dma_buf_attachment *dba;
+
+	dma_resv_assert_held(db->resv);
+
+	list_for_each_entry(dba, &db->attachments, node)
+		if (dba->importer_ops != NULL &&
+		    dba->importer_ops->move_notify != NULL)
+			dba->importer_ops->move_notify(dba);
 }
 
 void *
