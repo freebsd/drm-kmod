@@ -767,11 +767,6 @@ static unsigned long amdgpu_ttm_io_mem_pfn(struct ttm_buffer_object *bo,
 /*
  * TTM backend functions.
  */
-struct amdgpu_ttm_gup_task_list {
-	struct list_head	list;
-	struct task_struct	*task;
-};
-
 struct amdgpu_ttm_tt {
 	struct ttm_dma_tt	ttm;
 	struct drm_gem_object	*gobj;
@@ -779,10 +774,6 @@ struct amdgpu_ttm_tt {
 	uint64_t		userptr;
 	struct task_struct	*usertask;
 	uint32_t		userflags;
-	spinlock_t              guptasklock;
-	struct list_head        guptasks;
-	atomic_t		mmu_invalidations;
-	uint32_t		last_set_pages;
 #if IS_ENABLED(CONFIG_DRM_AMDGPU_USERPTR)
 	struct hmm_range	*range;
 #endif
