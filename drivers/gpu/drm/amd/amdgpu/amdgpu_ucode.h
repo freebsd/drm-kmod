@@ -389,11 +389,7 @@ void amdgpu_ucode_print_rlc_hdr(const struct common_firmware_header *hdr);
 void amdgpu_ucode_print_sdma_hdr(const struct common_firmware_header *hdr);
 void amdgpu_ucode_print_psp_hdr(const struct common_firmware_header *hdr);
 void amdgpu_ucode_print_gpu_info_hdr(const struct common_firmware_header *hdr);
-#ifdef __linux__
 int amdgpu_ucode_validate(const struct firmware *fw);
-#elif defined(__FreeBSD__)
-int amdgpu_ucode_validate(const struct firmware *fw);
-#endif
 bool amdgpu_ucode_hdr_version(union amdgpu_firmware_header *hdr,
 				uint16_t hdr_major, uint16_t hdr_minor);
 
