@@ -186,8 +186,4 @@ int drm_noop(struct drm_device *dev, void *data,
 int drm_invalid_op(struct drm_device *dev, void *data,
 		   struct drm_file *file_priv);
 
-#ifdef __FreeBSD__
-long drm_ioctl_kernel(struct file *file, drm_ioctl_t *func, void *kdata,
-    u32 flags);
-#endif
 #endif /* _DRM_IOCTL_H_ */
