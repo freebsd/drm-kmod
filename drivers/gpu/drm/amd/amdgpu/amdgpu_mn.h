@@ -25,10 +25,8 @@
 #define __AMDGPU_MN_H__
 
 #include <linux/types.h>
-#ifdef __linux__
 #include <linux/hmm.h>
 #include <linux/rwsem.h>
-#endif
 #include <linux/workqueue.h>
 #include <linux/interval_tree.h>
 

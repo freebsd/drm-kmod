@@ -32,13 +32,9 @@
 
 #include <linux/dma-mapping.h>
 #include <linux/iommu.h>
-#ifdef __linux__
 #include <linux/hmm.h>
-#endif
 #include <linux/pagemap.h>
-#ifdef __linux__
 #include <linux/sched/task.h>
-#endif
 #include <linux/sched/mm.h>
 #include <linux/seq_file.h>
 #include <linux/slab.h>
