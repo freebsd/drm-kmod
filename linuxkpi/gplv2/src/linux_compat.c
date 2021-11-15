@@ -11,6 +11,35 @@
 
 #include <asm/processor.h>
 
+static ssize_t
+kobj_sysfs_op_show(struct kobject *kobj, struct attribute *attr, char *buf)
+{
+	struct kobj_attribute *ka =
+	    container_of(attr, struct kobj_attribute, attr);
+
+	if (ka->show == NULL)
+		return (-EIO);
+
+	return (ka->show(kobj, ka, buf));
+}
+
+static ssize_t
+kobj_sysfs_op_store(struct kobject *kobj, struct attribute *attr,
+    const char *buf, size_t count)
+{
+	struct kobj_attribute *ka =
+	    container_of(attr, struct kobj_attribute, attr);
+
+	if (ka->store == NULL)
+		return (-EIO);
+
+	return (ka->store(kobj, ka, buf, count));
+}
+
+const struct sysfs_ops __kobj_sysfs_ops = {
+	.show	= kobj_sysfs_op_show,
+	.store	= kobj_sysfs_op_store,
+};
 
 #if defined(__i386__) || defined(__amd64__)
 /*
