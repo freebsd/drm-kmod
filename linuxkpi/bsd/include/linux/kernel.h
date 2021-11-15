@@ -8,6 +8,15 @@
 
 #define add_taint(a,b)
 
+/*
+static inline int
+kstrtoull(const char *cp, unsigned int base, unsigned long long *res)
+{
+	return (kstrtou64(cp, base, (u64 *)res));
+}
+*/
+#define	kstrtoull(cp, base, res)	kstrtou64(cp, base, (u64 *)(res))
+
 #include <linux/irqflags.h>
 #include <linux/kconfig.h>
 #include <linux/typecheck.h>
