@@ -84,7 +84,7 @@ bool i915_error_injected(void);
 	__i915_printk(i915, i915_error_injected() ? KERN_DEBUG : KERN_ERR, \
 		      fmt, ##__VA_ARGS__)
 
-#if defined(__linux__) && defined(GCC_VERSION) && GCC_VERSION >= 70000
+#if defined(GCC_VERSION) && GCC_VERSION >= 70000
 #define add_overflows_t(T, A, B) \
 	__builtin_add_overflow_p((A), (B), (T)0)
 #else
