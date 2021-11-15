@@ -1035,9 +1035,7 @@ static const struct resource_caps res_cap_nv14 = {
 		.num_dwb = 1,
 		.num_ddc = 5,
 		.num_vmid = 16,
-#ifdef CONFIG_DRM_AMD_DC_DSC_SUPPORT
 		.num_dsc = 5,
-#endif
 };
 
 static const struct dc_debug_options debug_defaults_drv = {
@@ -3067,6 +3065,7 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
 
 	if (fast_validate) {
 		voltage_supported = dcn20_validate_bandwidth_internal(dc, context, true);
+
 		DC_FP_END();
 		return voltage_supported;
 	}
