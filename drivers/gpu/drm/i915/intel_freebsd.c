@@ -17,6 +17,7 @@ __FBSDID("$FreeBSD$");
 #include <linux/vgaarb.h>
 #include <linux/vga_switcheroo.h>
 #include <drm/drm_crtc_helper.h>
+#include <drm/intel-gtt.h>
 
 #include <machine/md_var.h>
 

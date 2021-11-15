@@ -6,6 +6,8 @@
 #include <linux/kernel.h>
 
 struct agp_bridge_data;
+struct pci_dev;
+struct sg_table;
 struct intel_gtt;
 struct intel_gtt *intel_gtt_get(void);
 
