@@ -106,10 +106,14 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/lib \
 	${SRCDIR}/pm \
 	${SRCDIR}/pm/inc \
+	${SRCDIR}/pm/legacy-dpm \
 	${SRCDIR}/pm/powerplay \
 	${SRCDIR}/pm/powerplay/hwmgr \
+	${SRCDIR}/pm/powerplay/inc \
 	${SRCDIR}/pm/powerplay/smumgr \
 	${SRCDIR}/pm/swsmu \
+	${SRCDIR}/pm/swsmu/inc \
+	${SRCDIR}/pm/swsmu/inc/pmfw_if \
 	${SRCDIR}/pm/swsmu/smu11 \
 	${SRCDIR}/pm/swsmu/smu12 \
 	${SRCDIR}/pm/swsmu/smu13 \
@@ -787,10 +791,14 @@ CFLAGS+= -I${SRCDIR}/include
 CFLAGS+= -I${SRCDIR}/include/asic_reg
 CFLAGS+= -I${SRCDIR}/pm
 CFLAGS+= -I${SRCDIR}/pm/inc
+CFLAGS+= -I${SRCDIR}/pm/legacy-dpm
 CFLAGS+= -I${SRCDIR}/pm/powerplay
+CFLAGS+= -I${SRCDIR}/pm/powerplay/inc
 CFLAGS+= -I${SRCDIR}/pm/powerplay/hwmgr
 CFLAGS+= -I${SRCDIR}/pm/powerplay/smumgr
 CFLAGS+= -I${SRCDIR}/pm/swsmu
+CFLAGS+= -I${SRCDIR}/pm/swsmu/inc
+CFLAGS+= -I${SRCDIR}/pm/swsmu/inc/pmfw_if
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu11
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu12
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu13
