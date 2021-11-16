@@ -1863,9 +1863,7 @@ static void intel_enable_pipe(const struct intel_crtc_state *new_crtc_state)
 		/* FIXME: assert CPU port conditions for SNB+ */
 	}
 
-#ifdef __freebsd_notyet__
 	trace_intel_pipe_enable(crtc);
-#endif
 
 	reg = PIPECONF(cpu_transcoder);
 	val = I915_READ(reg);
@@ -1906,9 +1904,7 @@ void intel_disable_pipe(const struct intel_crtc_state *old_crtc_state)
 	 */
 	assert_planes_disabled(crtc);
 
-#ifdef __freebsd_notyet__
 	trace_intel_pipe_disable(crtc);
-#endif
 
 	reg = PIPECONF(cpu_transcoder);
 	val = I915_READ(reg);

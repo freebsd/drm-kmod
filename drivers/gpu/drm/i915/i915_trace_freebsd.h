@@ -7,6 +7,18 @@
 #include "gt/intel_engine.h"
 
 static inline void
+trace_intel_pipe_enable(void *crtc)
+{
+	CTR1(KTR_DRM, "pipe_enable crtc %p", crtc);
+}
+
+static inline void
+trace_intel_pipe_disable(void *crtc)
+{
+	CTR1(KTR_DRM, "pipe_disable crtc %p", crtc);
+}
+
+static inline void
 trace_i915_flip_complete(int plane, struct drm_i915_gem_object *pending_flip_obj)
 {
 	CTR2(KTR_DRM, "i915_flip_complete %d %p", plane, pending_flip_obj);
