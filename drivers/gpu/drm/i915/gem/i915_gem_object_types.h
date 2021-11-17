@@ -10,10 +10,6 @@
 #include <drm/drm_gem.h>
 #include <uapi/drm/i915_drm.h>
 
-#ifdef __FreeBSD__
-#include <linux/radix-tree.h>
-#endif
-
 #include "i915_active.h"
 #include "i915_selftest.h"
 
