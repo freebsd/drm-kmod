@@ -139,6 +139,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_discovery.c \
 	amdgpu_display.c \
 	amdgpu_dpm.c \
+	amdgpu_dpm_internal.c \
 	amdgpu_drv.c \
 	amdgpu_eeprom.c \
 	amdgpu_encoders.c \
