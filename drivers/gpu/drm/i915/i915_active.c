@@ -8,10 +8,6 @@
 #include <linux/debugobjects.h>
 #endif
 
-#ifdef __FreeBSD__
-#include <linux/wait_bit.h>
-#endif
-
 #include "gt/intel_context.h"
 #include "gt/intel_engine_pm.h"
 #include "gt/intel_ring.h"

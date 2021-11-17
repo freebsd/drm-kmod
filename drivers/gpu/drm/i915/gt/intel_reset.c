@@ -7,10 +7,6 @@
 #include <linux/sched/mm.h>
 #include <linux/stop_machine.h>
 
-#ifdef __FreeBSD__
-#include <linux/wait_bit.h>
-#endif
-
 #include "display/intel_display_types.h"
 #include "display/intel_overlay.h"
 

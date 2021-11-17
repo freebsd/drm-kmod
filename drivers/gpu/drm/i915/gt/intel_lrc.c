@@ -133,10 +133,6 @@
  */
 #include <linux/interrupt.h>
 
-#ifdef __FreeBSD__
-#include <linux/wait_bit.h>
-#endif
-
 #include "i915_drv.h"
 #include "i915_perf.h"
 #include "i915_trace.h"
