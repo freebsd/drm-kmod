@@ -31,7 +31,6 @@
 #ifdef __FreeBSD__
 /* CEM: Make sure we got the Linux version */
 CTASSERT(PAGE_MASK != (PAGE_SIZE - 1));
-#include <linux/capability.h>
 #endif
 
 enum {

@@ -48,10 +48,6 @@
 #include "drm_internal.h"
 #include "drm_legacy.h"
 
-#ifdef __FreeBSD__
-#include <linux/capability.h>
-#endif
-
 /* from BKL pushdown */
 DEFINE_MUTEX(drm_global_mutex);
 

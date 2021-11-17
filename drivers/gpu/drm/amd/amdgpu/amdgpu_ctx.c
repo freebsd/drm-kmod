@@ -27,10 +27,6 @@
 #include "amdgpu_sched.h"
 #include "amdgpu_ras.h"
 
-#ifdef __FreeBSD__
-#include <linux/capability.h>
-#endif
-
 #define to_amdgpu_ctx_entity(e)	\
 	container_of((e), struct amdgpu_ctx_entity, entity)
 

@@ -83,7 +83,6 @@
 #include "i915_user_extensions.h"
 
 #ifdef __FreeBSD__
-#include <linux/capability.h>
 #include <linux/wait_bit.h>
 #endif
 
