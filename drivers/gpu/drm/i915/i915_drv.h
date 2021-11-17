@@ -113,7 +113,6 @@
 #ifdef __FreeBSD__
 /* BSD: Make sure we get out[bwl] redefines */
 #include <linux/compiler.h>
-#include <linux/typecheck.h>
 #include <linux/ratelimit.h>
 #include <linux/poll.h>
 #include <linux/shrinker.h>

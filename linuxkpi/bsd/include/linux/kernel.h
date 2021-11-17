@@ -10,6 +10,7 @@
 
 #include <linux/irqflags.h>
 #include <linux/kconfig.h>
+#include <linux/typecheck.h>
 
 #include <asm/cpufeature.h>
 #include <asm/processor.h>
