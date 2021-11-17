@@ -692,6 +692,9 @@ intel_engine_init_active(struct intel_engine_cs *engine, unsigned int subclass)
 static struct intel_context *
 create_kernel_context(struct intel_engine_cs *engine)
 {
+#ifdef __linux__
+	static struct lock_class_key kernel;
+#endif
 	struct intel_context *ce;
 	int err;
 
@@ -1085,8 +1088,6 @@ bool intel_engine_is_idle(struct intel_engine_cs *engine)
 	/* Waiting to drain ELSP? */
 	if (execlists_active(&engine->execlists)) {
 #ifdef __linux__
-		struct tasklet_struct *t = &engine->execlists.tasklet;
-
 		synchronize_hardirq(engine->i915->drm.pdev->irq);
 #elif defined(__FreeBSD__)
 		/* BSDFIXME: Is it enough to wait that all cpu have context-switched ? */

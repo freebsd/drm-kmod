@@ -50,6 +50,7 @@ static unsigned int cpu_max_MHz(void)
 #elif defined(__FreeBSD__)
 	max_khz = tsc_freq / 1000;
 #endif
+
 	return max_khz / 1000;
 }
 

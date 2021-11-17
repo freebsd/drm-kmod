@@ -702,6 +702,7 @@ static void revoke_mmaps(struct intel_gt *gt)
 
 		node = &vma->mmo->vma_node;
 		vma_offset = vma->ggtt_view.partial.offset << PAGE_SHIFT;
+
 #ifdef __linux__
 		unmap_mapping_range(gt->i915->drm.anon_inode->i_mapping,
 				    drm_vma_node_offset_addr(node) + vma_offset,
