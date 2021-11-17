@@ -52,11 +52,6 @@
 #include "i915_trace.h"
 #include "intel_pm.h"
 
-#ifdef __FreeBSD__
-#undef BUILD_BUG_ON
-#define	BUILD_BUG_ON(x)
-#endif
-
 /**
  * DOC: interrupt handling
  *

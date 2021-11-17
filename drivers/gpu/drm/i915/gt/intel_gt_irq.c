@@ -13,11 +13,6 @@
 #include "intel_uncore.h"
 #include "intel_rps.h"
 
-#ifdef __FreeBSD__
-#undef	BUILD_BUG_ON
-#define	BUILD_BUG_ON(x)
-#endif
-
 static void guc_irq_handler(struct intel_guc *guc, u16 iir)
 {
 	if (iir & GUC_INTR_GUC2HOST)

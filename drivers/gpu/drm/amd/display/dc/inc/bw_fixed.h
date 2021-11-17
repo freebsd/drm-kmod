@@ -26,11 +26,6 @@
 #ifndef BW_FIXED_H_
 #define BW_FIXED_H_
 
-#ifdef __FreeBSD__
-#undef BUILD_BUG_ON
-#define	BUILD_BUG_ON(x)
-#endif
-
 #define BW_FIXED_BITS_PER_FRACTIONAL_PART 24
 
 #define BW_FIXED_GET_INTEGER_PART(x) ((x) >> BW_FIXED_BITS_PER_FRACTIONAL_PART)

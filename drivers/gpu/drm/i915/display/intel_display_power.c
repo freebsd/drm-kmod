@@ -19,11 +19,6 @@
 #include "intel_tc.h"
 #include "intel_vga.h"
 
-#ifdef __FreeBSD__
-#undef BUILD_BUG_ON
-#define	BUILD_BUG_ON(x) (0)
-#endif
-
 bool intel_display_power_well_is_enabled(struct drm_i915_private *dev_priv,
 					 enum i915_power_well_id power_well_id);
 

@@ -1437,12 +1437,9 @@ __platform_mask_index(const struct intel_runtime_info *info,
 	const unsigned int pbits =
 		BITS_PER_TYPE(info->platform_mask[0]) - INTEL_SUBPLATFORM_BITS;
 
-#ifdef __linux__
-	/* BSDFIXME: Can't work with CTASSERT */
 	/* Expand the platform_mask array if this fails. */
 	BUILD_BUG_ON(INTEL_MAX_PLATFORMS >
 		     pbits * ARRAY_SIZE(info->platform_mask));
-#endif
 
 	return p / pbits;
 }
@@ -1473,7 +1470,7 @@ IS_PLATFORM(const struct drm_i915_private *i915, enum intel_platform p)
 	const unsigned int pb = __platform_mask_bit(info, p);
 
 #ifdef __linux__
-	/* BSDFIXME: Can't work with CTASSERT */
+	/* BSDFIXME: Can't work with clang's __builtin_constant_p */
 	BUILD_BUG_ON(!__builtin_constant_p(p));
 #endif
 
@@ -1491,11 +1488,11 @@ IS_SUBPLATFORM(const struct drm_i915_private *i915,
 	const u32 mask = info->platform_mask[pi];
 
 #ifdef __linux__
-	/* BSDFIXME: Can't work with CTASSERT */
+	/* BSDFIXME: Can't work with clang's __builtin_constant_p */
 	BUILD_BUG_ON(!__builtin_constant_p(p));
 	BUILD_BUG_ON(!__builtin_constant_p(s));
-	BUILD_BUG_ON((s) >= INTEL_SUBPLATFORM_BITS);
 #endif
+	BUILD_BUG_ON((s) >= INTEL_SUBPLATFORM_BITS);
 
 	/* Shift and test on the MSB position so sign flag can be used. */
 	return ((mask << (msb - pb)) & (mask << (msb - s))) & BIT(msb);

@@ -187,9 +187,7 @@ static void guc_wq_item_append(struct intel_guc *guc,
 	 * XXX: if not the case, we need save data to a temp wqi and copy it to
 	 * workqueue buffer dw by dw.
 	 */
-#ifdef __linux__
 	BUILD_BUG_ON(wqi_size != 16);
-#endif
 
 	/* We expect the WQ to be active if we're appending items to it */
 	GEM_BUG_ON(desc->wq_status != WQ_STATUS_ACTIVE);

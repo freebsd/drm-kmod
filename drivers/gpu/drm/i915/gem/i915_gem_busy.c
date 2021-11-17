@@ -57,10 +57,7 @@ __busy_set_if_active(const struct dma_fence *fence, u32 (*flag)(u16 id))
 		return 0;
 
 	/* Beware type-expansion follies! */
-#ifdef __linux__
-	/* BSDFIXME: Can't work with CTASSERT */
 	BUILD_BUG_ON(!typecheck(u16, rq->engine->uabi_class));
-#endif
 	return flag(rq->engine->uabi_class);
 }
 
