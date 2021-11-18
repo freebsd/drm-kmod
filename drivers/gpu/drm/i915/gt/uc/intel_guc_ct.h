@@ -10,10 +10,6 @@
 #include <linux/workqueue.h>
 
 #include "intel_guc_fwif.h"
-#ifdef __FreeBSD__
-#include <linux/list.h>
-#include <linux/workqueue.h>
-#endif
 
 struct i915_vma;
 struct intel_guc;
