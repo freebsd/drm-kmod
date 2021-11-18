@@ -33,7 +33,6 @@
 
 #ifdef __FreeBSD__
 #define	prio	task_thread->td_priority
-#define	trace_dma_fence_signaled(x)
 #define	lockdep_assert_irqs_disabled()
 #endif
 

@@ -17,21 +17,15 @@
 #include <linux/dma-fence-array.h>
 #include <asm/atomic64.h>
 
-#ifdef __linux__
 #define CREATE_TRACE_POINTS
 #include <trace/events/dma_fence.h>
 
+#ifdef __linux__
 EXPORT_TRACEPOINT_SYMBOL(dma_fence_emit);
 EXPORT_TRACEPOINT_SYMBOL(dma_fence_enable_signal);
 EXPORT_TRACEPOINT_SYMBOL(dma_fence_signaled);
 #elif defined(__FreeBSD__)
 #include <linux/lockdep.h>	/* For lockded_assert_hold (manu 20200511) */
-#define trace_dma_fence_init(x)
-#define trace_dma_fence_destroy(x)
-#define trace_dma_fence_enable_signal(x)
-#define trace_dma_fence_signaled(x)
-#define trace_dma_fence_wait_start(x)
-#define trace_dma_fence_wait_end(x)
 #endif
 
 static DEFINE_SPINLOCK(dma_fence_stub_lock);
