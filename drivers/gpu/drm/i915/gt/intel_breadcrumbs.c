@@ -31,11 +31,6 @@
 #include "intel_gt_pm.h"
 #include "intel_gt_requests.h"
 
-#ifdef __FreeBSD__
-#define	prio	task_thread->td_priority
-#define	lockdep_assert_irqs_disabled()
-#endif
-
 static void irq_enable(struct intel_engine_cs *engine)
 {
 	if (!engine->irq_enable)
