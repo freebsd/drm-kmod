@@ -2367,9 +2367,6 @@ struct radeon_device {
 	/* io port */
 	void __iomem                    *rio_mem;
 	resource_size_t			rio_mem_size;
-#ifndef __linux__
-	int				rio_rid;
-#endif
 	struct radeon_clock             clock;
 	struct radeon_mc		mc;
 	struct radeon_gart		gart;
