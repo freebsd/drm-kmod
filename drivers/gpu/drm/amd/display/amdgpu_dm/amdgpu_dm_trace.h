@@ -29,9 +29,9 @@
 #if !defined(_AMDGPU_DM_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
 #define _AMDGPU_DM_TRACE_H_
 
+#ifdef __linux__
 #include <linux/tracepoint.h>
 
-#ifdef __linux__
 TRACE_EVENT(amdgpu_dc_rreg,
 	TP_PROTO(unsigned long *read_count, uint32_t reg, uint32_t value),
 	TP_ARGS(read_count, reg, value),

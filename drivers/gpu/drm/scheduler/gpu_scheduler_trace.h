@@ -24,10 +24,6 @@
 #if !defined(_GPU_SCHED_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
 #define _GPU_SCHED_TRACE_H_
 
-#include <linux/stringify.h>
-#include <linux/types.h>
-#include <linux/tracepoint.h>
-
 #ifdef __FreeBSD__
 
 static inline void
@@ -46,6 +42,10 @@ trace_drm_sched_process_job(void *s_fence) {
 }
 
 #else
+
+#include <linux/stringify.h>
+#include <linux/types.h>
+#include <linux/tracepoint.h>
 
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM gpu_scheduler
@@ -118,9 +118,7 @@ TRACE_EVENT(drm_sched_job_wait_dep,
 #endif /* __FreeBSD__ */
 #endif
 
-#ifdef __linux__
 /* This part must be outside protection */
 #undef TRACE_INCLUDE_PATH
 #define TRACE_INCLUDE_PATH ../../drivers/gpu/drm/scheduler
 #include <trace/define_trace.h>
-#endif

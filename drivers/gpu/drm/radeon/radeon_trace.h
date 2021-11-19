@@ -2,13 +2,13 @@
 #if !defined(_RADEON_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
 #define _RADEON_TRACE_H_
 
+#ifdef __linux__
 #include <linux/stringify.h>
 #include <linux/tracepoint.h>
 #include <linux/types.h>
 
 #include <drm/drm_file.h>
 
-#ifdef __linux__
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM radeon
 #define TRACE_INCLUDE_FILE radeon_trace
@@ -202,13 +202,12 @@ DEFINE_EVENT(radeon_semaphore_request, radeon_semaphore_wait,
 	    TP_ARGS(ring, sem)
 );
 
+#else
+#include "radeon_trace_freebsd.h"
+#endif
+#endif
+
 /* This part must be outside protection */
 #undef TRACE_INCLUDE_PATH
 #define TRACE_INCLUDE_PATH ../../drivers/gpu/drm/radeon
 #include <trace/define_trace.h>
-
-#else
-#include "radeon_trace_freebsd.h"
-#endif
-
-#endif

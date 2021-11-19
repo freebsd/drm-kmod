@@ -24,11 +24,11 @@
 #if !defined(_AMDGPU_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
 #define _AMDGPU_TRACE_H_
 
+#ifdef __linux__
 #include <linux/stringify.h>
 #include <linux/types.h>
 #include <linux/tracepoint.h>
 
-#ifdef __linux__
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM amdgpu
 #define TRACE_INCLUDE_FILE amdgpu_trace
@@ -495,14 +495,12 @@ TRACE_EVENT(amdgpu_ib_pipe_sync,
 );
 
 #undef AMDGPU_JOB_GET_TIMELINE_NAME
+#else
+#include "amdgpu_trace_freebsd.h"
+#endif
+#endif
 
 /* This part must be outside protection */
 #undef TRACE_INCLUDE_PATH
 #define TRACE_INCLUDE_PATH ../../drivers/gpu/drm/amd/amdgpu
 #include <trace/define_trace.h>
-
-#else
-#include "amdgpu_trace_freebsd.h"
-#endif
-
-#endif
