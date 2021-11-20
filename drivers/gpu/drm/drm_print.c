@@ -27,11 +27,7 @@
 #define DEBUG /* for pr_debug() */
 #endif
 
-#ifdef __FreeBSD__
-#include <machine/stdarg.h>
-#else
 #include <stdarg.h>
-#endif
 
 #include <linux/io.h>
 #include <linux/moduleparam.h>
