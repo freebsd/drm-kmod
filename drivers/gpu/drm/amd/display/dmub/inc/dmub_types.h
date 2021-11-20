@@ -31,11 +31,7 @@
 #include <linux/types.h>
 #include <linux/string.h>
 #include <linux/delay.h>
-#ifdef __linux__
 #include <stdarg.h>
-#elif defined(__FreeBSD__)
-#include <machine/stdarg.h>
-#endif
 
 #if defined(__cplusplus)
 extern "C" {

@@ -30,9 +30,7 @@
 #include <linux/delay.h>
 
 #include "dm_services.h"
-#ifdef __linux__
 #include <stdarg.h>
-#endif
 
 #include "dc.h"
 #include "dc_dmub_srv.h"
