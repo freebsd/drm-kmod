@@ -399,7 +399,7 @@ void dcn31_link_encoder_enable_dp_output(
 	struct dcn10_link_encoder *enc10 = TO_DCN10_LINK_ENC(enc);
 
 	/* Enable transmitter and encoder. */
-	if (!link_enc_cfg_is_transmitter_mappable(enc->ctx->dc->current_state, enc)) {
+	if (!link_enc_cfg_is_transmitter_mappable(enc->ctx->dc, enc)) {
 
 		dcn20_link_encoder_enable_dp_output(enc, link_settings, clock_source);
 
@@ -408,7 +408,7 @@ void dcn31_link_encoder_enable_dp_output(
 		struct dmub_cmd_dig_dpia_control_data dpia_control = { 0 };
 		struct dc_link *link;
 
-		link = link_enc_cfg_get_link_using_link_enc(enc->ctx->dc->current_state, enc->preferred_engine);
+		link = link_enc_cfg_get_link_using_link_enc(enc->ctx->dc, enc->preferred_engine);
 
 		enc1_configure_encoder(enc10, link_settings);
 
@@ -444,7 +444,7 @@ void dcn31_link_encoder_enable_dp_mst_output(
 	struct dcn10_link_encoder *enc10 = TO_DCN10_LINK_ENC(enc);
 
 	/* Enable transmitter and encoder. */
-	if (!link_enc_cfg_is_transmitter_mappable(enc->ctx->dc->current_state, enc)) {
+	if (!link_enc_cfg_is_transmitter_mappable(enc->ctx->dc, enc)) {
 
 		dcn10_link_encoder_enable_dp_mst_output(enc, link_settings, clock_source);
 
@@ -453,7 +453,7 @@ void dcn31_link_encoder_enable_dp_mst_output(
 		struct dmub_cmd_dig_dpia_control_data dpia_control = { 0 };
 		struct dc_link *link;
 
-		link = link_enc_cfg_get_link_using_link_enc(enc->ctx->dc->current_state, enc->preferred_engine);
+		link = link_enc_cfg_get_link_using_link_enc(enc->ctx->dc, enc->preferred_engine);
 
 		enc1_configure_encoder(enc10, link_settings);
 
@@ -488,7 +488,7 @@ void dcn31_link_encoder_disable_output(
 	struct dcn10_link_encoder *enc10 = TO_DCN10_LINK_ENC(enc);
 
 	/* Disable transmitter and encoder. */
-	if (!link_enc_cfg_is_transmitter_mappable(enc->ctx->dc->current_state, enc)) {
+	if (!link_enc_cfg_is_transmitter_mappable(enc->ctx->dc, enc)) {
 
 		dcn10_link_encoder_disable_output(enc, signal);
 
@@ -500,7 +500,7 @@ void dcn31_link_encoder_disable_output(
 		if (!dcn10_is_dig_enabled(enc))
 			return;
 
-		link = link_enc_cfg_get_link_using_link_enc(enc->ctx->dc->current_state, enc->preferred_engine);
+		link = link_enc_cfg_get_link_using_link_enc(enc->ctx->dc, enc->preferred_engine);
 
 		dpia_control.action = (uint8_t)TRANSMITTER_CONTROL_DISABLE;
 		dpia_control.enc_id = enc->preferred_engine;
