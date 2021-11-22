@@ -39,10 +39,6 @@
 #include "drm_internal.h"
 #include "drm_legacy.h"
 
-#ifdef __FreeBSD__
-#include <linux/lockdep.h>	/* For lockdep_assert_held* */
-#endif
-
 /**
  * DOC: master and authentication
  *

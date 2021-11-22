@@ -24,8 +24,6 @@
 EXPORT_TRACEPOINT_SYMBOL(dma_fence_emit);
 EXPORT_TRACEPOINT_SYMBOL(dma_fence_enable_signal);
 EXPORT_TRACEPOINT_SYMBOL(dma_fence_signaled);
-#elif defined(__FreeBSD__)
-#include <linux/lockdep.h>	/* For lockded_assert_hold (manu 20200511) */
 #endif
 
 static DEFINE_SPINLOCK(dma_fence_stub_lock);

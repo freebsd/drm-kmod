@@ -25,9 +25,6 @@
 #define DRM_MODESET_LOCK_H_
 
 #include <linux/ww_mutex.h>
-#ifdef __FreeBSD__
-#include <linux/lockdep.h>
-#endif
 
 struct drm_modeset_lock;
 

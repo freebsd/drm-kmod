@@ -15,10 +15,6 @@
 #include <linux/notifier.h> /* for NOTIFY_DONE */
 #include <linux/wait.h>
 
-#ifdef __FreeBSD__
-#include <linux/lockdep.h>
-#endif
-
 struct completion;
 struct dma_resv;
 

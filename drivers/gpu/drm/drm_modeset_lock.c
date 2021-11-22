@@ -26,10 +26,6 @@
 #include <drm/drm_device.h>
 #include <drm/drm_modeset_lock.h>
 
-#ifdef __FreeBSD__
-#include <linux/lockdep.h>	/* For lockdep_assert_held* */
-#endif
-
 /**
  * DOC: kms locking
  *

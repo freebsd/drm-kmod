@@ -17,7 +17,6 @@
 #include "drm_legacy.h"
 
 #ifdef __FreeBSD__
-#include <linux/lockdep.h>	/* For lockdep_assert_held* */
 #include <linux/overflow.h>	/* For array_size */
 #endif
 
