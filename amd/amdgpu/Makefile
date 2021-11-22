@@ -359,6 +359,7 @@ SRCS+=	dc_debug.c \
 	dc_hw_sequencer.c \
 	dc_link_ddc.c \
 	dc_link_dp.c \
+	dc_link_dpia.c \
 	dc_link_hwss.c \
 	dc_link.c \
 	dc_resource.c \
