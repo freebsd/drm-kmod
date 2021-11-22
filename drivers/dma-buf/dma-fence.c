@@ -14,8 +14,7 @@
 #include <linux/export.h>
 #include <linux/atomic.h>
 #include <linux/dma-fence.h>
-#include <linux/dma-fence-array.h>
-#include <asm/atomic64.h>
+#include <linux/sched/signal.h>
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/dma_fence.h>
@@ -672,8 +671,7 @@ dma_fence_init(struct dma_fence *fence, const struct dma_fence_ops *ops,
 {
 #ifdef __freebsd_notyet__
 	BUG_ON(!lock);
-	BUG_ON(!ops || !ops->wait || !ops->enable_signaling ||
-	       !ops->get_driver_name || !ops->get_timeline_name);
+	BUG_ON(!ops || !ops->get_driver_name || !ops->get_timeline_name);
 #endif
 
 	kref_init(&fence->refcount);
