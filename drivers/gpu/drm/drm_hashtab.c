@@ -37,9 +37,6 @@
 #include <linux/mm.h>
 #include <linux/rculist.h>
 #include <linux/slab.h>
-#ifdef __FreeBSD__
-#include <linux/overflow.h>	/* Needed for array_size */
-#endif
 #include <linux/vmalloc.h>
 
 #include <drm/drm_hashtab.h>

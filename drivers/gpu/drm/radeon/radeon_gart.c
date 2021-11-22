@@ -29,10 +29,6 @@
 #include <linux/pci.h>
 #include <linux/vmalloc.h>
 
-#ifdef __FreeBSD__
-#include <linux/overflow.h>	/* For array_size */
-#endif
-
 #include <drm/radeon_drm.h>
 #ifdef CONFIG_X86
 #include <asm/set_memory.h>
