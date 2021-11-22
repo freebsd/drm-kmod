@@ -38,7 +38,6 @@
 #include <linux/rculist.h>
 #include <linux/slab.h>
 #ifdef __FreeBSD__
-#include <linux/rculist.h>
 #include <linux/overflow.h>	/* Needed for array_size */
 #endif
 #include <linux/vmalloc.h>

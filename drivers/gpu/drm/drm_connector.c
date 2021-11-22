@@ -33,10 +33,6 @@
 #include "drm_crtc_internal.h"
 #include "drm_internal.h"
 
-#ifdef __FreeBSD__
-#include <linux/refcount.h>
-#endif
-
 /**
  * DOC: overview
  *
