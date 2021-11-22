@@ -3,8 +3,6 @@
  * Copyright 2018 Noralf Trønnes
  */
 
-#include <drm/drmP.h>
-// drmP.h must be the first to include because of file -> linux_file definition
 #include <linux/list.h>
 #include <linux/module.h>
 #include <linux/mutex.h>

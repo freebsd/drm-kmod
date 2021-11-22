@@ -28,9 +28,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <drm/drmP.h>
-// drmP.h must be the first to include because of file -> linux_file definition
-
 #include <linux/export.h>
 #include <linux/nospec.h>
 #include <linux/pci.h>

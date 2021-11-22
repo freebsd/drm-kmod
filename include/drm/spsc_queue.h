@@ -27,10 +27,6 @@
 #include <linux/atomic.h>
 #include <linux/preempt.h>
 
-#ifdef __FreeBSD__
-#include <asm/processor.h>
-#endif
-
 /** SPSC lockless queue */
 
 struct spsc_node {

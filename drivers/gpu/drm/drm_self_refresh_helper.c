@@ -5,7 +5,7 @@
  * Authors:
  * Sean Paul <seanpaul@chromium.org>
  */
-/* #include <linux/average.h> */
+#include <linux/average.h>
 #include <linux/bitops.h>
 #include <linux/slab.h>
 #include <linux/workqueue.h>

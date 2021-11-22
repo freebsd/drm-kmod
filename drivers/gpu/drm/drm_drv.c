@@ -34,10 +34,8 @@
 #include <linux/fs.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
-#ifdef __linux__
 #include <linux/mount.h>
 #include <linux/pseudo_fs.h>
-#endif
 #include <linux/slab.h>
 #include <linux/srcu.h>
 
