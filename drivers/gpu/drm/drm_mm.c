@@ -208,8 +208,12 @@ static void drm_mm_interval_tree_add_node(struct drm_mm_node *hole_node,
 	}
 
 	rb_link_node(&node->rb, rb, link);
+#ifdef __linux__
 	rb_insert_augmented_cached(&node->rb, &mm->interval_tree, leftmost,
 				   &drm_mm_interval_tree_augment);
+#elif defined(__FreeBSD__)
+	rb_insert_color_cached(&node->rb, &mm->interval_tree, leftmost);
+#endif
 }
 
 #ifdef __FreeBSD__
