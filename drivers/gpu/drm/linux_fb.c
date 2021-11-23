@@ -491,103 +491,6 @@ is_primary(struct linux_fb_info *info)
 	return (0);
 }
 
-
-static int
-fb_mode_is_equal(const struct fb_videomode *mode1,
-		     const struct fb_videomode *mode2)
-{
-	return (mode1->xres         == mode2->xres &&
-		mode1->yres         == mode2->yres &&
-		mode1->pixclock     == mode2->pixclock &&
-		mode1->hsync_len    == mode2->hsync_len &&
-		mode1->vsync_len    == mode2->vsync_len &&
-		mode1->left_margin  == mode2->left_margin &&
-		mode1->right_margin == mode2->right_margin &&
-		mode1->upper_margin == mode2->upper_margin &&
-		mode1->lower_margin == mode2->lower_margin &&
-		mode1->sync         == mode2->sync &&
-		mode1->vmode        == mode2->vmode);
-}
-static void
-fb_destroy_modes(struct list_head *head)
-{
-	struct list_head *pos, *n;
-
-	list_for_each_safe(pos, n, head) {
-		list_del(pos);
-		kfree(pos);
-	}
-}
-
-
-static int
-fb_add_videomode(const struct fb_videomode *mode, struct list_head *head)
-{
-	struct list_head *pos;
-	struct fb_modelist *modelist;
-	struct fb_videomode *m;
-	int found = 0;
-
-	list_for_each(pos, head) {
-		modelist = list_entry(pos, struct fb_modelist, list);
-		m = &modelist->mode;
-		if (fb_mode_is_equal(m, mode)) {
-			found = 1;
-			break;
-		}
-	}
-	if (!found) {
-		modelist = kmalloc(sizeof(struct fb_modelist),
-						  GFP_KERNEL);
-
-		if (!modelist)
-			return -ENOMEM;
-		modelist->mode = *mode;
-		list_add(&modelist->list, head);
-	}
-	return 0;
-}
-
-static void
-fb_var_to_videomode(struct fb_videomode *mode,
-			 const struct fb_var_screeninfo *var)
-{
-	u32 pixclock, hfreq, htotal, vtotal;
-
-	mode->name = NULL;
-	mode->xres = var->xres;
-	mode->yres = var->yres;
-	mode->pixclock = var->pixclock;
-	mode->hsync_len = var->hsync_len;
-	mode->vsync_len = var->vsync_len;
-	mode->left_margin = var->left_margin;
-	mode->right_margin = var->right_margin;
-	mode->upper_margin = var->upper_margin;
-	mode->lower_margin = var->lower_margin;
-	mode->sync = var->sync;
-	mode->vmode = var->vmode & FB_VMODE_MASK;
-	mode->flag = FB_MODE_IS_FROM_VAR;
-	mode->refresh = 0;
-
-	if (!var->pixclock)
-		return;
-
-	pixclock = PICOS2KHZ(var->pixclock) * 1000;
-
-	htotal = var->xres + var->right_margin + var->hsync_len +
-		var->left_margin;
-	vtotal = var->yres + var->lower_margin + var->vsync_len +
-		var->upper_margin;
-
-	if (var->vmode & FB_VMODE_INTERLACED)
-		vtotal /= 2;
-	if (var->vmode & FB_VMODE_DOUBLE)
-		vtotal *= 2;
-
-	hfreq = pixclock/htotal;
-	mode->refresh = hfreq/vtotal;
-}
-
 void
 drm_legacy_fb_init(struct linux_fb_info *info)
 {
@@ -664,11 +567,6 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	if (!fb_info->pixmap.blit_y)
 		fb_info->pixmap.blit_y = ~(u32)0;
 
-	if (!fb_info->modelist.prev || !fb_info->modelist.next)
-		INIT_LIST_HEAD(&fb_info->modelist);
-
-	fb_var_to_videomode(&mode, &fb_info->var);
-	fb_add_videomode(&mode, &fb_info->modelist);
 	registered_fb[i] = fb_info;
 
 	event.info = fb_info;
@@ -773,7 +671,6 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 	if (fb_info->pixmap.addr &&
 	    (fb_info->pixmap.flags & FB_PIXMAP_DEFAULT))
 		kfree(fb_info->pixmap.addr);
-	fb_destroy_modes(&fb_info->modelist);
 	registered_fb[i] = NULL;
 	num_registered_fb--;
 	event.info = fb_info;
