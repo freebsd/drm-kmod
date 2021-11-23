@@ -711,16 +711,6 @@ extern int fb_blank(struct linux_fb_info *info, int blank);
 extern void cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect); 
 extern void cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area); 
 extern void cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image);
-/*
- * Drawing operations where framebuffer is in system RAM
- */
-extern void sys_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
-extern void sys_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
-extern void sys_imageblit(struct linux_fb_info *info, const struct fb_image *image);
-extern ssize_t fb_sys_read(struct linux_fb_info *info, char __user *buf,
-			   size_t count, loff_t *ppos);
-extern ssize_t fb_sys_write(struct linux_fb_info *info, const char __user *buf,
-			    size_t count, loff_t *ppos);
 
 /* drivers/video/fbmem.c */
 extern int linux_register_framebuffer(struct linux_fb_info *fb_info);

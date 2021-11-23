@@ -815,7 +815,6 @@ fb_set_suspend(struct linux_fb_info *info, int state)
 #endif
 }
 
-
 void
 cfb_fillrect(struct linux_fb_info *p, const struct fb_fillrect *rect)
 {
@@ -831,25 +830,6 @@ cfb_copyarea(struct linux_fb_info *p, const struct fb_copyarea *area)
 
 void
 cfb_imageblit(struct linux_fb_info *p, const struct fb_image *image)
-{
-	tainted_cfb_imageblit(p, image);
-}
-
-void
-sys_fillrect(struct linux_fb_info *p, const struct fb_fillrect *rect)
-{
-	tainted_cfb_fillrect(p, rect);
-}
-
-void
-sys_copyarea(struct linux_fb_info *p, const struct fb_copyarea *area)
-{
-
-	tainted_cfb_copyarea(p, area);
-}
-
-void
-sys_imageblit(struct linux_fb_info *p, const struct fb_image *image)
 {
 	tainted_cfb_imageblit(p, image);
 }
@@ -935,73 +915,4 @@ fb_dealloc_cmap(struct fb_cmap *cmap)
 
 	cmap->red = cmap->green = cmap->blue = cmap->transp = NULL;
 	cmap->len = 0;
-}
-
-
-ssize_t
-fb_sys_read(struct linux_fb_info *info, char *ubuf, size_t count,
-		    loff_t *ppos)
-{
-	unsigned long p = *ppos;
-	void *src;
-	int err = 0;
-	unsigned long total_size;
-
-	if (info->state != FBINFO_STATE_RUNNING)
-		return -EPERM;
-
-	total_size = info->screen_size ? info->screen_size : info->fix.smem_len;
-
-	if (p >= total_size)
-		return 0;
-
-	if (count + p > total_size)
-		count = total_size - p;
-
-	src = (void *)(info->screen_base + p);
-
-	if (info->fbops->fb_sync)
-		info->fbops->fb_sync(info);
-
-	if (copyout(src, ubuf, count))
-		err = -EFAULT;
-
-	if  (!err)
-		*ppos += count;
-
-	return (err) ? err : count;
-}
-
-ssize_t
-fb_sys_write(struct linux_fb_info *info, const char *kbuf,
-		     size_t count, loff_t *ppos)
-{
-	unsigned long p = *ppos;
-	void *dst;
-	int err = 0;
-	unsigned long total_size;
-
-	if (info->state != FBINFO_STATE_RUNNING)
-		return -EPERM;
-
-	total_size = info->screen_size ? info->screen_size : info->fix.smem_len;
-
-	if (p > total_size)
-		return -EFBIG;
-
-	if (count + p > total_size)
-		count = total_size - p;
-
-	dst = (void *) (info->screen_base + p);
-
-	if (info->fbops->fb_sync)
-		info->fbops->fb_sync(info);
-
-	if (copyin(kbuf, dst, count))
-		err = -EFAULT;
-
-	if  (!err)
-		*ppos += count;
-
-	return (err) ? err : count;
 }

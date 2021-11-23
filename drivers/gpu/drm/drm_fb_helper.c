@@ -681,7 +681,6 @@ void drm_fb_helper_deferred_io(struct fb_info *info,
 	}
 }
 EXPORT_SYMBOL(drm_fb_helper_deferred_io);
-#endif
 
 /**
  * drm_fb_helper_sys_read - wrapper around fb_sys_read
@@ -769,6 +768,7 @@ void drm_fb_helper_sys_imageblit(struct fb_info *info,
 			    image->width, image->height);
 }
 EXPORT_SYMBOL(drm_fb_helper_sys_imageblit);
+#endif	/* __linux__ */
 
 /**
  * drm_fb_helper_cfb_fillrect - wrapper around cfb_fillrect
@@ -1980,6 +1980,7 @@ void drm_fb_helper_output_poll_changed(struct drm_device *dev)
 }
 EXPORT_SYMBOL(drm_fb_helper_output_poll_changed);
 
+#ifdef __linux__
 /* @user: 1=userspace, 0=fbcon */
 static int drm_fbdev_fb_open(struct fb_info *info, int user)
 {
@@ -2010,12 +2011,10 @@ static void drm_fbdev_cleanup(struct drm_fb_helper *fb_helper)
 	if (!fb_helper->dev)
 		return;
 
-#ifdef __linux__
 	if (fbi && fbi->fbdefio) {
 		fb_deferred_io_cleanup(fbi);
 		shadow = fbi->screen_buffer;
 	}
-#endif
 
 	drm_fb_helper_fini(fb_helper);
 
@@ -2064,12 +2063,10 @@ static const struct fb_ops drm_fbdev_fb_ops = {
 	.fb_imageblit	= drm_fb_helper_sys_imageblit,
 };
 
-#ifdef __linux__
 static struct fb_deferred_io drm_fbdev_defio = {
 	.delay		= HZ / 20,
 	.deferred_io	= drm_fb_helper_deferred_io,
 };
-#endif
 
 /*
  * This function uses the client API to create a framebuffer backed by a dumb buffer.
@@ -2299,3 +2296,4 @@ int __init drm_fb_helper_modinit(void)
 	return 0;
 }
 EXPORT_SYMBOL(drm_fb_helper_modinit);
+#endif	/* __linux__*/
