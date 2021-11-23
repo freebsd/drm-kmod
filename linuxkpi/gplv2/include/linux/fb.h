@@ -735,8 +735,13 @@ extern int fb_get_color_depth(struct fb_var_screeninfo *var,
 extern int fb_new_modelist(struct linux_fb_info *info);
 
 
-extern int fb_alloc_cmap(struct fb_cmap *cmap, int len, int transp);
-extern void fb_dealloc_cmap(struct fb_cmap *cmap);
+static inline int
+fb_alloc_cmap(struct fb_cmap *cmap, int len, int transp)
+{
+
+	return (0);
+}
+#define	fb_dealloc_cmap(x)	0
 
 /* updated FreeBSD fb_info */
 extern void drm_legacy_fb_init(struct linux_fb_info *fb_info);
