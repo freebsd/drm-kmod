@@ -708,9 +708,9 @@ static inline struct apertures_struct *alloc_apertures(unsigned int max_num) {
 extern int fb_set_var(struct linux_fb_info *info, struct fb_var_screeninfo *var); 
 extern int fb_pan_display(struct linux_fb_info *info, struct fb_var_screeninfo *var); 
 extern int fb_blank(struct linux_fb_info *info, int blank);
-extern void cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect); 
-extern void cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area); 
-extern void cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image);
+#define	cfb_fillrect(x, y)	0
+#define	cfb_copyarea(x, y)	0
+#define	cfb_imageblit(x, y)	0
 
 /* drivers/video/fbmem.c */
 extern int linux_register_framebuffer(struct linux_fb_info *fb_info);
@@ -749,8 +749,5 @@ extern int fb_get_options(const char *name, char **option);
  */
 
 extern const struct fb_cmap * tainted_fb_default_cmap(int len);
-extern void tainted_cfb_fillrect(struct linux_fb_info *p, const struct fb_fillrect *rect);
-extern void tainted_cfb_copyarea(struct linux_fb_info *p, const struct fb_copyarea *area);
-extern void tainted_cfb_imageblit(struct linux_fb_info *p, const struct fb_image *image);
 
 #endif /* __LINUX_FB_H_ */

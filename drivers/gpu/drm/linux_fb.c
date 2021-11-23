@@ -815,25 +815,6 @@ fb_set_suspend(struct linux_fb_info *info, int state)
 #endif
 }
 
-void
-cfb_fillrect(struct linux_fb_info *p, const struct fb_fillrect *rect)
-{
-	tainted_cfb_fillrect(p, rect);
-}
-
-void
-cfb_copyarea(struct linux_fb_info *p, const struct fb_copyarea *area)
-{
-
-	tainted_cfb_copyarea(p, area);
-}
-
-void
-cfb_imageblit(struct linux_fb_info *p, const struct fb_image *image)
-{
-	tainted_cfb_imageblit(p, image);
-}
-
 static int
 fb_copy_cmap(const struct fb_cmap *from, struct fb_cmap *to)
 {
