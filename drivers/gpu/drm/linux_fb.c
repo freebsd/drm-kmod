@@ -508,15 +508,6 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	if ((err = vt_fb_attach(&fb_info->fbio)) != 0)
 		return (err);
 	fb_info_print(&fb_info->fbio);
-
-#if 0
-	if (!lock_fb_info(fb_info))
-		return -ENODEV;
-	console_lock();
-	fb_notifier_call_chain(FB_EVENT_FB_REGISTERED, &event);
-	console_unlock();
-	unlock_fb_info(fb_info);
-#endif
 	return 0;
 }
 
@@ -560,31 +551,11 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 	vt_fb_detach(&fb_info->fbio);
 	fbd_destroy(fb_info);
 
-
-#if 0
-	if (!lock_fb_info(fb_info))
-		return -ENODEV;
-	console_lock();
-	event.info = fb_info;
-	ret = fb_notifier_call_chain(FB_EVENT_FB_UNBIND, &event);
-	console_unlock();
-	unlock_fb_info(fb_info);
-
-	if (ret)
-		return -EINVAL;
-#endif
-
 	unlink_framebuffer(fb_info);
 	if (fb_info->pixmap.addr &&
 	    (fb_info->pixmap.flags & FB_PIXMAP_DEFAULT))
 		kfree(fb_info->pixmap.addr);
 	event.info = fb_info;
-
-#if 0
-	console_lock();
-	fb_notifier_call_chain(FB_EVENT_FB_UNREGISTERED, &event);
-	console_unlock();
-#endif
 	put_fb_info(fb_info);
 	return 0;
 }
