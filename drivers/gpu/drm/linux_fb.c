@@ -88,8 +88,6 @@ vt_dummy_switchto(struct apertures_struct *a, const char *name)
 static struct sx linux_fb_mtx;
 SX_SYSINIT(linux_fb_mtx, &linux_fb_mtx, "linux fb");
 
-static struct linux_fb_info *registered_fb[FB_MAX];
-static int num_registered_fb;
 static struct class *fb_class;
 
 static int __unregister_framebuffer(struct linux_fb_info *fb_info);
@@ -447,14 +445,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 
 	vt_dummy_switchto(fb_info->apertures, fb_info->fix.id);
 
-	if (num_registered_fb == FB_MAX)
-		return -ENXIO;
-
-	num_registered_fb++;
-	for (i = 0 ; i < FB_MAX; i++)
-		if (!registered_fb[i])
-			break;
-	fb_info->node = i;
+	fb_info->node = 0;
 	atomic_set(&fb_info->count, 1);
 	mutex_init(&fb_info->lock);
 	mutex_init(&fb_info->mm_lock);
@@ -496,8 +487,6 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	if (!fb_info->pixmap.blit_y)
 		fb_info->pixmap.blit_y = ~(u32)0;
 
-	registered_fb[i] = fb_info;
-
 	event.info = fb_info;
 	drm_legacy_fb_init(fb_info);
 
@@ -509,17 +498,15 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	 * do the equivalent albeit with less fanfare in fbd_init
 	 */
 	fbd_init(fb_info, unit_no++);
-	if (num_registered_fb == 1) {
-		/* tell vt_fb to initialize color map */
-		fb_info->fbio.fb_cmsize = 0;
-		if (fb_info->fbio.fb_bpp == 0) {
-			device_printf(fb_info->fbio.fb_fbd_dev,
-				      "fb_bpp not set, setting to 8");
-			fb_info->fbio.fb_bpp = 32;
-		}
-		if ((err = vt_fb_attach(&fb_info->fbio)) != 0)
-			return (err);
+	/* tell vt_fb to initialize color map */
+	fb_info->fbio.fb_cmsize = 0;
+	if (fb_info->fbio.fb_bpp == 0) {
+		device_printf(fb_info->fbio.fb_fbd_dev,
+		    "fb_bpp not set, setting to 8");
+		fb_info->fbio.fb_bpp = 32;
 	}
+	if ((err = vt_fb_attach(&fb_info->fbio)) != 0)
+		return (err);
 	fb_info_print(&fb_info->fbio);
 
 #if 0
@@ -547,14 +534,9 @@ linux_register_framebuffer(struct linux_fb_info *fb_info)
 int
 unlink_framebuffer(struct linux_fb_info *fb_info)
 {
-	int i;
-
-	i = fb_info->node;
-	if (i < 0 || i >= FB_MAX || registered_fb[i] != fb_info)
-		return -EINVAL;
 
 	if (fb_info->dev) {
-		device_destroy(fb_class, MKDEV(FB_MAJOR, i));
+		device_destroy(fb_class, MKDEV(FB_MAJOR, 0));
 		fb_info->dev = NULL;
 	}
 	return 0;
@@ -564,11 +546,8 @@ static int
 __unregister_framebuffer(struct linux_fb_info *fb_info)
 {
 	struct fb_event event;
-	int i, ret = 0;
+	int ret = 0;
 
-	i = fb_info->node;
-	if (i < 0 || i >= FB_MAX || registered_fb[i] != fb_info)
-		return -EINVAL;
 	vm_phys_fictitious_unreg_range(fb_info->apertures->ranges[0].base,
 				     fb_info->apertures->ranges[0].base +
 				     fb_info->apertures->ranges[0].size);
@@ -578,8 +557,7 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 		mtx_unlock(&Giant);
 		fb_info->fbio.fb_fbd_dev = NULL;
 	}
-	if (num_registered_fb == 1)
-		vt_fb_detach(&fb_info->fbio);
+	vt_fb_detach(&fb_info->fbio);
 	fbd_destroy(fb_info);
 
 
@@ -600,8 +578,6 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 	if (fb_info->pixmap.addr &&
 	    (fb_info->pixmap.flags & FB_PIXMAP_DEFAULT))
 		kfree(fb_info->pixmap.addr);
-	registered_fb[i] = NULL;
-	num_registered_fb--;
 	event.info = fb_info;
 
 #if 0
