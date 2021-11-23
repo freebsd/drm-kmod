@@ -14,6 +14,8 @@ __FBSDID("$FreeBSD$");
 #include <vm/vm_phys.h>
 #include <dev/vt/vt.h>
 
+#undef fb_info
+
 extern struct vt_device *main_vd;
 
 static void
@@ -46,10 +48,43 @@ static struct vt_driver vt_dummy_driver = {
 	.vd_resume = vt_resume,
 };
 
+/*
+ * Switch to a dummy vt driver if the ranges are overlapping
+ * between the current one and the DRM one that we want to add
+ */
+static void
+vt_dummy_switchto(struct apertures_struct *a, const char *name)
+{
+	int i;
+	bool overlap = false;
+
+	if (main_vd && main_vd->vd_driver && main_vd->vd_softc &&
+	    /* For these, we know the softc (or its first field) is of type fb_info */
+	    (strcmp(main_vd->vd_driver->vd_name, "efifb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "vbefb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "ofwfb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "fb") == 0)) {
+		struct fb_info *fb = main_vd->vd_softc;
+
+		for (i = 0; i < a->count; i++) {
+			if (fb->fb_pbase == a->ranges[i].base) {
+				overlap = true;
+				break;
+			}
+			if ((fb->fb_pbase > a->ranges[i].base) &&
+			    (fb->fb_pbase < (a->ranges[i].base + a->ranges[i].size))) {
+				overlap = true;
+				break;
+			}
+		}
+		if (overlap == true)
+			vt_allocate(&vt_dummy_driver, &vt_dummy_driver /* any non-NULL softc */);
+	}
+}
+
 #define FB_MAJOR		29   /* /dev/fb* framebuffers */
 #define FBPIXMAPSIZE	(1024 * 8)
 
-#undef fb_info
 static struct sx linux_fb_mtx;
 SX_SYSINIT(linux_fb_mtx, &linux_fb_mtx, "linux fb");
 
@@ -341,88 +376,13 @@ put_fb_info(struct linux_fb_info *fb_info)
 		fb_info->fbops->fb_destroy(fb_info);
 }
 
-static bool
-apertures_overlap(struct aperture *gen, struct aperture *hw)
-{
-	/* is the generic aperture base the same as the HW one */
-	if (gen->base == hw->base)
-		return (true);
-	/* is the generic aperture base inside the hw base->hw base+size */
-	if (gen->base > hw->base && gen->base < hw->base + hw->size)
-		return (true);
-	return (false);
-}
-
-static bool
-check_overlap(struct apertures_struct *a, struct apertures_struct *b)
-{
-	int i, j;
-
-	if (a == NULL || b == NULL)
-		return (false);
-
-	for (i = 0; i < b->count; ++i)
-		for (j = 0; j < a->count; ++j) 
-			if (apertures_overlap(&a->ranges[j], &b->ranges[i]))
-				return (true);
-	return (false);
-}
-
-
-
-#define VGA_FB_PHYS 0xA0000
-static void
-__remove_conflicting(struct apertures_struct *a, const char *name, bool primary)
-{
-	struct apertures_struct *gen_aper;
-	int i;
-
-	for (i = 0 ; i < FB_MAX; i++) {
-
-		if (registered_fb[i] == NULL)
-			continue;
-
-		if ((registered_fb[i]->flags & FBINFO_MISC_FIRMWARE) == 0)
-			continue;
-
-		gen_aper = registered_fb[i]->apertures;
-		if (check_overlap(gen_aper, a) ||
-			(primary && gen_aper && gen_aper->count &&
-			 gen_aper->ranges[0].base == VGA_FB_PHYS)) {
-			__unregister_framebuffer(registered_fb[i]);
-		}
-	}
-
-#ifdef __FreeBSD__
-	// Native drivers are not registered in LinuxKPI so they
-	// would never be removed by the code above!
-	if (main_vd && main_vd->vd_driver && main_vd->vd_softc &&
-	    /* For these, we know the softc (or its first field) is of type fb_info */
-	    (strcmp(main_vd->vd_driver->vd_name, "efifb") == 0
-	    || strcmp(main_vd->vd_driver->vd_name, "vbefb") == 0
-	    || strcmp(main_vd->vd_driver->vd_name, "ofwfb") == 0
-	    || strcmp(main_vd->vd_driver->vd_name, "fb") == 0)) {
-		struct fb_info *fb = main_vd->vd_softc;
-		struct apertures_struct *fb_ap = alloc_apertures(1);
-		if (!fb_ap) {
-			DRM_ERROR("Could not allocate an apertures_struct");
-			return;
-		}
-		fb_ap->ranges[0].base = fb->fb_pbase;
-		fb_ap->ranges[0].size = fb->fb_size;
-		if (check_overlap(fb_ap, a))
-			vt_allocate(&vt_dummy_driver, &vt_dummy_driver /* any non-NULL softc */);
-		kfree(fb_ap);
-	}
-#endif
-}
-
 int
 remove_conflicting_framebuffers(struct apertures_struct *a,
 				const char *name, bool primary)
 {
+
 	sx_xlock(&linux_fb_mtx);
-	__remove_conflicting(a, name, primary);
+	vt_dummy_switchto(a, name);
 	sx_xunlock(&linux_fb_mtx);
 	return (0);
 }
@@ -453,41 +413,10 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 		ap->ranges[idx].size = pci_resource_len(pdev, bar);
 		idx++;
 	}
-
-#ifdef CONFIG_X86
-#ifndef __linux__
-	/* BSDFIXME: Check primary! */
-	primary = false;
-#else
-	primary = pdev->resource[PCI_ROM_RESOURCE].flags &
-					IORESOURCE_ROM_SHADOW;
-#endif
-#endif
 	sx_xlock(&linux_fb_mtx);
-	__remove_conflicting(ap, name, primary);
+	vt_dummy_switchto(ap, name);
 	sx_xunlock(&linux_fb_mtx);
 	kfree(ap);
-	return (0);
-}
-
-static int
-is_primary(struct linux_fb_info *info)
-{
-	struct device *device = info->device;
-	struct pci_dev *pci_dev = NULL;
-#ifdef __linux__
-	struct linux_resource *res = NULL;
-#endif
-
-	if (device &&  (pci_dev = to_pci_dev(device)) == NULL)
-		return (0);
-
-#ifdef __linux__
-	res = &pci_dev->resource[PCI_ROM_RESOURCE];
-	if (res && res->flags & IORESOURCE_ROM_SHADOW)
-		return (1);
-#endif
-
 	return (0);
 }
 
@@ -516,7 +445,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	struct fb_event event;
 	struct fb_videomode mode;
 
-	__remove_conflicting(fb_info->apertures, fb_info->fix.id, is_primary(fb_info));
+	vt_dummy_switchto(fb_info->apertures, fb_info->fix.id);
 
 	if (num_registered_fb == FB_MAX)
 		return -ENXIO;
