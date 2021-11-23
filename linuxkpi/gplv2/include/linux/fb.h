@@ -723,11 +723,10 @@ extern char* fb_get_buffer_offset(struct linux_fb_info *info, struct fb_pixmap *
 extern void fb_pad_unaligned_buffer(u8 *dst, u32 d_pitch, u8 *src, u32 idx,
 				u32 height, u32 shift_high, u32 shift_low, u32 mod);
 extern void fb_pad_aligned_buffer(u8 *dst, u32 d_pitch, u8 *src, u32 s_pitch, u32 height);
-extern void fb_set_suspend(struct linux_fb_info *info, int state);
 extern int fb_get_color_depth(struct fb_var_screeninfo *var,
 			      struct fb_fix_screeninfo *fix);
 extern int fb_new_modelist(struct linux_fb_info *info);
-
+#define	fb_set_suspend(x, y)	0
 
 static inline int
 fb_alloc_cmap(struct fb_cmap *cmap, int len, int transp)

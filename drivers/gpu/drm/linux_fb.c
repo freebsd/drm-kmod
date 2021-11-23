@@ -570,20 +570,3 @@ linux_unregister_framebuffer(struct linux_fb_info *fb_info)
 	sx_xunlock(&linux_fb_mtx);
 	return (rc);
 }
-
-void
-fb_set_suspend(struct linux_fb_info *info, int state)
-{
-#if 0
-	struct fb_event event;
-
-	event.info = info;
-	if (state) {
-		fb_notifier_call_chain(FB_EVENT_SUSPEND, &event);
-		info->state = FBINFO_STATE_SUSPENDED;
-	} else {
-		info->state = FBINFO_STATE_RUNNING;
-		fb_notifier_call_chain(FB_EVENT_RESUME, &event);
-	}
-#endif
-}
