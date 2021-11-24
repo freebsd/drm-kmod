@@ -64,36 +64,6 @@ struct fb_chroma {
 	__u32 whitey;
 };
 
-struct fb_monspecs {
-	struct fb_chroma chroma;
-	struct fb_videomode *modedb;	/* mode database */
-	__u8  manufacturer[4];		/* Manufacturer */
-	__u8  monitor[14];		/* Monitor String */
-	__u8  serial_no[14];		/* Serial Number */
-	__u8  ascii[14];		/* ? */
-	__u32 modedb_len;		/* mode database length */
-	__u32 model;			/* Monitor Model */
-	__u32 serial;			/* Serial Number - Integer */
-	__u32 year;			/* Year manufactured */
-	__u32 week;			/* Week Manufactured */
-	__u32 hfmin;			/* hfreq lower limit (Hz) */
-	__u32 hfmax;			/* hfreq upper limit (Hz) */
-	__u32 dclkmin;			/* pixelclock lower limit (Hz) */
-	__u32 dclkmax;			/* pixelclock upper limit (Hz) */
-	__u16 input;			/* display type - see FB_DISP_* */
-	__u16 dpms;			/* DPMS support - see FB_DPMS_ */
-	__u16 signal;			/* Signal Type - see FB_SIGNAL_* */
-	__u16 vfmin;			/* vfreq lower limit (Hz) */
-	__u16 vfmax;			/* vfreq upper limit (Hz) */
-	__u16 gamma;			/* Gamma - in fractions of 100 */
-	__u16 gtf	: 1;		/* supports GTF */
-	__u16 misc;			/* Misc flags - see FB_MISC_* */
-	__u8  version;			/* EDID version... */
-	__u8  revision;			/* ...and revision */
-	__u8  max_x;			/* Maximum horizontal size (cm) */
-	__u8  max_y;			/* Maximum vertical size (cm) */
-};
-
 #define KHZ2PICOS(a) (1000000000UL/(a))
 
 struct fb_fix_screeninfo {
@@ -383,38 +353,11 @@ struct linux_fb_info {
 	struct mutex mm_lock;		/* Lock for fb_mmap and smem_* fields */
 	struct fb_var_screeninfo var;	/* Current var */
 	struct fb_fix_screeninfo fix;	/* Current fix */
-	struct fb_monspecs monspecs;	/* Current Monitor specs */
-	struct work_struct queue;	/* Framebuffer event queue */
-	struct fb_pixmap pixmap;	/* Image hardware mapper */
-	struct fb_pixmap sprite;	/* Cursor hardware mapper */
 	struct fb_cmap cmap;		/* Current cmap */
-	struct list_head modelist;      /* mode list */
-	struct fb_videomode *mode;	/* current mode */
-
-#ifdef CONFIG_FB_BACKLIGHT
-	/* assigned backlight device */
-	/* set before framebuffer registration, 
-	   remove after unregister */
-	struct backlight_device *bl_dev;
-
-	/* Backlight level curve */
-	struct mutex bl_curve_mutex;	
-	u8 bl_curve[FB_BACKLIGHT_LEVELS];
-#endif
-
-#ifdef __linux__
-	/* Not used on FreeBSD */
-	struct delayed_work deferred_work;
-	struct fb_deferred_io *fbdefio;
-#endif
 
 	const struct fb_ops *fbops;
 	struct device *device;		/* This is the parent */
 	struct device *dev;		/* This is this fb device */
-	int class_flag;                    /* private sysfs flags */
-#ifdef CONFIG_FB_TILEBLITTING
-	struct fb_tile_ops *tileops;    /* Tile Blitting */
-#endif
 	union {
 		char __iomem *screen_base;	/* Virtual address */
 		char *screen_buffer;
@@ -424,7 +367,6 @@ struct linux_fb_info {
 #define FBINFO_STATE_RUNNING	0
 #define FBINFO_STATE_SUSPENDED	1
 	u32 state;			/* Hardware state i.e suspend */
-	void *fbcon_par;                /* fbcon use-only private area */
 	/* From here on everything is device dependent */
 	void *par;
 	/* we need the PCI or similar aperture base/size not
@@ -437,16 +379,11 @@ struct linux_fb_info {
 			resource_size_t size;
 		} ranges[0];
 	} *apertures;
-	bool skip_vt_switch; /* no VT switch on suspend/resume required */
 
 	struct fb_info fbio;
 	struct cdev *fb_cdev;
 	device_t fb_bsddev;
-#ifdef __linux__
-};
-#else
 } __aligned(sizeof(long));
-#endif
 
 static inline struct apertures_struct *alloc_apertures(unsigned int max_num) {
 	struct apertures_struct *a = kzalloc(sizeof(struct apertures_struct)

@@ -541,7 +541,9 @@ struct fb_info *drm_fb_helper_alloc_fbi(struct drm_fb_helper *fb_helper)
 	}
 
 	fb_helper->fbdev = info;
+#ifdef __linux__
 	info->skip_vt_switch = true;
+#endif
 
 	return info;
 

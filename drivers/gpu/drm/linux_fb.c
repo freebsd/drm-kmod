@@ -462,24 +462,6 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	} else
 		dev_set_drvdata(fb_info->dev, fb_info);
 
-	if (fb_info->pixmap.addr == NULL) {
-		fb_info->pixmap.addr = kmalloc(FBPIXMAPSIZE, GFP_KERNEL);
-		if (fb_info->pixmap.addr) {
-			fb_info->pixmap.size = FBPIXMAPSIZE;
-			fb_info->pixmap.buf_align = 1;
-			fb_info->pixmap.scan_align = 1;
-			fb_info->pixmap.access_align = 32;
-			fb_info->pixmap.flags = FB_PIXMAP_DEFAULT;
-		}
-	}
-	fb_info->pixmap.offset = 0;
-
-	if (!fb_info->pixmap.blit_x)
-		fb_info->pixmap.blit_x = ~(u32)0;
-
-	if (!fb_info->pixmap.blit_y)
-		fb_info->pixmap.blit_y = ~(u32)0;
-
 	event.info = fb_info;
 	drm_legacy_fb_init(fb_info);
 
@@ -545,9 +527,6 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 	fbd_destroy(fb_info);
 
 	unlink_framebuffer(fb_info);
-	if (fb_info->pixmap.addr &&
-	    (fb_info->pixmap.flags & FB_PIXMAP_DEFAULT))
-		kfree(fb_info->pixmap.addr);
 	event.info = fb_info;
 	put_fb_info(fb_info);
 	return 0;
