@@ -366,28 +366,6 @@ struct fb_blit_caps {
 	u32 flags;
 };
 
-#ifdef CONFIG_FB_NOTIFY
-extern int fb_register_client(struct notifier_block *nb);
-extern int fb_unregister_client(struct notifier_block *nb);
-extern int fb_notifier_call_chain(unsigned long val, void *v);
-#else
-static inline int fb_register_client(struct notifier_block *nb)
-{
-	return 0;
-};
-
-static inline int fb_unregister_client(struct notifier_block *nb)
-{
-	return 0;
-};
-
-static inline int fb_notifier_call_chain(unsigned long val, void *v)
-{
-	return 0;
-};
-#endif
-
-
 /*
  * Pixmap structure definition
  *
@@ -679,7 +657,6 @@ struct linux_fb_info {
 } __aligned(sizeof(long));
 #endif
 
-
 static inline struct apertures_struct *alloc_apertures(unsigned int max_num) {
 	struct apertures_struct *a = kzalloc(sizeof(struct apertures_struct)
 			+ max_num * sizeof(struct aperture), GFP_KERNEL);
@@ -689,24 +666,10 @@ static inline struct apertures_struct *alloc_apertures(unsigned int max_num) {
 	return a;
 }
 
-#ifdef MODULE
-#define FBINFO_DEFAULT	FBINFO_MODULE
-#else
-#define FBINFO_DEFAULT	0
-#endif
-
-// This will go away
-#define FBINFO_FLAG_MODULE	FBINFO_MODULE
-#define FBINFO_FLAG_DEFAULT	FBINFO_DEFAULT
-
-extern int fb_set_var(struct linux_fb_info *info, struct fb_var_screeninfo *var); 
-extern int fb_pan_display(struct linux_fb_info *info, struct fb_var_screeninfo *var); 
-extern int fb_blank(struct linux_fb_info *info, int blank);
 #define	cfb_fillrect(x, y)	0
 #define	cfb_copyarea(x, y)	0
 #define	cfb_imageblit(x, y)	0
 
-/* drivers/video/fbmem.c */
 extern int linux_register_framebuffer(struct linux_fb_info *fb_info);
 extern int linux_unregister_framebuffer(struct linux_fb_info *fb_info);
 extern int remove_conflicting_framebuffers(struct apertures_struct *a,
@@ -714,18 +677,7 @@ extern int remove_conflicting_framebuffers(struct apertures_struct *a,
 extern int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name);
 struct linux_fb_info *framebuffer_alloc(size_t size, struct device *dev);
 extern void framebuffer_release(struct linux_fb_info *info);
-
-
 extern int unlink_framebuffer(struct linux_fb_info *fb_info);
-extern int fb_prepare_logo(struct linux_fb_info *fb_info, int rotate);
-extern int fb_show_logo(struct linux_fb_info *fb_info, int rotate);
-extern char* fb_get_buffer_offset(struct linux_fb_info *info, struct fb_pixmap *buf, u32 size);
-extern void fb_pad_unaligned_buffer(u8 *dst, u32 d_pitch, u8 *src, u32 idx,
-				u32 height, u32 shift_high, u32 shift_low, u32 mod);
-extern void fb_pad_aligned_buffer(u8 *dst, u32 d_pitch, u8 *src, u32 s_pitch, u32 height);
-extern int fb_get_color_depth(struct fb_var_screeninfo *var,
-			      struct fb_fix_screeninfo *fix);
-extern int fb_new_modelist(struct linux_fb_info *info);
 #define	fb_set_suspend(x, y)	0
 
 static inline int
@@ -737,15 +689,6 @@ fb_alloc_cmap(struct fb_cmap *cmap, int len, int transp)
 #define	fb_dealloc_cmap(x)	0
 
 /* updated FreeBSD fb_info */
-extern void drm_legacy_fb_init(struct linux_fb_info *fb_info);
 extern int fb_get_options(const char *name, char **option);
-
-
-
-/*
- * GPL licensed routines that need to be replaced:
- */
-
-extern const struct fb_cmap * tainted_fb_default_cmap(int len);
 
 #endif /* __LINUX_FB_H_ */
