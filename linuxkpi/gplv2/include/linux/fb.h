@@ -19,28 +19,6 @@ struct videomode;
 struct vm_area_struct;
 
 #define FB_TYPE_PACKED_PIXELS		0	/* Packed Pixels	*/
-#define FB_TYPE_PLANES			1	/* Non interleaved planes */
-#define FB_TYPE_INTERLEAVED_PLANES	2	/* Interleaved planes	*/
-#define FB_TYPE_TEXT			3	/* Text/attributes	*/
-#define FB_TYPE_VGA_PLANES		4	/* EGA/VGA planes	*/
-#define FB_TYPE_FOURCC			5	/* Type identified by a V4L2 FOURCC */
-
-#define FB_AUX_TEXT_MDA		0	/* Monochrome text */
-#define FB_AUX_TEXT_CGA		1	/* CGA/EGA/VGA Color text */
-#define FB_AUX_TEXT_S3_MMIO	2	/* S3 MMIO fasttext */
-#define FB_AUX_TEXT_MGA_STEP16	3	/* MGA Millenium I: text, attr, 14 reserved bytes */
-#define FB_AUX_TEXT_MGA_STEP8	4	/* other MGAs:      text, attr,  6 reserved bytes */
-#define FB_AUX_TEXT_SVGA_GROUP	8	/* 8-15: SVGA tileblit compatible modes */
-#define FB_AUX_TEXT_SVGA_MASK	7	/* lower three bits says step */
-#define FB_AUX_TEXT_SVGA_STEP2	8	/* SVGA text mode:  text, attr */
-#define FB_AUX_TEXT_SVGA_STEP4	9	/* SVGA text mode:  text, attr,  2 reserved bytes */
-#define FB_AUX_TEXT_SVGA_STEP8	10	/* SVGA text mode:  text, attr,  6 reserved bytes */
-#define FB_AUX_TEXT_SVGA_STEP16	11	/* SVGA text mode:  text, attr, 14 reserved bytes */
-#define FB_AUX_TEXT_SVGA_LAST	15	/* reserved up to 15 */
-
-#define FB_AUX_VGA_PLANES_VGA4		0	/* 16 color planes (EGA/VGA) */
-#define FB_AUX_VGA_PLANES_CFB4		1	/* CFB4 in planes (VGA) */
-#define FB_AUX_VGA_PLANES_CFB8		2	/* CFB8 in planes (VGA) */
 
 #define FB_VISUAL_MONO01		0	/* Monochr. 1=Black 0=White */
 #define FB_VISUAL_MONO10		1	/* Monochr. 1=White 0=Black */
@@ -50,29 +28,11 @@ struct vm_area_struct;
 #define FB_VISUAL_STATIC_PSEUDOCOLOR	5	/* Pseudo color readonly */
 #define FB_VISUAL_FOURCC		6	/* Visual identified by a V4L2 FOURCC */
 
-
 #define FB_ACCEL_NONE		0	/* no hardware accelerator	*/
 
 #define FB_ACTIVATE_NOW		0	/* set values immediately (or vbl)*/
-#define FB_ACTIVATE_NXTOPEN	1	/* activate on next open	*/
-#define FB_ACTIVATE_TEST	2	/* don't set, round up impossible */
-#define FB_ACTIVATE_MASK       15
-					/* values			*/
-#define FB_ACTIVATE_VBL	       16	/* activate values on next vbl  */
-#define FB_CHANGE_CMAP_VBL     32	/* change colormap on vbl	*/
-#define FB_ACTIVATE_ALL	       64	/* change all VCs on this fb	*/
-#define FB_ACTIVATE_FORCE     128	/* force apply even when no change*/
-#define FB_ACTIVATE_INV_MODE  256       /* invalidate videomode */
 
 #define FB_ACCELF_TEXT		1	/* (OBSOLETE) see fb_info.flags and vc_mode */
-
-#define FB_MODE_IS_UNKNOWN	0
-#define FB_MODE_IS_DETAILED	1
-#define FB_MODE_IS_STANDARD	2
-#define FB_MODE_IS_VESA		4
-#define FB_MODE_IS_CALCULATED	8
-#define FB_MODE_IS_FIRST	16
-#define FB_MODE_IS_FROM_VAR     32
 
 struct fb_videomode {
 	const char *name;	/* optional */
@@ -92,33 +52,7 @@ struct fb_videomode {
 };
 
 extern const char *fb_mode_option;
-extern const struct fb_videomode cea_modes[64];
 
-/* Definitions below are used in the parsed monitor specs */
-#define FB_DPMS_ACTIVE_OFF	1
-#define FB_DPMS_SUSPEND		2
-#define FB_DPMS_STANDBY		4
-
-#define FB_DISP_DDI		1
-#define FB_DISP_ANA_700_300	2
-#define FB_DISP_ANA_714_286	4
-#define FB_DISP_ANA_1000_400	8
-#define FB_DISP_ANA_700_000	16
-
-#define FB_DISP_MONO		32
-#define FB_DISP_RGB		64
-#define FB_DISP_MULTI		128
-#define FB_DISP_UNKNOWN		256
-
-#define FB_SIGNAL_NONE		0
-#define FB_SIGNAL_BLANK_BLANK	1
-#define FB_SIGNAL_SEPARATE	2
-#define FB_SIGNAL_COMPOSITE	4
-#define FB_SIGNAL_SYNC_ON_GREEN	8
-#define FB_SIGNAL_SERRATION_ON	16
-
-#define FB_MISC_PRIM_COLOR	1
-#define FB_MISC_1ST_DETAIL	2	/* First Detailed Timing is preferred */
 struct fb_chroma {
 	__u32 redx;	/* in fraction of 1024 */
 	__u32 greenx;
@@ -160,18 +94,6 @@ struct fb_monspecs {
 	__u8  max_y;			/* Maximum vertical size (cm) */
 };
 
-
-#define FB_VMODE_NONINTERLACED  0	/* non interlaced */
-#define FB_VMODE_INTERLACED	1	/* interlaced	*/
-#define FB_VMODE_DOUBLE		2	/* double scan */
-#define FB_VMODE_ODD_FLD_FIRST	4	/* interlaced: top line first */
-#define FB_VMODE_MASK		255
-
-#define FB_VMODE_YWRAP		256	/* ywrap instead of panning     */
-#define FB_VMODE_SMOOTH_XPAN	512	/* smooth xpan possible (internally used) */
-#define FB_VMODE_CONUPDATE	512	/* don't update x/yoffset	*/
-
-#define PICOS2KHZ(a) (1000000000UL/(a))
 #define KHZ2PICOS(a) (1000000000UL/(a))
 
 struct fb_fix_screeninfo {
@@ -202,21 +124,7 @@ struct fb_bitfield {
 					/* right */ 
 };
 
-
-#define FB_NONSTD_HAM		1	/* Hold-And-Modify (HAM)        */
-#define FB_NONSTD_REV_PIX_IN_B	2	/* order of pixels in each byte is reversed */
-
 #define FB_ACTIVATE_NOW		0	/* set values immediately (or vbl)*/
-#define FB_ACTIVATE_NXTOPEN	1	/* activate on next open	*/
-#define FB_ACTIVATE_TEST	2	/* don't set, round up impossible */
-#define FB_ACTIVATE_MASK       15
-					/* values			*/
-#define FB_ACTIVATE_VBL	       16	/* activate values on next vbl  */
-#define FB_CHANGE_CMAP_VBL     32	/* change colormap on vbl	*/
-#define FB_ACTIVATE_ALL	       64	/* change all VCs on this fb	*/
-#define FB_ACTIVATE_FORCE     128	/* force apply even when no change*/
-#define FB_ACTIVATE_INV_MODE  256       /* invalidate videomode */
-
 
 struct fb_var_screeninfo {
 	__u32 xres;			/* visible resolution		*/
@@ -274,7 +182,6 @@ struct fb_cmap {
 #define VESA_HSYNC_SUSPEND      2
 #define VESA_POWERDOWN          3
 
-
 enum {
 	/* screen: unblanked, hsync: on,  vsync: on */
 	FB_BLANK_UNBLANK       = VESA_NO_BLANKING,
@@ -292,16 +199,6 @@ enum {
 	FB_BLANK_POWERDOWN     = VESA_POWERDOWN + 1
 };
 
-#define FB_VBLANK_VBLANKING	0x001	/* currently in a vertical blank */
-#define FB_VBLANK_HBLANKING	0x002	/* currently in a horizontal blank */
-#define FB_VBLANK_HAVE_VBLANK	0x004	/* vertical blanks can be detected */
-#define FB_VBLANK_HAVE_HBLANK	0x008	/* horizontal blanks can be detected */
-#define FB_VBLANK_HAVE_COUNT	0x010	/* global retrace counter is available */
-#define FB_VBLANK_HAVE_VCOUNT	0x020	/* the vcount field is valid */
-#define FB_VBLANK_HAVE_HCOUNT	0x040	/* the hcount field is valid */
-#define FB_VBLANK_VSYNCING	0x080	/* currently in a vsync */
-#define FB_VBLANK_HAVE_VSYNC	0x100	/* verical syncs can be detected */
-
 struct fb_vblank {
 	__u32 flags;			/* FB_VBLANK flags */
 	__u32 count;			/* counter of retraces since boot */
@@ -309,50 +206,6 @@ struct fb_vblank {
 	__u32 hcount;			/* current scandot position */
 	__u32 reserved[4];		/* reserved for future compatibility */
 };
-
-/*
- * Register/unregister for framebuffer events
- */
-
-/*	The resolution of the passed in fb_info about to change */ 
-#define FB_EVENT_MODE_CHANGE		0x01
-/*	The display on this fb_info is beeing suspended, no access to the
- *	framebuffer is allowed any more after that call returns
- */
-#define FB_EVENT_SUSPEND		0x02
-/*	The display on this fb_info was resumed, you can restore the display
- *	if you own it
- */
-#define FB_EVENT_RESUME			0x03
-/*      An entry from the modelist was removed */
-#define FB_EVENT_MODE_DELETE            0x04
-/*      A driver registered itself */
-#define FB_EVENT_FB_REGISTERED          0x05
-/*      A driver unregistered itself */
-#define FB_EVENT_FB_UNREGISTERED        0x06
-/*      CONSOLE-SPECIFIC: get console to framebuffer mapping */
-#define FB_EVENT_GET_CONSOLE_MAP        0x07
-/*      CONSOLE-SPECIFIC: set console to framebuffer mapping */
-#define FB_EVENT_SET_CONSOLE_MAP        0x08
-/*      A hardware display blank change occurred */
-#define FB_EVENT_BLANK                  0x09
-/*      Private modelist is to be replaced */
-#define FB_EVENT_NEW_MODELIST           0x0A
-/*	The resolution of the passed in fb_info about to change and
-        all vc's should be changed         */
-#define FB_EVENT_MODE_CHANGE_ALL	0x0B
-/*	A software display blank change occurred */
-#define FB_EVENT_CONBLANK               0x0C
-/*      Get drawing requirements        */
-#define FB_EVENT_GET_REQ                0x0D
-/*      Unbind from the console if possible */
-#define FB_EVENT_FB_UNBIND              0x0E
-/*      CONSOLE-SPECIFIC: remap all consoles to new fb - for vga_switcheroo */
-#define FB_EVENT_REMAP_ALL_CONSOLE      0x0F
-/*      A hardware display blank early change occured */
-#define FB_EARLY_EVENT_BLANK		0x10
-/*      A hardware display blank revert early change occured */
-#define FB_R_EARLY_EVENT_BLANK		0x11
 
 struct fb_event {
 	struct linux_fb_info *info;
@@ -395,10 +248,6 @@ struct fb_pixmap {
 	void (*writeio)(struct linux_fb_info *info, void __iomem *dst, void *src, unsigned int size);
 	void (*readio) (struct linux_fb_info *info, void *dst, void __iomem *src, unsigned int size);
 };
-
-/* Internal HW accel */
-#define ROP_COPY 0
-#define ROP_XOR  1
 
 struct fb_copyarea {
 	__u32 dx;
@@ -516,64 +365,6 @@ struct fb_ops {
 	int (*fb_debug_leave)(struct linux_fb_info *info);
 };
 
-
-
-/* FBINFO_* = fb_info.flags bit flags */
-#define FBINFO_MODULE		0x0001	/* Low-level driver is a module */
-#define FBINFO_HWACCEL_DISABLED	0x0002
-	/* When FBINFO_HWACCEL_DISABLED is set:
-	 *  Hardware acceleration is turned off.  Software implementations
-	 *  of required functions (copyarea(), fillrect(), and imageblit())
-	 *  takes over; acceleration engine should be in a quiescent state */
-
-/* hints */
-#define FBINFO_VIRTFB		0x0004 /* FB is System RAM, not device. */
-#define FBINFO_PARTIAL_PAN_OK	0x0040 /* otw use pan only for double-buffering */
-#define FBINFO_READS_FAST	0x0080 /* soft-copy faster than rendering */
-
-/* hardware supported ops */
-/*  semantics: when a bit is set, it indicates that the operation is
- *   accelerated by hardware.
- *  required functions will still work even if the bit is not set.
- *  optional functions may not even exist if the flag bit is not set.
- */
-#define FBINFO_HWACCEL_NONE		0x0000
-#define FBINFO_HWACCEL_COPYAREA		0x0100 /* required */
-#define FBINFO_HWACCEL_FILLRECT		0x0200 /* required */
-#define FBINFO_HWACCEL_IMAGEBLIT	0x0400 /* required */
-#define FBINFO_HWACCEL_ROTATE		0x0800 /* optional */
-#define FBINFO_HWACCEL_XPAN		0x1000 /* optional */
-#define FBINFO_HWACCEL_YPAN		0x2000 /* optional */
-#define FBINFO_HWACCEL_YWRAP		0x4000 /* optional */
-
-#define FBINFO_MISC_USEREVENT          0x10000 /* event request
-						  from userspace */
-#define FBINFO_MISC_TILEBLITTING       0x20000 /* use tile blitting */
-
-/* A driver may set this flag to indicate that it does want a set_par to be
- * called every time when fbcon_switch is executed. The advantage is that with
- * this flag set you can really be sure that set_par is always called before
- * any of the functions dependent on the correct hardware state or altering
- * that state, even if you are using some broken X releases. The disadvantage
- * is that it introduces unwanted delays to every console switch if set_par
- * is slow. It is a good idea to try this flag in the drivers initialization
- * code whenever there is a bug report related to switching between X and the
- * framebuffer console.
- */
-#define FBINFO_MISC_ALWAYS_SETPAR   0x40000
-
-/* where the fb is a firmware driver, and can be replaced with a proper one */
-#define FBINFO_MISC_FIRMWARE        0x80000
-/*
- * Host and GPU endianness differ.
- */
-#define FBINFO_FOREIGN_ENDIAN	0x100000
-/*
- * Big endian math. This is the same flags as above, but with different
- * meaning, it is set by the fb subsystem depending FOREIGN_ENDIAN flag
- * and host endianness. Drivers should not use this flag.
- */
-#define FBINFO_BE_MATH  0x100000
 
 /* report to the VT layer that this fb driver can accept forced console
    output like oopses */

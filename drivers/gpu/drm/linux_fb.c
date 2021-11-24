@@ -435,7 +435,6 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	int i, err;
 	static int unit_no;
 	struct fb_event event;
-	struct fb_videomode mode;
 
 	vt_dummy_switchto(fb_info->apertures, fb_info->fix.id);
 
