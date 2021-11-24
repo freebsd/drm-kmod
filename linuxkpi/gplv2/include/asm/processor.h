@@ -59,25 +59,6 @@ struct cpuinfo_x86 {
 	u16			cpu_index;
 	u32			microcode;
 };
-#ifndef mb
-#define	mb()	__asm __volatile("mfence;" : : : "memory")
-#endif
-#ifndef wmb
-#define	wmb()	__asm __volatile("sfence;" : : : "memory")
-#endif
-#ifndef rmb
-#define	rmb()	__asm __volatile("lfence;" : : : "memory")
-#endif
-
-#ifndef smp_mb
-#define smp_mb() mb()
-#endif
-#ifndef smp_wmb
-#define smp_wmb() wmb()
-#endif
-#ifndef smp_rmb
-#define smp_rmb() rmb()
-#endif
 
 static __always_inline void cpu_relax(void)
 {
@@ -86,13 +67,6 @@ static __always_inline void cpu_relax(void)
 
 #define cpu_relax_lowlatency() cpu_relax()
 
-#define smp_read_barrier_depends() do {} while (0)
-
 extern struct cpuinfo_x86	boot_cpu_data;
-
-#define __smp_store_mb(var, value) do { (void)xchg(&(var), value); } while (0)
-
-#define smp_store_mb __smp_store_mb
-
 
 #endif
