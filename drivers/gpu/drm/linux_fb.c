@@ -359,16 +359,6 @@ framebuffer_release(struct linux_fb_info *info)
 	free(info, DRM_MEM_KMS);
 }
 
-static void
-put_fb_info(struct linux_fb_info *fb_info)
-{
-	if (!atomic_dec_and_test(&fb_info->count))
-		return;
-
-	if (fb_info->fbops->fb_destroy)
-		fb_info->fbops->fb_destroy(fb_info);
-}
-
 int
 remove_conflicting_framebuffers(struct apertures_struct *a,
 				const char *name, bool primary)
@@ -437,11 +427,6 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	struct fb_event event;
 
 	vt_dummy_switchto(fb_info->apertures, fb_info->fix.id);
-
-	fb_info->node = 0;
-	atomic_set(&fb_info->count, 1);
-	mutex_init(&fb_info->lock);
-	mutex_init(&fb_info->mm_lock);
 
 	MPASS(fb_info->apertures->ranges[0].base);
 	MPASS(fb_info->apertures->ranges[0].size);
@@ -528,7 +513,8 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 
 	unlink_framebuffer(fb_info);
 	event.info = fb_info;
-	put_fb_info(fb_info);
+	if (fb_info->fbops->fb_destroy)
+		fb_info->fbops->fb_destroy(fb_info);
 	return 0;
 }
 

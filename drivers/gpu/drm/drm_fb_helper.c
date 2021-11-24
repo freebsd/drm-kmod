@@ -1750,6 +1750,7 @@ static void drm_setup_crtcs_fb(struct drm_fb_helper *fb_helper)
 	}
 	drm_connector_list_iter_end(&conn_iter);
 
+#ifdef __linux__
 	switch (sw_rotations) {
 	case DRM_MODE_ROTATE_0:
 		info->fbcon_rotate_hint = FB_ROTATE_UR;
@@ -1771,6 +1772,7 @@ static void drm_setup_crtcs_fb(struct drm_fb_helper *fb_helper)
 		 */
 		info->fbcon_rotate_hint = FB_ROTATE_UR;
 	}
+#endif
 }
 
 /* Note: Drops fb_helper->lock before returning. */
@@ -1804,12 +1806,14 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
 
 	info = fb_helper->fbdev;
 	info->var.pixclock = 0;
+#ifdef __linux__
 	/* Shamelessly allow physical address leaking to userspace */
 #if IS_ENABLED(CONFIG_DRM_FBDEV_LEAK_PHYS_SMEM)
 	if (!drm_leak_fbdev_smem)
 #endif
 		/* don't leak any physical addresses to userspace */
 		info->flags |= FBINFO_HIDE_SMEM_START;
+#endif
 
 #ifdef __FreeBSD__
 	info->fbio.fb_video_dev = device_get_parent(fb_helper->dev->dev->bsddev);
@@ -1829,8 +1833,10 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
 	if (ret < 0)
 		return ret;
 
+#ifdef __linux__
 	dev_info(dev->dev, "fb%d: %s frame buffer device\n",
 		 info->node, info->fix.id);
+#endif
 
 	mutex_lock(&kernel_fb_helper_lock);
 #ifdef __linux__

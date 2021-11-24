@@ -171,21 +171,7 @@ struct fb_ops {
 	void (*fb_destroy)(struct linux_fb_info *info);
 };
 
-/* report to the VT layer that this fb driver can accept forced console
-   output like oopses */
-#define	FBINFO_HIDE_SMEM_START  0x200000
-
 struct linux_fb_info {
-	atomic_t count;
-	int node;
-	int flags;
-	/*
-	 * -1 by default, set to a FB_ROTATE_* value by the driver, if it knows
-	 * a lcd is not mounted upright and fbcon should rotate to compensate.
-	 */
-	int fbcon_rotate_hint;
-	struct mutex lock;		/* Lock for open/release/ioctl funcs */
-	struct mutex mm_lock;		/* Lock for fb_mmap and smem_* fields */
 	struct fb_var_screeninfo var;	/* Current var */
 	struct fb_fix_screeninfo fix;	/* Current fix */
 	struct fb_cmap cmap;		/* Current cmap */
