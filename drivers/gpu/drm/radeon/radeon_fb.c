@@ -48,6 +48,7 @@ struct radeon_fbdev {
 	struct radeon_device *rdev;
 };
 
+#ifdef __linux__
 static int
 radeonfb_open(struct fb_info *info, int user)
 {
@@ -65,24 +66,25 @@ radeonfb_open(struct fb_info *info, int user)
 static int
 radeonfb_release(struct fb_info *info, int user)
 {
-#ifdef __linux__
 	struct radeon_fbdev *rfbdev = info->par;
 	struct radeon_device *rdev = rfbdev->rdev;
 
 	pm_runtime_mark_last_busy(rdev->ddev->dev);
 	pm_runtime_put_autosuspend(rdev->ddev->dev);
-#endif
 	return 0;
 }
+#endif	/* __linux__ */
 
 static const struct fb_ops radeonfb_ops = {
 	.owner = THIS_MODULE,
 	DRM_FB_HELPER_DEFAULT_OPS,
+#ifdef __linux__
 	.fb_open = radeonfb_open,
 	.fb_release = radeonfb_release,
 	.fb_fillrect = drm_fb_helper_cfb_fillrect,
 	.fb_copyarea = drm_fb_helper_cfb_copyarea,
 	.fb_imageblit = drm_fb_helper_cfb_imageblit,
+#endif
 };
 
 

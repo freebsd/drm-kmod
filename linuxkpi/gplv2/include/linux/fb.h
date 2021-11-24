@@ -34,23 +34,6 @@ struct vm_area_struct;
 
 #define FB_ACCELF_TEXT		1	/* (OBSOLETE) see fb_info.flags and vc_mode */
 
-struct fb_videomode {
-	const char *name;	/* optional */
-	u32 refresh;		/* optional */
-	u32 xres;
-	u32 yres;
-	u32 pixclock;
-	u32 left_margin;
-	u32 right_margin;
-	u32 upper_margin;
-	u32 lower_margin;
-	u32 hsync_len;
-	u32 vsync_len;
-	u32 sync;
-	u32 vmode;
-	u32 flag;
-};
-
 extern const char *fb_mode_option;
 
 struct fb_chroma {
@@ -169,172 +152,24 @@ enum {
 	FB_BLANK_POWERDOWN     = VESA_POWERDOWN + 1
 };
 
-struct fb_vblank {
-	__u32 flags;			/* FB_VBLANK flags */
-	__u32 count;			/* counter of retraces since boot */
-	__u32 vcount;			/* current scanline position */
-	__u32 hcount;			/* current scandot position */
-	__u32 reserved[4];		/* reserved for future compatibility */
-};
-
 struct fb_event {
 	struct linux_fb_info *info;
 	void *data;
 };
 
-struct fb_blit_caps {
-	u32 x;
-	u32 y;
-	u32 len;
-	u32 flags;
-};
-
-/*
- * Pixmap structure definition
- *
- * The purpose of this structure is to translate data
- * from the hardware independent format of fbdev to what
- * format the hardware needs.
- */
-
-#define FB_PIXMAP_DEFAULT 1     /* used internally by fbcon */
-#define FB_PIXMAP_SYSTEM  2     /* memory is in system RAM  */
-#define FB_PIXMAP_IO      4     /* memory is iomapped       */
-#define FB_PIXMAP_SYNC    256   /* set if GPU can DMA       */
-
-struct fb_pixmap {
-	u8  *addr;		/* pointer to memory			*/
-	u32 size;		/* size of buffer in bytes		*/
-	u32 offset;		/* current offset to buffer		*/
-	u32 buf_align;		/* byte alignment of each bitmap	*/
-	u32 scan_align;		/* alignment per scanline		*/
-	u32 access_align;	/* alignment per read/write (bits)	*/
-	u32 flags;		/* see FB_PIXMAP_*			*/
-	u32 blit_x;             /* supported bit block dimensions (1-32)*/
-	u32 blit_y;             /* Format: blit_x = 1 << (width - 1)    */
-	                        /*         blit_y = 1 << (height - 1)   */
-	                        /* if 0, will be set to 0xffffffff (all)*/
-	/* access methods */
-	void (*writeio)(struct linux_fb_info *info, void __iomem *dst, void *src, unsigned int size);
-	void (*readio) (struct linux_fb_info *info, void *dst, void __iomem *src, unsigned int size);
-};
-
-struct fb_copyarea {
-	__u32 dx;
-	__u32 dy;
-	__u32 width;
-	__u32 height;
-	__u32 sx;
-	__u32 sy;
-};
-
-struct fb_fillrect {
-	__u32 dx;	/* screen-relative */
-	__u32 dy;
-	__u32 width;
-	__u32 height;
-	__u32 color;
-	__u32 rop;
-};
-
-struct fb_image {
-	__u32 dx;		/* Where to place image */
-	__u32 dy;
-	__u32 width;		/* Size of image */
-	__u32 height;
-	__u32 fg_color;		/* Only used when a mono bitmap */
-	__u32 bg_color;
-	__u8  depth;		/* Depth of the image */
-	const char *data;	/* Pointer to image data */
-	struct fb_cmap cmap;	/* color map info */
-};
-
-struct lfbcurpos {
-	__u16 x, y;
-};
-
-struct fb_cursor {
-	__u16 set;		/* what to set */
-	__u16 enable;		/* cursor on/off */
-	__u16 rop;		/* bitop operation */
-	const char *mask;	/* cursor mask bits */
-	struct lfbcurpos hot;	/* cursor hot spot */
-	struct fb_image	image;	/* Cursor image */
-};
-
 struct fb_ops {
 	/* open/release and usage marking */
 	struct module *owner;
-	int (*fb_open)(struct linux_fb_info *info, int user);
-	int (*fb_release)(struct linux_fb_info *info, int user);
-
-	/* For framebuffers with strange non linear layouts or that do not
-	 * work with normal memory mapped access
-	 */
-	ssize_t (*fb_read)(struct linux_fb_info *info, char __user *buf,
-			   size_t count, loff_t *ppos);
-	ssize_t (*fb_write)(struct linux_fb_info *info, const char __user *buf,
-			    size_t count, loff_t *ppos);
-
-	/* checks var and eventually tweaks it to something supported,
-	 * DO NOT MODIFY PAR */
-	int (*fb_check_var)(struct fb_var_screeninfo *var, struct linux_fb_info *info);
 
 	/* set the video mode according to info->var */
 	int (*fb_set_par)(struct linux_fb_info *info);
 
-	/* set color register */
-	int (*fb_setcolreg)(unsigned regno, unsigned red, unsigned green,
-			    unsigned blue, unsigned transp, struct linux_fb_info *info);
-
-	/* set color registers in batch */
-	int (*fb_setcmap)(struct fb_cmap *cmap, struct linux_fb_info *info);
-
 	/* blank display */
 	int (*fb_blank)(int blank, struct linux_fb_info *info);
 
-	/* pan display */
-	int (*fb_pan_display)(struct fb_var_screeninfo *var, struct linux_fb_info *info);
-
-	/* Draws a rectangle */
-	void (*fb_fillrect) (struct linux_fb_info *info, const struct fb_fillrect *rect);
-	/* Copy data from area to another */
-	void (*fb_copyarea) (struct linux_fb_info *info, const struct fb_copyarea *region);
-	/* Draws a image to the display */
-	void (*fb_imageblit) (struct linux_fb_info *info, const struct fb_image *image);
-
-	/* Draws cursor */
-	int (*fb_cursor) (struct linux_fb_info *info, struct fb_cursor *cursor);
-
-	/* Rotates the display */
-	void (*fb_rotate)(struct linux_fb_info *info, int angle);
-
-	/* wait for blit idle, optional */
-	int (*fb_sync)(struct linux_fb_info *info);
-
-	/* perform fb specific ioctl (optional) */
-	int (*fb_ioctl)(struct linux_fb_info *info, unsigned int cmd,
-			unsigned long arg);
-
-	/* Handle 32bit compat ioctl (optional) */
-	int (*fb_compat_ioctl)(struct linux_fb_info *info, unsigned cmd,
-			unsigned long arg);
-
-	/* perform fb specific mmap */
-	int (*fb_mmap)(struct linux_fb_info *info, struct vm_area_struct *vma);
-
-	/* get capability given var */
-	void (*fb_get_caps)(struct linux_fb_info *info, struct fb_blit_caps *caps,
-			    struct fb_var_screeninfo *var);
-
 	/* teardown any resources to do with this framebuffer */
 	void (*fb_destroy)(struct linux_fb_info *info);
-
-	/* called at KDB enter and leave time to prepare the console */
-	int (*fb_debug_enter)(struct linux_fb_info *info);
-	int (*fb_debug_leave)(struct linux_fb_info *info);
 };
-
 
 /* report to the VT layer that this fb driver can accept forced console
    output like oopses */

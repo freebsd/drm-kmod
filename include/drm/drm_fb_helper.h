@@ -204,6 +204,7 @@ drm_fb_helper_from_client(struct drm_client_dev *client)
  * Helper define to register default implementations of drm_fb_helper
  * functions. To be used in struct fb_ops of drm drivers.
  */
+#ifdef __linux__
 #define DRM_FB_HELPER_DEFAULT_OPS \
 	.fb_check_var	= drm_fb_helper_check_var, \
 	.fb_set_par	= drm_fb_helper_set_par, \
@@ -213,6 +214,11 @@ drm_fb_helper_from_client(struct drm_client_dev *client)
 	.fb_debug_enter = drm_fb_helper_debug_enter, \
 	.fb_debug_leave = drm_fb_helper_debug_leave, \
 	.fb_ioctl	= drm_fb_helper_ioctl
+#elif defined(__FreeBSD__)
+#define DRM_FB_HELPER_DEFAULT_OPS \
+	.fb_set_par	= drm_fb_helper_set_par, \
+	.fb_blank	= drm_fb_helper_blank
+#endif
 
 #ifdef CONFIG_DRM_FBDEV_EMULATION
 void drm_fb_helper_prepare(struct drm_device *dev, struct drm_fb_helper *helper,
@@ -243,6 +249,7 @@ ssize_t drm_fb_helper_sys_read(struct fb_info *info, char __user *buf,
 ssize_t drm_fb_helper_sys_write(struct fb_info *info, const char __user *buf,
 				size_t count, loff_t *ppos);
 
+#ifdef __linux__
 void drm_fb_helper_sys_fillrect(struct fb_info *info,
 				const struct fb_fillrect *rect);
 void drm_fb_helper_sys_copyarea(struct fb_info *info,
@@ -256,6 +263,7 @@ void drm_fb_helper_cfb_copyarea(struct fb_info *info,
 				const struct fb_copyarea *area);
 void drm_fb_helper_cfb_imageblit(struct fb_info *info,
 				 const struct fb_image *image);
+#endif	/* __linux__ */
 
 void drm_fb_helper_set_suspend(struct drm_fb_helper *fb_helper, bool suspend);
 void drm_fb_helper_set_suspend_unlocked(struct drm_fb_helper *fb_helper,

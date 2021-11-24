@@ -770,7 +770,6 @@ void drm_fb_helper_sys_imageblit(struct fb_info *info,
 			    image->width, image->height);
 }
 EXPORT_SYMBOL(drm_fb_helper_sys_imageblit);
-#endif	/* __linux__ */
 
 /**
  * drm_fb_helper_cfb_fillrect - wrapper around cfb_fillrect
@@ -819,6 +818,7 @@ void drm_fb_helper_cfb_imageblit(struct fb_info *info,
 			    image->width, image->height);
 }
 EXPORT_SYMBOL(drm_fb_helper_cfb_imageblit);
+#endif	/* __linux__ */
 
 /**
  * drm_fb_helper_set_suspend - wrapper around fb_set_suspend
@@ -2116,7 +2116,6 @@ static int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
 		if (!fbi->screen_buffer)
 			return -ENOMEM;
 
-#ifdef __linux__
 		fbi->fbdefio = &drm_fbdev_defio;
 
 		fb_deferred_io_init(fbi);
@@ -2134,7 +2133,6 @@ static int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
 				page_to_phys(virt_to_page(fbi->screen_buffer));
 #endif
 	}
-#endif
 	}
 
 	return 0;

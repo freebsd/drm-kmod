@@ -46,6 +46,7 @@
    the helper contains a pointer to amdgpu framebuffer baseclass.
 */
 
+#ifdef __linux__
 static int
 amdgpufb_open(struct fb_info *info, int user)
 {
@@ -62,23 +63,24 @@ amdgpufb_open(struct fb_info *info, int user)
 static int
 amdgpufb_release(struct fb_info *info, int user)
 {
-#ifdef __linux__
 	struct drm_fb_helper *fb_helper = info->par;
 
 	pm_runtime_mark_last_busy(fb_helper->dev->dev);
 	pm_runtime_put_autosuspend(fb_helper->dev->dev);
-#endif
 	return 0;
 }
+#endif	/* __linux__ */
 
 static const struct fb_ops amdgpufb_ops = {
 	.owner = THIS_MODULE,
 	DRM_FB_HELPER_DEFAULT_OPS,
+#ifdef __linux__
 	.fb_open = amdgpufb_open,
 	.fb_release = amdgpufb_release,
 	.fb_fillrect = drm_fb_helper_cfb_fillrect,
 	.fb_copyarea = drm_fb_helper_cfb_copyarea,
 	.fb_imageblit = drm_fb_helper_cfb_imageblit,
+#endif
 };
 
 
