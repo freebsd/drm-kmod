@@ -1,9 +1,7 @@
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
-#include <drm/drm_crtc.h>
 #include <drm/drm_fb_helper.h>
-#include <drm/drm_crtc_helper.h>
 #include <drm/drm_print.h>
 
 #include <sys/kdb.h>
@@ -285,8 +283,6 @@ fb_mmap(struct cdev *dev, vm_ooffset_t offset, vm_paddr_t *paddr, int nprot,
 	return (EINVAL);
 }
 
-
-
 static int
 fbd_init(struct linux_fb_info *fb_info, int unit)
 {
@@ -303,7 +299,6 @@ fbd_destroy(struct linux_fb_info *fb_info)
 
 	return (0);
 }
-
 
 static int
 fb_init(void)
@@ -384,7 +379,6 @@ remove_conflicting_framebuffers(struct apertures_struct *a,
 	sx_xunlock(&linux_fb_mtx);
 	return (0);
 }
-
 
 #define	PCI_STD_NUM_BARS	6
 int
