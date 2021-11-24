@@ -25,4 +25,27 @@
 
 #define atomic_try_cmpxchg(_p, _po, _n)	__atomic_try_cmpxchg(, _p, _po, _n)
 
+#ifndef mb
+#define	mb()	__asm __volatile("mfence;" : : : "memory")
+#endif
+#ifndef wmb
+#define	wmb()	__asm __volatile("sfence;" : : : "memory")
+#endif
+#ifndef rmb
+#define	rmb()	__asm __volatile("lfence;" : : : "memory")
+#endif
+
+#ifndef smp_mb
+#define	smp_mb()	mb()
+#endif
+#ifndef smp_wmb
+#define	smp_wmb()	wmb()
+#endif
+#ifndef smp_rmb
+#define	smp_rmb()	rmb()
+#endif
+
+#define	__smp_store_mb(var, value) do { (void)xchg(&(var), value); } while (0)
+#define	smp_store_mb __smp_store_mb
+
 #endif	/* _BSD_LKPI_LINUX_ATOMIC_H_ */
