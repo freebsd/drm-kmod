@@ -322,6 +322,7 @@ CWARNFLAGS.intel_dpll_mgr.c=	-Wno-compare-distinct-pointer-types
 CWARNFLAGS.intel_display.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_dpll.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_fb.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.intel_fbc.c=		-Wno-unused-variable
 CWARNFLAGS.intel_fbdev.c=	-Wno-initializer-overrides
 CWARNFLAGS.intel_freebsd.c=	-Wno-unused-function
 CWARNFLAGS.i915_gem_context.c=	-Wno-unused-function
