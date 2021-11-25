@@ -34,10 +34,6 @@
 #include <drm/drm_vblank.h>
 #include <drm/drm_dp_mst_helper.h>
 
-#ifdef __FreeBSD__
-#include <linux/ratelimit.h>
-#endif
-
 #include "drm_crtc_helper_internal.h"
 
 /**

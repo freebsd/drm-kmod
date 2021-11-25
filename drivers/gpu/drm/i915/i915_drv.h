@@ -48,10 +48,6 @@
 #include <linux/stackdepot.h>
 #include <linux/xarray.h>
 
-#ifdef __FreeBSD__
-#include <linux/ratelimit.h>
-#endif
-
 #include <drm/intel-gtt.h>
 #include <drm/drm_legacy.h> /* for struct drm_dma_handle */
 #include <drm/drm_gem.h>
@@ -113,7 +109,6 @@
 #ifdef __FreeBSD__
 /* BSD: Make sure we get out[bwl] redefines */
 #include <linux/compiler.h>
-#include <linux/ratelimit.h>
 #include <linux/poll.h>
 #include <linux/shrinker.h>
 #include <linux/uuid.h>
