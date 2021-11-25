@@ -32,9 +32,11 @@
 extern void ttm_trace_dma_map(struct device *dev, struct ttm_dma_tt *tt);
 extern void ttm_trace_dma_unmap(struct device *dev, struct ttm_dma_tt *tt);
 
-#else
+#elif defined(__FreeBSD__)
 
-#include <drm/drmP.h>
+#include <sys/param.h>
+#include <sys/ktr.h>
+
 #include "ttm_bo_driver.h"
 
 static inline void
