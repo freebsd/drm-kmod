@@ -58,7 +58,6 @@ SYSCTL_NODE(_hw, OID_AUTO, radeonkms,
     DRIVER_DESC " parameters");
 
 #include <vm/vm_phys.h>
-#include <asm/mtrr.h>	/* Needed for arch_phys_wc_* */
 #endif
 
 /*
