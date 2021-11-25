@@ -424,7 +424,6 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 {
 	int i, err;
 	static int unit_no;
-	struct fb_event event;
 
 	vt_dummy_switchto(fb_info->apertures, fb_info->fix.id);
 
@@ -447,7 +446,6 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	} else
 		dev_set_drvdata(fb_info->dev, fb_info);
 
-	event.info = fb_info;
 	drm_legacy_fb_init(fb_info);
 
 	fb_info->fbio.fb_fbd_dev = device_add_child(fb_info->fb_bsddev, "fbd",
@@ -496,7 +494,6 @@ unlink_framebuffer(struct linux_fb_info *fb_info)
 static int
 __unregister_framebuffer(struct linux_fb_info *fb_info)
 {
-	struct fb_event event;
 	int ret = 0;
 
 	vm_phys_fictitious_unreg_range(fb_info->apertures->ranges[0].base,
@@ -512,7 +509,6 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 	fbd_destroy(fb_info);
 
 	unlink_framebuffer(fb_info);
-	event.info = fb_info;
 	if (fb_info->fbops->fb_destroy)
 		fb_info->fbops->fb_destroy(fb_info);
 	return 0;

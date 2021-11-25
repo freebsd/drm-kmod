@@ -152,11 +152,6 @@ enum {
 	FB_BLANK_POWERDOWN     = VESA_POWERDOWN + 1
 };
 
-struct fb_event {
-	struct linux_fb_info *info;
-	void *data;
-};
-
 struct fb_ops {
 	/* open/release and usage marking */
 	struct module *owner;
