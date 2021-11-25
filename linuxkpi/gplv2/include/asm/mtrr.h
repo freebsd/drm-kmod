@@ -10,10 +10,4 @@
 #define MTRR_TYPE_WRBACK     6
 #define MTRR_NUM_TYPES       7
 
-
-int arch_phys_wc_add(unsigned long base, unsigned long size);
-void arch_phys_wc_del(int handle);
-
-#define arch_phys_wc_index(x) (x)
-
 #endif

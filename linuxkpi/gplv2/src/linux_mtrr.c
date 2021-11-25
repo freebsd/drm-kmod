@@ -40,6 +40,7 @@ __FBSDID("$FreeBSD$");
 
 #include <linux/kernel.h>
 #include <linux/idr.h>
+#include <linux/io.h>
 
 /*
  * Check that there is a SYSUNINIT for this
