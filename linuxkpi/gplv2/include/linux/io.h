@@ -36,4 +36,10 @@ static inline void lo_hi_writeq(uint64_t val, volatile void *addr)
 #define writeq(val, addr) lo_hi_writeq(val, addr)
 #endif
 
+int arch_phys_wc_add(unsigned long base, unsigned long size);
+void arch_phys_wc_del(int handle);
+#ifndef arch_phys_wc_index
+#define	arch_phys_wc_index(x)	(x)
+#endif
+
 #endif	/* _LINUX_IO_H_ */
