@@ -69,7 +69,6 @@
 
 #ifdef __FreeBSD__
 #include <dev/pci/pcireg.h>
-#include <asm/mtrr.h>	/* Needed for arch_phys_wc_* */
 #endif
 
 #include "drm_legacy.h"
