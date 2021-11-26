@@ -13,7 +13,12 @@ __FBSDID("$FreeBSD$");
 #include <dev/agp/agpreg.h>
 #include <dev/pci/pcireg.h>
 #include <sys/reboot.h>
+#include <sys/fbio.h>
+#include <dev/vt/vt.h>
+
 #include <linux/cdev.h>
+#include <linux/fb.h>
+#undef fb_info
 #undef cdev
 
 devclass_t drm_devclass;
@@ -80,6 +85,48 @@ sysctl_pci_id(SYSCTL_HANDLER_ARGS)
 }
 
 /* Framebuffer related code */
+
+extern struct vt_device *main_vd;
+
+void
+vt_freeze_main_vd(struct apertures_struct *a, const char *name)
+{
+	struct fb_info *fb;
+	int i;
+	bool overlap = false;
+
+	if (main_vd && main_vd->vd_driver && main_vd->vd_softc &&
+	    /* For these, we know the softc (or its first field) is of type fb_info */
+	    (strcmp(main_vd->vd_driver->vd_name, "efifb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "vbefb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "ofwfb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "fb") == 0)) {
+		fb = main_vd->vd_softc;
+
+		for (i = 0; i < a->count; i++) {
+			if (fb->fb_pbase == a->ranges[i].base) {
+				overlap = true;
+				break;
+			}
+			if ((fb->fb_pbase > a->ranges[i].base) &&
+			    (fb->fb_pbase < (a->ranges[i].base + a->ranges[i].size))) {
+				overlap = true;
+				break;
+			}
+		}
+		if (overlap == true)
+			fb->fb_flags |= FB_FLAG_NOWRITE;
+	}
+}
+
+void
+vt_unfreeze_main_vd(void)
+{
+	struct fb_info *fb;
+
+	fb = main_vd->vd_softc;
+	fb->fb_flags &= ~FB_FLAG_NOWRITE;
+}
 
 /* Call restore out of vt(9) locks. */
 void

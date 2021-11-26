@@ -6,7 +6,6 @@ __FBSDID("$FreeBSD$");
 
 #undef fb_info
 
-#include <sys/kdb.h>
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <vm/vm.h>
@@ -14,72 +13,6 @@ __FBSDID("$FreeBSD$");
 #include <vm/vm_phys.h>
 #include <dev/vt/vt.h>
 #include <dev/vt/hw/fb/vt_fb.h>
-
-extern struct vt_device *main_vd;
-
-static void
-vt_dummy_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
-    const uint8_t *pattern, const uint8_t *mask,
-    unsigned int width, unsigned int height,
-    unsigned int x, unsigned int y, term_color_t fg, term_color_t bg)
-{
-}
-
-static void
-vt_dummy_bitblt_text(struct vt_device *vd, const struct vt_window *vw,
-    const term_rect_t *area)
-{
-}
-
-static int
-vt_dummy_init(struct vt_device *vd)
-{
-	return (CN_INTERNAL);
-}
-
-static struct vt_driver vt_dummy_driver = {
-	.vd_name = "dummy",
-	.vd_init = vt_dummy_init,
-	.vd_bitblt_text = vt_dummy_bitblt_text,
-	.vd_bitblt_bmp = vt_dummy_bitblt_bitmap,
-	.vd_priority = VD_PRIORITY_GENERIC + 9, /* > efifb, < fb */
-	.vd_suspend = vt_suspend,
-	.vd_resume = vt_resume,
-};
-
-/*
- * Switch to a dummy vt driver if the ranges are overlapping
- * between the current one and the DRM one that we want to add
- */
-static void
-vt_dummy_switchto(struct apertures_struct *a, const char *name)
-{
-	int i;
-	bool overlap = false;
-
-	if (main_vd && main_vd->vd_driver && main_vd->vd_softc &&
-	    /* For these, we know the softc (or its first field) is of type fb_info */
-	    (strcmp(main_vd->vd_driver->vd_name, "efifb") == 0
-	    || strcmp(main_vd->vd_driver->vd_name, "vbefb") == 0
-	    || strcmp(main_vd->vd_driver->vd_name, "ofwfb") == 0
-	    || strcmp(main_vd->vd_driver->vd_name, "fb") == 0)) {
-		struct fb_info *fb = main_vd->vd_softc;
-
-		for (i = 0; i < a->count; i++) {
-			if (fb->fb_pbase == a->ranges[i].base) {
-				overlap = true;
-				break;
-			}
-			if ((fb->fb_pbase > a->ranges[i].base) &&
-			    (fb->fb_pbase < (a->ranges[i].base + a->ranges[i].size))) {
-				overlap = true;
-				break;
-			}
-		}
-		if (overlap == true)
-			vt_allocate(&vt_dummy_driver, &vt_dummy_driver /* any non-NULL softc */);
-	}
-}
 
 #define FB_MAJOR		29   /* /dev/fb* framebuffers */
 
@@ -304,7 +237,7 @@ remove_conflicting_framebuffers(struct apertures_struct *a,
 {
 
 	sx_xlock(&linux_fb_mtx);
-	vt_dummy_switchto(a, name);
+	vt_freeze_main_vd(a, name);
 	sx_xunlock(&linux_fb_mtx);
 	return (0);
 }
@@ -335,7 +268,7 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 		idx++;
 	}
 	sx_xlock(&linux_fb_mtx);
-	vt_dummy_switchto(ap, name);
+	vt_freeze_main_vd(ap, name);
 	sx_xunlock(&linux_fb_mtx);
 	kfree(ap);
 	return (0);
@@ -364,7 +297,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	int i, err;
 	static int unit_no;
 
-	vt_dummy_switchto(fb_info->apertures, fb_info->fix.id);
+	vt_freeze_main_vd(fb_info->apertures, fb_info->fix.id);
 
 	MPASS(fb_info->apertures->ranges[0].base);
 	MPASS(fb_info->apertures->ranges[0].size);

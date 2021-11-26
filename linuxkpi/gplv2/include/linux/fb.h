@@ -224,4 +224,7 @@ fb_alloc_cmap(struct fb_cmap *cmap, int len, int transp)
 /* updated FreeBSD fb_info */
 extern int fb_get_options(const char *name, char **option);
 
+void vt_dummy_switchto(struct apertures_struct *a, const char *name);
+
+
 #endif /* __LINUX_FB_H_ */

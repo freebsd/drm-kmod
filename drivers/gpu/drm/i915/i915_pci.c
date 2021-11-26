@@ -1074,6 +1074,7 @@ static void __exit i915_exit(void)
 {
 #ifdef __FreeBSD__
 	linux_pci_unregister_drm_driver(&i915_pci_driver);
+	vt_unfreeze_main_vd();
 #else
 	if (!i915_pci_driver.driver.owner)
 		return;
