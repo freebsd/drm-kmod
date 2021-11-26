@@ -184,6 +184,10 @@ void cancel_reset_debug_log(void);
 
 
 struct linux_fb_info;
+void vt_restore_fbdev_mode(void *arg, int pending);
+int vt_kms_postswitch(void *arg);
+
+
 #if 0
 static inline void vga_switcheroo_unregister_client(struct pci_dev *pdev) {}
 static inline int vga_switcheroo_register_client(struct pci_dev *pdev,

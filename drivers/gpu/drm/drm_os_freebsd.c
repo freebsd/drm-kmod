@@ -5,12 +5,14 @@ __FBSDID("$FreeBSD$");
 #include <drm/drm_file.h>
 #include <drm/drm_ioctl.h>
 #include <drm/drm_print.h>
+#include <drm/drm_fb_helper.h>
+#include <drm/drm_os_freebsd.h>
 
 #include <sys/types.h>
 #include <sys/bus.h>
-
 #include <dev/agp/agpreg.h>
 #include <dev/pci/pcireg.h>
+#include <sys/reboot.h>
 #include <linux/cdev.h>
 #undef cdev
 
@@ -75,6 +77,60 @@ sysctl_pci_id(SYSCTL_HANDLER_ARGS)
 
 	snprintf(buf, sizeof(buf), "%x:%x", vid, pid);
 	return (sysctl_handle_string(oidp, buf, sizeof(buf), req));
+}
+
+/* Framebuffer related code */
+
+/* Call restore out of vt(9) locks. */
+void
+vt_restore_fbdev_mode(void *arg, int pending)
+{
+	struct drm_fb_helper *fb_helper;
+	struct vt_kms_softc *sc;
+	struct mm_struct mm;
+
+	sc = (struct vt_kms_softc *)arg;
+	fb_helper = sc->fb_helper;
+	linux_set_current(curthread);
+	if(!fb_helper) {
+		DRM_DEBUG("fb helper is null!\n");
+		return;
+	}
+	drm_fb_helper_restore_fbdev_mode_unlocked(fb_helper);
+}
+
+int
+vt_kms_postswitch(void *arg)
+{
+	struct vt_kms_softc *sc;
+
+	sc = (struct vt_kms_softc *)arg;
+
+	if (!kdb_active && panicstr == NULL) {
+		taskqueue_enqueue(taskqueue_thread, &sc->fb_mode_task);
+
+		/* XXX the VT_ACTIVATE IOCTL must be synchronous */
+		if (curthread->td_proc->p_pid != 0 &&
+		    taskqueue_member(taskqueue_thread, curthread) == 0)
+			taskqueue_drain(taskqueue_thread, &sc->fb_mode_task);
+	} else {
+#ifdef DDB
+		db_trace_self_depth(10);
+		mdelay(1000);
+#endif
+		if (skip_ddb) {
+			spinlock_enter();
+			doadump(0);
+			EVENTHANDLER_INVOKE(shutdown_final, RB_NOSYNC);
+		}
+		linux_set_current(curthread);
+		if(!sc->fb_helper) {
+			DRM_DEBUG("fb helper is null!\n");
+			return -1;
+		}
+		drm_fb_helper_restore_fbdev_mode_unlocked(sc->fb_helper);
+	}
+	return (0);
 }
 
 int

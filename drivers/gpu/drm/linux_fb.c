@@ -93,8 +93,6 @@ static int __unregister_framebuffer(struct linux_fb_info *fb_info);
 extern int vt_fb_attach(struct fb_info *info);
 extern void vt_fb_detach(struct fb_info *info);
 
-#include <sys/reboot.h>
-
 int skip_ddb;
 
 void
@@ -112,58 +110,6 @@ fb_info_print(struct fb_info *t)
 	printf("cmap[0]=%x cmap[1]=%x cmap[2]=%x cmap[3]=%x\n",
 	       t->fb_cmap[0], t->fb_cmap[1], t->fb_cmap[2], t->fb_cmap[3]);
 	printf("end FB_INFO\n");
-}
-
-/* Call restore out of vt(9) locks. */
-static void
-vt_restore_fbdev_mode(void *arg, int pending)
-{
-	struct drm_fb_helper *fb_helper;
-	struct vt_kms_softc *sc;
-	struct mm_struct mm;
-
-	sc = (struct vt_kms_softc *)arg;
-	fb_helper = sc->fb_helper;
-	linux_set_current(curthread);
-	if(!fb_helper) {
-		DRM_DEBUG("fb helper is null!\n");
-		return;
-	}
-	drm_fb_helper_restore_fbdev_mode_unlocked(fb_helper);
-}
-
-static int
-vt_kms_postswitch(void *arg)
-{
-	struct vt_kms_softc *sc;
-
-	sc = (struct vt_kms_softc *)arg;
-
-	if (!kdb_active && panicstr == NULL) {
-		taskqueue_enqueue(taskqueue_thread, &sc->fb_mode_task);
-
-		/* XXX the VT_ACTIVATE IOCTL must be synchronous */
-		if (curthread->td_proc->p_pid != 0 &&
-		    taskqueue_member(taskqueue_thread, curthread) == 0)
-			taskqueue_drain(taskqueue_thread, &sc->fb_mode_task);
-	} else {
-#ifdef DDB
-		db_trace_self_depth(10);
-		mdelay(1000);
-#endif
-		if (skip_ddb) {
-			spinlock_enter();
-			doadump(0);
-			EVENTHANDLER_INVOKE(shutdown_final, RB_NOSYNC);
-		}
-		linux_set_current(curthread);
-		if(!sc->fb_helper) {
-			DRM_DEBUG("fb helper is null!\n");
-			return -1;
-		}
-		drm_fb_helper_restore_fbdev_mode_unlocked(sc->fb_helper);
-	}
-	return (0);
 }
 
 static d_open_t		fb_open;
