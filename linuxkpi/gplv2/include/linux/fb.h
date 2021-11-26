@@ -70,13 +70,6 @@ struct fb_fix_screeninfo {
 	__u16 reserved[2];		/* Reserved for future compatibility */
 };
 
-struct fb_bitfield {
-	__u32 offset;			/* beginning of bitfield	*/
-	__u32 length;			/* length of bitfield		*/
-	__u32 msb_right;		/* != 0 : Most significant bit is */ 
-					/* right */ 
-};
-
 #define FB_ACTIVATE_NOW		0	/* set values immediately (or vbl)*/
 
 struct fb_var_screeninfo {
@@ -90,10 +83,6 @@ struct fb_var_screeninfo {
 	__u32 bits_per_pixel;		/* guess what			*/
 	__u32 grayscale;		/* 0 = color, 1 = grayscale,	*/
 					/* >1 = FOURCC			*/
-	struct fb_bitfield red;		/* bitfield in fb mem if true color, */
-	struct fb_bitfield green;	/* else only length is significant */
-	struct fb_bitfield blue;
-	struct fb_bitfield transp;	/* transparency			*/	
 
 	__u32 nonstd;			/* != 0 Non standard pixel format */
 

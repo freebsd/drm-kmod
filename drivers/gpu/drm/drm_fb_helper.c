@@ -882,6 +882,7 @@ void drm_fb_helper_set_suspend_unlocked(struct drm_fb_helper *fb_helper,
 }
 EXPORT_SYMBOL(drm_fb_helper_set_suspend_unlocked);
 
+#ifdef __linux__
 static int setcmap_pseudo_palette(struct fb_cmap *cmap, struct fb_info *info)
 {
 	u32 *palette = (u32 *)info->pseudo_palette;
@@ -1112,6 +1113,7 @@ unlock:
 	return ret;
 }
 EXPORT_SYMBOL(drm_fb_helper_setcmap);
+#endif	/* __linux__ */
 
 /**
  * drm_fb_helper_ioctl - legacy ioctl implementation
@@ -1180,6 +1182,7 @@ unlock:
 }
 EXPORT_SYMBOL(drm_fb_helper_ioctl);
 
+#ifdef __linux__
 static bool drm_fb_pixel_format_equal(const struct fb_var_screeninfo *var_1,
 				      const struct fb_var_screeninfo *var_2)
 {
@@ -1327,6 +1330,7 @@ int drm_fb_helper_check_var(struct fb_var_screeninfo *var,
 	return 0;
 }
 EXPORT_SYMBOL(drm_fb_helper_check_var);
+#endif	/* __linux__ */
 
 /**
  * drm_fb_helper_set_par - implementation for &fb_ops.fb_set_par
@@ -1664,7 +1668,9 @@ static void drm_fb_helper_fill_var(struct fb_info *info,
 	info->var.yoffset = 0;
 	info->var.activate = FB_ACTIVATE_NOW;
 
+#ifdef __linux__
 	drm_fb_helper_fill_pixel_fmt(&info->var, fb->format->depth);
+#endif
 
 	info->var.xres = fb_width;
 	info->var.yres = fb_height;
