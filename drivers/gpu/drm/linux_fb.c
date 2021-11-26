@@ -4,6 +4,8 @@ __FBSDID("$FreeBSD$");
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_print.h>
 
+#undef fb_info
+
 #include <sys/kdb.h>
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -11,8 +13,7 @@ __FBSDID("$FreeBSD$");
 #include <vm/vm_page.h>
 #include <vm/vm_phys.h>
 #include <dev/vt/vt.h>
-
-#undef fb_info
+#include <dev/vt/hw/fb/vt_fb.h>
 
 extern struct vt_device *main_vd;
 
@@ -81,7 +82,6 @@ vt_dummy_switchto(struct apertures_struct *a, const char *name)
 }
 
 #define FB_MAJOR		29   /* /dev/fb* framebuffers */
-#define FBPIXMAPSIZE	(1024 * 8)
 
 static struct sx linux_fb_mtx;
 SX_SYSINIT(linux_fb_mtx, &linux_fb_mtx, "linux fb");
@@ -89,11 +89,6 @@ SX_SYSINIT(linux_fb_mtx, &linux_fb_mtx, "linux fb");
 static struct class *fb_class;
 
 static int __unregister_framebuffer(struct linux_fb_info *fb_info);
-
-extern int vt_fb_attach(struct fb_info *info);
-extern void vt_fb_detach(struct fb_info *info);
-
-int skip_ddb;
 
 void
 fb_info_print(struct fb_info *t)
@@ -130,8 +125,6 @@ static struct cdevsw fb_cdevsw = {
 	.d_mmap =	fb_mmap,
 	.d_name =	"fb",
 };
-
-static int framebuffer_dev_unit = 0;
 
 static int
 fb_open(struct cdev *dev, int oflags, int devtype, struct thread *td)
