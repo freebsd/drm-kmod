@@ -27,15 +27,9 @@
 /*
  * Authors: Thomas Hellstrom <thellstrom-at-vmware-dot-com>
  */
-/* $FreeBSD$ */
-
 #ifndef _TTM_BO_DRIVER_H_
 #define _TTM_BO_DRIVER_H_
 
-
-#ifndef __linux__
-#include <drm/drmP.h>
-#endif
 #include <drm/drm_mm.h>
 #include <drm/drm_vma_manager.h>
 #include <linux/workqueue.h>

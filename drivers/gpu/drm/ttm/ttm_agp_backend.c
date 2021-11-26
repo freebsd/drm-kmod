@@ -42,6 +42,10 @@
 #include <linux/io.h>
 #include <asm/agp.h>
 
+#ifdef __FreeBSD__
+#include <dev/agp/agpvar.h>
+#endif
+
 struct ttm_agp_backend {
 	struct ttm_tt ttm;
 #ifdef __linux__
