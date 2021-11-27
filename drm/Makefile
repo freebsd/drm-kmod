@@ -49,6 +49,7 @@ SRCS=	drm_atomic.c \
 	drm_mode_object.c \
 	drm_modeset_lock.c \
 	drm_modeset_helper.c \
+	drm_nomodeset.c \
 	drm_os_freebsd.c \
 	drm_panel.c \
 	drm_pci.c \
