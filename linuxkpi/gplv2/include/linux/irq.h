@@ -312,7 +312,7 @@ static inline irqreturn_t
 handle_irq_event_percpu(struct irq_desc *desc)
 {
 	irqreturn_t retval = IRQ_NONE;
-	unsigned int flags = 0, irq = desc->irq_data.irq;
+	unsigned int irq = desc->irq_data.irq;
 	struct irqaction *action;
 
 	for_each_action_of_desc(desc, action) {
@@ -324,7 +324,6 @@ handle_irq_event_percpu(struct irq_desc *desc)
 			MPASS(action->thread_fn != NULL);
 			linux_irq_wake_thread(desc, action);
 		case IRQ_HANDLED:
-			flags |= action->flags;
 			break;
 		default:
 			break;
