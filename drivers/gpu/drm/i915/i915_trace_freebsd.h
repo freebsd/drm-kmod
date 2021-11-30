@@ -1,7 +1,9 @@
 #ifndef _I915_TRACE_FREEBSD_H_
 #define _I915_TRACE_FREEBSD_H_
 
-#include <drm/drmP.h>
+#include <sys/param.h>
+#include <sys/ktr.h>
+
 #include "i915_drv.h"
 #include "intel_display_types.h"
 #include "gt/intel_engine.h"

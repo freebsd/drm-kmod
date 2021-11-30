@@ -22,7 +22,13 @@
 #include "i915_vma.h"
 
 #ifdef __FreeBSD__
+#include <sys/proc.h>
 #include <sys/resourcevar.h>	/* for lim_cur_proc */
+#include <vm/vm.h>
+#include <vm/vm_map.h>
+#include <vm/vm_object.h>
+#include <vm/vm_pager.h>
+#include <vm/vm_param.h>
 #endif
 
 #ifdef __linux__ /* Mute unused function warning. */
