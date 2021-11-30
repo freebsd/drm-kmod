@@ -21,6 +21,12 @@ trace_intel_pipe_disable(void *crtc)
 }
 
 static inline void
+trace_intel_pipe_crc(void *crtc, const u32 *crcs)
+{
+	CTR2(KTR_DRM, "pipe_disable crtc %p %p", crtc, crcs);
+}
+
+static inline void
 trace_i915_flip_complete(int plane, struct drm_i915_gem_object *pending_flip_obj)
 {
 	CTR2(KTR_DRM, "i915_flip_complete %d %p", plane, pending_flip_obj);
