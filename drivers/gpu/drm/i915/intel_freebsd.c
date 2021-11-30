@@ -3,7 +3,6 @@ __FBSDID("$FreeBSD$");
 
 #include <linux/device.h>
 #include <linux/acpi.h>
-#include <drm/drmP.h>
 #include <drm/i915_drm.h>
 #include "i915_trace.h"
 #include <linux/mm.h>

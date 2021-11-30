@@ -1,14 +1,17 @@
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
-#include <drm/drmP.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_crtc_helper.h>
+#include <drm/drm_print.h>
 
 #include <sys/kdb.h>
 #include <sys/param.h>
 #include <sys/systm.h>
+#include <vm/vm.h>
+#include <vm/vm_page.h>
+#include <vm/vm_phys.h>
 #include <dev/vt/vt.h>
 
 extern struct vt_device *main_vd;

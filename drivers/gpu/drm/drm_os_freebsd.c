@@ -2,7 +2,12 @@
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
-#include <drm/drmP.h>
+#include <drm/drm_file.h>
+#include <drm/drm_ioctl.h>
+#include <drm/drm_print.h>
+
+#include <sys/types.h>
+#include <sys/bus.h>
 
 #include <dev/agp/agpreg.h>
 #include <dev/pci/pcireg.h>

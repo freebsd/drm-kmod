@@ -29,8 +29,12 @@
 #ifndef _DRM_TRACE_FREEBSD_H_
 #define _DRM_TRACE_FREEBSD_H_
 
-#include <drm/drmP.h>
+#include <sys/param.h>
+#include <sys/ktr.h>
 
+#include <linux/ktime.h>
+
+struct drm_file;
 
 /* TRACE_EVENT(drm_vblank_event, */
 /* TP_PROTO(int crtc, unsigned int seq, ktime_t time, bool high_prec), */

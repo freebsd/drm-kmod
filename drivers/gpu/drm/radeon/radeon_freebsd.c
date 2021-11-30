@@ -1,11 +1,8 @@
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
-#include <linux/device.h>
-#include <linux/acpi.h>
-#include <drm/drmP.h>
-
-#include <drm/drm_crtc_helper.h>
+#include <sys/param.h>
+#include <sys/module.h>
 
 MODULE_DEPEND(radeonkms, drmn, 2, 2, 2);
 MODULE_DEPEND(radeonkms, ttm, 1, 1, 1);

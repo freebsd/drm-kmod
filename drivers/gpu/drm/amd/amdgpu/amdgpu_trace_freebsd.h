@@ -1,7 +1,9 @@
 #if !defined(_AMDGPU_TRACE_FREEBSD_H_) || defined(TRACE_HEADER_MULTI_READ)
 #define _AMDGPU_TRACE_FREEBSD_H_
 
-#include <drm/drmP.h>
+#include <sys/param.h>
+#include <sys/ktr.h>
+
 #include "amdgpu.h"
 
 static inline void
