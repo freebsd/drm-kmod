@@ -168,6 +168,12 @@ void drm_gem_unpin(struct drm_gem_object *obj);
 void *drm_gem_vmap(struct drm_gem_object *obj);
 void drm_gem_vunmap(struct drm_gem_object *obj, void *vaddr);
 
+#ifdef __FreeBSD__
+/* Need to find a proper way to do that */
+int drm_sysctl_init(struct drm_device *dev);
+int drm_sysctl_cleanup(struct drm_device *dev);
+#endif
+
 /* drm_debugfs.c drm_debugfs_crc.c */
 #if defined(CONFIG_DEBUG_FS)
 int drm_debugfs_init(struct drm_minor *minor, int minor_id,
@@ -179,9 +185,6 @@ void drm_debugfs_crtc_add(struct drm_crtc *crtc);
 void drm_debugfs_crtc_remove(struct drm_crtc *crtc);
 void drm_debugfs_crtc_crc_add(struct drm_crtc *crtc);
 #else
-/* Need to find a proper way to do that */
-int drm_sysctl_init(struct drm_device *dev);
-int drm_sysctl_cleanup(struct drm_device *dev);
 static inline int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 				   struct dentry *root)
 {
