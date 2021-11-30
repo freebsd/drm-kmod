@@ -113,6 +113,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_cs.c \
 	amdgpu_csa.c \
 	amdgpu_ctx.c \
+	amdgpu_debugfs.c \
 	amdgpu_device.c \
 	amdgpu_discovery.c \
 	amdgpu_display.c \
@@ -494,7 +495,6 @@ SRCS+=	dmub_dcn20.c \
 
 # Debug files, not handled for now
 SRCS_DEBUG=	amdgpu_dm_crc.c \
-		amdgpu_debugfs.c \
 		amdgpu_dm_debugfs.c
 
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"

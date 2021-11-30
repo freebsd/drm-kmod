@@ -3111,21 +3111,17 @@ fence_driver_init:
 	if (r)
 		DRM_ERROR("registering gem debugfs failed (%d).\n", r);
 
-#if defined(CONFIG_DEBUG_FS)
 	r = amdgpu_debugfs_regs_init(adev);
 	if (r)
 		DRM_ERROR("registering register debugfs failed (%d).\n", r);
-#endif
 
 	r = amdgpu_debugfs_firmware_init(adev);
 	if (r)
 		DRM_ERROR("registering firmware debugfs failed (%d).\n", r);
 
-#if defined(CONFIG_DEBUG_FS)
 	r = amdgpu_debugfs_init(adev);
 	if (r)
 		DRM_ERROR("Creating debugfs files failed (%d).\n", r);
-#endif
 
 	if ((amdgpu_testing & 1)) {
 		if (adev->accel_working)
@@ -3242,18 +3238,13 @@ void amdgpu_device_fini(struct amdgpu_device *adev)
 	adev->rmmio = NULL;
 	amdgpu_device_doorbell_fini(adev);
 
-#if defined(CONFIG_DEBUG_FS)
 	amdgpu_debugfs_regs_cleanup(adev);
-#endif
 	device_remove_file(adev->dev, &dev_attr_pcie_replay_count);
 	if (adev->ucode_sysfs_en)
 		amdgpu_ucode_sysfs_fini(adev);
 	if (IS_ENABLED(CONFIG_PERF_EVENTS))
 		amdgpu_pmu_fini(adev);
-#if defined(CONFIG_DEBUG_FS)
 	amdgpu_debugfs_preempt_cleanup(adev);
-#endif
-
 	if (amdgpu_discovery && adev->asic_type >= CHIP_NAVI10)
 		amdgpu_discovery_fini(adev);
 }
