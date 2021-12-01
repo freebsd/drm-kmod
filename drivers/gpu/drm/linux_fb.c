@@ -119,23 +119,6 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 	return (0);
 }
 
-void
-drm_legacy_fb_init(struct linux_fb_info *info)
-{
-	struct fb_info *t;
-
-	t = &info->fbio;
-	t->fb_type = FBTYPE_PCIMISC;
-	t->fb_height = info->var.yres;
-	t->fb_width = info->var.xres;
-	t->fb_depth = info->var.bits_per_pixel;
-	t->fb_cmsize = info->cmap.len;
-	t->fb_stride = info->fix.line_length;
-	t->fb_pbase = info->fix.smem_start;
-	t->fb_size = info->fix.smem_len;
-	t->fb_vbase = (uintptr_t)info->screen_base;
-}
-
 static int
 __register_framebuffer(struct linux_fb_info *fb_info)
 {
@@ -154,7 +137,15 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 				     VM_MEMATTR_UNCACHEABLE);
 #endif
 
-	drm_legacy_fb_init(fb_info);
+	fb_info->fbio.fb_type = FBTYPE_PCIMISC;
+	fb_info->fbio.fb_height = fb_info->var.yres;
+	fb_info->fbio.fb_width = fb_info->var.xres;
+	fb_info->fbio.fb_depth = fb_info->var.bits_per_pixel;
+	fb_info->fbio.fb_cmsize = fb_info->cmap.len;
+	fb_info->fbio.fb_stride = fb_info->fix.line_length;
+	fb_info->fbio.fb_pbase = fb_info->fix.smem_start;
+	fb_info->fbio.fb_size = fb_info->fix.smem_len;
+	fb_info->fbio.fb_vbase = (uintptr_t)fb_info->screen_base;
 
 	fb_info->fbio.fb_fbd_dev = device_add_child(fb_info->fb_bsddev, "fbd",
 				device_get_unit(fb_info->fb_bsddev));
