@@ -50,14 +50,6 @@ static void engine_retire(struct work_struct *work)
 		container_of(work, typeof(*engine), retire_work);
 	struct intel_timeline *tl = xchg(&engine->retire, NULL);
 
-#ifdef __FreeBSD__
-	/*
-	 * We have to wait for RCU callbacks to fire.  Otherwise
-	 * retire_request() can clobber RCU's callback_head link due to
-	 * concurrent execution with linux_rcu_cleaner_func.
-	 */
-	rcu_barrier();
-#endif
 	do {
 		struct intel_timeline *next = xchg(&tl->retire, NULL);
 
