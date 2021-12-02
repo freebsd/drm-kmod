@@ -3,6 +3,7 @@
 
 #include_next <linux/atomic.h>
 
+#ifndef try_cmpxchg
 #define try_cmpxchg(p, op, n)						\
 ({									\
 	__typeof(p) __op = (__typeof((p)))(op);				\
@@ -12,7 +13,9 @@
 		*__op = __p;						\
 	(__p == __o);							\
 })
+#endif
 
+#ifndef atomic_try_cmpxchg
 #define __atomic_try_cmpxchg(type, _p, _po, _n)				\
 ({									\
 	typeof(_po) __po = (_po);					\
@@ -24,6 +27,7 @@
 })
 
 #define atomic_try_cmpxchg(_p, _po, _n)	__atomic_try_cmpxchg(, _p, _po, _n)
+#endif
 
 #ifndef mb
 #define	mb()	__asm __volatile("mfence;" : : : "memory")
@@ -45,7 +49,9 @@
 #define	smp_rmb()	rmb()
 #endif
 
+#ifndef	smp_store_mb
 #define	__smp_store_mb(var, value) do { (void)xchg(&(var), value); } while (0)
 #define	smp_store_mb __smp_store_mb
+#endif
 
 #endif	/* _BSD_LKPI_LINUX_ATOMIC_H_ */
