@@ -32,23 +32,12 @@ struct fb_var_screeninfo {
 	int	bits_per_pixel;
 };
 
-enum {
-	FB_BLANK_UNBLANK       = 0,
-	FB_BLANK_NORMAL,
-	FB_BLANK_VSYNC_SUSPEND,
-	FB_BLANK_HSYNC_SUSPEND,
-	FB_BLANK_POWERDOWN,
-};
-
 struct fb_ops {
 	/* open/release and usage marking */
 	struct module *owner;
 
 	/* set the video mode according to info->var */
 	int (*fb_set_par)(struct linux_fb_info *info);
-
-	/* blank display */
-	int (*fb_blank)(int blank, struct linux_fb_info *info);
 
 	/* teardown any resources to do with this framebuffer */
 	void (*fb_destroy)(struct linux_fb_info *info);

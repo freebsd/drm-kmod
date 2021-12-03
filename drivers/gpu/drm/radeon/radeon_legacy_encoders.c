@@ -444,7 +444,9 @@ void radeon_legacy_backlight_init(struct radeon_encoder *radeon_encoder,
 	}
 
 	bd->props.brightness = radeon_legacy_backlight_get_brightness(bd);
+#ifdef __linux__
 	bd->props.power = FB_BLANK_UNBLANK;
+#endif
 	backlight_update_status(bd);
 
 	DRM_INFO("radeon legacy LVDS backlight initialized\n");

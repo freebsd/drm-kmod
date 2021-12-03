@@ -213,7 +213,9 @@ void amdgpu_atombios_encoder_init_backlight(struct amdgpu_encoder *amdgpu_encode
 	dig->bl_dev = bd;
 
 	bd->props.brightness = amdgpu_atombios_encoder_get_backlight_brightness(bd);
+#ifdef __linux__
 	bd->props.power = FB_BLANK_UNBLANK;
+#endif
 	backlight_update_status(bd);
 
 	DRM_INFO("amdgpu atom DIG backlight initialized\n");

@@ -71,6 +71,7 @@ static int intel_fbdev_set_par(struct fb_info *info)
 	return ret;
 }
 
+#ifdef __linux__
 static int intel_fbdev_blank(int blank, struct fb_info *info)
 {
 	struct drm_fb_helper *fb_helper = info->par;
@@ -85,7 +86,6 @@ static int intel_fbdev_blank(int blank, struct fb_info *info)
 	return ret;
 }
 
-#ifdef __linux__
 static int intel_fbdev_pan_display(struct fb_var_screeninfo *var,
 				   struct fb_info *info)
 {
@@ -111,8 +111,8 @@ static const struct fb_ops intelfb_ops = {
 	.fb_copyarea = drm_fb_helper_cfb_copyarea,
 	.fb_imageblit = drm_fb_helper_cfb_imageblit,
 	.fb_pan_display = intel_fbdev_pan_display,
-#endif
 	.fb_blank = intel_fbdev_blank,
+#endif
 };
 
 static int intelfb_alloc(struct drm_fb_helper *helper,

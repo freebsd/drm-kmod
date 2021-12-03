@@ -863,8 +863,10 @@ void intel_panel_disable_backlight(const struct drm_connector_state *old_conn_st
 
 	mutex_lock(&dev_priv->backlight_lock);
 
+#ifdef __linux__
 	if (panel->backlight.device)
 		panel->backlight.device->props.power = FB_BLANK_POWERDOWN;
+#endif
 	panel->backlight.enabled = false;
 	panel->backlight.disable(old_conn_state);
 
@@ -1179,8 +1181,10 @@ static void __intel_panel_enable_backlight(const struct intel_crtc_state *crtc_s
 
 	panel->backlight.enable(crtc_state, conn_state);
 	panel->backlight.enabled = true;
+#ifdef __linux__
 	if (panel->backlight.device)
 		panel->backlight.device->props.power = FB_BLANK_UNBLANK;
+#endif
 }
 
 void intel_panel_enable_backlight(const struct intel_crtc_state *crtc_state,
@@ -1268,12 +1272,18 @@ static int intel_backlight_device_update_status(struct backlight_device *bd)
 	 */
 	if (panel->backlight.enabled) {
 		if (panel->backlight.power) {
+#ifdef __linux__
 			bool enable = bd->props.power == FB_BLANK_UNBLANK &&
 				bd->props.brightness != 0;
+#elif defined(__FreeBSD__)
+			bool enable = bd->props.brightness != 0;
+#endif
 			panel->backlight.power(connector, enable);
 		}
 	} else {
+#ifdef __linux__
 		bd->props.power = FB_BLANK_POWERDOWN;
+#endif
 	}
 
 	drm_modeset_unlock(&dev->mode_config.connection_mutex);
@@ -1333,10 +1343,12 @@ int intel_backlight_device_register(struct intel_connector *connector)
 					    panel->backlight.level,
 					    props.max_brightness);
 
+#ifdef __linux__
 	if (panel->backlight.enabled)
 		props.power = FB_BLANK_UNBLANK;
 	else
 		props.power = FB_BLANK_POWERDOWN;
+#endif
 
 	/*
 	 * Note: using the same name independent of the connector prevents

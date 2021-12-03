@@ -343,6 +343,7 @@ static void drm_fb_helper_dpms(struct fb_info *info, int dpms_mode)
 	mutex_unlock(&fb_helper->lock);
 }
 
+#ifdef __linux__
 /**
  * drm_fb_helper_blank - implementation for &fb_ops.fb_blank
  * @blank: desired blanking state
@@ -378,6 +379,7 @@ int drm_fb_helper_blank(int blank, struct fb_info *info)
 	return 0;
 }
 EXPORT_SYMBOL(drm_fb_helper_blank);
+#endif
 
 static void drm_fb_helper_resume_worker(struct work_struct *work)
 {
