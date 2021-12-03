@@ -18,21 +18,18 @@ struct linux_fb_info;
 struct videomode;
 struct vm_area_struct;
 
-#define FB_TYPE_PACKED_PIXELS		0	/* Packed Pixels	*/
+#define FB_TYPE_PACKED_PIXELS		0
 
-#define FB_VISUAL_MONO01		0	/* Monochr. 1=Black 0=White */
-#define FB_VISUAL_MONO10		1	/* Monochr. 1=White 0=Black */
-#define FB_VISUAL_TRUECOLOR		2	/* True color	*/
-#define FB_VISUAL_PSEUDOCOLOR		3	/* Pseudo color (like atari) */
-#define FB_VISUAL_DIRECTCOLOR		4	/* Direct color */
-#define FB_VISUAL_STATIC_PSEUDOCOLOR	5	/* Pseudo color readonly */
-#define FB_VISUAL_FOURCC		6	/* Visual identified by a V4L2 FOURCC */
+enum {
+	FB_VISUAL_TRUECOLOR = 0,
+	FB_VISUAL_PSEUDOCOLOR,
+};
 
-#define FB_ACCEL_NONE		0	/* no hardware accelerator	*/
+#define FB_ACCEL_NONE		0
 
-#define FB_ACTIVATE_NOW		0	/* set values immediately (or vbl)*/
+#define FB_ACTIVATE_NOW		0
 
-#define FB_ACCELF_TEXT		1	/* (OBSOLETE) see fb_info.flags and vc_mode */
+#define FB_ACCELF_TEXT		1
 
 extern const char *fb_mode_option;
 
@@ -69,8 +66,6 @@ struct fb_fix_screeninfo {
 	__u16 capabilities;		/* see FB_CAP_*			*/
 	__u16 reserved[2];		/* Reserved for future compatibility */
 };
-
-#define FB_ACTIVATE_NOW		0	/* set values immediately (or vbl)*/
 
 struct fb_var_screeninfo {
 	__u32 xres;			/* visible resolution		*/
