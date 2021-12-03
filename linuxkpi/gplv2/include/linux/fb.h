@@ -31,17 +31,6 @@ enum {
 
 #define FB_ACCELF_TEXT		1
 
-struct fb_chroma {
-	__u32 redx;	/* in fraction of 1024 */
-	__u32 greenx;
-	__u32 bluex;
-	__u32 whitex;
-	__u32 redy;
-	__u32 greeny;
-	__u32 bluey;
-	__u32 whitey;
-};
-
 #define KHZ2PICOS(a) (1000000000UL/(a))
 
 struct fb_fix_screeninfo {
