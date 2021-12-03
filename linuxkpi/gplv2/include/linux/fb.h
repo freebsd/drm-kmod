@@ -85,23 +85,16 @@ static inline struct apertures_struct *alloc_apertures(unsigned int max_num) {
 	return a;
 }
 
-#define	cfb_fillrect(x, y)	0
-#define	cfb_copyarea(x, y)	0
-#define	cfb_imageblit(x, y)	0
-
-extern int linux_register_framebuffer(struct linux_fb_info *fb_info);
-extern int linux_unregister_framebuffer(struct linux_fb_info *fb_info);
-extern int remove_conflicting_framebuffers(struct apertures_struct *a,
-				const char *name, bool primary);
-extern int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name);
+int linux_register_framebuffer(struct linux_fb_info *fb_info);
+int linux_unregister_framebuffer(struct linux_fb_info *fb_info);
+int remove_conflicting_framebuffers(struct apertures_struct *a,
+	const char *name, bool primary);
+int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name);
 struct linux_fb_info *framebuffer_alloc(size_t size, struct device *dev);
-extern void framebuffer_release(struct linux_fb_info *info);
+void framebuffer_release(struct linux_fb_info *info);
 #define	fb_set_suspend(x, y)	0
 
 /* updated FreeBSD fb_info */
-extern int fb_get_options(const char *name, char **option);
-
-void vt_dummy_switchto(struct apertures_struct *a, const char *name);
-
+int fb_get_options(const char *name, char **option);
 
 #endif /* __LINUX_FB_H_ */
