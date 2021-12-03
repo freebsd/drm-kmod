@@ -1275,10 +1275,12 @@ int drm_fb_helper_check_var(struct fb_var_screeninfo *var,
 	if (in_dbg_master())
 		return -EINVAL;
 
+#ifdef __linux__
 	if (var->pixclock != 0) {
 		drm_dbg_kms(dev, "fbdev emulation doesn't support changing the pixel clock, value of pixclock is ignored\n");
 		var->pixclock = 0;
 	}
+#endif
 
 	if ((drm_format_info_block_width(fb->format, 0) > 1) ||
 	    (drm_format_info_block_height(fb->format, 0) > 1))
@@ -1348,10 +1350,12 @@ int drm_fb_helper_set_par(struct fb_info *info)
 	if (oops_in_progress)
 		return -EBUSY;
 
+#ifdef __linux__
 	if (var->pixclock != 0) {
 		drm_err(fb_helper->dev, "PIXEL CLOCK SET\n");
 		return -EINVAL;
 	}
+#endif
 
 	drm_fb_helper_restore_fbdev_mode_unlocked(fb_helper);
 
@@ -1359,6 +1363,7 @@ int drm_fb_helper_set_par(struct fb_info *info)
 }
 EXPORT_SYMBOL(drm_fb_helper_set_par);
 
+#ifdef __linux__
 static void pan_set(struct drm_fb_helper *fb_helper, int x, int y)
 {
 	struct drm_mode_set *mode_set;
@@ -1370,10 +1375,12 @@ static void pan_set(struct drm_fb_helper *fb_helper, int x, int y)
 	}
 	mutex_unlock(&fb_helper->client.modeset_mutex);
 }
+#endif
 
 static int pan_display_atomic(struct fb_var_screeninfo *var,
 			      struct fb_info *info)
 {
+#ifdef __linux__
 	struct drm_fb_helper *fb_helper = info->par;
 	int ret;
 
@@ -1387,11 +1394,15 @@ static int pan_display_atomic(struct fb_var_screeninfo *var,
 		pan_set(fb_helper, info->var.xoffset, info->var.yoffset);
 
 	return ret;
+#elif defined(__FreeBSD__)
+	return 0;
+#endif
 }
 
 static int pan_display_legacy(struct fb_var_screeninfo *var,
 			      struct fb_info *info)
 {
+#ifdef __linux__
 	struct drm_fb_helper *fb_helper = info->par;
 	struct drm_client_dev *client = &fb_helper->client;
 	struct drm_mode_set *modeset;
@@ -1415,6 +1426,9 @@ static int pan_display_legacy(struct fb_var_screeninfo *var,
 	mutex_unlock(&client->modeset_mutex);
 
 	return ret;
+#elif defined(__FreeBSD__)
+	return 0;
+#endif
 }
 
 /**
@@ -1662,15 +1676,17 @@ static void drm_fb_helper_fill_var(struct fb_info *info,
 	WARN_ON((drm_format_info_block_width(fb->format, 0) > 1) ||
 		(drm_format_info_block_height(fb->format, 0) > 1));
 	info->pseudo_palette = fb_helper->pseudo_palette;
+#ifdef __linux__
 	info->var.xres_virtual = fb->width;
 	info->var.yres_virtual = fb->height;
+#endif
 	info->var.bits_per_pixel = fb->format->cpp[0] * 8;
+#ifdef __linux__
 	info->var.accel_flags = FB_ACCELF_TEXT;
 	info->var.xoffset = 0;
 	info->var.yoffset = 0;
 	info->var.activate = FB_ACTIVATE_NOW;
 
-#ifdef __linux__
 	drm_fb_helper_fill_pixel_fmt(&info->var, fb->format->depth);
 #endif
 
@@ -1753,8 +1769,10 @@ static void drm_setup_crtcs_fb(struct drm_fb_helper *fb_helper)
 
 		/* use first connected connector for the physical dimensions */
 		if (connector->status == connector_status_connected) {
+#ifdef __linux__
 			info->var.width = connector->display_info.width_mm;
 			info->var.height = connector->display_info.height_mm;
+#endif
 			break;
 		}
 	}
@@ -1815,8 +1833,8 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
 	fb_helper->deferred_setup = false;
 
 	info = fb_helper->fbdev;
-	info->var.pixclock = 0;
 #ifdef __linux__
+	info->var.pixclock = 0;
 	/* Shamelessly allow physical address leaking to userspace */
 #if IS_ENABLED(CONFIG_DRM_FBDEV_LEAK_PHYS_SMEM)
 	if (!drm_leak_fbdev_smem)
