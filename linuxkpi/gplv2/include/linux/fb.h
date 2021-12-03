@@ -31,8 +31,6 @@ enum {
 
 #define FB_ACCELF_TEXT		1
 
-extern const char *fb_mode_option;
-
 struct fb_chroma {
 	__u32 redx;	/* in fraction of 1024 */
 	__u32 greenx;

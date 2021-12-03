@@ -22,7 +22,6 @@ __FBSDID("$FreeBSD$");
 #undef cdev
 
 devclass_t drm_devclass;
-const char *fb_mode_option = NULL;
 
 MALLOC_DEFINE(DRM_MEM_DMA, "drm_dma", "DRM DMA Data Structures");
 MALLOC_DEFINE(DRM_MEM_DRIVER, "drm_driver", "DRM DRIVER Data Structures");
