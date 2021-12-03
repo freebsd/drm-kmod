@@ -117,28 +117,12 @@ struct fb_cmap {
 	__u16 *transp;			/* transparency, can be NULL */
 };
 
-
-/* VESA Blanking Levels */
-#define VESA_NO_BLANKING        0
-#define VESA_VSYNC_SUSPEND      1
-#define VESA_HSYNC_SUSPEND      2
-#define VESA_POWERDOWN          3
-
 enum {
-	/* screen: unblanked, hsync: on,  vsync: on */
-	FB_BLANK_UNBLANK       = VESA_NO_BLANKING,
-
-	/* screen: blanked,   hsync: on,  vsync: on */
-	FB_BLANK_NORMAL        = VESA_NO_BLANKING + 1,
-
-	/* screen: blanked,   hsync: on,  vsync: off */
-	FB_BLANK_VSYNC_SUSPEND = VESA_VSYNC_SUSPEND + 1,
-
-	/* screen: blanked,   hsync: off, vsync: on */
-	FB_BLANK_HSYNC_SUSPEND = VESA_HSYNC_SUSPEND + 1,
-
-	/* screen: blanked,   hsync: off, vsync: off */
-	FB_BLANK_POWERDOWN     = VESA_POWERDOWN + 1
+	FB_BLANK_UNBLANK       = 0,
+	FB_BLANK_NORMAL,
+	FB_BLANK_VSYNC_SUSPEND,
+	FB_BLANK_HSYNC_SUSPEND,
+	FB_BLANK_POWERDOWN,
 };
 
 struct fb_ops {
