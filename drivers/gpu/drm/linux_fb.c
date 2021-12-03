@@ -25,14 +25,10 @@ fb_info_print(struct fb_info *t)
 	printf("start FB_INFO:\n");
 	printf("type=%d height=%d width=%d depth=%d\n",
 	       t->fb_type, t->fb_height, t->fb_width, t->fb_depth);
-	printf("cmsize=%d size=%d\n",
-	       t->fb_cmsize, t->fb_size);
 	printf("pbase=0x%lx vbase=0x%lx\n",
 	       t->fb_pbase, t->fb_vbase);
 	printf("name=%s flags=0x%x stride=%d bpp=%d\n",
 	       t->fb_name, t->fb_flags, t->fb_stride, t->fb_bpp);
-	printf("cmap[0]=%x cmap[1]=%x cmap[2]=%x cmap[3]=%x\n",
-	       t->fb_cmap[0], t->fb_cmap[1], t->fb_cmap[2], t->fb_cmap[3]);
 	printf("end FB_INFO\n");
 }
 
@@ -141,7 +137,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	fb_info->fbio.fb_height = fb_info->var.yres;
 	fb_info->fbio.fb_width = fb_info->var.xres;
 	fb_info->fbio.fb_depth = fb_info->var.bits_per_pixel;
-	fb_info->fbio.fb_cmsize = fb_info->cmap.len;
+	fb_info->fbio.fb_cmsize = 0;
 	fb_info->fbio.fb_stride = fb_info->fix.line_length;
 	fb_info->fbio.fb_pbase = fb_info->fix.smem_start;
 	fb_info->fbio.fb_size = fb_info->fix.smem_len;

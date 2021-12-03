@@ -269,7 +269,9 @@ void drm_fb_helper_set_suspend(struct drm_fb_helper *fb_helper, bool suspend);
 void drm_fb_helper_set_suspend_unlocked(struct drm_fb_helper *fb_helper,
 					bool suspend);
 
+#ifdef __linux__
 int drm_fb_helper_setcmap(struct fb_cmap *cmap, struct fb_info *info);
+#endif
 
 int drm_fb_helper_ioctl(struct fb_info *info, unsigned int cmd,
 			unsigned long arg);

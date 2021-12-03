@@ -18,10 +18,6 @@ struct linux_fb_info;
 struct videomode;
 struct vm_area_struct;
 
-#define FB_ACTIVATE_NOW		0
-
-#define FB_ACCELF_TEXT		1
-
 #define KHZ2PICOS(a) (1000000000UL/(a))
 
 struct fb_fix_screeninfo {
@@ -34,15 +30,6 @@ struct fb_var_screeninfo {
 	int	xres;
 	int	yres;
 	int	bits_per_pixel;
-};
-
-struct fb_cmap {
-	__u32 start;			/* First entry	*/
-	__u32 len;			/* Number of entries */
-	__u16 *red;			/* Red values	*/
-	__u16 *green;
-	__u16 *blue;
-	__u16 *transp;			/* transparency, can be NULL */
 };
 
 enum {
@@ -70,7 +57,6 @@ struct fb_ops {
 struct linux_fb_info {
 	struct fb_var_screeninfo var;	/* Current var */
 	struct fb_fix_screeninfo fix;	/* Current fix */
-	struct fb_cmap cmap;		/* Current cmap */
 
 	const struct fb_ops *fbops;
 	struct device *device;		/* This is the parent */
@@ -122,14 +108,6 @@ extern int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char 
 struct linux_fb_info *framebuffer_alloc(size_t size, struct device *dev);
 extern void framebuffer_release(struct linux_fb_info *info);
 #define	fb_set_suspend(x, y)	0
-
-static inline int
-fb_alloc_cmap(struct fb_cmap *cmap, int len, int transp)
-{
-
-	return (0);
-}
-#define	fb_dealloc_cmap(x)	0
 
 /* updated FreeBSD fb_info */
 extern int fb_get_options(const char *name, char **option);

@@ -530,9 +530,11 @@ struct fb_info *drm_fb_helper_alloc_fbi(struct drm_fb_helper *fb_helper)
 	if (!info)
 		return ERR_PTR(-ENOMEM);
 
+#ifdef __linux__
 	ret = fb_alloc_cmap(&info->cmap, 256, 0);
 	if (ret)
 		goto err_release;
+#endif
 
 	info->apertures = alloc_apertures(1);
 	if (!info->apertures) {
@@ -548,7 +550,9 @@ struct fb_info *drm_fb_helper_alloc_fbi(struct drm_fb_helper *fb_helper)
 	return info;
 
 err_free_cmap:
+#ifdef __linux__
 	fb_dealloc_cmap(&info->cmap);
+#endif
 err_release:
 	framebuffer_release(info);
 	return ERR_PTR(ret);
@@ -593,8 +597,10 @@ void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 
 	info = fb_helper->fbdev;
 	if (info) {
+#ifdef __linux__
 		if (info->cmap.len)
 			fb_dealloc_cmap(&info->cmap);
+#endif
 		framebuffer_release(info);
 	}
 	fb_helper->fbdev = NULL;
