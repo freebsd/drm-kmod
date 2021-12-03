@@ -1633,6 +1633,7 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 static void drm_fb_helper_fill_fix(struct fb_info *info, uint32_t pitch,
 				   uint32_t depth)
 {
+#ifdef __linux__
 	info->fix.type = FB_TYPE_PACKED_PIXELS;
 	info->fix.visual = depth == 8 ? FB_VISUAL_PSEUDOCOLOR :
 		FB_VISUAL_TRUECOLOR;
@@ -1643,6 +1644,7 @@ static void drm_fb_helper_fill_fix(struct fb_info *info, uint32_t pitch,
 	info->fix.ypanstep = 1; /* doing it in hw */
 	info->fix.ywrapstep = 0;
 	info->fix.accel = FB_ACCEL_NONE;
+#endif
 
 	info->fix.line_length = pitch;
 #ifdef __FreeBSD__
@@ -1707,8 +1709,10 @@ void drm_fb_helper_fill_info(struct fb_info *info,
 			       sizes->fb_width, sizes->fb_height);
 
 	info->par = fb_helper;
+#ifdef __linux__
 	snprintf(info->fix.id, sizeof(info->fix.id), "%sdrmfb",
 		 fb_helper->dev->driver->name);
+#endif
 
 }
 EXPORT_SYMBOL(drm_fb_helper_fill_info);
@@ -2119,7 +2123,9 @@ static int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
 
 	fbi->fbops = &drm_fbdev_fb_ops;
 	fbi->screen_size = fb->height * fb->pitches[0];
+#ifdef __linux__
 	fbi->fix.smem_len = fbi->screen_size;
+#endif
 
 	drm_fb_helper_fill_info(fbi, fb_helper, sizes);
 

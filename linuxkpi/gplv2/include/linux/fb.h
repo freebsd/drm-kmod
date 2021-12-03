@@ -18,15 +18,6 @@ struct linux_fb_info;
 struct videomode;
 struct vm_area_struct;
 
-#define FB_TYPE_PACKED_PIXELS		0
-
-enum {
-	FB_VISUAL_TRUECOLOR = 0,
-	FB_VISUAL_PSEUDOCOLOR,
-};
-
-#define FB_ACCEL_NONE		0
-
 #define FB_ACTIVATE_NOW		0
 
 #define FB_ACCELF_TEXT		1
@@ -34,24 +25,9 @@ enum {
 #define KHZ2PICOS(a) (1000000000UL/(a))
 
 struct fb_fix_screeninfo {
-	char id[16];			/* identification string eg "TT Builtin" */
-	unsigned long smem_start;	/* Start of frame buffer mem */
-					/* (physical address) */
-	__u32 smem_len;			/* Length of frame buffer mem */
-	__u32 type;			/* see FB_TYPE_*		*/
-	__u32 type_aux;			/* Interleave for interleaved Planes */
-	__u32 visual;			/* see FB_VISUAL_*		*/ 
-	__u16 xpanstep;			/* zero if no hardware panning  */
-	__u16 ypanstep;			/* zero if no hardware panning  */
-	__u16 ywrapstep;		/* zero if no hardware ywrap    */
-	__u32 line_length;		/* length of a line in bytes    */
-	unsigned long mmio_start;	/* Start of Memory Mapped I/O   */
-					/* (physical address) */
-	__u32 mmio_len;			/* Length of Memory Mapped I/O  */
-	__u32 accel;			/* Indicate to driver which	*/
-					/*  specific chip/card we have	*/
-	__u16 capabilities;		/* see FB_CAP_*			*/
-	__u16 reserved[2];		/* Reserved for future compatibility */
+	vm_paddr_t	smem_start;
+	uint32_t	smem_len;
+	uint32_t	line_length;
 };
 
 struct fb_var_screeninfo {

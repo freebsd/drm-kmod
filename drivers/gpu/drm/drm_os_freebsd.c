@@ -88,7 +88,7 @@ sysctl_pci_id(SYSCTL_HANDLER_ARGS)
 extern struct vt_device *main_vd;
 
 void
-vt_freeze_main_vd(struct apertures_struct *a, const char *name)
+vt_freeze_main_vd(struct apertures_struct *a)
 {
 	struct fb_info *fb;
 	int i;

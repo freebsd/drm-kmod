@@ -186,7 +186,7 @@ void cancel_reset_debug_log(void);
 struct linux_fb_info;
 void vt_restore_fbdev_mode(void *arg, int pending);
 int vt_kms_postswitch(void *arg);
-void vt_freeze_main_vd(struct apertures_struct *a, const char *name);
+void vt_freeze_main_vd(struct apertures_struct *a);
 void vt_unfreeze_main_vd(void);
 
 #if 0

@@ -82,7 +82,7 @@ remove_conflicting_framebuffers(struct apertures_struct *a,
 {
 
 	sx_xlock(&linux_fb_mtx);
-	vt_freeze_main_vd(a, name);
+	vt_freeze_main_vd(a);
 	sx_xunlock(&linux_fb_mtx);
 	return (0);
 }
@@ -113,7 +113,7 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 		idx++;
 	}
 	sx_xlock(&linux_fb_mtx);
-	vt_freeze_main_vd(ap, name);
+	vt_freeze_main_vd(ap);
 	sx_xunlock(&linux_fb_mtx);
 	kfree(ap);
 	return (0);
@@ -124,7 +124,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 {
 	int i, err;
 
-	vt_freeze_main_vd(fb_info->apertures, fb_info->fix.id);
+	vt_freeze_main_vd(fb_info->apertures);
 
 	MPASS(fb_info->apertures->ranges[0].base);
 	MPASS(fb_info->apertures->ranges[0].size);
