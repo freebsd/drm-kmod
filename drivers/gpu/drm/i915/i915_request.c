@@ -448,16 +448,12 @@ void i915_request_submit(struct i915_request *request)
 
 void __i915_request_unsubmit(struct i915_request *request)
 {
-#ifdef __freebsd_notyet__
 	struct intel_engine_cs *engine = request->engine;
 
 	RQ_TRACE(request, "\n");
-#endif
 
 	GEM_BUG_ON(!irqs_disabled());
-#ifdef __freebsd__notyet__
 	lockdep_assert_held(&engine->active.lock);
-#endif
 
 	/*
 	 * Only unwind in reverse order, required so that the per-context list
@@ -791,9 +787,7 @@ i915_request_create(struct intel_context *ce)
 		goto err_unlock;
 
 	/* Check that we do not interrupt ourselves with a new request */
-#ifdef __freebsd_notyet__
 	rq->cookie = lockdep_pin_lock(&tl->mutex);
-#endif
 
 	return rq;
 
@@ -1363,9 +1357,7 @@ void i915_request_add(struct i915_request *rq)
 	struct i915_request *prev;
 
 	lockdep_assert_held(&tl->mutex);
-#ifdef __freebsd_notyet__
 	lockdep_unpin_lock(&tl->mutex, rq->cookie);
-#endif
 
 	trace_i915_request_add(rq);
 

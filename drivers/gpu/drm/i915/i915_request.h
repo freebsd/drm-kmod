@@ -189,9 +189,7 @@ struct i915_request {
 	 * can use the ring and manipulate the associated timeline during
 	 * construction.
 	 */
-#ifdef __freebsd_notyet__
 	struct pin_cookie cookie;
-#endif
 
 	/*
 	 * Fences for the various phases in the request's lifetime.
