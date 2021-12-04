@@ -107,9 +107,6 @@ static void __fence_set_priority(struct dma_fence *fence,
 
 	local_bh_disable();
 	rcu_read_lock(); /* RCU serialisation for set-wedged protection */
-#ifdef __FreeBSD__
-#undef schedule
-#endif
 	if (engine->schedule)
 		engine->schedule(rq, attr);
 	rcu_read_unlock();

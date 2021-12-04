@@ -13,10 +13,6 @@
 #include "intel_gt.h"
 #include "intel_reset.h"
 
-#ifdef __FreeBSD__
-#undef schedule
-#endif
-
 /*
  * While the engine is active, we send a periodic pulse along the engine
  * to check on its health and to flush any idle-barriers. If that request
