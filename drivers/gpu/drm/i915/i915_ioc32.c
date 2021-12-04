@@ -29,8 +29,8 @@
 #include <linux/compat.h>
 
 #include <drm/i915_drm.h>
-#include "i915_drv.h"
 #include <drm/drm_ioctl.h>
+#include "i915_drv.h"
 
 struct drm_i915_getparam32 {
 	s32 param;
@@ -41,11 +41,6 @@ struct drm_i915_getparam32 {
 	 */
 	u32 value;
 };
-
-#ifdef __FreeBSD__
-extern int i915_getparam_ioctl(struct drm_device *dev, void *data,
-			 struct drm_file *file_priv);
-#endif
 
 static int compat_i915_getparam(struct file *file, unsigned int cmd,
 				unsigned long arg)
