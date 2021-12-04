@@ -1174,13 +1174,7 @@ validate_fail:
 	out = false;
 
 validate_out:
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	kfree(pipes);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	BW_VAL_TRACE_FINISH();
 
