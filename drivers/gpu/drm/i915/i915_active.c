@@ -4,9 +4,7 @@
  * Copyright © 2019 Intel Corporation
  */
 
-#ifdef __linux__
 #include <linux/debugobjects.h>
-#endif
 
 #include "gt/intel_context.h"
 #include "gt/intel_engine_pm.h"
