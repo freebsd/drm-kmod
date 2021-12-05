@@ -24,6 +24,9 @@
 
 #include <linux/kernel.h>
 #include <asm/fpu/api.h>
+#ifdef __FreeBSD__
+#include <linux/jump_label.h>
+#endif
 
 #include "i915_memcpy.h"
 
@@ -33,11 +36,7 @@
 #define CI_BUG_ON(expr) BUILD_BUG_ON_INVALID(expr)
 #endif
 
-#ifdef __linux__
 static DEFINE_STATIC_KEY_FALSE(has_movntdqa);
-#elif defined(__FreeBSD__)
-static bool has_movntdqa = false;
-#endif
 
 #ifdef CONFIG_AS_MOVNTDQA
 static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len)
@@ -124,11 +123,7 @@ bool i915_memcpy_from_wc(void *dst, const void *src, unsigned long len)
 	if (unlikely(((unsigned long)dst | (unsigned long)src | len) & 15))
 		return false;
 
-#ifdef __linux__
 	if (static_branch_likely(&has_movntdqa)) {
-#elif defined(__FreeBSD__)
-	if (likely(has_movntdqa)) {
-#endif
 		if (likely(len))
 			__memcpy_ntdqa(dst, src, len >> 4);
 		return true;
@@ -177,9 +172,5 @@ void i915_memcpy_init_early(struct drm_i915_private *dev_priv)
 	 */
 	if (static_cpu_has(X86_FEATURE_XMM4_1) &&
 	    !boot_cpu_has(X86_FEATURE_HYPERVISOR))
-#ifdef __linux__
 		static_branch_enable(&has_movntdqa);
-#elif defined(__FreeBSD__)
-		has_movntdqa = true;
-#endif
 }
