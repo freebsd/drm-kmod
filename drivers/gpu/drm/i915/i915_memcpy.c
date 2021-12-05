@@ -27,19 +27,16 @@
 
 #include "i915_memcpy.h"
 
-#ifdef __linux__
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG)
 #define CI_BUG_ON(expr) BUG_ON(expr)
 #else
 #define CI_BUG_ON(expr) BUILD_BUG_ON_INVALID(expr)
 #endif
 
+#ifdef __linux__
 static DEFINE_STATIC_KEY_FALSE(has_movntdqa);
 #elif defined(__FreeBSD__)
-#include <x86/x86_var.h>
 static bool has_movntdqa = false;
-#define	asm		__asm
-#define CI_BUG_ON(expr) BUG_ON(expr)
 #endif
 
 #ifdef CONFIG_AS_MOVNTDQA
@@ -174,16 +171,15 @@ void i915_unaligned_memcpy_from_wc(void *dst, void *src, unsigned long len)
 
 void i915_memcpy_init_early(struct drm_i915_private *dev_priv)
 {
-#ifdef __linux__
 	/*
 	 * Some hypervisors (e.g. KVM) don't support VEX-prefix instructions
 	 * emulation. So don't enable movntdqa in hypervisor guest.
 	 */
 	if (static_cpu_has(X86_FEATURE_XMM4_1) &&
 	    !boot_cpu_has(X86_FEATURE_HYPERVISOR))
+#ifdef __linux__
 		static_branch_enable(&has_movntdqa);
 #elif defined(__FreeBSD__)
-	if (cpu_feature2 & CPUID2_SSE41)
 		has_movntdqa = true;
 #endif
 }
