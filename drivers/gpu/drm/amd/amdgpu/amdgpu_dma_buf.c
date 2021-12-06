@@ -63,9 +63,6 @@ static int amdgpu_dma_buf_attach(struct dma_buf *dmabuf,
 		attach->peer2peer = false;
 #endif
 
-	if (attach->dev->driver == adev->dev->driver)
-		return 0;
-
 	r = pm_runtime_get_sync(adev_to_drm(adev)->dev);
 	if (r < 0)
 		goto out;
