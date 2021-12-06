@@ -1386,7 +1386,11 @@ int drm_fb_helper_set_par(struct fb_info *info)
 	 * commit function, which ensures that we never steal the display from
 	 * an active drm master.
 	 */
+#ifdef __linux__
 	force = var->activate & FB_ACTIVATE_KD_TEXT;
+#elif defined(__FreeBSD__)
+	force = false;
+#endif
 
 	__drm_fb_helper_restore_fbdev_mode_unlocked(fb_helper, force);
 
