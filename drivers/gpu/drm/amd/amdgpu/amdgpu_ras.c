@@ -80,6 +80,7 @@ atomic_t amdgpu_ras_in_intr = ATOMIC_INIT(0);
 #ifdef CONFIG_DEBUGFS
 static bool amdgpu_ras_check_bad_page(struct amdgpu_device *adev,
 				uint64_t addr);
+#endif
 
 void amdgpu_ras_set_error_query_ready(struct amdgpu_device *adev, bool ready)
 {
@@ -95,6 +96,7 @@ bool amdgpu_ras_get_error_query_ready(struct amdgpu_device *adev)
 	return false;
 }
 
+#ifdef CONFIG_DEBUGFS
 static ssize_t amdgpu_ras_debugfs_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
