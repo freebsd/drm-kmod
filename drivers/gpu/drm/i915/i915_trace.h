@@ -10,24 +10,6 @@
 #include "gt/intel_engine.h"
 
 static inline void
-trace_intel_pipe_enable(void *crtc)
-{
-	CTR1(KTR_DRM, "pipe_enable crtc %p", crtc);
-}
-
-static inline void
-trace_intel_pipe_disable(void *crtc)
-{
-	CTR1(KTR_DRM, "pipe_disable crtc %p", crtc);
-}
-
-static inline void
-trace_intel_pipe_crc(void *crtc, const u32 *crcs)
-{
-	CTR2(KTR_DRM, "pipe_disable crtc %p %p", crtc, crcs);
-}
-
-static inline void
 trace_i915_flip_complete(int plane, struct drm_i915_gem_object *pending_flip_obj)
 {
 	CTR2(KTR_DRM, "i915_flip_complete %d %p", plane, pending_flip_obj);
@@ -390,20 +372,6 @@ trace_i915_pipe_update_end(void *crtc, u32 end_vbl_count, int scanline_end)
 	CTR3(KTR_DRM, "pipe_update_end %p end_vbl_count %d scanline_end %d", crtc, end_vbl_count, scanline_end);
 }
 
-/* frontbuffer tracking */
-
-static inline void
-trace_intel_frontbuffer_invalidate(unsigned int frontbuffer_bits, unsigned int origin)
-{
-	CTR2(KTR_DRM, "frontbuffer_bits=0x%08x, origin=%u", frontbuffer_bits, origin);
-}
-
-static inline void
-trace_intel_frontbuffer_flush(unsigned int frontbuffer_bits, unsigned int origin)
-{
-	CTR2(KTR_DRM, "frontbuffer_bits=0x%08x, origin=%u", frontbuffer_bits, origin);
-}
-
 #define	trace_i915_request(req) \
     CTR6(KTR_DRM, \
 	__func__ " dev=%u, engine=%u:%u, ctx=%llu, seqno=%u, tail=%u", \
@@ -480,118 +448,6 @@ static inline void
 trace_intel_engine_notify(struct intel_engine_cs *engine, bool waiters)
 {
 	CTR2(KTR_DRM, "engine_notify engine %p waiters %x", engine, waiters);
-}
-
-static inline void
-trace_intel_plane_update_noarm(void *plane, void *crtc)
-{
-	CTR2(KTR_DRM, "plane_update_noarm plane %p crtc %p", plane, crtc);
-}
-
-static inline void
-trace_intel_plane_update_arm(struct drm_plane *plane, struct intel_crtc *crtc)
-{
-	CTR6(KTR_DRM,
-	    "plane_update_arm pipe %c, plane %s, frame=%u, scanline=%u, " DRM_RECT_FP_FMT " -> " DRM_RECT_FMT,
-	    pipe_name(crtc->pipe), plane->name,
-	    intel_crtc_get_vblank_counter(crtc),
-	    intel_get_crtc_scanline(crtc),
-	    DRM_RECT_FP_ARG((const struct drm_rect *)&plane->state->src),
-	    DRM_RECT_ARG((const struct drm_rect *)&plane->state->dst));
-};
-
-static inline void
-trace_intel_plane_disable_arm(void *plane, void *crtc)
-{
-	CTR2(KTR_DRM, "plane_disable_arm plane %p crtc %p", plane, crtc);
-}
-
-static inline void
-trace_intel_cpu_fifo_underrun(void *dev_priv, int pipe)
-{
-	CTR2(KTR_DRM, "cpu_fifo_underrun drm_i915_private %p pipe %d", dev_priv, pipe);
-}
-
-static inline void
-trace_intel_pch_fifo_underrun(void *dev_priv, int pch_transcoder)
-{
-	CTR2(KTR_DRM, "pch_fifo_underrun drm_i915_private %p pch_transcoder %d", dev_priv, pch_transcoder);
-}
-
-static inline void
-trace_intel_memory_cxsr(void *dev_priv, bool old, bool new)
-{
-	CTR3(KTR_DRM, "memory_cxsr drm_i915_private %p old %d new %d", dev_priv, old, new);
-}
-
-static inline void
-trace_vlv_wm(void *crtc, void *wm)
-{
-	CTR2(KTR_DRM, "vlv_wm crtc %p wm %p", crtc, wm);
-}
-
-static inline void
-trace_g4x_wm(void *crtc, void *wm)
-{
-	CTR2(KTR_DRM, "g4x_wm crtc %p wm %p", crtc, wm);
-}
-
-static inline void
-trace_vlv_fifo_size(void *crtc, uint32_t sprite0_start, uint32_t sprite1_start, uint32_t fifo_size)
-{
-	CTR4(KTR_DRM, "vlv_fifo_size crtc %p sprite0_start %x, sprite1_start %x, fifo_size %x", crtc, sprite0_start, sprite1_start, fifo_size);
-}
-
-static inline void
-trace_intel_fbc_activate(void *crtc)
-{
-	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
-}
-
-static inline void
-trace_intel_fbc_deactivate(void *crtc)
-{
-	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
-}
-
-static inline void
-trace_intel_fbc_nuke(void *crtc)
-{
-	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
-}
-
-static inline void
-trace_intel_crtc_vblank_work_start(struct intel_crtc *crtc)
-{
-	CTR3(KTR_DRM, "crtc_vblank_work_start pipe %c, frame=%u, scanline=%u",
-	    crtc->pipe, intel_crtc_get_vblank_counter(crtc),
-	    intel_get_crtc_scanline(crtc));
-};
-
-static inline void
-trace_intel_crtc_vblank_work_end(struct intel_crtc *crtc)
-{
-	CTR3(KTR_DRM, "crtc_vblank_work_end pipe %c, frame=%u, scanline=%u",
-	    crtc->pipe, intel_crtc_get_vblank_counter(crtc),
-	    intel_get_crtc_scanline(crtc));
-};
-
-static inline void
-trace_intel_pipe_update_start(void *crtc)
-{
-	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
-}
-
-static inline void
-trace_intel_pipe_update_vblank_evaded(void *crtc)
-{
-	CTR1(KTR_DRM, "gpu_freq_change crtc %p", crtc);
-}
-
-static inline void
-trace_intel_pipe_update_end(void *crtc, uint32_t frame, int scanline_end)
-{
-	CTR3(KTR_DRM, "gpu_freq_change crtc %p frame %x scanline_end %d", crtc, frame, scanline_end);
 }
 
 #endif /* _I915_TRACE_H_ */
