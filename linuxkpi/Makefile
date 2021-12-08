@@ -8,7 +8,6 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_compat.c		\
 	linux_hdmi.c		\
 	linux_i2c.c		\
-	linux_mtrr.c		\
 	linux_sort.c
 
 SRCS+=	dma-buf.c \
