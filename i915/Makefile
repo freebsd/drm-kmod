@@ -332,6 +332,7 @@ CWARNFLAGS.intel_pm.c=		-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.intel_psr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.intel_region_ttm.c=	-Wno-missing-prototypes
 CWARNFLAGS.intel_reset.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.i915_debugfs.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.i915_driver.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.i915_irq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.i915_gem_execbuffer.c=	-Wno-unused-but-set-variable -Wno-sometimes-uninitialized
