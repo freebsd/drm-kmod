@@ -3595,6 +3595,13 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	if (r)
 		return r;
 
+	/* Need to get xgmi info early to decide the reset behavior*/
+	if (adev->gmc.xgmi.supported) {
+		r = adev->gfxhub.funcs->get_xgmi_info(adev);
+		if (r)
+			return r;
+	}
+
 #ifdef __linux__
 	// XXX: Don't need this, driver will fallback to MMIO
 	// See: amdgpu_atombios_init()
