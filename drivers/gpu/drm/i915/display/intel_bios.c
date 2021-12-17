@@ -2053,6 +2053,11 @@ static void parse_ddi_port(struct drm_i915_private *i915,
 	i915->vbt.ports[port] = devdata;
 }
 
+static bool has_ddi_port_info(struct drm_i915_private *i915)
+{
+	return HAS_DDI(i915);
+}
+
 static void parse_ddi_ports(struct drm_i915_private *i915)
 {
 	struct intel_bios_encoder_data *devdata;
@@ -2660,7 +2665,7 @@ bool intel_bios_is_port_present(struct drm_i915_private *i915, enum port port)
 		[PORT_F] = { DVO_PORT_DPF, DVO_PORT_HDMIF, },
 	};
 
-	if (HAS_DDI(i915))
+	if (has_ddi_port_info(i915))
 		return i915->vbt.ports[port];
 
 	/* FIXME maybe deal with port A as well? */
@@ -2700,7 +2705,7 @@ bool intel_bios_is_port_edp(struct drm_i915_private *i915, enum port port)
 		[PORT_F] = DVO_PORT_DPF,
 	};
 
-	if (HAS_DDI(i915)) {
+	if (has_ddi_port_info(i915)) {
 		const struct intel_bios_encoder_data *devdata;
 
 		devdata = intel_bios_encoder_data_lookup(i915, port);
@@ -2755,7 +2760,7 @@ bool intel_bios_is_port_dp_dual_mode(struct drm_i915_private *i915,
 	};
 	const struct intel_bios_encoder_data *devdata;
 
-	if (HAS_DDI(i915)) {
+	if (has_ddi_port_info(i915)) {
 		const struct intel_bios_encoder_data *devdata;
 
 		devdata = intel_bios_encoder_data_lookup(i915, port);
