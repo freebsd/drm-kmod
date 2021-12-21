@@ -19,6 +19,7 @@ SRCS=	\
 	i915_buddy.c \
 	i915_cmd_parser.c \
 	i915_config.c \
+	i915_deps.c \
 	i915_driver.c \
 	i915_getparam.c \
 	i915_gem.c \
