@@ -11,7 +11,6 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_interval_tree.c	\
 	linux_irq.c		\
 	linux_mtrr.c		\
-	linux_notifier.c	\
 	linux_rbtree.c		\
 	linux_sort.c
 

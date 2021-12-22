@@ -20,7 +20,6 @@
 
 #ifdef __FreeBSD__
 #include <linux/seqlock.h>
-#include <linux/notifier.h>	/* for struct atomic_notifier_head */
 #endif
 
 #include "i915_gem.h"
@@ -471,8 +470,10 @@ struct intel_engine_cs {
 	struct intel_timeline *retire;
 	struct work_struct retire_work;
 
+#ifdef __linux__
 	/* status_notifier: list of callbacks for context-switch changes */
 	struct atomic_notifier_head context_status_notifier;
+#endif
 
 #define I915_ENGINE_USING_CMD_PARSER BIT(0)
 #define I915_ENGINE_SUPPORTS_STATS   BIT(1)
