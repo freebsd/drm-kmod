@@ -137,11 +137,22 @@ __active_retire(struct i915_active *ref)
 	struct rb_root root;
 	unsigned long flags;
 
+#ifdef __FreeBSD__
+	/* drm-kmod 5.5+ lockups sometimes if &ref->mutex is not held */
+	lockdep_assert_held(&ref->mutex);
+#endif
 	GEM_BUG_ON(i915_active_is_idle(ref));
 
 	/* return the unused nodes to our slabcache -- flushing the allocator */
 	if (!atomic_dec_and_lock_irqsave(&ref->count, &ref->tree_lock, flags))
+#ifdef __FreeBSD__
+	{
+		mutex_unlock(&ref->mutex);
+#endif
 		return;
+#ifdef __FreeBSD__
+	}
+#endif
 
 	GEM_BUG_ON(rcu_access_pointer(ref->excl.fence));
 	debug_active_deactivate(ref);
@@ -151,6 +162,9 @@ __active_retire(struct i915_active *ref)
 	ref->cache = NULL;
 
 	spin_unlock_irqrestore(&ref->tree_lock, flags);
+#ifdef __FreeBSD__
+	mutex_unlock(&ref->mutex);
+#endif
 
 	/* After the final retire, the entire struct may be freed */
 	if (ref->retire)
@@ -178,6 +192,9 @@ active_work(struct irq_work *wrk)
 	if (atomic_add_unless(&ref->count, -1, 1))
 		return;
 
+#ifdef __FreeBSD__
+	mutex_lock(&ref->mutex);
+#endif
 	__active_retire(ref);
 }
 
@@ -188,10 +205,13 @@ active_retire(struct i915_active *ref)
 	if (atomic_add_unless(&ref->count, -1, 1))
 		return;
 
-	if (ref->flags & I915_ACTIVE_RETIRE_SLEEPS) {
 #ifdef __linux__
+	if (ref->flags & I915_ACTIVE_RETIRE_SLEEPS) {
 		queue_work(system_unbound_wq, &ref->work);
 #elif defined(__FreeBSD__)
+	/* If we are inside interrupt context (fence signaling), defer */
+	if (ref->flags & I915_ACTIVE_RETIRE_SLEEPS ||
+	    !mutex_trylock(&ref->mutex)) {
 		irq_work_queue(&ref->work);
 #endif
 		return;
