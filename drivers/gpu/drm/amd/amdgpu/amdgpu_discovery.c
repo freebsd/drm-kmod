@@ -1430,6 +1430,7 @@ static int amdgpu_discovery_set_gc_ip_blocks(struct amdgpu_device *adev)
 	case IP_VERSION(10, 3, 4):
 	case IP_VERSION(10, 3, 5):
 	case IP_VERSION(10, 3, 3):
+	case IP_VERSION(10, 3, 7):
 		amdgpu_device_ip_block_add(adev, &gfx_v10_0_ip_block);
 		break;
 	default:
@@ -1771,6 +1772,9 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 	case IP_VERSION(10, 3, 3):
 		adev->family = AMDGPU_FAMILY_YC;
 		break;
+	case IP_VERSION(10, 3, 7):
+		adev->family = AMDGPU_FAMILY_GC_10_3_7;
+		break;
 	default:
 		return -EINVAL;
 	}
@@ -1783,6 +1787,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 	case IP_VERSION(10, 1, 4):
 	case IP_VERSION(10, 3, 1):
 	case IP_VERSION(10, 3, 3):
+	case IP_VERSION(10, 3, 7):
 		adev->flags |= AMD_IS_APU;
 		break;
 	default:
