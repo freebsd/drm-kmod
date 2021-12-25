@@ -7,8 +7,7 @@ KMOD=	linuxkpi_gplv2
 SRCS=	linux_kmod_gplv2.c	\
 	linux_compat.c		\
 	linux_hdmi.c		\
-	linux_i2c.c		\
-	linux_sort.c
+	linux_i2c.c
 
 SRCS+=	dma-buf.c \
 	dma-fence-array.c \
