@@ -106,13 +106,13 @@
 #include "i915_scheduler.h"
 #include "gt/intel_timeline.h"
 #include "i915_vma.h"
-#include "i915_irq.h"
 
 
 #ifdef __FreeBSD__
 /* BSD: Make sure we get out[bwl] redefines */
 #include <linux/compiler.h>
 #include <linux/shrinker.h>
+#include "i915_irq.h"
 #endif
 
 /* General customization:
