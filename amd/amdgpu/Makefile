@@ -14,6 +14,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn21 \
 	${SRCDIR}/display/dc/dml/dcn30 \
 	${SRCDIR}/display/dc/dml/dcn301 \
+	${SRCDIR}/display/dc/dml/dcn302 \
 	${SRCDIR}/display/dc/dml/dcn31 \
 	${SRCDIR}/display/dc/dml/dsc
 .endif
@@ -613,6 +614,9 @@ SRCS+=	display_mode_lib.c \
 	display_rq_dlg_calc_21.c \
 	dml1_display_rq_dlg_calc.c
 .endif
+
+# display/dc/dml/dcn302
+SRCS+=	dcn302_fpu.c
 
 # display/dc/gpio/*
 SRCS+=	gpio_base.c \
