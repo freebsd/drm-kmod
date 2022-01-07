@@ -30,7 +30,6 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/bios/dce112 \
 	${SRCDIR}/display/dc/bios/dce60 \
 	${SRCDIR}/display/dc/bios/dce80 \
-	${SRCDIR}/display/dc/calcs \
 	${SRCDIR}/display/dc/core \
 	${SRCDIR}/display/dc/clk_mgr \
 	${SRCDIR}/display/dc/clk_mgr/dce100 \
@@ -61,6 +60,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn302 \
 	${SRCDIR}/display/dc/dcn303 \
 	${SRCDIR}/display/dc/dcn31 \
+	${SRCDIR}/display/dc/dml/calcs \
 	${SRCDIR}/display/dc/dsc \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
