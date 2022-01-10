@@ -34,6 +34,7 @@
 #include <sys/mman.h>
 #include <sys/queue.h>
 #include <sys/rwlock.h>
+#include <sys/systm.h>
 #include <vm/vm.h>
 #include <vm/pmap.h>
 #include <vm/vm_extern.h>
