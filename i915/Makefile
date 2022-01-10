@@ -347,6 +347,7 @@ CWARNFLAGS.i915_sw_fence.c=	-Wno-unused-function
 CWARNFLAGS.i915_vma.c=		-Wno-unused-function -Wno-unused-but-set-variable
 CWARNFLAGS.i915_vma.c=		-Wno-unused-function -Wno-unused-but-set-variable
 CWARNFLAGS.i915_vma_resource.c=	-Wno-missing-prototypes
+CWARNFLAGS.i915_vma_snapshot.c=	-Wno-shift-count-overflow
 CWARNFLAGS.i9xx_plane.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.g4x_dp.c=		-Wno-shift-count-overflow
 CWARNFLAGS.skl_universal_plane.c=	-Wno-unused-but-set-variable
