@@ -47,6 +47,7 @@ SRCS=	\
 	i915_vgpu.c \
 	i915_ttm_buddy_manager.c \
 	i915_vma.c \
+	i915_vma_resource.c \
 	i915_vma_snapshot.c \
 	intel_acpi.c \
 	intel_atomic.c \
@@ -344,6 +345,7 @@ CWARNFLAGS.i915_pci.c=		-Wno-initializer-overrides
 CWARNFLAGS.i915_active.c=	-Wno-unused-function
 CWARNFLAGS.i915_sw_fence.c=	-Wno-unused-function
 CWARNFLAGS.i915_vma.c=		-Wno-unused-function -Wno-unused-but-set-variable
+CWARNFLAGS.i915_vma_resource.c=	-Wno-incompatible-pointer-types
 CWARNFLAGS.i9xx_plane.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.g4x_dp.c=		-Wno-shift-count-overflow
 CWARNFLAGS.skl_universal_plane.c=	-Wno-unused-but-set-variable
