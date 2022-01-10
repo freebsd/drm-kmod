@@ -116,7 +116,9 @@ void intel_pipe_update_start(const struct intel_crtc_state *new_crtc_state)
 		DRM_ERROR("PSR idle timed out 0x%x, atomic update may fail\n",
 			  psr_status);
 
+#ifdef __linux__
 	local_irq_disable();
+#endif
 
 	crtc->debug.min_vbl = min;
 	crtc->debug.max_vbl = max;
@@ -140,11 +142,15 @@ void intel_pipe_update_start(const struct intel_crtc_state *new_crtc_state)
 			break;
 		}
 
+#ifdef __linux__
 		local_irq_enable();
+#endif
 
 		timeout = schedule_timeout(timeout);
 
+#ifdef __linux__
 		local_irq_disable();
+#endif
 	}
 
 	finish_wait(wq, &wait);
@@ -177,7 +183,11 @@ void intel_pipe_update_start(const struct intel_crtc_state *new_crtc_state)
 	return;
 
 irq_disable:
+#ifdef __linux__
 	local_irq_disable();
+#else
+	return;
+#endif
 }
 
 /**
@@ -214,7 +224,9 @@ void intel_pipe_update_end(struct intel_crtc_state *new_crtc_state)
 		new_crtc_state->uapi.event = NULL;
 	}
 
+#ifdef __linux__
 	local_irq_enable();
+#endif
 
 	if (intel_vgpu_active(dev_priv))
 		return;

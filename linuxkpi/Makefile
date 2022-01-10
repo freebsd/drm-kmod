@@ -9,7 +9,6 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_hdmi.c		\
 	linux_i2c.c		\
 	linux_interval_tree.c	\
-	linux_irq.c		\
 	linux_mtrr.c		\
 	linux_rbtree.c		\
 	linux_sort.c
