@@ -144,9 +144,7 @@ dma_fence_signal_locked_sub(struct dma_fence *fence)
 	while ((cur = list_first_entry_or_null(&fence->cb_list,
 	            struct dma_fence_cb, node)) != NULL) {
 		list_del_init(&cur->node);
-		spin_unlock(fence->lock);
 		cur->func(fence, cur);
-		spin_lock(fence->lock);
 	}
 }
 
