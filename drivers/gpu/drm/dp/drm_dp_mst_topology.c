@@ -46,7 +46,9 @@
 #include <drm/drm_probe_helper.h>
 
 #include "drm_dp_helper_internal.h"
+#ifdef __linux__
 #include "drm_dp_mst_topology_internal.h"
+#endif
 
 /**
  * DOC: dp mst helper
