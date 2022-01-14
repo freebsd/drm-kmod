@@ -2,7 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
-.PATH:	${SRCDIR} ${SRCDIR}/scheduler
+.PATH:	${SRCDIR} ${SRCDIR}/dp ${SRCDIR}/scheduler
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
@@ -25,8 +25,9 @@ SRCS=	drm_atomic.c \
 	drm_crtc_helper.c \
 	drm_damage_helper.c \
 	drm_dp_dual_mode_helper.c \
-	drm_dp_helper.c \
+	drm_dp_helper_mod.c \
 	drm_dp_mst_topology.c \
+	drm_dp.c \
 	drm_drv.c \
 	drm_dsc.c \
 	drm_dumb_buffers.c \
