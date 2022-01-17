@@ -1643,7 +1643,7 @@ static int amdgpu_vm_update_ptes(struct amdgpu_vm_update_params *params,
 
 #ifdef __linux__
 			trace_amdgpu_vm_update_ptes(params, frag_start, upd_end,
-						    nptes, dst, incr, upd_flags,
+						    min(nptes, 32u), dst, incr, upd_flags,
 						    vm->task_info.pid,
 						    vm->immediate.fence_context);
 #endif
