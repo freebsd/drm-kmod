@@ -18,6 +18,7 @@ SRCS=	drm_atomic.c \
 	drm_auth.c \
 	drm_blend.c \
 	drm_bridge.c \
+	drm_buddy.c \
 	drm_cache.c \
 	drm_client.c \
 	drm_client_modeset.c \
