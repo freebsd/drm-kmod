@@ -55,6 +55,9 @@ struct dma_fence {
 
 struct dma_fence_cb;
 
+extern const struct dma_fence_ops dma_fence_array_ops;
+extern const struct dma_fence_ops dma_fence_chain_ops;
+
 typedef void (*dma_fence_func_t)(struct dma_fence *fence,
 				 struct dma_fence_cb *cb);
 
@@ -123,6 +126,10 @@ struct dma_fence *dma_fence_later(struct dma_fence *f1, struct dma_fence *f2);
 int dma_fence_get_status_locked(struct dma_fence *fence);
 void dma_fence_set_error(struct dma_fence *fence, int error);
 signed long dma_fence_wait(struct dma_fence *fence, bool intr);
+
+bool dma_fence_is_array(struct dma_fence *fence);
+bool dma_fence_is_chain(struct dma_fence *fence);
+bool dma_fence_is_container(struct dma_fence *fence);
 
 #define	dma_fence_begin_signalling() true
 #define	dma_fence_end_signalling(cookie) do { (void)cookie; } while (0)

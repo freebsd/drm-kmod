@@ -655,3 +655,9 @@ dma_fence_wait(struct dma_fence *fence, bool intr)
 
 	return (ret < 0 ? ret : 0);
 }
+
+bool
+dma_fence_is_container(struct dma_fence *fence)
+{
+	return (dma_fence_is_array(fence) || dma_fence_is_chain(fence));
+}

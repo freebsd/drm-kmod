@@ -223,11 +223,17 @@ dma_fence_chain_walk(struct dma_fence *fence)
 	return (prev);
 }
 
+bool
+dma_fence_is_chain(struct dma_fence *fence)
+{
+	return (fence->ops == &dma_fence_chain_ops);
+}
+
 struct dma_fence_chain *
 to_dma_fence_chain(struct dma_fence *fence)
 {
 
-	if (!fence || fence->ops != &dma_fence_chain_ops)
+	if (!fence || !dma_fence_is_chain(fence))
 		return (NULL);
 
 	return (container_of(fence, struct dma_fence_chain, base));
