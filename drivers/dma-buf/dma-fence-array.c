@@ -173,7 +173,7 @@ struct dma_fence_array *
 to_dma_fence_array(struct dma_fence *fence)
 {
 
-	if (fence->ops != &dma_fence_array_ops)
+	if (fence == NULL || !dma_fence_is_array(fence))
 		return NULL;
 
 	return (container_of(fence, struct dma_fence_array, base));

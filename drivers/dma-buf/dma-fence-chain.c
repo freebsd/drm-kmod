@@ -141,6 +141,12 @@ const struct dma_fence_ops dma_fence_chain_ops = {
 	.release = dma_fence_chain_release,
 };
 
+bool
+dma_fence_is_chain(struct dma_fence *fence)
+{
+	return fence->ops == &dma_fence_chain_ops;
+}
+
 void
 dma_fence_chain_init(struct dma_fence_chain *chain,
 			  struct dma_fence *prev,
@@ -227,7 +233,7 @@ struct dma_fence_chain *
 to_dma_fence_chain(struct dma_fence *fence)
 {
 
-	if (!fence || fence->ops != &dma_fence_chain_ops)
+	if (fence == NULL || !dma_fence_is_chain(fence))
 		return (NULL);
 
 	return (container_of(fence, struct dma_fence_chain, base));

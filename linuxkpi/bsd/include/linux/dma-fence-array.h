@@ -44,7 +44,6 @@ struct dma_fence_array {
 	struct irq_work work;
 };
 
-bool dma_fence_is_array(struct dma_fence *fence);
 struct dma_fence_array *to_dma_fence_array(struct dma_fence *fence);
 struct dma_fence_array *dma_fence_array_create(int num_fences,
     struct dma_fence **fences, u64 context, unsigned seqno,
