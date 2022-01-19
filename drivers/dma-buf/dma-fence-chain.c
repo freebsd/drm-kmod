@@ -166,6 +166,7 @@ dma_fence_chain_init(struct dma_fence_chain *chain,
 
 	dma_fence_init(&chain->base, &dma_fence_chain_ops,
 	    &chain->lock, context, seqno);
+	WARN_ON(dma_fence_is_chain(fence));
 }
 
 int
