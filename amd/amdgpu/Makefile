@@ -1109,6 +1109,7 @@ CWARNFLAGS.gfx_v10_0.c=				-Wno-unused-variable
 CWARNFLAGS.gfx_v11_0.c=				-Wno-sometimes-uninitialized
 CWARNFLAGS.jpeg_v2_5.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.jpeg_v3_0.c=				-Wno-unused-but-set-variable
+CWARNFLAGS.jpeg_v4_0_3.c=			-Wno-uninitialized
 CWARNFLAGS.imu_v11_0_3.c=			-Wno-missing-prototypes
 CWARNFLAGS.kv_dpm.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.mmhub_v1_7.c=			-Wno-missing-prototypes
