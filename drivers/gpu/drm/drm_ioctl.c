@@ -202,10 +202,11 @@ int drm_getclient(struct drm_device *dev, void *data,
 	 */
 	if (client->idx == 0) {
 		client->auth = file_priv->authenticated;
-		client->pid = task_pid_vnr(current);
 #ifdef __linux__
+		client->pid = task_pid_vnr(current);
 		client->uid = overflowuid;
 #elif defined(__FreeBSD__)
+		client->pid = current->task_thread->td_proc->p_pid;
 		client->uid = 0;
 #endif
 		client->magic = 0;
