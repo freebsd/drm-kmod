@@ -14,6 +14,11 @@ __FBSDID("$FreeBSD$");
 extern struct vt_device *main_vd;
 
 static void
+vt_dummy_setpixel(struct vt_device *vd, int x, int y, term_color_t c)
+{
+}
+
+static void
 vt_dummy_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
     const uint8_t *pattern, const uint8_t *mask,
     unsigned int width, unsigned int height,
@@ -36,6 +41,7 @@ vt_dummy_init(struct vt_device *vd)
 static struct vt_driver vt_dummy_driver = {
 	.vd_name = "dummy",
 	.vd_init = vt_dummy_init,
+	.vd_setpixel = vt_dummy_setpixel,
 	.vd_bitblt_text = vt_dummy_bitblt_text,
 	.vd_bitblt_bmp = vt_dummy_bitblt_bitmap,
 	.vd_priority = VD_PRIORITY_GENERIC + 9, /* > efifb, < fb */
