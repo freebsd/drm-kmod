@@ -70,16 +70,13 @@ dma_fence_chain_cb(struct dma_fence *fence, struct dma_fence_cb *cb)
 static bool
 dma_fence_chain_enable_signaling(struct dma_fence *fence)
 {
-	struct dma_fence_chain *chain, *c;
+	struct dma_fence_chain *chain;
 	struct dma_fence *f;
 
 	chain = to_dma_fence_chain(fence);
 	dma_fence_get(&chain->base);
 	dma_fence_chain_for_each(fence, &chain->base) {
-		if ((c = to_dma_fence_chain(fence)) == NULL)
-			f = fence;
-		else
-			f = c->fence;
+		f = dma_fence_chain_contained(fence);
 		dma_fence_get(f);
 		if (dma_fence_add_callback(f, &chain->cb,
 		    dma_fence_chain_cb) == false) {
@@ -95,14 +92,10 @@ dma_fence_chain_enable_signaling(struct dma_fence *fence)
 static bool
 dma_fence_chain_signaled(struct dma_fence *fence)
 {
-	struct dma_fence_chain *chain;
 	struct dma_fence *f;
 
 	dma_fence_chain_for_each(fence, fence) {
-		if ((chain = to_dma_fence_chain(fence)) == NULL)
-			f = fence;
-		else
-			f = chain->fence;
+		f = dma_fence_chain_contained(fence);
 		if (dma_fence_is_signaled(f) == false) {
 			dma_fence_put(fence);
 			return (false);
