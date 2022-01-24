@@ -123,6 +123,40 @@ dma_fence_array_release(struct dma_fence *fence)
 	dma_fence_free(fence);
 }
 
+struct dma_fence *
+dma_fence_array_first(struct dma_fence *head)
+{
+	struct dma_fence_array *array;
+
+	if (head == NULL)
+		return (NULL);
+
+	if ((array = to_dma_fence_array(head)) == NULL)
+		return (head);
+
+	if (array->num_fences > 0)
+		return (array->fences[0]);
+
+	return (NULL);
+}
+
+struct dma_fence *
+dma_fence_array_next(struct dma_fence *head, unsigned int index)
+{
+	struct dma_fence_array *array;
+
+	if (head == NULL)
+		return (NULL);
+
+	if ((array = to_dma_fence_array(head)) == NULL)
+		return (NULL);
+
+	if (index < array->num_fences)
+		return (array->fences[index]);
+
+	return (NULL);
+}
+
 const struct dma_fence_ops dma_fence_array_ops = {
 	.get_driver_name = dma_fence_array_get_driver_name,
 	.get_timeline_name = dma_fence_array_get_timeline_name,

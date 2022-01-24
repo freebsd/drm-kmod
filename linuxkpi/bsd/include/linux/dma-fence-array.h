@@ -44,9 +44,17 @@ struct dma_fence_array {
 	struct irq_work work;
 };
 
+#define dma_fence_array_for_each(fence, index, head)			\
+	for (index = 0, fence = dma_fence_array_first(head);		\
+	     fence != NULL;						\
+	     (index)++, fence = dma_fence_array_next(head, index))
+
 struct dma_fence_array *to_dma_fence_array(struct dma_fence *fence);
 struct dma_fence_array *dma_fence_array_create(int num_fences,
     struct dma_fence **fences, u64 context, unsigned seqno,
     bool signal_on_any);
+struct dma_fence *dma_fence_array_first(struct dma_fence *head);
+struct dma_fence *dma_fence_array_next(struct dma_fence *head,
+    unsigned int index);
 
 #endif /* _LINUX_DMA_FENCE_ARRAY_H_ */
