@@ -130,7 +130,23 @@ retry:
 	}
 
 	if (args->busy && read_seqcount_retry(&obj->base.resv->seq, seq))
+#ifdef __linux__
 		goto retry;
+#elif defined(__FreeBSD__)
+	{
+		/*
+		 * On FreeBSD, thread holding reservation object seqcount lock
+		 * for write may be blocked. In that case reader thread should
+		 * be blocked too.
+		 */
+		rcu_read_unlock();
+		rw_rlock(&obj->base.resv->rw);
+		rw_runlock(&obj->base.resv->rw);
+		rcu_read_lock();
+		goto retry;
+	}
+#endif
+
 
 	err = 0;
 out:
