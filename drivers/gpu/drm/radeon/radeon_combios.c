@@ -2700,11 +2700,13 @@ void radeon_combios_get_power_modes(struct radeon_device *rdev)
 				i2c_bus = combios_setup_i2c_bus(rdev, gpio, 0, 0);
 			rdev->pm.i2c_bus = radeon_i2c_lookup(rdev, &i2c_bus);
 			if (rdev->pm.i2c_bus) {
+#ifdef I2CNOTYET
 				struct i2c_board_info info = { };
 				const char *name = thermal_controller_names[thermal_controller];
 				info.addr = i2c_addr >> 1;
 				strlcpy(info.type, name, sizeof(info.type));
 				i2c_new_device(&rdev->pm.i2c_bus->adapter, &info);
+#endif
 			}
 		}
 	} else {
@@ -2717,6 +2719,7 @@ void radeon_combios_get_power_modes(struct radeon_device *rdev)
 			i2c_bus = combios_setup_i2c_bus(rdev, DDC_MONID, 0, 0);
 			rdev->pm.i2c_bus = radeon_i2c_lookup(rdev, &i2c_bus);
 			if (rdev->pm.i2c_bus) {
+#ifdef I2CNOTYET
 				struct i2c_board_info info = { };
 				const char *name = "f75375";
 				info.addr = 0x28;
@@ -2724,6 +2727,7 @@ void radeon_combios_get_power_modes(struct radeon_device *rdev)
 				i2c_new_device(&rdev->pm.i2c_bus->adapter, &info);
 				DRM_INFO("Possible %s thermal controller at 0x%02x\n",
 					 name, info.addr);
+#endif
 			}
 		}
 	}

@@ -101,6 +101,7 @@ struct drm_encoder_slave {
 };
 #define to_encoder_slave(x) container_of((x), struct drm_encoder_slave, base)
 
+#ifdef I2CNOTYET
 int drm_i2c_encoder_init(struct drm_device *dev,
 			 struct drm_encoder_slave *encoder,
 			 struct i2c_adapter *adap,
@@ -178,5 +179,6 @@ enum drm_connector_status drm_i2c_encoder_detect(struct drm_encoder *encoder,
 void drm_i2c_encoder_save(struct drm_encoder *encoder);
 void drm_i2c_encoder_restore(struct drm_encoder *encoder);
 
+#endif /* I2CNOTYET */
 
 #endif

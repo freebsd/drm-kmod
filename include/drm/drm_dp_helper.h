@@ -24,6 +24,10 @@
 #define _DRM_DP_HELPER_H_
 
 #include <linux/delay.h>
+#ifdef __FreeBSD__
+#include <linux/mutex.h>
+#include <linux/workqueue.h>
+#endif
 #include <linux/i2c.h>
 #include <linux/types.h>
 

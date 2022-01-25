@@ -450,15 +450,11 @@ static void i2c_acpi_find_adapter(struct intel_dsi *intel_dsi,
 		acpi_dev_free_resource_list(&resource_list);
 	}
 }
-#else
-static inline void i2c_acpi_find_adapter(struct intel_dsi *intel_dsi,
-					 const u16 slave_addr)
-{
-}
 #endif
 
 static const u8 *mipi_exec_i2c(struct intel_dsi *intel_dsi, const u8 *data)
 {
+#ifdef I2CNOTYET
 	struct drm_device *drm_dev = intel_dsi->base.base.dev;
 	struct device *dev = &drm_dev->pdev->dev;
 	struct i2c_adapter *adapter;
@@ -504,6 +500,9 @@ err_alloc:
 	i2c_put_adapter(adapter);
 err_bus:
 	return data + payload_size + 7;
+#else
+	return NULL;
+#endif
 }
 
 static const u8 *mipi_exec_spi(struct intel_dsi *intel_dsi, const u8 *data)

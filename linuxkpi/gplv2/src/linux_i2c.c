@@ -88,6 +88,8 @@ __FBSDID("$FreeBSD$");
 
 #include <linux/idr.h>
 
+#if __FreeBSD_version < 1400051
+
 #if defined(__i386__) || defined(__amd64__) || defined(__aarch64__)
 #include <linux/acpi.h>
 #endif
@@ -730,3 +732,4 @@ i2c_bit_add_bus(struct i2c_adapter *adap)
 
 	return (0);
 }
+#endif

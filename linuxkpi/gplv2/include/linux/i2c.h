@@ -1,3 +1,7 @@
+#include <sys/param.h>
+#if __FreeBSD_version >= 1400051
+#include_next <linux/i2c.h>
+#else
 #ifndef _LINUX_I2C_H_
 #define _LINUX_I2C_H_
 
@@ -288,4 +292,5 @@ i2c_unlock_bus(struct i2c_adapter *adapter, unsigned int flags)
 	adapter->lock_ops->unlock_bus(adapter, flags);
 }
 
+#endif
 #endif

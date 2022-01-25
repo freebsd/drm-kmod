@@ -2106,12 +2106,14 @@ static int radeon_atombios_parse_power_table_1_3(struct radeon_device *rdev)
 		i2c_bus = radeon_lookup_i2c_gpio(rdev, power_info->info.ucOverdriveI2cLine);
 		rdev->pm.i2c_bus = radeon_i2c_lookup(rdev, &i2c_bus);
 		if (rdev->pm.i2c_bus) {
+#ifdef I2CNOTYET
 			struct i2c_board_info info = { };
 			const char *name = thermal_controller_names[power_info->info.
 								    ucOverdriveThermalController];
 			info.addr = power_info->info.ucOverdriveControllerAddress >> 1;
 			strlcpy(info.type, name, sizeof(info.type));
 			i2c_new_device(&rdev->pm.i2c_bus->adapter, &info);
+#endif
 		}
 	}
 	num_modes = power_info->info.ucNumOfPowerModeEntries;
@@ -2347,11 +2349,13 @@ static void radeon_atombios_add_pplib_thermal_controller(struct radeon_device *r
 			i2c_bus = radeon_lookup_i2c_gpio(rdev, controller->ucI2cLine);
 			rdev->pm.i2c_bus = radeon_i2c_lookup(rdev, &i2c_bus);
 			if (rdev->pm.i2c_bus) {
+#ifdef I2CNOTYET
 				struct i2c_board_info info = { };
 				const char *name = pp_lib_thermal_controller_names[controller->ucType];
 				info.addr = controller->ucI2cAddress >> 1;
 				strlcpy(info.type, name, sizeof(info.type));
 				i2c_new_device(&rdev->pm.i2c_bus->adapter, &info);
+#endif
 			}
 		} else {
 			DRM_INFO("Unknown thermal controller type %d at 0x%02x %s fan control\n",

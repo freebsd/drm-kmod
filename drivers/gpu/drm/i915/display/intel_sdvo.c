@@ -2477,9 +2477,11 @@ static const struct drm_connector_helper_funcs intel_sdvo_connector_helper_funcs
 
 static void intel_sdvo_enc_destroy(struct drm_encoder *encoder)
 {
+#ifdef I2CNOTYET
 	struct intel_sdvo *intel_sdvo = to_sdvo(to_intel_encoder(encoder));
 
 	i2c_del_adapter(&intel_sdvo->ddc);
+#endif
 	intel_encoder_destroy(encoder);
 }
 
