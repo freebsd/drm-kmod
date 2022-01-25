@@ -137,5 +137,18 @@ struct amdgpu_reset_domain *amdgpu_reset_create_reset_domain(enum amdgpu_reset_d
 	return reset_domain;
 }
 
+void amdgpu_device_lock_reset_domain(struct amdgpu_reset_domain *reset_domain)
+{
+	atomic_set(&reset_domain->in_gpu_reset, 1);
+	down_write(&reset_domain->sem);
+}
+
+
+void amdgpu_device_unlock_reset_domain(struct amdgpu_reset_domain *reset_domain)
+{
+	atomic_set(&reset_domain->in_gpu_reset, 0);
+	up_write(&reset_domain->sem);
+}
+
 
 
