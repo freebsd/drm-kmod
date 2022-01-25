@@ -14,9 +14,6 @@
 #include <linux/rbtree.h>
 #include <linux/rcupdate.h>
 #include <linux/workqueue.h>
-#ifdef __FreeBSD__
-#include <linux/irq_work.h>
-#endif
 
 #include "i915_utils.h"
 
@@ -49,13 +46,7 @@ struct i915_active {
 	int (*active)(struct i915_active *ref);
 	void (*retire)(struct i915_active *ref);
 
-#ifdef __linux__
 	struct work_struct work;
-#elif defined(__FreeBSD__)
-	/* On FreeBSD this work is sporadically scheduled
-	 * within a critical section. */
-	struct irq_work work;
-#endif
 
 	struct llist_head preallocated_barriers;
 };
