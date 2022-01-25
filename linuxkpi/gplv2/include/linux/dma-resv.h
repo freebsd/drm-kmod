@@ -47,6 +47,9 @@
 #ifdef __FreeBSD__
 /* On Linux linux/preempt.h is included through linux/seqlock.h */
 #include <linux/preempt.h>
+#include <sys/param.h>
+#include <sys/lock.h>
+#include <sys/rwlock.h>
 #endif
 
 extern struct ww_class reservation_ww_class;
@@ -76,6 +79,9 @@ struct dma_resv_list {
 struct dma_resv {
 	struct ww_mutex lock;
 	seqcount_t seq;
+#ifdef __FreeBSD__
+	struct rwlock rw;
+#endif
 
 	struct dma_fence __rcu *fence_excl;
 	struct dma_resv_list __rcu *fence;

@@ -134,6 +134,9 @@ subsys_initcall(dma_resv_lockdep);
 void dma_resv_init(struct dma_resv *obj)
 {
 	ww_mutex_init(&obj->lock, &reservation_ww_class);
+#ifdef __FreeBSD__
+	rw_init(&obj->rw, "dma_resv_rw");
+#endif
 
 	__seqcount_init(&obj->seq, reservation_seqcount_string,
 			&reservation_seqcount_class);
@@ -161,6 +164,9 @@ void dma_resv_fini(struct dma_resv *obj)
 
 	fobj = rcu_dereference_protected(obj->fence, 1);
 	dma_resv_list_free(fobj);
+#ifdef __FreeBSD__
+	rw_destroy(&obj->rw);
+#endif
 	ww_mutex_destroy(&obj->lock);
 }
 EXPORT_SYMBOL(dma_resv_fini);
@@ -266,7 +272,15 @@ void dma_resv_add_shared_fence(struct dma_resv *obj, struct dma_fence *fence)
 	fobj = dma_resv_get_list(obj);
 	count = fobj->shared_count;
 
+#ifdef __linux__
 	preempt_disable();
+#elif defined(__FreeBSD__)
+	/*
+	 * Under FreeBSD dma_fence_is_signaled can be blocked. Prevent readers
+	 * from spinning on seqlock in that case with blocking on rwlock.
+	 */
+	rw_wlock(&obj->rw);
+#endif
 	write_seqcount_begin(&obj->seq);
 
 	for (i = 0; i < count; ++i) {
@@ -288,7 +302,11 @@ replace:
 	smp_store_mb(fobj->shared_count, count);
 
 	write_seqcount_end(&obj->seq);
+#ifdef __linux__
 	preempt_enable();
+#elif defined(__FreeBSD__)
+	rw_wunlock(&obj->rw);
+#endif
 	dma_fence_put(old);
 }
 EXPORT_SYMBOL(dma_resv_add_shared_fence);
@@ -498,6 +516,17 @@ int dma_resv_get_fences_rcu(struct dma_resv *obj,
 		ret = 0;
 unlock:
 		rcu_read_unlock();
+#ifdef __FreeBSD__
+		/*
+		 * On FreeBSD, thread holding reservation object seqcount lock
+		 * for write may be blocked. In that case reader thread should
+		 * be blocked too.
+		 */
+		if (ret != 0) {
+			rw_rlock(&obj->rw);
+			rw_runlock(&obj->rw);
+		}
+#endif
 	} while (ret);
 
 	if (pfence_excl)
@@ -599,6 +628,10 @@ retry:
 
 unlock_retry:
 	rcu_read_unlock();
+#ifdef __FreeBSD__
+	rw_rlock(&obj->rw);
+	rw_runlock(&obj->rw);
+#endif
 	goto retry;
 }
 EXPORT_SYMBOL_GPL(dma_resv_wait_timeout_rcu);
@@ -660,7 +693,17 @@ retry:
 		}
 
 		if (read_seqcount_retry(&obj->seq, seq))
+#ifdef __linux__
 			goto retry;
+#elif defined(__FreeBSD__)
+		{
+			rcu_read_unlock();
+			rw_rlock(&obj->rw);
+			rw_runlock(&obj->rw);
+			rcu_read_lock();
+			goto retry;
+		}
+#endif
 	}
 
 	if (!shared_count) {
@@ -672,7 +715,17 @@ retry:
 				goto retry;
 
 			if (read_seqcount_retry(&obj->seq, seq))
+#ifdef __linux__
 				goto retry;
+#elif defined(__FreeBSD__)
+			{
+				rcu_read_unlock();
+				rw_rlock(&obj->rw);
+				rw_runlock(&obj->rw);
+				rcu_read_lock();
+				goto retry;
+			}
+#endif
 		}
 	}
 
