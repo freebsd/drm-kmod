@@ -24,8 +24,8 @@
  *
  */
 
-#include <linux/gpio/consumer.h>
 #ifdef __linux__
+#include <linux/gpio/consumer.h>
 #include <linux/gpio/machine.h>
 #endif
 #include <linux/mfd/intel_soc_pmic.h>
@@ -74,6 +74,7 @@ struct gpio_map {
 	bool init;
 };
 
+#ifdef __linux__
 static struct gpio_map vlv_gpio_table[] = {
 	{ VLV_GPIO_NC_0_HV_DDI0_HPD },
 	{ VLV_GPIO_NC_1_HV_DDI0_DDC_SDA },
@@ -88,6 +89,7 @@ static struct gpio_map vlv_gpio_table[] = {
 	{ VLV_GPIO_NC_10_PANEL1_BKLTEN },
 	{ VLV_GPIO_NC_11_PANEL1_BKLTCTL },
 };
+#endif
 
 struct i2c_adapter_lookup {
 	u16 slave_addr;
@@ -231,6 +233,7 @@ static const u8 *mipi_exec_delay(struct intel_dsi *intel_dsi, const u8 *data)
 	return data;
 }
 
+#ifdef __linux__
 static void vlv_exec_gpio(struct drm_i915_private *dev_priv,
 			  u8 gpio_source, u8 gpio_index, bool value)
 {
@@ -397,6 +400,7 @@ static const u8 *mipi_exec_gpio(struct intel_dsi *intel_dsi, const u8 *data)
 
 	return data;
 }
+#endif
 
 #if defined(CONFIG_ACPI) && defined(__linux__)
 static int i2c_adapter_lookup(struct acpi_resource *ares, void *data)
@@ -546,7 +550,9 @@ typedef const u8 * (*fn_mipi_elem_exec)(struct intel_dsi *intel_dsi,
 static const fn_mipi_elem_exec exec_elem[] = {
 	[MIPI_SEQ_ELEM_SEND_PKT] = mipi_exec_send_packet,
 	[MIPI_SEQ_ELEM_DELAY] = mipi_exec_delay,
+#ifdef __linux__
 	[MIPI_SEQ_ELEM_GPIO] = mipi_exec_gpio,
+#endif
 	[MIPI_SEQ_ELEM_I2C] = mipi_exec_i2c,
 	[MIPI_SEQ_ELEM_SPI] = mipi_exec_spi,
 	[MIPI_SEQ_ELEM_PMIC] = mipi_exec_pmic,
@@ -653,17 +659,21 @@ static void intel_dsi_vbt_exec(struct intel_dsi *intel_dsi,
 void intel_dsi_vbt_exec_sequence(struct intel_dsi *intel_dsi,
 				 enum mipi_seq seq_id)
 {
+#ifdef __linux__
 	if (seq_id == MIPI_SEQ_POWER_ON && intel_dsi->gpio_panel)
 		gpiod_set_value_cansleep(intel_dsi->gpio_panel, 1);
 	if (seq_id == MIPI_SEQ_BACKLIGHT_ON && intel_dsi->gpio_backlight)
 		gpiod_set_value_cansleep(intel_dsi->gpio_backlight, 1);
+#endif
 
 	intel_dsi_vbt_exec(intel_dsi, seq_id);
 
+#ifdef __linux__
 	if (seq_id == MIPI_SEQ_POWER_OFF && intel_dsi->gpio_panel)
 		gpiod_set_value_cansleep(intel_dsi->gpio_panel, 0);
 	if (seq_id == MIPI_SEQ_BACKLIGHT_OFF && intel_dsi->gpio_backlight)
 		gpiod_set_value_cansleep(intel_dsi->gpio_backlight, 0);
+#endif
 }
 
 void intel_dsi_msleep(struct intel_dsi *intel_dsi, int msec)
