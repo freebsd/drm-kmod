@@ -651,10 +651,12 @@ CWARNFLAGS.amdgpu_device.c=	-Wno-missing-prototypes
 .endif
 CWARNFLAGS.amdgpu_atpx_handler.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_bo_list.c=			-Wno-unused-but-set-variable
+CWARNFLAGS.amdgpu_cs.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_csa.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_dma_buf.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_device.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_ioc32.c=			-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_job.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_pm.c=				-Wno-unused-const-variable
 CWARNFLAGS.amdgpu_psp.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ras.c=			-Wno-missing-prototypes -Wno-unused-function
@@ -667,7 +669,7 @@ CWARNFLAGS.dce_v8_0.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.gfx_v7_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gfx_v8_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gfx_v9_0.c=				-Wno-missing-prototypes
-CWARNFLAGS.gfx_v10_0.c=				-Wno-missing-prototypes
+CWARNFLAGS.gfx_v10_0.c=				-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.gmc_v6_0.c=				-Wno-unused-const-variable
 CWARNFLAGS.jpeg_v1_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.jpeg_v2_0.c=				-Wno-missing-prototypes
@@ -758,6 +760,7 @@ CWARNFLAGS.power_helpers.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes -Wno-unused-variable
 CWARNFLAGS.dc_dmub_srv.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dmub_psr.c=			-Wno-unused-but-set-variable
 
 # display/dmub/*
 CWARNFLAGS.dmub_dcn20.c=		-Wno-unused-but-set-variable
