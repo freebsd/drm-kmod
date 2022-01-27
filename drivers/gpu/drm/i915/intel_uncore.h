@@ -35,7 +35,7 @@
 #include <linux/io.h>		/* For writeb/readb */
 #endif
 
-#include "i915_reg.h"
+#include "i915_reg_defs.h"
 
 struct drm_i915_private;
 struct intel_runtime_pm;
