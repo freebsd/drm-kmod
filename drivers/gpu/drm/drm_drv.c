@@ -1174,7 +1174,9 @@ static const struct file_operations drm_stub_fops = {
 static void drm_core_exit(void)
 {
 	unregister_chrdev(DRM_MAJOR, "drm");
+#ifdef CONFIG_DEBUGFS
 	debugfs_remove(drm_debugfs_root);
+#endif
 	drm_sysfs_destroy();
 	idr_destroy(&drm_minors_idr);
 	drm_connector_ida_destroy();
@@ -1193,7 +1195,9 @@ static int __init drm_core_init(void)
 		goto error;
 	}
 
+#ifdef CONFIG_DEBUGFS
 	drm_debugfs_root = debugfs_create_dir("dri", NULL);
+#endif
 
 #ifdef __linux__
 	ret = register_chrdev(DRM_MAJOR, "drm", &drm_stub_fops);
