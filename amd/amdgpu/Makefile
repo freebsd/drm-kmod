@@ -96,6 +96,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn302 \
 	${SRCDIR}/display/dc/irq/dcn303 \
 	${SRCDIR}/display/dc/irq/dcn31 \
+	${SRCDIR}/display/dc/link \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
@@ -360,7 +361,6 @@ SRCS+=	dc_debug.c \
 	dc_hw_sequencer.c \
 	dc_link_ddc.c \
 	dc_link_dp.c \
-	dc_link_hwss.c \
 	dc_link.c \
 	dc_resource.c \
 	dc_sink.c \
@@ -654,8 +654,14 @@ SRCS+=	irq_service.c \
 	irq_service_dcn20.c \
 	irq_service_dcn21.c
 
+# display/dc/link/*
+SRCS+=	link_hwss_dio.c \
+	link_hwss_dpia.c \
+	link_hwss_hpo_dp.c
+
 # display/dc/virtual
 SRCS+=	virtual_link_encoder.c \
+	virtual_link_hwss.c \
 	virtual_stream_encoder.c
 
 # display/modules/*

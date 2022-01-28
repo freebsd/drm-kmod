@@ -27,7 +27,6 @@
 #define __DC_LINK_HWSS_H__
 
 /* include basic type headers only */
-#include "os_types.h"
 #include "dc_dp_types.h"
 #include "signal_types.h"
 #include "grph_object_id.h"
@@ -74,7 +73,5 @@ struct link_hwss {
 	void (*setup_stream_encoder)(struct pipe_ctx *pipe_ctx);
 	void (*reset_stream_encoder)(struct pipe_ctx *pipe_ctx);
 };
-
-const struct link_hwss *get_link_hwss(const struct dc_link *link, const struct link_resource *link_res);
-
 #endif /* __DC_LINK_HWSS_H__ */
+
