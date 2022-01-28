@@ -570,7 +570,7 @@ SRCS+=	amd_powerplay.c \
 	vega20_thermal.c \
 	vegam_smumgr.c
 
-.ifdef (CONFIG_DEBUGFS)
+.ifdef (CONFIG_DEBUG_FS)
 SRCS+=	amdgpu_pmu.c
 .endif
 

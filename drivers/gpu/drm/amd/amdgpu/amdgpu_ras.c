@@ -77,7 +77,7 @@ enum amdgpu_ras_retire_page_reservation {
 
 atomic_t amdgpu_ras_in_intr = ATOMIC_INIT(0);
 
-#ifdef CONFIG_DEBUGFS
+#ifdef CONFIG_DEBUG_FS
 static bool amdgpu_ras_check_bad_page(struct amdgpu_device *adev,
 				uint64_t addr);
 
@@ -370,7 +370,7 @@ static const struct file_operations amdgpu_ras_debugfs_eeprom_ops = {
 	.write = amdgpu_ras_debugfs_eeprom_write,
 	.llseek = default_llseek
 };
-#endif /* CONFIG_DEBUGFS */
+#endif /* CONFIG_DEBUG_FS */
 
 /**
  * DOC: AMDGPU RAS sysfs Error Count Interface
@@ -1080,7 +1080,7 @@ static int amdgpu_ras_sysfs_remove_all(struct amdgpu_device *adev)
 }
 /* sysfs end */
 
-#ifdef CONFIG_DEBUGFS
+#ifdef CONFIG_DEBUG_FS
 /**
  * DOC: AMDGPU RAS Reboot Behavior for Unrecoverable Errors
  *
@@ -1208,7 +1208,7 @@ static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 
 static int amdgpu_ras_fs_fini(struct amdgpu_device *adev)
 {
-#ifdef CONFIG_DEBUGFS
+#ifdef CONFIG_DEBUG_FS
 	amdgpu_ras_debugfs_remove_all(adev);
 #endif
 	amdgpu_ras_sysfs_remove_all(adev);

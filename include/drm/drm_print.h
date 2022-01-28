@@ -91,7 +91,7 @@ void __drm_printfn_err(struct drm_printer *p, struct va_format *vaf);
 __printf(2, 3)
 void drm_printf(struct drm_printer *p, const char *f, ...);
 void drm_puts(struct drm_printer *p, const char *str);
-#ifdef CONFIG_DEBUGFS
+#ifdef CONFIG_DEBUG_FS
 void drm_print_regset32(struct drm_printer *p, struct debugfs_regset32 *regset);
 #endif
 void drm_print_bits(struct drm_printer *p, unsigned long value,
