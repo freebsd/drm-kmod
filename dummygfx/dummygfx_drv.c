@@ -50,4 +50,6 @@ MODULE_DEPEND(dummygfx, ttm, 1, 1, 1);
 MODULE_DEPEND(dummygfx, agp, 1, 1, 1);
 MODULE_DEPEND(dummygfx, linuxkpi, 1, 1, 1);
 MODULE_DEPEND(dummygfx, linuxkpi_gplv2, 1, 1, 1);
+#ifdef CONFIG_DEBUGFS
 MODULE_DEPEND(dummygfx, debugfs, 1, 1, 1);
+#endif
