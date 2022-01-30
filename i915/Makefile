@@ -113,10 +113,7 @@ SRCS+=	dvo_ch7017.c \
 	vlv_dsi_pll.c
 
 # gt/*
-SRCS+=	debugfs_engines.c \
-	debugfs_gt.c \
-	debugfs_gt_pm.c \
-	gen6_ppgtt.c \
+SRCS+=	gen6_ppgtt.c \
 	gen6_renderstate.c \
 	gen7_renderclear.c \
 	gen7_renderstate.c \
@@ -215,6 +212,9 @@ SRCS+=	i915_ioc32.c
 SRCS+==	i915_debugfs.c \
 	i915_gemfs.c \
 	intel_pipe_crc.c
+SRCS+=	debugfs_engines.c \
+	debugfs_gt.c \
+	debugfs_gt_pm.c
 .endif
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
