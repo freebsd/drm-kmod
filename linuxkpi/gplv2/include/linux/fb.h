@@ -95,6 +95,18 @@ struct fb_ops {
 	int (*fb_debug_leave)(struct linux_fb_info *info);
 };
 
+/* FBINFO_* = fb_info.flags bit flags */
+#define FBINFO_DEFAULT		0
+#define FBINFO_HWACCEL_DISABLED	0x0002
+	/* When FBINFO_HWACCEL_DISABLED is set:
+	 *  Hardware acceleration is turned off.  Software implementations
+	 *  of required functions (copyarea(), fillrect(), and imageblit())
+	 *  takes over; acceleration engine should be in a quiescent state */
+
+/* hints */
+#define FBINFO_VIRTFB		0x0004 /* FB is System RAM, not device. */
+#define FBINFO_PARTIAL_PAN_OK	0x0040 /* otw use pan only for double-buffering */
+#define FBINFO_READS_FAST	0x0080 /* soft-copy faster than rendering */
 /*
  * Hide smem_start in the FBIOGET_FSCREENINFO IOCTL. This is used by modern DRM
  * drivers to stop userspace from trying to share buffers behind the kernel's
