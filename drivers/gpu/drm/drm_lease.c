@@ -482,6 +482,9 @@ out_free_objects:
 int drm_mode_create_lease_ioctl(struct drm_device *dev,
 				void *data, struct drm_file *lessor_priv)
 {
+#ifdef __FreeBSD__
+	return (-EINVAL);
+#else
 	struct drm_mode_create_lease *cl = data;
 	size_t object_count;
 	int ret = 0;
@@ -553,12 +556,7 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 
 	/* Clone the lessor file to create a new file for us */
 	DRM_DEBUG_LEASE("Allocating lease file\n");
-#ifdef __linux__
 	lessee_file = file_clone_open(lessor_file);
-#elif defined(__FreeBSD__)
-	// BSDFIXME!
-	panic("%s: missing implementation!\n", __func__);
-#endif       
 	if (IS_ERR(lessee_file)) {
 		ret = PTR_ERR(lessee_file);
 		goto out_lessee;
@@ -590,6 +588,7 @@ out_leases:
 
 	DRM_DEBUG_LEASE("drm_mode_create_lease_ioctl failed: %d\n", ret);
 	return ret;
+#endif
 }
 
 /**
