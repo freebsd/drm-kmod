@@ -14,6 +14,10 @@
 #include <asm/io.h>
 #include <linux/notifier.h>
 
+#define	FBINFO_DEFAULT		0
+#define	FBINFO_VIRTFB		1
+#define	FBINFO_READS_FAST	2
+
 struct linux_fb_info;
 struct videomode;
 struct vm_area_struct;
