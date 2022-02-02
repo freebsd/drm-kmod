@@ -135,7 +135,7 @@ void dma_resv_init(struct dma_resv *obj)
 {
 	ww_mutex_init(&obj->lock, &reservation_ww_class);
 #ifdef __FreeBSD__
-	rw_init(&obj->rw, "dma_resv_rw");
+	rw_init_flags(&obj->rw, "dma_resv_rw", RW_NEW);
 #endif
 
 	__seqcount_init(&obj->seq, reservation_seqcount_string,
