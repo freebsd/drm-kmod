@@ -100,6 +100,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn302 \
 	${SRCDIR}/display/dc/irq/dcn303 \
 	${SRCDIR}/display/dc/irq/dcn31 \
+	${SRCDIR}/display/dc/irq/dcn315 \
 	${SRCDIR}/display/dc/link \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
@@ -591,7 +592,8 @@ SRCS+=	dcn31_afmt.c \
 
 # display/dc/clk_mgr/dcn315
 SRCS+=	dcn315_clk_mgr.c \
-	dcn315_smu.c
+	dcn315_smu.c \
+	irq_service_dcn315.c
 
 # display/dc/clk_mgr/dcn316
 SRCS+=	dcn316_clk_mgr.c \
@@ -1063,6 +1065,7 @@ CWARNFLAGS.irq_service_dcn201.c=	-Wno-missing-prototypes -Wno-unused-const-varia
 CWARNFLAGS.irq_service_dcn21.c=		-Wno-missing-prototypes -Wno-unused-const-variable -Wno-initializer-overrides
 CWARNFLAGS.irq_service_dcn30.c=		-Wno-missing-prototypes -Wno-unused-const-variable
 CWARNFLAGS.irq_service_dcn31.c=		-Wno-missing-prototypes
+CWARNFLAGS.irq_service_dcn315.c=	-Wno-missing-prototypes
 CWARNFLAGS.power_helpers.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes
