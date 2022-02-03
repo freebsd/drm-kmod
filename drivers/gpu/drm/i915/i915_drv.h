@@ -106,6 +106,25 @@
 #include "gt/intel_timeline.h"
 #include "i915_vma.h"
 
+struct dpll;
+struct drm_i915_gem_object;
+struct drm_i915_private;
+struct intel_atomic_state;
+struct intel_audio_funcs;
+struct intel_cdclk_config;
+struct intel_cdclk_funcs;
+struct intel_cdclk_state;
+struct intel_cdclk_vals;
+struct intel_connector;
+struct intel_crtc;
+struct intel_dp;
+struct intel_encoder;
+struct intel_fbdev;
+struct intel_initial_plane_config;
+struct intel_limit;
+struct intel_overlay;
+struct intel_overlay_error_state;
+struct vlv_s0ix_state;
 
 #ifdef __FreeBSD__
 /* BSD: Make sure we get out[bwl] redefines */
@@ -120,8 +139,6 @@
 #define DRIVER_DESC		"Intel Graphics"
 #define DRIVER_DATE		"20201103"
 #define DRIVER_TIMESTAMP	1604406085
-
-struct drm_i915_gem_object;
 
 /* Threshold == 5 for long IRQs, 50 for short */
 #define HPD_STORM_DEFAULT_THRESHOLD 50
@@ -171,8 +188,6 @@ struct i915_hotplug {
 	 I915_GEM_DOMAIN_COMMAND | \
 	 I915_GEM_DOMAIN_INSTRUCTION | \
 	 I915_GEM_DOMAIN_VERTEX)
-
-struct drm_i915_private;
 
 struct drm_i915_file_private {
 	struct drm_i915_private *dev_priv;
@@ -280,9 +295,6 @@ struct drm_i915_file_private {
 #define DRIVER_MINOR		6
 #define DRIVER_PATCHLEVEL	0
 
-struct intel_overlay;
-struct intel_overlay_error_state;
-
 struct sdvo_device_mapping {
 	u8 initialized;
 	u8 dvo_port;
@@ -291,18 +303,6 @@ struct sdvo_device_mapping {
 	u8 i2c_pin;
 	u8 ddc_pin;
 };
-
-struct intel_connector;
-struct intel_encoder;
-struct intel_atomic_state;
-struct intel_cdclk_config;
-struct intel_cdclk_funcs;
-struct intel_cdclk_state;
-struct intel_cdclk_vals;
-struct intel_initial_plane_config;
-struct intel_crtc;
-struct intel_limit;
-struct dpll;
 
 /* functions used internal in intel_pm.c */
 struct drm_i915_clock_gating_funcs {
@@ -391,7 +391,6 @@ enum drrs_support_type {
 	SEAMLESS_DRRS_SUPPORT = 2
 };
 
-struct intel_dp;
 struct i915_drrs {
 	struct mutex mutex;
 	struct delayed_work work;
@@ -408,8 +407,6 @@ struct i915_drrs {
 #define QUIRK_INCREASE_T12_DELAY (1<<6)
 #define QUIRK_INCREASE_DDI_DISABLED_TIME (1<<7)
 #define QUIRK_NO_PPS_BACKLIGHT_POWER_HOOK (1<<8)
-
-struct intel_fbdev;
 
 struct intel_gmbus {
 	struct i2c_adapter adapter;
@@ -428,8 +425,6 @@ struct i915_suspend_saved_registers {
 	u32 saveSWF3[3];
 	u16 saveGCDGMBUS;
 };
-
-struct vlv_s0ix_state;
 
 #define MAX_L3_SLICES 2
 struct intel_l3_parity {
@@ -619,7 +614,6 @@ struct i915_selftest_stash {
 };
 
 /* intel_audio.c private */
-struct intel_audio_funcs;
 struct intel_audio_private {
 	/* Display internal audio functions */
 	const struct intel_audio_funcs *funcs;
