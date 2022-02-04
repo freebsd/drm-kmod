@@ -4709,6 +4709,20 @@ static const struct dbuf_slice_conf_entry adlp_allowed_dbufs[] = {
 		.join_mbus = true,
 	},
 	{
+		.active_pipes = BIT(PIPE_A),
+		.dbuf_mask = {
+			[PIPE_A] = BIT(DBUF_S1) | BIT(DBUF_S2),
+		},
+		.join_mbus = false,
+	},
+	{
+		.active_pipes = BIT(PIPE_B),
+		.dbuf_mask = {
+			[PIPE_B] = BIT(DBUF_S3) | BIT(DBUF_S4),
+		},
+		.join_mbus = false,
+	},
+	{
 		.active_pipes = BIT(PIPE_B),
 		.dbuf_mask = {
 			[PIPE_B] = BIT(DBUF_S1) | BIT(DBUF_S2) | BIT(DBUF_S3) | BIT(DBUF_S4),
