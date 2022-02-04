@@ -25,7 +25,7 @@
 #ifndef _LINUX_GPLV2_DMA_BUF_H_
 #define _LINUX_GPLV2_DMA_BUF_H_
 
-#include <linux/dma-buf-map.h>
+#include <linux/iosys-map.h>
 #include <linux/file.h>
 #include <linux/err.h>
 #include <linux/scatterlist.h>
@@ -99,8 +99,8 @@ struct dma_buf_ops {
 	
 	int (*mmap)(struct dma_buf *, struct vm_area_struct *vma);
 
-	int (*vmap)(struct dma_buf *dmabuf, struct dma_buf_map *map);
-	void (*vunmap)(struct dma_buf *dmabuf, struct dma_buf_map *map);
+	int (*vmap)(struct dma_buf *dmabuf, struct iosys_map *map);
+	void (*vunmap)(struct dma_buf *dmabuf, struct iosys_map *map);
 };
 
 #undef file
@@ -112,7 +112,7 @@ struct dma_buf {
 	/* mutex to serialize list manipulation, attach/detach and vmap/unmap */
 	struct mutex lock;
 	unsigned vmapping_counter;
-	struct dma_buf_map vmap_ptr;
+	struct iosys_map vmap_ptr;
 	const char *exp_name;
 	struct module *owner;
 	struct list_head list_node;
@@ -177,7 +177,7 @@ struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *,
 void dma_buf_unmap_attachment(struct dma_buf_attachment *, struct sg_table *,
 				enum dma_data_direction);
 void dma_buf_move_notify(struct dma_buf *);
-int dma_buf_vmap(struct dma_buf *dmabuf, struct dma_buf_map *map);
-void dma_buf_vunmap(struct dma_buf *dmabuf, struct dma_buf_map *map);
+int dma_buf_vmap(struct dma_buf *dmabuf, struct iosys_map *map);
+void dma_buf_vunmap(struct dma_buf *dmabuf, struct iosys_map *map);
 
 #endif /* _LINUX_GPLV2_DMA_BUF_H_ */
