@@ -263,6 +263,7 @@ drm_getpciinfo(struct drm_device *dev, void *data, struct drm_file *file_priv)
 }
 #endif
 
+#ifdef CONFIG_AGP
 void drm_pci_agp_destroy(struct drm_device *dev)
 {
 	if (dev->agp) {
@@ -272,6 +273,7 @@ void drm_pci_agp_destroy(struct drm_device *dev)
 		dev->agp = NULL;
 	}
 }
+#endif
 
 #ifdef CONFIG_DRM_LEGACY
 

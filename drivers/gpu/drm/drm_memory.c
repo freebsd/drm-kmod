@@ -39,9 +39,9 @@
 #include <linux/vmalloc.h>
 #ifdef __linux__
 #include <xen/xen.h>
-#endif
 
 #include <drm/drm_agpsupport.h>
+#endif
 #include <drm/drm_cache.h>
 #include <drm/drm_device.h>
 
@@ -62,7 +62,6 @@
 static void *agp_remap(unsigned long offset, unsigned long size,
 		       struct drm_device *dev)
 {
-#ifdef __linux__
 	unsigned long i, num_pages =
 	    PAGE_ALIGN(size) / PAGE_SIZE;
 	struct drm_agp_mem *agpmem;
@@ -101,77 +100,24 @@ static void *agp_remap(unsigned long offset, unsigned long size,
 	vfree(page_map);
 
 	return addr;
-#elif defined(__FreeBSD__)
-	/*
-	 * FIXME Linux<->FreeBSD: Not implemented. This is never called
-	 * on FreeBSD anyway, because drm_agp_mem->cant_use_aperture is
-	 * set to 0.
-	 */
-	return NULL;
-#endif
 }
 
-#ifdef __FreeBSD__
-#define	vunmap(handle)
-#endif
 /** Wrapper around agp_free_memory() */
-#ifdef __linux__
 void drm_free_agp(struct agp_memory *handle, int pages)
-#elif defined(__FreeBSD__)
-void drm_free_agp(DRM_AGP_MEM * handle, int pages)
-#endif
 {
-	device_t agpdev;
-
-	agpdev = agp_find_device();
-	if (!agpdev || !handle)
-		return;
-
-#ifdef __linux__
 	agp_free_memory(handle);
-#elif defined(__FreeBSD__)
-	agp_free_memory(agpdev, handle);
-#endif
 }
 
 /** Wrapper around agp_bind_memory() */
-#ifdef __linux__
 int drm_bind_agp(struct agp_memory *handle, unsigned int start)
-#elif defined(__FreeBSD__)
-int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
-#endif
 {
-	device_t agpdev;
-
-	agpdev = agp_find_device();
-	if (!agpdev || !handle)
-		return -EINVAL;
-
-#ifdef __linux__
 	return agp_bind_memory(handle, start);
-#elif defined(__FreeBSD__)
-	return -agp_bind_memory(agpdev, handle, start * PAGE_SIZE);
-#endif
 }
 
 /** Wrapper around agp_unbind_memory() */
-#ifdef __linux__
 int drm_unbind_agp(struct agp_memory *handle)
-#elif defined(__FreeBSD__)
-int drm_unbind_agp(DRM_AGP_MEM * handle)
-#endif
 {
-	device_t agpdev;
-
-	agpdev = agp_find_device();
-	if (!agpdev || !handle)
-		return -EINVAL;
-
-#ifdef __linux__
 	return agp_unbind_memory(handle);
-#elif defined(__FreeBSD__)
-	return -agp_unbind_memory(agpdev, handle);
-#endif
 }
 
 #else /*  CONFIG_AGP  */
@@ -183,6 +129,7 @@ static inline void *agp_remap(unsigned long offset, unsigned long size,
 
 #endif /* CONFIG_AGP */
 
+#ifdef CONFIG_DRM_LEGACY
 void drm_legacy_ioremap(struct drm_local_map *map, struct drm_device *dev)
 {
 	if (dev->agp && dev->agp->cant_use_aperture && map->type == _DRM_AGP)
@@ -212,6 +159,7 @@ void drm_legacy_ioremapfree(struct drm_local_map *map, struct drm_device *dev)
 		iounmap(map->handle);
 }
 EXPORT_SYMBOL(drm_legacy_ioremapfree);
+#endif /* CONFIG_DRM_LEGACY */
 
 bool drm_need_swiotlb(int dma_bits)
 {

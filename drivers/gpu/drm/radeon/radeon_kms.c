@@ -78,10 +78,12 @@ void radeon_driver_unload_kms(struct drm_device *dev)
 	radeon_modeset_fini(rdev);
 	radeon_device_fini(rdev);
 
+#ifdef CONFIG_AGP
 	if (dev->agp)
 		arch_phys_wc_del(dev->agp->agp_mtrr);
 	kfree(dev->agp);
 	dev->agp = NULL;
+#endif
 
 done_free:
 	kfree(rdev);
