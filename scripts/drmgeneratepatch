@@ -78,6 +78,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_*vram*' \
     ':!include/drm/bridge/*' \
     ':!include/drm/tinydrm/*' \
+    ':!include/drm/drm_agpsupport*' \
     ':!include/drm/drm_fb_cma_helper.h*' \
     ':!include/drm/drm_gem_cma*' \
     ':!include/drm/drm_gem_shmem*' \
