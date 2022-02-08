@@ -77,16 +77,6 @@ SRCS+=	drm_fb_helper.c
 SRCS+=	drm_agpsupport.c
 .endif
 
-.if !empty(KCONFIG:MDRM_LEGACY)
-SRCS+=	ati_pcigart.c \
-	drm_legacy_misc.c \
-	drm_bufs.c \
-	drm_context.c \
-	drm_dma.c \
-	drm_scatter.c \
-	drm_lock.c
-.endif
-
 .if !empty(KCONFIG:MCOMPAT)
 SRCS+=	drm_ioc32.c
 .endif
@@ -95,10 +85,6 @@ SRCS+=	drm_ioc32.c
 SRCS_DEBUG=	\
 		drm_debugfs.c \
 		drm_debugfs_crc.c
-.endif
-
-.if !empty(KCONFIG:MDRM_VM)
-SRCS+=	drm_vm.c
 .endif
 
 .if !empty(KCONFIG:MDRM_DP_AUX_CHARDEV)
