@@ -33,5 +33,12 @@ for file in $1/*.patch; do
 	    echo "New files in questions : ${newfiles}"
 	    exit 1
 	fi
+	renames=$(awk '($1 == "rename" && $2 == "from") {print $3" renamed to "; getline; print $3}' $1/applied/${patchfile})
+	if [ -n "${renames}" ]; then
+	    echo "files got renamed, makefiles needs modification"
+	    echo "renamed files in questions : "
+	    echo "${renames}"
+	    exit 1
+	fi
 	make -sj$(sysctl -n hw.ncpu) || exit 1
 done
