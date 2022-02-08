@@ -64,7 +64,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_gem_ttm_helper*' \
     ':!drivers/gpu/drm/drm_hdcp*' \
     ':!drivers/gpu/drm/drm_kms_helper*' \
-    ':!drivers/gpu/drm/drm_mibi_dbi*' \
+    ':!drivers/gpu/drm/drm_mipi_dbi*' \
     ':!drivers/gpu/drm/drm_of*' \
     ':!drivers/gpu/drm/drm_simple*' \
     ':!drivers/gpu/drm/drm_trace*' \
