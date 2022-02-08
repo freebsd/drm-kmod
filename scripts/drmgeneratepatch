@@ -56,6 +56,9 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/i915/gt/selftest*' \
     ':!drivers/gpu/drm/i915/gem/selftests/*' \
     ':!drivers/gpu/drm/selftests/*' \
+    ':!drivers/gpu/drm/drm_bufs*' \
+    ':!drivers/gpu/drm/drm_context*' \
+    ':!drivers/gpu/drm/drm_dma*' \
     ':!drivers/gpu/drm/drm_dp_cec*' \
     ':!drivers/gpu/drm/drm_edid_load*' \
     ':!drivers/gpu/drm/drm_fb_cma_helper*' \
@@ -64,10 +67,14 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_gem_ttm_helper*' \
     ':!drivers/gpu/drm/drm_hdcp*' \
     ':!drivers/gpu/drm/drm_kms_helper*' \
+    ':!drivers/gpu/drm/drm_legacy_misc*' \
+    ':!drivers/gpu/drm/drm_lock*' \
     ':!drivers/gpu/drm/drm_mipi_dbi*' \
     ':!drivers/gpu/drm/drm_of*' \
+    ':!drivers/gpu/drm/drm_scatter*' \
     ':!drivers/gpu/drm/drm_simple*' \
     ':!drivers/gpu/drm/drm_trace*' \
+    ':!drivers/gpu/drm/drm_vm*' \
     ':!drivers/gpu/drm/drm_*vram*' \
     ':!include/drm/bridge/*' \
     ':!include/drm/tinydrm/*' \
