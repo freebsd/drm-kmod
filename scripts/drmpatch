@@ -40,5 +40,12 @@ for file in $1/*.patch; do
 	    echo "${renames}"
 	    exit 1
 	fi
+	deleted=$(awk '$1 == "deleted" { getline; getline; print $2 }' ../patches/5.8/applied/${patchfile} | sed 's/\(a\/\)\(.*\)/\2/')
+	if [ -n "${deleted}" ]; then
+	    echo "files got deleted, makefiles needs modification"
+	    echo "deleted files in questions : "
+	    echo "${deleted}"
+	    exit 1
+	fi
 	make -sj$(sysctl -n hw.ncpu) || exit 1
 done
