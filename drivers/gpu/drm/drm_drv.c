@@ -26,10 +26,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifdef __FreeBSD__
-#include <sys/sysent.h>
-#include <drm_os_freebsd.h>	/* Include first for DRM_CONFIG_LEGACY */
-#endif
 #include <linux/debugfs.h>
 #include <linux/fs.h>
 #include <linux/module.h>
