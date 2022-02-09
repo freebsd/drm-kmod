@@ -44,12 +44,6 @@
 #include "i915_irq.h"
 #include "i915_trace.h"
 #include "intel_pm.h"
-
-#ifdef __FreeBSD__
-#include <machine/clock.h>
-#include <asm/atomic.h>
-#endif
-
 #include "intel_sideband.h"
 #ifdef __linux__
 #include "../../../platform/x86/intel_ips.h"
