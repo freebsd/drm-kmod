@@ -32,10 +32,6 @@
 #include <linux/export.h>
 #include <linux/moduleparam.h>
 
-#ifdef __FreeBSD__
-#include <linux/list.h>	/* Needed by drm_client */
-#endif
-
 #include <drm/drm_bridge.h>
 #include <drm/drm_client.h>
 #include <drm/drm_crtc.h>
@@ -48,7 +44,6 @@
 #include <drm/drm_sysfs.h>
 
 #include "drm_crtc_helper_internal.h"
-
 
 /**
  * DOC: output probing helper overview
