@@ -7,10 +7,6 @@
 #include <linux/slab.h>
 #include <linux/workqueue.h>
 
-#ifdef __FreeBSD__
-#include <linux/list.h>
-#endif
-
 #include "i915_active.h"
 #include "gem/i915_gem_context.h"
 #include "gem/i915_gem_object.h"
