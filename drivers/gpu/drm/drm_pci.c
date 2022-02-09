@@ -348,6 +348,7 @@ err_free:
  */
 int drm_legacy_pci_init(struct drm_driver *driver, struct pci_driver *pdriver)
 {
+#ifdef __linux__
 	struct pci_dev *pdev = NULL;
 	const struct pci_device_id *pid;
 	int i;
@@ -357,20 +358,6 @@ int drm_legacy_pci_init(struct drm_driver *driver, struct pci_driver *pdriver)
 	if (WARN_ON(!(driver->driver_features & DRIVER_LEGACY)))
 		return -EINVAL;
 
-#ifdef __FreeBSD__
-
-	// XXX: clean up this
-	
-	pdriver->bsdclass = drm_devclass;
-	pdriver->name = "drmn";
-
-	if (!(driver->driver_features & DRIVER_LEGACY))
-		return linux_pci_register_drm_driver(pdriver);
-
-	DRM_ERROR("FreeBSD needs DRIVER_MODESET");
-	return (-ENOTSUP);
-
-#else
 	/* If not using KMS, fall back to stealth mode manual scanning. */
 	INIT_LIST_HEAD(&driver->legacy_dev_list);
 	for (i = 0; pdriver->id_table[i].vendor != 0; i++) {
