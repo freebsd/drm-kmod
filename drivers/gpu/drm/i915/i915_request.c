@@ -22,8 +22,6 @@
  *
  */
 
-/* FreeBSD include linux/prefetch.h first */
-#include <linux/prefetch.h>
 #include <linux/dma-fence-array.h>
 #include <linux/irq_work.h>
 #include <linux/prefetch.h>
