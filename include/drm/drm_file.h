@@ -33,9 +33,6 @@
 #include <linux/types.h>
 #include <linux/completion.h>
 #include <linux/idr.h>
-#ifdef __FreeBSD__
-#include <linux/file.h>
-#endif
 
 #include <uapi/drm/drm.h>
 
