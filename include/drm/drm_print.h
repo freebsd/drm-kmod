@@ -456,16 +456,6 @@ void drm_err(const char *format, ...);
 		    ##__VA_ARGS__);			  		\
 })
 #endif
-/**
- * Rate limited debug output. Like DRM_DEBUG() but won't flood the log.
- *
- * @dev: device pointer
- * @fmt: printf() like format string.
- */
-#define DRM_DEV_DEBUG_KMS_RATELIMITED(dev, fmt, ...)			\
-	_DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, DRM_UT_KMS,		\
-					  fmt, ##__VA_ARGS__)
-
 /*
  * struct drm_device based logging
  *
