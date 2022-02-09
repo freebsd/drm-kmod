@@ -31,6 +31,7 @@
 #include "i915_drv.h"
 
 #ifdef __FreeBSD__
+#include "i915_driver.h"
 SYSCTL_NODE(_hw, OID_AUTO, i915kms,
     CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
     DRIVER_DESC " parameters");
