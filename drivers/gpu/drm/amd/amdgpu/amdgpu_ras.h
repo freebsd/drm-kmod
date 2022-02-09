@@ -621,7 +621,7 @@ int amdgpu_ras_feature_enable_on_boot(struct amdgpu_device *adev,
 		struct ras_common_if *head, bool enable);
 
 int amdgpu_ras_sysfs_create(struct amdgpu_device *adev,
-		struct ras_fs_if *head);
+		struct ras_common_if *head);
 
 int amdgpu_ras_sysfs_remove(struct amdgpu_device *adev,
 		struct ras_common_if *head);
@@ -638,10 +638,10 @@ int amdgpu_ras_error_inject(struct amdgpu_device *adev,
 		struct ras_inject_if *info);
 
 int amdgpu_ras_interrupt_add_handler(struct amdgpu_device *adev,
-		struct ras_ih_if *info);
+		struct ras_common_if *head);
 
 int amdgpu_ras_interrupt_remove_handler(struct amdgpu_device *adev,
-		struct ras_ih_if *info);
+		struct ras_common_if *head);
 
 int amdgpu_ras_interrupt_dispatch(struct amdgpu_device *adev,
 		struct ras_dispatch_if *info);
