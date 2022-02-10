@@ -698,6 +698,7 @@ SRCS+=	dc_helper.c \
 # display/dmub/src
 SRCS+=	dmub_dcn20.c \
 	dmub_dcn21.c \
+	dmub_dcn315.c \
 	dmub_dcn316.c \
 	dmub_reg.c \
 	dmub_srv.c \
@@ -1088,6 +1089,7 @@ CWARNFLAGS.dmub_dcn301.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_dcn302.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_dcn303.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_dcn31.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dmub_dcn315.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_dcn316.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_outbox.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_reg.c=			-Wno-unused-but-set-variable
