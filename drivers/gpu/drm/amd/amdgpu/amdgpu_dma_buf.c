@@ -280,21 +280,14 @@ static struct sg_table *amdgpu_dma_buf_map(struct dma_buf_attachment *attach,
 	struct dma_buf *dma_buf = attach->dmabuf;
 	struct drm_gem_object *obj = dma_buf->priv;
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
-	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	struct sg_table *sgt;
 	long r;
 
 	if (!bo->pin_count) {
-		/* move buffer into GTT or VRAM */
+		/* move buffer into GTT */
 		struct ttm_operation_ctx ctx = { false, false };
-		unsigned domains = AMDGPU_GEM_DOMAIN_GTT;
 
-		if (bo->preferred_domains & AMDGPU_GEM_DOMAIN_VRAM &&
-		    attach->peer2peer) {
-			bo->flags |= AMDGPU_GEM_CREATE_CPU_ACCESS_REQUIRED;
-			domains |= AMDGPU_GEM_DOMAIN_VRAM;
-		}
-		amdgpu_bo_placement_from_domain(bo, domains);
+		amdgpu_bo_placement_from_domain(bo, AMDGPU_GEM_DOMAIN_GTT);
 		r = ttm_bo_validate(&bo->tbo, &bo->placement, &ctx);
 		if (r)
 			return ERR_PTR(r);
@@ -304,34 +297,20 @@ static struct sg_table *amdgpu_dma_buf_map(struct dma_buf_attachment *attach,
 		return ERR_PTR(-EBUSY);
 	}
 
-	switch (bo->tbo.mem.mem_type) {
-	case TTM_PL_TT:
-		sgt = drm_prime_pages_to_sg(bo->tbo.ttm->pages,
-					    bo->tbo.num_pages);
-		if (IS_ERR(sgt))
-			return sgt;
+	sgt = drm_prime_pages_to_sg(bo->tbo.ttm->pages, bo->tbo.num_pages);
+	if (IS_ERR(sgt))
+		return sgt;
 
-		if (!dma_map_sg_attrs(attach->dev, sgt->sgl, sgt->nents, dir,
-				      DMA_ATTR_SKIP_CPU_SYNC))
-			goto error_free;
-		break;
-
-	case TTM_PL_VRAM:
-		r = amdgpu_vram_mgr_alloc_sgt(adev, &bo->tbo.mem, attach->dev,
-					      dir, &sgt);
-		if (r)
-			return ERR_PTR(r);
-		break;
-	default:
-		return ERR_PTR(-EINVAL);
-	}
+	if (!dma_map_sg_attrs(attach->dev, sgt->sgl, sgt->nents, dir,
+			      DMA_ATTR_SKIP_CPU_SYNC))
+		goto error_free;
 
 	return sgt;
 
 error_free:
 	sg_free_table(sgt);
 	kfree(sgt);
-	return ERR_PTR(-EBUSY);
+	return ERR_PTR(-ENOMEM);
 }
 
 /**
@@ -347,18 +326,9 @@ static void amdgpu_dma_buf_unmap(struct dma_buf_attachment *attach,
 				 struct sg_table *sgt,
 				 enum dma_data_direction dir)
 {
-	struct dma_buf *dma_buf = attach->dmabuf;
-	struct drm_gem_object *obj = dma_buf->priv;
-	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
-	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
-
-	if (sgt->sgl->page_link) {
-		dma_unmap_sg(attach->dev, sgt->sgl, sgt->nents, dir);
-		sg_free_table(sgt);
-		kfree(sgt);
-	} else {
-		amdgpu_vram_mgr_free_sgt(adev, attach->dev, dir, sgt);
-	}
+	dma_unmap_sg(attach->dev, sgt->sgl, sgt->nents, dir);
+	sg_free_table(sgt);
+	kfree(sgt);
 }
 
 /**

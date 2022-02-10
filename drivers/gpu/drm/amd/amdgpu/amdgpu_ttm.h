@@ -24,9 +24,8 @@
 #ifndef __AMDGPU_TTM_H__
 #define __AMDGPU_TTM_H__
 
-#include <linux/dma-direction.h>
-#include <drm/gpu_scheduler.h>
 #include "amdgpu.h"
+#include <drm/gpu_scheduler.h>
 
 #define AMDGPU_PL_GDS		(TTM_PL_PRIV + 0)
 #define AMDGPU_PL_GWS		(TTM_PL_PRIV + 1)
@@ -75,15 +74,6 @@ uint64_t amdgpu_gtt_mgr_usage(struct ttm_mem_type_manager *man);
 int amdgpu_gtt_mgr_recover(struct ttm_mem_type_manager *man);
 
 u64 amdgpu_vram_mgr_bo_visible_size(struct amdgpu_bo *bo);
-int amdgpu_vram_mgr_alloc_sgt(struct amdgpu_device *adev,
-			      struct ttm_mem_reg *mem,
-			      struct device *dev,
-			      enum dma_data_direction dir,
-			      struct sg_table **sgt);
-void amdgpu_vram_mgr_free_sgt(struct amdgpu_device *adev,
-			      struct device *dev,
-			      enum dma_data_direction dir,
-			      struct sg_table *sgt);
 uint64_t amdgpu_vram_mgr_usage(struct ttm_mem_type_manager *man);
 uint64_t amdgpu_vram_mgr_vis_usage(struct ttm_mem_type_manager *man);
 
