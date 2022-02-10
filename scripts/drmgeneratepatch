@@ -84,6 +84,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_gem_shmem*' \
     ':!include/drm/drm_gem_ttm_helper*' \
     ':!include/drm/drm_mipi_dsi*' \
+    ':!include/drm/drm_mipi_dbi*' \
     ':!include/drm/drm_of*' \
     ':!include/drm/gma*' \
     ':!include/drm/drm_*vram*' \
