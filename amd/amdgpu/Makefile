@@ -593,6 +593,7 @@ SRCS+=	dcn31_afmt.c \
 # display/dc/clk_mgr/dcn315
 SRCS+=	dcn315_clk_mgr.c \
 	dcn315_smu.c \
+	dmub_dcn315.c \
 	irq_service_dcn315.c
 
 # display/dc/clk_mgr/dcn316
@@ -1082,6 +1083,7 @@ CWARNFLAGS.dmub_dcn301.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_dcn302.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_dcn303.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_dcn31.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dmub_dcn315.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_dcn316.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_outbox.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_reg.c=			-Wno-unused-but-set-variable
