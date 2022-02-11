@@ -25,10 +25,6 @@
 #ifndef _I915_REG_H_
 #define _I915_REG_H_
 
-#ifdef __FreeBSD__
-#include <linux/types.h>
-#endif
-
 #include <linux/bitfield.h>
 #include <linux/bits.h>
 
