@@ -193,8 +193,8 @@ static int
 dma_buf_poll(struct file *fp, int events,
 	     struct ucred *active_cred, struct thread *td)
 {
-	panic("XXX implement me!!!");
-	return (0);
+	// TODO: implement this when we need it (mostly used for cross-device fence sync)
+	return (ENOTSUP);
 }
 
 
