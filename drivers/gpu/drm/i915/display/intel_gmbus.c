@@ -37,8 +37,6 @@
 #include "intel_display_types.h"
 #include "intel_gmbus.h"
 
-extern struct class *drm_class;
-
 struct gmbus_pin {
 	const char *name;
 	enum i915_gpio gpio;
