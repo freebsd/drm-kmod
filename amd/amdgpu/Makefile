@@ -673,7 +673,8 @@ SRCS+=	irq_service.c \
 # display/dc/link
 SRCS+=	link_hwss_dio.c \
 	link_hwss_dpia.c \
-	link_hwss_hpo_dp.c
+	link_hwss_hpo_dp.c \
+	link_dp_trace.c
 
 # display/dc/virtual
 SRCS+=	virtual_link_encoder.c \
