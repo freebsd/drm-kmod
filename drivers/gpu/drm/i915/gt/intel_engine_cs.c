@@ -339,7 +339,7 @@ static int intel_engine_setup(struct intel_gt *gt, enum intel_engine_id id)
 	ewma__engine_latency_init(&engine->latency);
 	seqlock_init(&engine->stats.lock);
 
-#ifdef __linux__
+#ifdef CONFIG_DRM_I915_GVT
 	ATOMIC_INIT_NOTIFIER_HEAD(&engine->context_status_notifier);
 #endif
 
