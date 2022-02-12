@@ -203,16 +203,6 @@ static inline int vga_switcheroo_process_delayed_switch(void) { return 0; }
 static inline int vga_switcheroo_get_client_state(struct pci_dev *pdev) { return VGA_SWITCHEROO_ON; }
 #endif
 
-/* Linux 5.6 and before */
-#define pm_qos_add_request(a, b, c)
-#define pm_qos_update_request(a, b)
-#define pm_qos_remove_request(a)
-/* Linux 5.7 and after */
-#include <linux/pm_qos.h>
-#define	cpu_latency_qos_add_request(a, b)
-#define	cpu_latency_qos_update_request(a, b)
-#define	cpu_latency_qos_remove_request(a)
-
 #define pci_get_power_state pci_get_powerstate
 
 #define do_gettimeofday microtime

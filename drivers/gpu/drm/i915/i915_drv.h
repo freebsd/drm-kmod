@@ -902,15 +902,11 @@ struct drm_i915_private {
 	bool display_irqs_enabled;
 
 	/* To control wakeup latency, e.g. for irq-driven dp aux transfers. */
-#ifdef __linux__
 	struct pm_qos_request pm_qos;
-#endif
 
 	/* Sideband mailbox protection */
 	struct mutex sb_lock;
-#ifdef __linux__
 	struct pm_qos_request sb_qos;
-#endif
 
 	/** Cached value of IMR to avoid reads in updating the bitfield */
 	union {
