@@ -52,6 +52,7 @@ __FBSDID("$FreeBSD$");
 #include <linux/list.h>
 #include <linux/dma-buf.h>
 #include <linux/dma-resv.h>
+#include <linux/poll.h>
 
 #include <uapi/linux/dma-buf.h>
 
@@ -194,11 +195,138 @@ dma_buf_seek(struct file *fp, off_t offset, int whence, struct thread *td)
 }
 
 static int
+wake_up_task(struct task_struct *task, unsigned int state)
+{
+	int ret, wakeup_swapper;
+
+	ret = wakeup_swapper = 0;
+	sleepq_lock(task);
+	if ((atomic_read(&task->state) & state) != 0) {
+		set_task_state(task, TASK_WAKING);
+		wakeup_swapper = sleepq_signal(task, SLEEPQ_SLEEP, 0, 0);
+		ret = 1;
+	}
+	sleepq_release(task);
+	if (wakeup_swapper)
+		kick_proc0();
+	return (ret);
+}
+
+static void
+linux_wake_up_key(wait_queue_head_t *wqh, unsigned int state, int nr, bool locked, void *key)
+{
+	wait_queue_t *pos, *next;
+
+	if (!locked)
+	spin_lock(&wqh->lock);
+	list_for_each_entry_safe(pos, next, &wqh->task_list, task_list) {
+		if (pos->func == NULL) {
+			if (wake_up_task(pos->private, state) != 0 && --nr == 0)
+				break;
+		} else {
+			if (pos->func(pos, state, 0, key) != 0 && --nr == 0)
+				break;
+		}
+	}
+	if (!locked)
+		spin_unlock(&wqh->lock);
+}
+
+#define poll_to_key(m) ((void *)(__force uintptr_t)(__poll_t)(m))
+#define wake_up_locked_poll(wqh, m)					\
+	linux_wake_up_key(wqh, TASK_NORMAL, 1, true, poll_to_key(m))
+
+static void dma_buf_poll_cb(struct dma_fence *fence, struct dma_fence_cb *cb)
+{
+	struct dma_buf_poll_cb_t *dbcb = (struct dma_buf_poll_cb_t *)cb;
+	struct dma_buf *dmabuf = container_of(dbcb->poll, struct dma_buf, poll);
+	unsigned long flags;
+
+	spin_lock_irqsave(&dbcb->poll->lock, flags);
+	wake_up_locked_poll(dbcb->poll, dbcb->active);
+	dbcb->active = 0;
+	spin_unlock_irqrestore(&dbcb->poll->lock, flags);
+	dma_fence_put(fence);
+	fput((struct linux_file *)dmabuf->linux_file);
+}
+
+static bool dma_buf_poll_add_cb(struct dma_resv *resv, bool write,
+				struct dma_buf_poll_cb_t *dbcb)
+{
+	struct dma_resv_iter cursor;
+	struct dma_fence *fence;
+	int r;
+
+	dma_resv_for_each_fence(&cursor, resv, write, fence) {
+		dma_fence_get(fence);
+		r = dma_fence_add_callback(fence, &dbcb->cb, dma_buf_poll_cb);
+		if (!r)
+			return true;
+		dma_fence_put(fence);
+	}
+
+	return false;
+}
+
+static int
 dma_buf_poll(struct file *fp, int events,
 	     struct ucred *active_cred, struct thread *td)
 {
-	// TODO: implement this when we need it (mostly used for cross-device fence sync)
-	return (ENOTSUP);
+	if (!events)
+		return 0;
+	if (!fp_is_db(fp))
+		return (EINVAL);
+
+	struct dma_buf *db;
+	struct dma_resv *ro;
+
+	db = fp->f_data;
+	ro = db->resv;
+	MPASS(db != NULL);
+
+	dma_resv_lock(ro, NULL);
+	if (events & POLLOUT) {
+		struct dma_buf_poll_cb_t *dbcb = &db->cb_shared;
+
+		spin_lock_irq(&db->poll.lock);
+		if (dbcb->active)
+			events &= ~POLLOUT;
+		else
+			dbcb->active = POLLOUT;
+		spin_unlock_irq(&db->poll.lock);
+
+		if (events & POLLOUT) {
+			get_file((struct linux_file *)db->linux_file);
+
+			if (!dma_buf_poll_add_cb(ro, true, dbcb))
+				dma_buf_poll_cb(NULL, &dbcb->cb);
+			else
+				events &= ~POLLOUT;
+		}
+	}
+
+	if (events & POLLIN) {
+		struct dma_buf_poll_cb_t *dbcb = &db->cb_shared;
+
+		spin_lock_irq(&db->poll.lock);
+		if (dbcb->active)
+			events &= ~POLLIN;
+		else
+			dbcb->active = POLLIN;
+		spin_unlock_irq(&db->poll.lock);
+
+		if (events & POLLIN) {
+			get_file((struct linux_file *)db->linux_file);
+
+			if (!dma_buf_poll_add_cb(ro, true, dbcb))
+				dma_buf_poll_cb(NULL, &dbcb->cb);
+			else
+				events &= ~POLLIN;
+		}
+	}
+
+	dma_resv_unlock(ro);
+	return events;
 }
 
 
