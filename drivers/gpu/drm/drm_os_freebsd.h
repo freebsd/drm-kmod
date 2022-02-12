@@ -208,6 +208,7 @@ static inline int vga_switcheroo_get_client_state(struct pci_dev *pdev) { return
 #define pm_qos_update_request(a, b)
 #define pm_qos_remove_request(a)
 /* Linux 5.7 and after */
+#include <linux/pm_qos.h>
 #define	cpu_latency_qos_add_request(a, b)
 #define	cpu_latency_qos_update_request(a, b)
 #define	cpu_latency_qos_remove_request(a)
