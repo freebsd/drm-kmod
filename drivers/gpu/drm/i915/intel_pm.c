@@ -3804,8 +3804,9 @@ void intel_sagv_pre_plane_update(struct intel_atomic_state *state)
 	if (!new_bw_state)
 		return;
 
-	if (DISPLAY_VER(dev_priv) < 11 && !intel_can_enable_sagv(dev_priv, new_bw_state)) {
-		intel_disable_sagv(dev_priv);
+	if (DISPLAY_VER(dev_priv) < 11) {
+		if (!intel_can_enable_sagv(dev_priv, new_bw_state))
+			intel_disable_sagv(dev_priv);
 		return;
 	}
 
@@ -3855,8 +3856,9 @@ void intel_sagv_post_plane_update(struct intel_atomic_state *state)
 	if (!new_bw_state)
 		return;
 
-	if (DISPLAY_VER(dev_priv) < 11 && intel_can_enable_sagv(dev_priv, new_bw_state)) {
-		intel_enable_sagv(dev_priv);
+	if (DISPLAY_VER(dev_priv) < 11) {
+		if (intel_can_enable_sagv(dev_priv, new_bw_state))
+			intel_enable_sagv(dev_priv);
 		return;
 	}
 
