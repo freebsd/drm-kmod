@@ -20,8 +20,6 @@ __FBSDID("$FreeBSD$");
 #define DRM_DEV_UID	UID_ROOT
 #define DRM_DEV_GID	GID_VIDEO
 
-extern int drm_always_interruptible;
-
 struct vt_kms_softc {
 	struct drm_fb_helper    *fb_helper;
 	struct task              fb_mode_task;
