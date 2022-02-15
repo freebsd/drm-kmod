@@ -71,7 +71,4 @@ static inline int vga_switcheroo_process_delayed_switch(void) { return 0; }
 static inline int vga_switcheroo_get_client_state(struct pci_dev *pdev) { return VGA_SWITCHEROO_ON; }
 #endif
 
-#define acpi_video_register()
-#define acpi_video_unregister()
-
 #endif /* _DRM_OS_FREEBSD_H_ */
