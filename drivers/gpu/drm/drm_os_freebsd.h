@@ -13,12 +13,7 @@ __FBSDID("$FreeBSD$");
 #include <sys/priv.h>
 #include <sys/smp.h>
 
-#include <linux/kernel.h>
-#include <asm/uaccess.h>
-#include <linux/delay.h>
-#include <linux/slab.h>
 #include <linux/mod_devicetable.h>
-#include <linux/pci.h>
 #include <linux/fb.h>
 
 #define DRM_DEV_MODE	(S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP)
@@ -32,85 +27,12 @@ struct vt_kms_softc {
 	struct task              fb_mode_task;
 };
 
-#define	DRM_IRQ_ARGS		int irq, void *arg
-
-#define	KHZ2PICOS(a)	(1000000000UL/(a))
-
-#define	DRM_HZ			hz
-#define DRM_CURPROC		curthread
-#define	DRM_SUSER(p)		(priv_check(p, PRIV_DRIVER) == 0)
-#define	DRM_UDELAY(n)		udelay(n);
-
-#define DRM_WAIT_ON( ret, queue, timeout, condition )		\
-do {								\
-	DECLARE_WAITQUEUE(entry, current);			\
-	unsigned long end = ticks + (timeout);		\
-	add_wait_queue(&(queue), &entry);			\
-								\
-	for (;;) {						\
-		__set_current_state(TASK_INTERRUPTIBLE);	\
-		if (condition)					\
-			break;					\
-		if (time_after_eq(ticks, end)) {		\
-			ret = -EBUSY;				\
-			break;					\
-		}						\
-		schedule_timeout((HZ/100 > 1) ? HZ/100 : 1);	\
-		if (signal_pending(current)) {			\
-			ret = -EINTR;				\
-			break;					\
-		}						\
-	}							\
-	__set_current_state(TASK_RUNNING);			\
-	remove_wait_queue(&(queue), &entry);			\
-} while (0)
-
-
-
-#define	DRM_WRITE8(map, offset, val)					\
-	*(volatile u_int8_t *)(((vm_offset_t)(map)->handle) +		\
-	    (vm_offset_t)(offset)) = val
-#define	DRM_WRITE16(map, offset, val)					\
-	*(volatile u_int16_t *)(((vm_offset_t)(map)->handle) +		\
-	    (vm_offset_t)(offset)) = htole16(val)
-#define	DRM_WRITE32(map, offset, val)					\
-	*(volatile u_int32_t *)(((vm_offset_t)(map)->handle) +		\
-	    (vm_offset_t)(offset)) = htole32(val)
-#define	DRM_WRITE64(map, offset, val)					\
-	*(volatile u_int64_t *)(((vm_offset_t)(map)->handle) +		\
-	    (vm_offset_t)(offset)) = htole64(val)
-
-/* DRM_READMEMORYBARRIER() prevents reordering of reads.
- * DRM_WRITEMEMORYBARRIER() prevents reordering of writes.
- * DRM_MEMORYBARRIER() prevents reordering of reads and writes.
- */
-#define	DRM_READMEMORYBARRIER()		rmb()
-#define	DRM_WRITEMEMORYBARRIER()	wmb()
-#define	DRM_MEMORYBARRIER()		mb()
-#define	smp_mb__before_atomic_inc()	mb()
-#define	smp_mb__after_atomic_inc()	mb()
-
 /* XXXKIB what is the right code for the FreeBSD ? */
 /* kib@ used ENXIO here -- dumbbell@ */
 #define	EREMOTEIO	EIO
 
 #define	KTR_DRM		KTR_DEV
 #define	KTR_DRM_REG	KTR_SPARE3
-
-#define	DRM_AGP_KERN	struct agp_info
-#define	DRM_AGP_MEM	void
-
-#define	get_unaligned(ptr)                                              \
-	({ __typeof__(*(ptr)) __tmp;                                    \
-	  memcpy(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
-
-#define	drm_get_device_from_kdev(_kdev)	(((struct drm_minor *)(_kdev)->si_drv1)->dev)
-
-#define DRM_IOC_VOID		IOC_VOID
-#define DRM_IOC_READ		IOC_OUT
-#define DRM_IOC_WRITE		IOC_IN
-#define DRM_IOC_READWRITE	IOC_INOUT
-#define DRM_IOC(dir, group, nr, size) _IOC(dir, group, nr, size)
 
 static inline int
 __copy_to_user_inatomic(void __user *to, const void *from, unsigned n)
@@ -125,7 +47,6 @@ static inline unsigned long
 __copy_from_user_inatomic(void *to, const void __user *from,
     unsigned long n)
 {
-
 	/*
 	 * XXXKIB.  Equivalent Linux function is implemented using
 	 * MOVNTI for aligned moves.  For unaligned head and tail,
@@ -138,23 +59,11 @@ __copy_from_user_inatomic(void *to, const void __user *from,
 #define	__copy_from_user_inatomic_nocache(to, from, n) \
     __copy_from_user_inatomic((to), (from), (n))
 
-
-#define	sigemptyset(set)	SIGEMPTYSET(set)
-#define	sigaddset(set, sig)	SIGADDSET(set, sig)
-
 MALLOC_DECLARE(DRM_MEM_DMA);
 MALLOC_DECLARE(DRM_MEM_DRIVER);
 MALLOC_DECLARE(DRM_MEM_KMS);
 
 extern devclass_t drm_devclass;
-
-typedef struct drm_pci_id_list
-{
-	int vendor;
-	int device;
-	long driver_private;
-	char *name;
-} drm_pci_id_list_t;
 
 struct drm_minor;
 int drm_dev_alias(struct device *dev, struct drm_minor *minor, const char *minor_str);
@@ -169,27 +78,13 @@ void cancel_reset_debug_log(void);
 #define	PM_EVENT_PRETHAW	PM_EVENT_QUIESCE
 
 
-#define drm_proc_cleanup(a, b)
-
-
-/* Legacy VGA regions */
-#define VGA_RSRC_NONE	       0x00
-#define VGA_RSRC_LEGACY_IO     0x01
-#define VGA_RSRC_LEGACY_MEM    0x02
-#define VGA_RSRC_LEGACY_MASK   (VGA_RSRC_LEGACY_IO | VGA_RSRC_LEGACY_MEM)
-/* Non-legacy access */
-#define VGA_RSRC_NORMAL_IO     0x04
-#define VGA_RSRC_NORMAL_MEM    0x08
-
-
-
-struct linux_fb_info;
 void vt_restore_fbdev_mode(void *arg, int pending);
 int vt_kms_postswitch(void *arg);
 void vt_freeze_main_vd(struct apertures_struct *a);
 void vt_unfreeze_main_vd(void);
 
 #if 0
+struct linux_fb_info;
 static inline void vga_switcheroo_unregister_client(struct pci_dev *pdev) {}
 static inline int vga_switcheroo_register_client(struct pci_dev *pdev,
 		const struct vga_switcheroo_client_ops *ops) { return 0; }
@@ -203,12 +98,7 @@ static inline int vga_switcheroo_process_delayed_switch(void) { return 0; }
 static inline int vga_switcheroo_get_client_state(struct pci_dev *pdev) { return VGA_SWITCHEROO_ON; }
 #endif
 
-#define pci_get_power_state pci_get_powerstate
-
-#define do_gettimeofday microtime
 #define acpi_video_register()
 #define acpi_video_unregister()
-
-extern	u_int	cpu_clflush_line_size;
 
 #endif /* _DRM_OS_FREEBSD_H_ */
