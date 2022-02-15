@@ -43,9 +43,6 @@ int drm_debug_persist = 0;
 #endif
 SYSCTL_INT(_dev_drm, OID_AUTO, drm_debug_persist, CTLFLAG_RWTUN, &drm_debug_persist, 0, "keep drm debug flags post-load (compat)");
 SYSCTL_INT(_hw_dri, OID_AUTO, drm_debug_persist, CTLFLAG_RWTUN, &drm_debug_persist, 0, "keep drm debug flags post-load");
-int drm_panic_on_error = 0;
-SYSCTL_INT(_dev_drm, OID_AUTO, error_panic, CTLFLAG_RWTUN, &drm_panic_on_error, 0, "panic if an ERROR is hit (compat)");
-SYSCTL_INT(_hw_dri, OID_AUTO, error_panic, CTLFLAG_RWTUN, &drm_panic_on_error, 0, "panic if an ERROR is hit");
 
 static struct callout reset_debug_log_handle;
 
