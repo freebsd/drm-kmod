@@ -42,11 +42,6 @@ struct drm_minor;
 int drm_dev_alias(struct device *dev, struct drm_minor *minor, const char *minor_str);
 void cancel_reset_debug_log(void);
 
-#define	console_lock()
-#define	console_unlock()
-#define	console_trylock()	true
-
-
 void vt_restore_fbdev_mode(void *arg, int pending);
 int vt_kms_postswitch(void *arg);
 void vt_freeze_main_vd(struct apertures_struct *a);

@@ -29,6 +29,22 @@
 
 #include <linux/types.h>
 
+static inline void
+console_lock(void)
+{
+}
+
+static inline int
+console_trylock(void)
+{
+	return (1);
+}
+
+static inline void
+console_unlock(void)
+{
+}
+
 static inline bool
 vgacon_text_force(void)
 {
