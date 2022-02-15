@@ -46,10 +46,6 @@ void cancel_reset_debug_log(void);
 #define	console_unlock()
 #define	console_trylock()	true
 
-#define	PM_EVENT_SUSPEND	0x0002
-#define	PM_EVENT_QUIESCE	0x0008
-#define	PM_EVENT_PRETHAW	PM_EVENT_QUIESCE
-
 
 void vt_restore_fbdev_mode(void *arg, int pending);
 int vt_kms_postswitch(void *arg);
