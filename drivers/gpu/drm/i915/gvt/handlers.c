@@ -39,6 +39,7 @@
 #include "i915_drv.h"
 #include "gvt.h"
 #include "i915_pvinfo.h"
+#include "intel_mchbar_regs.h"
 #include "display/intel_display_types.h"
 
 /* XXX FIXME i915 has changed PP_XXX definition */
