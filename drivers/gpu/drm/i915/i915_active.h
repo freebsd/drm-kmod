@@ -181,11 +181,7 @@ static inline bool i915_active_has_exclusive(struct i915_active *ref)
 	return rcu_access_pointer(ref->excl.fence);
 }
 
-int __i915_active_wait(struct i915_active *ref, int state);
-static inline int i915_active_wait(struct i915_active *ref)
-{
-	return __i915_active_wait(ref, TASK_INTERRUPTIBLE);
-}
+int i915_active_wait(struct i915_active *ref);
 
 int i915_sw_fence_await_active(struct i915_sw_fence *fence,
 			       struct i915_active *ref,
