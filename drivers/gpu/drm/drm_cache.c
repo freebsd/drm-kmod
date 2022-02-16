@@ -31,6 +31,7 @@
 #include <linux/cc_platform.h>
 #include <linux/export.h>
 #include <linux/highmem.h>
+#include <linux/ioport.h>
 #include <linux/iosys-map.h>
 #ifdef __linux__
 #include <xen/xen.h>
