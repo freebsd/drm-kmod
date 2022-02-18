@@ -15,6 +15,20 @@
 #include "i915_gem_object.h"
 #include "i915_scatterlist.h"
 
+#ifdef __FreeBSD__
+/*
+ * This effectively reverts Linux 2170ecfa768850bb29487baa3101c993ab7d7402
+ * "drm/i915: convert get_user_pages() --> pin_user_pages()" commit.
+ */
+#define	pin_user_pages_remote(task, mm, start, nr_pages, gup_flags, pages, \
+    vmas, locked)							\
+    get_user_pages_remote(task, mm, start, nr_pages, gup_flags, pages, vmas)
+#define	pin_user_pages_fast_only(start, nr_pages, gup_flags, pagep)	\
+    __get_user_pages_fast(start, nr_pages, (gup_flags) & FOLL_WRITE, pagep)
+#define	unpin_user_pages(pages, npages)	release_pages(pages, npages)
+#define	unpin_user_page(page)	put_page(page)
+#endif
+
 struct i915_mm_struct {
 	struct mm_struct *mm;
 	struct drm_i915_private *i915;
@@ -476,11 +490,7 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 					 obj->userptr.ptr + pinned * PAGE_SIZE,
 					 npages - pinned,
 					 flags,
-#ifdef __linux__
 					 pvec + pinned, NULL, &locked);
-#elif defined(__FreeBSD__)
-					 pvec + pinned, NULL);
-#endif
 				if (ret < 0)
 					break;
 
