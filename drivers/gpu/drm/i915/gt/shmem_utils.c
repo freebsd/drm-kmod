@@ -35,7 +35,12 @@ struct file *shmem_create_from_object(struct drm_i915_gem_object *obj)
 
 	if (obj->ops == &i915_gem_shmem_ops) {
 		file = obj->base.filp;
+#ifdef __linux__
 		atomic_long_inc(&file->f_count);
+#elif defined(__FreeBSD__)
+		MPASS(filp->_file == NULL);
+		refcount_acquire(&file->f_count);
+#endif
 		return file;
 	}
 
@@ -49,6 +54,7 @@ struct file *shmem_create_from_object(struct drm_i915_gem_object *obj)
 	return file;
 }
 
+#ifdef __linux__
 static size_t shmem_npte(struct file *file)
 {
 	return file->f_mapping->host->i_size >> PAGE_SHIFT;
@@ -124,6 +130,7 @@ void shmem_unpin_map(struct file *file, void *ptr)
 	mapping_clear_unevictable(file->f_mapping);
 	__shmem_unpin_map(file, ptr, shmem_npte(file));
 }
+#endif
 
 static int __shmem_rw(struct file *file, loff_t off,
 		      void *ptr, size_t len,
@@ -137,7 +144,11 @@ static int __shmem_rw(struct file *file, loff_t off,
 		struct page *page;
 		void *vaddr;
 
+#ifdef __linux__
 		page = shmem_read_mapping_page_gfp(file->f_mapping, pfn,
+#elif defined(__FreeBSD__)
+		page = shmem_read_mapping_page_gfp(file->f_shmem, pfn,
+#endif
 						   GFP_KERNEL);
 		if (IS_ERR(page))
 			return PTR_ERR(page);

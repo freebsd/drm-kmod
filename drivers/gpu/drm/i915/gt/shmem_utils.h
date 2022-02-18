@@ -14,8 +14,10 @@ struct file;
 struct file *shmem_create_from_data(const char *name, void *data, size_t len);
 struct file *shmem_create_from_object(struct drm_i915_gem_object *obj);
 
+#ifdef __linux__
 void *shmem_pin_map(struct file *file);
 void shmem_unpin_map(struct file *file, void *ptr);
+#endif
 
 int shmem_read(struct file *file, loff_t off, void *dst, size_t len);
 int shmem_write(struct file *file, loff_t off, void *src, size_t len);

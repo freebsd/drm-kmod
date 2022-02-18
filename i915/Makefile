@@ -151,6 +151,7 @@ SRCS+=	gen6_ppgtt.c \
 	intel_sseu.c \
 	intel_timeline.c \
 	intel_workarounds.c \
+	shmem_utils.c \
 	sysfs_engines.c
 
 # gt/uc*
