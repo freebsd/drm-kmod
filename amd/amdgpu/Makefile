@@ -75,6 +75,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/gpio/dcn20 \
 	${SRCDIR}/display/dc/gpio/dcn21 \
 	${SRCDIR}/display/dc/gpio/dcn30 \
+	${SRCDIR}/display/dc/gpio/dcn315 \
 	${SRCDIR}/display/dc/gpio/diagnostics \
 	${SRCDIR}/display/dc/i2caux \
 	${SRCDIR}/display/dc/i2caux/dce100 \
@@ -648,6 +649,7 @@ SRCS+=	gpio_base.c \
 	hw_factory_dcn10.c \
 	hw_factory_dcn20.c \
 	hw_factory_dcn21.c \
+	hw_factory_dcn315.c \
 	hw_factory_diag.c \
 	hw_translate_dce110.c \
 	hw_translate_dce120.c \
@@ -656,6 +658,7 @@ SRCS+=	gpio_base.c \
 	hw_translate_dcn10.c \
 	hw_translate_dcn20.c \
 	hw_translate_dcn21.c \
+	hw_translate_dcn315.c \
 	hw_translate_diag.c
 
 # display/dc/irq/*
