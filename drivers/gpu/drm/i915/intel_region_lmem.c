@@ -9,20 +9,6 @@
 #include "gem/i915_gem_region.h"
 #include "intel_region_lmem.h"
 
-#ifdef __FreeBSD__
-/*
- * dma_(un)map_resource implementation should belong to LKPI from base system
- * and should stay in sys/compat/linuxkpi/common/include/linux/dma-mapping.h.
- * See https://reviews.freebsd.org/D30933
- * It temporarily left here as untested and should be replaced with patch from
- * aforementioned review after it gets proven to work.
- */
-#define	dma_map_resource(dev, phys_addr, size, dir, attrs)	\
-	linux_dma_map_phys(dev, phys_addr, size)
-#define	dma_unmap_resource(dev, dma_addr, size, dir, attrs)	\
-	linux_dma_unmap(dev, dma_addr, size)
-#endif
-
 static int init_fake_lmem_bar(struct intel_memory_region *mem)
 {
 	struct drm_i915_private *i915 = mem->i915;
