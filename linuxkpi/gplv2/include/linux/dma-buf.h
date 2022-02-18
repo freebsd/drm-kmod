@@ -135,12 +135,14 @@ struct dma_buf_attachment {
 	struct list_head node;
 	struct sg_table *sgt;
 	enum dma_data_direction dir;
+	bool peer2peer;
 	const struct dma_buf_attach_ops *importer_ops;
 	void *importer_priv;
 	void *priv;
 };
 
 struct dma_buf_attach_ops {
+	bool allow_peer2peer;
 	void (*move_notify)(struct dma_buf_attachment *attach);
 };
 

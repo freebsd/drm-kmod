@@ -288,6 +288,8 @@ dma_buf_dynamic_attach(struct dma_buf *db, struct device *dev,
 	
 	dba->dev = dev;
 	dba->dmabuf = db;
+	if (iops != NULL)
+		dba->peer2peer = iops->allow_peer2peer;
 	dba->importer_ops = iops;
 	dba->importer_priv = ipriv;
 
