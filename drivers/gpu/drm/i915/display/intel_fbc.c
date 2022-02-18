@@ -807,7 +807,11 @@ static bool intel_fbc_can_activate(struct intel_crtc *crtc)
 	 * For now this will effectively disable FBC with 90/270 degree
 	 * rotation.
 	 */
+#ifdef __linux__
 	if (INTEL_GEN(dev_priv) < 9 && cache->fence_id < 0) {
+#elif defined(__FreeBSD__)
+	if (cache->fence_id < 0) {
+#endif
 		fbc->no_fbc_reason = "framebuffer not tiled or fenced";
 		return false;
 	}
