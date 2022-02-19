@@ -46,7 +46,6 @@ struct drm_i915_getparam32 {
 static int compat_i915_getparam(struct file *file, unsigned int cmd,
 				unsigned long arg)
 {
-#ifdef __linux__
 	struct drm_i915_getparam32 req32;
 	struct drm_i915_getparam req;
 
@@ -58,20 +57,6 @@ static int compat_i915_getparam(struct file *file, unsigned int cmd,
 
 	return drm_ioctl_kernel(file, i915_getparam_ioctl, &req,
 				DRM_RENDER_ALLOW);
-#elif defined(__FreeBSD__)
-	drm_i915_getparam_t __user *request = (void __user *)arg;
-	struct drm_i915_getparam32 req32;
-	struct drm_i915_getparam req;
-
-	if (copy_from_user(&req32, request, sizeof(req32)))
-		return -EFAULT;
-
-	req.param = req32.param;
-	req.value = (void *)(uintptr_t)req32.value;
-
-	return drm_ioctl_kernel(file, i915_getparam_ioctl,
-			 &req, DRM_AUTH|DRM_RENDER_ALLOW);
-#endif
 }
 
 static drm_ioctl_compat_t *i915_compat_ioctls[] = {
