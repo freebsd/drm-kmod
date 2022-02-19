@@ -1263,7 +1263,6 @@ static struct intel_timeline *get_timeline(struct i915_request *rq)
 	return tl;
 }
 
-#ifdef __linux__
 static int print_ring(char *buf, int sz, struct i915_request *rq)
 {
 	int len = 0;
@@ -1285,7 +1284,6 @@ static int print_ring(char *buf, int sz, struct i915_request *rq)
 
 	return len;
 }
-#endif
 
 #ifdef __linux__
 static void hexdump(struct drm_printer *m, const void *buf, size_t len)
@@ -1442,7 +1440,6 @@ static void intel_engine_print_registers(struct intel_engine_cs *engine,
 		execlists_active_lock_bh(execlists);
 		rcu_read_lock();
 		for (port = execlists->active; (rq = *port); port++) {
-#ifdef __linux__
 			char hdr[160];
 			int len;
 
@@ -1453,10 +1450,8 @@ static void intel_engine_print_registers(struct intel_engine_cs *engine,
 			len += print_ring(hdr + len, sizeof(hdr) - len, rq);
 			scnprintf(hdr + len, sizeof(hdr) - len, "rq: ");
 			print_request(m, rq, hdr);
-#endif
 		}
 		for (port = execlists->pending; (rq = *port); port++) {
-#ifdef __linux__
 			char hdr[160];
 			int len;
 
@@ -1467,7 +1462,6 @@ static void intel_engine_print_registers(struct intel_engine_cs *engine,
 			len += print_ring(hdr + len, sizeof(hdr) - len, rq);
 			scnprintf(hdr + len, sizeof(hdr) - len, "rq: ");
 			print_request(m, rq, hdr);
-#endif
 		}
 		rcu_read_unlock();
 		execlists_active_unlock_bh(execlists);
