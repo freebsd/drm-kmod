@@ -38,7 +38,7 @@ struct file *shmem_create_from_object(struct drm_i915_gem_object *obj)
 #ifdef __linux__
 		atomic_long_inc(&file->f_count);
 #elif defined(__FreeBSD__)
-		MPASS(filp->_file == NULL);
+		MPASS(file->_file == NULL);
 		refcount_acquire(&file->f_count);
 #endif
 		return file;
