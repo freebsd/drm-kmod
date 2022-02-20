@@ -47,14 +47,6 @@ resource_contains(struct linux_resource *a, struct linux_resource *b)
 	return a->start <= b->start && a->end >= b->end;
 }
 
-static inline struct pci_dev *
-pci_upstream_bridge(struct pci_dev *dev)
-{
-
-	UNIMPLEMENTED();
-	return (NULL);
-}
-
 static inline bool
 pci_is_thunderbolt_attached(struct pci_dev *pdev)
 {
