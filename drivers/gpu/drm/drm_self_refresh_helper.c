@@ -53,19 +53,15 @@
 
 #define SELF_REFRESH_AVG_SEED_MS 200
 
-#ifdef __linux__
 DECLARE_EWMA(psr_time, 4, 4)
-#endif
 
 struct drm_self_refresh_data {
 	struct drm_crtc *crtc;
 	struct delayed_work entry_work;
 
 	struct mutex avg_mutex;
-#ifdef __linux__
 	struct ewma_psr_time entry_avg_ms;
 	struct ewma_psr_time exit_avg_ms;
-#endif
 };
 
 static void drm_self_refresh_helper_entry_work(struct work_struct *work)
@@ -133,7 +129,6 @@ out_drop_locks:
 	drm_modeset_acquire_fini(&ctx);
 }
 
-#ifdef __linux__
 /**
  * drm_self_refresh_helper_update_avg_times - Updates a crtc's SR time averages
  * @state: the state which has just been applied to hardware
@@ -175,7 +170,6 @@ drm_self_refresh_helper_update_avg_times(struct drm_atomic_state *state,
 	}
 }
 EXPORT_SYMBOL(drm_self_refresh_helper_update_avg_times);
-#endif
 
 /**
  * drm_self_refresh_helper_alter_state - Alters the atomic state for SR exit
@@ -218,12 +212,10 @@ void drm_self_refresh_helper_alter_state(struct drm_atomic_state *state)
 		if (!sr_data)
 			continue;
 
-#ifdef __linux__
 		mutex_lock(&sr_data->avg_mutex);
 		delay = (ewma_psr_time_read(&sr_data->entry_avg_ms) +
 			 ewma_psr_time_read(&sr_data->exit_avg_ms)) * 2;
 		mutex_unlock(&sr_data->avg_mutex);
-#endif
 
 		mod_delayed_work(system_wq, &sr_data->entry_work,
 				 msecs_to_jiffies(delay));
@@ -253,7 +245,6 @@ int drm_self_refresh_helper_init(struct drm_crtc *crtc)
 			  drm_self_refresh_helper_entry_work);
 	sr_data->crtc = crtc;
 	mutex_init(&sr_data->avg_mutex);
-#ifdef __linux__
 	ewma_psr_time_init(&sr_data->entry_avg_ms);
 	ewma_psr_time_init(&sr_data->exit_avg_ms);
 
@@ -264,7 +255,6 @@ int drm_self_refresh_helper_init(struct drm_crtc *crtc)
 	 */
 	ewma_psr_time_add(&sr_data->entry_avg_ms, SELF_REFRESH_AVG_SEED_MS);
 	ewma_psr_time_add(&sr_data->exit_avg_ms, SELF_REFRESH_AVG_SEED_MS);
-#endif
 
 	crtc->self_refresh_data = sr_data;
 	return 0;

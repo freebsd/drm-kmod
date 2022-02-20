@@ -1647,12 +1647,10 @@ static void commit_tail(struct drm_atomic_state *old_state)
 		drm_atomic_helper_commit_tail(old_state);
 
 	commit_time_ms = ktime_ms_delta(ktime_get(), start);
-#ifdef __linux__
 	if (commit_time_ms > 0)
 		drm_self_refresh_helper_update_avg_times(old_state,
 						 (unsigned long)commit_time_ms,
 						 new_self_refresh_mask);
-#endif
 
 	drm_atomic_helper_commit_cleanup_done(old_state);
 
