@@ -611,15 +611,17 @@ static bool amdgpu_atpx_detect(void)
 	bool has_atpx = false;
 	int vga_count = 0;
 	bool d3_supported = false;
+#ifdef __linux__
 	struct pci_dev *parent_pdev;
+#endif
 
 	while ((pdev = pci_get_class(PCI_CLASS_DISPLAY_VGA << 8, pdev)) != NULL) {
 		vga_count++;
 
 		has_atpx |= (amdgpu_atpx_pci_probe_handle(pdev) == true);
 
-		parent_pdev = pci_upstream_bridge(pdev);
 #ifdef __linux__
+		parent_pdev = pci_upstream_bridge(pdev);
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
 #elif defined(__FreeBSD__)
 		// BSDFIXME
@@ -633,8 +635,8 @@ static bool amdgpu_atpx_detect(void)
 
 		has_atpx |= (amdgpu_atpx_pci_probe_handle(pdev) == true);
 
-		parent_pdev = pci_upstream_bridge(pdev);
 #ifdef __linux__
+		parent_pdev = pci_upstream_bridge(pdev);
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
 #elif defined(__FreeBSD__)
 		// BSDFIXME
