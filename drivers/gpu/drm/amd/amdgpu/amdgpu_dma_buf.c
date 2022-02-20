@@ -38,9 +38,7 @@
 #include <drm/amdgpu_drm.h>
 #include <linux/dma-buf.h>
 #include <linux/dma-fence-array.h>
-#ifdef __linux__
 #include <linux/pci-p2pdma.h>
-#endif
 
 /**
  * amdgpu_gem_prime_vmap - &dma_buf_ops.vmap implementation
@@ -552,9 +550,7 @@ amdgpu_dma_buf_move_notify(struct dma_buf_attachment *attach)
 }
 
 static const struct dma_buf_attach_ops amdgpu_dma_buf_attach_ops = {
-#ifdef __linux__
 	.allow_peer2peer = true,
-#endif
 	.move_notify = amdgpu_dma_buf_move_notify
 };
 
