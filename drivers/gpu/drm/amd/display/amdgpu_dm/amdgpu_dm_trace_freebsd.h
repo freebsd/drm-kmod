@@ -3,6 +3,7 @@
 
 #include <sys/param.h>
 #include <sys/ktr.h>
+#include <drm/drm_os_freebsd.h>	/* KTR_DRM */
 
 /* TRACE_EVENT(amdgpu_dc_rreg, */
 /* 	TP_PROTO(unsigned long *read_count, uint32_t reg, uint32_t value), */
