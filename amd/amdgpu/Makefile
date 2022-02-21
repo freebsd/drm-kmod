@@ -798,6 +798,7 @@ SRCS+=	amd_powerplay.c \
 	smu_v13_0.c \
 	smu_v13_0_0_ppt.c \
 	smu_v13_0_5_ppt.c \
+	smu_v13_0_7_ppt.c \
 	smu_helper.c \
 	smumgr.c \
 	tonga_baco.c \
