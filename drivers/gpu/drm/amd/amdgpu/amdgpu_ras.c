@@ -2010,9 +2010,8 @@ int amdgpu_ras_late_init(struct amdgpu_device *adev,
 	}
 
 	/* in resume phase, no need to create ras fs node */
-	if (adev->in_suspend || adev->in_gpu_reset) {
+	if (adev->in_suspend || adev->in_gpu_reset)
 		return 0;
-	}
 
 	if (ih_info->cb) {
 		r = amdgpu_ras_interrupt_add_handler(adev, ih_info);
