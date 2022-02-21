@@ -261,6 +261,7 @@ static int navi10_ih_irq_init(struct amdgpu_device *adev)
 	} else {
 		WREG32_SOC15(OSSSYS, 0, mmIH_RB_CNTL, ih_rb_cntl);
 	}
+	navi10_ih_reroute_ih(adev);
 
 	if (unlikely(adev->firmware.load_type == AMDGPU_FW_LOAD_DIRECT)) {
 		if (ih->use_bus_addr) {
@@ -270,7 +271,6 @@ static int navi10_ih_irq_init(struct amdgpu_device *adev)
 			WREG32_SOC15(OSSSYS, 0, mmIH_CHICKEN, ih_chicken);
 		}
 	}
-	navi10_ih_reroute_ih(adev);
 
 	/* set the writeback address whether it's enabled or not */
 	WREG32_SOC15(OSSSYS, 0, mmIH_RB_WPTR_ADDR_LO,
