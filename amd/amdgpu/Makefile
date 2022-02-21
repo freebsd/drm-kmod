@@ -18,6 +18,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn302 \
 	${SRCDIR}/display/dc/dml/dcn303 \
 	${SRCDIR}/display/dc/dml/dcn31 \
+	${SRCDIR}/display/dc/dml/dcn32 \
 	${SRCDIR}/display/dc/dml/dsc
 .endif
 
@@ -674,6 +675,11 @@ SRCS+=	dcn303_fpu.c
 # display/dc/dml/dcn31
 SRCS+=	dcn31_fpu.c
 
+# display/dc/dml/dcn32
+SRCS+=	display_mode_vba_32.c \
+	display_mode_vba_util_32.c \
+	display_rq_dlg_calc_32.c
+
 # display/dc/gpio/*
 SRCS+=	gpio_base.c \
 	gpio_service.c \
@@ -918,11 +924,14 @@ CFLAGS.display_mode_vba_20.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_21.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_30.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_31.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_mode_vba_32.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_mode_vba_util_32.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_pipe_clocks.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml1_display_rq_dlg_calc.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_helpers.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_20.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_21.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-missing-prototypes
+CFLAGS.display_rq_dlg_calc_32.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.soc_bounding_box.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_rq_dlg_calc_20v2.c= ${FPUFLAGS} -mstack-alignment=4
@@ -1155,6 +1164,8 @@ CWARNFLAGS.dmub_srv_stat.c=		-Wno-unused-but-set-variable
 
 # display/dc/dml/
 CWARNFLAGS.display_mode_vba_30.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.display_mode_vba_32.c=	-Wno-enum-conversion -Wno-unused-const-variable
+CWARNFLAGS.display_mode_vba_util_32.c=	-Wno-enum-conversion -Wno-missing-prototypes -Wno-unused-local-typedef
 
 # powerplay/*
 CWARNFLAGS.amdgpu_smu.c=		-Wno-unused-function -Wno-missing-prototypes -Wno-unused-but-set-variable
