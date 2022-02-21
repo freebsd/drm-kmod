@@ -38,7 +38,6 @@
 #include <linux/dma-resv.h>
 
 #ifndef __linux__
-#include <sys/rwlock.h>
 #include <sys/tree.h>
 #endif
 #include "ttm_bo_api.h"
@@ -457,10 +456,7 @@ struct ttm_bo_device {
 	struct list_head device_list;
 	struct ttm_bo_driver *driver;
 	struct ttm_mem_type_manager man[TTM_NUM_MEM_TYPES];
-#ifndef __linux__
-	rwlock_t vm_lock;
-	spinlock_t fence_lock;
-#endif
+
 	/*
 	 * Protected by the vm lock.
 	 */
