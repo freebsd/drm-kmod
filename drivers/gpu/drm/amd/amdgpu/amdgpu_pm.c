@@ -449,6 +449,10 @@ static ssize_t amdgpu_get_pp_num_states(struct device *dev,
 	/* sysctl -a can panic if this data is uninitialized */
 	memset(&data, 0, sizeof(struct pp_states_info));
 #endif
+
+	if (adev->in_gpu_reset)
+		return -EPERM;
+
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -487,9 +491,6 @@ static ssize_t amdgpu_get_pp_cur_state(struct device *dev,
 	struct smu_context *smu = &adev->smu;
 	enum amd_pm_state_type pm = 0;
 	int i = 0, ret = 0;
-
-	if (adev->in_gpu_reset)
-		return -EPERM;
 
 	if (adev->in_gpu_reset)
 		return -EPERM;
@@ -942,6 +943,9 @@ static ssize_t amdgpu_get_pp_features(struct device *dev,
 	ssize_t size;
 	int ret;
 
+	if (adev->in_gpu_reset)
+		return -EPERM;
+
 	ret = pm_runtime_get_sync(ddev->dev);
 	if (ret < 0)
 		return ret;
@@ -997,9 +1001,6 @@ static ssize_t amdgpu_get_pp_dpm_sclk(struct device *dev,
 	struct amdgpu_device *adev = ddev->dev_private;
 	ssize_t size;
 	int ret;
-
-	if (adev->in_gpu_reset)
-		return -EPERM;
 
 	if (adev->in_gpu_reset)
 		return -EPERM;
@@ -1690,9 +1691,6 @@ static ssize_t amdgpu_get_gpu_busy_percent(struct device *dev,
 	if (adev->in_gpu_reset)
 		return -EPERM;
 
-	if (adev->in_gpu_reset)
-		return -EPERM;
-
 	r = pm_runtime_get_sync(ddev->dev);
 	if (r < 0)
 		return r;
@@ -1725,6 +1723,9 @@ static ssize_t amdgpu_get_mem_busy_percent(struct device *dev,
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = ddev->dev_private;
 	int r, value, size = sizeof(value);
+
+	if (adev->in_gpu_reset)
+		return -EPERM;
 
 	r = pm_runtime_get_sync(ddev->dev);
 	if (r < 0)
@@ -2666,6 +2667,9 @@ static ssize_t amdgpu_hwmon_show_power_cap_max(struct device *dev,
 	ssize_t size;
 	int r;
 
+	if (adev->in_gpu_reset)
+		return -EPERM;
+
 	r = pm_runtime_get_sync(adev->ddev->dev);
 	if (r < 0)
 		return r;
@@ -2694,9 +2698,6 @@ static ssize_t amdgpu_hwmon_show_power_cap(struct device *dev,
 	uint32_t limit = 0;
 	ssize_t size;
 	int r;
-
-	if (adev->in_gpu_reset)
-		return -EPERM;
 
 	if (adev->in_gpu_reset)
 		return -EPERM;
