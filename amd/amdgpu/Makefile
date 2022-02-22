@@ -254,6 +254,7 @@ SRCS+=	amdgpu_afmt.c \
 	aldebaran_reg_init.c \
 	aldebaran.c \
 	iceland_ih.c \
+	ih_v6_0.c \
 	jpeg_v1_0.c \
 	jpeg_v2_0.c \
 	jpeg_v2_5.c \
