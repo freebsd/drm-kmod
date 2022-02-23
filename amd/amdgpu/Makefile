@@ -49,6 +49,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/clk_mgr/dcn31 \
 	${SRCDIR}/display/dc/clk_mgr/dcn315 \
 	${SRCDIR}/display/dc/clk_mgr/dcn316 \
+	${SRCDIR}/display/dc/clk_mgr/dcn32 \
 	${SRCDIR}/display/dc/dce \
 	${SRCDIR}/display/dc/dce100 \
 	${SRCDIR}/display/dc/dce110 \
@@ -67,6 +68,8 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn31 \
 	${SRCDIR}/display/dc/dcn315 \
 	${SRCDIR}/display/dc/dcn316 \
+	${SRCDIR}/display/dc/dcn32 \
+	${SRCDIR}/display/dc/dcn321 \
 	${SRCDIR}/display/dc/dml/calcs \
 	${SRCDIR}/display/dc/dsc \
 	${_dml} \
@@ -602,6 +605,24 @@ SRCS+=	dcn315_resource.c
 # display/dc/dcn316
 SRCS+=	dcn316_resource.c
 
+# display/dc/dcn32
+SRCS+=	dcn32_dccg.c \
+	dcn32_dio_link_encoder.c \
+	dcn32_dio_stream_encoder.c \
+	dcn32_dpp.c \
+	dcn32_hpo_dp_link_encoder.c \
+	dcn32_hubbub.c \
+	dcn32_hubp.c \
+	dcn32_hwseq.c \
+	dcn32_init.c \
+	dcn32_mmhubbub.c \
+	dcn32_mpc.c \
+	dcn32_optc.c \
+	dcn32_resource.c
+
+# display/dc/dcn321
+SRCS+=	dcn321_resource.c
+
 # display/dc/clk_mgr/dcn31
 SRCS+=	dcn31_afmt.c \
 	dcn31_apg.c \
@@ -631,6 +652,10 @@ SRCS+=	dcn315_clk_mgr.c \
 # display/dc/clk_mgr/dcn316
 SRCS+=	dcn316_clk_mgr.c \
 	dcn316_smu.c
+
+# display/dc/clk_mgr/dcn32
+SRCS+=	dcn32_clk_mgr.c \
+	dcn32_clk_mgr_smu_msg.c
 
 # display/dc/core
 SRCS+=	dc_link_dpia.c \
@@ -917,6 +942,7 @@ CFLAGS.dcn301_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn303_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn32_resource.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_mode_lib.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba.c= ${FPUFLAGS} -mstack-alignment=4
@@ -1018,6 +1044,7 @@ CWARNFLAGS.conversion.c=		-Wno-missing-prototypes
 CWARNFLAGS.fixpt31_32.c=		-Wno-incompatible-pointer-types
 CWARNFLAGS.vector.c=			-Wno-missing-prototypes
 CWARNFLAGS.bios_parser.c=		-Wno-missing-prototypes
+CWARNFLAGS.bios_parser2.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dc.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_hw_sequencer.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_link.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
@@ -1124,6 +1151,19 @@ CWARNFLAGS.dcn315_smu.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn316_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types -Wno-unused-but-set-variable
 CWARNFLAGS.dcn316_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn316_smu.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn32_clk_mgr.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn32_dccg.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn32_dio_link_encoder.c=	-Wno-missing-prototypes -Wno-unused-variable
+CWARNFLAGS.dcn32_dio_stream_encoder.c=	-Wno-missing-prototypes
+CWARNFLAGS.dcn32_dpp.c=			-Wno-missing-prototypes
+CWARNFLAGS.dcn32_hwseq.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dcn32_hubbub.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn32_init.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn32_mmhubbub.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn32_mpc.c=			-Wno-missing-prototypes
+CWARNFLAGS.dcn32_optc.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn32_resource.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-initializer-overrides
+CWARNFLAGS.dcn321_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
