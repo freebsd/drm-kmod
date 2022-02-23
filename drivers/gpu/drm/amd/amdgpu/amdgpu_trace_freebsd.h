@@ -134,6 +134,12 @@ trace_amdgpu_ib_pipe_sync(struct amdgpu_job *job, struct dma_fence *fence){
 	CTR2(KTR_DRM, "amdgpu_ib_pipe_sync %p, fence %p", job, fence);
 }
 
+static inline void
+trace_amdgpu_reset_reg_dumps(uint32_t address, uint32_t value){
+	CTR2(KTR_DRM, "amdgpu_reset_reg_dumps address %x, value %x",
+	    address, value);
+}
+
 #define trace_amdgpu_mm_rreg(dev, reg, ret)	\
 	CTR3(KTR_DRM, "amdgpu_mm_rreg %p %x %d", (dev), (reg), (ret))
 
