@@ -861,6 +861,7 @@ FPUFLAGS= -msse
 CFLAGS.dcn_calcs.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn_calc_auto.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn_calc_math.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-tautological-compare
+CFLAGS.dcn20_fpu.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-unused-variable
 CFLAGS.dcn20_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn21_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn30_resource.c= ${FPUFLAGS} -mstack-alignment=4
