@@ -18,6 +18,15 @@ __FBSDID("$FreeBSD$");
 #include <linux/vga_switcheroo.h>
 #include <drm/drm_crtc_helper.h>
 
+#include <machine/md_var.h>
+
+/*
+ * intel_graphics_stolen_* are defined in sys/dev/pci/pcivar.h
+ * and set at early boot from machdep.c. Copy over the values
+ * here to a linux_resource struct.
+ */
+struct linux_resource intel_graphics_stolen_res;
+
 void *intel_gtt_get_registers(void);
 void _intel_gtt_get(size_t *gtt_total, size_t *stolen_size, unsigned long *mappable_end);
 void intel_gtt_install_pte(unsigned int index, vm_paddr_t addr, unsigned int flags);
@@ -149,3 +158,15 @@ linux_intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
 
 	intel_gtt_read_pte(pg_start + i - 1);
 }
+
+#if defined(__amd64__)
+static void
+intel_freebsd_init(void *arg __unused)
+{
+	/* Defined in $SYSDIR/x86/pci/pci_early_quirks.c */
+	intel_graphics_stolen_res = (struct linux_resource)
+		DEFINE_RES_MEM(intel_graphics_stolen_base,
+		    intel_graphics_stolen_size);
+}
+SYSINIT(intel_freebsd, SI_SUB_DRIVERS, SI_ORDER_ANY, intel_freebsd_init, NULL);
+#endif
