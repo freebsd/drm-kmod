@@ -42,6 +42,8 @@ __FBSDID("$FreeBSD$");
 #include <linux/idr.h>
 #include <linux/io.h>
 
+#if (((__FreeBSD_version < 1400047) && (__FreeBSD_version > 1400000)) || \
+      (__FreeBSD_version < 1300525))
 /*
  * Check that there is a SYSUNINIT for this
  */
@@ -134,3 +136,4 @@ arch_phys_wc_del(int reg)
 	mtrr_del(mi->base, mi->size);
 	free(mi, M_LKMTRR);
 }
+#endif

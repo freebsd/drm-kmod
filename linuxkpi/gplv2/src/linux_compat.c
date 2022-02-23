@@ -23,7 +23,7 @@ struct cpuinfo_x86 boot_cpu_data;
 #endif
 
 static void
-linux_compat_init(void *arg __unused)
+linux_gplv2_compat_init(void *arg __unused)
 {
 
 #if defined(__i386__) || defined(__amd64__)
@@ -42,4 +42,4 @@ linux_compat_init(void *arg __unused)
 	            intel_graphics_stolen_size);
 #endif
 }
-SYSINIT(linux_compat, SI_SUB_VFS, SI_ORDER_ANY, linux_compat_init, NULL);
+SYSINIT(linux_gplv2_compat, SI_SUB_VFS, SI_ORDER_ANY, linux_gplv2_compat_init, NULL);
