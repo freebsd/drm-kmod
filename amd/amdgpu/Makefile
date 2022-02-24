@@ -15,6 +15,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn30 \
 	${SRCDIR}/display/dc/dml/dcn301 \
 	${SRCDIR}/display/dc/dml/dcn302 \
+	${SRCDIR}/display/dc/dml/dcn303 \
 	${SRCDIR}/display/dc/dml/dcn31 \
 	${SRCDIR}/display/dc/dml/dsc
 .endif
@@ -635,6 +636,9 @@ SRCS+=	display_mode_lib.c \
 # display/dc/dml/dcn302
 SRCS+=	dcn302_fpu.c
 
+# display/dc/dml/dcn303
+SRCS+=	dcn303_fpu.c
+
 # display/dc/gpio/*
 SRCS+=	gpio_base.c \
 	gpio_service.c \
@@ -861,6 +865,7 @@ CFLAGS.dcn21_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn30_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn301_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn301_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn303_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_resource.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_mode_lib.c= ${FPUFLAGS} -mstack-alignment=4
