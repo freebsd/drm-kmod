@@ -3,6 +3,8 @@
  * Copyright © 2016 Intel Corporation
  */
 
+#include <linux/string_helpers.h>
+
 #include <drm/drm_print.h>
 
 #include "gem/i915_gem_context.h"
@@ -1719,8 +1721,7 @@ static void intel_engine_print_registers(struct intel_engine_cs *engine,
 #ifdef __linux__
 		/* BSDFIXME: We don't have a tasklet.state or tasklet.count */
 		drm_printf(m, "\tExeclist tasklet queued? %s (%s), preempt? %s, timeslice? %s\n",
-			   yesno(test_bit(TASKLET_STATE_SCHED,
-					  &engine->sched_engine->tasklet.state)),
+			   str_yes_no(test_bit(TASKLET_STATE_SCHED, &engine->sched_engine->tasklet.state)),
 			   enableddisabled(!atomic_read(&engine->sched_engine->tasklet.count)),
 			   repr_timer(&engine->execlists.preempt),
 			   repr_timer(&engine->execlists.timer));
@@ -1983,7 +1984,7 @@ void intel_engine_dump(struct intel_engine_cs *engine,
 
 	drm_printf(m, "\tAwake? %d\n", atomic_read(&engine->wakeref.count));
 	drm_printf(m, "\tBarriers?: %s\n",
-		   yesno(!llist_empty(&engine->barrier_tasks)));
+		   str_yes_no(!llist_empty(&engine->barrier_tasks)));
 	drm_printf(m, "\tLatency: %luus\n",
 		   ewma__engine_latency_read(&engine->latency));
 	if (intel_engine_supports_stats(engine))
@@ -2029,7 +2030,7 @@ void intel_engine_dump(struct intel_engine_cs *engine,
 	linux_hexdump(m, engine->status_page.addr, PAGE_SIZE);
 #endif
 
-	drm_printf(m, "Idle? %s\n", yesno(intel_engine_is_idle(engine)));
+	drm_printf(m, "Idle? %s\n", str_yes_no(intel_engine_is_idle(engine)));
 
 	intel_engine_print_breadcrumbs(engine, m);
 }

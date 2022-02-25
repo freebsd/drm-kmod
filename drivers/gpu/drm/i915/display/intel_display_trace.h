@@ -136,11 +136,11 @@ trace_g4x_wm(struct intel_crtc *crtc, const struct g4x_wm_values *wm)
 	    wm->pipe[crtc->pipe].plane[PLANE_CURSOR]);
 	CTR4(KTR_DRM,
 	    "g4x_wm[2/3]: sr %s/%d/%d/%d",
-	    yesno(wm->cxsr), wm->sr.plane, wm->sr.cursor, wm->sr.fbc);
+	    str_yes_no(wm->cxsr), wm->sr.plane, wm->sr.cursor, wm->sr.fbc);
 	CTR5(KTR_DRM,
 	    "g4x_wm(3/3]: hpll %s/%d/%d/%d, fbc %s",
-	    yesno(wm->hpll_en), wm->hpll.plane, wm->hpll.cursor, wm->hpll.fbc,
-	    yesno(wm->fbc_en));
+	    str_yes_no(wm->hpll_en), wm->hpll.plane, wm->hpll.cursor, wm->hpll.fbc,
+	    str_yes_no(wm->fbc_en));
 }
 
 static inline void
