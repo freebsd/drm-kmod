@@ -116,7 +116,7 @@ trace_intel_memory_cxsr(struct drm_i915_private *dev_priv, bool old, bool new)
 
 	CTR2(KTR_DRM,
 	    "intel_memory_cxsr[1/2]: %s->%s",
-	    onoff(old), onoff(new));
+	    str_on_off(old), str_on_off(new));
 	CTR6(KTR_DRM, 
 	    "intel_memory_cxsr[2/2]: "
 	    "pipe A: frame=%u, scanline=%u, pipe B: frame=%u, scanline=%u, pipe C: frame=%u, scanline=%u",
