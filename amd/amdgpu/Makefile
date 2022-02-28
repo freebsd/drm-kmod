@@ -10,6 +10,7 @@ KMOD=	amdgpu
 
 .if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
 _dml=	${SRCDIR}/display/dc/dml \
+	${SRCDIR}/display/dc/dml/dcn10 \
 	${SRCDIR}/display/dc/dml/dcn20 \
 	${SRCDIR}/display/dc/dml/dcn21 \
 	${SRCDIR}/display/dc/dml/dcn30 \
@@ -632,6 +633,9 @@ SRCS+=	display_mode_lib.c \
 	display_rq_dlg_calc_21.c \
 	dml1_display_rq_dlg_calc.c
 .endif
+
+# display/dc/dml/dcn10
+SRCS+=	dcn10_fpu.c
 
 # display/dc/dml/dcn302
 SRCS+=	dcn302_fpu.c
