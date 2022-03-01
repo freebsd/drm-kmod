@@ -621,7 +621,8 @@ SRCS+=	dcn32_dccg.c \
 	dcn32_resource.c
 
 # display/dc/dcn321
-SRCS+=	dcn321_resource.c
+SRCS+=	dcn321_dio_link_encoder.c \
+	dcn321_resource.c
 
 # display/dc/clk_mgr/dcn31
 SRCS+=	dcn31_afmt.c \
