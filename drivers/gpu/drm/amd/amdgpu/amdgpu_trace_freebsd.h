@@ -17,8 +17,9 @@ trace_amdgpu_cs_ioctl(struct amdgpu_job *job){
 }
 
 static inline void
-trace_amdgpu_cs(struct amdgpu_cs_parser *parser, int i){
-	CTR2(KTR_DRM, "amdgpu_cs %d %p", i, parser);
+trace_amdgpu_cs(struct amdgpu_cs_parser *parser, struct amdgpu_job *job,
+    struct amdgpu_ib *ib){
+	CTR3(KTR_DRM, "amdgpu_cs %p %p %p", parser, job, ib);
 }
 
 static inline void
