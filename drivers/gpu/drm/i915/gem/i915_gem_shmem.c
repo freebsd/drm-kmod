@@ -456,6 +456,7 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 	vm_object_t mapping = obj->base.filp->f_shmem;
 #else
 	struct address_space *mapping = obj->base.filp->f_mapping;
+	const struct address_space_operations *aops = mapping->a_ops;
 #endif
 	char __user *user_data = u64_to_user_ptr(arg->data_ptr);
 	u64 remain, offset;
@@ -521,9 +522,8 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 		if (err)
 			return err;
 
-		err = pagecache_write_begin(obj->base.filp, mapping,
-					    offset, len, 0,
-					    &page, &data);
+		err = aops->write_begin(obj->base.filp, mapping, offset, len,
+					&page, &data);
 		if (err < 0)
 			return err;
 #endif
@@ -535,9 +535,8 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 		kunmap_atomic(vaddr);
 
 #ifdef __linux__
-		err = pagecache_write_end(obj->base.filp, mapping,
-					  offset, len, len - unwritten,
-					  page, data);
+		err = aops->write_end(obj->base.filp, mapping, offset, len,
+				      len - unwritten, page, data);
 		if (err < 0)
 			return err;
 #else
@@ -692,6 +691,9 @@ i915_gem_object_create_shmem_from_data(struct drm_i915_private *dev_priv,
 {
 	struct drm_i915_gem_object *obj;
 	struct file *file;
+#ifdef __linux__
+	const struct address_space_operations *aops;
+#endif
 	resource_size_t offset;
 	int err;
 
@@ -703,6 +705,9 @@ i915_gem_object_create_shmem_from_data(struct drm_i915_private *dev_priv,
 	GEM_BUG_ON(obj->write_domain != I915_GEM_DOMAIN_CPU);
 
 	file = obj->base.filp;
+#ifdef __linux__
+	aops = file->f_mapping->a_ops;
+#endif
 	offset = 0;
 	do {
 		unsigned int len = min_t(typeof(size), size, PAGE_SIZE);
@@ -710,9 +715,8 @@ i915_gem_object_create_shmem_from_data(struct drm_i915_private *dev_priv,
 		void *pgdata, *vaddr;
 
 #ifdef __linux__
-		err = pagecache_write_begin(file, file->f_mapping,
-					    offset, len, 0,
-					    &page, &pgdata);
+		err = aops->write_begin(file, file->f_mapping, offset, len,
+					&page, &pgdata);
 		if (err < 0)
 			goto fail;
 #elif defined(__FreeBSD__)
@@ -726,9 +730,8 @@ i915_gem_object_create_shmem_from_data(struct drm_i915_private *dev_priv,
 		kunmap(page);
 
 #ifdef __linux__
-		err = pagecache_write_end(file, file->f_mapping,
-					  offset, len, len,
-					  page, pgdata);
+		err = aops->write_end(file, file->f_mapping, offset, len, len,
+				      page, pgdata);
 		if (err < 0)
 			goto fail;
 #elif defined(__FreeBSD__)
