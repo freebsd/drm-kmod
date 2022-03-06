@@ -204,6 +204,7 @@ SRCS+=	intel_guc.c \
 	intel_guc_ads.c \
 	intel_guc_ct.c \
 	intel_guc_fw.c \
+	intel_guc_hwconfig.c \
 	intel_guc_log.c \
 	intel_guc_submission.c \
 	intel_huc.c \
