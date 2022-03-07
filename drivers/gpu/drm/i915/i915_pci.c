@@ -1133,6 +1133,7 @@ MODULE_DEPEND(i915kms, drmn, 2, 2, 2);
 MODULE_DEPEND(i915kms, agp, 1, 1, 1);
 MODULE_DEPEND(i915kms, linuxkpi, 1, 1, 1);
 MODULE_DEPEND(i915kms, linuxkpi_gplv2, 1, 1, 1);
+MODULE_DEPEND(i915kms, dmabuf, 1, 1, 1);
 MODULE_DEPEND(i915kms, firmware, 1, 1, 1);
 #ifdef CONFIG_DEBUG_FS
 MODULE_DEPEND(i915kms, debugfs, 1, 1, 1);
