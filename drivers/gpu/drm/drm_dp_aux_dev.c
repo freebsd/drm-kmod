@@ -33,9 +33,7 @@
 #include <linux/sched/signal.h>
 #include <linux/slab.h>
 #include <linux/uaccess.h>
-#ifdef __linux__
 #include <linux/uio.h>
-#endif
 
 #include <drm/drm_crtc.h>
 #include <drm/drm_dp_helper.h>
