@@ -1008,6 +1008,7 @@ CWARNFLAGS.rv1_clk_mgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp_dscl.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_hw_sequencer.c=	-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-unused-variable
+CWARNFLAGS.dcn10_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_link_encoder.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.dcn10_stream_encoder.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.dcn10_opp.c=			-Wno-missing-prototypes
