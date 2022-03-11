@@ -160,7 +160,6 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_fru_eeprom.c \
 	amdgpu_fw_attestation.c \
 	amdgpu_securedisplay.c \
-	amdgpu_hdp.c \
 	amdgpu_gart.c \
 	amdgpu_gem.c \
 	amdgpu_gfx.c \
@@ -177,7 +176,6 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_jpeg.c \
 	amdgpu_kms.c \
 	amdgpu_mca.c \
-	amdgpu_mmhub.c \
 	amdgpu_nbio.c \
 	amdgpu_object.c \
 	amdgpu_pll.c \
@@ -897,9 +895,7 @@ CWARNFLAGS.amdgpu_device.c=			-Wno-missing-prototypes -Wno-unused-but-set-variab
 CWARNFLAGS.amdgpu_discovery.c=			-Wno-unused-function
 CWARNFLAGS.amdgpu_dm_debugfs.c=			-Wno-pointer-bool-conversion -Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_fence.c=			-Wno-unused-variable
-CWARNFLAGS.amdgpu_hdp.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ioc32.c=			-Wno-missing-prototypes
-CWARNFLAGS.amdgpu_mmhub.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_pm.c=				-Wno-unused-const-variable
 CWARNFLAGS.amdgpu_fw_attestation.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_securedisplay.c=		-Wno-unused-const-variable
