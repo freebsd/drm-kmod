@@ -31,5 +31,7 @@
 
 #define	fs_reclaim_acquire(x)	0
 #define	fs_reclaim_release(x)	0
+#define	memalloc_nofs_save(x)	0
+#define	memalloc_nofs_restore(x)
 
 #endif	/* _BSD_LKPI_LINUX_SCHED_MM_H_ */
