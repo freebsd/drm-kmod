@@ -11,6 +11,15 @@ amd/amdkfd/*.h
 amd/amdkfd/x86
 amd/amdkfd/machine
 amd/amdkfd/export_syms
+dmabuf/bus_if.h
+dmabuf/device_if.h
+dmabuf/export_syms
+dmabuf/machine
+dmabuf/opt_global.h
+dmabuf/vnode_if.h
+dmabuf/vnode_if_newproto.h
+dmabuf/vnode_if_typedef.h
+dmabuf/x86
 drm/*.h
 drm/x86
 drm/machine
