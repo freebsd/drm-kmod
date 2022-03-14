@@ -322,9 +322,7 @@ uint32_t amdgpu_device_rreg(struct amdgpu_device *adev, uint32_t reg,
 		ret = readl(((void __iomem *)adev->rmmio) + (reg * 4));
 	else
 		ret = adev->pcie_rreg(adev, (reg * 4));
-#ifdef __linux__
 	trace_amdgpu_device_rreg(adev->pdev->device, reg, ret);
-#endif
 	return ret;
 }
 
@@ -373,9 +371,7 @@ void amdgpu_mm_wreg8(struct amdgpu_device *adev, uint32_t offset, uint8_t value)
 void static inline amdgpu_device_wreg_no_kiq(struct amdgpu_device *adev, uint32_t reg,
 					     uint32_t v, uint32_t acc_flags)
 {
-#ifdef __linux__
 	trace_amdgpu_device_wreg(adev->pdev->device, reg, v);
-#endif
 
 	if ((reg * 4) < adev->rmmio_size)
 		writel(v, ((void __iomem *)adev->rmmio) + (reg * 4));

@@ -156,5 +156,8 @@ trace_amdgpu_ib_pipe_sync(struct amdgpu_job *job, struct dma_fence *fence){
 #define trace_amdgpu_vm_copy_ptes(pe, src, count, direct)			\
 	CTR3(KTR_DRM, "amdgpu_vm_copy_ptes %lx %lx %u", pe, src, count)
 
+#define	trace_amdgpu_device_rreg(dev, reg, ret)
+#define	trace_amdgpu_device_wreg(dev, reg, value)
+
 #endif
 
