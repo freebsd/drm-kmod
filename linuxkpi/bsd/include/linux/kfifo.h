@@ -28,5 +28,6 @@
 #define	_BSD_LKPI_LINUX_KFIFO_H_
 
 #define	INIT_KFIFO(x)	0
+#define	DECLARE_KFIFO(x, y, z)
 
 #endif	/* _BSD_LKPI_LINUX_KFIFO_H_*/
