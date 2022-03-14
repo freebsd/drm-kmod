@@ -4166,7 +4166,6 @@ static void amdgpu_device_unlock_adev(struct amdgpu_device *adev)
 
 static void amdgpu_device_resume_display_audio(struct amdgpu_device *adev)
 {
-#ifdef __linux__
 	struct pci_dev *p = NULL;
 
 	p = pci_get_domain_bus_and_slot(pci_domain_nr(adev->pdev->bus),
@@ -4175,10 +4174,6 @@ static void amdgpu_device_resume_display_audio(struct amdgpu_device *adev)
 		pm_runtime_enable(&(p->dev));
 		pm_runtime_resume(&(p->dev));
 	}
-#elif defined(__FreeBSD__)
-	/* Missing pm_runtime support */
-	UNIMPLEMENTED();
-#endif
 }
 
 static int amdgpu_device_suspend_display_audio(struct amdgpu_device *adev)
