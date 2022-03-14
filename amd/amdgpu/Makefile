@@ -1061,6 +1061,7 @@ CWARNFLAGS.dcn31_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-t
 CWARNFLAGS.dcn31_dccg.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn31_dio_link_encoder.c=	-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn31_hpo_dp_stream_encoder.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.dcn31_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn31_hwseq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn31_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn31_panel_cntl.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
