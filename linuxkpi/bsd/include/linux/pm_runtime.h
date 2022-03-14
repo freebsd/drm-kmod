@@ -20,6 +20,7 @@
 #define pm_runtime_enable(x)
 #define pm_runtime_disable(x)
 #define pm_runtime_autosuspend(x)
+#define pm_runtime_resume(x)
 
 static inline int
 pm_runtime_get_sync(struct device *dev)
