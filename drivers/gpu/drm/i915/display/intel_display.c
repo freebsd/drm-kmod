@@ -10574,8 +10574,6 @@ void intel_modeset_driver_remove_noirq(struct drm_i915_private *i915)
 	intel_unregister_dsm_handler();
 #endif
 
-	intel_fbc_global_disable(i915);
-
 	/* flush any delayed tasks or pending work */
 	flush_scheduled_work();
 
