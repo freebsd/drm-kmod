@@ -222,9 +222,11 @@ linux_fb_get_options(const char *connector_name, char **option)
 	 */
 	snprintf(tunable, sizeof(tunable), "kern.vt.fb.modes.%s",
 	    connector_name);
-	printf("[drm] Connector %s: get mode from tunables:\n", connector_name);
-	printf("[drm]  - %s\n", tunable);
-	printf("[drm]  - kern.vt.fb.default_mode\n");
+	if (bootverbose) {
+		printf("[drm] Connector %s: get mode from tunables:\n", connector_name);
+		printf("[drm]  - %s\n", tunable);
+		printf("[drm]  - kern.vt.fb.default_mode\n");
+	}
 	*option = kern_getenv(tunable);
 	if (*option == NULL)
 		*option = kern_getenv("kern.vt.fb.default_mode");
