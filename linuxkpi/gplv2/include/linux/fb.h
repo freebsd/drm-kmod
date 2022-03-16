@@ -98,4 +98,6 @@ void framebuffer_release(struct linux_fb_info *info);
 int linux_fb_get_options(const char *name, char **option);
 #define	fb_get_options	linux_fb_get_options
 
+void vt_unfreeze_main_vd(void);
+
 #endif /* __LINUX_FB_H_ */

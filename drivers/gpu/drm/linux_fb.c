@@ -54,7 +54,49 @@ MALLOC_DEFINE(LKPI_FB_MEM, "fb_kms", "FB KMS Data Structures");
 static struct sx linux_fb_mtx;
 SX_SYSINIT(linux_fb_mtx, &linux_fb_mtx, "linux fb");
 
+extern struct vt_device *main_vd;
+
 static int __unregister_framebuffer(struct linux_fb_info *fb_info);
+
+static void
+vt_freeze_main_vd(struct apertures_struct *a)
+{
+	struct fb_info *fb;
+	int i;
+	bool overlap = false;
+
+	if (main_vd && main_vd->vd_driver && main_vd->vd_softc &&
+	    /* For these, we know the softc (or its first field) is of type fb_info */
+	    (strcmp(main_vd->vd_driver->vd_name, "efifb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "vbefb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "ofwfb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "fb") == 0)) {
+		fb = main_vd->vd_softc;
+
+		for (i = 0; i < a->count; i++) {
+			if (fb->fb_pbase == a->ranges[i].base) {
+				overlap = true;
+				break;
+			}
+			if ((fb->fb_pbase > a->ranges[i].base) &&
+			    (fb->fb_pbase < (a->ranges[i].base + a->ranges[i].size))) {
+				overlap = true;
+				break;
+			}
+		}
+		if (overlap == true)
+			fb->fb_flags |= FB_FLAG_NOWRITE;
+	}
+}
+
+void
+vt_unfreeze_main_vd(void)
+{
+	struct fb_info *fb;
+
+	fb = main_vd->vd_softc;
+	fb->fb_flags &= ~FB_FLAG_NOWRITE;
+}
 
 void
 fb_info_print(struct fb_info *t)
