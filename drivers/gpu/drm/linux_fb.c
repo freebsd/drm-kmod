@@ -1,18 +1,29 @@
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
-#include <drm/drm_fb_helper.h>
-#include <drm/drm_print.h>
-
 #undef fb_info
 
 #include <sys/param.h>
+#include <sys/types.h>
+#include <sys/kernel.h>
+#include <sys/lock.h>
+#include <sys/malloc.h>
 #include <sys/systm.h>
+#include <sys/sx.h>
+#include <sys/fbio.h>
+
 #include <vm/vm.h>
 #include <vm/vm_page.h>
 #include <vm/vm_phys.h>
+
 #include <dev/vt/vt.h>
 #include <dev/vt/hw/fb/vt_fb.h>
+
+#include <linux/fb.h>
+#undef fb_info
+#include <drm/drm_os_freebsd.h>
+
+MALLOC_DEFINE(LKPI_FB_MEM, "fb_kms", "FB KMS Data Structures");
 
 static struct sx linux_fb_mtx;
 SX_SYSINIT(linux_fb_mtx, &linux_fb_mtx, "linux fb");
@@ -40,8 +51,8 @@ framebuffer_alloc(size_t size, struct device *dev)
 	struct linux_fb_info *info;
 	struct vt_kms_softc *sc;
 
-	info = malloc(sizeof(*info) + size, DRM_MEM_KMS, M_WAITOK | M_ZERO);
-	sc = malloc(sizeof(*sc), DRM_MEM_KMS, M_WAITOK | M_ZERO);
+	info = malloc(sizeof(*info) + size, LKPI_FB_MEM, M_WAITOK | M_ZERO);
+	sc = malloc(sizeof(*sc), LKPI_FB_MEM, M_WAITOK | M_ZERO);
 	TASK_INIT(&sc->fb_mode_task, 0, vt_restore_fbdev_mode, sc);
 
 	info->fbio.fb_priv = sc;
@@ -62,14 +73,11 @@ framebuffer_release(struct linux_fb_info *info)
 
 	if (info == NULL)
 		return;
-	if (info->fbio.fb_priv) {
+	if (info->fbio.fb_priv)
 		sc = info->fbio.fb_priv;
-		if (sc->fb_helper != NULL)
-			sc->fb_helper->fbdev = NULL;
-	}
 	kfree(info->apertures);
-	free(info->fbio.fb_priv, DRM_MEM_KMS);
-	free(info, DRM_MEM_KMS);
+	free(info->fbio.fb_priv, LKPI_FB_MEM);
+	free(info, LKPI_FB_MEM);
 }
 
 int
