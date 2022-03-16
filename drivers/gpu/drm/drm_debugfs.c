@@ -78,7 +78,7 @@ static int drm_clients_info(struct seq_file *m, void *data)
 #ifdef __linux__
 	kuid_t uid;
 
-#else
+#elif defined(__FreeBSD__)
 	uid_t uid;
 #endif
 	seq_printf(m,
@@ -100,7 +100,7 @@ static int drm_clients_info(struct seq_file *m, void *data)
 		task = pid_task(priv->pid, PIDTYPE_PID);
 #ifdef __linux__
 		uid = task ? __task_cred(task)->euid : GLOBAL_ROOT_UID;
-#else
+#elif defined(__FreeBSD__)
 		uid = task ? task_euid(task) : 0;
 #endif
 		seq_printf(m, "%20s %5d %3d   %c    %c %5d %10u\n",
@@ -111,7 +111,7 @@ static int drm_clients_info(struct seq_file *m, void *data)
 			   priv->authenticated ? 'y' : 'n',
 #ifdef __linux__
 			   from_kuid_munged(seq_user_ns(m), uid),
-#else
+#elif defined(__FreeBSD__)
 		    	   uid,
 #endif
 			   priv->magic);
@@ -246,6 +246,7 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 
 	if (dev->driver->debugfs_init)
 		dev->driver->debugfs_init(minor);
+
 	return 0;
 }
 
