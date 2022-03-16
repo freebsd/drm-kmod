@@ -31,7 +31,6 @@ SRCS=	drm_atomic.c \
 	drm_dumb_buffers.c \
 	drm_edid.c \
 	drm_encoder.c \
-	drm_fb_helper_freebsd.c \
 	drm_file.c \
 	drm_flip_work.c \
 	drm_fourcc.c \

@@ -95,6 +95,7 @@ void framebuffer_release(struct linux_fb_info *info);
 #define	fb_set_suspend(x, y)	0
 
 /* updated FreeBSD fb_info */
-int fb_get_options(const char *name, char **option);
+int linux_fb_get_options(const char *name, char **option);
+#define	fb_get_options	linux_fb_get_options
 
 #endif /* __LINUX_FB_H_ */
