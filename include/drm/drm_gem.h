@@ -37,6 +37,10 @@
 #include <linux/kref.h>
 #include <linux/dma-resv.h>
 
+#ifdef __FreeBSD__
+#include <linux/xarray.h>
+#endif
+
 #include <drm/drm_vma_manager.h>
 
 struct drm_gem_object;
@@ -409,13 +413,11 @@ int drm_gem_lock_reservations(struct drm_gem_object **objs, int count,
 			      struct ww_acquire_ctx *acquire_ctx);
 void drm_gem_unlock_reservations(struct drm_gem_object **objs, int count,
 				 struct ww_acquire_ctx *acquire_ctx);
-#ifdef __freebsd_notyet__
 int drm_gem_fence_array_add(struct xarray *fence_array,
 			    struct dma_fence *fence);
 int drm_gem_fence_array_add_implicit(struct xarray *fence_array,
 				     struct drm_gem_object *obj,
 				     bool write);
-#endif
 int drm_gem_dumb_map_offset(struct drm_file *file, struct drm_device *dev,
 			    u32 handle, u64 *offset);
 int drm_gem_dumb_destroy(struct drm_file *file,
