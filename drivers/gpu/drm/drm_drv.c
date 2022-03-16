@@ -702,6 +702,7 @@ int drm_dev_init(struct drm_device *dev,
 
 err:
 	drm_managed_release(dev);
+
 	return ret;
 }
 EXPORT_SYMBOL(drm_dev_init);
