@@ -44,7 +44,7 @@
 const char power_group_name[] = "power";
 #endif
 
-static inline struct drm_i915_private *kdev_minor_to_i915(struct device *kdev)
+struct drm_i915_private *kdev_minor_to_i915(struct device *kdev)
 {
 	struct drm_minor *minor = dev_get_drvdata(kdev);
 	return to_i915(minor->dev);
@@ -551,6 +551,11 @@ void i915_setup_sysfs(struct drm_i915_private *dev_priv)
 		ret = sysfs_create_files(&kdev->kobj, gen6_attrs);
 	if (ret)
 		drm_err(&dev_priv->drm, "RPS sysfs setup failed\n");
+
+	dev_priv->sysfs_gt = kobject_create_and_add("gt", &kdev->kobj);
+	if (!dev_priv->sysfs_gt)
+		drm_warn(&dev_priv->drm,
+			 "failed to register GT sysfs directory\n");
 
 #ifdef __linux__
 	/* Missing sysfs bin files support */
