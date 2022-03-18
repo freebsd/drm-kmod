@@ -189,6 +189,8 @@ struct intel_gt {
 	} default_steering;
 
 	struct intel_gt_info {
+		unsigned int id;
+
 		intel_engine_mask_t engine_mask;
 
 		u32 l3bank_mask;
