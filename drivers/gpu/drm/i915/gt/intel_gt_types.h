@@ -188,6 +188,11 @@ struct intel_gt {
 		u8 instanceid;
 	} default_steering;
 
+	/*
+	 * Base of per-tile GTTMMADR where we can derive the MMIO and the GGTT.
+	 */
+	phys_addr_t phys_addr;
+
 	struct intel_gt_info {
 		unsigned int id;
 
