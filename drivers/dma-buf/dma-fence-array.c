@@ -142,6 +142,8 @@ dma_fence_array_create(int num_fences,
 {
 	struct dma_fence_array *array;
 
+	WARN_ON(!num_fences || !fences);
+
 	array = malloc(sizeof(*array) +
 	    (num_fences * sizeof(struct dma_fence_array_cb)),
 	    M_DMABUF, M_WAITOK | M_ZERO);
@@ -190,6 +192,9 @@ dma_fence_array_first(struct dma_fence *head)
 	array = to_dma_fence_array(head);
 	if (!array)
 		return head;
+
+	if (!array->num_fences)
+		return NULL;
 
 	return array->fences[0];
 }
