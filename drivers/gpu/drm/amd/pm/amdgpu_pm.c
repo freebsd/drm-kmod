@@ -3545,7 +3545,7 @@ static int amdgpu_debugfs_pm_info_pp(struct seq_file *m, struct amdgpu_device *a
 	return 0;
 }
 
-static void amdgpu_parse_cg_state(struct seq_file *m, u32 flags)
+static void amdgpu_parse_cg_state(struct seq_file *m, u64 flags)
 {
 	int i;
 
@@ -3558,7 +3558,7 @@ static int amdgpu_debugfs_pm_info_show(struct seq_file *m, void *unused)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	struct drm_device *dev = adev_to_drm(adev);
-	u32 flags = 0;
+	u64 flags = 0;
 	int r;
 
 	if (amdgpu_in_reset(adev))
@@ -3580,7 +3580,7 @@ static int amdgpu_debugfs_pm_info_show(struct seq_file *m, void *unused)
 
 	amdgpu_device_ip_get_clockgating_state(adev, &flags);
 
-	seq_printf(m, "Clock Gating Flags Mask: 0x%x\n", flags);
+	seq_printf(m, "Clock Gating Flags Mask: 0x%llx\n", flags);
 	amdgpu_parse_cg_state(m, flags);
 	seq_printf(m, "\n");
 
