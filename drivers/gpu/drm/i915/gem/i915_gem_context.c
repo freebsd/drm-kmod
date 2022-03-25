@@ -111,7 +111,8 @@ static void lut_close(struct i915_gem_context *ctx)
 		if (!kref_get_unless_zero(&obj->base.refcount))
 			continue;
 
-		spin_lock(&obj->lut_lock);
+		rcu_read_unlock();
+		i915_gem_object_lock(obj);
 		list_for_each_entry(lut, &obj->lut_list, obj_link) {
 			if (lut->ctx != ctx)
 				continue;
@@ -122,7 +123,8 @@ static void lut_close(struct i915_gem_context *ctx)
 			list_del(&lut->obj_link);
 			break;
 		}
-		spin_unlock(&obj->lut_lock);
+		i915_gem_object_unlock(obj);
+		rcu_read_lock();
 
 		if (&lut->obj_link != &obj->lut_list) {
 			i915_lut_handle_free(lut);
