@@ -196,9 +196,7 @@ static void __notify_execute_cb(struct i915_request *rq)
 
 	lockdep_assert_held(&rq->lock);
 
-#ifdef __linux__
 	GEM_BUG_ON(!i915_request_is_active(rq));
-#endif
 	if (llist_empty(&rq->execute_cb))
 		return;
 
@@ -604,9 +602,7 @@ xfer:
 			intel_engine_signal_breadcrumbs(engine);
 
 		spin_unlock(&request->lock);
-#ifdef __linux__
 		GEM_BUG_ON(!llist_empty(&request->execute_cb));
-#endif
 	}
 
 	return result;
