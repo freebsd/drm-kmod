@@ -14742,16 +14742,15 @@ static int intel_atomic_check_planes(struct intel_atomic_state *state)
 static int intel_atomic_check_cdclk(struct intel_atomic_state *state,
 				    bool *need_cdclk_calc)
 {
+	struct drm_i915_private *dev_priv = to_i915(state->base.dev);
 	struct intel_cdclk_state *new_cdclk_state;
-	int i;
 	struct intel_plane_state *plane_state;
+	struct intel_bw_state *new_bw_state;
 	struct intel_plane *plane;
+	int min_cdclk = 0;
+	enum pipe pipe;
 	int ret;
-
-	new_cdclk_state = intel_atomic_get_new_cdclk_state(state);
-	if (new_cdclk_state && new_cdclk_state->force_min_cdclk_changed)
-		*need_cdclk_calc = true;
-
+	int i;
 	/*
 	 * active_planes bitmask has been updated, and potentially
 	 * affected planes are part of the state. We can now
@@ -14761,6 +14760,30 @@ static int intel_atomic_check_cdclk(struct intel_atomic_state *state,
 		ret = intel_plane_calc_min_cdclk(state, plane, need_cdclk_calc);
 		if (ret)
 			return ret;
+	}
+
+	new_cdclk_state = intel_atomic_get_new_cdclk_state(state);
+
+	if (new_cdclk_state && new_cdclk_state->force_min_cdclk_changed)
+		*need_cdclk_calc = true;
+
+	ret = dev_priv->display.bw_calc_min_cdclk(state);
+	if (ret)
+		return ret;
+
+	new_bw_state = intel_atomic_get_new_bw_state(state);
+
+	if (!new_cdclk_state || !new_bw_state)
+		return 0;
+
+	for_each_pipe(dev_priv, pipe) {
+		min_cdclk = max(new_cdclk_state->min_cdclk[pipe], min_cdclk);
+
+		/*
+		 * Currently do this change only if we need to increase
+		 */
+		if (new_bw_state->min_cdclk > min_cdclk)
+			*need_cdclk_calc = true;
 	}
 
 	return 0;
@@ -17810,9 +17833,9 @@ int intel_modeset_init_noirq(struct drm_i915_private *i915)
 	i915->modeset_wq = alloc_ordered_workqueue("i915_modeset", 0);
 	i915->flip_wq = alloc_workqueue("i915_flip", WQ_HIGHPRI |
 #ifdef __linux__
-					  WQ_UNBOUND, WQ_UNBOUND_MAX_ACTIVE);
+					WQ_UNBOUND, WQ_UNBOUND_MAX_ACTIVE);
 #elif defined(__FreeBSD__)
-					  WQ_UNBOUND, 512);
+					WQ_UNBOUND, 512);
 #endif
 
 	intel_mode_config_init(i915);
