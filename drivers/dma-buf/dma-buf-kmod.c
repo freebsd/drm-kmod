@@ -31,3 +31,4 @@ __FBSDID("$FreeBSD$");
 #include <sys/module.h>
 
 MODULE_VERSION(dmabuf, 1);
+MODULE_DEPEND(dmabuf, linuxkpi, 1, 1, 1);
