@@ -16,7 +16,6 @@ _dml=	${SRCDIR}/display/dc/dml \
 
 .PATH:	${SRCDIR}/acp \
 	${SRCDIR}/amdgpu \
-	${SRCDIR}/amdkfd \
 	${SRCDIR}/display \
 	${SRCDIR}/display/amdgpu_dm \
 	${SRCDIR}/display/dc \
@@ -96,15 +95,6 @@ SRCS=	acp_hw.c
 # amdgpu
 # amdgpu_acp.c \ # not yet - need i2s
 # amdgpu_mn.c \  # disabled
-
-# These should only be included if we set CONFIG_HSA_AMD
-# amdgpu_amdkfd_fence.c \
-# amdgpu_amdkfd_gfx_v8.c \
-# amdgpu_amdkfd_gfx_v9.c \
-# amdgpu_amdkfd_gpuvm.c \
-
-# This one for CONFIG_DRM_AMDGPU_CIK & CONFIG_HSA_AMD
-# amdgpu_amdkfd_gfx_v7.c \
 
 SRCS+=	amdgpu_afmt.c \
 	amdgpu_amdkfd.c \
