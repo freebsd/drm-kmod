@@ -1166,8 +1166,6 @@ static int smu_smc_hw_cleanup(struct smu_context *smu)
 
 	cancel_work_sync(&smu->throttling_logging_work);
 
-	cancel_work_sync(&smu->throttling_logging_work);
-
 	ret = smu_disable_thermal_alert(smu);
 	if (ret) {
 		dev_err(adev->dev, "Fail to disable thermal alert!\n");
@@ -2414,6 +2412,9 @@ int smu_set_xgmi_pstate(struct smu_context *smu,
 
 	mutex_unlock(&smu->mutex);
 
+	if(ret)
+		dev_err(smu->adev->dev, "Failed to set XGMI pstate!\n");
+
 	return ret;
 }
 
@@ -2430,9 +2431,6 @@ int smu_set_azalia_d3_pme(struct smu_context *smu)
 		ret = smu->ppt_funcs->set_azalia_d3_pme(smu);
 
 	mutex_unlock(&smu->mutex);
-
-	if(ret)
-		dev_err(smu->adev->dev, "Failed to set XGMI pstate!\n");
 
 	return ret;
 }
@@ -2488,6 +2486,9 @@ int smu_baco_enter(struct smu_context *smu)
 
 	mutex_unlock(&smu->mutex);
 
+	if (ret)
+		dev_err(smu->adev->dev, "Failed to enter BACO state!\n");
+
 	return ret;
 }
 
@@ -2506,7 +2507,7 @@ int smu_baco_exit(struct smu_context *smu)
 	mutex_unlock(&smu->mutex);
 
 	if (ret)
-		dev_err(smu->adev->dev, "Failed to enter BACO state!\n");
+		dev_err(smu->adev->dev, "Failed to exit BACO state!\n");
 
 	return ret;
 }
@@ -2560,7 +2561,7 @@ int smu_mode2_reset(struct smu_context *smu)
 	mutex_unlock(&smu->mutex);
 
 	if (ret)
-		dev_err(smu->adev->dev, "Failed to exit BACO state!\n");
+		dev_err(smu->adev->dev, "Mode2 reset failed!\n");
 
 	return ret;
 }
@@ -2579,9 +2580,6 @@ int smu_get_max_sustainable_clocks_by_dc(struct smu_context *smu,
 		ret = smu->ppt_funcs->get_max_sustainable_clocks_by_dc(smu, max_clocks);
 
 	mutex_unlock(&smu->mutex);
-
-	if (ret)
-		dev_err(smu->adev->dev, "Mode2 reset failed!\n");
 
 	return ret;
 }
