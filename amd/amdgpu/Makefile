@@ -553,8 +553,7 @@ SRCS_DEBUG=	amdgpu_dm_crc.c \
 		amdgpu_dm_debugfs.c
 
 .if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
-SRCS+=	amdgpu_acpi.c \
-	amdgpu_atpx_handler.c
+SRCS+=	amdgpu_acpi.c
 .endif
 
 .if ${MACHINE_CPUARCH} == "amd64"
