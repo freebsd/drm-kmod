@@ -51,6 +51,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     include/linux/dma-fence-chain.h \
     include/linux/sync_file.h \
     ':!drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_*' \
+    ':!drivers/gpu/drm/amd/amdgpu/amdgpu_atpx_handler*' \
     ':!drivers/gpu/drm/amd/amdkfd/*' \
     ':!drivers/gpu/drm/i915/gvt/*' \
     ':!drivers/gpu/drm/i915/selftests/*' \
