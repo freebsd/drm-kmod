@@ -425,32 +425,32 @@ SRCS+=	dcn21_hubbub.c \
 	dcn21_resource.c
 
 # display/dc/dcn30
-SRCS+=	dcn30_dio_link_encoder.c
-#	dcn30_clk_mgr.c \
-#	dcn30_clk_mgr_smu_msg.c \
-#	dcn30_dccg.c \
-#	dcn30_optc.c \
-#	dcn30_mpc.c \
-#	dcn30_cm_common.c \
-#	dcn30_dpp.c \
-#	dcn30_dpp_cm.c \
-#	dcn30_hubbub.c \
-#	dcn30_hubp.c \
-#	dcn30_mmhubbub.c \
-#	dcn30_dwb.c \
-#	dcn30_dwb_cm.c \
-#	dcn30_dio_stream_encoder.c \
-#	dcn30_hwseq.c \
-#	dcn30_resource.c \
-#	dcn30_afmt.c \
-#	dcn30_vpg.c \
-#	dcn30_init.c \
-#	irq_service_dcn30.c \
-#	hw_factory_dcn30.c \
-#	hw_translate_dcn30.c \
-#	dmub_dcn30.c \
-#	display_mode_vba_30.c \
-#	display_rq_dlg_calc_30.c
+SRCS+=	dcn30_dio_link_encoder.c \
+	dcn30_clk_mgr.c \
+	dcn30_clk_mgr_smu_msg.c \
+	dcn30_dccg.c \
+	dcn30_optc.c \
+	dcn30_mpc.c \
+	dcn30_cm_common.c \
+	dcn30_dpp.c \
+	dcn30_dpp_cm.c \
+	dcn30_hubbub.c \
+	dcn30_hubp.c \
+	dcn30_mmhubbub.c \
+	dcn30_dwb.c \
+	dcn30_dwb_cm.c \
+	dcn30_dio_stream_encoder.c \
+	dcn30_hwseq.c \
+	dcn30_resource.c \
+	dcn30_afmt.c \
+	dcn30_vpg.c \
+	dcn30_init.c \
+	irq_service_dcn30.c \
+	hw_factory_dcn30.c \
+	hw_translate_dcn30.c \
+	dmub_dcn30.c \
+	display_mode_vba_30.c \
+	display_rq_dlg_calc_30.c
 
 # display/dc/core
 SRCS+=	dc_vm_helper.c
@@ -667,11 +667,13 @@ CFLAGS.dcn_calc_auto.c= -msse -mstack-alignment=4
 CFLAGS.dcn_calc_math.c= -msse -mstack-alignment=4 -Wno-tautological-compare
 CFLAGS.dcn20_resource.c= -msse -mstack-alignment=4
 CFLAGS.dcn21_resource.c= -msse -mstack-alignment=4
+CFLAGS.dcn30_resource.c= -msse -mstack-alignment=4
 
 CFLAGS.display_mode_lib.c= -msse -mstack-alignment=4
 CFLAGS.display_mode_vba.c= -msse -mstack-alignment=4
 CFLAGS.display_mode_vba_20.c= -msse -mstack-alignment=4
 CFLAGS.display_mode_vba_21.c= -msse -mstack-alignment=4
+CFLAGS.display_mode_vba_30.c= -msse -mstack-alignment=4
 CFLAGS.display_pipe_clocks.c= -msse -mstack-alignment=4
 CFLAGS.dml1_display_rq_dlg_calc.c= -msse -mstack-alignment=4
 CFLAGS.display_rq_dlg_helpers.c= -msse -mstack-alignment=4
@@ -681,6 +683,7 @@ CFLAGS.soc_bounding_box.c= -msse -mstack-alignment=4
 
 CFLAGS.display_rq_dlg_calc_20v2.c= -msse -mstack-alignment=4
 CFLAGS.display_mode_vba_20v2.c= -msse -mstack-alignment=4
+CFLAGS.display_rq_dlg_calc_30.c= -msse -mstack-alignment=4
 
 CFLAGS.rc_calc.c= -msse -mstack-alignment=4
 CFLAGS.rc_calc_dpi.c= -msse -mstack-alignment=4
@@ -737,6 +740,7 @@ CWARNFLAGS.dc_link_dp.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_resource.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_aux.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dce_calcs.c=			-Wno-unused-but-set-variable
+CWARNFLAGS.dce_clock_source.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dce_dmcu.c=			-Wno-missing-prototypes
 CWARNFLAGS.dce_i2c_hw.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_i2c_sw.c=		-Wno-missing-prototypes
@@ -781,6 +785,16 @@ CWARNFLAGS.dcn21_hwseq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn21_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_link_encoder.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn21_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
+CWARNFLAGS.dcn30_dpp.c=			-Wno-missing-prototypes
+CWARNFLAGS.dcn30_hubp.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn30_mpc.c=			-Wno-missing-prototypes
+CWARNFLAGS.dcn30_mmhubbub.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn30_dio_stream_encoder.c=	-Wno-missing-prototypes
+CWARNFLAGS.dcn30_hwseq.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dcn30_resource.c=		-Wno-initializer-overrides -Wno-missing-prototypes
+CWARNFLAGS.dcn30_afmt.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dcn30_init.c=		-Wno-missing-prototypes
+
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.hw_factory.c=		-Wno-missing-prototypes
 CWARNFLAGS.hw_factory_diag.c=		-Wno-missing-prototypes
@@ -790,6 +804,7 @@ CWARNFLAGS.irq_service.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn10.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn20.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn21.c=		-Wno-missing-prototypes
+CWARNFLAGS.irq_service_dcn30.c=		-Wno-missing-prototypes
 CWARNFLAGS.power_helpers.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes
@@ -801,8 +816,12 @@ CWARNFLAGS.dmub_hw_lock_mgr.c=		-Wno-unused-but-set-variable
 # display/dmub/*
 CWARNFLAGS.dmub_dcn20.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_dcn21.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dmub_dcn30.c=		-Wno-missing-prototypes
 CWARNFLAGS.dmub_reg.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_srv.c=			-Wno-unused-but-set-variable
+
+# display/dc/dml/
+CWARNFLAGS.display_mode_vba_30.c=	-Wno-unused-but-set-variable
 
 # powerplay/*
 CWARNFLAGS.amdgpu_smu.c=		-Wno-unused-function
