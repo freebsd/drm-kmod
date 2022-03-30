@@ -116,8 +116,7 @@ SRCS=	atom.c \
 
 .if !empty(KCONFIG:MACPI)
 SRCS+=  opt_acpi.h \
-	radeon_acpi.c \
-	radeon_atpx_handler.c
+	radeon_acpi.c
 .endif
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
