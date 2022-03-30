@@ -65,7 +65,6 @@ SRCS=	drm_atomic.c \
 	drm_sysfs.c \
 	drm_vblank.c \
 	drm_vma_manager.c \
-	drm_writeback.c \
 	linux_fb.c
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
