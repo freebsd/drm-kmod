@@ -60,6 +60,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/i915/gem/selftests/*' \
     ':!drivers/gpu/drm/selftests/*' \
     ':!drivers/gpu/drm/drm_bufs*' \
+    ':!drivers/gpu/drm/drm_bridge_connector*' \
     ':!drivers/gpu/drm/drm_context*' \
     ':!drivers/gpu/drm/drm_dma*' \
     ':!drivers/gpu/drm/drm_dp_cec*' \
