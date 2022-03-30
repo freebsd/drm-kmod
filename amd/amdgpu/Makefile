@@ -23,6 +23,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/bios \
 	${SRCDIR}/display/dc/bios/dce110 \
 	${SRCDIR}/display/dc/bios/dce112 \
+	${SRCDIR}/display/dc/bios/dce60 \
 	${SRCDIR}/display/dc/bios/dce80 \
 	${SRCDIR}/display/dc/calcs \
 	${SRCDIR}/display/dc/core \
@@ -31,6 +32,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/clk_mgr/dce110 \
 	${SRCDIR}/display/dc/clk_mgr/dce112 \
 	${SRCDIR}/display/dc/clk_mgr/dce120 \
+	${SRCDIR}/display/dc/clk_mgr/dce60 \
 	${SRCDIR}/display/dc/clk_mgr/dcn10 \
 	${SRCDIR}/display/dc/clk_mgr/dcn20 \
 	${SRCDIR}/display/dc/clk_mgr/dcn21 \
@@ -40,6 +42,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dce110 \
 	${SRCDIR}/display/dc/dce112 \
 	${SRCDIR}/display/dc/dce120 \
+	${SRCDIR}/display/dc/dce60 \
 	${SRCDIR}/display/dc/dce80 \
 	${SRCDIR}/display/dc/dcn10 \
 	${SRCDIR}/display/dc/dcn20 \
@@ -50,6 +53,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/gpio \
 	${SRCDIR}/display/dc/gpio/dce110 \
 	${SRCDIR}/display/dc/gpio/dce120 \
+	${SRCDIR}/display/dc/gpio/dce60 \
 	${SRCDIR}/display/dc/gpio/dce80 \
 	${SRCDIR}/display/dc/gpio/dcn10 \
 	${SRCDIR}/display/dc/gpio/dcn20 \
@@ -69,6 +73,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq \
 	${SRCDIR}/display/dc/irq/dce110 \
 	${SRCDIR}/display/dc/irq/dce120 \
+	${SRCDIR}/display/dc/irq/dce60 \
 	${SRCDIR}/display/dc/irq/dce80 \
 	${SRCDIR}/display/dc/irq/dcn10 \
 	${SRCDIR}/display/dc/irq/dcn20 \
@@ -292,6 +297,7 @@ SRCS+=	bios_parser_common.c \
 	command_table_helper2_dce112.c \
 	command_table_helper_dce110.c \
 	command_table_helper_dce112.c \
+	command_table_helper_dce60.c \
 	command_table_helper_dce80.c
 
 # display/dc/calcs
@@ -360,6 +366,11 @@ SRCS+=	dce120_hw_sequencer.c \
 	dce120_resource.c \
 	dce120_timing_generator.c
 
+# display/dc/dce60
+SRCS+=	dce60_hw_sequencer.c \
+	dce60_resource.c \
+	dce60_timing_generator.c
+
 # display/dc/dce80
 SRCS+=	dce80_hw_sequencer.c \
 	dce80_resource.c \
@@ -371,6 +382,7 @@ SRCS+=	clk_mgr.c \
 	dce110_clk_mgr.c \
 	dce112_clk_mgr.c \
 	dce120_clk_mgr.c \
+	dce60_clk_mgr.c \
 	rv1_clk_mgr.c \
 	rv1_clk_mgr_vbios_smu.c \
 	rv2_clk_mgr.c
@@ -490,6 +502,7 @@ SRCS+=	gpio_base.c \
 	hw_translate.c \
 	hw_factory_dce110.c \
 	hw_factory_dce120.c \
+	hw_factory_dce60.c \
 	hw_factory_dce80.c \
 	hw_factory_dcn10.c \
 	hw_factory_dcn20.c \
@@ -497,6 +510,7 @@ SRCS+=	gpio_base.c \
 	hw_factory_diag.c \
 	hw_translate_dce110.c \
 	hw_translate_dce120.c \
+	hw_translate_dce60.c \
 	hw_translate_dce80.c \
 	hw_translate_dcn10.c \
 	hw_translate_dcn20.c \
@@ -507,6 +521,7 @@ SRCS+=	gpio_base.c \
 SRCS+=	irq_service.c \
 	irq_service_dce110.c \
 	irq_service_dce120.c \
+	irq_service_dce60.c \
 	irq_service_dce80.c \
 	irq_service_dcn10.c \
 	irq_service_dcn20.c \
@@ -729,6 +744,7 @@ CWARNFLAGS.amdgpu_dm.c=			-Wno-missing-prototypes -Wno-unused-function -Wno-unus
 
 # display/dc
 CWARNFLAGS.command_table2.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.command_table_helper_dce60.c=		-Wno-missing-prototypes
 CWARNFLAGS.conversion.c=		-Wno-missing-prototypes
 CWARNFLAGS.fixpt31_32.c=		-Wno-incompatible-pointer-types
 CWARNFLAGS.vector.c=			-Wno-missing-prototypes
@@ -739,13 +755,16 @@ CWARNFLAGS.dc_link.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dc_link_dp.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_resource.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_aux.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.dce_audio.c=			-Wno-missing-prototypes
 CWARNFLAGS.dce_calcs.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dce_clock_source.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dce_dmcu.c=			-Wno-missing-prototypes
 CWARNFLAGS.dce_i2c_hw.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_i2c_sw.c=		-Wno-missing-prototypes
-CWARNFLAGS.dce_link_encoder.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dce_link_encoder.c=		-Wno-unused-but-set-variable -Wno-missing-prototypes
+CWARNFLAGS.dce_transform.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dce_stream_encoder.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.dce_opp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dce_panel_cntl.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dce100_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dce110_compressor.c=		-Wno-missing-prototypes
@@ -757,6 +776,8 @@ CWARNFLAGS.dce112_resource.c=		-Wno-missing-prototypes -Wno-initializer-override
 CWARNFLAGS.dce120_hw_sequencer.c=	-Wno-unused-const-variable
 CWARNFLAGS.dce120_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dce120_timing_generator.c=	-Wno-missing-prototypes
+CWARNFLAGS.dce60_timing_generator.c=	-Wno-missing-prototypes
+CWARNFLAGS.dce60_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dce80_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.rn_clk_mgr_vbios_smu.c=	-Wno-missing-prototypes
 CWARNFLAGS.rn_clk_mgr.c=		-Wno-missing-prototypes
