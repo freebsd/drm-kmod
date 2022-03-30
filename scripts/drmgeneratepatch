@@ -79,6 +79,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_trace*' \
     ':!drivers/gpu/drm/drm_vm*' \
     ':!drivers/gpu/drm/drm_*vram*' \
+    ':!drivers/gpu/drm/amd/radeon/radeon_atpx_handler*' \
     ':!include/drm/bridge/*' \
     ':!include/drm/tinydrm/*' \
     ':!include/drm/drm_agpsupport*' \
