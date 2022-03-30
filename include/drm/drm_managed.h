@@ -3,6 +3,8 @@
 #ifndef _DRM_MANAGED_H_
 #define _DRM_MANAGED_H_
 
+#include <linux/types.h>
+
 struct drm_device;
 
 typedef void (*drmm_func_t)(struct drm_device *, void *);
