@@ -296,6 +296,7 @@ SRCS+=	amdgpu_afmt.c \
 	si_smc.c \
 	si.c \
 	soc15.c \
+	soc21.c \
 	smuio_v9_0.c \
 	smuio_v11_0.c \
 	smuio_v11_0_6.c \
