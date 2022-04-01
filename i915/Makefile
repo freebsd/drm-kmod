@@ -20,6 +20,7 @@ SRCS=	\
 	i915_config.c \
 	i915_deps.c \
 	i915_driver.c \
+	i915_drm_client.c \
 	i915_getparam.c \
 	i915_gem.c \
 	i915_gem_evict.c \
