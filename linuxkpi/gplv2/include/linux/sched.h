@@ -5,12 +5,6 @@
 
 #include <linux/hrtimer.h>
 
-/* XXX */
-#define	__smp_mb__before_atomic()	barrier()
-#define	smp_mb__before_atomic()		barrier()
-#define	__smp_mb__after_atomic()	barrier()
-#define	smp_mb__after_atomic()		barrier()
-
 struct seq_file;
 
 static inline int

@@ -54,4 +54,12 @@
 #define	smp_store_mb __smp_store_mb
 #endif
 
+#ifndef smp_mb__before_atomic
+#define	smp_mb__before_atomic()	barrier()
+#endif
+
+#ifndef smp_mb__after_atomic
+#define	smp_mb__after_atomic()	barrier()
+#endif
+
 #endif	/* _BSD_LKPI_LINUX_ATOMIC_H_ */
