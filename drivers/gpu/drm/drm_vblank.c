@@ -507,10 +507,6 @@ static void drm_vblank_init_release(struct drm_device *dev, void *ptr)
 	drm_WARN_ON(dev, READ_ONCE(vblank->enabled) &&
 		    drm_core_check_feature(dev, DRIVER_MODESET));
 
-#ifdef __FreeBSD__
-	spin_lock_destroy(&dev->vbl_lock);
-	spin_lock_destroy(&dev->vblank_time_lock);
-#endif
 	del_timer_sync(&vblank->disable_timer);
 }
 
