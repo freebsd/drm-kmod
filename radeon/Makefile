@@ -100,7 +100,6 @@ SRCS=	atom.c \
 	rv770_dpm.c \
 	rv770_smc.c \
 	si.c \
-	si_blit_shaders.c \
 	si_dma.c \
 	si_dpm.c \
 	si_smc.c \
