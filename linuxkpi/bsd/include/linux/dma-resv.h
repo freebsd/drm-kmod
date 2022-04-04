@@ -44,13 +44,6 @@
 #include <linux/slab.h>
 #include <linux/seqlock.h>
 #include <linux/rcupdate.h>
-#ifdef __FreeBSD__
-/* On Linux linux/preempt.h is included through linux/seqlock.h */
-#include <linux/preempt.h>
-#include <sys/param.h>
-#include <sys/lock.h>
-#include <sys/rwlock.h>
-#endif
 
 extern struct ww_class reservation_ww_class;
 
@@ -163,18 +156,6 @@ struct dma_resv {
 	struct ww_mutex lock;
 
 	/**
-	 * @seq:
-	 *
-	 * Sequence count for managing RCU read-side synchronization, allows
-	 * read-only access to @fences while ensuring we take a consistent
-	 * snapshot.
-	 */
-	seqcount_ww_mutex_t seq;
-#ifdef __FreeBSD__
-	struct rwlock rw;
-#endif
-
-	/**
 	 * @fences:
 	 *
 	 * Array of fences which where added to the dma_resv object
@@ -211,9 +192,6 @@ struct dma_resv_iter {
 
 	/** @fence_usage: the usage of the current fence */
 	enum dma_resv_usage fence_usage;
-
-	/** @seq: sequence number to check for modifications */
-	unsigned int seq;
 
 	/** @index: index into the shared fences */
 	unsigned int index;
