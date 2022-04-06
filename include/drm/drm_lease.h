@@ -1,37 +1,34 @@
-/* SPDX-License-Identifier: GPL-2.0-or-later */
-/*
- * Copyright © 2017 Keith Packard <keithp@keithp.com>
- */
+/* Public domain. */
 
-#ifndef _DRM_LEASE_H_
-#define _DRM_LEASE_H_
+#ifndef _DRM_LEASE_H
+#define _DRM_LEASE_H
 
-struct drm_file;
-struct drm_device;
+#include <drm/drm_device.h>
+#include <drm/drm_file.h>
+
 struct drm_master;
 
-struct drm_master *drm_lease_owner(struct drm_master *master);
+#define drm_lease_held(f, id)		(true)
+#define _drm_lease_held(f, id)		(true)
+#define drm_lease_filter_crtcs(f, in)	(in)
 
-void drm_lease_destroy(struct drm_master *lessee);
+static inline void
+drm_lease_revoke(struct drm_master *m)
+{
+}
 
-bool drm_lease_held(struct drm_file *file_priv, int id);
-
-bool _drm_lease_held(struct drm_file *file_priv, int id);
-
-void drm_lease_revoke(struct drm_master *master);
-
-uint32_t drm_lease_filter_crtcs(struct drm_file *file_priv, uint32_t crtcs);
+static inline void
+drm_lease_destroy(struct drm_master *m)
+{
+}
 
 int drm_mode_create_lease_ioctl(struct drm_device *dev,
-				void *data, struct drm_file *file_priv);
-
+    void *data, struct drm_file *lessor_priv);
 int drm_mode_list_lessees_ioctl(struct drm_device *dev,
-				void *data, struct drm_file *file_priv);
-
+    void *data, struct drm_file *lessor_priv);
 int drm_mode_get_lease_ioctl(struct drm_device *dev,
-			     void *data, struct drm_file *file_priv);
-
+    void *data, struct drm_file *lessee_priv);
 int drm_mode_revoke_lease_ioctl(struct drm_device *dev,
-				void *data, struct drm_file *file_priv);
+    void *data, struct drm_file *lessor_priv);
 
-#endif /* _DRM_LEASE_H_ */
+#endif
