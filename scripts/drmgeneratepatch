@@ -102,6 +102,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_of*' \
     ':!include/drm/gma*' \
     ':!include/drm/drm_*vram*' \
+    ':!include/drm/i915_mei_hdcp_interface*' \
     ':!include/uapi/drm/etnaviv*' \
     ':!include/uapi/drm/exynos_drm*' \
     ':!include/uapi/drm/lima*' \
