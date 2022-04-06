@@ -74,7 +74,9 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_hdcp*' \
     ':!drivers/gpu/drm/drm_kms_helper*' \
     ':!drivers/gpu/drm/drm_legacy_misc*' \
+    ':!drivers/gpu/drm/drm_lease*' \
     ':!drivers/gpu/drm/drm_lock*' \
+    ':!drivers/gpu/drm/drm_managed*' \
     ':!drivers/gpu/drm/drm_mipi_dbi*' \
     ':!drivers/gpu/drm/drm_of*' \
     ':!drivers/gpu/drm/drm_scatter*' \
@@ -92,6 +94,8 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_gem_cma*' \
     ':!include/drm/drm_gem_shmem*' \
     ':!include/drm/drm_gem_ttm_helper*' \
+    ':!include/drm/drm_lease*' \
+    ':!include/drm/drm_managed*' \
     ':!include/drm/drm_mipi_dsi*' \
     ':!include/drm/drm_mipi_dbi*' \
     ':!include/drm/drm_simple_kms_helper*' \
