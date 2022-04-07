@@ -121,6 +121,10 @@ SRCS+=	drm_scdc_helper.c \
 SRCS+=	drm_dp_aux_dev.c
 .endif
 
+.if !empty(KCONFIG:MDRM_EXEC)
+SRCS+=	drm_exec.c
+.endif
+
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
