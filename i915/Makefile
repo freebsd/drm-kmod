@@ -38,7 +38,6 @@ SRCS=	\
 	i915_user_extensions.c \
 	i915_vgpu.c \
 	i915_vma.c \
-	intel_acpi.c \
 	intel_atomic.c \
 	intel_atomic_plane.c \
 	intel_audio.c \

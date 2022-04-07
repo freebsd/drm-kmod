@@ -738,7 +738,9 @@ static void i915_driver_register(struct drm_i915_private *dev_priv)
 	intel_power_domains_enable(dev_priv);
 	intel_runtime_pm_enable(&dev_priv->runtime_pm);
 
+#ifdef __linux__
 	intel_register_dsm_handler();
+#endif
 
 	if (i915_switcheroo_register(dev_priv))
 		drm_err(&dev_priv->drm, "Failed to register vga switcheroo!\n");
@@ -752,7 +754,9 @@ static void i915_driver_unregister(struct drm_i915_private *dev_priv)
 {
 	i915_switcheroo_unregister(dev_priv);
 
+#ifdef __linux__
 	intel_unregister_dsm_handler();
+#endif
 
 	intel_runtime_pm_disable(&dev_priv->runtime_pm);
 	intel_power_domains_disable(dev_priv);
