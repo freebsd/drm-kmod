@@ -2773,7 +2773,7 @@ static int amdgpu_device_ip_reinit_early_sriov(struct amdgpu_device *adev)
 		AMD_IP_BLOCK_TYPE_IH,
 	};
 
-	for (i = 0; i < adev->num_ip_blocks; i++) {
+	for (i = 0; i < ARRAY_SIZE(ip_order); i++) {
 		int j;
 		struct amdgpu_ip_block *block;
 
@@ -5128,6 +5128,7 @@ bool amdgpu_device_cache_pci_state(struct pci_dev *pdev)
 #elif defined(__FreeBSD__)
 	pci_save_state(pdev);
 #endif
+
 	return true;
 }
 

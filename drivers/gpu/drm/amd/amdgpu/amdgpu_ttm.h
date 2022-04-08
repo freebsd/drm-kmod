@@ -71,6 +71,9 @@ struct amdgpu_mman {
 	/* Scheduler entity for buffer moves */
 	struct drm_sched_entity			entity;
 
+	struct amdgpu_vram_mgr vram_mgr;
+	struct amdgpu_gtt_mgr gtt_mgr;
+
 	uint64_t		stolen_vga_size;
 	struct amdgpu_bo	*stolen_vga_memory;
 	uint64_t		stolen_extended_size;
@@ -87,9 +90,6 @@ struct amdgpu_mman {
 	u64		fw_vram_usage_size;
 	struct amdgpu_bo	*fw_vram_usage_reserved_bo;
 	void		*fw_vram_usage_va;
-
-	struct amdgpu_vram_mgr vram_mgr;
-	struct amdgpu_gtt_mgr gtt_mgr;
 };
 
 struct amdgpu_copy_mem {
