@@ -613,7 +613,7 @@ static int ttm_bo_evict(struct ttm_buffer_object *bo,
 		ttm_bo_wait(bo, false, false);
 
 		ttm_bo_cleanup_memtype_use(bo);
-		return 0;
+		return ttm_tt_create(bo, false);
 	}
 
 	evict_mem = bo->mem;
