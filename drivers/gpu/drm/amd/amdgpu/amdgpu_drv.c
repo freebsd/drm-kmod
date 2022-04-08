@@ -784,7 +784,11 @@ module_param_named(abmlevel, amdgpu_dm_abm_level, uint, 0444);
 
 int amdgpu_backlight = -1;
 MODULE_PARM_DESC(backlight, "Backlight control (0 = pwm, 1 = aux, -1 auto (default))");
+#ifdef __linux__
 module_param_named(backlight, amdgpu_backlight, bint, 0444);
+#elif defined(__FreeBSD__)
+module_param_named(backlight, amdgpu_backlight, int, 0444);
+#endif
 
 /**
  * DOC: tmz (int)
