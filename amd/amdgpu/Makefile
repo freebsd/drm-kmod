@@ -260,6 +260,7 @@ SRCS+=	amdgpu_afmt.c \
 	aldebaran.c \
 	iceland_ih.c \
 	ih_v6_0.c \
+	imu_v11_0.c \
 	jpeg_v1_0.c \
 	jpeg_v2_0.c \
 	jpeg_v2_5.c \
@@ -937,6 +938,7 @@ CWARNFLAGS.amdgpu_psp.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ras.c=			-Wno-missing-prototypes -Wno-unused-function -Wno-undefined-inline
 CWARNFLAGS.amdgpu_sched.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ttm.c=			-Wno-unused-but-set-variable
+CWARNFLAGS.amdgpu_ucode.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_virt.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_vram_mgr.c=			-Wno-unused-variable
 CWARNFLAGS.aldebaran_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
