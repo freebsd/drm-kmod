@@ -301,6 +301,7 @@ SRCS+=	amdgpu_afmt.c \
 	sdma_v4_4.c \
 	sdma_v5_0.c \
 	sdma_v5_2.c \
+	sdma_v6_0.c \
 	si_dma.c \
 	si_dpm.c \
 	si_ih.c \
