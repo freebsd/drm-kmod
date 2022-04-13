@@ -270,6 +270,7 @@ SRCS+=	amdgpu_afmt.c \
 	legacy_dpm.c \
 	mca_v3_0.c \
 	mes_v10_1.c \
+	mes_v11_0.c \
 	mmhub_v1_0.c \
 	mmhub_v1_7.c \
 	mmhub_v2_0.c \
