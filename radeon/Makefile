@@ -23,7 +23,6 @@ SRCS=	atom.c \
 	dce3_1_afmt.c \
 	dce6_afmt.c \
 	evergreen.c \
-	evergreen_blit_shaders.c \
 	evergreen_cs.c \
 	evergreen_dma.c \
 	evergreen_hdmi.c \
