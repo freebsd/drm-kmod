@@ -185,6 +185,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_pm.c \
 	amdgpu_dma_buf.c \
 	amdgpu_psp.c \
+	amdgpu_psp_ta.c \
 	amdgpu_ring.c \
 	amdgpu_rap.c \
 	amdgpu_ras.c \
