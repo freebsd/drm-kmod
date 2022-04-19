@@ -173,6 +173,7 @@ SRCS+=	gen2_engine_cs.c \
 	intel_execlists_submission.c \
 	intel_ggtt.c \
 	intel_ggtt_fencing.c \
+	intel_gsc.c \
 	intel_gt.c \
 	intel_gt_buffer_pool.c \
 	intel_gt_clock_utils.c \
