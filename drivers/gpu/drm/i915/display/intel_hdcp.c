@@ -17,7 +17,7 @@
 #include <linux/wait.h>
 #endif
 
-#include <drm/drm_hdcp.h>
+#include <drm/display/drm_hdcp_helper.h>
 #include <drm/i915_component.h>
 
 #include "i915_drv.h"

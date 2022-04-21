@@ -111,7 +111,8 @@ SRCS+=	drm_display_helper_mod.c \
 	drm_dp_dual_mode_helper.c \
 	drm_dp_mst_topology.c \
 	drm_dp_helper.c \
-	drm_dsc_helper.c
+	drm_dsc_helper.c \
+	drm_hdcp_helper.c
 
 .if !empty(KCONFIG:MDRM_DP_AUX_CHARDEV)
 SRCS+=	drm_dp_aux_dev.c
