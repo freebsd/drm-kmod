@@ -58,7 +58,6 @@ SRCS=	drm_atomic.c \
 	drm_property.c \
 	drm_rect.c \
 	drm_self_refresh_helper.c \
-	drm_scdc_helper.c \
 	drm_syncobj.c \
 	drm_sysctl_freebsd.c \
 	drm_sysfs.c \
@@ -107,7 +106,8 @@ SRCS+=	sched_main.c \
 	sched_entity.c
 
 # drm display (moved from amdgpu)
-SRCS+=	drm_display_helper_mod.c \
+SRCS+=	drm_scdc_helper.c \
+	drm_display_helper_mod.c \
 	drm_dp_dual_mode_helper.c \
 	drm_dp_mst_topology.c \
 	drm_dp_helper.c \
