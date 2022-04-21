@@ -2,7 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
-.PATH:	${SRCDIR} ${SRCDIR}/dp ${SRCDIR}/scheduler
+.PATH:	${SRCDIR} ${SRCDIR}/display ${SRCDIR}/scheduler
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
