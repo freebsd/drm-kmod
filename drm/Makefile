@@ -26,7 +26,6 @@ SRCS=	drm_atomic.c \
 	drm_crtc_helper.c \
 	drm_damage_helper.c \
 	drm_drv.c \
-	drm_dsc.c \
 	drm_dumb_buffers.c \
 	drm_edid.c \
 	drm_displayid.c \
@@ -112,6 +111,7 @@ SRCS+=	drm_display_helper_mod.c \
 	drm_dp_dual_mode_helper.c \
 	drm_dp_mst_topology.c \
 	drm_dp_helper.c \
+	drm_dsc_helper.c
 
 .if !empty(KCONFIG:MDRM_DP_AUX_CHARDEV)
 SRCS+=	drm_dp_aux_dev.c
