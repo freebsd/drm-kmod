@@ -870,11 +870,6 @@ static int psp_rl_load(struct amdgpu_device *adev)
 	return ret;
 }
 
-static int psp_asd_load(struct psp_context *psp)
-{
-	return psp_ta_load(psp, &psp->asd_context);
-}
-
 static int psp_asd_initialize(struct psp_context *psp)
 {
 	int ret;
@@ -890,7 +885,7 @@ static int psp_asd_initialize(struct psp_context *psp)
 	psp->asd_context.mem_context.shared_mem_size = PSP_ASD_SHARED_MEM_SIZE;
 	psp->asd_context.ta_load_type                = GFX_CMD_ID_LOAD_ASD;
 
-	ret = psp_asd_load(psp);
+	ret = psp_ta_load(psp, &psp->asd_context);
 	if (!ret)
 		psp->asd_context.initialized = true;
 
@@ -918,11 +913,6 @@ int psp_ta_unload(struct psp_context *psp, struct ta_context *context)
 	return ret;
 }
 
-static int psp_asd_unload(struct psp_context *psp)
-{
-	return psp_ta_unload(psp, &psp->asd_context);
-}
-
 static int psp_asd_terminate(struct psp_context *psp)
 {
 	int ret;
@@ -933,8 +923,7 @@ static int psp_asd_terminate(struct psp_context *psp)
 	if (!psp->asd_context.initialized)
 		return 0;
 
-	ret = psp_asd_unload(psp);
-
+	ret = psp_ta_unload(psp, &psp->asd_context);
 	if (!ret)
 		psp->asd_context.initialized = false;
 
@@ -1004,11 +993,6 @@ void psp_ta_free_shared_buf(struct ta_mem_context *mem_ctx)
 {
 	amdgpu_bo_free_kernel(&mem_ctx->shared_bo, &mem_ctx->shared_mc_addr,
 			      &mem_ctx->shared_buf);
-}
-
-static int psp_xgmi_init_shared_buf(struct psp_context *psp)
-{
-	return psp_ta_init_shared_buf(psp, &psp->xgmi_context.context.mem_context);
 }
 
 static void psp_prep_ta_invoke_indirect_cmd_buf(struct psp_gfx_cmd_resp *cmd,
@@ -1101,16 +1085,6 @@ int psp_ta_load(struct psp_context *psp, struct ta_context *context)
 	return ret;
 }
 
-static int psp_xgmi_load(struct psp_context *psp)
-{
-	return psp_ta_load(psp, &psp->xgmi_context.context);
-}
-
-static int psp_xgmi_unload(struct psp_context *psp)
-{
-	return psp_ta_unload(psp, &psp->xgmi_context.context);
-}
-
 int psp_xgmi_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 {
 	return psp_ta_invoke(psp, ta_cmd_id, &psp->xgmi_context.context);
@@ -1130,7 +1104,7 @@ int psp_xgmi_terminate(struct psp_context *psp)
 	if (!psp->xgmi_context.context.initialized)
 		return 0;
 
-	ret = psp_xgmi_unload(psp);
+	ret = psp_ta_unload(psp, &psp->xgmi_context.context);
 	if (ret)
 		return ret;
 
@@ -1159,13 +1133,13 @@ int psp_xgmi_initialize(struct psp_context *psp, bool set_extended_data, bool lo
 	psp->xgmi_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
 
 	if (!psp->xgmi_context.context.initialized) {
-		ret = psp_xgmi_init_shared_buf(psp);
+		ret = psp_ta_init_shared_buf(psp, &psp->xgmi_context.context.mem_context);
 		if (ret)
 			return ret;
 	}
 
 	/* Load XGMI TA */
-	ret = psp_xgmi_load(psp);
+	ret = psp_ta_load(psp, &psp->xgmi_context.context);
 	if (!ret)
 		psp->xgmi_context.context.initialized = true;
 	else
@@ -1388,21 +1362,6 @@ int psp_xgmi_set_topology_info(struct psp_context *psp,
 }
 
 // ras begin
-static int psp_ras_init_shared_buf(struct psp_context *psp)
-{
-	return psp_ta_init_shared_buf(psp, &psp->ras_context.context.mem_context);
-}
-
-static int psp_ras_load(struct psp_context *psp)
-{
-	return psp_ta_load(psp, &psp->ras_context.context);
-}
-
-static int psp_ras_unload(struct psp_context *psp)
-{
-	return psp_ta_unload(psp, &psp->ras_context.context);
-}
-
 static void psp_ras_ta_check_status(struct psp_context *psp)
 {
 	struct ta_ras_shared_memory *ras_cmd =
@@ -1510,7 +1469,7 @@ int psp_ras_terminate(struct psp_context *psp)
 	if (!psp->ras_context.context.initialized)
 		return 0;
 
-	ret = psp_ras_unload(psp);
+	ret = psp_ta_unload(psp, &psp->ras_context.context);
 	if (ret)
 		return ret;
 
@@ -1586,7 +1545,7 @@ static int psp_ras_initialize(struct psp_context *psp)
 	psp->ras_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
 
 	if (!psp->ras_context.context.initialized) {
-		ret = psp_ras_init_shared_buf(psp);
+		ret = psp_ta_init_shared_buf(psp, &psp->ras_context.context.mem_context);
 		if (ret)
 			return ret;
 	}
@@ -1599,7 +1558,7 @@ static int psp_ras_initialize(struct psp_context *psp)
 	if (!adev->gmc.xgmi.connected_to_cpu)
 		ras_cmd->ras_in_message.init_flags.dgpu_mode = 1;
 
-	ret = psp_ras_load(psp);
+	ret = psp_ta_load(psp, &psp->ras_context.context);
 
 	if (!ret && !ras_cmd->ras_status)
 		psp->ras_context.context.initialized = true;
@@ -1646,16 +1605,6 @@ int psp_ras_trigger_error(struct psp_context *psp,
 // ras end
 
 // HDCP start
-static int psp_hdcp_init_shared_buf(struct psp_context *psp)
-{
-	return psp_ta_init_shared_buf(psp, &psp->hdcp_context.context.mem_context);
-}
-
-static int psp_hdcp_load(struct psp_context *psp)
-{
-	return psp_ta_load(psp, &psp->hdcp_context.context);
-}
-
 static int psp_hdcp_initialize(struct psp_context *psp)
 {
 	int ret;
@@ -1676,23 +1625,18 @@ static int psp_hdcp_initialize(struct psp_context *psp)
 	psp->hdcp_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
 
 	if (!psp->hdcp_context.context.initialized) {
-		ret = psp_hdcp_init_shared_buf(psp);
+		ret = psp_ta_init_shared_buf(psp, &psp->hdcp_context.context.mem_context);
 		if (ret)
 			return ret;
 	}
 
-	ret = psp_hdcp_load(psp);
+	ret = psp_ta_load(psp, &psp->hdcp_context.context);
 	if (!ret) {
 		psp->hdcp_context.context.initialized = true;
 		mutex_init(&psp->hdcp_context.mutex);
 	}
 
 	return ret;
-}
-
-static int psp_hdcp_unload(struct psp_context *psp)
-{
-	return psp_ta_unload(psp, &psp->hdcp_context.context);
 }
 
 int psp_hdcp_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
@@ -1723,7 +1667,7 @@ static int psp_hdcp_terminate(struct psp_context *psp)
 			return 0;
 	}
 
-	ret = psp_hdcp_unload(psp);
+	ret = psp_ta_unload(psp, &psp->hdcp_context.context);
 	if (ret)
 		return ret;
 
@@ -1738,16 +1682,6 @@ out:
 // HDCP end
 
 // DTM start
-static int psp_dtm_init_shared_buf(struct psp_context *psp)
-{
-	return psp_ta_init_shared_buf(psp, &psp->dtm_context.context.mem_context);
-}
-
-static int psp_dtm_load(struct psp_context *psp)
-{
-	return psp_ta_load(psp, &psp->dtm_context.context);
-}
-
 static int psp_dtm_initialize(struct psp_context *psp)
 {
 	int ret;
@@ -1768,23 +1702,18 @@ static int psp_dtm_initialize(struct psp_context *psp)
 	psp->dtm_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
 
 	if (!psp->dtm_context.context.initialized) {
-		ret = psp_dtm_init_shared_buf(psp);
+		ret = psp_ta_init_shared_buf(psp, &psp->dtm_context.context.mem_context);
 		if (ret)
 			return ret;
 	}
 
-	ret = psp_dtm_load(psp);
+	ret = psp_ta_load(psp, &psp->dtm_context.context);
 	if (!ret) {
 		psp->dtm_context.context.initialized = true;
 		mutex_init(&psp->dtm_context.mutex);
 	}
 
 	return ret;
-}
-
-static int psp_dtm_unload(struct psp_context *psp)
-{
-	return psp_ta_unload(psp, &psp->dtm_context.context);
 }
 
 int psp_dtm_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
@@ -1815,7 +1744,7 @@ static int psp_dtm_terminate(struct psp_context *psp)
 			return 0;
 	}
 
-	ret = psp_dtm_unload(psp);
+	ret = psp_ta_unload(psp, &psp->dtm_context.context);
 	if (ret)
 		return ret;
 
@@ -1830,21 +1759,6 @@ out:
 // DTM end
 
 // RAP start
-static int psp_rap_init_shared_buf(struct psp_context *psp)
-{
-	return psp_ta_init_shared_buf(psp, &psp->rap_context.context.mem_context);
-}
-
-static int psp_rap_load(struct psp_context *psp)
-{
-	return psp_ta_load(psp, &psp->rap_context.context);
-}
-
-static int psp_rap_unload(struct psp_context *psp)
-{
-	return psp_ta_unload(psp, &psp->rap_context.context);
-}
-
 static int psp_rap_initialize(struct psp_context *psp)
 {
 	int ret;
@@ -1866,12 +1780,12 @@ static int psp_rap_initialize(struct psp_context *psp)
 	psp->rap_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
 
 	if (!psp->rap_context.context.initialized) {
-		ret = psp_rap_init_shared_buf(psp);
+		ret = psp_ta_init_shared_buf(psp, &psp->rap_context.context.mem_context);
 		if (ret)
 			return ret;
 	}
 
-	ret = psp_rap_load(psp);
+	ret = psp_ta_load(psp, &psp->rap_context.context);
 	if (!ret) {
 		psp->rap_context.context.initialized = true;
 		mutex_init(&psp->rap_context.mutex);
@@ -1898,7 +1812,7 @@ static int psp_rap_terminate(struct psp_context *psp)
 	if (!psp->rap_context.context.initialized)
 		return 0;
 
-	ret = psp_rap_unload(psp);
+	ret = psp_ta_unload(psp, &psp->rap_context.context);
 
 	psp->rap_context.context.initialized = false;
 
@@ -1944,22 +1858,6 @@ out_unlock:
 // RAP end
 
 /* securedisplay start */
-static int psp_securedisplay_init_shared_buf(struct psp_context *psp)
-{
-	return psp_ta_init_shared_buf(
-		psp, &psp->securedisplay_context.context.mem_context);
-}
-
-static int psp_securedisplay_load(struct psp_context *psp)
-{
-	return psp_ta_load(psp, &psp->securedisplay_context.context);
-}
-
-static int psp_securedisplay_unload(struct psp_context *psp)
-{
-	return psp_ta_unload(psp, &psp->securedisplay_context.context);
-}
-
 static int psp_securedisplay_initialize(struct psp_context *psp)
 {
 	int ret;
@@ -1982,12 +1880,13 @@ static int psp_securedisplay_initialize(struct psp_context *psp)
 	psp->securedisplay_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
 
 	if (!psp->securedisplay_context.context.initialized) {
-		ret = psp_securedisplay_init_shared_buf(psp);
+		ret = psp_ta_init_shared_buf(psp,
+					     &psp->securedisplay_context.context.mem_context);
 		if (ret)
 			return ret;
 	}
 
-	ret = psp_securedisplay_load(psp);
+	ret = psp_ta_load(psp, &psp->securedisplay_context.context);
 	if (!ret) {
 		psp->securedisplay_context.context.initialized = true;
 		mutex_init(&psp->securedisplay_context.mutex);
@@ -2026,7 +1925,7 @@ static int psp_securedisplay_terminate(struct psp_context *psp)
 	if (!psp->securedisplay_context.context.initialized)
 		return 0;
 
-	ret = psp_securedisplay_unload(psp);
+	ret = psp_ta_unload(psp, &psp->securedisplay_context.context);
 	if (ret)
 		return ret;
 
