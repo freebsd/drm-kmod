@@ -198,9 +198,15 @@ __notify_execute_cb(struct i915_request *rq, bool (*fn)(struct irq_work *wrk))
 	if (llist_empty(&rq->execute_cb))
 		return;
 
+#ifdef __linux__
 	llist_for_each_entry_safe(cb, cn,
 				  llist_del_all(&rq->execute_cb),
 				  work.llnode)
+#elif defined(__FreeBSD__)
+	struct llist_node *head = llist_del_all(&rq->execute_cb);
+	/* Only variable can be a third parameter of this macro */
+	llist_for_each_entry_safe(cb, cn, head, work.llnode)
+#endif
 		fn(&cb->work);
 }
 
