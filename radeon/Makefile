@@ -17,7 +17,6 @@ SRCS=	atom.c \
 	ci_dpm.c \
 	ci_smc.c \
 	cik.c \
-	cik_blit_shaders.c \
 	cik_sdma.c \
 	cypress_dpm.c \
 	dce3_1_afmt.c \
