@@ -10,6 +10,7 @@ SRCS=	dma-buf-kmod.c \
 	dma-buf.c \
 	dma-fence-array.c \
 	dma-fence-chain.c \
+	dma-fence-unwrap.c \
 	dma-fence.c \
 	dma-resv.c \
 	sync_file.c

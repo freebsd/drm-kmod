@@ -40,6 +40,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     drivers/dma-buf/dma-fence.c \
     drivers/dma-buf/dma-fence-array.c \
     drivers/dma-buf/dma-fence-chain.c \
+    drivers/dma-buf/dma-fence-unwrap.c \
     drivers/dma-buf/dma-resv.c \
     drivers/dma-buf/sync_file.c \
     drivers/video/hdmi.c \
