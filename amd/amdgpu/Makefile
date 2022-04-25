@@ -243,6 +243,7 @@ SRCS+=	amdgpu_afmt.c \
 	atombios_dp.c \
 	atombios_encoders.c \
 	atombios_i2c.c \
+	aqua_vanjaram_reg_init.c \
 	cik_ih.c \
 	cik_sdma.c \
 	cik.c \
@@ -1095,6 +1096,7 @@ CWARNFLAGS.amdgpu_xgmi.c=			-Wno-unused-variable
 CWARNFLAGS.aldebaran_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.aldebaran.c=				-Wno-unused-variable
 CWARNFLAGS.arcturus_ppt.c=			-Wno-uninitialized
+CWARNFLAGS.aqua_vanjaram_reg_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dimgrey_cavefish_reg_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.yellow_carp_ppt.c=			-Wno-sometimes-uninitialized
 CWARNFLAGS.atombios_encoders.c=			-Wno-unused-but-set-variable
