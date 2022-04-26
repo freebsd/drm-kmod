@@ -691,3 +691,7 @@ CWARNFLAGS.vega12_processpptables.c=	-Wno-missing-prototypes
 CWARNFLAGS.vega12_thermal.c=		-Wno-missing-prototypes
 CWARNFLAGS.vega20_hwmgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.vegam_smumgr.c=		-Wno-missing-prototypes
+
+.if ${COMPILER_VERSION} >= 130000
+CWARNFLAGS+=   -Wno-error=unused-but-set-variable
+.endif
