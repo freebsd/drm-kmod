@@ -13651,7 +13651,6 @@ static void __printf(4, 5)
 pipe_config_mismatch(bool fastset, const struct intel_crtc *crtc,
 		     const char *name, const char *format, ...)
 {
-#ifdef __linux__
 	struct drm_i915_private *i915 = to_i915(crtc->base.dev);
 	struct va_format vaf;
 	va_list args;
@@ -13669,12 +13668,6 @@ pipe_config_mismatch(bool fastset, const struct intel_crtc *crtc,
 			crtc->base.base.id, crtc->base.name, name, &vaf);
 
 	va_end(args);
-#elif defined(__FreeBSD__)
-	if (fastset)
-		DRM_DEBUG_KMS("mismatch in %s %s", name, format);
-	else
-		DRM_ERROR("mismatch in %s %s", name, format);
-#endif
 }
 
 static bool fastboot_enabled(struct drm_i915_private *dev_priv)
