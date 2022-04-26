@@ -795,3 +795,7 @@ CWARNFLAGS.vegam_smumgr.c=		-Wno-missing-prototypes
 
 # modules/*
 CWARNFLAGS.freesync.c=			-Wno-unused-but-set-variable
+
+.if ${COMPILER_VERSION} >= 130000
+CWARNFLAGS+=   -Wno-error=unused-but-set-variable
+.endif

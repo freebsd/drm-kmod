@@ -283,3 +283,8 @@ CWARNFLAGS.i915_active.c=	-Wno-unused-function
 CWARNFLAGS.i915_sw_fence.c=	-Wno-unused-function
 CWARNFLAGS.i915_vma.c=		-Wno-unused-function -Wno-unused-but-set-variable
 CWARNFLAGS.vlv_dsi.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.i915_vma.c=		-Wno-unused-function
+
+.if ${COMPILER_VERSION} >= 130000
+CWARNFLAGS+=   -Wno-error=unused-but-set-variable
+.endif
