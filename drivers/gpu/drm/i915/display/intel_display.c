@@ -24,6 +24,8 @@
  *	Eric Anholt <eric@anholt.net>
  */
 
+#define LKPI_IRQ_WORK_USE_FAST_TQ 1
+
 #include <linux/i2c.h>
 #include <linux/input.h>
 #include <linux/intel-iommu.h>

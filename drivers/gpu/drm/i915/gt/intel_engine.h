@@ -2,6 +2,8 @@
 #ifndef _INTEL_RINGBUFFER_H_
 #define _INTEL_RINGBUFFER_H_
 
+#define LKPI_IRQ_WORK_USE_FAST_TQ 1
+
 #include <drm/drm_util.h>
 
 #include <linux/hashtable.h>

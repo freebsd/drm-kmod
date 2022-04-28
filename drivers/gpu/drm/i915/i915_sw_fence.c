@@ -4,6 +4,8 @@
  * (C) Copyright 2016 Intel Corporation
  */
 
+#define LKPI_IRQ_WORK_USE_FAST_TQ 1
+
 #include <linux/slab.h>
 #include <linux/dma-fence.h>
 #include <linux/irq_work.h>

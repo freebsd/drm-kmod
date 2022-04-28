@@ -7,6 +7,8 @@
  *	Christian König <christian.koenig@amd.com>
  */
 
+#define LKPI_IRQ_WORK_USE_FAST_TQ 1
+
 #include <linux/dma-fence-chain.h>
 
 #ifdef __FreeBSD__

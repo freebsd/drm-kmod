@@ -3,6 +3,8 @@
  * Copyright © 2019 Intel Corporation
  */
 
+#define LKPI_IRQ_WORK_USE_FAST_TQ 1
+
 #include "i915_drv.h"
 #include "gt/intel_context.h"
 #include "gt/intel_engine_pm.h"

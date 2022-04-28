@@ -22,6 +22,8 @@
  *
  */
 
+#define LKPI_IRQ_WORK_USE_FAST_TQ 1
+
 /* FreeBSD include linux/prefetch.h first */
 #include <linux/prefetch.h>
 #include <linux/dma-fence-array.h>
