@@ -9,7 +9,10 @@ __FBSDID("$FreeBSD$");
 
 #include <asm/pgtable.h>
 
+#include <acpi/video.h>
+
 #include "i915_driver.h"
+#include "intel_acpi.h"
 #include <linux/console.h>
 #include <linux/module.h>
 #include <linux/pm_runtime.h>
@@ -206,4 +209,10 @@ void
 intel_gmch_gtt_flush(void)
 {
 	intel_gtt_chipset_flush();
+}
+
+void
+intel_acpi_video_register(struct drm_i915_private *i915)
+{
+	acpi_video_register();
 }
