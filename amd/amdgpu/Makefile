@@ -619,7 +619,8 @@ SRCS+=	dcn32_dccg.c \
 	dcn32_mmhubbub.c \
 	dcn32_mpc.c \
 	dcn32_optc.c \
-	dcn32_resource.c
+	dcn32_resource.c \
+	dcn32_resource_helpers.c
 
 # display/dc/dcn321
 SRCS+=	dcn321_dio_link_encoder.c \
@@ -945,6 +946,7 @@ CFLAGS.dcn303_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn32_resource_helpers.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_mode_lib.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba.c= ${FPUFLAGS} -mstack-alignment=4
@@ -1165,6 +1167,7 @@ CWARNFLAGS.dcn32_mmhubbub.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn32_mpc.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn32_optc.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn32_resource.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-initializer-overrides
+CWARNFLAGS.dcn32_resource_helpers.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn321_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
@@ -1184,7 +1187,7 @@ CWARNFLAGS.irq_service_dcn315.c=	-Wno-missing-prototypes
 CWARNFLAGS.power_helpers.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes
-CWARNFLAGS.dc_dmub_srv.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dc_dmub_srv.c=		-Wno-unused-but-set-variable -Wno-missing-prototypes
 CWARNFLAGS.dmub_psr.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_abm.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_hw_lock_mgr.c=		-Wno-unused-but-set-variable
