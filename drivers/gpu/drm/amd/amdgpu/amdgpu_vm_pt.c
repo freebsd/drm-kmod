@@ -635,6 +635,7 @@ static void amdgpu_vm_pt_free(struct amdgpu_vm_bo_base *entry)
 		ttm_bo_set_bulk_move(&shadow->tbo, NULL);
 		amdgpu_bo_unref(&shadow);
 	}
+	ttm_bo_set_bulk_move(&entry->bo->tbo, NULL);
 	entry->bo->vm_bo = NULL;
 	list_del(&entry->vm_status);
 	amdgpu_bo_unref(&entry->bo);
