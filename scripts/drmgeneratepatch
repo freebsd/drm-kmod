@@ -14,9 +14,9 @@ if [ $# -ne 3 ]; then
 	usage
 fi
 
-LINUX_DIR=$1
+LINUX_DIR=$(realpath "$1")
 shift
-PATCH_DIR=$1
+PATCH_DIR=$(realpath "$1")
 shift
 REV=$1
 
