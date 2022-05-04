@@ -3,7 +3,7 @@
 usage()
 {
 	cat << EOF
-	Usage: `basename $0` patchdir
+	Usage: `basename "$0"` patchdir
 EOF
 
 	exit 1
@@ -13,13 +13,20 @@ if [ $# -ne 1 ]; then
 	usage
 fi
 
-mkdir -p $1/alreadyapplied/
+mkdir -p "$1"/alreadyapplied/
 
-for file in $1/*.patch; do
-	subject=$(grep Subject $file | awk -F '] ' '{print $2}')
-	git log --oneline | grep "${subject}" >/dev/null
+scriptdir=$(dirname "$0")
+log="$scriptdir/log.txt"
+
+git log --oneline > "$log"
+
+for file in "$1"/*.patch; do
+	subject=$("$scriptdir/extract-commit-title-from-patch.awk" "$file")
+	grep -q -F "${subject}" "$log"
 	if [ $? -eq 0 ]; then
 		echo "$file already applied"
 		mv $file $1/alreadyapplied
 	fi
 done
+
+rm "$log"
