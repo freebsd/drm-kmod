@@ -335,62 +335,31 @@ static void __force_fw_fetch_failures(struct intel_uc_fw *uc_fw, int e)
 	}
 }
 
-/**
- * intel_uc_fw_fetch - fetch uC firmware
- * @uc_fw: uC firmware
- *
- * Fetch uC firmware into GEM obj.
- *
- * Return: 0 on success, a negative errno code on failure.
- */
-int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
+static int check_gsc_manifest(const struct firmware *fw,
+			      struct intel_uc_fw *uc_fw)
 {
-	struct drm_i915_private *i915 = __uc_fw_to_gt(uc_fw)->i915;
-	struct device *dev = i915->drm.dev;
-	struct drm_i915_gem_object *obj;
-	const struct firmware *fw = NULL;
+	u32 *dw = (u32 *)fw->data;
+	u32 version = dw[HUC_GSC_VERSION_DW];
+
+	uc_fw->major_ver_found = FIELD_GET(HUC_GSC_MAJOR_VER_MASK, version);
+	uc_fw->minor_ver_found = FIELD_GET(HUC_GSC_MINOR_VER_MASK, version);
+
+	return 0;
+}
+
+static int check_ccs_header(struct drm_i915_private *i915,
+			    const struct firmware *fw,
+			    struct intel_uc_fw *uc_fw)
+{
 	struct uc_css_header *css;
 	size_t size;
-	int err;
-
-	GEM_BUG_ON(!i915->wopcm.size);
-	GEM_BUG_ON(!intel_uc_fw_is_enabled(uc_fw));
-
-	err = i915_inject_probe_error(i915, -ENXIO);
-	if (err)
-		goto fail;
-
-	__force_fw_fetch_failures(uc_fw, -EINVAL);
-	__force_fw_fetch_failures(uc_fw, -ESTALE);
-
-	err = firmware_request_nowarn(&fw, uc_fw->path, dev);
-	if (err && !intel_uc_fw_is_overridden(uc_fw) && uc_fw->fallback.path) {
-		err = firmware_request_nowarn(&fw, uc_fw->fallback.path, dev);
-		if (!err) {
-			drm_notice(&i915->drm,
-				   "%s firmware %s is recommended, but only %s was found\n",
-				   intel_uc_fw_type_repr(uc_fw->type),
-				   uc_fw->wanted_path,
-				   uc_fw->fallback.path);
-			drm_info(&i915->drm,
-				 "Consider updating your linux-firmware pkg or downloading from %s\n",
-				 INTEL_UC_FIRMWARE_URL);
-
-			uc_fw->path = uc_fw->fallback.path;
-			uc_fw->major_ver_wanted = uc_fw->fallback.major_ver;
-			uc_fw->minor_ver_wanted = uc_fw->fallback.minor_ver;
-		}
-	}
-	if (err)
-		goto fail;
 
 	/* Check the size of the blob before examining buffer contents */
 	if (unlikely(fw->size < sizeof(struct uc_css_header))) {
 		drm_warn(&i915->drm, "%s firmware %s: invalid size: %zu < %zu\n",
 			 intel_uc_fw_type_repr(uc_fw->type), uc_fw->path,
 			 fw->size, sizeof(struct uc_css_header));
-		err = -ENODATA;
-		goto fail;
+		return -ENODATA;
 	}
 
 	css = (struct uc_css_header *)fw->data;
@@ -403,8 +372,7 @@ int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
 			 "%s firmware %s: unexpected header size: %zu != %zu\n",
 			 intel_uc_fw_type_repr(uc_fw->type), uc_fw->path,
 			 fw->size, sizeof(struct uc_css_header));
-		err = -EPROTO;
-		goto fail;
+		return -EPROTO;
 	}
 
 	/* uCode size must calculated from other sizes */
@@ -419,8 +387,7 @@ int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
 		drm_warn(&i915->drm, "%s firmware %s: invalid size: %zu < %zu\n",
 			 intel_uc_fw_type_repr(uc_fw->type), uc_fw->path,
 			 fw->size, size);
-		err = -ENOEXEC;
-		goto fail;
+		return -ENOEXEC;
 	}
 
 	/* Sanity check whether this fw is not larger than whole WOPCM memory */
@@ -429,8 +396,7 @@ int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
 		drm_warn(&i915->drm, "%s firmware %s: invalid size: %zu > %zu\n",
 			 intel_uc_fw_type_repr(uc_fw->type), uc_fw->path,
 			 size, (size_t)i915->wopcm.size);
-		err = -E2BIG;
-		goto fail;
+		return -E2BIG;
 	}
 
 	/* Get version numbers from the CSS header */
@@ -438,6 +404,49 @@ int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
 					   css->sw_version);
 	uc_fw->minor_ver_found = FIELD_GET(CSS_SW_VERSION_UC_MINOR,
 					   css->sw_version);
+
+	if (uc_fw->type == INTEL_UC_FW_TYPE_GUC)
+		uc_fw->private_data_size = css->private_data_size;
+
+	return 0;
+}
+
+/**
+ * intel_uc_fw_fetch - fetch uC firmware
+ * @uc_fw: uC firmware
+ *
+ * Fetch uC firmware into GEM obj.
+ *
+ * Return: 0 on success, a negative errno code on failure.
+ */
+int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
+{
+	struct drm_i915_private *i915 = __uc_fw_to_gt(uc_fw)->i915;
+	struct device *dev = i915->drm.dev;
+	struct drm_i915_gem_object *obj;
+	const struct firmware *fw = NULL;
+	int err;
+
+	GEM_BUG_ON(!i915->wopcm.size);
+	GEM_BUG_ON(!intel_uc_fw_is_enabled(uc_fw));
+
+	err = i915_inject_probe_error(i915, -ENXIO);
+	if (err)
+		goto fail;
+
+	__force_fw_fetch_failures(uc_fw, -EINVAL);
+	__force_fw_fetch_failures(uc_fw, -ESTALE);
+
+	err = request_firmware(&fw, uc_fw->path, dev);
+	if (err)
+		goto fail;
+
+	if (uc_fw->loaded_via_gsc)
+		err = check_gsc_manifest(fw, uc_fw);
+	else
+		err = check_ccs_header(i915, fw, uc_fw);
+	if (err)
+		goto fail;
 
 	if (uc_fw->major_ver_found != uc_fw->major_ver_wanted ||
 	    uc_fw->minor_ver_found < uc_fw->minor_ver_wanted) {
@@ -450,9 +459,6 @@ int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
 			goto fail;
 		}
 	}
-
-	if (uc_fw->type == INTEL_UC_FW_TYPE_GUC)
-		uc_fw->private_data_size = css->private_data_size;
 
 	if (HAS_LMEM(i915)) {
 		obj = i915_gem_object_create_lmem_from_data(i915, fw->data, fw->size);
