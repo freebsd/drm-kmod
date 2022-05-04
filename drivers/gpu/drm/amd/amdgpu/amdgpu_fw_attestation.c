@@ -116,7 +116,9 @@ static const struct file_operations amdgpu_fw_attestation_debugfs_ops = {
 	.owner = THIS_MODULE,
 	.read = amdgpu_fw_attestation_debugfs_read,
 	.write = NULL,
+#ifdef __linux__
 	.llseek = default_llseek
+#endif
 };
 
 static int amdgpu_is_fw_attestation_supported(struct amdgpu_device *adev)
