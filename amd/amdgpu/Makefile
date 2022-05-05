@@ -178,6 +178,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_job.c \
 	amdgpu_jpeg.c \
 	amdgpu_kms.c \
+	amdgpu_lsdma.c \
 	amdgpu_mca.c \
 	amdgpu_mes.c \
 	amdgpu_nbio.c \
@@ -271,6 +272,7 @@ SRCS+=	amdgpu_afmt.c \
 	kv_dpm.c \
 	kv_smc.c \
 	legacy_dpm.c \
+	lsdma_v6_0.c \
 	mca_v3_0.c \
 	mes_v10_1.c \
 	mes_v11_0.c \
