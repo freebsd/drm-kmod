@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# Compares two trees recursively and outputs diff in git-like style.
+# Both trees must be at the same VCS revision.
+
+DEFAULT_DRM_DIR=drivers/gpu/drm
+
+usage()
+{
+	cat << EOF
+	Usage: `basename $0` linux_dir drm_dir
+ex: `basename $0` HOME/linux/ [${DEFAULT_DRM_DIR}]
+EOF
+
+        exit 1
+}
+
+if [ $# -eq 0 -o $# -gt 2 ]; then
+        usage
+fi
+
+LINUX_DIR=$1
+shift
+if [ $# -eq 1 ]; then
+	DRM_DIR=$1
+else
+	DRM_DIR=${DEFAULT_DRM_DIR}
+fi
+
+if [ ! -d ${LINUX_DIR} ]; then
+        echo "No directory ${LINUX_DIR}"
+        exit 1
+fi
+
+if [ ! -d ${DRM_DIR} ]; then
+        echo "No directory ${DRM_DIR}"
+        exit 1
+fi
+
+/usr/bin/find ${DRM_DIR} -type d -exec /usr/bin/diff -dpu --color=always \
+	-x drm_dp_mst_topology_internal.h \
+	-x drm_flip_work.c \
+	-x drm_gem_framebuffer_helper.c \
+	-x drm_lease.c \
+	-x drm_managed.c \
+	-x drm_sysfs.c \
+	-x i915_trace.h \
+{} ${LINUX_DIR}/{} \; | /usr/bin/less -MR
