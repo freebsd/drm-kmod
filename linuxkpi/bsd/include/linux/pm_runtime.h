@@ -37,7 +37,7 @@ pm_runtime_get_if_in_use(struct device *dev)
 static inline int
 pm_runtime_get_if_active(struct device *dev, bool x)
 {
-	return -EINVAL;
+	return 1;
 }
 
 #endif
