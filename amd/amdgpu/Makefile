@@ -661,6 +661,9 @@ SRCS+=	display_mode_lib.c \
 # display/dc/dml/dcn10
 SRCS+=	dcn10_fpu.c
 
+# display/dc/dml/dcn30
+SRCS+=	dcn30_fpu.c
+
 # display/dc/dml/dcn302
 SRCS+=	dcn302_fpu.c
 
@@ -898,6 +901,7 @@ CFLAGS.dcn_calc_math.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-tautological-compar
 CFLAGS.dcn20_fpu.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-unused-variable
 CFLAGS.dcn20_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn21_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn30_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn30_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn301_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn301_resource.c= ${FPUFLAGS} -mstack-alignment=4
