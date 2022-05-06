@@ -203,7 +203,8 @@ static int smu_v13_0_7_store_powerplay_table(struct smu_context *smu)
 	return 0;
 }
 
-int smu_v13_0_7_check_fw_status(struct smu_context *smu) {
+static int smu_v13_0_7_check_fw_status(struct smu_context *smu)
+{
 	struct amdgpu_device *adev = smu->adev;
 	uint32_t mp1_fw_flags;
 
@@ -278,7 +279,6 @@ static int smu_v13_0_7_tables_init(struct smu_context *smu)
 {
 	struct smu_table_context *smu_table = &smu->smu_table;
 	struct smu_table *tables = smu_table->tables;
-	struct amdgpu_device *adev = smu->adev;
 
 	SMU_TABLE_INIT(tables, SMU_TABLE_PPTABLE, sizeof(PPTable_t),
 		PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM);
@@ -356,7 +356,6 @@ static int smu_v13_0_7_set_default_dpm_table(struct smu_context *smu)
 	PPTable_t *driver_ppt = smu->smu_table.driver_pptable;
 	SkuTable_t *sku_ppt = &driver_ppt->SkuTable;
 	struct smu_13_0_dpm_table *dpm_table;
-	struct amdgpu_device *adev = smu->adev;
 	int ret = 0;
 
 	/* socclk dpm table setup */
@@ -461,8 +460,6 @@ static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
 
 void smu_v13_0_7_set_ppt_funcs(struct smu_context *smu)
 {
-	struct amdgpu_device *adev = smu->adev;
-
 	smu->ppt_funcs = &smu_v13_0_7_ppt_funcs;
 	smu->message_map = smu_v13_0_7_message_map;
 	smu->clock_map = smu_v13_0_7_clk_map;
