@@ -200,9 +200,14 @@ MODULE_VERSION(drmn, 2);
 MODULE_DEPEND(drmn, agp, 1, 1, 1);
 #endif
 #if __FreeBSD_version >= 1400051
+#if __FreeBSD_version >= 1400058
+DRIVER_MODULE(iicbus, drmn, iicbus_driver, NULL, NULL);
+DRIVER_MODULE(acpi_iicbus, drmn, acpi_iicbus_driver, NULL, NULL);
+#else
 DRIVER_MODULE(iicbus, drmn, iicbus_driver, iicbus_devclass, NULL, NULL);
 DRIVER_MODULE(acpi_iicbus, drmn, acpi_iicbus_driver, iicbus_devclass, NULL,
     NULL);
+#endif
 MODULE_DEPEND(drmn, iicbus, IICBUS_MINVER, IICBUS_PREFVER, IICBUS_MAXVER);
 MODULE_DEPEND(drmn, iic, 1, 1, 1);
 MODULE_DEPEND(drmn, iicbb, IICBB_MINVER, IICBB_PREFVER, IICBB_MAXVER);
