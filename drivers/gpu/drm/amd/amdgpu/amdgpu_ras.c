@@ -80,7 +80,6 @@ enum amdgpu_ras_retire_page_reservation {
 
 atomic_t amdgpu_ras_in_intr = ATOMIC_INIT(0);
 
-#ifdef CONFIG_DEBUG_FS
 static bool amdgpu_ras_check_bad_page(struct amdgpu_device *adev,
 				uint64_t addr);
 
@@ -133,7 +132,9 @@ static const struct file_operations amdgpu_ras_debugfs_ops = {
 	.owner = THIS_MODULE,
 	.read = amdgpu_ras_debugfs_read,
 	.write = NULL,
+#ifdef __linux__
 	.llseek = default_llseek
+#endif
 };
 
 static int amdgpu_ras_find_block_id_by_name(const char *name, int *block_id)
@@ -299,13 +300,11 @@ static ssize_t amdgpu_ras_debugfs_ctrl_write(struct file *f, const char __user *
 	struct ras_debug_if data;
 	int ret = 0;
 
-#ifdef CONFIG_DEBUG_FS
 	if (!amdgpu_ras_get_error_query_ready(adev)) {
 		dev_warn(adev->dev, "RAS WARN: error injection "
 				"currently inaccessible\n");
 		return size;
 	}
-#endif
 
 	ret = amdgpu_ras_debugfs_ctrl_parse_data(f, buf, size, pos, &data);
 	if (ret)
@@ -392,16 +391,19 @@ static const struct file_operations amdgpu_ras_debugfs_ctrl_ops = {
 	.owner = THIS_MODULE,
 	.read = NULL,
 	.write = amdgpu_ras_debugfs_ctrl_write,
+#ifdef __linux__
 	.llseek = default_llseek
+#endif
 };
 
 static const struct file_operations amdgpu_ras_debugfs_eeprom_ops = {
 	.owner = THIS_MODULE,
 	.read = NULL,
 	.write = amdgpu_ras_debugfs_eeprom_write,
+#ifdef __linux__
 	.llseek = default_llseek
+#endif
 };
-#endif /* CONFIG_DEBUG_FS */
 
 /**
  * DOC: AMDGPU RAS sysfs Error Count Interface
@@ -432,11 +434,9 @@ static ssize_t amdgpu_ras_sysfs_read(struct device *dev,
 		.head = obj->head,
 	};
 
-#ifdef CONFIG_DEBUG_FS
 	if (!amdgpu_ras_get_error_query_ready(obj->adev))
 		return snprintf(buf, PAGE_SIZE,
 				"Query currently inaccessible\n");
-#endif
 
 	if (amdgpu_ras_error_query(obj->adev, &info))
 		return -EINVAL;
@@ -1137,7 +1137,6 @@ static int amdgpu_ras_sysfs_remove_all(struct amdgpu_device *adev)
 }
 /* sysfs end */
 
-#ifdef CONFIG_DEBUG_FS
 /**
  * DOC: AMDGPU RAS Reboot Behavior for Unrecoverable Errors
  *
@@ -1168,6 +1167,7 @@ static void amdgpu_ras_debugfs_create_ctrl_node(struct amdgpu_device *adev)
 	debugfs_create_file("ras_eeprom_reset", S_IWUGO | S_IRUGO, con->dir,
 				adev, &amdgpu_ras_debugfs_eeprom_ops);
 
+#ifdef __linux__
 	/*
 	 * After one uncorrectable error happens, usually GPU recovery will
 	 * be scheduled. But due to the known problem in GPU recovery failing
@@ -1185,6 +1185,7 @@ static void amdgpu_ras_debugfs_create_ctrl_node(struct amdgpu_device *adev)
 	 */
 	debugfs_create_bool("disable_ras_err_cnt_harvest", 0644,
 			con->dir, &con->disable_ras_err_cnt_harvest);
+#endif
 }
 
 static void amdgpu_ras_debugfs_create(struct amdgpu_device *adev,
@@ -1257,7 +1258,6 @@ static void amdgpu_ras_debugfs_remove_all(struct amdgpu_device *adev)
 	con->dir = NULL;
 }
 /* debugfs end */
-#endif
 
 /* ras fs */
 #ifdef __linux__
@@ -1307,10 +1307,8 @@ static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 
 static int amdgpu_ras_fs_fini(struct amdgpu_device *adev)
 {
-#ifdef CONFIG_DEBUG_FS
 	if (IS_ENABLED(CONFIG_DEBUG_FS))
 		amdgpu_ras_debugfs_remove_all(adev);
-#endif
 	amdgpu_ras_sysfs_remove_all(adev);
 	return 0;
 }
