@@ -35,6 +35,7 @@ SRCS=	drm_atomic.c \
 	drm_fourcc.c \
 	drm_framebuffer.c \
 	drm_gem.c \
+	drm_gem_atomic_helper.c \
 	drm_gem_framebuffer_helper.c \
 	drm_hashtab.c \
 	drm_ioctl.c \

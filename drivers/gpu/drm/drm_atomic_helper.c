@@ -2444,13 +2444,9 @@ int drm_atomic_helper_prepare_planes(struct drm_device *dev,
 			if (!drm_core_check_feature(dev, DRIVER_GEM))
 				continue;
 
-#ifdef __linux__
 			ret = drm_gem_plane_helper_prepare_fb(plane, new_plane_state);
 			if (ret)
 				goto fail;
-#elif defined(__FreeBSD__)
-			panic("drm_gem_plane_helper_prepare_fb() not implemented");
-#endif
 		}
 	}
 

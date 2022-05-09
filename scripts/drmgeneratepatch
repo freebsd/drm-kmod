@@ -78,6 +78,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_dma*' \
     ':!drivers/gpu/drm/drm_edid_load*' \
     ':!drivers/gpu/drm/drm_fb_cma_helper*' \
+    ':!drivers/gpu/drm/drm_gem_atomic_helper.c' \
     ':!drivers/gpu/drm/drm_gem_cma_helper*' \
     ':!drivers/gpu/drm/drm_gem_framebuffer_helper*' \
     ':!drivers/gpu/drm/drm_gem_shmem_helper*' \
@@ -103,6 +104,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/display/drm_dp_aux_bus*' \
     ':!include/drm/drm_bridge_connector*' \
     ':!include/drm/drm_fb_cma_helper*' \
+    ':!include/drm/drm_gem_atomic_helper.h' \
     ':!include/drm/drm_gem_cma*' \
     ':!include/drm/drm_gem_shmem*' \
     ':!include/drm/drm_gem_ttm_helper*' \
