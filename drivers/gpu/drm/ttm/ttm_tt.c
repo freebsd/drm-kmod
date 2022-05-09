@@ -36,7 +36,8 @@
 #include <linux/file.h>
 #include <linux/module.h>
 #include <drm/drm_cache.h>
-#include <drm/ttm/ttm_bo_driver.h>
+#include <drm/ttm/ttm_bo.h>
+#include <drm/ttm/ttm_tt.h>
 #ifdef __FreeBSD__
 #include <drm/ttm/ttm_sysctl_freebsd.h>
 #endif
