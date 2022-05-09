@@ -1633,18 +1633,15 @@ static int __init amdgpu_init(void)
 	/* Ignore KFD init failures. Normal when CONFIG_HSA_AMD is not set. */
 	amdgpu_amdkfd_init();
 
-#ifdef __FreeBSD__
+#ifdef __linux__
+	/* let modprobe override vga console setting */
+	return pci_register_driver(&amdgpu_kms_pci_driver);
+#elif defined(__FreeBSD__)
 	amdgpu_kms_pci_driver.bsdclass = drm_devclass;
 	amdgpu_kms_pci_driver.name = "drmn";
 
-	if (!(kms_driver.driver_features & DRIVER_LEGACY))
-		return linux_pci_register_drm_driver(&amdgpu_kms_pci_driver);
-
-	DRM_ERROR("FreeBSD needs DRIVER_MODESET");
-	return (-ENOTSUP);
+	return linux_pci_register_drm_driver(&amdgpu_kms_pci_driver);
 #endif
-	/* let modprobe override vga console setting */
-	return pci_register_driver(&amdgpu_kms_pci_driver);
 
 error_fence:
 	amdgpu_sync_fini();

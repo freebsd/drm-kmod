@@ -717,7 +717,11 @@ static int __init radeon_module_init(void)
 
 static void __exit radeon_module_exit(void)
 {
+#ifdef __linux__
 	pci_unregister_driver(&radeon_kms_pci_driver);
+#elif defined(__FreeBSD__)
+	linux_pci_unregister_drm_driver(&radeon_kms_pci_driver);
+#endif
 	radeon_unregister_atpx_handler();
 #ifdef __linux__
 	mmu_notifier_synchronize();
