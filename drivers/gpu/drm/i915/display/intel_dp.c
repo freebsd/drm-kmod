@@ -1898,8 +1898,10 @@ static i915_reg_t tgl_aux_data_reg(struct intel_dp *intel_dp, int index)
 static void
 intel_dp_aux_fini(struct intel_dp *intel_dp)
 {
+#ifdef __linux__
 	if (cpu_latency_qos_request_active(&intel_dp->pm_qos))
 		cpu_latency_qos_remove_request(&intel_dp->pm_qos);
+#endif
 
 	kfree(intel_dp->aux.name);
 }
