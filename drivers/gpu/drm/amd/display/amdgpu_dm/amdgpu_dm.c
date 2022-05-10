@@ -698,7 +698,11 @@ static const struct component_ops amdgpu_dm_audio_component_bind_ops = {
 
 static int amdgpu_dm_audio_init(struct amdgpu_device *adev)
 {
+#ifdef __linux__
+	int i, ret;
+#elif defined(__FreeBSD__)
 	int i;
+#endif
 
 	if (!amdgpu_audio)
 		return 0;
