@@ -1025,7 +1025,7 @@ static int amdgpu_ttm_backend_bind(struct ttm_bo_device *bdev,
 				   struct ttm_resource *bo_mem)
 {
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
-	struct amdgpu_ttm_tt *gtt = (void *)ttm;
+	struct amdgpu_ttm_tt *gtt = (void*)ttm;
 	uint64_t flags;
 	int r = 0;
 

@@ -139,6 +139,13 @@
 #define mmCP_HYP_ME_UCODE_DATA			0x5817
 #define mmCP_HYP_ME_UCODE_DATA_BASE_IDX		1
 
+#define mmCPG_PSP_DEBUG				0x5c10
+#define mmCPG_PSP_DEBUG_BASE_IDX		1
+#define mmCPC_PSP_DEBUG				0x5c11
+#define mmCPC_PSP_DEBUG_BASE_IDX		1
+#define CPC_PSP_DEBUG__GPA_OVERRIDE_MASK	0x00000008L
+#define CPG_PSP_DEBUG__GPA_OVERRIDE_MASK	0x00000008L
+
 //CC_GC_SA_UNIT_DISABLE
 #define mmCC_GC_SA_UNIT_DISABLE                 0x0fe9
 #define mmCC_GC_SA_UNIT_DISABLE_BASE_IDX        0
@@ -158,20 +165,13 @@
 #define mmCGTT_SPI_CS_CLK_CTRL			0x507c
 #define mmCGTT_SPI_CS_CLK_CTRL_BASE_IDX         1
 
-#define mmCPG_PSP_DEBUG				0x5c10
-#define mmCPG_PSP_DEBUG_BASE_IDX		1
-#define mmCPC_PSP_DEBUG				0x5c11
-#define mmCPC_PSP_DEBUG_BASE_IDX		1
-#define CPC_PSP_DEBUG__GPA_OVERRIDE_MASK	0x00000008L
-#define CPG_PSP_DEBUG__GPA_OVERRIDE_MASK	0x00000008L
-
-#define mmGC_THROTTLE_CTRL_Sienna_Cichlid              0x2030
-#define mmGC_THROTTLE_CTRL_Sienna_Cichlid_BASE_IDX     0
-
 #define mmGCUTCL2_CGTT_CLK_CTRL_Sienna_Cichlid		0x16f3
 #define mmGCUTCL2_CGTT_CLK_CTRL_Sienna_Cichlid_BASE_IDX	0
 #define mmGCVM_L2_CGTT_CLK_CTRL_Sienna_Cichlid          0x15db
 #define mmGCVM_L2_CGTT_CLK_CTRL_Sienna_Cichlid_BASE_IDX	0
+
+#define mmGC_THROTTLE_CTRL_Sienna_Cichlid              0x2030
+#define mmGC_THROTTLE_CTRL_Sienna_Cichlid_BASE_IDX     0
 
 MODULE_FIRMWARE("amdgpu/navi10_ce.bin");
 MODULE_FIRMWARE("amdgpu/navi10_pfp.bin");
@@ -3155,6 +3155,8 @@ static const struct soc15_reg_golden golden_settings_gc_10_3[] =
 	SOC15_REG_GOLDEN_VALUE(GC, 0 ,mmGCEA_SDP_TAG_RESERVE0, 0xffffffff, 0x10100100),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGCEA_SDP_TAG_RESERVE1, 0xffffffff, 0x17000088),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGCR_GENERAL_CNTL_Sienna_Cichlid, 0x1ff1ffff, 0x00000500),
+	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGCUTCL2_CGTT_CLK_CTRL_Sienna_Cichlid, 0xff000000, 0xff008080),
+	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGCVM_L2_CGTT_CLK_CTRL_Sienna_Cichlid, 0xff000000, 0xff008080),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGE_PC_CNTL, 0x003fffff, 0x00280400),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGL2A_ADDR_MATCH_MASK, 0xffffffff, 0xffffffcf),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGL2C_ADDR_MATCH_MASK, 0xffffffff, 0xffffffcf),
@@ -3193,6 +3195,7 @@ static const struct soc15_reg_golden golden_settings_gc_10_3_sienna_cichlid[] =
 
 static const struct soc15_reg_golden golden_settings_gc_10_3_2[] =
 {
+	SOC15_REG_GOLDEN_VALUE(GC, 0, mmCGTT_SPI_CS_CLK_CTRL, 0xff7f0fff, 0x78000100),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmCGTT_SPI_PS_CLK_CTRL, 0xff7f0fff, 0x78000100),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmCGTT_SPI_RA0_CLK_CTRL, 0xff7f0fff, 0x30000100),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmCGTT_SPI_RA1_CLK_CTRL, 0xff7f0fff, 0x7e000100),
@@ -3201,8 +3204,8 @@ static const struct soc15_reg_golden golden_settings_gc_10_3_2[] =
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmDB_DEBUG4, 0xffffffff, 0x00800000),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmDB_EXCEPTION_CONTROL, 0x7fff0f1f, 0x00b80000),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGCR_GENERAL_CNTL_Sienna_Cichlid, 0x1ff1ffff, 0x00000500),
-	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGCUTCL2_CGTT_CLK_CTRL_Sienna_Cichlid, 0xff000000, 0xff008080),
-	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGCVM_L2_CGTT_CLK_CTRL_Sienna_Cichlid, 0xff000000, 0xff008080),
+	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGCUTCL2_CGTT_CLK_CTRL_Sienna_Cichlid, 0xffffffff, 0xff008080),
+	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGCVM_L2_CGTT_CLK_CTRL_Sienna_Cichlid, 0xffff8fff, 0xff008080),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGE_PC_CNTL, 0x003fffff, 0x00280400),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGL2A_ADDR_MATCH_MASK, 0xffffffff, 0xffffffcf),
 	SOC15_REG_GOLDEN_VALUE(GC, 0, mmGL2C_ADDR_MATCH_MASK, 0xffffffff, 0xffffffcf),
