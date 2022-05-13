@@ -53,6 +53,7 @@ typedef struct FW_ATT_RECORD
 	uint8_t  Reserved;
 } FW_ATT_RECORD;
 
+#ifdef __linux__
 static ssize_t amdgpu_fw_attestation_debugfs_read(struct file *f,
 						  char __user *buf,
 						  size_t size,
@@ -117,10 +118,9 @@ static const struct file_operations amdgpu_fw_attestation_debugfs_ops = {
 	.owner = THIS_MODULE,
 	.read = amdgpu_fw_attestation_debugfs_read,
 	.write = NULL,
-#ifdef __linux__
 	.llseek = default_llseek
-#endif
 };
+#endif
 
 static int amdgpu_is_fw_attestation_supported(struct amdgpu_device *adev)
 {
@@ -135,9 +135,11 @@ void amdgpu_fw_attestation_debugfs_init(struct amdgpu_device *adev)
 	if (!amdgpu_is_fw_attestation_supported(adev))
 		return;
 
+#ifdef __linux__
 	debugfs_create_file("amdgpu_fw_attestation",
 			    S_IRUSR,
 			    adev_to_drm(adev)->primary->debugfs_root,
 			    adev,
 			    &amdgpu_fw_attestation_debugfs_ops);
+#endif
 }
