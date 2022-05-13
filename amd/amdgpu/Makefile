@@ -418,7 +418,8 @@ SRCS+=	dcn10_cm_common.c \
 	dcn10_stream_encoder.c
 
 # display/dc/dcn20
-SRCS+=	dcn20_dccg.c \
+SRCS+=	dcn20_clk_mgr.c \
+	dcn20_dccg.c \
 	dcn20_dpp_cm.c \
 	dcn20_dpp.c \
 	dcn20_dsc.c \
