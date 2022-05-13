@@ -2,7 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/ttm
 
-.PATH:	${SRCDIR}
+.PATH:	${SRCDIR} ${SRCDIR}/..
 
 .include "../kconfig.mk"
 
@@ -16,7 +16,8 @@ SRCS=	ttm_bo.c \
 	ttm_pool.c \
 	ttm_range_manager.c \
 	ttm_resource.c \
-	ttm_tt.c
+	ttm_tt.c \
+	drm_gem_ttm_helper.c
 
 .if !empty(KCONFIG:MAGP)
 SRCS+=	ttm_agp_backend.c
