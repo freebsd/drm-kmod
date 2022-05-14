@@ -293,7 +293,9 @@ static struct pci_device_id pciidlist[] = {
 	radeon_PCI_IDS
 };
 
+#ifdef __linux__
 MODULE_DEVICE_TABLE(pci, pciidlist);
+#endif
 
 static const struct drm_driver kms_driver;
 
@@ -696,8 +698,6 @@ static int __init radeon_module_init(void)
 	return pci_register_driver(&radeon_kms_pci_driver);
 #elif defined(__FreeBSD__)
 	radeon_kms_pci_driver.bsdclass = drm_devclass;
-	radeon_kms_pci_driver.name = "drmn";
-
 	return linux_pci_register_drm_driver(&radeon_kms_pci_driver);
 #endif
 }
@@ -715,8 +715,13 @@ static void __exit radeon_module_exit(void)
 #endif
 }
 
+#ifdef __linux__
 module_init(radeon_module_init);
 module_exit(radeon_module_exit);
+#elif defined(__FreeBSD__)
+LKPI_DRIVER_MODULE(radeonkms, radeon_module_init, radeon_module_exit);
+LKPI_PNP_INFO(pci, radeonkms, pciidlist);
+#endif
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESC);

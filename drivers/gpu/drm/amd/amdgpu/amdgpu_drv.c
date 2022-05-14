@@ -1132,7 +1132,9 @@ static const struct pci_device_id pciidlist[] = {
 	{0, 0, 0}
 };
 
+#ifdef __linux__
 MODULE_DEVICE_TABLE(pci, pciidlist);
+#endif
 
 static const struct drm_driver amdgpu_kms_driver;
 
@@ -1651,8 +1653,6 @@ static int __init amdgpu_init(void)
 	return pci_register_driver(&amdgpu_kms_pci_driver);
 #elif defined(__FreeBSD__)
 	amdgpu_kms_pci_driver.bsdclass = drm_devclass;
-	amdgpu_kms_pci_driver.name = "drmn";
-
 	return linux_pci_register_drm_driver(&amdgpu_kms_pci_driver);
 #endif
 
@@ -1684,6 +1684,7 @@ module_init(amdgpu_init);
 module_exit(amdgpu_exit);
 #elif defined(__FreeBSD__)
 LKPI_DRIVER_MODULE(amdgpu, amdgpu_init, amdgpu_exit);
+LKPI_PNP_INFO(pci, amdgpu, pciidlist);
 #endif
 
 MODULE_AUTHOR(DRIVER_AUTHOR);

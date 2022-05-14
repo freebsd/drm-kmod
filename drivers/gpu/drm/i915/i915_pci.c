@@ -1003,7 +1003,9 @@ static const struct pci_device_id pciidlist[] = {
 	INTEL_RKL_IDS(&rkl_info),
 	{0, 0, 0}
 };
+#ifdef __linux__
 MODULE_DEVICE_TABLE(pci, pciidlist);
+#endif
 
 static void i915_pci_remove(struct pci_dev *pdev)
 {
@@ -1153,11 +1155,11 @@ static int __init i915_init(void)
 
 	i915_pmu_init();
 
-#ifdef __FreeBSD__
+#ifdef __linux__
+	err = pci_register_driver(&i915_pci_driver);
+#elif defined(__FreeBSD__)
 	i915_pci_driver.bsdclass = drm_devclass;
 	err = linux_pci_register_drm_driver(&i915_pci_driver);
-#else
-	err = pci_register_driver(&i915_pci_driver);
 #endif
 	if (err) {
 		i915_pmu_exit();
