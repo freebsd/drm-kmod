@@ -5,6 +5,7 @@
 KMOD=	linuxkpi_gplv2
 
 SRCS=	linux_kmod_gplv2.c	\
+	linux_devres.c		\
 	linux_hdmi.c
 
 .if !empty(KCONFIG:MACPI*)
