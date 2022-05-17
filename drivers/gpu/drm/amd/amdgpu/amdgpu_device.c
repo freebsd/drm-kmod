@@ -5384,6 +5384,8 @@ skip_sched_resume:
 
 	if (r)
 		dev_info(adev->dev, "GPU reset end with ret = %d\n", r);
+
+	atomic_set(&adev->reset_domain->reset_res, r);
 	return r;
 }
 
@@ -5398,7 +5400,7 @@ static void amdgpu_device_queue_gpu_recover_work(struct work_struct *work)
 {
 	struct amdgpu_recover_work_struct *recover_work = container_of(work, struct amdgpu_recover_work_struct, base);
 
-	recover_work->ret = amdgpu_device_gpu_recover_imp(recover_work->adev, recover_work->job);
+	amdgpu_device_gpu_recover_imp(recover_work->adev, recover_work->job);
 }
 /*
  * Serialize gpu recover into reset domain single threaded wq
@@ -5415,7 +5417,7 @@ int amdgpu_device_gpu_recover(struct amdgpu_device *adev,
 
 	flush_work(&work.base);
 
-	return work.ret;
+	return atomic_read(&adev->reset_domain->reset_res);
 }
 
 /**
