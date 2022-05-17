@@ -326,6 +326,7 @@ SRCS+=	amdgpu_afmt.c \
 	sdma_v3_0.c \
 	sdma_v4_0.c \
 	sdma_v4_4.c \
+	sdma_v4_4_2.c \
 	sdma_v5_0.c \
 	sdma_v5_2.c \
 	sdma_v6_0.c \
@@ -1087,6 +1088,7 @@ CWARNFLAGS.nv.c=				-Wno-unused-const-variable
 CWARNFLAGS.psp_v10_0.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.psp_v11_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.sdma_v4_0.c=				-Wno-unused-but-set-variable
+CWARNFLAGS.sdma_v4_4_2.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.si_dma.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.si_dpm.c=				-Wno-gnu-variable-sized-type-not-at-end
 CWARNFLAGS.si_smc.c=				-Wno-gnu-variable-sized-type-not-at-end
