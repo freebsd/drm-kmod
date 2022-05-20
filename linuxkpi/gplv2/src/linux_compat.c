@@ -5,9 +5,6 @@
 #include <machine/specialreg.h>
 #include <machine/md_var.h>
 #endif
-#include <linux/bitops.h>
-#include <linux/idr.h>
-#include <linux/pci.h>
 
 #include <asm/processor.h>
 
