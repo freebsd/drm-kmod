@@ -3,6 +3,8 @@
 #ifndef _LINUX_PM_H
 #define _LINUX_PM_H
 
+#include_next <linux/pm.h>
+
 #include <linux/completion.h>
 #include <linux/wait.h>
 
