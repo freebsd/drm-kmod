@@ -29,6 +29,7 @@
 #define _BSD_ASM_X86_PROCESSOR_H_
 
 #include <sys/types.h>
+#include <machine/cpufunc.h>
 #include <machine/cpu.h>
 
 struct cpuinfo_x86 {
