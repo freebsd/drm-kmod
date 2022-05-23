@@ -228,6 +228,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_sa.c \
 	amdgpu_sched.c \
 	amdgpu_sdma.c \
+	amdgpu_vpe.c \
 	sienna_cichlid.c \
 	amdgpu_sync.c \
 	amdgpu_trace_points.c \
@@ -397,7 +398,8 @@ SRCS+=	amdgpu_afmt.c \
 	vega10_reg_init.c \
 	vega20_ih.c \
 	vega20_reg_init.c \
-	vi.c
+	vi.c \
+	vpe_v6_1.c
 
 # amdxcp
 SRCS+=	amdgpu_xcp_drv.c
