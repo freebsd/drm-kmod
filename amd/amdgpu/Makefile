@@ -1102,6 +1102,7 @@ CWARNFLAGS.gmc_v9_0.c=				-Wno-initializer-overrides
 CWARNFLAGS.gfx_v7_0.c=				-Wno-unused-const-variable
 CWARNFLAGS.gfx_v9_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gfx_v9_4_2.c=			-Wno-missing-prototypes
+CWARNFLAGS.gfx_v9_4_3.c=			-Wno-missing-prototypes -Wno-unused-const-variable
 CWARNFLAGS.gfx_v10_0.c=				-Wno-unused-variable
 CWARNFLAGS.gfx_v11_0.c=				-Wno-sometimes-uninitialized
 CWARNFLAGS.jpeg_v2_5.c=				-Wno-unused-but-set-variable
