@@ -5064,6 +5064,10 @@ static void amdgpu_dm_connector_unregister(struct drm_connector *connector)
 {
 	struct amdgpu_dm_connector *amdgpu_dm_connector = to_amdgpu_dm_connector(connector);
 
+#ifdef __FreeBSD__
+	if (amdgpu_dm_connector->dm_dp_aux.aux.dev == NULL)
+		return;
+#endif
 	drm_dp_aux_unregister(&amdgpu_dm_connector->dm_dp_aux.aux);
 }
 
