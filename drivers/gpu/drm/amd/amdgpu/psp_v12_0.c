@@ -49,9 +49,14 @@ static int psp_v12_0_init_microcode(struct psp_context *psp)
 {
 	struct amdgpu_device *adev = psp->adev;
 	const char *chip_name;
+#ifdef __linux__
 	char fw_name[30];
 	int err = 0;
 	const struct ta_firmware_header_v1_0 *ta_hdr;
+#elif defined(__FreeBSD__)
+	/* We do not support HDCP in drm-kmod yet */
+	int err = 0;
+#endif
 	DRM_DEBUG("\n");
 
 	switch (adev->asic_type) {
@@ -69,6 +74,7 @@ static int psp_v12_0_init_microcode(struct psp_context *psp)
 	if (err)
 		return err;
 
+#ifdef __linux__
 	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_ta.bin", chip_name);
 	err = request_firmware(&adev->psp.ta_fw, fw_name, adev->dev);
 	if (err) {
@@ -113,6 +119,7 @@ out:
 			"psp v12.0: Failed to load firmware \"%s\"\n",
 			fw_name);
 	}
+#endif
 
 	return err;
 }
