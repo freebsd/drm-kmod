@@ -994,11 +994,9 @@ static void intel_hdcp_prop_work(struct work_struct *work)
 	 * those to UNDESIRED is handled by core. If value == UNDESIRED,
 	 * we're running just after hdcp has been disabled, so just exit
 	 */
-#ifdef __linux__
 	if (hdcp->value != DRM_MODE_CONTENT_PROTECTION_UNDESIRED)
 		drm_hdcp_update_content_protection(&connector->base,
 						   hdcp->value);
-#endif
 
 	mutex_unlock(&hdcp->mutex);
 	drm_modeset_unlock(&dev_priv->drm.mode_config.connection_mutex);
