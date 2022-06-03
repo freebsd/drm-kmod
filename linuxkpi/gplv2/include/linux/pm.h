@@ -21,6 +21,10 @@
 #ifndef _LINUX_PM_H_
 #define _LINUX_PM_H_
 
+#ifdef __FreeBSD__
+#include_next <linux/pm.h>
+#endif
+
 #include <linux/device.h>
 #include <linux/list.h>
 #include <linux/workqueue.h>
@@ -37,6 +41,7 @@ struct device;
 
 extern const char power_group_name[];		/* = "power" */
 
+#ifdef __linux__
 /*
  * Use this if you want to use the same suspend and resume callbacks for suspend
  * to RAM and hibernation.
@@ -58,6 +63,7 @@ extern const char power_group_name[];		/* = "power" */
 const struct dev_pm_ops name = { \
 	SET_SYSTEM_SLEEP_PM_OPS(suspend_fn, resume_fn) \
 }
+#endif
 
 struct dev_pm_domain {
 #ifdef __linux__
