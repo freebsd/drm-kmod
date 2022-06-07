@@ -4,13 +4,12 @@
 #include <sys/types.h>
 #include <linux/types.h>
 
+#ifndef I2C_NAME_SIZE
 #define I2C_NAME_SIZE	20
+#endif
+#ifndef I2C_MODULE_PREFIX
 #define I2C_MODULE_PREFIX "i2c:"
-
-struct i2c_device_id {
-	char name[I2C_NAME_SIZE];
-	uintptr_t driver_data;	/* Data private to the driver */
-};
+#endif
 
 #if __FreeBSD_version < 1400060
 enum dmi_field {
