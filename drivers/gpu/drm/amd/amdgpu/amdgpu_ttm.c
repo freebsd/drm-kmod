@@ -2448,6 +2448,7 @@ static const struct file_operations amdgpu_ttm_gtt_fops = {
 
 #endif
 
+#ifdef __linux__
 /**
  * amdgpu_iomem_read - Virtual read access to GPU mapped memory
  *
@@ -2567,6 +2568,7 @@ static const struct file_operations amdgpu_ttm_iomem_fops = {
 	.write = amdgpu_iomem_write,
 	.llseek = default_llseek
 };
+#endif /* __linux__ */
 
 static const struct {
 	char *name;
@@ -2577,7 +2579,9 @@ static const struct {
 #ifdef CONFIG_DRM_AMDGPU_GART_DEBUGFS
 	{ "amdgpu_gtt", &amdgpu_ttm_gtt_fops, TTM_PL_TT },
 #endif
+#ifdef __linux__
 	{ "amdgpu_iomem", &amdgpu_ttm_iomem_fops, TTM_PL_SYSTEM },
+#endif
 };
 
 #endif
