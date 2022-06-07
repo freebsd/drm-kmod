@@ -11,6 +11,7 @@
 #include <linux/list.h>
 #include <linux/kernel.h>
 
+#include "i915_tasklet.h"
 #include "i915_scheduler_types.h"
 
 struct drm_printer;
