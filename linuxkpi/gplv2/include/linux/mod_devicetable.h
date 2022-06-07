@@ -12,6 +12,7 @@ struct i2c_device_id {
 	uintptr_t driver_data;	/* Data private to the driver */
 };
 
+#if __FreeBSD_version < 1400060
 enum dmi_field {
 	DMI_NONE,
         DMI_BIOS_VENDOR,
@@ -62,5 +63,7 @@ struct acpi_device_id {
 
 #define DMI_MATCH(a, b)	{ .slot = a, .substr = b }
 #define DMI_EXACT_MATCH(a, b)	{ .slot = a, .substr = b, .exact_match = 1 }
-
+#else
+#include_next <linux/mod_devicetable.h>
+#endif
 #endif
