@@ -1,5 +1,5 @@
-#ifndef	_LINUX_GPLV2_IO_H_
-#define	_LINUX_GPLV2_IO_H_
+#ifndef	_BSD_LKPI_LINUX_IO_H_
+#define	_BSD_LKPI_LINUX_IO_H_
 
 #include <asm/set_memory.h>
 
@@ -19,4 +19,4 @@ arch_io_free_memtype_wc(resource_size_t start, resource_size_t size)
 }
 #endif
 
-#endif	/* _LINUX_IO_H_ */
+#endif	/* _BSD_LKPI_LINUX_IO_H_ */
