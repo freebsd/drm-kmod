@@ -35,6 +35,7 @@
 #include <drm/drm_crtc.h>
 #include <drm/drm_plane.h>
 #include <drm/drm_fourcc.h>
+#include <drm/drm_framebuffer.h>
 #include <drm/drm_encoder.h>
 #include <drm/drm_atomic.h>
 
