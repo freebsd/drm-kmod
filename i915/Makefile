@@ -181,6 +181,7 @@ SRCS+=	gen2_engine_cs.c \
 	intel_gt_clock_utils.c \
 	intel_gt_gmch.c \
 	intel_gt_irq.c \
+	intel_gt_mcr.c \
 	intel_gt_pm.c \
 	intel_gt_pm_irq.c \
 	intel_gt_requests.c \
