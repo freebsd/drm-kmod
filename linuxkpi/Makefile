@@ -9,7 +9,7 @@ SRCS=	linux_kmod_gplv2.c	\
 	linux_hdmi.c		\
 	linux_i2c.c
 
-.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
+.if !empty(KCONFIG:MACPI*)
 SRCS+=	opt_acpi.h
 .endif
 
