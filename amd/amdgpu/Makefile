@@ -7,7 +7,7 @@ KMOD=	amdgpu
 
 .include "../../kconfig.mk"
 
-.if ${MACHINE_CPUARCH} == "amd64"
+.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
 _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn20 \
 	${SRCDIR}/display/dc/dml/dcn21 \
@@ -388,7 +388,7 @@ SRCS+=	clk_mgr.c \
 	rv2_clk_mgr.c
 
 # display/dc/dcn10
-.if ${MACHINE_CPUARCH} == "amd64"
+.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
 SRCS+=	dcn10_cm_common.c \
 	dcn10_dpp.c \
 	dcn10_dpp_cm.c \
@@ -437,6 +437,7 @@ SRCS+=	dcn21_hubbub.c \
 	dcn21_resource.c
 
 # display/dc/dcn30
+.if !empty(KCONFIG:MDRM_AMD_DC_DCN3_0*)
 SRCS+=	dcn30_dio_link_encoder.c \
 	dcn30_clk_mgr.c \
 	dcn30_clk_mgr_smu_msg.c \
@@ -463,6 +464,7 @@ SRCS+=	dcn30_dio_link_encoder.c \
 	dmub_dcn30.c \
 	display_mode_vba_30.c \
 	display_rq_dlg_calc_30.c
+.endif
 
 # display/dc/core
 SRCS+=	dc_vm_helper.c
@@ -480,7 +482,7 @@ SRCS+=	rc_calc.c \
 .endif
 
 # display/dc/dml
-.if ${MACHINE_CPUARCH} == "amd64"
+.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
 SRCS+=	display_mode_lib.c \
 	display_mode_vba.c \
 	display_mode_vba_20.c \
@@ -552,14 +554,16 @@ SRCS+=	dmub_dcn20.c \
 SRCS_DEBUG=	amdgpu_dm_crc.c \
 		amdgpu_dm_debugfs.c
 
-.if ${MACHINE_CPUARCH} == "amd64" || ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "aarch64"
+.if !empty(KCONFIG:MACPI*)
 SRCS+=	amdgpu_acpi.c
+.else
 .endif
 
-.if ${MACHINE_CPUARCH} == "amd64"
+.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
 SRCS+=	dcn_calc_auto.c \
 	dcn_calc_math.c \
 	dcn_calcs.c
+.else
 .endif
 
 # powerplay
