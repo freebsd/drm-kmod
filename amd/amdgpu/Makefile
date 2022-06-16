@@ -676,31 +676,36 @@ SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h pci_iov_if.h device_if.h iicbus_
 
 CFLAGS.gcc+= -Wno-redundant-decls -Wno-unused-but-set-variable
 
-CFLAGS.dcn_calcs.c= -msse -mstack-alignment=4
-CFLAGS.dcn_calc_auto.c= -msse -mstack-alignment=4
-CFLAGS.dcn_calc_math.c= -msse -mstack-alignment=4 -Wno-tautological-compare
-CFLAGS.dcn20_resource.c= -msse -mstack-alignment=4
-CFLAGS.dcn21_resource.c= -msse -mstack-alignment=4
-CFLAGS.dcn30_resource.c= -msse -mstack-alignment=4
 
-CFLAGS.display_mode_lib.c= -msse -mstack-alignment=4
-CFLAGS.display_mode_vba.c= -msse -mstack-alignment=4
-CFLAGS.display_mode_vba_20.c= -msse -mstack-alignment=4
-CFLAGS.display_mode_vba_21.c= -msse -mstack-alignment=4
-CFLAGS.display_mode_vba_30.c= -msse -mstack-alignment=4
-CFLAGS.display_pipe_clocks.c= -msse -mstack-alignment=4
-CFLAGS.dml1_display_rq_dlg_calc.c= -msse -mstack-alignment=4
-CFLAGS.display_rq_dlg_helpers.c= -msse -mstack-alignment=4
-CFLAGS.display_rq_dlg_calc_20.c= -msse -mstack-alignment=4
-CFLAGS.display_rq_dlg_calc_21.c= -msse -mstack-alignment=4 -Wno-missing-prototypes
-CFLAGS.soc_bounding_box.c= -msse -mstack-alignment=4
+.if ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "amd64"
+FPUFLAGS= -msse
+.endif
 
-CFLAGS.display_rq_dlg_calc_20v2.c= -msse -mstack-alignment=4
-CFLAGS.display_mode_vba_20v2.c= -msse -mstack-alignment=4
-CFLAGS.display_rq_dlg_calc_30.c= -msse -mstack-alignment=4
+CFLAGS.dcn_calcs.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn_calc_auto.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn_calc_math.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-tautological-compare
+CFLAGS.dcn20_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn21_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn30_resource.c= ${FPUFLAGS} -mstack-alignment=4
 
-CFLAGS.rc_calc.c= -msse -mstack-alignment=4
-CFLAGS.rc_calc_dpi.c= -msse -mstack-alignment=4
+CFLAGS.display_mode_lib.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_mode_vba.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_mode_vba_20.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_mode_vba_21.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_mode_vba_30.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_pipe_clocks.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dml1_display_rq_dlg_calc.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_rq_dlg_helpers.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_rq_dlg_calc_20.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_rq_dlg_calc_21.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-missing-prototypes
+CFLAGS.soc_bounding_box.c= ${FPUFLAGS} -mstack-alignment=4
+
+CFLAGS.display_rq_dlg_calc_20v2.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_mode_vba_20v2.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_rq_dlg_calc_30.c= ${FPUFLAGS} -mstack-alignment=4
+
+CFLAGS.rc_calc.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.rc_calc_dpi.c= ${FPUFLAGS} -mstack-alignment=4
 
 .if ${MACHINE_CPUARCH} != "powerpc"
 CWARNFLAGS+=	-Wno-expansion-to-defined
