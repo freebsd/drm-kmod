@@ -135,6 +135,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_hdmi.c \
 	intel_lspcon.c \
 	intel_lvds.c \
+	intel_modeset_setup.c \
 	intel_modeset_verify.c \
 	intel_panel.c \
 	intel_pch_display.c \
