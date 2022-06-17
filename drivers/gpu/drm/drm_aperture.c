@@ -329,7 +329,22 @@ int drm_aperture_remove_conflicting_pci_framebuffers(struct pci_dev *pdev,
 						     const struct drm_driver *req_driver)
 {
 	resource_size_t base, size;
-	int bar, ret = 0;
+	int bar, ret;
+
+	/*
+	 * WARNING: Apparently we must kick fbdev drivers before vgacon,
+	 * otherwise the vga fbdev driver falls over.
+	 */
+#if IS_REACHABLE(CONFIG_FB)
+	ret = remove_conflicting_pci_framebuffers(pdev, req_driver->name);
+	if (ret)
+		return ret;
+#endif
+#ifdef __linux__
+	ret = vga_remove_vgacon(pdev);
+	if (ret)
+		return ret;
+#endif
 
 	for (bar = 0; bar < PCI_STD_NUM_BARS; ++bar) {
 		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
@@ -339,17 +354,6 @@ int drm_aperture_remove_conflicting_pci_framebuffers(struct pci_dev *pdev,
 		drm_aperture_detach_drivers(base, size);
 	}
 
-	/*
-	 * WARNING: Apparently we must kick fbdev drivers before vgacon,
-	 * otherwise the vga fbdev driver falls over.
-	 */
-#if IS_REACHABLE(CONFIG_FB)
-	ret = remove_conflicting_pci_framebuffers(pdev, req_driver->name);
-#endif
-#ifdef __linux__
-	if (ret == 0)
-		ret = vga_remove_vgacon(pdev);
-#endif
-	return ret;
+	return 0;
 }
 EXPORT_SYMBOL(drm_aperture_remove_conflicting_pci_framebuffers);
