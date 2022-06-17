@@ -8,7 +8,7 @@
 #include <drm/drm_device.h>
 #include <drm/drm_managed.h>
 
-MALLOC_DECLARE(DRM_MEM_KMS);
+MALLOC_DEFINE(DRM_MEM_MANAGED, "drm_managed", "DRM MANAGED Data Structures");
 
 struct drmm_node {
 	void *p;
@@ -21,12 +21,12 @@ void *
 drmm_kzalloc(struct drm_device *dev, size_t size, int flags)
 {
 	void *p;
-	struct drmm_node *node = malloc(sizeof(*node), DRM_MEM_KMS, flags | M_ZERO);
+	struct drmm_node *node = malloc(sizeof(*node), DRM_MEM_MANAGED, flags | M_ZERO);
 	if (node == NULL)
 		return NULL;
 	p = kzalloc(size, flags);
 	if (p == NULL) {
-		free(node, DRM_MEM_KMS);
+		free(node, DRM_MEM_MANAGED);
 		return NULL;
 	}
 	INIT_LIST_HEAD(&node->list);
@@ -42,12 +42,12 @@ void *
 drmm_kcalloc(struct drm_device *dev, size_t n, size_t size, int flags)
 {
 	void *p;
-	struct drmm_node *node = malloc(sizeof(*node), DRM_MEM_KMS, flags | M_ZERO);
+	struct drmm_node *node = malloc(sizeof(*node), DRM_MEM_MANAGED, flags | M_ZERO);
 	if (node == NULL)
 		return NULL;
 	p = kcalloc(n, size, flags);
 	if (p == NULL) {
-		free(node, DRM_MEM_KMS);
+		free(node, DRM_MEM_MANAGED);
 		return NULL;
 	}
 	INIT_LIST_HEAD(&node->list);
@@ -63,12 +63,12 @@ char *
 drmm_kstrdup(struct drm_device *dev, const char *s, int flags)
 {
 	char *p;
-	struct drmm_node *node = malloc(sizeof(*node), DRM_MEM_KMS, flags | M_ZERO);
+	struct drmm_node *node = malloc(sizeof(*node), DRM_MEM_MANAGED, flags | M_ZERO);
 	if (node == NULL)
 		return NULL;
 	p = kstrdup(s, flags);
 	if (p == NULL) {
-		free(node, DRM_MEM_KMS);
+		free(node, DRM_MEM_MANAGED);
 		return NULL;
 	}
 	INIT_LIST_HEAD(&node->list);
@@ -99,15 +99,15 @@ drmm_kfree(struct drm_device *dev, void *p)
 	spin_unlock(&dev->managed.lock);
 	
 	if (m != NULL) {
-		free(m->p, DRM_MEM_KMS);
-		free(m, DRM_MEM_KMS);
+		free(m->p, DRM_MEM_MANAGED);
+		free(m, DRM_MEM_MANAGED);
 	}
 }
 
 int
 drmm_add_action(struct drm_device *dev, drmm_func_t f, void *cookie)
 {
-	struct drmm_node *node = malloc(sizeof(*node), DRM_MEM_KMS, M_WAITOK | M_ZERO);
+	struct drmm_node *node = malloc(sizeof(*node), DRM_MEM_MANAGED, M_WAITOK | M_ZERO);
 	if (node == NULL)
 		return -ENOMEM;
 	INIT_LIST_HEAD(&node->list);
@@ -123,7 +123,7 @@ drmm_add_action(struct drm_device *dev, drmm_func_t f, void *cookie)
 int
 drmm_add_action_or_reset(struct drm_device *dev, drmm_func_t f, void *cookie)
 {
-	struct drmm_node *node = malloc(sizeof(*node), DRM_MEM_KMS, M_WAITOK | M_ZERO);
+	struct drmm_node *node = malloc(sizeof(*node), DRM_MEM_MANAGED, M_WAITOK | M_ZERO);
 	if (node == NULL) {
 		f(dev, cookie);
 		return -ENOMEM;
@@ -147,8 +147,8 @@ drm_managed_release(struct drm_device *dev)
 		if (n->func)
 			n->func(dev, n->p);
 		else
-			free(n->p, DRM_MEM_KMS);
-		free(n, DRM_MEM_KMS);
+			free(n->p, DRM_MEM_MANAGED);
+		free(n, DRM_MEM_MANAGED);
 	}
 }
 
