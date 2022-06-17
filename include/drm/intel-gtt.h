@@ -1,6 +1,7 @@
-/* Public Domain */
+/* Public domain. */
+
 #ifndef _DRM_INTEL_GTT_H
-#define	_DRM_INTEL_GTT_H
+#define _DRM_INTEL_GTT_H
 
 #include <linux/agp_backend.h>
 #include <linux/kernel.h>
@@ -8,20 +9,16 @@
 struct agp_bridge_data;
 struct pci_dev;
 struct sg_table;
-struct intel_gtt;
 
-int intel_gmch_probe(struct pci_dev *bridge_pdev, struct pci_dev *gpu_pdev,
-		     struct agp_bridge_data *bridge);
+bool intel_gmch_enable_gtt(void);
+void intel_gmch_gtt_flush(void);
+int intel_gmch_probe(struct pci_dev *, struct pci_dev *,
+    struct agp_bridge_data *);
+void intel_gmch_gtt_get(u64 *, phys_addr_t *, resource_size_t *);
+void intel_gmch_gtt_insert_sg_entries(struct sg_table *, unsigned int,
+    unsigned int);
+void intel_gmch_gtt_insert_page(dma_addr_t, unsigned int, unsigned int);
+void intel_gmch_gtt_clear_range(unsigned int, unsigned int);
 void intel_gmch_remove(void);
-bool intel_enable_gtt(void);
-int intel_gtt_chipset_flush(void);
-void intel_gtt_insert_page(dma_addr_t addr,
-			   unsigned int pg,
-			   unsigned int flags);
-void linux_intel_gtt_insert_sg_entries(struct sg_table *st,
-    unsigned int pg_start, unsigned int flags);
-void linux_intel_gtt_get(uint64_t *gtt_total, phys_addr_t *mappable_base,
-    resource_size_t *mappable_end);
-void intel_gtt_clear_range(unsigned int first_entry, unsigned int num_entries);
 
 #endif

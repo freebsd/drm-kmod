@@ -77,7 +77,7 @@ bsd_intel_pci_bus_release_mem(device_t dev, int rid, void *res)
 }
 
 bool
-intel_enable_gtt(void)
+intel_gmch_enable_gtt(void)
 {
 #ifdef __notyet__
 	u8 __iomem *reg;
@@ -159,7 +159,7 @@ intel_gmch_remove(void)
 }
 
 void
-intel_gtt_insert_page(dma_addr_t addr, unsigned int pg, unsigned int flags)
+intel_gmch_gtt_insert_page(dma_addr_t addr, unsigned int pg, unsigned int flags)
 {
 
 	intel_gtt_install_pte(pg, addr, flags);
@@ -167,7 +167,7 @@ intel_gtt_insert_page(dma_addr_t addr, unsigned int pg, unsigned int flags)
 }
 
 void
-linux_intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
+intel_gmch_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
     unsigned int flags)
 {
 	struct sg_page_iter sg_iter;
@@ -185,7 +185,7 @@ linux_intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
 }
 
 void
-linux_intel_gtt_get(uint64_t *gtt_total, phys_addr_t *mappable_base,
+intel_gmch_gtt_get(uint64_t *gtt_total, phys_addr_t *mappable_base,
     resource_size_t *mappable_end)
 {
 	struct intel_gtt *gtt;
@@ -194,4 +194,16 @@ linux_intel_gtt_get(uint64_t *gtt_total, phys_addr_t *mappable_base,
 	*gtt_total = gtt->gtt_total_entries << PAGE_SHIFT;
 	*mappable_base = gtt->gma_bus_addr;
 	*mappable_end = gtt->gtt_mappable_entries << PAGE_SHIFT;
+}
+
+void
+intel_gmch_gtt_clear_range(unsigned int first_entry, unsigned int num_entries)
+{
+	intel_gtt_clear_range(first_entry, num_entries);
+}
+
+void
+intel_gmch_gtt_flush(void)
+{
+	intel_gtt_chipset_flush();
 }
