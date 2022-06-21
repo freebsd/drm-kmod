@@ -199,7 +199,7 @@ MODULE_VERSION(drmn, 2);
 #ifdef CONFIG_AGP
 MODULE_DEPEND(drmn, agp, 1, 1, 1);
 #endif
-#if __FreeBSD_version >= 1400051
+#if __FreeBSD_version >= 1301505
 #if __FreeBSD_version >= 1400058
 DRIVER_MODULE(iicbus, drmn, iicbus_driver, NULL, NULL);
 DRIVER_MODULE(acpi_iicbus, drmn, acpi_iicbus_driver, NULL, NULL);
