@@ -88,7 +88,7 @@ __FBSDID("$FreeBSD$");
 
 #include <linux/idr.h>
 
-#if __FreeBSD_version < 1400051
+#if __FreeBSD_version < 1301505
 
 #if defined(__i386__) || defined(__amd64__) || defined(__aarch64__)
 #include <linux/acpi.h>

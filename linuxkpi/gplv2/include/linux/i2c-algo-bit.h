@@ -1,5 +1,5 @@
 #include <sys/param.h>
-#if __FreeBSD_version >= 1400051
+#if __FreeBSD_version >= 1301505
 #include_next <linux/i2c-algo-bit.h>
 #else
 #ifndef _LINUX_I2C_ALGO_BIT_H_
