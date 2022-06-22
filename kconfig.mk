@@ -53,15 +53,18 @@ KCONFIG+=	DRM_AMD_DC_DCN \
 .endif
 .endif
 
-.if !empty(${MACHINE_ARCH:Mpowerpc64*})
+.if ${MACHINE_ARCH:Mpowerpc64*} != ""
 KCONFIG+=	64BIT \
 		PPC64
+		
+KCONFIG+=	DRM_AMD_DC_DCN \
+		DRM_AMD_DC_DCN3_0
 .endif
 
 .if ${MACHINE_CPUARCH} == "riscv"
 KCONFIG+=	RISCV
 
-.if !empty(${MACHINE_ARCH:Mriscv64*})
+.if ${MACHINE_ARCH:Mriscv64*} != ""
 KCONFIG+=	64BIT
 .endif
 .endif
