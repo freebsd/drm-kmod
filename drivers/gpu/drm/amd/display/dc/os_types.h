@@ -56,6 +56,7 @@
 #define DC_FP_START() kernel_fpu_begin()
 #define DC_FP_END() kernel_fpu_end()
 #elif defined(CONFIG_PPC64)
+#ifdef __linux__
 #include <asm/switch_to.h>
 #include <asm/cputable.h>
 #define DC_FP_START() { \
@@ -82,6 +83,10 @@
 		preempt_enable(); \
 	} \
 }
+#elif defined(__FreeBSD__)
+#define DC_FP_START()
+#define DC_FP_END()
+#endif
 #endif
 #endif
 
