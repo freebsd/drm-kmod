@@ -57,6 +57,7 @@ KCONFIG+=	DRM_AMD_DC_DCN \
 KCONFIG+=	64BIT \
 		PPC64
 		
+# DCN is only compile-tested.
 KCONFIG+=	DRM_AMD_DC_DCN \
 		DRM_AMD_DC_DCN3_0
 .endif
