@@ -196,10 +196,10 @@ SRCS+=	i915_ioc32.c
 .endif
 
 .if !empty(KCONFIG:MDEBUGFS)
-SRCS+==	i915_debugfs.c \
+SRCS+=	i915_debugfs.c \
 	i915_gemfs.c \
-	intel_pipe_crc.c
-SRCS+=	debugfs_engines.c \
+	intel_pipe_crc.c \
+	debugfs_engines.c \
 	debugfs_gt.c \
 	debugfs_gt_pm.c \
 	intel_guc_debugfs.c \
