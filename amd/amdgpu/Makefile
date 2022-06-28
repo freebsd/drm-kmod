@@ -18,6 +18,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn302 \
 	${SRCDIR}/display/dc/dml/dcn303 \
 	${SRCDIR}/display/dc/dml/dcn31 \
+	${SRCDIR}/display/dc/dml/dcn314 \
 	${SRCDIR}/display/dc/dml/dcn32 \
 	${SRCDIR}/display/dc/dml/dsc
 .endif
@@ -67,6 +68,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn302 \
 	${SRCDIR}/display/dc/dcn303 \
 	${SRCDIR}/display/dc/dcn31 \
+	${SRCDIR}/display/dc/dcn314 \
 	${SRCDIR}/display/dc/dcn315 \
 	${SRCDIR}/display/dc/dcn316 \
 	${SRCDIR}/display/dc/dcn32 \
@@ -602,6 +604,14 @@ SRCS+=	dcn303_hwseq.c \
 	irq_service_dcn303.c \
 	dmub_dcn303.c
 
+# display/dc/dcn314
+SRCS+=	dcn314_dccg.c \
+	dcn314_dio_stream_encoder.c \
+	dcn314_hwseq.c \
+	dcn314_init.c \
+	dcn314_optc.c \
+	dcn314_resource.c
+
 # display/dc/dcn315
 SRCS+=	dcn315_resource.c
 
@@ -708,6 +718,10 @@ SRCS+=	dcn303_fpu.c
 
 # display/dc/dml/dcn31
 SRCS+=	dcn31_fpu.c
+
+# display/dc/dml/dcn314
+SRCS+=	display_mode_vba_314.c \
+	display_rq_dlg_calc_314.c
 
 # display/dc/dml/dcn32
 SRCS+=	display_mode_vba_32.c \
@@ -961,6 +975,7 @@ CFLAGS.display_mode_vba_20.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_21.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_30.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_31.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.display_mode_vba_314.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_32.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba_util_32.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_pipe_clocks.c= ${FPUFLAGS} -mstack-alignment=4
@@ -968,6 +983,7 @@ CFLAGS.dml1_display_rq_dlg_calc.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_helpers.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_20.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_21.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-missing-prototypes
+CFLAGS.display_rq_dlg_calc_314.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_rq_dlg_calc_32.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.soc_bounding_box.c= ${FPUFLAGS} -mstack-alignment=4
 
@@ -1157,6 +1173,10 @@ CWARNFLAGS.dcn31_panel_cntl.c=		-Wno-missing-prototypes -Wno-unused-but-set-vari
 CWARNFLAGS.dcn31_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dcn31_smu.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn314_clk_mgr.c=		-Wno-incompatible-pointer-types
+CWARNFLAGS.dcn314_dccg.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn314_dio_stream_encoder.c=	-Wno-missing-prototypes
+CWARNFLAGS.dcn314_optc.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn314_resource.c=		-Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn315_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types -Wno-unused-but-set-variable
 CWARNFLAGS.dcn315_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn315_smu.c=		-Wno-missing-prototypes
@@ -1219,6 +1239,7 @@ CWARNFLAGS.dmub_srv_stat.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.display_mode_vba_30.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.display_mode_vba_32.c=	-Wno-enum-conversion -Wno-unused-const-variable
 CWARNFLAGS.display_mode_vba_util_32.c=	-Wno-enum-conversion -Wno-missing-prototypes -Wno-unused-local-typedef
+CWARNFLAGS.display_rq_dlg_calc_314.c=	-Wno-unused-but-set-variable
 
 # powerplay/*
 CWARNFLAGS.amdgpu_smu.c=		-Wno-unused-function -Wno-missing-prototypes -Wno-unused-but-set-variable

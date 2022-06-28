@@ -1,5 +1,6 @@
+/* SPDX-License-Identifier: MIT */
 /*
- * Copyright 2012-15 Advanced Micro Devices, Inc.
+ * Copyright 2022 Advanced Micro Devices, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,46 +24,20 @@
  *
  */
 
-#ifndef __DAL_TYPES_H__
-#define __DAL_TYPES_H__
+#ifndef _DCN314_RESOURCE_H_
+#define _DCN314_RESOURCE_H_
 
-#include "signal_types.h"
-#include "dc_types.h"
+#include "core_types.h"
 
-struct dal_logger;
-struct dc_bios;
+#define TO_DCN314_RES_POOL(pool)\
+	container_of(pool, struct dcn314_resource_pool, base)
 
-enum dce_version {
-	DCE_VERSION_UNKNOWN = (-1),
-	DCE_VERSION_6_0,
-	DCE_VERSION_6_1,
-	DCE_VERSION_6_4,
-	DCE_VERSION_8_0,
-	DCE_VERSION_8_1,
-	DCE_VERSION_8_3,
-	DCE_VERSION_10_0,
-	DCE_VERSION_11_0,
-	DCE_VERSION_11_2,
-	DCE_VERSION_11_22,
-	DCE_VERSION_12_0,
-	DCE_VERSION_12_1,
-	DCE_VERSION_MAX,
-	DCN_VERSION_1_0,
-	DCN_VERSION_1_01,
-	DCN_VERSION_2_0,
-	DCN_VERSION_2_01,
-	DCN_VERSION_2_1,
-	DCN_VERSION_3_0,
-	DCN_VERSION_3_01,
-	DCN_VERSION_3_02,
-	DCN_VERSION_3_03,
-	DCN_VERSION_3_1,
-	DCN_VERSION_3_14,
-	DCN_VERSION_3_15,
-	DCN_VERSION_3_16,
-	DCN_VERSION_3_2,
-	DCN_VERSION_3_21,
-	DCN_VERSION_MAX
+struct dcn314_resource_pool {
+	struct resource_pool base;
 };
 
-#endif /* __DAL_TYPES_H__ */
+struct resource_pool *dcn314_create_resource_pool(
+		const struct dc_init_data *init_data,
+		struct dc *dc);
+
+#endif /* _DCN314_RESOURCE_H_ */
