@@ -107,6 +107,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn302 \
 	${SRCDIR}/display/dc/irq/dcn303 \
 	${SRCDIR}/display/dc/irq/dcn31 \
+	${SRCDIR}/display/dc/irq/dcn314 \
 	${SRCDIR}/display/dc/irq/dcn315 \
 	${SRCDIR}/display/dc/irq/dcn32 \
 	${SRCDIR}/display/dc/link \
@@ -745,6 +746,7 @@ SRCS+=	irq_service.c \
 	irq_service_dcn10.c \
 	irq_service_dcn20.c \
 	irq_service_dcn21.c \
+	irq_service_dcn314.c \
 	irq_service_dcn315.c \
 	irq_service_dcn32.c
 
