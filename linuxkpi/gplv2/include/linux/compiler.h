@@ -28,8 +28,6 @@
 #undef UNIMPLEMENTED /* is defined to NOP in kernel lkpi */
 #define	UNIMPLEMENTED()	UNIMPLEMENTED_ONCE()
 
-#define	unreachable()	__unreachable()
-
 // Changed in base linuxkpi in 13.0-CURRENT
 #ifdef __deprecated
 #undef __deprecated
