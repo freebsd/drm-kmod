@@ -27,7 +27,6 @@
 
 #undef UNIMPLEMENTED /* is defined to NOP in kernel lkpi */
 #define	UNIMPLEMENTED()	UNIMPLEMENTED_ONCE()
-#define	WARN_NOT()	UNIMPLEMENTED_ONCE()
 
 #define	unreachable()	__unreachable()
 
