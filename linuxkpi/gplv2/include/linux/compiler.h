@@ -25,21 +25,9 @@
 	}					\
 } while (0)
 
-#define	DODGY_ONCE() do {			\
-	static int seen = 0;			\
-						\
-	if (!seen && PRINT_UNIMPLEMENTED) {	\
-		log(LOG_WARNING,		\
-		    "%s is dodgy -- see your local kernel hacker\n", \
-		    __FUNCTION__);		\
-		seen = 1;			\
-	}					\
-} while (0)
-
 #undef UNIMPLEMENTED /* is defined to NOP in kernel lkpi */
 #define	UNIMPLEMENTED()	UNIMPLEMENTED_ONCE()
 #define	WARN_NOT()	UNIMPLEMENTED_ONCE()
-#define	DODGY()		DODGY_ONCE()
 
 #define	unreachable()	__unreachable()
 
