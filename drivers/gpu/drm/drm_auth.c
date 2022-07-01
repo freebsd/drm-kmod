@@ -155,7 +155,11 @@ struct drm_master *drm_master_create(struct drm_device *dev)
 	INIT_LIST_HEAD(&master->lessees);
 	INIT_LIST_HEAD(&master->lessee_list);
 	idr_init(&master->leases);
+#ifdef __linux__
+	idr_init_base(&master->lessee_idr, 1);
+#elif defined(__FreeBSD__)
 	idr_init(&master->lessee_idr);
+#endif
 
 	return master;
 }
