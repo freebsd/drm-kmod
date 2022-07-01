@@ -848,7 +848,11 @@ void amdgpu_ctx_mgr_init(struct amdgpu_ctx_mgr *mgr,
 
 	mgr->adev = adev;
 	mutex_init(&mgr->lock);
+#ifdef __linux__
+	idr_init_base(&mgr->ctx_handles, 1);
+#elif defined(__FreeBSD__)
 	idr_init(&mgr->ctx_handles);
+#endif
 
 	for (i = 0; i < AMDGPU_HW_IP_NUM; ++i)
 		atomic64_set(&mgr->time_spend[i], 0);
