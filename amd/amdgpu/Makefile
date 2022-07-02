@@ -276,6 +276,7 @@ SRCS+=	amdgpu_afmt.c \
 	iceland_ih.c \
 	ih_v6_0.c \
 	imu_v11_0.c \
+	imu_v11_0_3.c \
 	jpeg_v1_0.c \
 	jpeg_v2_0.c \
 	jpeg_v2_5.c \
@@ -1053,6 +1054,7 @@ CWARNFLAGS.gfx_v10_0.c=				-Wno-missing-prototypes -Wno-unused-but-set-variable 
 CWARNFLAGS.gfx_v11_0.c=				-Wno-sometimes-uninitialized
 CWARNFLAGS.jpeg_v2_5.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.jpeg_v3_0.c=				-Wno-unused-but-set-variable
+CWARNFLAGS.imu_v11_0_3.c=			-Wno-missing-prototypes
 CWARNFLAGS.kv_dpm.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.mmhub_v1_7.c=			-Wno-missing-prototypes
 CWARNFLAGS.nv.c=				-Wno-unused-const-variable
