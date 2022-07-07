@@ -727,7 +727,8 @@ SRCS+=	display_mode_vba_314.c \
 	display_rq_dlg_calc_314.c
 
 # display/dc/dml/dcn32
-SRCS+=	display_mode_vba_32.c \
+SRCS+=	dcn32_fpu.c \
+	display_mode_vba_32.c \
 	display_mode_vba_util_32.c \
 	display_rq_dlg_calc_32.c
 
