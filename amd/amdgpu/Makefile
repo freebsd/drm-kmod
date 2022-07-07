@@ -1212,7 +1212,7 @@ CWARNFLAGS.dcn32_optc.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn32_resource.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn32_resource_helpers.c=	-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn321_fpu.c=		-Wno-unused-but-set-variable
-CWARNFLAGS.dcn321_resource.c=		-Wno-initializer-overrides -Wno-unused-but-set-variable
+CWARNFLAGS.dcn321_resource.c=		-Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
