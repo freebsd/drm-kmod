@@ -970,6 +970,7 @@ CFLAGS.dcn301_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn303_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn32_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource_helpers.c= ${FPUFLAGS} -mstack-alignment=4
 
