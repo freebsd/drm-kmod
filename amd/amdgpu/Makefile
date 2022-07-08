@@ -20,6 +20,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn31 \
 	${SRCDIR}/display/dc/dml/dcn314 \
 	${SRCDIR}/display/dc/dml/dcn32 \
+	${SRCDIR}/display/dc/dml/dcn321 \
 	${SRCDIR}/display/dc/dml/dsc
 .endif
 
@@ -732,6 +733,9 @@ SRCS+=	dcn32_fpu.c \
 	display_mode_vba_util_32.c \
 	display_rq_dlg_calc_32.c
 
+# display/dc/dml/dcn321
+SRCS+=	dcn321_fpu.c
+
 # display/dc/gpio/*
 SRCS+=	gpio_base.c \
 	gpio_service.c \
@@ -973,6 +977,7 @@ CFLAGS.dcn31_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource_helpers.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn321_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_mode_lib.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba.c= ${FPUFLAGS} -mstack-alignment=4
