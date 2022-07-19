@@ -725,7 +725,8 @@ SRCS+=	dcn303_fpu.c
 SRCS+=	dcn31_fpu.c
 
 # display/dc/dml/dcn314
-SRCS+=	display_mode_vba_314.c \
+SRCS+=	dcn314_fpu.c \
+	display_mode_vba_314.c \
 	display_rq_dlg_calc_314.c
 
 # display/dc/dml/dcn32
