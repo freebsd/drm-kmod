@@ -363,6 +363,7 @@ SRCS+=	amdgpu_dm_color.c \
 	amdgpu_dm_helpers.c \
 	amdgpu_dm_irq.c \
 	amdgpu_dm_mst_types.c \
+	amdgpu_dm_plane.c \
 	amdgpu_dm_pp_smu.c \
 	amdgpu_dm_psr.c \
 	amdgpu_dm_services.c \
@@ -1060,6 +1061,7 @@ CWARNFLAGS.vcn_v3_0.c=				-Wno-missing-prototypes -Wno-unused-but-set-variable
 # display/amdgpu_dm
 CWARNFLAGS.amdgpu_dm_helpers.c=		-Wno-int-in-bool-context
 CWARNFLAGS.amdgpu_dm_mst_types.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.amdgpu_dm_plane.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_dm_pp_smu.c=		-Wno-missing-prototypes -Wno-incompatible-function-pointer-types
 CWARNFLAGS.amdgpu_dm_psr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_dm_services.c=	-Wno-missing-prototypes
