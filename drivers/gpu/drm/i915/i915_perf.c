@@ -3344,6 +3344,9 @@ static const struct file_operations fops = {
 	.release	= i915_perf_release,
 	.poll		= i915_perf_poll,
 	.read		= i915_perf_read,
+#ifdef __FreeBSD__
+	.write		= NULL,
+#endif
 	.unlocked_ioctl	= i915_perf_ioctl,
 	/* Our ioctl have no arguments, so it's safe to use the same function
 	 * to handle 32bits compatibility.

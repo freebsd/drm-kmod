@@ -1038,6 +1038,9 @@ static const struct file_operations radeon_ttm_vram_fops = {
 	.owner = THIS_MODULE,
 	.open = radeon_ttm_vram_open,
 	.read = radeon_ttm_vram_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = default_llseek
 };
 
@@ -1092,6 +1095,9 @@ static const struct file_operations radeon_ttm_gtt_fops = {
 	.owner = THIS_MODULE,
 	.open = radeon_ttm_gtt_open,
 	.read = radeon_ttm_gtt_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = default_llseek
 };
 

@@ -76,10 +76,10 @@ SRCS+=	drm_fb_helper.c
 SRCS+=	drm_ioc32.c
 .endif
 
-.if !empty(KCONFIG:MDEBUGFS)
-SRCS_DEBUG=	\
-		drm_debugfs.c \
-		drm_debugfs_crc.c
+.if !empty(KCONFIG:MDEBUG_FS)
+SRCS+=	\
+	drm_debugfs.c \
+	drm_debugfs_crc.c
 .endif
 
 .if !empty(KCONFIG:MDRM_DP_AUX_CHARDEV)

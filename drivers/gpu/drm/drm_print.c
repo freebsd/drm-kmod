@@ -163,7 +163,7 @@ EXPORT_SYMBOL(__drm_puts_seq_file);
 void __drm_printfn_seq_file(struct drm_printer *p, struct va_format *vaf)
 {
 #ifdef __FreeBSD__
-	seq_printf((struct seq_file *)(p->arg), "%pV", vaf);
+	seq_vprintf((struct seq_file *)(p->arg), vaf->fmt, *vaf->va);
 #else
 	seq_printf(p->arg, "%pV", vaf);
 #endif	

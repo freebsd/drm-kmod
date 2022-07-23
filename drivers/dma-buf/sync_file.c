@@ -488,5 +488,7 @@ static const struct file_operations sync_file_fops = {
 	.compat_ioctl = compat_ptr_ioctl,
 #elif defined(__FreeBSD__)
 	.compat_ioctl = sync_file_ioctl,
+	.read = NULL,
+	.write = NULL,
 #endif
 };

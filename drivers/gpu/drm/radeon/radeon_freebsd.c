@@ -11,5 +11,5 @@ MODULE_DEPEND(radeonkms, linuxkpi_gplv2, 1, 1, 1);
 MODULE_DEPEND(radeonkms, dmabuf, 1, 1, 1);
 MODULE_DEPEND(radeonkms, firmware, 1, 1, 1);
 #ifdef CONFIG_DEBUG_FS
-MODULE_DEPEND(radeonkms, debugfs, 1, 1, 1);
+MODULE_DEPEND(radeonkms, lindebugfs, 1, 1, 1);
 #endif

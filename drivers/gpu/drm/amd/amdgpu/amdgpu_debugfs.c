@@ -101,9 +101,12 @@ static int amdgpu_debugfs_autodump_open(struct inode *inode, struct file *file)
 
 	file->private_data = adev;
 
+#ifdef __linux__
+	/* down_read_killable() absent in LinuxKPI <linux/rwsem.h> */
 	ret = down_read_killable(&adev->reset_sem);
 	if (ret)
 		return ret;
+#endif
 
 	if (adev->autodump.dumping.done) {
 		reinit_completion(&adev->autodump.dumping);
@@ -1245,10 +1248,13 @@ static int amdgpu_debugfs_test_ib(struct seq_file *m, void *data)
 		return r;
 	}
 
+#ifdef __linux__
+	/* down_read_killable() absent in LinuxKPI <linux/rwsem.h> */
 	/* Avoid accidently unparking the sched thread during GPU reset */
 	r = down_read_killable(&adev->reset_sem);
 	if (r)
 		return r;
+#endif
 
 	/* hold on the scheduler */
 	for (i = 0; i < AMDGPU_MAX_RINGS; i++) {
@@ -1464,10 +1470,13 @@ static int amdgpu_debugfs_ib_preempt(void *data, u64 val)
 	if (!fences)
 		return -ENOMEM;
 
+#ifdef __linux__
+	/* down_read_killable() absent in LinuxKPI <linux/rwsem.h> */
 	/* Avoid accidently unparking the sched thread during GPU reset */
 	r = down_read_killable(&adev->reset_sem);
 	if (r)
 		goto pro_end;
+#endif
 
 	/* stop the scheduler */
 	kthread_park(ring->sched.thread);
@@ -1512,8 +1521,10 @@ failure:
 
 	ttm_bo_unlock_delayed_workqueue(&adev->mman.bdev, resched);
 
+#ifdef __linux__
 pro_end:
 	kfree(fences);
+#endif
 
 	return r;
 }

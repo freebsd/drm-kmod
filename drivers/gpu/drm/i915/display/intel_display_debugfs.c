@@ -1949,6 +1949,9 @@ i915_fifo_underrun_reset_write(struct file *filp,
 static const struct file_operations i915_fifo_underrun_reset_ops = {
 	.owner = THIS_MODULE,
 	.open = simple_open,
+#ifdef __FreeBSD__
+	.read = NULL,
+#endif
 	.write = i915_fifo_underrun_reset_write,
 	.llseek = default_llseek,
 };

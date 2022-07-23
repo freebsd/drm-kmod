@@ -564,6 +564,10 @@ static int drm_syncobj_file_release(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations drm_syncobj_file_fops = {
+#ifdef __FreeBSD__
+	.read = NULL,
+	.write = NULL,
+#endif
 	.release = drm_syncobj_file_release,
 };
 

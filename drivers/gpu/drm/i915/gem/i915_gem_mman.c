@@ -884,6 +884,10 @@ static int singleton_release(struct inode *inode, struct file *file)
 static const struct file_operations singleton_fops = {
 	.owner = THIS_MODULE,
 	.release = singleton_release,
+#ifdef __FreeBSD__
+	.read = NULL,
+	.write = NULL,
+#endif
 };
 
 static struct file *mmap_singleton(struct drm_i915_private *i915)

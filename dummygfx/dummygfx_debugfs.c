@@ -61,6 +61,9 @@ static const struct file_operations testseq_fops = {
 	.owner = THIS_MODULE,
 	.open = testseq_open,
 	.read = seq_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = seq_lseek,
 	.release = testseq_release,
 };
@@ -171,6 +174,10 @@ static int simplerw_release(struct inode *inode, struct file *file)
 static const struct file_operations simplerw_fops = {
 	.owner = THIS_MODULE,
 	.open = simplerw_open,
+#ifdef __FreeBSD__
+	.read = NULL,
+	.write = NULL,
+#endif
 	.release = simplerw_release,
 };
 
@@ -181,6 +188,10 @@ static const struct file_operations simplerw_fops = {
 static const struct file_operations simple_fops = {
 	.owner = THIS_MODULE,
 	.open = simple_open,
+#ifdef __FreeBSD__
+	.read = NULL,
+	.write = NULL,
+#endif
 	.release = simple_release,
 };
 

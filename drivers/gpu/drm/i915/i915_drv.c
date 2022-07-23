@@ -1701,6 +1701,9 @@ static const struct file_operations i915_driver_fops = {
 	.mmap = i915_gem_mmap,
 	.poll = drm_poll,
 	.read = drm_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.compat_ioctl = i915_ioc32_compat_ioctl,
 	.llseek = noop_llseek,
 };

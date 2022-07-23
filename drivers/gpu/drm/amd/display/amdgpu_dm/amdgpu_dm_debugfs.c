@@ -2069,29 +2069,44 @@ static const struct file_operations dp_dsc_bits_per_pixel_debugfs_fops = {
 static const struct file_operations dp_dsc_pic_width_debugfs_fops = {
 	.owner = THIS_MODULE,
 	.read = dp_dsc_pic_width_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = default_llseek
 };
 
 static const struct file_operations dp_dsc_pic_height_debugfs_fops = {
 	.owner = THIS_MODULE,
 	.read = dp_dsc_pic_height_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = default_llseek
 };
 
 static const struct file_operations dp_dsc_chunk_size_debugfs_fops = {
 	.owner = THIS_MODULE,
 	.read = dp_dsc_chunk_size_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = default_llseek
 };
 
 static const struct file_operations dp_dsc_slice_bpg_offset_debugfs_fops = {
 	.owner = THIS_MODULE,
 	.read = dp_dsc_slice_bpg_offset_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = default_llseek
 };
 
 static const struct file_operations dp_trigger_hotplug_debugfs_fops = {
 	.owner = THIS_MODULE,
+#ifdef __FreeBSD__
+	.read = NULL,
+#endif
 	.write = dp_trigger_hotplug,
 	.llseek = default_llseek
 };
@@ -2112,24 +2127,36 @@ static const struct file_operations dp_phy_settings_debugfs_fop = {
 
 static const struct file_operations dp_phy_test_pattern_fops = {
 	.owner = THIS_MODULE,
+#ifdef __FreeBSD__
+	.read = NULL,
+#endif
 	.write = dp_phy_test_pattern_debugfs_write,
 	.llseek = default_llseek
 };
 
 static const struct file_operations sdp_message_fops = {
 	.owner = THIS_MODULE,
+#ifdef __FreeBSD__
+	.read = NULL,
+#endif
 	.write = dp_sdp_message_debugfs_write,
 	.llseek = default_llseek
 };
 
 static const struct file_operations dp_dpcd_address_debugfs_fops = {
 	.owner = THIS_MODULE,
+#ifdef __FreeBSD__
+	.read = NULL,
+#endif
 	.write = dp_dpcd_address_write,
 	.llseek = default_llseek
 };
 
 static const struct file_operations dp_dpcd_size_debugfs_fops = {
 	.owner = THIS_MODULE,
+#ifdef __FreeBSD__
+	.read = NULL,
+#endif
 	.write = dp_dpcd_size_write,
 	.llseek = default_llseek
 };

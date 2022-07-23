@@ -102,6 +102,9 @@ static int guc_log_relay_release(struct inode *inode, struct file *file)
 static const struct file_operations guc_log_relay_fops = {
 	.owner = THIS_MODULE,
 	.open = guc_log_relay_open,
+#ifdef __FreeBSD__
+	.read = NULL,
+#endif
 	.write = guc_log_relay_write,
 	.release = guc_log_relay_release,
 };

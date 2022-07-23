@@ -58,6 +58,9 @@ static const struct file_operations i915_param_int_fops_ro = {
 	.owner = THIS_MODULE,
 	.open = i915_param_int_open,
 	.read = seq_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = default_llseek,
 	.release = single_release,
 };
@@ -111,6 +114,9 @@ static const struct file_operations i915_param_uint_fops_ro = {
 	.owner = THIS_MODULE,
 	.open = i915_param_uint_open,
 	.read = seq_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = default_llseek,
 	.release = single_release,
 };
@@ -165,6 +171,9 @@ static const struct file_operations i915_param_charp_fops_ro = {
 	.owner = THIS_MODULE,
 	.open = i915_param_charp_open,
 	.read = seq_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = default_llseek,
 	.release = single_release,
 };

@@ -737,6 +737,9 @@ static const struct file_operations i915_gpu_info_fops = {
 	.owner = THIS_MODULE,
 	.open = i915_gpu_info_open,
 	.read = gpu_state_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = default_llseek,
 	.release = gpu_state_release,
 };
@@ -1274,6 +1277,7 @@ static int i915_llc(struct seq_file *m, void *data)
 
 static int i915_runtime_pm_status(struct seq_file *m, void *unused)
 {
+#if defined(__linux__)
 	struct drm_i915_private *dev_priv = node_to_i915(m->private);
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 
@@ -1287,11 +1291,21 @@ static int i915_runtime_pm_status(struct seq_file *m, void *unused)
 	seq_printf(m, "IRQs disabled: %s\n",
 		   yesno(!intel_irqs_enabled(dev_priv)));
 #ifdef CONFIG_PM
+	/*
+	 * Member `struct dev_pm_info power` from <linux/pm.h> must be
+	 * added to `struct device` in <linux/device.h> for this to work
+	 * on FreeBSD's LinuxKPI.
+	 */
 	seq_printf(m, "Usage count: %d\n",
 		   atomic_read(&dev_priv->drm.dev->power.usage_count));
 #else
 	seq_printf(m, "Device Power Management (CONFIG_PM) disabled\n");
-#endif
+#endif /* CONFIG_PM */
+	/*
+	 * Function pci_power_name() from <linux/pci.h> is absent in the
+	 * LinuxKPI header and `struct pci_dev` from <linux/pci.h> is missing
+	 * member `pci_power_t current_state`.
+	 */
 	seq_printf(m, "PCI device power state: %s [%d]\n",
 		   pci_power_name(pdev->current_state),
 		   pdev->current_state);
@@ -1303,6 +1317,9 @@ static int i915_runtime_pm_status(struct seq_file *m, void *unused)
 	}
 
 	return 0;
+#elif defined(__FreeBSD__)
+	return -1;
+#endif /* __linux__ */
 }
 
 static int i915_engine_info(struct seq_file *m, void *unused)
@@ -1616,6 +1633,10 @@ static int i915_forcewake_release(struct inode *inode, struct file *file)
 static const struct file_operations i915_forcewake_fops = {
 	.owner = THIS_MODULE,
 	.open = i915_forcewake_open,
+#ifdef __FreeBSD__
+	.read = NULL,
+	.write = NULL,
+#endif
 	.release = i915_forcewake_release,
 };
 

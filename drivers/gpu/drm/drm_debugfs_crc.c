@@ -361,6 +361,9 @@ static const struct file_operations drm_crtc_crc_data_fops = {
 	.owner = THIS_MODULE,
 	.open = crtc_crc_open,
 	.read = crtc_crc_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.poll = crtc_crc_poll,
 	.release = crtc_crc_release,
 };

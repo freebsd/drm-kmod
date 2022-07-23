@@ -1041,6 +1041,10 @@ static const struct file_operations drm_stub_fops = {
 	.owner = THIS_MODULE,
 	.open = drm_stub_open,
 	.llseek = noop_llseek,
+#ifdef __FreeBSD__
+	.read = NULL,
+	.write = NULL,
+#endif
 };
 
 static void drm_core_exit(void)

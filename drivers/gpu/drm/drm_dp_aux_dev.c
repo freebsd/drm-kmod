@@ -247,6 +247,9 @@ static const struct file_operations auxdev_fops = {
 #ifdef __linux__
 	.read_iter	= auxdev_read_iter,
 	.write_iter	= auxdev_write_iter,
+#elif defined(__FreeBSD__)
+	.read = NULL,
+	.write = NULL,
 #endif
 	.open		= auxdev_open,
 	.release	= auxdev_release,

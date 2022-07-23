@@ -167,6 +167,9 @@ static const struct file_operations drm_debugfs_fops = {
 	.owner = THIS_MODULE,
 	.open = drm_debugfs_open,
 	.read = seq_read,
+#ifdef __FreeBSD__
+	.write = NULL,
+#endif
 	.llseek = seq_lseek,
 	.release = single_release,
 };
