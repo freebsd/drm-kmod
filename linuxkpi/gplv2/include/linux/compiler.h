@@ -72,8 +72,9 @@ memset_p(void **p, void *v, size_t n)
 #include <sys/types.h>
 #include <linux/math64.h>
 
-
+#ifndef atomic_fetch_inc
 #define	atomic_fetch_inc(v)	(atomic_inc_return(v) - 1)
+#endif
 
 static inline int
 pfn_valid(unsigned long pfn)
