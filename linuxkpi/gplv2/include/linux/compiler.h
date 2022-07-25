@@ -6,9 +6,15 @@
 #include <sys/syslog.h>
 #include <linux/types.h>
 
+#ifndef outb
 #define	outb(a,b) outb(b,a)
+#endif
+#ifndef outw
 #define	outw(a,b) outw(b,a)
+#endif
+#ifndef outl
 #define	outl(a,b) outl(b,a)
+#endif
 
 #ifndef PRINT_UNIMPLEMENTED
 #define PRINT_UNIMPLEMENTED 0
