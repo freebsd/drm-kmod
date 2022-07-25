@@ -16,21 +16,10 @@
 	 .end = (_start) + (_size) - 1,		\
 	}
 
-#define BSD_TO_LINUX_RESOURCE(r)		\
-	{					\
-	 .bsd_res = (r),			\
-	 .start = rman_get_start(r),		\
-	 .end = rman_get_end(r),		\
-	}
-
 struct linux_resource {
 	struct resource *bsd_res;
 	resource_size_t start;
 	resource_size_t end;
-	/* const char *name; */
-	/* unsigned long flags; */
-	/* unsigned long desc; */
-	/* struct resource *parent, *sibling, *child; */
 };
 #define	resource	linux_resource
 
@@ -68,14 +57,6 @@ pci_ignore_hotplug(struct pci_dev *pdev)
 {
 
 	UNIMPLEMENTED();
-}
-
-static inline void *
-pci_alloc_consistent(struct pci_dev *hwdev, size_t size, dma_addr_t *dma_handle)
-{
-
-	return (dma_alloc_coherent(hwdev == NULL ? NULL : &hwdev->dev, size,
-	    dma_handle, GFP_ATOMIC));
 }
 
 static inline int
