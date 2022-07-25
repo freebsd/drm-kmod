@@ -35,6 +35,8 @@ resource_contains(struct linux_resource *a, struct linux_resource *b)
 	return a->start <= b->start && a->end >= b->end;
 }
 
+#if __FreeBSD_version < 1400065
+
 static inline bool
 pci_is_thunderbolt_attached(struct pci_dev *pdev)
 {
@@ -67,5 +69,6 @@ pcie_get_readrq(struct pci_dev *dev)
 
 	return 128 << ((ctl & PCI_EXP_DEVCTL_READRQ) >> 12);
 }
+#endif
 
 #endif /* _LINUX_GPLV2_PCI_H_ */
