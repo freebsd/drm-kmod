@@ -2484,8 +2484,10 @@ static ssize_t amdgpu_iomem_read(struct file *f, char __user *buf,
 		addr = dom ? iommu_iova_to_phys(dom, addr) : addr;
 
 		pfn = addr >> PAGE_SHIFT;
+#ifdef __linux__
 		if (!pfn_valid(pfn))
 			return -EPERM;
+#endif
 
 		p = pfn_to_page(pfn);
 #ifdef __linux__

@@ -76,12 +76,6 @@ memset_p(void **p, void *v, size_t n)
 #define	atomic_fetch_inc(v)	(atomic_inc_return(v) - 1)
 #endif
 
-static inline int
-pfn_valid(unsigned long pfn)
-{
-	return 1;
-}
-
 struct linux_kmem_cache;
 static inline int
 kmem_cache_shrink(struct linux_kmem_cache *c)
