@@ -116,12 +116,14 @@ static inline uint64_t mul_u64_u32_shr(uint64_t a, uint32_t mul, unsigned int sh
 	return (uint64_t)((a * mul) >> shift);
 }
 
+#ifndef array_index_nospec
 /* Copied from Linux */
 static inline unsigned long array_index_mask_nospec(unsigned long index,
 						    unsigned long size)
 {
 	return ~(long)(index | (size - 1UL - index)) >> (BITS_PER_LONG - 1);
 }
+
 /* Copied from Linux */
 #define array_index_nospec(index, size)					\
 ({									\
@@ -134,5 +136,6 @@ static inline unsigned long array_index_mask_nospec(unsigned long index,
 									\
 	(typeof(_i)) (_i & _mask);					\
 })
+#endif
 
 #endif /* _LINUX_GPLV2_COMPILER_H_ */
