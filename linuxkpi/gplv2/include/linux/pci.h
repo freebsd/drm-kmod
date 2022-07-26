@@ -23,8 +23,6 @@ struct linux_resource {
 };
 #define	resource	linux_resource
 
-struct pci_dev *linux_pci_get_class(unsigned int class, struct pci_dev *from);
-
 static inline resource_size_t
 resource_size(const struct linux_resource *res)
 {
