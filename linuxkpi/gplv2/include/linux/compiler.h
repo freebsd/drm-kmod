@@ -46,6 +46,7 @@
 
 // XXX: Move to better place?
 
+#if __FreeBSD_version < 1400065
 static inline void *
 memset32(uint32_t *s, uint32_t v, size_t count)
 {
@@ -74,6 +75,7 @@ memset_p(void **p, void *v, size_t n)
 	else
 		return memset64((uint64_t *)p, (uintptr_t)v, n);
 }
+#endif
 
 #include <sys/types.h>
 #include <linux/math64.h>
