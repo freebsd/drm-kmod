@@ -90,6 +90,10 @@ kmem_cache_shrink(struct linux_kmem_cache *c)
 	return 0;
 }
 
+
+
+#if __FreeBSD_version < 1400065
+
 static inline uint64_t mul_u64_u32_div(uint64_t a, uint32_t mul, uint32_t divisor)
 {
 	union {
@@ -121,6 +125,7 @@ static inline uint64_t mul_u64_u32_shr(uint64_t a, uint32_t mul, unsigned int sh
 {
 	return (uint64_t)((a * mul) >> shift);
 }
+#endif
 
 #ifndef array_index_nospec
 /* Copied from Linux */
