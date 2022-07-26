@@ -69,12 +69,13 @@ check_move_unevictable_pages(struct pagevec *pvec)
 	UNIMPLEMENTED();
 }
 
+#if __FreeBSD_version < 1400065
 static inline void
 mapping_clear_unevictable(vm_object_t mapping)
 {
 
 	UNIMPLEMENTED();
 }
-
+#endif
 
 #endif /* _LINUX_PAGEVEC_H */
