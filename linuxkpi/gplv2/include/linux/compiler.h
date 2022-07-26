@@ -127,7 +127,7 @@ static inline uint64_t mul_u64_u32_shr(uint64_t a, uint32_t mul, unsigned int sh
 }
 #endif
 
-#ifndef array_index_nospec
+#if __FreeBSD_version < 1400065
 /* Copied from Linux */
 static inline unsigned long array_index_mask_nospec(unsigned long index,
 						    unsigned long size)
