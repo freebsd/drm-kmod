@@ -15,6 +15,7 @@
 #include "gt/intel_gt_mcr.h"
 #include "gt/intel_gt_regs.h"
 
+#ifdef CONFIG_64BIT
 #ifdef __linux__
 static void _release_bars(struct pci_dev *pdev)
 {
@@ -115,6 +116,9 @@ static void i915_resize_lmem_bar(struct drm_i915_private *i915, resource_size_t 
 	pci_write_config_dword(pdev, PCI_COMMAND, pci_cmd);
 #endif
 }
+#else
+static void i915_resize_lmem_bar(struct drm_i915_private *i915, resource_size_t lmem_size) {}
+#endif
 
 static int
 region_lmem_release(struct intel_memory_region *mem)
