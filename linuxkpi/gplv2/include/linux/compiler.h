@@ -80,7 +80,7 @@ memset_p(void **p, void *v, size_t n)
 #include <sys/types.h>
 #include <linux/math64.h>
 
-#ifndef atomic_fetch_inc
+#if __FreeBSD_version < 1400065
 #define	atomic_fetch_inc(v)	(atomic_inc_return(v) - 1)
 #endif
 
