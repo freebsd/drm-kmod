@@ -183,6 +183,18 @@ i915_param_named(guc_log_level, int, 0400,
 	"GuC firmware logging level. Requires GuC to be loaded. "
 	"(-1=auto [default], 0=disable, 1..4=enable with verbosity min..max)");
 
+i915_param_named(guc_log_size_crash, int, 0400,
+	"GuC firmware logging buffer size for crash dumps (in MB)"
+	"(-1=auto [default], NB: max = 4, other restrictions apply)");
+
+i915_param_named(guc_log_size_debug, int, 0400,
+	"GuC firmware logging buffer size for debug logs (in MB)"
+	"(-1=auto [default], NB: max = 16, other restrictions apply)");
+
+i915_param_named(guc_log_size_capture, int, 0400,
+	"GuC error capture register dump buffer size (in MB)"
+	"(-1=auto [default], NB: max = 4, other restrictions apply)");
+
 #ifdef __linux__
 // XXX: How to we handle char *?
 // Not critical: default kmod dir is fine...
