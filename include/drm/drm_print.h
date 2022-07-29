@@ -349,9 +349,9 @@ void __drm_err(const char *format, ...);
 __printf(3, 4)
 void drm_dev_printk(const struct device *dev, const char *level,
 		    const char *format, ...);
-__printf(3, 4)
+__printf(4, 5)
 void drm_dev_dbg(const struct device *dev, unsigned int category,
-		 const char *format, ...);
+		 const char *func, const char *format, ...);
 
 __printf(2, 3)
 void drm_dbg(unsigned int category, const char *format, ...);
@@ -637,6 +637,15 @@ void __drm_err(const char *function_name, const char *format, ...);
 #define DRM_DEBUG_DP(fmt, ...)						\
 	__drm_dbg(DRM_UT_DP, fmt, ## __VA_ARGS__)
 
+#define DRM_DEBUG_KMS_RATELIMITED(fmt, ...)				\
+({									\
+	static DEFINE_RATELIMIT_STATE(_rs,				\
+				      DEFAULT_RATELIMIT_INTERVAL,       \
+				      DEFAULT_RATELIMIT_BURST);         \
+	if (__ratelimit(&_rs))						\
+		drm_dev_dbg(NULL, DRM_UT_KMS, fmt, ##__VA_ARGS__);	\
+})
+
 #elif defined(__FreeBSD__)
 
 #define DRM_DEBUG(fmt, ...)						\
@@ -662,7 +671,6 @@ void __drm_err(const char *function_name, const char *format, ...);
 
 #define DRM_DEBUG_DP(dev, fmt, ...)					\
 	__drm_dbg(DRM_UT_DP, __func__, fmt, ## __VA_ARGS__)
-#endif
 
 #define DRM_DEBUG_KMS_RATELIMITED(fmt, ...)				\
 ({									\
@@ -670,8 +678,10 @@ void __drm_err(const char *function_name, const char *format, ...);
 				      DEFAULT_RATELIMIT_INTERVAL,       \
 				      DEFAULT_RATELIMIT_BURST);         \
 	if (__ratelimit(&_rs))						\
-		drm_dev_dbg(NULL, DRM_UT_KMS, fmt, ##__VA_ARGS__);	\
+		drm_dev_dbg(NULL, DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__); \
 })
+#endif
+
 
 /*
  * struct drm_device based WARNs
