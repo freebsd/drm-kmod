@@ -523,7 +523,8 @@ icl_combo_phy_aux_power_well_disable(struct drm_i915_private *dev_priv,
 	hsw_wait_for_power_well_disable(dev_priv, power_well);
 }
 
-#if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM)
+/* #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM) */
+#if 1
 
 static u64 async_put_domains_mask(struct i915_power_domains *power_domains);
 
@@ -1941,7 +1942,8 @@ static u64 __async_put_domains_mask(struct i915_power_domains *power_domains)
 	       power_domains->async_put_domains[1];
 }
 
-#if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM)
+/* #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM) */
+#if 1
 
 static bool
 assert_async_put_domain_masks_disjoint(struct i915_power_domains *power_domains)
@@ -2394,7 +2396,8 @@ intel_display_power_flush_work_sync(struct drm_i915_private *i915)
 	drm_WARN_ON(&i915->drm, power_domains->async_put_wakeref);
 }
 
-#if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM)
+/* #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM) */
+#if 1
 /**
  * intel_display_power_put - release a power domain reference
  * @dev_priv: i915 device instance
@@ -5742,7 +5745,8 @@ void intel_power_domains_resume(struct drm_i915_private *i915)
 	intel_power_domains_verify_state(i915);
 }
 
-#if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM)
+/* #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM) */
+#if 1
 
 static void intel_power_domains_dump_info(struct drm_i915_private *i915)
 {
@@ -5782,7 +5786,7 @@ static void intel_power_domains_verify_state(struct drm_i915_private *i915)
 
 	verify_async_put_domains_state(power_domains);
 
-	dump_domain_info = false;
+	dump_domain_info = true;
 	for_each_power_well(i915, power_well) {
 		enum intel_display_power_domain domain;
 		int domains_count;

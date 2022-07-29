@@ -282,7 +282,8 @@ void __intel_display_power_put_async(struct drm_i915_private *i915,
 				     enum intel_display_power_domain domain,
 				     intel_wakeref_t wakeref);
 void intel_display_power_flush_work(struct drm_i915_private *i915);
-#if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM)
+/* #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM) */
+#if 1
 void intel_display_power_put(struct drm_i915_private *dev_priv,
 			     enum intel_display_power_domain domain,
 			     intel_wakeref_t wakeref);
