@@ -329,7 +329,11 @@ int ttm_tt_swapin(struct ttm_tt *ttm)
 #endif
 
 	for (i = 0; i < ttm->num_pages; ++i) {
+#ifdef __linux__
 		gfp_t gfp_mask = mapping_gfp_mask(swap_space);
+#elif defined(__FreeBSD__)
+		gfp_t gfp_mask = 0;
+#endif
 
 		gfp_mask |= (ttm->page_flags & TTM_PAGE_FLAG_NO_RETRY ? __GFP_RETRY_MAYFAIL : 0);
 		from_page = shmem_read_mapping_page_gfp(swap_space, i, gfp_mask);
@@ -391,7 +395,11 @@ int ttm_tt_swapout(struct ttm_bo_device *bdev,
 #endif
 
 	for (i = 0; i < ttm->num_pages; ++i) {
+#ifdef __linux__
 		gfp_t gfp_mask = mapping_gfp_mask(swap_space);
+#elif defined(__FreeBSD__)
+		gfp_t gfp_mask = 0;
+#endif
 
 		gfp_mask |= (ttm->page_flags & TTM_PAGE_FLAG_NO_RETRY ? __GFP_RETRY_MAYFAIL : 0);
 
