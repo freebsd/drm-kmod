@@ -3,6 +3,7 @@
 
 #include_next <linux/mm.h>
 
+#if __FreeBSD_version < 1400065
 static inline int
 trylock_page(struct page *page)
 {
@@ -15,5 +16,6 @@ unlock_page(struct page *page)
 
 	vm_page_unlock(page);
 }
+#endif
 
 #endif	/* _BSD_LKPI_LINUX_MM_H_ */
