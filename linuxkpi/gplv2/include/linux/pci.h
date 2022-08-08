@@ -35,40 +35,4 @@ resource_contains(struct linux_resource *a, struct linux_resource *b)
 	return a->start <= b->start && a->end >= b->end;
 }
 
-#if __FreeBSD_version < 1400065
-
-static inline bool
-pci_is_thunderbolt_attached(struct pci_dev *pdev)
-{
-	UNIMPLEMENTED();
-	return false;
-}
-
-static inline void *
-pci_platform_rom(struct pci_dev *pdev, size_t *size)
-{
-
-	UNIMPLEMENTED();
-	return (NULL);
-}
-
-static inline void
-pci_ignore_hotplug(struct pci_dev *pdev)
-{
-
-	UNIMPLEMENTED();
-}
-
-static inline int
-pcie_get_readrq(struct pci_dev *dev)
-{
-	u16 ctl;
-
-	if (pcie_capability_read_word(dev, PCI_EXP_DEVCTL, &ctl))
-		return (-EINVAL);
-
-	return 128 << ((ctl & PCI_EXP_DEVCTL_READRQ) >> 12);
-}
-#endif
-
 #endif /* _LINUX_GPLV2_PCI_H_ */
