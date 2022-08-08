@@ -321,6 +321,7 @@ static void gen8_ggtt_clear_range(struct i915_address_space *vm,
 		gen8_set_pte(&gtt_base[i], scratch_pte);
 }
 
+#ifdef __linux__
 static void bxt_vtd_ggtt_wa(struct i915_address_space *vm)
 {
 	/*
@@ -332,6 +333,7 @@ static void bxt_vtd_ggtt_wa(struct i915_address_space *vm)
 	 */
 	intel_uncore_posting_read_fw(vm->gt->uncore, GFX_FLSH_CNTL_GEN6);
 }
+#endif
 
 struct insert_page {
 	struct i915_address_space *vm;
@@ -340,6 +342,7 @@ struct insert_page {
 	enum i915_cache_level level;
 };
 
+#ifdef __linux__
 static int bxt_vtd_ggtt_insert_page__cb(void *_arg)
 {
 	struct insert_page *arg = _arg;
@@ -349,6 +352,7 @@ static int bxt_vtd_ggtt_insert_page__cb(void *_arg)
 
 	return 0;
 }
+#endif
 
 static void bxt_vtd_ggtt_insert_page__BKL(struct i915_address_space *vm,
 					  dma_addr_t addr,
@@ -356,9 +360,11 @@ static void bxt_vtd_ggtt_insert_page__BKL(struct i915_address_space *vm,
 					  enum i915_cache_level level,
 					  u32 unused)
 {
+#ifdef __linux__
 	struct insert_page arg = { vm, addr, offset, level };
 
 	stop_machine(bxt_vtd_ggtt_insert_page__cb, &arg, NULL);
+#endif
 }
 
 struct insert_entries {
@@ -368,6 +374,7 @@ struct insert_entries {
 	u32 flags;
 };
 
+#ifdef __linux__
 static int bxt_vtd_ggtt_insert_entries__cb(void *_arg)
 {
 	struct insert_entries *arg = _arg;
@@ -377,15 +384,18 @@ static int bxt_vtd_ggtt_insert_entries__cb(void *_arg)
 
 	return 0;
 }
+#endif
 
 static void bxt_vtd_ggtt_insert_entries__BKL(struct i915_address_space *vm,
 					     struct i915_vma *vma,
 					     enum i915_cache_level level,
 					     u32 flags)
 {
+#ifdef __linux__
 	struct insert_entries arg = { vm, vma, level, flags };
 
 	stop_machine(bxt_vtd_ggtt_insert_entries__cb, &arg, NULL);
+#endif
 }
 
 static void gen6_ggtt_clear_range(struct i915_address_space *vm,
