@@ -15,6 +15,7 @@
 #define dma_unmap_resource(dev, dma_addr, size, dir, attrs)     \
 	linux_dma_unmap(dev, dma_addr, size)
 
+#if __FreeBSD_version < 1400066
 static inline int
 dma_map_sgtable(struct device *dev, struct sg_table *sgt,
     enum dma_data_direction dir,
@@ -32,5 +33,6 @@ dma_unmap_sgtable(struct device *dev, struct sg_table *sgt,
 
 	dma_unmap_sg(dev, sgt->sgl, sgt->nents, dir);
 }
+#endif
 
 #endif	/* _BSD_LKPI_LINUX_DMA_MAPPING_H_ */
