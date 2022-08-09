@@ -28,6 +28,7 @@
 #ifndef _BSD_ASM_X86_PROCESSOR_H_
 #define _BSD_ASM_X86_PROCESSOR_H_
 
+#if __FreeBSD_version < 1400066
 #include <sys/types.h>
 #include <machine/cpufunc.h>
 #include <machine/cpu.h>
@@ -40,5 +41,8 @@ struct cpuinfo_x86 {
 #define	cpu_relax()	cpu_spinwait()
 
 extern struct cpuinfo_x86	boot_cpu_data;
+#else
+#include_next <asm/processor.h>
+#endif
 
 #endif
