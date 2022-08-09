@@ -33,13 +33,4 @@ dma_unmap_sgtable(struct device *dev, struct sg_table *sgt,
 	dma_unmap_sg(dev, sgt->sgl, sgt->nents, dir);
 }
 
-#if __FreeBSD_version < 1301502
-static inline size_t
-dma_max_mapping_size(struct device *dev)
-{
-
-	return (SCATTERLIST_MAX_SEGMENT);
-}
-#endif
-
 #endif	/* _BSD_LKPI_LINUX_DMA_MAPPING_H_ */
