@@ -3,11 +3,13 @@
 
 #include_next <linux/scatterlist.h>
 
+#if __FreeBSD_version < 1400066
 #define	for_each_sgtable_sg(sgt, sg, i) \
 	for_each_sg((sgt)->sgl, sg, (sgt)->orig_nents, i)
 
 #define	for_each_sgtable_page(sgt, iter, pgoffset) \
 	for_each_sg_page((sgt)->sgl, iter, (sgt)->orig_nents, pgoffset)
+#endif
 
 #ifndef for_each_sgtable_dma_sg
 #define	for_each_sgtable_dma_sg(sgt, sg, iter)		\
