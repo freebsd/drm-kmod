@@ -8,7 +8,7 @@
 
 #include <asm/processor.h>
 
-
+#if __FreeBSD_version < 1400066
 #if defined(__i386__) || defined(__amd64__)
 struct cpuinfo_x86 boot_cpu_data;
 
@@ -20,4 +20,5 @@ linux_compat_init(void *arg __unused)
 	boot_cpu_data.x86 = ((cpu_id & 0xf0000) >> 12) | ((cpu_id & 0xf0) >> 4);
 }
 SYSINIT(linux_compat, SI_SUB_VFS, SI_ORDER_ANY, linux_compat_init, NULL);
+#endif
 #endif
