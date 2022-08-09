@@ -3,6 +3,7 @@
 
 #include_next <linux/refcount.h>
 
+#if __FreeBSD_version < 1400066
 /*
  * We can't change this right now as struct kref from linuxkpi base doesn't
  * use refcount_t but an atomic_t directly
@@ -13,5 +14,6 @@ refcount_dec_and_test(atomic_t *r)
 
 	return atomic_dec_and_test(r);
 }
+#endif
 
 #endif /* _BSD_LKPI_LINUX_REFCOUNT_H_ */
