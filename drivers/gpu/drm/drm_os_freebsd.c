@@ -106,7 +106,7 @@ vt_kms_postswitch(void *arg)
 
 	sc = (struct vt_kms_softc *)arg;
 
-	if (!kdb_active && panicstr == NULL) {
+	if (!kdb_active && !KERNEL_PANICKED()) {
 		taskqueue_enqueue(taskqueue_thread, &sc->fb_mode_task);
 
 		/* XXX the VT_ACTIVATE IOCTL must be synchronous */
