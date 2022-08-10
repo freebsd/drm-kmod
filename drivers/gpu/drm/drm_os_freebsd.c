@@ -44,6 +44,8 @@ int drm_debug_persist = 0;
 SYSCTL_INT(_dev_drm, OID_AUTO, drm_debug_persist, CTLFLAG_RWTUN, &drm_debug_persist, 0, "keep drm debug flags post-load (compat)");
 SYSCTL_INT(_hw_dri, OID_AUTO, drm_debug_persist, CTLFLAG_RWTUN, &drm_debug_persist, 0, "keep drm debug flags post-load");
 
+static bool already_switching_inside_panic = false;
+
 static struct callout reset_debug_log_handle;
 
 static void
@@ -118,7 +120,7 @@ vt_kms_postswitch(void *arg)
 		db_trace_self_depth(10);
 		mdelay(1000);
 #endif
-		if (skip_ddb) {
+		if (already_switching_inside_panic || skip_ddb) {
 			spinlock_enter();
 			doadump(false);
 			EVENTHANDLER_INVOKE(shutdown_final, RB_NOSYNC);
@@ -128,7 +130,9 @@ vt_kms_postswitch(void *arg)
 			DRM_DEBUG("fb helper is null!\n");
 			return -1;
 		}
+		already_switching_inside_panic = true;
 		drm_fb_helper_restore_fbdev_mode_unlocked(sc->fb_helper);
+		already_switching_inside_panic = false;
 	}
 	return (0);
 }
