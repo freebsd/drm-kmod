@@ -38,7 +38,9 @@
 #include <linux/dma-buf.h>
 #include <linux/dma-buf-map.h>
 #include <linux/mem_encrypt.h>
+#ifdef __linux__
 #include <linux/pagevec.h>
+#endif
 
 #include <drm/drm.h>
 #include <drm/drm_device.h>
