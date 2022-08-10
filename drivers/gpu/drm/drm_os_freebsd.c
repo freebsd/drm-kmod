@@ -120,7 +120,7 @@ vt_kms_postswitch(void *arg)
 #endif
 		if (skip_ddb) {
 			spinlock_enter();
-			doadump(0);
+			doadump(false);
 			EVENTHANDLER_INVOKE(shutdown_final, RB_NOSYNC);
 		}
 		linux_set_current(curthread);
