@@ -6,15 +6,4 @@
 /* XXX */
 #define	irqs_disabled() (curthread->td_critnest != 0 || curthread->td_intr_nesting_level != 0)
 
-#if __FreeBSD_version < 1400066
-#define add_taint(a,b)
-
-#include <linux/irqflags.h>
-#include <linux/kconfig.h>
-#include <linux/typecheck.h>
-
-#include <asm/cpufeature.h>
-#include <asm/processor.h>
-#endif
-
 #endif /* _BSD_LKPI_LINUX_KERNEL_H_ */
