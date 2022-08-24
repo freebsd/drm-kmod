@@ -8694,8 +8694,6 @@ int intel_modeset_init_noirq(struct drm_i915_private *i915)
 					WQ_UNBOUND, 512);
 #endif
 
-	i915->window2_delay = 0; /* No DSB so no window2 delay */
-
 	intel_mode_config_init(i915);
 
 	ret = intel_cdclk_init(i915);
