@@ -610,7 +610,8 @@ void intel_fbdev_unregister(struct drm_i915_private *dev_priv)
 	if (!ifbdev)
 		return;
 
-	cancel_work_sync(&dev_priv->display.fbdev.suspend_work);
+	intel_fbdev_set_suspend(&dev_priv->drm, FBINFO_STATE_SUSPENDED, true);
+
 #ifdef __linux__
 	if (!current_is_async())
 		intel_fbdev_sync(ifbdev);
@@ -657,7 +658,7 @@ void intel_fbdev_set_suspend(struct drm_device *dev, int state, bool synchronous
 	struct fb_info *info;
 
 	if (!ifbdev || !ifbdev->vma)
-		return;
+		goto set_suspend;
 
 	info = ifbdev->helper.fbdev;
 
@@ -700,6 +701,7 @@ void intel_fbdev_set_suspend(struct drm_device *dev, int state, bool synchronous
 	drm_fb_helper_set_suspend(&ifbdev->helper, state);
 	console_unlock();
 
+set_suspend:
 	intel_fbdev_hpd_set_suspend(dev_priv, state);
 }
 
