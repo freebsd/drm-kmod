@@ -298,7 +298,6 @@ struct drm_i915_private {
 
 	unsigned int max_dotclk_freq;
 	unsigned int hpll_freq;
-	unsigned int fdi_pll_freq;
 	unsigned int czclk_freq;
 
 	struct {
@@ -370,8 +369,6 @@ struct drm_i915_private {
 
 	struct drm_property *broadcast_rgb_property;
 	struct drm_property *force_audio_property;
-
-	u32 fdi_rx_config;
 
 	/*
 	 * Shadows for CHV DPLL_MD regs to keep the state
