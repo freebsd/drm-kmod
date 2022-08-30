@@ -954,10 +954,8 @@ void drm_dev_unregister(struct drm_device *dev)
 	if (dev->driver->unload)
 		dev->driver->unload(dev);
 
-#ifdef CONFIG_AGP
 	if (dev->agp)
 		drm_pci_agp_destroy(dev);
-#endif
 
 	drm_legacy_rmmaps(dev);
 
