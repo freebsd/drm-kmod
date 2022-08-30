@@ -382,7 +382,6 @@ static int radeon_pci_probe(struct pci_dev *pdev,
 
 	pci_set_drvdata(pdev, dev);
 
-#ifdef CONFIG_AGP
 	if (pci_find_capability(dev->pdev, PCI_CAP_ID_AGP))
 		dev->agp = drm_agp_init(dev);
 	if (dev->agp) {
@@ -391,7 +390,6 @@ static int radeon_pci_probe(struct pci_dev *pdev,
 			dev->agp->agp_info.aper_size *
 			1024 * 1024);
 	}
-#endif
 
 	ret = drm_dev_register(dev, ent->driver_data);
 	if (ret)
@@ -400,11 +398,9 @@ static int radeon_pci_probe(struct pci_dev *pdev,
 	return 0;
 
 err_agp:
-#ifdef CONFIG_AGP
 	if (dev->agp)
 		arch_phys_wc_del(dev->agp->agp_mtrr);
 	kfree(dev->agp);
-#endif
 	pci_disable_device(pdev);
 err_free:
 	drm_dev_put(dev);
