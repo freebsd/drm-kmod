@@ -39,6 +39,7 @@ KCONFIG+=	64BIT \
 .if ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "amd64"
 KCONFIG+=	ACPI \
 		ACPI_SLEEP \
+		AGP \
 		X86 \
 		X86_PAT
 
