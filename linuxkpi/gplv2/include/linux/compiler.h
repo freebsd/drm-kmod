@@ -153,4 +153,8 @@ static inline unsigned long array_index_mask_nospec(unsigned long index,
 })
 #endif
 
+#ifndef	noinline_for_stack
+#define	noinline_for_stack noinline
+#endif
+
 #endif /* _LINUX_GPLV2_COMPILER_H_ */
