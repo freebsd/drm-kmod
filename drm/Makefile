@@ -71,6 +71,10 @@ SRCS=	drm_atomic.c \
 SRCS+=	drm_fb_helper.c
 .endif
 
+.if !empty(KCONFIG:MAGP)
+SRCS+=	drm_agpsupport.c
+.endif
+
 .if !empty(KCONFIG:MCOMPAT)
 SRCS+=	drm_ioc32.c
 .endif
