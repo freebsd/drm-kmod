@@ -89,7 +89,6 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/bridge/*' \
     ':!include/drm/intel-gtt*' \
     ':!include/drm/tinydrm/*' \
-    ':!include/drm/drm_agpsupport*' \
     ':!include/drm/drm_bridge_connector*' \
     ':!include/drm/drm_fb_cma_helper.h*' \
     ':!include/drm/drm_gem_cma*' \
