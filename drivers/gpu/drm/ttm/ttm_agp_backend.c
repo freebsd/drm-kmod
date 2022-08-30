@@ -128,6 +128,7 @@ void ttm_agp_unbind(struct ttm_tt *ttm)
 #elif defined(__FreeBSD__)
 	agp_unbind_pages(agp_be->bridge, ttm->num_pages << PAGE_SHIFT,
 	    agp_be->offset);
+	agp_be->offset = 0;
 #endif
 }
 EXPORT_SYMBOL(ttm_agp_unbind);
@@ -139,7 +140,11 @@ bool ttm_agp_is_bound(struct ttm_tt *ttm)
 	if (!ttm)
 		return false;
 
+#ifdef __linux__
 	return (agp_be->mem != NULL);
+#elif defined(__FreeBSD__)
+	return (agp_be->offset != 0);
+#endif
 }
 EXPORT_SYMBOL(ttm_agp_is_bound);
 
