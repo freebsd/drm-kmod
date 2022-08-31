@@ -32,6 +32,9 @@ struct vt_kms_softc {
 #define	KTR_DRM		KTR_DEV
 #define	KTR_DRM_REG	KTR_SPARE3
 
+#define	DRM_AGP_KERN	struct agp_info
+#define	DRM_AGP_MEM	void
+
 MALLOC_DECLARE(DRM_MEM_DMA);
 MALLOC_DECLARE(DRM_MEM_DRIVER);
 MALLOC_DECLARE(DRM_MEM_KMS);
