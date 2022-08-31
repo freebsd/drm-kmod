@@ -35,11 +35,14 @@
 #include "drm_internal.h"
 #include "drm_legacy.h"
 
-
 #ifdef __FreeBSD__
 #define aper_base ai_aperture_base
 #define aper_size ai_aperture_size
+#endif
 
+#ifdef CONFIG_DRM_LEGACY
+
+#ifdef __FreeBSD__
 static void
 drm_pci_busdma_callback(void *arg, bus_dma_segment_t *segs, int nsegs, int error)
 {
@@ -52,8 +55,6 @@ drm_pci_busdma_callback(void *arg, bus_dma_segment_t *segs, int nsegs, int error
 	dmah->busaddr = segs[0].ds_addr;
 }
 #endif
-
-#ifdef CONFIG_DRM_LEGACY
 
 /**
  * drm_pci_alloc - Allocate a PCI consistent memory block, for DMA.
