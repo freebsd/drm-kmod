@@ -114,21 +114,18 @@ static void *agp_remap(unsigned long offset, unsigned long size,
 #endif
 }
 
-#ifdef __FreeBSD__
-#define	vunmap(handle)
-#endif
 /** Wrapper around agp_free_memory() */
 void drm_free_agp(struct agp_memory *handle, int pages)
 {
+#ifdef __linux__
+	agp_free_memory(handle);
+#elif defined(__FreeBSD__)
 	device_t agpdev;
 
 	agpdev = agp_find_device();
 	if (!agpdev || !handle)
 		return;
 
-#ifdef __linux__
-	agp_free_memory(handle);
-#elif defined(__FreeBSD__)
 	agp_free_memory(agpdev, handle);
 #endif
 }
@@ -136,15 +133,15 @@ void drm_free_agp(struct agp_memory *handle, int pages)
 /** Wrapper around agp_bind_memory() */
 int drm_bind_agp(struct agp_memory *handle, unsigned int start)
 {
+#ifdef __linux__
+	return agp_bind_memory(handle, start);
+#elif defined(__FreeBSD__)
 	device_t agpdev;
 
 	agpdev = agp_find_device();
 	if (!agpdev || !handle)
 		return -EINVAL;
 
-#ifdef __linux__
-	return agp_bind_memory(handle, start);
-#elif defined(__FreeBSD__)
 	return -agp_bind_memory(agpdev, handle, start * PAGE_SIZE);
 #endif
 }
@@ -152,15 +149,15 @@ int drm_bind_agp(struct agp_memory *handle, unsigned int start)
 /** Wrapper around agp_unbind_memory() */
 int drm_unbind_agp(struct agp_memory *handle)
 {
+#ifdef __linux__
+	return agp_unbind_memory(handle);
+#elif defined(__FreeBSD__)
 	device_t agpdev;
 
 	agpdev = agp_find_device();
 	if (!agpdev || !handle)
 		return -EINVAL;
 
-#ifdef __linux__
-	return agp_unbind_memory(handle);
-#elif defined(__FreeBSD__)
 	return -agp_unbind_memory(agpdev, handle);
 #endif
 }
