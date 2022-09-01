@@ -321,21 +321,20 @@ void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 EXPORT_SYMBOL(drm_dev_dbg);
 #elif defined(__FreeBSD__)
 void drm_dev_dbg(const struct device *dev, unsigned int category,
-		 const char *format, ...)
+		 const char *func, const char *format, ...)
 {
-	struct va_format vaf;
 	va_list args;
 
 	if (!(__drm_debug & category))
 		return;
 
-	va_start(args, format);
-	vaf.fmt = format;
-	vaf.va = &args;
-	if (dev)
-		device_printf((dev)->bsddev, "[" DRM_NAME "] ");
+	if (dev) {
+		device_print_prettyname((dev)->bsddev);
+		printf("%s: ", func);
+	}
 	else
-		printf("[" DRM_NAME "] ");
+		printf("[" DRM_NAME "] %s: ", func);
+	va_start(args, format);
 	vprintf(format, args);
 	va_end(args);
 }

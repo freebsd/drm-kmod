@@ -35,6 +35,11 @@
 #include <drm/ttm/ttm_module.h>
 #include <drm/drm_sysfs.h>
 
+#ifdef __FreeBSD__
+#include <linux/completion.h>
+#include <linux/wait.h>
+#endif
+
 static DECLARE_WAIT_QUEUE_HEAD(exit_q);
 static atomic_t device_released;
 

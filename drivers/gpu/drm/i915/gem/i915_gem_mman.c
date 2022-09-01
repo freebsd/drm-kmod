@@ -301,11 +301,7 @@ static vm_fault_t i915_error_to_vmf_fault(int err)
 	}
 }
 
-#if defined(__linux__) || __FreeBSD_version > 1400033
 static vm_fault_t vm_fault_cpu(struct vm_fault *vmf)
-#elif defined(__FreeBSD__)
-static vm_fault_t vm_fault_cpu(struct vm_area_struct *dummy, struct vm_fault *vmf)
-#endif
 {
 	struct vm_area_struct *area = vmf->vma;
 	struct i915_mmap_offset *mmo = area->vm_private_data;
@@ -344,11 +340,7 @@ out:
 	return i915_error_to_vmf_fault(err);
 }
 
-#if defined(__linux__) || __FreeBSD_version > 1400033
 static vm_fault_t vm_fault_gtt(struct vm_fault *vmf)
-#elif defined(__FreeBSD__)
-static vm_fault_t vm_fault_gtt(struct vm_area_struct *dummy, struct vm_fault *vmf)
-#endif
 {
 #define MIN_CHUNK_PAGES (SZ_1M >> PAGE_SHIFT)
 	struct vm_area_struct *area = vmf->vma;

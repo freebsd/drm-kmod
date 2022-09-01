@@ -416,11 +416,7 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 }
 EXPORT_SYMBOL(ttm_bo_vm_fault_reserved);
 
-#if defined(__linux__) || __FreeBSD_version > 1400033
 vm_fault_t ttm_bo_vm_fault(struct vm_fault *vmf)
-#elif defined (__FreeBSD__)
-vm_fault_t ttm_bo_vm_fault(struct vm_area_struct *dummy, struct vm_fault *vmf)
-#endif
 {
 	struct vm_area_struct *vma = vmf->vma;
 	pgprot_t prot;

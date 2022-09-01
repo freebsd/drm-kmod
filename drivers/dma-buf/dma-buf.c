@@ -122,13 +122,8 @@ dma_buf_close(struct file *fp, struct thread *td)
 }
 
 static int
-#if __FreeBSD_version < 1400037
-dma_buf_stat(struct file *fp, struct stat *sb,
-	     struct ucred *active_cred __unused, struct thread *td __unused)
-#else
 dma_buf_stat(struct file *fp, struct stat *sb,
 	     struct ucred *active_cred __unused)
-#endif
 {
 
 	/* XXX need to define flags for st_mode */

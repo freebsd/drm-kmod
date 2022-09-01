@@ -6,6 +6,10 @@
 #include <linux/pci.h>
 #include <linux/vgaarb.h>
 
+#if defined(__FreeBSD__)
+#include <asm-generic/io.h>
+#endif
+
 #include <drm/i915_drm.h>
 
 #include "i915_drv.h"

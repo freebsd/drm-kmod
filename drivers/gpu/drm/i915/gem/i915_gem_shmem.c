@@ -15,7 +15,7 @@
 #include "i915_trace.h"
 
 #ifdef __FreeBSD__
-static inline unsigned long totalram_pages() { return physmem; }
+static inline unsigned long totalram_pages(void) { return physmem; }
 #endif
 
 /*

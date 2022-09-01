@@ -12,6 +12,11 @@
 #include <linux/i2c.h>
 #include <linux/random.h>
 
+#ifdef __FreeBSD__
+#include <linux/completion.h>
+#include <linux/wait.h>
+#endif
+
 #include <drm/drm_hdcp.h>
 #include <drm/i915_component.h>
 
