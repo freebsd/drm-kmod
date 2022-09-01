@@ -218,7 +218,7 @@ int drm_agp_enable_ioctl(struct drm_device *dev, void *data,
 int drm_agp_alloc(struct drm_device *dev, struct drm_agp_buffer *request)
 {
 	struct drm_agp_mem *entry;
-	DRM_AGP_MEM *memory;
+	struct agp_memory *memory;
 	unsigned long pages;
 	u32 type;
 	struct agp_memory_info info;
