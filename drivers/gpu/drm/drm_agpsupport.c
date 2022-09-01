@@ -111,8 +111,6 @@ int drm_agp_info_ioctl(struct drm_device *dev, void *data,
  */
 int drm_agp_acquire(struct drm_device *dev)
 {
-	int retcode;
-
 	if (!dev->agp)
 		return -ENODEV;
 	if (dev->agp->acquired)
@@ -121,8 +119,8 @@ int drm_agp_acquire(struct drm_device *dev)
 	dev->agp->bridge = agp_backend_acquire(dev->pdev);
 	if (!dev->agp->bridge)
 		return -ENODEV;
-#else
-	retcode = agp_acquire(dev->agp->bridge);
+#elif defined(__FreeBSD__)
+	int retcode = agp_acquire(dev->agp->bridge);
 	if (retcode)
 		return -retcode;
 #endif
@@ -161,7 +159,11 @@ int drm_agp_release(struct drm_device *dev)
 {
 	if (!dev->agp || !dev->agp->acquired)
 		return -EINVAL;
+#ifdef __linux__
+	agp_backend_release(dev->agp->bridge);
+#elif defined(__FreeBSD__)
 	agp_release(dev->agp->bridge);
+#endif
 	dev->agp->acquired = 0;
 	return 0;
 }
@@ -221,7 +223,6 @@ int drm_agp_alloc(struct drm_device *dev, struct drm_agp_buffer *request)
 	struct agp_memory *memory;
 	unsigned long pages;
 	u32 type;
-	struct agp_memory_info info;
 
 	if (!dev->agp || !dev->agp->acquired)
 		return -EINVAL;
@@ -233,7 +234,7 @@ int drm_agp_alloc(struct drm_device *dev, struct drm_agp_buffer *request)
 	type = (u32) request->type;
 #ifdef __linux__
 	memory = agp_allocate_memory(dev->agp->bridge, pages, type);
-#else
+#elif defined(__FreeBSD__)
 	memory = agp_alloc_memory(dev->agp->bridge, type, pages << PAGE_SHIFT);
 #endif
 	if (!memory) {
@@ -241,16 +242,24 @@ int drm_agp_alloc(struct drm_device *dev, struct drm_agp_buffer *request)
 		return -ENOMEM;
 	}
 
+#ifdef __linux__
+	entry->handle = (unsigned long)memory->key + 1;
+#elif defined(__FreeBSD__)
 	entry->handle = (unsigned long)memory;
+#endif
 	entry->memory = memory;
 	entry->bound = 0;
 	entry->pages = pages;
 	list_add(&entry->head, &dev->agp->memory);
 
-	agp_memory_info(dev->agp->bridge, entry->memory, &info);
-
 	request->handle = entry->handle;
+#ifdef __linux__
+	request->physical = memory->physical;
+#elif defined(__FreeBSD__)
+	struct agp_memory_info info;
+	agp_memory_info(dev->agp->bridge, entry->memory, &info);
 	request->physical = info.ami_physical;
+#endif
 
 	return 0;
 }
@@ -475,6 +484,8 @@ struct drm_agp_head *drm_agp_init(struct drm_device *dev)
 	head->base = head->agp_info.aper_base;
 	return head;
 }
+/* Only exported for i810.ko */
+EXPORT_SYMBOL(drm_agp_init);
 
 /**
  * drm_legacy_agp_clear - Clear AGP resource list
