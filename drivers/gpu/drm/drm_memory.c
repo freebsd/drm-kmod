@@ -118,11 +118,7 @@ static void *agp_remap(unsigned long offset, unsigned long size,
 #define	vunmap(handle)
 #endif
 /** Wrapper around agp_free_memory() */
-#ifdef __linux__
 void drm_free_agp(struct agp_memory *handle, int pages)
-#elif defined(__FreeBSD__)
-void drm_free_agp(DRM_AGP_MEM * handle, int pages)
-#endif
 {
 	device_t agpdev;
 
@@ -138,11 +134,7 @@ void drm_free_agp(DRM_AGP_MEM * handle, int pages)
 }
 
 /** Wrapper around agp_bind_memory() */
-#ifdef __linux__
 int drm_bind_agp(struct agp_memory *handle, unsigned int start)
-#elif defined(__FreeBSD__)
-int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
-#endif
 {
 	device_t agpdev;
 
@@ -158,11 +150,7 @@ int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
 }
 
 /** Wrapper around agp_unbind_memory() */
-#ifdef __linux__
 int drm_unbind_agp(struct agp_memory *handle)
-#elif defined(__FreeBSD__)
-int drm_unbind_agp(DRM_AGP_MEM * handle)
-#endif
 {
 	device_t agpdev;
 

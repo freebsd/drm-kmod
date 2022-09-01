@@ -34,15 +34,9 @@ struct drm_agp_head {
 
 #if IS_ENABLED(CONFIG_AGP)
 
-#ifdef __linux__
 void drm_free_agp(struct agp_memory * handle, int pages);
 int drm_bind_agp(struct agp_memory * handle, unsigned int start);
 int drm_unbind_agp(struct agp_memory * handle);
-#elif defined(__FreeBSD__)
-void drm_free_agp(DRM_AGP_MEM * handle, int pages);
-int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start);
-int drm_unbind_agp(DRM_AGP_MEM * handle);
-#endif
 
 struct drm_agp_head *drm_agp_init(struct drm_device *dev);
 void drm_legacy_agp_clear(struct drm_device *dev);
@@ -73,7 +67,6 @@ int drm_agp_bind_ioctl(struct drm_device *dev, void *data,
 
 #else /* CONFIG_AGP */
 
-#ifdef __linux__
 static inline void drm_free_agp(struct agp_memory * handle, int pages)
 {
 }
@@ -87,22 +80,6 @@ static inline int drm_unbind_agp(struct agp_memory * handle)
 {
 	return -ENODEV;
 }
-
-#elif defined(__FreeBSD__)
-static inline void drm_free_agp(DRM_AGP_MEM * handle, int pages)
-{
-}
-
-static inline int drm_bind_agp(DRM_AGP_MEM * handle, unsigned int start)
-{
-	return -ENODEV;
-}
-
-static inline int drm_unbind_agp(DRM_AGP_MEM * handle)
-{
-	return -ENODEV;
-}
-#endif
 
 static inline struct drm_agp_head *drm_agp_init(struct drm_device *dev)
 {

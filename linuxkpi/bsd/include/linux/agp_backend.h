@@ -19,4 +19,6 @@ struct agp_kern_info {
 	unsigned long	page_mask;
 };
 
+struct agp_memory;
+
 #endif /* _BSD_LKPI_LINUX_AGP_BACKEND_H_ */
