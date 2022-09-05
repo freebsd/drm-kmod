@@ -7,9 +7,11 @@
 
 struct drm_writeback_connector {
 	struct drm_connector base;
+	struct drm_property_blob *pixel_formats_blob_ptr;
 };
 
 struct drm_writeback_job {
+	struct drm_writeback_connector *connector;
 	struct dma_fence *out_fence;
 	struct drm_framebuffer *fb;
 };
