@@ -204,6 +204,7 @@ SRCS+=	gen2_engine_cs.c \
 	intel_ring.c \
 	intel_ring_submission.c \
 	intel_rps.c \
+	intel_sa_media.c \
 	intel_sseu.c \
 	intel_timeline.c \
 	intel_workarounds.c \
