@@ -1035,6 +1035,7 @@ CWARNFLAGS.amdgpu_kms.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_mes.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_psp.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ras.c=			-Wno-missing-prototypes -Wno-unused-function -Wno-undefined-inline
+CWARNFLAGS.amdgpu_ring_mux.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_sched.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ttm.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_ucode.c=			-Wno-missing-prototypes
