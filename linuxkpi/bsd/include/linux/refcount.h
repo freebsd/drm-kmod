@@ -3,7 +3,7 @@
 
 #include_next <linux/refcount.h>
 
-#if __FreeBSD_version < 1400066
+#if __FreeBSD_version < 1301506
 /*
  * We can't change this right now as struct kref from linuxkpi base doesn't
  * use refcount_t but an atomic_t directly

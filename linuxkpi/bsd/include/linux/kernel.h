@@ -6,7 +6,7 @@
 /* XXX */
 #define	irqs_disabled() (curthread->td_critnest != 0 || curthread->td_intr_nesting_level != 0)
 
-#if __FreeBSD_version < 1400066
+#if __FreeBSD_version < 1301506
 #define add_taint(a,b)
 
 #include <linux/irqflags.h>

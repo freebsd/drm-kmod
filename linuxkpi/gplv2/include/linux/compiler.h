@@ -46,7 +46,7 @@
 
 // XXX: Move to better place?
 
-#if __FreeBSD_version < 1400065
+#if __FreeBSD_version < 1301506
 static inline void *
 memset32(uint32_t *s, uint32_t v, size_t count)
 {
@@ -80,11 +80,11 @@ memset_p(void **p, void *v, size_t n)
 #include <sys/types.h>
 #include <linux/math64.h>
 
-#if __FreeBSD_version < 1400065
+#if __FreeBSD_version < 1301506
 #define	atomic_fetch_inc(v)	(atomic_inc_return(v) - 1)
 #endif
 
-#if __FreeBSD_version < 1400066
+#if __FreeBSD_version < 1301506
 struct linux_kmem_cache;
 static inline int
 kmem_cache_shrink(struct linux_kmem_cache *c)
@@ -96,7 +96,7 @@ kmem_cache_shrink(struct linux_kmem_cache *c)
 
 
 
-#if __FreeBSD_version < 1400065
+#if __FreeBSD_version < 1301506
 
 static inline uint64_t mul_u64_u32_div(uint64_t a, uint32_t mul, uint32_t divisor)
 {
@@ -131,7 +131,7 @@ static inline uint64_t mul_u64_u32_shr(uint64_t a, uint32_t mul, unsigned int sh
 }
 #endif
 
-#if __FreeBSD_version < 1400065
+#if __FreeBSD_version < 1301506
 /* Copied from Linux */
 static inline unsigned long array_index_mask_nospec(unsigned long index,
 						    unsigned long size)
