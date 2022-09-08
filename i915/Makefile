@@ -152,6 +152,7 @@ SRCS+=	dvo_ch7017.c \
 	i9xx_plane.c \
 	skl_scaler.c \
 	skl_universal_plane.c \
+	skl_watermark.c \
 	vlv_dsi.c \
 	vlv_dsi_pll.c
 
