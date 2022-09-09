@@ -32,7 +32,6 @@
 
 #ifdef __FreeBSD__
 #include <linux/kernel.h>	/* For container_of */
-#include <linux/io.h>		/* For writeb/readb */
 #endif
 
 #include "i915_reg.h"
