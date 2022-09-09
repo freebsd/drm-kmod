@@ -28,6 +28,9 @@
 #ifndef _BSD_ASM_X86_PROCESSOR_H_
 #define _BSD_ASM_X86_PROCESSOR_H_
 
+#if __FreeBSD_version < 1400067 && defined(__i386__)
+#include <sys/systm.h>
+#endif
 #if __FreeBSD_version < 1400066
 #include <sys/types.h>
 #include <machine/cpufunc.h>
