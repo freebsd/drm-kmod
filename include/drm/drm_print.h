@@ -512,7 +512,7 @@ void __drm_dev_dbg(const struct device *dev, unsigned int category,
 
 #define drm_dbg_core(drm, fmt, ...)					\
 	drm_dev_dbg((drm) ? (drm)->dev : NULL, DRM_UT_CORE, fmt, ##__VA_ARGS__)
-#define drm_dbg(drm, fmt, ...)						\
+#define drm_dbg_driver(drm, fmt, ...)						\
 	drm_dev_dbg((drm) ? (drm)->dev : NULL, DRM_UT_DRIVER, fmt, ##__VA_ARGS__)
 #define drm_dbg_kms(drm, fmt, ...)					\
 	drm_dev_dbg((drm) ? (drm)->dev : NULL, DRM_UT_KMS, fmt, ##__VA_ARGS__)
@@ -530,12 +530,11 @@ void __drm_dev_dbg(const struct device *dev, unsigned int category,
 	drm_dev_dbg((drm) ? (drm)->dev : NULL, DRM_UT_DP, fmt, ##__VA_ARGS__)
 #define drm_dbg_drmres(drm, fmt, ...)					\
 	drm_dev_dbg((drm) ? (drm)->dev : NULL, DRM_UT_DRMRES, fmt, ##__VA_ARGS__)
-
 #else
 
 #define drm_dbg_core(drm, fmt, ...)					\
 	drm_dev_dbg((drm)->dev, DRM_UT_CORE, __func__, fmt, ##__VA_ARGS__)
-#define drm_dbg(drm, fmt, ...)						\
+#define drm_dbg_driver(drm, fmt, ...)						\
 	drm_dev_dbg((drm)->dev, DRM_UT_DRIVER, __func__, fmt, ##__VA_ARGS__)
 #define drm_dbg_kms(drm, fmt, ...)					\
 	drm_dev_dbg((drm)->dev, DRM_UT_KMS, __func__, fmt, ##__VA_ARGS__)
@@ -553,8 +552,9 @@ void __drm_dev_dbg(const struct device *dev, unsigned int category,
 	drm_dev_dbg((drm)->dev, DRM_UT_DP, __func__, fmt, ##__VA_ARGS__)
 #define drm_dbg_drmres(drm, fmt, ...)					\
 	drm_dev_dbg((drm)->dev, DRM_UT_DRMRES, __func__, fmt, ##__VA_ARGS__)
-
 #endif
+
+#define drm_dbg(drm, fmt, ...)	drm_dbg_driver(drm, fmt, ##__VA_ARGS__)
 
 /*
  * printk based logging
