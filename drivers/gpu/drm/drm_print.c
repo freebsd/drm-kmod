@@ -29,6 +29,7 @@
 #include <linux/moduleparam.h>
 #include <linux/seq_file.h>
 #include <linux/slab.h>
+#include <linux/dynamic_debug.h>
 
 #include <drm/drm.h>
 #include <drm/drm_drv.h>
@@ -316,8 +317,8 @@ void drm_dev_printk(const struct device *dev, const char *level,
 #endif
 
 #ifdef __linux__
-void __drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
-		 const char *format, ...)
+void __drm_dev_dbg(struct _ddebug *desc, const struct device *dev,
+		   enum drm_debug_category category, const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -325,6 +326,7 @@ void __drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 	if (!__drm_debug_enabled(category))
 		return;
 
+	/* we know we are printing for either syslog, tracefs, or both */
 	va_start(args, format);
 	vaf.fmt = format;
 	vaf.va = &args;
@@ -340,8 +342,9 @@ void __drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 }
 EXPORT_SYMBOL(__drm_dev_dbg);
 #elif defined(__FreeBSD__)
-void __drm_dev_dbg(const struct device *dev, unsigned int category,
-		 const char *func, const char *format, ...)
+void __drm_dev_dbg(struct _ddebug *desc, const struct device *dev,
+		   enum drm_debug_category category, const char *func,
+		   const char *format, ...)
 {
 	va_list args;
 
@@ -361,7 +364,7 @@ void __drm_dev_dbg(const struct device *dev, unsigned int category,
 #endif
 
 #ifdef __linux__
-void ___drm_dbg(enum drm_debug_category category, const char *format, ...)
+void ___drm_dbg(struct _ddebug *desc, enum drm_debug_category category, const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -380,8 +383,8 @@ void ___drm_dbg(enum drm_debug_category category, const char *format, ...)
 }
 EXPORT_SYMBOL(___drm_dbg);
 #elif defined(__FreeBSD__)
-void ___drm_dbg(unsigned int category, const char *function_name,
-	       const char *format, ...)
+void ___drm_dbg(struct _ddebug *desc, enum drm_debug_category category,
+		const char *function_name, const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
