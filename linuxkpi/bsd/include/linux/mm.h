@@ -3,7 +3,7 @@
 
 #include_next <linux/mm.h>
 
-#if __FreeBSD_version < 1301506
+#if __FreeBSD_version < 1301507
 static inline int
 trylock_page(struct page *page)
 {

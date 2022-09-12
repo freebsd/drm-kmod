@@ -5,7 +5,7 @@
 
 #include_next <linux/io.h>
 
-#if __FreeBSD_version < 1301506
+#if __FreeBSD_version < 1301507
  
 #if defined(__amd64__) || defined(__i386__) || defined(__aarch64__) || defined(__powerpc__) || defined(__riscv)
 static inline int
