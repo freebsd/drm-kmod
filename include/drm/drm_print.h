@@ -340,14 +340,14 @@ __printf(3, 4)
 void drm_dev_printk(const struct device *dev, const char *level,
 		    const char *format, ...);
 __printf(3, 4)
-void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
+void __drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 		 const char *format, ...);
 #elif defined(__FreeBSD__)
 __printf(3, 4)
 void drm_dev_printk(const struct device *dev, const char *level,
 		    const char *format, ...);
 __printf(4, 5)
-void drm_dev_dbg(const struct device *dev, unsigned int category,
+void __drm_dev_dbg(const struct device *dev, unsigned int category,
 		 const char *func, const char *format, ...);
 #endif
 
@@ -406,6 +406,9 @@ void drm_dev_dbg(const struct device *dev, unsigned int category,
 		DRM_DEV_INFO(dev, fmt, ##__VA_ARGS__);			\
 	}								\
 })
+
+#define drm_dev_dbg(dev, cat, fmt, ...)				\
+	__drm_dev_dbg(dev, cat, fmt, ##__VA_ARGS__)
 
 /**
  * DRM_DEV_DEBUG() - Debug output for generic drm code
@@ -555,16 +558,18 @@ void drm_dev_dbg(const struct device *dev, unsigned int category,
 
 #ifdef __linux__
 __printf(2, 3)
-void __drm_dbg(enum drm_debug_category category, const char *format, ...);
+void ___drm_dbg(enum drm_debug_category category, const char *format, ...);
 __printf(1, 2)
 void __drm_err(const char *format, ...);
 #else
 __printf(3, 4)
-void __drm_dbg(enum drm_debug_category category, const char *function_name,
+void ___drm_dbg(enum drm_debug_category category, const char *function_name,
 	       const char *format, ...);
 __printf(2, 3)
 void __drm_err(const char *function_name, const char *format, ...);
 #endif
+
+#define __drm_dbg(fmt, ...)		___drm_dbg(fmt, ##__VA_ARGS__)
 
 /* Macros to make printk easier */
 

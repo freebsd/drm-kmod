@@ -319,7 +319,7 @@ void drm_dev_printk(const struct device *dev, const char *level,
 #endif
 
 #ifdef __linux__
-void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
+void __drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 		 const char *format, ...)
 {
 	struct va_format vaf;
@@ -341,9 +341,9 @@ void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 
 	va_end(args);
 }
-EXPORT_SYMBOL(drm_dev_dbg);
+EXPORT_SYMBOL(__drm_dev_dbg);
 #elif defined(__FreeBSD__)
-void drm_dev_dbg(const struct device *dev, unsigned int category,
+void __drm_dev_dbg(const struct device *dev, unsigned int category,
 		 const char *func, const char *format, ...)
 {
 	va_list args;
@@ -364,7 +364,7 @@ void drm_dev_dbg(const struct device *dev, unsigned int category,
 #endif
 
 #ifdef __linux__
-void __drm_dbg(enum drm_debug_category category, const char *format, ...)
+void ___drm_dbg(enum drm_debug_category category, const char *format, ...)
 {
 	struct va_format vaf;
 	va_list args;
@@ -381,9 +381,9 @@ void __drm_dbg(enum drm_debug_category category, const char *format, ...)
 
 	va_end(args);
 }
-EXPORT_SYMBOL(__drm_dbg);
+EXPORT_SYMBOL(___drm_dbg);
 #elif defined(__FreeBSD__)
-void __drm_dbg(unsigned int category, const char *function_name,
+void ___drm_dbg(unsigned int category, const char *function_name,
 	       const char *format, ...)
 {
 	struct va_format vaf;
@@ -408,7 +408,7 @@ void __drm_dbg(unsigned int category, const char *function_name,
 
 	va_end(args);
 }
-EXPORT_SYMBOL(__drm_dbg);
+EXPORT_SYMBOL(___drm_dbg);
 #endif
 
 #ifdef __linux__
