@@ -35,7 +35,7 @@ resource_contains(struct linux_resource *a, struct linux_resource *b)
 	return a->start <= b->start && a->end >= b->end;
 }
 
-#if __FreeBSD_version < 1301506
+#if __FreeBSD_version < 1301507
 
 static inline bool
 pci_is_thunderbolt_attached(struct pci_dev *pdev)
