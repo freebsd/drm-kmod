@@ -31,5 +31,6 @@
 
 void drm_primary_helper_destroy(struct drm_plane *plane);
 extern const struct drm_plane_funcs drm_primary_helper_funcs;
+int drm_plane_helper_atomic_check(struct drm_plane *plane, struct drm_atomic_state *state);
 
 #endif
