@@ -177,6 +177,8 @@ dma_fence_wait_timeout(struct dma_fence *fence, bool intr, signed long timeout)
 	if (fence == NULL)
 		return (-EINVAL);
 
+	dma_fence_enable_sw_signaling(fence);
+
 	if (fence->ops && fence->ops->wait != NULL)
 		rv = fence->ops->wait(fence, intr, timeout);
 	else
@@ -326,26 +328,11 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
 {
 	struct default_wait_cb cb;
 	signed long rv = timeout ? timeout : 1;
-	bool was_enabled;
 
 	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
 		return (rv);
 
 	spin_lock(fence->lock);
-
-	was_enabled = test_and_set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT,
-	    &fence->flags);
-
-	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
-		goto out;
-
-	if (was_enabled == false && fence->ops &&
-	    fence->ops->enable_signaling) {
-		if (!fence->ops->enable_signaling(fence)) {
-			dma_fence_signal_locked(fence);
-			goto out;
-		}
-	}
 
 	if (timeout == 0) {
 		rv = 0;
