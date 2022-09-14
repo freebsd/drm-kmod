@@ -214,8 +214,6 @@ dma_fence_enable_sw_signaling(struct dma_fence *fence)
 {
 	bool was_enabled;
 
-	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
-		return;
 	spin_lock(fence->lock);
 	was_enabled = test_and_set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT,
 	    &fence->flags);
