@@ -329,10 +329,10 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
 	struct default_wait_cb cb;
 	signed long rv = timeout ? timeout : 1;
 
-	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
-		return (rv);
-
 	spin_lock(fence->lock);
+
+	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
+		goto out;
 
 	if (timeout == 0) {
 		rv = 0;
