@@ -21,8 +21,8 @@
  *
  */
 
-#include "amdgpu_mes.h"
 #include "amdgpu.h"
+#include "amdgpu_mes.h"
 #include "soc15_common.h"
 #include "amdgpu_mes_ctx.h"
 
