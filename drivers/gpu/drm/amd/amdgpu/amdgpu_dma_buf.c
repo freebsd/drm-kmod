@@ -59,7 +59,7 @@ static int amdgpu_dma_buf_attach(struct dma_buf *dmabuf,
 	int r;
 
 #ifdef __linux__
-	if (pci_p2pdma_distance_many(adev->pdev, &attach->dev, 1, true) < 0)
+	if (pci_p2pdma_distance_many(adev->pdev, &attach->dev, 1, false) < 0)
 		attach->peer2peer = false;
 #endif
 
