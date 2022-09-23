@@ -1111,6 +1111,7 @@ CWARNFLAGS.gfx_v9_4_2.c=			-Wno-missing-prototypes
 CWARNFLAGS.gfx_v9_4_3.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.gfx_v10_0.c=				-Wno-unused-variable
 CWARNFLAGS.gfx_v11_0.c=				-Wno-sometimes-uninitialized
+CWARNFLAGS.gfxhub_v1_2.c=			-Wno-sometimes-uninitialized
 CWARNFLAGS.jpeg_v2_5.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.jpeg_v3_0.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.jpeg_v4_0_3.c=			-Wno-uninitialized
