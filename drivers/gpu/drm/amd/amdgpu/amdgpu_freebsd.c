@@ -11,5 +11,5 @@ MODULE_DEPEND(amdgpu, linuxkpi_gplv2, 1, 1, 1);
 MODULE_DEPEND(amdgpu, dmabuf, 1, 1, 1);
 MODULE_DEPEND(amdgpu, firmware, 1, 1, 1);
 #ifdef CONFIG_DEBUG_FS
-MODULE_DEPEND(amdgpu, debugfs, 1, 1, 1);
+MODULE_DEPEND(amdgpu, lindebugfs, 1, 1, 1);
 #endif

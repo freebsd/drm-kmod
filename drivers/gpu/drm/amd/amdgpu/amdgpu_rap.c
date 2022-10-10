@@ -27,7 +27,6 @@
 #include "amdgpu.h"
 #include "amdgpu_rap.h"
 
-#ifdef __linux__
 /**
  * DOC: AMDGPU RAP debugfs test interface
  *
@@ -113,7 +112,6 @@ static const struct file_operations amdgpu_rap_debugfs_ops = {
 	.write = amdgpu_rap_debugfs_write,
 	.llseek = default_llseek
 };
-#endif
 
 void amdgpu_rap_debugfs_init(struct amdgpu_device *adev)
 {

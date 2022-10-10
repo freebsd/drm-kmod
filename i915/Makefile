@@ -195,17 +195,19 @@ SRCS+=	i915_gem_busy.c \
 SRCS+=	i915_ioc32.c
 .endif
 
-.if !empty(KCONFIG:MDEBUGFS)
-SRCS+=	i915_debugfs.c \
-	i915_gemfs.c \
-	intel_pipe_crc.c \
-	debugfs_engines.c \
+.if !empty(KCONFIG:MDEBUG_FS)
+SRCS+=	debugfs_engines.c \
 	debugfs_gt.c \
 	debugfs_gt_pm.c \
+	i915_debugfs.c \
+	i915_debugfs_params.c \
+	intel_display_debugfs.c \
 	intel_guc_debugfs.c \
 	intel_guc_log_debugfs.c \
-	intel_uc_debugfs.c \
-	intel_sseu_debugfs.c
+	intel_huc_debugfs.c \
+	intel_pipe_crc.c \
+	intel_sseu_debugfs.c \
+	intel_uc_debugfs.c
 .endif
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
