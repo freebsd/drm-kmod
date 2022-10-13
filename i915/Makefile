@@ -292,6 +292,10 @@ SRCS+=	intel_fbdev.c
 SRCS+=	i915_gpu_error.c
 .endif
 
+.if !empty(KCONFIG:MHWMON)
+SRCS+=	i915_hwmon.c
+.endif
+
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
 # intel_lpe_audio.c   # Need platform and irq_chip support
 
