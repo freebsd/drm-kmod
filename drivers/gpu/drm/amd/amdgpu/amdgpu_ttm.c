@@ -2302,9 +2302,9 @@ static ssize_t amdgpu_iomem_read(struct file *f, char __user *buf,
 			return -EPERM;
 #endif
 
-		ptr = kmap(p);
+		ptr = kmap_local_page(p);
 		r = copy_to_user(buf, ptr + off, bytes);
-		kunmap(p);
+		kunmap_local(ptr);
 		if (r)
 			return -EFAULT;
 
@@ -2356,9 +2356,9 @@ static ssize_t amdgpu_iomem_write(struct file *f, const char __user *buf,
 			return -EPERM;
 #endif
 
-		ptr = kmap(p);
+		ptr = kmap_local_page(p);
 		r = copy_from_user(ptr + off, buf, bytes);
-		kunmap(p);
+		kunmap_local(ptr);
 		if (r)
 			return -EFAULT;
 
