@@ -519,6 +519,22 @@ dma_buf_map_attachment(struct dma_buf_attachment *dba, enum dma_data_direction d
 	return (sgt);
 }
 
+struct sg_table *
+dma_buf_map_attachment_unlocked(struct dma_buf_attachment *dba,
+    enum dma_data_direction dir)
+{
+	struct sg_table *sgt;
+
+	if (dba == NULL || dba->dmabuf == NULL)
+		return ERR_PTR(-EINVAL);
+
+	dma_resv_lock(dba->dmabuf->resv, NULL);
+	sgt = dma_buf_map_attachment(dba, dir);
+	dma_resv_unlock(dba->dmabuf->resv);
+
+	return (sgt);
+}
+
 void
 dma_buf_unmap_attachment(struct dma_buf_attachment *dba,
 			 struct sg_table *sg_table,
@@ -544,6 +560,18 @@ dma_buf_unmap_attachment(struct dma_buf_attachment *dba,
 	if (dba->dmabuf->ops->pin != NULL)
 		dma_buf_unpin(dba);
 #endif
+}
+
+void
+dma_buf_unmap_attachment_unlocked(struct dma_buf_attachment *dba,
+    struct sg_table *sgt, enum dma_data_direction dir)
+{
+	if (dba == NULL || dba->dmabuf == NULL || sgt == NULL)
+		return;
+
+	dma_resv_lock(dba->dmabuf->resv, NULL);
+	dma_buf_unmap_attachment(dba, sgt, dir);
+	dma_resv_unlock(dba->dmabuf->resv);
 }
 
 void
