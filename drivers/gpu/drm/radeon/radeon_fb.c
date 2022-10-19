@@ -278,7 +278,7 @@ static int radeonfb_create(struct drm_fb_helper *helper,
 	drm_fb_helper_fill_info(info, &rfbdev->helper, sizes);
 
 	/* setup aperture base/size for vesafb takeover */
-	info->apertures->ranges[0].base = rdev->ddev->mode_config.fb_base;
+	info->apertures->ranges[0].base = rdev->mc.aper_base;
 	info->apertures->ranges[0].size = rdev->mc.aper_size;
 
 #ifdef __FreeBSD__
