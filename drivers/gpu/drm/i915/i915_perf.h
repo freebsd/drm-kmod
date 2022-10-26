@@ -129,4 +129,14 @@ static inline void i915_oa_config_put(struct i915_oa_config *oa_config)
 #endif
 }
 
+#if defined(CONFIG_I915_PERF)
+u32 i915_perf_oa_timestamp_frequency(struct drm_i915_private *i915);
+#else
+static inline u32
+i915_perf_oa_timestamp_frequency(struct drm_i915_private *i915)
+{
+	return (to_gt(i915)->clock_frequency);
+}
+#endif
+
 #endif /* __I915_PERF_H__ */
