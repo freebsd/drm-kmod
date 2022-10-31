@@ -160,6 +160,7 @@ CWARNFLAGS.r600.c=			-Wno-missing-prototypes -Wno-cast-qual -Wno-unused-but-set-
 CWARNFLAGS.r600_cs.c=			-Wno-missing-prototypes
 CWARNFLAGS.r600_hdmi.c=			-Wno-missing-prototypes
 CWARNFLAGS.radeon_atombios.c=		-Wno-missing-prototypes
+CWARNFLAGS.radeon_audio.c=		-Wno-unused-function
 CWARNFLAGS.radeon_connectors.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.radeon_display.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.radeon_device.c=		-Wno-missing-prototypes -Wno-cast-qual
