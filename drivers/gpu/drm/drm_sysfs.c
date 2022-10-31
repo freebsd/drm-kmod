@@ -27,6 +27,7 @@
 #include <linux/device.h>
 #include <linux/err.h>
 
+#include <drm/drm_accel.h>
 #include <drm/drm_connector.h>
 #include <drm/drm_device.h>
 #include <drm/drm_print.h>
@@ -172,21 +173,34 @@ struct device *drm_sysfs_minor_alloc(struct drm_minor *minor)
 	struct device *kdev;
 	int rv;
 
-	if (minor->type == DRM_MINOR_RENDER)
-		minor_str = "renderD%d";
-	else
-		minor_str = "card%d";
-
 	kdev = kzalloc(sizeof(*kdev), GFP_KERNEL);
 	if (kdev == NULL)
 		return ERR_PTR(-ENOMEM);
 
-	kdev->devt = MKDEV(DRM_MAJOR, minor->index);
-	kdev->class = drm_class;
-	kdev->type = &drm_sysfs_device_minor;
+#ifdef __linux__
+	device_initialize(kdev);
+#endif
+
+	if (minor->type == DRM_MINOR_ACCEL) {
+		minor_str = "accel%d";
+		accel_set_device_instance_params(kdev, minor->index);
+	} else {
+		if (minor->type == DRM_MINOR_RENDER)
+			minor_str = "renderD%d";
+		else
+			minor_str = "card%d";
+
+		kdev->devt = MKDEV(DRM_MAJOR, minor->index);
+		kdev->class = drm_class;
+		kdev->type = &drm_sysfs_device_minor;
+	}
+
 	kdev->parent = minor->dev->dev;
 	kdev->release = drm_sysfs_release;
+#ifdef __FreeBSD__
+	/* FreeBSD depends on kdev->devt initialized already */
 	device_initialize(kdev);
+#endif
 	dev_set_drvdata(kdev, minor);
 
 	rv = dev_set_name(kdev, minor_str, minor->index);
