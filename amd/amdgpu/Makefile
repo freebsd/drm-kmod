@@ -1209,6 +1209,7 @@ CWARNFLAGS.dcn32_dpp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn32_fpu.c=			-Wno-unused-but-set-variable -Wno-missing-prototypes
 CWARNFLAGS.dcn32_hwseq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn32_hubbub.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn32_hwseq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn32_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn32_mmhubbub.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn32_mpc.c=			-Wno-missing-prototypes
