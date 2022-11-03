@@ -360,8 +360,8 @@ static void intel_fbdev_destroy(struct intel_fbdev *ifbdev)
 
 #ifdef __FreeBSD__
 	unregister_fictitious_range(
-	    ifbdev->helper.fbdev->apertures->ranges[0].base,
-	    ifbdev->helper.fbdev->apertures->ranges[0].size);
+	    ifbdev->helper.info->apertures->ranges[0].base,
+	    ifbdev->helper.info->apertures->ranges[0].size);
 #endif
 
 	drm_fb_helper_fini(&ifbdev->helper);
@@ -666,7 +666,7 @@ void intel_fbdev_set_suspend(struct drm_device *dev, int state, bool synchronous
 	if (!ifbdev || !ifbdev->vma)
 		goto set_suspend;
 
-	info = ifbdev->helper.fbdev;
+	info = ifbdev->helper.info;
 
 	if (synchronous) {
 		/* Flush any pending work to turn the console on, and then
