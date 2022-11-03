@@ -32,15 +32,12 @@
 
 struct drm_fb_helper;
 
-#ifdef __FreeBSD__
 #include <linux/fb.h>
+#ifdef __FreeBSD__
 #define fb_info linux_fb_info
 #endif
+
 #include <drm/drm_client.h>
-#include <drm/drm_crtc.h>
-#include <drm/drm_device.h>
-#include <linux/fb.h>
-#include <linux/kgdb.h>
 
 enum mode_set_atomic {
 	LEAVE_ATOMIC_MODE_SET,
