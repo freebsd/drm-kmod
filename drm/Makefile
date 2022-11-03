@@ -69,7 +69,8 @@ SRCS=	drm_atomic.c \
 	vt_drmfb.c
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
-SRCS+=	drm_fb_helper.c
+SRCS+=	drm_fb_helper.c \
+	drm_fbdev_generic.c
 .endif
 
 .if !empty(KCONFIG:MDRM_LEGACY)
