@@ -59,7 +59,7 @@ __FBSDID("$FreeBSD$");
 #include "vt_drmfb.h"
 
 #define	to_drm_fb_helper(fbio) ((struct drm_fb_helper *)fbio->fb_priv)
-#define	to_linux_fb_info(fbio) (to_drm_fb_helper(fbio)->fbdev)
+#define	to_linux_fb_info(fbio) (to_drm_fb_helper(fbio)->info)
 
 vd_init_t		vt_drmfb_init;
 vd_fini_t		vt_drmfb_fini;

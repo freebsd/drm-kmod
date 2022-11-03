@@ -332,8 +332,8 @@ static int radeon_fbdev_destroy(struct drm_device *dev, struct radeon_fbdev *rfb
 
 #ifdef __FreeBSD__
 	unregister_fictitious_range(
-	    rfbdev->helper.fbdev->apertures->ranges[0].base,
-	    rfbdev->helper.fbdev->apertures->ranges[0].size);
+	    rfbdev->helper.info->apertures->ranges[0].base,
+	    rfbdev->helper.info->apertures->ranges[0].size);
 #endif
 
 	drm_fb_helper_unregister_fbi(&rfbdev->helper);
