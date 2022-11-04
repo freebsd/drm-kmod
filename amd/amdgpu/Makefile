@@ -1167,6 +1167,7 @@ CWARNFLAGS.dcn30_mpc.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn30_mmhubbub.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn30_dio_stream_encoder.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn30_hwseq.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dcn30_optc.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn30_resource.c=		-Wno-initializer-overrides -Wno-missing-prototypes
 CWARNFLAGS.dcn30_afmt.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn30_init.c=		-Wno-missing-prototypes
