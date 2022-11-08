@@ -93,7 +93,6 @@ SRCS=	\
 	intel_uncore.c \
 	i915_utils.c \
 	intel_wakeref.c \
-	intel_wopcm.c \
 	vlv_sideband.c \
 	vlv_suspend.c
 
@@ -208,6 +207,7 @@ SRCS+=	gen2_engine_cs.c \
 	intel_sa_media.c \
 	intel_sseu.c \
 	intel_timeline.c \
+	intel_wopcm.c \
 	intel_workarounds.c \
 	shmem_utils.c \
 	sysfs_engines.c
