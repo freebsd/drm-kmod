@@ -838,8 +838,8 @@ void intel_audio_codec_enable(struct intel_encoder *encoder,
 
 	if (i915->display.funcs.audio)
 		i915->display.funcs.audio->audio_codec_enable(encoder,
-								  crtc_state,
-								  conn_state);
+							      crtc_state,
+							      conn_state);
 
 	mutex_lock(&i915->display.audio.mutex);
 	encoder->audio_connector = connector;
@@ -854,7 +854,7 @@ void intel_audio_codec_enable(struct intel_encoder *encoder,
 		if (!intel_crtc_has_type(crtc_state, INTEL_OUTPUT_DP_MST))
 			pipe = -1;
 		acomp->base.audio_ops->pin_eld_notify(acomp->base.audio_ops->audio_ptr,
-						 (int) port, (int) pipe);
+						      (int)port, (int)pipe);
 	}
 
 #ifdef __linux__
@@ -893,8 +893,8 @@ void intel_audio_codec_disable(struct intel_encoder *encoder,
 
 	if (i915->display.funcs.audio)
 		i915->display.funcs.audio->audio_codec_disable(encoder,
-								   old_crtc_state,
-								   old_conn_state);
+							       old_crtc_state,
+							       old_conn_state);
 
 	mutex_lock(&i915->display.audio.mutex);
 	encoder->audio_connector = NULL;
@@ -907,7 +907,7 @@ void intel_audio_codec_disable(struct intel_encoder *encoder,
 		if (!intel_crtc_has_type(old_crtc_state, INTEL_OUTPUT_DP_MST))
 			pipe = -1;
 		acomp->base.audio_ops->pin_eld_notify(acomp->base.audio_ops->audio_ptr,
-						 (int) port, (int) pipe);
+						      (int)port, (int)pipe);
 	}
 
 #ifdef __linux__
