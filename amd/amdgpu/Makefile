@@ -144,7 +144,7 @@ SRCS=	acp_hw.c
 
 # amdgpu
 # amdgpu_acp.c \ # not yet - need i2s
-# amdgpu_mn.c \  # disabled
+# amdgpu_hmm.c \  # disabled
 
 SRCS+=	amdgpu_afmt.c \
 	amdgpu_amdkfd.c \
