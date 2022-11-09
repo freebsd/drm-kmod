@@ -133,6 +133,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_global_state.c \
 	intel_gmbus.c \
 	intel_hdmi.c \
+	intel_hti.c \
 	intel_lspcon.c \
 	intel_lvds.c \
 	intel_modeset_setup.c \
