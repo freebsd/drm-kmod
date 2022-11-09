@@ -32,10 +32,9 @@
 
 #ifdef __linux__
 int amdgpu_hmm_range_get_pages(struct mmu_interval_notifier *notifier,
-			       struct mm_struct *mm, struct page **pages,
-			       uint64_t start, uint64_t npages,
-			       struct hmm_range **phmm_range, bool readonly,
-			       bool mmap_locked, void *owner);
+			       uint64_t start, uint64_t npages, bool readonly,
+			       void *owner, struct page **pages,
+			       struct hmm_range **phmm_range);
 int amdgpu_hmm_range_get_pages_done(struct hmm_range *hmm_range);
 #endif
 
