@@ -219,9 +219,9 @@ trace_intel_fbc_activate(struct intel_plane *plane)
 	    plane->pipe);
 #endif
 
-	CTR3(KTR_DRM,
-	    "intel_fbc_activate: pipe %c, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR4(KTR_DRM,
+	    "intel_fbc_activate: pipe %c, plane %s, frame=%u, scanline=%u",
+	    pipe_name(crtc->pipe), plane->base.name, intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
 
 static inline void
@@ -232,9 +232,9 @@ trace_intel_fbc_deactivate(struct intel_plane *plane)
 	    plane->pipe);
 #endif
 
-	CTR3(KTR_DRM,
-	    "intel_fbc_deactivate: pipe %c, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR4(KTR_DRM,
+	    "intel_fbc_deactivate: pipe %c, plane %s, frame=%u, scanline=%u",
+	    pipe_name(crtc->pipe), plane->base.name, intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
 
 static inline void
@@ -245,9 +245,9 @@ trace_intel_fbc_nuke(struct intel_plane *plane)
 	    plane->pipe);
 #endif
 
-	CTR3(KTR_DRM,
-	    "intel_fbc_nuke: pipe %c, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR4(KTR_DRM,
+	    "intel_fbc_nuke: pipe %c, plane %s, frame=%u, scanline=%u",
+	    pipe_name(crtc->pipe), plane->base.name, intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
 
 static inline void
