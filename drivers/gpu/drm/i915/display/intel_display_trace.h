@@ -11,6 +11,9 @@
 #include "intel_crtc.h"
 #include "intel_display_types.h"
 
+#define __dev_name_i915(i915) dev_name((i915)->drm.dev)
+#define __dev_name_kms(obj) dev_name((obj)->base.dev->dev)
+
 static inline void
 trace_intel_pipe_enable(struct intel_crtc *crtc)
 {
@@ -25,9 +28,9 @@ trace_intel_pipe_enable(struct intel_crtc *crtc)
 	}
 #endif
 
-	CTR1(KTR_DRM,
-	    "intel_pipe_enable[1/2]: pipe %c enable",
-	    pipe_name(crtc->pipe));
+	CTR2(KTR_DRM,
+	    "intel_pipe_enable[1/2]: dev %s, pipe %c enable",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe));
 	CTR6(KTR_DRM,
 	    "intel_pipe_enable[2/2]: "
 	    "pipe A: frame=%u, scanline=%u, pipe B: frame=%u, scanline=%u, pipe C: frame=%u, scanline=%u",
@@ -50,9 +53,9 @@ trace_intel_pipe_disable(struct intel_crtc *crtc)
 	}
 #endif
 
-	CTR1(KTR_DRM,
-	    "intel_pipe_disable[1/2]: pipe %c enable",
-	    pipe_name(crtc->pipe));
+	CTR2(KTR_DRM,
+	    "intel_pipe_disable[1/2]: dev %s, pipe %c enable",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe));
 	CTR6(KTR_DRM,
 	    "intel_pipe_disable[2/2]: "
 	    "pipe A: frame=%u, scanline=%u, pipe B: frame=%u, scanline=%u, pipe C: frame=%u, scanline=%u",
@@ -64,9 +67,9 @@ trace_intel_pipe_disable(struct intel_crtc *crtc)
 static inline void
 trace_intel_pipe_crc(struct intel_crtc *crtc, const u32 *crcs)
 {
-	CTR3(KTR_DRM,
-	    "intel_pipe_crc[1/2]: pipe %c, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe),
+	CTR4(KTR_DRM,
+	    "intel_pipe_crc[1/2]: dev %s, pipe %c, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe),
 	    intel_crtc_get_vblank_counter(crtc),
 	    intel_get_crtc_scanline(crtc));
 	CTR5(KTR_DRM,
@@ -81,9 +84,9 @@ trace_intel_cpu_fifo_underrun(struct drm_i915_private *dev_priv, enum pipe pipe)
 	struct intel_crtc *crtc = intel_crtc_for_pipe(dev_priv, pipe);
 #endif
 
-	CTR3(KTR_DRM,
-	    "intel_cpu_fifo_underrun: pipe %c, frame=%u, scanline=%u",
-	    pipe_name(pipe),
+	CTR4(KTR_DRM,
+	    "intel_cpu_fifo_underrun: dev %s, pipe %c, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(pipe),
 	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
 
@@ -95,9 +98,9 @@ trace_intel_pch_fifo_underrun(struct drm_i915_private *dev_priv, enum pipe pch_t
 	struct intel_crtc *crtc = intel_crtc_for_pipe(dev_priv, pipe);
 #endif
 
-	CTR3(KTR_DRM,
-	    "intel_pch_fifo_underrun: pch transcoder %c, frame=%u, scanline=%u",
-	    pipe_name(pipe),
+	CTR4(KTR_DRM,
+	    "intel_pch_fifo_underrun: dev %s, pch transcoder %c, frame=%u, scanline=%u",
+	    __dev_name_i915(dev_priv), pipe_name(pipe),
 	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
 
@@ -114,9 +117,9 @@ trace_intel_memory_cxsr(struct drm_i915_private *dev_priv, bool old, bool new)
 	}
 #endif
 
-	CTR2(KTR_DRM,
-	    "intel_memory_cxsr[1/2]: %s->%s",
-	    str_on_off(old), str_on_off(new));
+	CTR3(KTR_DRM,
+	    "intel_memory_cxsr[1/2]: dev %s, cxsr %s->%s",
+	    __dev_name_i915(dev_priv), str_on_off(old), str_on_off(new));
 	CTR6(KTR_DRM, 
 	    "intel_memory_cxsr[2/2]: "
 	    "pipe A: frame=%u, scanline=%u, pipe B: frame=%u, scanline=%u, pipe C: frame=%u, scanline=%u",
@@ -128,17 +131,20 @@ trace_intel_memory_cxsr(struct drm_i915_private *dev_priv, bool old, bool new)
 static inline void
 trace_g4x_wm(struct intel_crtc *crtc, const struct g4x_wm_values *wm)
 {
-	CTR6(KTR_DRM,
-	    "g4x_wm[1/3]: pipe %c, frame=%u, scanline=%u, wm %d/%d/%d",
-	    pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc),
+	CTR4(KTR_DRM,
+	    "g4x_wm[1/4]: dev %s, pipe %c, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe),
+	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR3(KTR_DRM,
+	    "g4x_wm[2/4]: wm %d/%d/%d",
 	    wm->pipe[crtc->pipe].plane[PLANE_PRIMARY],
 	    wm->pipe[crtc->pipe].plane[PLANE_SPRITE0],
 	    wm->pipe[crtc->pipe].plane[PLANE_CURSOR]);
 	CTR4(KTR_DRM,
-	    "g4x_wm[2/3]: sr %s/%d/%d/%d",
+	    "g4x_wm[3/4]: sr %s/%d/%d/%d",
 	    str_yes_no(wm->cxsr), wm->sr.plane, wm->sr.cursor, wm->sr.fbc);
 	CTR5(KTR_DRM,
-	    "g4x_wm(3/3]: hpll %s/%d/%d/%d, fbc %s",
+	    "g4x_wm(4/4]: hpll %s/%d/%d/%d, fbc %s",
 	    str_yes_no(wm->hpll_en), wm->hpll.plane, wm->hpll.cursor, wm->hpll.fbc,
 	    str_yes_no(wm->fbc_en));
 }
@@ -146,9 +152,9 @@ trace_g4x_wm(struct intel_crtc *crtc, const struct g4x_wm_values *wm)
 static inline void
 trace_vlv_wm(struct intel_crtc *crtc, const struct vlv_wm_values *wm)
 {
-	CTR5(KTR_DRM,
-	    "vlv_wm[1/2]: pipe %c, frame=%u, scanline=%u, level=%d, cxsr=%d",
-	    pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc),
+	CTR6(KTR_DRM,
+	    "vlv_wm[1/2]: dev %s, pipe %c, frame=%u, scanline=%u, level=%d, cxsr=%d",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc),
 	    intel_get_crtc_scanline(crtc), wm->level, wm->cxsr);
 	CTR6(KTR_DRM,
 	    "vlv_wm[2/2]: wm %d/%d/%d/%d, sr %d/%d",
@@ -162,19 +168,22 @@ trace_vlv_wm(struct intel_crtc *crtc, const struct vlv_wm_values *wm)
 static inline void
 trace_vlv_fifo_size(struct intel_crtc *crtc, u32 sprite0_start, u32 sprite1_start, u32 fifo_size)
 {
-	CTR6(KTR_DRM,
-	    "vlv_fifo_size: pipe %c, frame=%u, scanline=%u, %d/%d/%d",
-	    pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc),
-	    intel_get_crtc_scanline(crtc), sprite0_start,
-	    sprite1_start, fifo_size);
+	CTR4(KTR_DRM,
+	    "vlv_fifo_size[1/2]: dev %s, pipe %c, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe),
+	    intel_crtc_get_vblank_counter(crtc),
+	    intel_get_crtc_scanline(crtc));
+	CTR3(KTR_DRM,
+	    "vlv_fifo_size[2/2]: %d/%d/%d",
+	    sprite0_start, sprite1_start, fifo_size);
 }
 
 static inline void
 trace_intel_plane_update_noarm(struct intel_plane *plane, struct intel_crtc *crtc)
 {
-	CTR4(KTR_DRM,
-	    "intel_plane_update_noarm[1/3]: pipe %c, plane %s, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), plane->base.name,
+	CTR5(KTR_DRM,
+	    "intel_plane_update_noarm[1/3]: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
+	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 	/* FIXME FreeBSD
 	CTR8(KTR_DRM,
@@ -188,9 +197,9 @@ trace_intel_plane_update_noarm(struct intel_plane *plane, struct intel_crtc *crt
 static inline void
 trace_intel_plane_update_arm(struct intel_plane *plane, struct intel_crtc *crtc)
 {
-	CTR4(KTR_DRM,
-	    "intel_plane_update_arm[1/3]: pipe %c, plane %s, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), plane->base.name,
+	CTR5(KTR_DRM,
+	    "intel_plane_update_arm[1/3]: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
+	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 	/* FIXME FreeBSD
 	CTR8(KTR_DRM,
@@ -204,9 +213,9 @@ trace_intel_plane_update_arm(struct intel_plane *plane, struct intel_crtc *crtc)
 static inline void
 trace_intel_plane_disable_arm(struct intel_plane *plane, struct intel_crtc *crtc)
 {
-	CTR4(KTR_DRM,
-	    "intel_plane_disable_arm: pipe %c, plane %s, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), plane->base.name,
+	CTR5(KTR_DRM,
+	    "intel_plane_disable_arm: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
+	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc),
 	    intel_get_crtc_scanline(crtc));
 }
@@ -219,9 +228,10 @@ trace_intel_fbc_activate(struct intel_plane *plane)
 	    plane->pipe);
 #endif
 
-	CTR4(KTR_DRM,
-	    "intel_fbc_activate: pipe %c, plane %s, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), plane->base.name, intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR5(KTR_DRM,
+	    "intel_fbc_activate: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
+	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
+	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
 
 static inline void
@@ -232,9 +242,10 @@ trace_intel_fbc_deactivate(struct intel_plane *plane)
 	    plane->pipe);
 #endif
 
-	CTR4(KTR_DRM,
-	    "intel_fbc_deactivate: pipe %c, plane %s, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), plane->base.name, intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR5(KTR_DRM,
+	    "intel_fbc_deactivate: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
+	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
+	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
 
 static inline void
@@ -245,71 +256,72 @@ trace_intel_fbc_nuke(struct intel_plane *plane)
 	    plane->pipe);
 #endif
 
-	CTR4(KTR_DRM,
-	    "intel_fbc_nuke: pipe %c, plane %s, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), plane->base.name, intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR5(KTR_DRM,
+	    "intel_fbc_nuke: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
+	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
+	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
 
 static inline void
 trace_intel_crtc_vblank_work_start(struct intel_crtc *crtc)
 {
-	CTR3(KTR_DRM,
-	    "intel_crtc_vblank_work_start: pipe %c, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc),
+	CTR4(KTR_DRM,
+	    "intel_crtc_vblank_work_start: dev %s, pipe %c, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc),
 	    intel_get_crtc_scanline(crtc));
 }
 
 static inline void
 trace_intel_crtc_vblank_work_end(struct intel_crtc *crtc)
 {
-	CTR3(KTR_DRM,
-	    "intel_crtc_vblank_work_end: pipe %c, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc),
+	CTR4(KTR_DRM,
+	    "intel_crtc_vblank_work_end: dev %s, pipe %c, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc),
 	    intel_get_crtc_scanline(crtc));
 }
 
 static inline void
 trace_intel_pipe_update_start(struct intel_crtc *crtc)
 {
-	CTR5(KTR_DRM,
-	    "pipe %c, frame=%u, scanline=%u, min=%u, max=%u",
-	    pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc),
+	CTR6(KTR_DRM,
+	    "dev %s, pipe %c, frame=%u, scanline=%u, min=%u, max=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe), intel_crtc_get_vblank_counter(crtc),
 	    intel_get_crtc_scanline(crtc), crtc->debug.min_vbl, crtc->debug.max_vbl);
 }
 
 static inline void
 trace_intel_pipe_update_vblank_evaded(struct intel_crtc *crtc)
 {
-	CTR5(KTR_DRM,
-	    "intel_pipe_update_vblank_evaded: pipe %c, frame=%u, scanline=%u, min=%u, max=%u",
-	    pipe_name(crtc->pipe), crtc->debug.start_vbl_count,
+	CTR6(KTR_DRM,
+	    "intel_pipe_update_vblank_evaded: dev %s, pipe %c, frame=%u, scanline=%u, min=%u, max=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe), crtc->debug.start_vbl_count,
 	    crtc->debug.scanline_start, crtc->debug.min_vbl, crtc->debug.max_vbl);
 }
 
 static inline void
 trace_intel_pipe_update_end(struct intel_crtc *crtc, u32 frame, int scanline_end)
 {
-	CTR3(KTR_DRM,
-	    "intel_pipe_update_end: pipe %c, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), frame, scanline_end);
+	CTR4(KTR_DRM,
+	    "intel_pipe_update_end: dev %s, pipe %c, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe), frame, scanline_end);
 }
 
 static inline void
 trace_intel_frontbuffer_invalidate(struct drm_i915_private *i915,
     unsigned int frontbuffer_bits, unsigned int origin)
 {
-	CTR2(KTR_DRM,
-	    "intel_frontbuffer_invalidate: frontbuffer_bits=0x%08x, origin=%u",
-	    frontbuffer_bits, origin);
+	CTR3(KTR_DRM,
+	    "intel_frontbuffer_invalidate: dev %s, frontbuffer_bits=0x%08x, origin=%u",
+	    __dev_name_i915(i915), frontbuffer_bits, origin);
 }
 
 static inline void
 trace_intel_frontbuffer_flush(struct drm_i915_private *i915,
     unsigned int frontbuffer_bits, unsigned int origin)
 {
-	CTR2(KTR_DRM,
-	    "intel_frontbuffer_flush: frontbuffer_bits=0x%08x, origin=%u",
-	    frontbuffer_bits, origin);
+	CTR3(KTR_DRM,
+	    "intel_frontbuffer_flush: dev %s, frontbuffer_bits=0x%08x, origin=%u",
+	    __dev_name_i915(i915), frontbuffer_bits, origin);
 }
 
 #endif /* __INTEL_DISPLAY_TRACE_H__ */
