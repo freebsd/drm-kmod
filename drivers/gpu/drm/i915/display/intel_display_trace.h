@@ -170,11 +170,11 @@ trace_vlv_fifo_size(struct intel_crtc *crtc, u32 sprite0_start, u32 sprite1_star
 }
 
 static inline void
-trace_intel_plane_update_noarm(struct drm_plane *plane, struct intel_crtc *crtc)
+trace_intel_plane_update_noarm(struct intel_plane *plane, struct intel_crtc *crtc)
 {
 	CTR4(KTR_DRM,
 	    "intel_plane_update_noarm[1/3]: pipe %c, plane %s, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), plane->name,
+	    pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 	/* FIXME FreeBSD
 	CTR8(KTR_DRM,
@@ -186,11 +186,11 @@ trace_intel_plane_update_noarm(struct drm_plane *plane, struct intel_crtc *crtc)
 }
 
 static inline void
-trace_intel_plane_update_arm(struct drm_plane *plane, struct intel_crtc *crtc)
+trace_intel_plane_update_arm(struct intel_plane *plane, struct intel_crtc *crtc)
 {
 	CTR4(KTR_DRM,
 	    "intel_plane_update_arm[1/3]: pipe %c, plane %s, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), plane->name,
+	    pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 	/* FIXME FreeBSD
 	CTR8(KTR_DRM,
@@ -202,11 +202,11 @@ trace_intel_plane_update_arm(struct drm_plane *plane, struct intel_crtc *crtc)
 }
 
 static inline void
-trace_intel_plane_disable_arm(struct drm_plane *plane, struct intel_crtc *crtc)
+trace_intel_plane_disable_arm(struct intel_plane *plane, struct intel_crtc *crtc)
 {
 	CTR4(KTR_DRM,
 	    "intel_plane_disable_arm: pipe %c, plane %s, frame=%u, scanline=%u",
-	    pipe_name(crtc->pipe), plane->name,
+	    pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc),
 	    intel_get_crtc_scanline(crtc));
 }
