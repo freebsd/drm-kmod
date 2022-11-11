@@ -295,7 +295,8 @@ trace_intel_pipe_update_end(struct intel_crtc *crtc, u32 frame, int scanline_end
 }
 
 static inline void
-trace_intel_frontbuffer_invalidate(unsigned int frontbuffer_bits, unsigned int origin)
+trace_intel_frontbuffer_invalidate(struct drm_i915_private *i915,
+    unsigned int frontbuffer_bits, unsigned int origin)
 {
 	CTR2(KTR_DRM,
 	    "intel_frontbuffer_invalidate: frontbuffer_bits=0x%08x, origin=%u",
@@ -303,7 +304,8 @@ trace_intel_frontbuffer_invalidate(unsigned int frontbuffer_bits, unsigned int o
 }
 
 static inline void
-trace_intel_frontbuffer_flush(unsigned int frontbuffer_bits, unsigned int origin)
+trace_intel_frontbuffer_flush(struct drm_i915_private *i915,
+    unsigned int frontbuffer_bits, unsigned int origin)
 {
 	CTR2(KTR_DRM,
 	    "intel_frontbuffer_flush: frontbuffer_bits=0x%08x, origin=%u",
