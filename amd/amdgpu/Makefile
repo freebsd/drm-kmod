@@ -282,6 +282,8 @@ SRCS+=	amdgpu_afmt.c \
 
 # display/amdgpu_dm
 SRCS+=	amdgpu_dm_color.c \
+	amdgpu_dm_crc.c \
+	amdgpu_dm_debugfs.c \
 	amdgpu_dm_helpers.c \
 	amdgpu_dm_irq.c \
 	amdgpu_dm_mst_types.c \
