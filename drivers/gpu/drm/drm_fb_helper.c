@@ -1548,9 +1548,6 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 	struct drm_connector *connector;
 	struct drm_mode_set *mode_set;
 	int best_depth = 0;
-#ifdef __FreeBSD__
-	struct vt_kms_softc *sc;
-#endif
 
 	memset(&sizes, 0, sizeof(struct drm_fb_helper_surface_size));
 	sizes.surface_depth = 24;
