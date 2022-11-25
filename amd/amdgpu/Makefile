@@ -1248,6 +1248,7 @@ CWARNFLAGS.irq_service_dcn21.c=		-Wno-missing-prototypes -Wno-unused-const-varia
 CWARNFLAGS.irq_service_dcn30.c=		-Wno-missing-prototypes -Wno-unused-const-variable
 CWARNFLAGS.irq_service_dcn31.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn315.c=	-Wno-missing-prototypes
+CWARNFLAGS.link_dp_capability.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.power_helpers.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes
