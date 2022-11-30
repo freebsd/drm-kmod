@@ -4164,17 +4164,6 @@ void intel_execlists_show_requests(struct intel_engine_cs *engine,
 	spin_unlock_irqrestore(&sched_engine->lock, flags);
 }
 
-static unsigned long list_count(struct list_head *list)
-{
-	struct list_head *pos;
-	unsigned long count = 0;
-
-	list_for_each(pos, list)
-		count++;
-
-	return count;
-}
-
 void intel_execlists_dump_active_requests(struct intel_engine_cs *engine,
 					  struct i915_request *hung_rq,
 					  struct drm_printer *m)
@@ -4186,7 +4175,7 @@ void intel_execlists_dump_active_requests(struct intel_engine_cs *engine,
 	intel_engine_dump_active_requests(&engine->sched_engine->requests, hung_rq, m);
 
 	drm_printf(m, "\tOn hold?: %zu\n",
-		   list_count(&engine->sched_engine->hold));
+		   list_count_nodes(&engine->sched_engine->hold));
 
 	spin_unlock_irqrestore(&engine->sched_engine->lock, flags);
 }
