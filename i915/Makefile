@@ -8,7 +8,8 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 	${SRCDIR}/gt \
 	${SRCDIR}/gt/uc \
 	${SRCDIR}/oa \
-	${SRCDIR}/pxp
+	${SRCDIR}/pxp \
+	${SRCDIR}/soc
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
@@ -68,7 +69,6 @@ SRCS=	\
 	intel_dpio_phy.c \
 	intel_dpll.c \
 	intel_dpll_mgr.c \
-	intel_dram.c \
 	intel_fbc.c \
 	intel_fdi.c \
 	intel_fifo_underrun.c \
@@ -79,7 +79,6 @@ SRCS=	\
 	intel_memory_region.c \
 	intel_opregion.c \
 	intel_overlay.c \
-	intel_pch.c \
 	intel_pcode.c \
 	intel_pm.c \
 	intel_psr.c \
@@ -267,6 +266,10 @@ SRCS+=	intel_pxp.c \
 	intel_pxp_session.c \
 	intel_pxp_tee.c
 .endif
+
+# soc/*
+SRCS+=	intel_dram.c \
+	intel_pch.c
 
 .if !empty(KCONFIG:MCOMPAT)
 SRCS+=	i915_ioc32.c
