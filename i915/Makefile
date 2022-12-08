@@ -214,7 +214,8 @@ SRCS+=	gen2_engine_cs.c \
 	sysfs_engines.c
 
 # gt/uc*
-SRCS+=	intel_guc.c \
+SRCS+=	intel_gsc_uc.c \
+	intel_guc.c \
 	intel_guc_ads.c \
 	intel_guc_capture.c \
 	intel_guc_ct.c \
