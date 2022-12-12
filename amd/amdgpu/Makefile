@@ -408,7 +408,6 @@ SRCS+=	bw_fixed.c \
 # display/dc/core
 SRCS+=	dc_debug.c \
 	dc_hw_sequencer.c \
-	dc_link_ddc.c \
 	dc_link_dp.c \
 	dc_link.c \
 	dc_resource.c \
@@ -785,7 +784,8 @@ SRCS+=	irq_service.c \
 	irq_service_dcn32.c
 
 # display/dc/link/*
-SRCS+=	link_dp_dpia_bw.c \
+SRCS+=	link_ddc.c \
+	link_dp_dpia_bw.c \
 	link_dp_trace.c \
 	link_hpd.c \
 	link_hwss_dio.c \
