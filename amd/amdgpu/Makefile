@@ -786,6 +786,12 @@ SRCS+=	link_ddc.c \
 	link_dp_dpia.c \
 	link_dp_dpia_bw.c \
 	link_dp_trace.c \
+	link_dp_training.c \
+	link_dp_training_128b_132b.c \
+	link_dp_training_8b_10b.c \
+	link_dp_training_auxless.c \
+	link_dp_training_dpia.c \
+	link_dp_training_fixed_vs_pe_retimer.c \
 	link_dpcd.c \
 	link_hpd.c \
 	link_hwss_dio.c \
