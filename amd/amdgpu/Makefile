@@ -783,6 +783,7 @@ SRCS+=	irq_service.c \
 
 # display/dc/link/*
 SRCS+=	link_ddc.c \
+	link_dp_capability.c \
 	link_dp_dpia.c \
 	link_dp_dpia_bw.c \
 	link_dp_phy.c \
