@@ -785,6 +785,7 @@ SRCS+=	irq_service.c \
 SRCS+=	link_ddc.c \
 	link_dp_dpia.c \
 	link_dp_dpia_bw.c \
+	link_dp_phy.c \
 	link_dp_trace.c \
 	link_dp_training.c \
 	link_dp_training_128b_132b.c \
