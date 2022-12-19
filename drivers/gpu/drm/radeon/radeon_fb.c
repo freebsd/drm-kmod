@@ -279,10 +279,6 @@ static int radeonfb_create(struct drm_fb_helper *helper,
 
 	drm_fb_helper_fill_info(info, &rfbdev->helper, sizes);
 
-	/* setup aperture base/size for vesafb takeover */
-	info->apertures->ranges[0].base = rdev->mc.aper_base;
-	info->apertures->ranges[0].size = rdev->mc.aper_size;
-
 #ifdef __FreeBSD__
 	/*
 	 * We can register the fictitious memory range based on the
@@ -297,9 +293,7 @@ static int radeonfb_create(struct drm_fb_helper *helper,
 	 * values passed to register_fictitious_range() below are unavailable
 	 * from a generic structure set by both drivers.
 	 */
-	register_fictitious_range(
-	    info->apertures->ranges[0].base,
-	    info->apertures->ranges[0].size);
+	register_fictitious_range(rdev->mc.aper_base, rdev->mc.aper_size);
 #endif
 
 	/* Use default scratch pixmap (info->pixmap.flags = FB_PIXMAP_SYSTEM) */
@@ -333,9 +327,8 @@ static int radeon_fbdev_destroy(struct drm_device *dev, struct radeon_fbdev *rfb
 	struct drm_framebuffer *fb = &rfbdev->fb;
 
 #ifdef __FreeBSD__
-	unregister_fictitious_range(
-	    rfbdev->helper.info->apertures->ranges[0].base,
-	    rfbdev->helper.info->apertures->ranges[0].size);
+	struct radeon_device *rdev = rfbdev->rdev;
+	unregister_fictitious_range(rdev->mc.aper_base, rdev->mc.aper_size);
 #endif
 
 	drm_fb_helper_unregister_info(&rfbdev->helper);
