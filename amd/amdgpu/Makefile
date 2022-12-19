@@ -799,6 +799,7 @@ SRCS+=	link_ddc.c \
 	link_dp_training_dpia.c \
 	link_dp_training_fixed_vs_pe_retimer.c \
 	link_dpcd.c \
+	link_edp_panel_control.c \
 	link_hpd.c \
 	link_hwss_dio.c \
 	link_hwss_dpia.c \
