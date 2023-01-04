@@ -100,7 +100,6 @@ struct detailed_mode_closure {
 	struct drm_connector *connector;
 	const struct drm_edid *drm_edid;
 	bool preferred;
-	u32 quirks;
 	int modes;
 };
 
@@ -2891,9 +2890,9 @@ static u32 edid_get_quirks(const struct drm_edid *drm_edid)
  * Walk the mode list for connector, clearing the preferred status on existing
  * modes and setting it anew for the right mode ala quirks.
  */
-static void edid_fixup_preferred(struct drm_connector *connector,
-				 u32 quirks)
+static void edid_fixup_preferred(struct drm_connector *connector)
 {
+	const struct drm_display_info *info = &connector->display_info;
 	struct drm_display_mode *t, *cur_mode, *preferred_mode;
 	int target_refresh = 0;
 	int cur_vrefresh, preferred_vrefresh;
@@ -2901,9 +2900,9 @@ static void edid_fixup_preferred(struct drm_connector *connector,
 	if (list_empty(&connector->probed_modes))
 		return;
 
-	if (quirks & EDID_QUIRK_PREFER_LARGE_60)
+	if (info->quirks & EDID_QUIRK_PREFER_LARGE_60)
 		target_refresh = 60;
-	if (quirks & EDID_QUIRK_PREFER_LARGE_75)
+	if (info->quirks & EDID_QUIRK_PREFER_LARGE_75)
 		target_refresh = 75;
 
 	preferred_mode = list_first_entry(&connector->probed_modes,
@@ -3405,9 +3404,9 @@ drm_mode_do_interlace_quirk(struct drm_display_mode *mode,
  */
 static struct drm_display_mode *drm_mode_detailed(struct drm_connector *connector,
 						  const struct drm_edid *drm_edid,
-						  const struct detailed_timing *timing,
-						  u32 quirks)
+						  const struct detailed_timing *timing)
 {
+	const struct drm_display_info *info = &connector->display_info;
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *mode;
 	const struct detailed_pixel_timing *pt = &timing->data.pixel_data;
@@ -3441,7 +3440,7 @@ static struct drm_display_mode *drm_mode_detailed(struct drm_connector *connecto
 		return NULL;
 	}
 
-	if (quirks & EDID_QUIRK_FORCE_REDUCED_BLANKING) {
+	if (info->quirks & EDID_QUIRK_FORCE_REDUCED_BLANKING) {
 		mode = drm_cvt_mode(dev, hactive, vactive, 60, true, false, false);
 		if (!mode)
 			return NULL;
@@ -3453,7 +3452,7 @@ static struct drm_display_mode *drm_mode_detailed(struct drm_connector *connecto
 	if (!mode)
 		return NULL;
 
-	if (quirks & EDID_QUIRK_135_CLOCK_TOO_HIGH)
+	if (info->quirks & EDID_QUIRK_135_CLOCK_TOO_HIGH)
 		mode->clock = 1088 * 10;
 	else
 		mode->clock = le16_to_cpu(timing->pixel_clock) * 10;
@@ -3476,7 +3475,7 @@ static struct drm_display_mode *drm_mode_detailed(struct drm_connector *connecto
 
 	drm_mode_do_interlace_quirk(mode, pt);
 
-	if (quirks & EDID_QUIRK_DETAILED_SYNC_PP) {
+	if (info->quirks & EDID_QUIRK_DETAILED_SYNC_PP) {
 		mode->flags |= DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC;
 	} else {
 		mode->flags |= (pt->misc & DRM_EDID_PT_HSYNC_POSITIVE) ?
@@ -3489,12 +3488,12 @@ set_size:
 	mode->width_mm = pt->width_mm_lo | (pt->width_height_mm_hi & 0xf0) << 4;
 	mode->height_mm = pt->height_mm_lo | (pt->width_height_mm_hi & 0xf) << 8;
 
-	if (quirks & EDID_QUIRK_DETAILED_IN_CM) {
+	if (info->quirks & EDID_QUIRK_DETAILED_IN_CM) {
 		mode->width_mm *= 10;
 		mode->height_mm *= 10;
 	}
 
-	if (quirks & EDID_QUIRK_DETAILED_USE_MAXIMUM_SIZE) {
+	if (info->quirks & EDID_QUIRK_DETAILED_USE_MAXIMUM_SIZE) {
 		mode->width_mm = drm_edid->edid->width_cm * 10;
 		mode->height_mm = drm_edid->edid->height_cm * 10;
 	}
@@ -4007,8 +4006,7 @@ do_detailed_mode(const struct detailed_timing *timing, void *c)
 		return;
 
 	newmode = drm_mode_detailed(closure->connector,
-				    closure->drm_edid, timing,
-				    closure->quirks);
+				    closure->drm_edid, timing);
 	if (!newmode)
 		return;
 
@@ -4031,15 +4029,13 @@ do_detailed_mode(const struct detailed_timing *timing, void *c)
  * add_detailed_modes - Add modes from detailed timings
  * @connector: attached connector
  * @drm_edid: EDID block to scan
- * @quirks: quirks to apply
  */
 static int add_detailed_modes(struct drm_connector *connector,
-			      const struct drm_edid *drm_edid, u32 quirks)
+			      const struct drm_edid *drm_edid)
 {
 	struct detailed_mode_closure closure = {
 		.connector = connector,
 		.drm_edid = drm_edid,
-		.quirks = quirks,
 	};
 
 	if (drm_edid->edid->revision >= 4)
@@ -6655,7 +6651,7 @@ static int _drm_edid_connector_update(struct drm_connector *connector,
 	 *
 	 * XXX order for additional mode types in extension blocks?
 	 */
-	num_modes += add_detailed_modes(connector, drm_edid, info->quirks);
+	num_modes += add_detailed_modes(connector, drm_edid);
 	num_modes += add_cvt_modes(connector, drm_edid);
 	num_modes += add_standard_modes(connector, drm_edid);
 	num_modes += add_established_modes(connector, drm_edid);
@@ -6666,7 +6662,7 @@ static int _drm_edid_connector_update(struct drm_connector *connector,
 		num_modes += add_inferred_modes(connector, drm_edid);
 
 	if (info->quirks & (EDID_QUIRK_PREFER_LARGE_60 | EDID_QUIRK_PREFER_LARGE_75))
-		edid_fixup_preferred(connector, info->quirks);
+		edid_fixup_preferred(connector);
 
 	if (info->quirks & EDID_QUIRK_FORCE_6BPC)
 		info->bpc = 6;
