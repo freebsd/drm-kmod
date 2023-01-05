@@ -193,7 +193,7 @@ int drm_pci_set_busid(struct drm_device *dev, struct drm_master *master)
 					drm_get_pci_domain(dev),
 					pci_get_bus(dev->dev->bsddev),
 					pci_get_slot(dev->dev->bsddev),
-					PCI_FUNC(dev->pdev->devfn));
+					PCI_FUNC(pdev->devfn));
 #else
 	master->unique = kasprintf(GFP_KERNEL, "pci:%04x:%02x:%02x.%d",
 					drm_get_pci_domain(dev),
