@@ -790,6 +790,7 @@ SRCS+=	link_ddc.c \
 	link_dp_capability.c \
 	link_dp_dpia.c \
 	link_dp_dpia_bw.c \
+	link_dp_irq_handler.c \
 	link_dp_phy.c \
 	link_dp_trace.c \
 	link_dp_training.c \
