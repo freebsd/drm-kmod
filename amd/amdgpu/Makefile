@@ -1052,6 +1052,7 @@ CWARNFLAGS.amdgpu_ttm.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_ucode.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_virt.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_vram_mgr.c=			-Wno-unused-variable
+CWARNFLAGS.amdgpu_xgmi.c=			-Wno-unused-variable
 CWARNFLAGS.aldebaran_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.aldebaran.c=				-Wno-unused-variable
 CWARNFLAGS.arcturus_ppt.c=			-Wno-uninitialized
