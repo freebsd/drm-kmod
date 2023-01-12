@@ -1547,8 +1547,10 @@ uint32_t amdgpu_bo_get_preferred_domain(struct amdgpu_device *adev,
  */
 u64 amdgpu_bo_print_info(int id, struct amdgpu_bo *bo, struct seq_file *m)
 {
+#ifdef _linux__
 	struct dma_buf_attachment *attachment;
 	struct dma_buf *dma_buf;
+#endif
 	unsigned int domain;
 	const char *placement;
 	unsigned int pin_count;
@@ -1576,13 +1578,16 @@ u64 amdgpu_bo_print_info(int id, struct amdgpu_bo *bo, struct seq_file *m)
 	if (pin_count)
 		seq_printf(m, " pin count %d", pin_count);
 
+#ifdef _linux__
 	dma_buf = READ_ONCE(bo->tbo.base.dma_buf);
 	attachment = READ_ONCE(bo->tbo.base.import_attach);
 
+	// BSDFIXME: dma_buf->file is FreeBSD file
 	if (attachment)
-		seq_printf(m, " imported from %p", dma_buf);
+		seq_printf(m, " imported from ino:%lu", file_inode(dma_buf->file)->i_ino);
 	else if (dma_buf)
-		seq_printf(m, " exported as %p", dma_buf);
+		seq_printf(m, " exported as ino:%lu", file_inode(dma_buf->file)->i_ino);
+#endif
 
 	amdgpu_bo_print_flag(m, bo, CPU_ACCESS_REQUIRED);
 	amdgpu_bo_print_flag(m, bo, NO_CPU_ACCESS);
