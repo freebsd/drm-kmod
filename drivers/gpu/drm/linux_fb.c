@@ -226,11 +226,24 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	fb_info->fbio.fb_cmsize = 0;
 	if (fb_info->fbio.fb_bpp == 0) {
 		device_printf(fb_info->fbio.fb_fbd_dev,
-		    "fb_bpp not set, setting to 8");
+		    "fb_bpp not set, setting to 8\n");
 		fb_info->fbio.fb_bpp = 32;
 	}
-	if ((err = vt_fb_attach(&fb_info->fbio)) != 0)
-		return (err);
+	if ((err = vt_fb_attach(&fb_info->fbio)) != 0) {
+		switch (err) {
+		case EEXIST:
+			device_printf(fb_info->fbio.fb_fbd_dev,
+			    "not attached to vt(4) console; "
+			    "another device has precedence (err=%d)\n",
+			    err);
+			break;
+		default:
+			device_printf(fb_info->fbio.fb_fbd_dev,
+			    "failed to attach to vt(4) console (err=%d)\n",
+			    err);
+		}
+		return (-err);
+	}
 	fb_info_print(&fb_info->fbio);
 	return 0;
 }
