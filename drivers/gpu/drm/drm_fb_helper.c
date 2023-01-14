@@ -50,7 +50,6 @@
 #include "drm_internal.h"
 
 #ifdef __FreeBSD__
-#define fb_info linux_fb_info
 #define register_framebuffer linux_register_framebuffer
 #define unregister_framebuffer linux_unregister_framebuffer
 #endif
