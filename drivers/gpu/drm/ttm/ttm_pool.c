@@ -493,6 +493,7 @@ error_free_all:
 #elif defined(__FreeBSD__)
 		order = tt->orders[i];
 #endif
+		ttm_pool_free_page(pool, tt->caching, order, tt->pages[i]);
 		i += 1 << order;
 	}
 

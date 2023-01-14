@@ -402,7 +402,8 @@ static const u8 *mipi_exec_gpio(struct intel_dsi *intel_dsi, const u8 *data)
 }
 #endif
 
-#if defined(CONFIG_ACPI) && defined(__linux__)
+#ifdef CONFIG_ACPI
+#ifdef I2CNOTYET
 static int i2c_adapter_lookup(struct acpi_resource *ares, void *data)
 {
 	struct i2c_adapter_lookup *lookup = data;
@@ -453,6 +454,12 @@ static void i2c_acpi_find_adapter(struct intel_dsi *intel_dsi,
 				       &lookup);
 		acpi_dev_free_resource_list(&resource_list);
 	}
+}
+#endif /* defined(I2CNOTYET) */
+#else
+static inline void i2c_acpi_find_adapter(struct intel_dsi *intel_dsi,
+					 const u16 slave_addr)
+{
 }
 #endif
 

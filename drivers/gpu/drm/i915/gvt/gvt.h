@@ -33,6 +33,10 @@
 #ifndef _GVT_H_
 #define _GVT_H_
 
+#include <uapi/linux/pci_regs.h>
+
+#include "i915_drv.h"
+
 #include "debug.h"
 #include "hypercall.h"
 #include "mmio.h"
@@ -56,7 +60,7 @@ struct intel_gvt_host {
 	struct device *dev;
 	bool initialized;
 	int hypervisor_type;
-	struct intel_gvt_mpt *mpt;
+	const struct intel_gvt_mpt *mpt;
 };
 
 extern struct intel_gvt_host intel_gvt_host;
@@ -129,6 +133,7 @@ struct intel_vgpu_display {
 	struct intel_vgpu_i2c_edid i2c_edid;
 	struct intel_vgpu_port ports[I915_MAX_PORTS];
 	struct intel_vgpu_sbi sbi;
+	enum port port_num;
 };
 
 struct vgpu_sched_ctl {
@@ -210,6 +215,7 @@ struct intel_vgpu {
 	struct list_head dmabuf_obj_list_head;
 	struct mutex dmabuf_lock;
 	struct idr object_idr;
+	struct intel_vgpu_vblank_timer vblank_timer;
 
 	u32 scan_nonprivbb;
 };
@@ -244,7 +250,7 @@ struct gvt_mmio_block {
 #define INTEL_GVT_MMIO_HASH_BITS 11
 
 struct intel_gvt_mmio {
-	u8 *mmio_attribute;
+	u16 *mmio_attribute;
 /* Register contains RO bits */
 #define F_RO		(1 << 0)
 /* Register contains graphics address */
@@ -263,6 +269,8 @@ struct intel_gvt_mmio {
  * logical context image
  */
 #define F_SR_IN_CTX	(1 << 7)
+/* Value of command write of this reg needs to be patched */
+#define F_CMD_WRITE_PATCH	(1 << 8)
 
 	struct gvt_mmio_block *mmio_block;
 	unsigned int num_mmio_block;
@@ -329,6 +337,7 @@ struct intel_gvt {
 		u32 *mocs_mmio_offset_list;
 		u32 mocs_mmio_offset_list_cnt;
 	} engine_mmio_list;
+	bool is_reg_whitelist_updated;
 
 	struct dentry *debugfs_root;
 };
@@ -339,13 +348,16 @@ static inline struct intel_gvt *to_gvt(struct drm_i915_private *i915)
 }
 
 enum {
-	INTEL_GVT_REQUEST_EMULATE_VBLANK = 0,
-
 	/* Scheduling trigger by timer */
-	INTEL_GVT_REQUEST_SCHED = 1,
+	INTEL_GVT_REQUEST_SCHED = 0,
 
 	/* Scheduling trigger by event */
-	INTEL_GVT_REQUEST_EVENT_SCHED = 2,
+	INTEL_GVT_REQUEST_EVENT_SCHED = 1,
+
+	/* per-vGPU vblank emulation request */
+	INTEL_GVT_REQUEST_EMULATE_VBLANK = 2,
+	INTEL_GVT_REQUEST_EMULATE_VBLANK_MAX = INTEL_GVT_REQUEST_EMULATE_VBLANK
+		+ GVT_MAX_VGPU,
 };
 
 static inline void intel_gvt_request_service(struct intel_gvt *gvt,
@@ -411,6 +423,9 @@ int intel_gvt_load_firmware(struct intel_gvt *gvt);
 
 #define vgpu_fence_base(vgpu) (vgpu->fence.base)
 #define vgpu_fence_sz(vgpu) (vgpu->fence.size)
+
+/* ring context size i.e. the first 0x50 dwords*/
+#define RING_CTX_SIZE 320
 
 struct intel_vgpu_creation_params {
 	__u64 handle;
@@ -559,9 +574,6 @@ struct intel_gvt_ops {
 	void (*vgpu_reset)(struct intel_vgpu *);
 	void (*vgpu_activate)(struct intel_vgpu *);
 	void (*vgpu_deactivate)(struct intel_vgpu *);
-	struct intel_vgpu_type *(*gvt_find_vgpu_type)(struct intel_gvt *gvt,
-			const char *name);
-	bool (*get_gvt_attrs)(struct attribute_group ***intel_vgpu_type_groups);
 	int (*vgpu_query_plane)(struct intel_vgpu *vgpu, void *);
 	int (*vgpu_get_dmabuf)(struct intel_vgpu *vgpu, unsigned int);
 	int (*write_protect_handler)(struct intel_vgpu *, u64, void *,
@@ -683,6 +695,35 @@ static inline void intel_gvt_mmio_set_sr_in_ctx(
 }
 
 void intel_gvt_debugfs_add_vgpu(struct intel_vgpu *vgpu);
+/**
+ * intel_gvt_mmio_set_cmd_write_patch -
+ *				mark an MMIO if its cmd write needs to be
+ *				patched
+ * @gvt: a GVT device
+ * @offset: register offset
+ *
+ */
+static inline void intel_gvt_mmio_set_cmd_write_patch(
+			struct intel_gvt *gvt, unsigned int offset)
+{
+	gvt->mmio.mmio_attribute[offset >> 2] |= F_CMD_WRITE_PATCH;
+}
+
+/**
+ * intel_gvt_mmio_is_cmd_write_patch - check if an mmio's cmd access needs to
+ * be patched
+ * @gvt: a GVT device
+ * @offset: register offset
+ *
+ * Returns:
+ * True if GPU commmand write to an MMIO should be patched
+ */
+static inline bool intel_gvt_mmio_is_cmd_write_patch(
+			struct intel_gvt *gvt, unsigned int offset)
+{
+	return gvt->mmio.mmio_attribute[offset >> 2] & F_CMD_WRITE_PATCH;
+}
+
 void intel_gvt_debugfs_remove_vgpu(struct intel_vgpu *vgpu);
 void intel_gvt_debugfs_init(struct intel_gvt *gvt);
 void intel_gvt_debugfs_clean(struct intel_gvt *gvt);
