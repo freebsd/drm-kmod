@@ -21,6 +21,10 @@
 #include "i915_utils.h"
 #include "i915_vma.h"
 
+#ifdef __FreeBSD__
+#include <drm/drm_util.h>
+#endif
+
 struct __guc_ads_blob;
 struct intel_guc_state_capture;
 
