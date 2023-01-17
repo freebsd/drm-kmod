@@ -270,6 +270,7 @@ SRCS+=	intel_pxp.c \
 
 # soc/*
 SRCS+=	intel_dram.c \
+	intel_gmch.c \
 	intel_pch.c
 
 .if !empty(KCONFIG:MCOMPAT)
