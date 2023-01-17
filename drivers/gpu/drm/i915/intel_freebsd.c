@@ -11,7 +11,7 @@ __FBSDID("$FreeBSD$");
 
 #include <acpi/video.h>
 
-#include "i915_driver.h"
+#include "soc/intel_gmch.h"
 #include "intel_acpi.h"
 #include <linux/console.h>
 #include <linux/module.h>
