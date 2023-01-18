@@ -75,8 +75,6 @@ struct intel_pxp;
 #include "i915_irq.h"
 #endif
 
-#define I915_COLOR_UNEVICTABLE (-1) /* a non-vma sharing the address space */
-
 #define GEM_QUIRK_PIN_SWIZZLED_PAGES	BIT(0)
 
 /* Data Stolen Memory (DSM) aka "i915 stolen memory" */
