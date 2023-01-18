@@ -786,6 +786,7 @@ SRCS+=	irq_service.c \
 
 # display/dc/link/*
 SRCS+=	link_ddc.c \
+	link_detection.c \
 	link_dp_capability.c \
 	link_dp_cts.c \
 	link_dp_dpia.c \
@@ -800,11 +801,16 @@ SRCS+=	link_ddc.c \
 	link_dp_training_dpia.c \
 	link_dp_training_fixed_vs_pe_retimer.c \
 	link_dpcd.c \
+	link_dpms.c \
 	link_edp_panel_control.c \
+	link_factory.c \
+	link_fpga.c \
 	link_hpd.c \
 	link_hwss_dio.c \
 	link_hwss_dpia.c \
-	link_hwss_hpo_dp.c
+	link_hwss_hpo_dp.c \
+	link_resource.c \
+	link_validation.c
 
 # display/dc/virtual
 SRCS+=	virtual_link_encoder.c \
@@ -1256,6 +1262,7 @@ CWARNFLAGS.irq_service_dcn21.c=		-Wno-missing-prototypes -Wno-unused-const-varia
 CWARNFLAGS.irq_service_dcn30.c=		-Wno-missing-prototypes -Wno-unused-const-variable
 CWARNFLAGS.irq_service_dcn31.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn315.c=	-Wno-missing-prototypes
+CWARNFLAGS.link_detection.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.link_dp_capability.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.link_dp_trace.c=		-Wno-missing-prototypes
 CWARNFLAGS.power_helpers.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
