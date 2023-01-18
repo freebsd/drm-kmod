@@ -25,14 +25,4 @@
 #undef UNIMPLEMENTED /* is defined to NOP in kernel lkpi */
 #define	UNIMPLEMENTED()	UNIMPLEMENTED_ONCE()
 
-#if __FreeBSD_version < 1400066
-struct linux_kmem_cache;
-static inline int
-kmem_cache_shrink(struct linux_kmem_cache *c)
-{
-	UNIMPLEMENTED();
-	return 0;
-}
-#endif
-
 #endif /* _LINUX_GPLV2_COMPILER_H_ */
