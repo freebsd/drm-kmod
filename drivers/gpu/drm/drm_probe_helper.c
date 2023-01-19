@@ -1167,7 +1167,9 @@ int drm_connector_helper_get_modes(struct drm_connector *connector)
 	 * EDID. Otherwise, if the EDID is NULL, clear the connector
 	 * information.
 	 */
-	count = drm_edid_connector_update(connector, drm_edid);
+	drm_edid_connector_update(connector, drm_edid);
+
+	count = drm_edid_connector_add_modes(connector);
 
 	drm_edid_free(drm_edid);
 
