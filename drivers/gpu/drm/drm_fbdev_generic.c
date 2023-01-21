@@ -235,7 +235,9 @@ static int drm_fbdev_fb_probe(struct drm_fb_helper *fb_helper,
 
 #ifdef __linux__
 		fbi->fbdefio = &drm_fbdev_defio;
-		fb_deferred_io_init(fbi);
+		ret = fb_deferred_io_init(fbi);
+		if (ret)
+			return ret;
 #endif
 	} else {
 		/* buffer is mapped for HW framebuffer */
