@@ -39,9 +39,6 @@
 
 #include <drm/ttm/ttm_device.h>
 
-#ifndef __linux__
-#include <sys/tree.h>
-#endif
 #include "ttm_bo_api.h"
 #include "ttm_kmap_iter.h"
 #include "ttm_placement.h"
@@ -230,9 +227,6 @@ int ttm_mem_io_reserve(struct ttm_device *bdev,
 		       struct ttm_resource *mem);
 void ttm_mem_io_free(struct ttm_device *bdev,
 		     struct ttm_resource *mem);
-
-int ttm_bo_move_to_system(struct ttm_buffer_object *bo,
-			  struct ttm_operation_ctx *ctx);
 
 /**
  * ttm_bo_move_memcpy

@@ -34,7 +34,6 @@
 
 #include "amdgpu_drv.h"
 
-#ifdef CONFIG_COMPAT
 long amdgpu_kms_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	unsigned int nr = DRM_IOCTL_NR(cmd);
@@ -47,4 +46,3 @@ long amdgpu_kms_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long 
 
 	return ret;
 }
-#endif

@@ -820,7 +820,7 @@ CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
 
 # amdgpu/
 CWARNFLAGS.amdgpu_atpx_handler.c=		-Wno-missing-prototypes
-CWARNFLAGS.amdgpu_bo_list.c=			-Wno-unused-but-set-variable
+CWARNFLAGS.amdgpu_bo_list.c=			-Wno-unused-but-set-variable -Wno-tautological-constant-out-of-range-compare
 CWARNFLAGS.amdgpu_csa.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_device.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_dm_debugfs.c=			-Wno-pointer-bool-conversion

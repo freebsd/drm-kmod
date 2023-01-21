@@ -71,7 +71,7 @@ int amdgpu_bo_list_create(struct amdgpu_device *adev, struct drm_file *filp,
 	unsigned i;
 	int r;
 
-	if ((long)num_entries > (SIZE_MAX - sizeof(struct amdgpu_bo_list))
+	if (num_entries > (SIZE_MAX - sizeof(struct amdgpu_bo_list))
 				/ sizeof(struct amdgpu_bo_list_entry))
 		return -EINVAL;
 

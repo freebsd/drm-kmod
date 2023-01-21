@@ -684,19 +684,20 @@ int amdgpu_ttm_tt_get_user_pages(struct amdgpu_bo *bo, struct page **pages)
 	vma = vma_lookup(mm, start);
 	if (unlikely(!vma)) {
 		r = -EFAULT;
-		goto out_putmm;
+		goto out_unlock;
 	}
 	if (unlikely((gtt->userflags & AMDGPU_GEM_USERPTR_ANONONLY) &&
 		vma->vm_file)) {
 		r = -EPERM;
-		goto out_putmm;
+		goto out_unlock;
 	}
 
 	readonly = amdgpu_ttm_tt_is_readonly(ttm);
 	r = amdgpu_hmm_range_get_pages(&bo->notifier, mm, pages, start,
 				       ttm->num_pages, &gtt->range, readonly,
-				       false, NULL);
-out_putmm:
+				       true, NULL);
+out_unlock:
+	mmap_read_unlock(mm);
 	mmput(mm);
 
 	return r;

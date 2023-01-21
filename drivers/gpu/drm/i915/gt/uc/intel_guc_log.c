@@ -146,7 +146,6 @@ static const struct rchan_callbacks relay_callbacks = {
 	.create_buf_file = create_buf_file_callback,
 	.remove_buf_file = remove_buf_file_callback,
 };
-
 #endif /* __linux__ */
 
 static void guc_move_to_next_buf(struct intel_guc_log *log)
@@ -430,6 +429,7 @@ static int guc_log_relay_create(struct intel_guc_log *log)
 static void guc_log_relay_destroy(struct intel_guc_log *log)
 {
 	lockdep_assert_held(&log->relay.lock);
+
 #ifdef __linux__
 	relay_close(log->relay.channel);
 	log->relay.channel = NULL;

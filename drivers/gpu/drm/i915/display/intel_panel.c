@@ -1398,6 +1398,10 @@ int intel_backlight_device_register(struct intel_connector *connector)
 	memset(&props, 0, sizeof(props));
 	props.type = BACKLIGHT_RAW;
 
+	/*
+	 * Note: Everything should work even if the backlight device max
+	 * presented to the userspace is arbitrarily chosen.
+	 */
 	props.max_brightness = panel->backlight.max;
 	props.brightness = scale_hw_to_user(connector,
 					    panel->backlight.level,
@@ -1410,10 +1414,6 @@ int intel_backlight_device_register(struct intel_connector *connector)
 		props.power = FB_BLANK_POWERDOWN;
 #endif
 
-	/*
-	 * Note: using the same name independent of the connector prevents
-	 * registration of multiple backlight devices in the driver.
-	 */
 	name = kstrdup("intel_backlight", GFP_KERNEL);
 	if (!name)
 		return -ENOMEM;

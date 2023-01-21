@@ -2595,9 +2595,7 @@ static int amdgpu_device_ip_late_init(struct amdgpu_device *adev)
 		adev->ip_blocks[i].status.late_initialized = true;
 	}
 
-#ifdef CONFIG_FS
 	amdgpu_ras_set_error_query_ready(adev, true);
-#endif
 
 	amdgpu_device_set_cg_state(adev, AMD_CG_STATE_GATE);
 	amdgpu_device_set_pg_state(adev, AMD_PG_STATE_GATE);
@@ -4989,9 +4987,7 @@ int amdgpu_device_gpu_recover(struct amdgpu_device *adev,
 		if (!amdgpu_device_suspend_display_audio(tmp_adev))
 			audio_suspended = true;
 
-#ifdef CONFIG_DEBUG_FS
 		amdgpu_ras_set_error_query_ready(tmp_adev, false);
-#endif
 
 		cancel_delayed_work_sync(&tmp_adev->delayed_init_work);
 

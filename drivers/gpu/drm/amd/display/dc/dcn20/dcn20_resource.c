@@ -3727,6 +3727,7 @@ static bool init_soc_bounding_box(struct dc *dc,
 	DC_FP_START();
 	dcn20_patch_bounding_box(dc, loaded_bb);
 	DC_FP_END();
+
 	return true;
 }
 

@@ -91,9 +91,7 @@ void __drm_printfn_err(struct drm_printer *p, struct va_format *vaf);
 __printf(2, 3)
 void drm_printf(struct drm_printer *p, const char *f, ...);
 void drm_puts(struct drm_printer *p, const char *str);
-#ifdef CONFIG_DEBUG_FS
 void drm_print_regset32(struct drm_printer *p, struct debugfs_regset32 *regset);
-#endif
 void drm_print_bits(struct drm_printer *p, unsigned long value,
 		    const char * const bits[], unsigned int nbits);
 
@@ -339,12 +337,6 @@ void drm_dev_printk(const struct device *dev, const char *level,
 __printf(3, 4)
 void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 		 const char *format, ...);
-
-__printf(2, 3)
-void __drm_dbg(enum drm_debug_category category, const char *format, ...);
-__printf(1, 2)
-void __drm_err(const char *format, ...);
-
 #elif defined(__FreeBSD__)
 __printf(3, 4)
 void drm_dev_printk(const struct device *dev, const char *level,
@@ -352,11 +344,6 @@ void drm_dev_printk(const struct device *dev, const char *level,
 __printf(4, 5)
 void drm_dev_dbg(const struct device *dev, unsigned int category,
 		 const char *func, const char *format, ...);
-
-__printf(2, 3)
-void drm_dbg(unsigned int category, const char *format, ...);
-__printf(1, 2)
-void drm_err(const char *format, ...);
 #endif
 
 /**
@@ -453,27 +440,6 @@ void drm_err(const char *format, ...);
 
 #endif
 
-#ifdef __linux__
-#define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, category, fmt, ...)	\
-({									\
-	static DEFINE_RATELIMIT_STATE(_rs,				\
-				      DEFAULT_RATELIMIT_INTERVAL,	\
-				      DEFAULT_RATELIMIT_BURST);		\
-	if (__ratelimit(&_rs))						\
-		drm_dev_dbg(dev, category, fmt, ##__VA_ARGS__);		\
-})
-
-#elif defined(__FreeBSD__)
-#define _DRM_DEV_DEFINE_DEBUG_RATELIMITED(dev, category, fmt, ...)	\
-({									\
-	static DEFINE_RATELIMIT_STATE(_rs,				\
-				      DEFAULT_RATELIMIT_INTERVAL,	\
-				      DEFAULT_RATELIMIT_BURST);		\
-	if (__ratelimit(&_rs))						\
-		drm_dev_dbg(dev, category, __func__, fmt, 		\
-		    ##__VA_ARGS__);			  		\
-})
-#endif
 /*
  * struct drm_device based logging
  *

@@ -373,9 +373,7 @@ void intel_gt_driver_register(struct intel_gt *gt)
 {
 	intel_rps_driver_register(&gt->rps);
 
-#if defined(CONFIG_DEBUG_FS)
 	debugfs_gt_register(gt);
-#endif
 }
 
 static int intel_gt_init_scratch(struct intel_gt *gt, unsigned int size)

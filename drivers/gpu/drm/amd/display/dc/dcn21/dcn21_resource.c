@@ -1064,8 +1064,6 @@ static void patch_bounding_box(struct dc *dc, struct _vcs_dpi_soc_bounding_box_s
 {
 	int i;
 
-	// BSDFIXME: DC_FP_START removed due to a backport from 5.12
-
 	if (dc->bb_overrides.sr_exit_time_ns) {
 		for (i = 0; i < WM_SET_COUNT; i++) {
 			  dc->clk_mgr->bw_params->wm_table.entries[i].sr_exit_time_us =
@@ -1090,8 +1088,6 @@ static void patch_bounding_box(struct dc *dc, struct _vcs_dpi_soc_bounding_box_s
 				dc->bb_overrides.dram_clock_change_latency_ns / 1000.0;
 		}
 	}
-
-	// BSDFIXME: DC_FP_END removed due to a backport from 5.12
 }
 
 void dcn21_calculate_wm(
@@ -1394,7 +1390,6 @@ validate_out:
 	return out;
 }
 
-// BSDFIXME: the DC_FP change is a backport from 5.12
 /*
  * Some of the functions further below use the FPU, so we need to wrap this
  * with DC_FP_START()/DC_FP_END(). Use the same approach as for

@@ -79,14 +79,6 @@ static int i915_adjust_stolen(struct drm_i915_private *i915,
 		return -EINVAL;
 
 	/*
-	 * With stolen lmem, we don't need to check if the address range
-	 * overlaps with the non-stolen system memory range, since lmem is local
-	 * to the gpu.
-	 */
-	if (HAS_LMEM(i915))
-		return 0;
-
-	/*
 	 * TODO: We have yet too encounter the case where the GTT wasn't at the
 	 * end of stolen. With that assumption we could simplify this.
 	 */
@@ -129,6 +121,14 @@ static int i915_adjust_stolen(struct drm_i915_private *i915,
 				dsm);
 		}
 	}
+
+	/*
+	 * With stolen lmem, we don't need to check if the address range
+	 * overlaps with the non-stolen system memory range, since lmem is local
+	 * to the gpu.
+	 */
+	if (HAS_LMEM(i915))
+		return 0;
 
 #ifdef __FreeBSD__
 	(void)r;
