@@ -188,9 +188,6 @@ int drm_sysctl_init(struct drm_device *dev);
 int drm_sysctl_cleanup(struct drm_device *dev);
 #endif
 
-int drm_gem_dumb_destroy(struct drm_file *file, struct drm_device *dev,
-			 u32 handle);
-
 /* drm_debugfs.c drm_debugfs_crc.c */
 #if defined(CONFIG_DEBUG_FS)
 int drm_debugfs_init(struct drm_minor *minor, int minor_id,
