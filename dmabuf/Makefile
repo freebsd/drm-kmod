@@ -23,6 +23,7 @@ CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/bsd/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include # fallback to dummy
+CFLAGS+= -I${SYSDIR}/compat/linuxkpi/dummy/include
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= -DLINUXKPI_VERSION=51300
