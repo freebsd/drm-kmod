@@ -1072,6 +1072,7 @@ CWARNFLAGS+=	-Wno-pointer-arith -Wno-format -Wno-cast-qual
 CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
 
 # amdgpu/
+CWARNFLAGS.amdgpu_acpi.c=			-Wno-missing-prototypes -Wno-incompatible-pointer-types
 CWARNFLAGS.amdgpu_atpx_handler.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_bo_list.c=			-Wno-unused-but-set-variable -Wno-tautological-constant-out-of-range-compare
 CWARNFLAGS.amdgpu_csa.c=			-Wno-unused-but-set-variable
