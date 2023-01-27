@@ -2956,6 +2956,7 @@ static void __exit amdgpu_exit(void)
 	linux_pci_unregister_drm_driver(&amdgpu_kms_pci_driver);
 #endif
 	amdgpu_unregister_atpx_handler();
+	amdgpu_acpi_release();
 	amdgpu_sync_fini();
 	amdgpu_fence_slab_fini();
 #ifdef __linux__
