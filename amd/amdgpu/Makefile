@@ -1118,6 +1118,7 @@ CWARNFLAGS.jpeg_v4_0_3.c=			-Wno-uninitialized
 CWARNFLAGS.imu_v11_0_3.c=			-Wno-missing-prototypes
 CWARNFLAGS.kv_dpm.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.mmhub_v1_7.c=			-Wno-missing-prototypes
+CWARNFLAGS.mmhub_v1_8.c=			-Wno-unused-function
 CWARNFLAGS.nv.c=				-Wno-unused-const-variable
 CWARNFLAGS.psp_v10_0.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.psp_v11_0.c=				-Wno-missing-prototypes
