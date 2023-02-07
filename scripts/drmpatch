@@ -9,6 +9,8 @@ EOF
 	exit 1
 }
 
+trap 'printf "\a\n"' EXIT
+
 if [ $# -ne 1 ]; then
 	usage
 fi
