@@ -13,6 +13,10 @@ SRCS=	hdmi.c \
 SRCS+= aperture.c
 .endif
 
+.if !empty(KCONFIG:MVIDEO_CMDLINE)
+SRCS+=	cmdline.c
+.endif
+
 SRCS+=	bus_if.h \
 	device_if.h \
 	pci_if.h \
