@@ -419,7 +419,7 @@ execlists_context_status_change(struct i915_request *rq, unsigned long status)
 	if (!IS_ENABLED(CONFIG_DRM_I915_GVT))
 		return;
 
-#ifdef CONFIG_DRM_I915_GVT
+#ifdef __linux__
 	atomic_notifier_call_chain(&rq->engine->context_status_notifier,
 				   status, rq);
 #endif

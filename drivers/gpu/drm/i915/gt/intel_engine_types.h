@@ -436,7 +436,7 @@ struct intel_engine_cs {
 	struct intel_timeline *retire;
 	struct work_struct retire_work;
 
-#ifdef CONFIG_DRM_I915_GVT
+#ifdef __linux__
 	/* status_notifier: list of callbacks for context-switch changes */
 	struct atomic_notifier_head context_status_notifier;
 #endif

@@ -346,6 +346,7 @@ static void *i915_gem_object_map_pfn(struct drm_i915_gem_object *obj,
 	vaddr = vmap_pfn(pfns, n_pfn, pgprot_writecombine(PAGE_KERNEL_IO));
 	if (pfns != stack)
 		kvfree(pfns);
+
 	return vaddr ?: ERR_PTR(-ENOMEM);
 #endif
 }
