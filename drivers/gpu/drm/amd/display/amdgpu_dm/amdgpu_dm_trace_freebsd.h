@@ -610,12 +610,12 @@ trace_amdgpu_refresh_rate_track(int crtc_index, ktime_t refresh_rate_ns,
 /*	    TP_PROTO(bool begin, const char *function, const int line), */
 
 static inline void
-trace_dcn_fpu(bool begin, const char *function, const int line)
+trace_dcn_fpu(bool begin, const char *function, const int line, const int recursion_depth)
 {
-	CTR3(KTR_DRM,
+	CTR4(KTR_DRM,
 	    "dcn_fpu "
-	    "%s()+%d: %s",
-	    function, line, begin ? "begin" : "end");
+	    "%s: recursion_depth: %d: %s()+%d:",
+	    begin ? "begin" : "end", recursion_depth, function, line);
 }
 
 #endif /* _AMDGPU_DM_TRACE_FREEBSD_H_ */
