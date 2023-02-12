@@ -57,7 +57,7 @@ void dma_fence_chain_init(struct dma_fence_chain *chain, struct dma_fence *prev,
 MALLOC_DECLARE(M_DMABUF);
 
 static inline struct dma_fence_chain *
-dma_fence_chain_alloc()
+dma_fence_chain_alloc(void)
 {
 	return malloc(sizeof(struct dma_fence_chain), M_DMABUF, M_WAITOK | M_ZERO);
 }
