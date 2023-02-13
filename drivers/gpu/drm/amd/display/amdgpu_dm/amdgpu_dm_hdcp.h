@@ -71,7 +71,9 @@ struct hdcp_workqueue {
 	uint8_t *srm_temp;
 	uint32_t srm_version;
 	uint32_t srm_size;
+#ifdef _linux__
 	struct bin_attribute attr;
+#endif
 };
 
 void hdcp_update_display(struct hdcp_workqueue *hdcp_work,
