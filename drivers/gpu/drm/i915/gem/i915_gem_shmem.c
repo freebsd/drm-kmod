@@ -14,8 +14,8 @@
 #include "i915_scatterlist.h"
 #include "i915_trace.h"
 
-#ifdef __FreeBSD__
-static inline unsigned long totalram_pages() { return physmem; }
+#if !defined(__FreeBSD_version) || __FreeBSD_version < 1400080
+static inline unsigned long totalram_pages(void) { return physmem; }
 #endif
 
 /*
