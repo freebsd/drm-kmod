@@ -105,6 +105,8 @@ SRCS+=	dvo_ch7017.c \
 	g4x_dp.c \
 	g4x_hdmi.c \
 	hsw_ips.c \
+	i9xx_plane.c \
+	i9xx_wm.c \
 	icl_dsi.c \
 	intel_backlight.c \
 	intel_crt.c \
@@ -150,7 +152,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_vdsc.c \
 	intel_vrr.c \
 	intel_vga.c \
-	i9xx_plane.c \
+	intel_wm.c \
 	skl_scaler.c \
 	skl_universal_plane.c \
 	skl_watermark.c \
