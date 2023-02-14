@@ -8,7 +8,7 @@ KMOD=	amdgpu
 .include "../../kconfig.mk"
 .include "../../linuxkpi_version.mk"
 
-.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn10 \
 	${SRCDIR}/display/dc/dml/dcn20 \
@@ -497,7 +497,7 @@ SRCS+=	clk_mgr.c \
 	rv2_clk_mgr.c
 
 # display/dc/dcn10
-.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 SRCS+=	dcn10_cm_common.c \
 	dcn10_dpp.c \
 	dcn10_dpp_cm.c \
@@ -564,7 +564,7 @@ SRCS+=	dcn21_dccg.c \
 	dcn21_resource.c
 
 # display/dc/dcn30
-.if !empty(KCONFIG:MDRM_AMD_DC_DCN3_0*)
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 SRCS+=	dcn30_dio_link_encoder.c \
 	dcn30_clk_mgr.c \
 	dcn30_clk_mgr_smu_msg.c \
@@ -708,7 +708,7 @@ SRCS+=	rc_calc.c \
 .endif
 
 # display/dc/dml
-.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 SRCS+=	display_mode_lib.c \
 	display_mode_vba.c \
 	display_mode_vba_20.c \
@@ -864,7 +864,7 @@ SRCS+=	amdgpu_acpi.c
 .else
 .endif
 
-.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 SRCS+=	dcn_calc_auto.c \
 	dcn_calc_math.c \
 	dcn_calcs.c
