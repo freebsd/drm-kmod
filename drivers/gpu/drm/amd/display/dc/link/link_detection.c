@@ -1335,7 +1335,7 @@ static bool link_add_remote_sink_helper(struct dc_link *dc_link, struct dc_sink 
 	return true;
 }
 
-struct dc_sink *dc_link_add_remote_sink(
+struct dc_sink *link_add_remote_sink(
 		struct dc_link *link,
 		const uint8_t *edid,
 		int len,
@@ -1393,7 +1393,7 @@ fail_add_sink:
 	return NULL;
 }
 
-void dc_link_remove_remote_sink(struct dc_link *link, struct dc_sink *sink)
+void link_remove_remote_sink(struct dc_link *link, struct dc_sink *sink)
 {
 	int i;
 
