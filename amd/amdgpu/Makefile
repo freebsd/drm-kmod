@@ -413,7 +413,6 @@ SRCS+=	bw_fixed.c \
 # display/dc/core
 SRCS+=	dc_debug.c \
 	dc_hw_sequencer.c \
-	dc_link.c \
 	dc_link_exports.c \
 	dc_resource.c \
 	dc_sink.c \
