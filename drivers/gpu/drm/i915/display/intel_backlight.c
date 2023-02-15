@@ -1296,6 +1296,10 @@ static int lpt_setup_backlight(struct intel_connector *connector, enum pipe unus
 			       cpu_ctl2 & ~BLM_PWM_ENABLE);
 	}
 
+	drm_dbg_kms(&i915->drm,
+		    "[CONNECTOR:%d:%s] Using native PCH PWM for backlight control\n",
+		    connector->base.base.id, connector->base.name);
+
 	return 0;
 }
 
@@ -1322,6 +1326,10 @@ static int pch_setup_backlight(struct intel_connector *connector, enum pipe unus
 	cpu_ctl2 = intel_de_read(i915, BLC_PWM_CPU_CTL2);
 	panel->backlight.pwm_enabled = (cpu_ctl2 & BLM_PWM_ENABLE) &&
 		(pch_ctl1 & BLM_PCH_PWM_ENABLE);
+
+	drm_dbg_kms(&i915->drm,
+		    "[CONNECTOR:%d:%s] Using native PCH PWM for backlight control\n",
+		    connector->base.base.id, connector->base.name);
 
 	return 0;
 }
@@ -1361,6 +1369,10 @@ static int i9xx_setup_backlight(struct intel_connector *connector, enum pipe unu
 
 	panel->backlight.pwm_enabled = val != 0;
 
+	drm_dbg_kms(&i915->drm,
+		    "[CONNECTOR:%d:%s] Using native PWM for backlight control\n",
+		    connector->base.base.id, connector->base.name);
+
 	return 0;
 }
 
@@ -1390,6 +1402,10 @@ static int i965_setup_backlight(struct intel_connector *connector, enum pipe unu
 
 	panel->backlight.pwm_enabled = ctl2 & BLM_PWM_ENABLE;
 
+	drm_dbg_kms(&i915->drm,
+		    "[CONNECTOR:%d:%s] Using native PWM for backlight control\n",
+		    connector->base.base.id, connector->base.name);
+
 	return 0;
 }
 
@@ -1417,6 +1433,10 @@ static int vlv_setup_backlight(struct intel_connector *connector, enum pipe pipe
 	panel->backlight.pwm_level_min = get_backlight_min_vbt(connector);
 
 	panel->backlight.pwm_enabled = ctl2 & BLM_PWM_ENABLE;
+
+	drm_dbg_kms(&i915->drm,
+		    "[CONNECTOR:%d:%s] Using native PWM for backlight control (on pipe %c)\n",
+		    connector->base.base.id, connector->base.name, pipe_name(pipe));
 
 	return 0;
 }
@@ -1453,6 +1473,11 @@ bxt_setup_backlight(struct intel_connector *connector, enum pipe unused)
 	panel->backlight.pwm_level_min = get_backlight_min_vbt(connector);
 
 	panel->backlight.pwm_enabled = pwm_ctl & BXT_BLC_PWM_ENABLE;
+
+	drm_dbg_kms(&i915->drm,
+		    "[CONNECTOR:%d:%s] Using native PWM for backlight control (controller=%d)\n",
+		    connector->base.base.id, connector->base.name,
+		    panel->backlight.controller);
 
 	return 0;
 }
@@ -1516,6 +1541,11 @@ cnp_setup_backlight(struct intel_connector *connector, enum pipe unused)
 
 	panel->backlight.pwm_enabled = pwm_ctl & BXT_BLC_PWM_ENABLE;
 
+	drm_dbg_kms(&i915->drm,
+		    "[CONNECTOR:%d:%s] Using native PCH PWM for backlight control (controller=%d)\n",
+		    connector->base.base.id, connector->base.name,
+		    panel->backlight.controller);
+
 	return 0;
 }
 
@@ -1564,8 +1594,10 @@ static int ext_pwm_setup_backlight(struct intel_connector *connector,
 			NSEC_PER_SEC / get_vbt_pwm_freq(connector);
 	}
 
-	drm_info(&i915->drm, "Using %s PWM for LCD backlight control\n",
-		 desc);
+	drm_dbg_kms(&i915->drm,
+		    "[CONNECTOR:%d:%s] Using %s PWM for backlight control\n",
+		    connector->base.base.id, connector->base.name, desc);
+
 	return 0;
 }
 
