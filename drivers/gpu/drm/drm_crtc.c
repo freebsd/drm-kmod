@@ -338,6 +338,9 @@ static int __drm_crtc_init_with_planes(struct drm_device *dev, struct drm_crtc *
  * the crtc structure. The crtc structure should not be allocated with
  * devm_kzalloc().
  *
+ * The @primary and @cursor planes are only relevant for legacy uAPI, see
+ * &drm_crtc.primary and &drm_crtc.cursor.
+ *
  * Note: consider using drmm_crtc_alloc_with_planes() instead of
  * drm_crtc_init_with_planes() to let the DRM managed resource infrastructure
  * take care of cleanup and deallocation.

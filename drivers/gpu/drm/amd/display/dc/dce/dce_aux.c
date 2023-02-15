@@ -715,11 +715,6 @@ bool dce_aux_transfer_with_retries(struct ddc_service *ddc,
 		aux110 = FROM_AUX_ENGINE(aux_engine);
 	}
 
-	if (ddc_pin) {
-		aux_engine = ddc->ctx->dc->res_pool->engines[ddc_pin->pin_data->en];
-		aux110 = FROM_AUX_ENGINE(aux_engine);
-	}
-
 	if (!payload->reply) {
 		payload_reply = false;
 		payload->reply = &reply;

@@ -21,7 +21,9 @@
  *
  */
 #include <asm/div64.h>
+#ifdef __FreeBSD__
 #undef MAX
+#endif
 
 #define SHIFT_AMOUNT 16 /* We multiply all original integers with 2^SHIFT_AMOUNT to get the fInt representation */
 

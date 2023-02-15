@@ -3704,7 +3704,6 @@ static bool init_soc_bounding_box(struct dc *dc,
 			clock_limits_available = (status == PP_SMU_RESULT_OK);
 		}
 
-		// DC_FP_START/DC_FP_END additions are backport from 5.16 (bc39a69a2ac4)
 		if (clock_limits_available && uclk_states_available && num_states) {
 			DC_FP_START();
 			dcn20_update_bounding_box(dc, loaded_bb, &max_clocks, uclk_states, num_states);
@@ -3721,11 +3720,9 @@ static bool init_soc_bounding_box(struct dc *dc,
 	DC_FP_START();
 	dcn20_patch_bounding_box(dc, loaded_bb);
 	DC_FP_END();
-
 	return true;
 }
 
-// DC_FP_START/DC_FP_END removals are backport from 5.16 (bc39a69a2ac4)
 static bool dcn20_resource_construct(
 	uint8_t num_virtual_links,
 	struct dc *dc,

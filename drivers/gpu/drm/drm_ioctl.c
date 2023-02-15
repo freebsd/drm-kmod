@@ -535,10 +535,8 @@ int drm_version(struct drm_device *dev, void *data,
 static int drm_ioctl_permit(u32 flags, struct drm_file *file_priv)
 {
 	/* ROOT_ONLY is only for CAP_SYS_ADMIN */
-	if (unlikely((flags & DRM_ROOT_ONLY) && !capable(CAP_SYS_ADMIN))) {
-		DRM_DEBUG("(unlikely((flags & DRM_ROOT_ONLY) && !capable(CAP_SYS_ADMIN)))");
+	if (unlikely((flags & DRM_ROOT_ONLY) && !capable(CAP_SYS_ADMIN)))
 		return -EACCES;
-	}
 
 	/* AUTH is only for authenticated or render client */
 	if (unlikely((flags & DRM_AUTH) && !drm_is_render_client(file_priv) &&
@@ -552,11 +550,9 @@ static int drm_ioctl_permit(u32 flags, struct drm_file *file_priv)
 
 	/* Render clients must be explicitly allowed */
 	if (unlikely(!(flags & DRM_RENDER_ALLOW) &&
-		     drm_is_render_client(file_priv))) {
-		DRM_DEBUG("unlikely(!(flags & DRM_RENDER_ALLOW) && "
-		     "drm_is_render_client(file_priv)))");
+		     drm_is_render_client(file_priv)))
 		return -EACCES;
-	}
+
 	return 0;
 }
 

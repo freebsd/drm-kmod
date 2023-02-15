@@ -9,18 +9,13 @@
 #include <linux/dma-resv.h>
 #include <linux/module.h>
 
+#include <asm/smp.h>
+
 #include "i915_drv.h"
 #include "i915_gem_object.h"
 #include "i915_scatterlist.h"
 
 MODULE_IMPORT_NS(DMA_BUF);
-
-#if defined(CONFIG_X86)
-#include <asm/smp.h>
-#else
-#define wbinvd_on_all_cpus() \
-	pr_warn(DRIVER_NAME ": Missing cache flush in %s\n", __func__)
-#endif
 
 I915_SELFTEST_DECLARE(static bool force_different_devices;)
 
