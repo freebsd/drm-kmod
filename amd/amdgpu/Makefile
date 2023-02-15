@@ -1100,6 +1100,7 @@ CWARNFLAGS.umc_v6_7.c=				-Wno-unused-function
 CWARNFLAGS.vangogh_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.vcn_sw_ring.c=			-Wno-missing-prototypes
 CWARNFLAGS.vcn_v3_0.c=				-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.vcn_v4_0.c=				-Wno-unused-but-set-variable
 
 # display/amdgpu_dm
 CWARNFLAGS.amdgpu_dm_helpers.c=		-Wno-int-in-bool-context
