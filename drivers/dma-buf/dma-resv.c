@@ -369,8 +369,10 @@ static void dma_resv_iter_restart_unlocked(struct dma_resv_iter *cursor)
 	 * for write may be blocked. In that case reader thread should
 	 * be blocked too.
 	 */
+	rcu_read_unlock();
 	rw_rlock(&cursor->obj->rw);
 	rw_runlock(&cursor->obj->rw);
+	rcu_read_lock();
 #endif
 }
 
