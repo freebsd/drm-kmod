@@ -1290,6 +1290,7 @@ CWARNFLAGS.link_dp_capability.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.link_dp_dpia_bw.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.link_dp_trace.c=		-Wno-missing-prototypes
 CWARNFLAGS.link_dp_training.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.link_validation.c=		-Wno-missing-prototypes
 CWARNFLAGS.power_helpers.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes
