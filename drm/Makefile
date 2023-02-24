@@ -58,6 +58,7 @@ SRCS=	drm_atomic.c \
 	drm_property.c \
 	drm_rect.c \
 	drm_self_refresh_helper.c \
+	drm_suballoc.c \
 	drm_syncobj.c \
 	drm_sysctl_freebsd.c \
 	drm_sysfs.c \
