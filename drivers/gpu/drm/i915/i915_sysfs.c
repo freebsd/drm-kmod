@@ -37,7 +37,6 @@
 
 #include "i915_drv.h"
 #include "i915_sysfs.h"
-#include "intel_pm.h"
 
 #ifdef __FreeBSD__
 /* TODO: Move to base (when refactoring sysfs.h to sysfs.c) */
