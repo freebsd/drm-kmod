@@ -918,6 +918,7 @@ SRCS+=	amd_powerplay.c \
 	smu_v13_0_0_ppt.c \
 	smu_v13_0_4_ppt.c \
 	smu_v13_0_5_ppt.c \
+	smu_v13_0_6_ppt.c \
 	smu_v13_0_7_ppt.c \
 	smu_helper.c \
 	smumgr.c \
@@ -1333,6 +1334,7 @@ CWARNFLAGS.smu7_hwmgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu8_hwmgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu9_smumgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu_cmn.c=			-Wno-implicit-function-declaration -Wno-sometimes-uninitialized
+CWARNFLAGS.smu_v13_0_6_ppt.c=		-Wno-uninitialized
 CWARNFLAGS.tonga_smumgr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.vega10_hwmgr.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.vega10_processpptables.c=	-Wno-missing-prototypes
