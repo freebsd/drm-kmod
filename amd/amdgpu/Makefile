@@ -196,6 +196,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_lsdma.c \
 	amdgpu_mca.c \
 	amdgpu_mes.c \
+	amdgpu_mmhub.c \
 	amdgpu_nbio.c \
 	amdgpu_object.c \
 	amdgpu_pll.c \
