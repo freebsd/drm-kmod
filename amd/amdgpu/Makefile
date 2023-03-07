@@ -362,6 +362,7 @@ SRCS+=	amdgpu_aca.c \
 	hdp_v5_0.c \
 	hdp_v5_2.c \
 	hdp_v6_0.c \
+	hdp_v7_0.c \
 	aldebaran_reg_init.c \
 	aldebaran.c \
 	iceland_ih.c \
