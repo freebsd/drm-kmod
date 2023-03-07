@@ -3814,10 +3814,6 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 		}
 	}
 
-#ifdef __linux__
-	pci_enable_pcie_error_reporting(adev->pdev);
-#endif
-
 	/* Post card if necessary */
 	if (amdgpu_device_need_post(adev)) {
 		if (!adev->bios) {
