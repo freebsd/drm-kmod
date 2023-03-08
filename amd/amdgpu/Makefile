@@ -380,6 +380,7 @@ SRCS+=	amdgpu_aca.c \
 	kv_smc.c \
 	legacy_dpm.c \
 	lsdma_v6_0.c \
+	lsdma_v7_0.c \
 	mca_v3_0.c \
 	mes_v10_1.c \
 	mes_v11_0.c \
