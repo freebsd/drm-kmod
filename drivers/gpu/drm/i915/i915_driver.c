@@ -537,7 +537,7 @@ static int i915_driver_hw_probe(struct drm_i915_private *dev_priv)
 
 	ret = i915_pcode_init(dev_priv);
 	if (ret)
-		goto err_msi;
+		goto err_opregion;
 
 	/*
 	 * Fill the dram structure to get the system dram info. This will be
@@ -560,6 +560,8 @@ static int i915_driver_hw_probe(struct drm_i915_private *dev_priv)
 
 	return 0;
 
+err_opregion:
+	intel_opregion_cleanup(dev_priv);
 err_msi:
 	if (pdev->msi_enabled)
 		pci_disable_msi(pdev);
@@ -586,6 +588,8 @@ static void i915_driver_hw_remove(struct drm_i915_private *dev_priv)
 #endif
 
 	i915_perf_fini(dev_priv);
+
+	intel_opregion_cleanup(dev_priv);
 
 	if (pdev->msi_enabled)
 		pci_disable_msi(pdev);
