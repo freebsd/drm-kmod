@@ -403,6 +403,7 @@ SRCS+=	amdgpu_aca.c \
 	mxgpu_ai.c \
 	mxgpu_nv.c \
 	mxgpu_vi.c \
+	nbif_v6_3_1.c \
 	nbio_v2_3.c \
 	nbio_v4_3.c \
 	nbio_v6_1.c \
