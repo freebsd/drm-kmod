@@ -313,6 +313,7 @@ SRCS+=	amdgpu_aca.c \
 	athub_v2_0.c \
 	athub_v2_1.c \
 	athub_v3_0.c \
+	athub_v4_1_0.c \
 	atom.c \
 	atombios_crtc.c \
 	atombios_dp.c \
