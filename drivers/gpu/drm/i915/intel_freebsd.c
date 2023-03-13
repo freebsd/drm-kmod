@@ -158,15 +158,3 @@ linux_intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
 
 	intel_gtt_read_pte(pg_start + i - 1);
 }
-
-#if defined(__amd64__)
-static void
-intel_freebsd_init(void *arg __unused)
-{
-	/* Defined in $SYSDIR/x86/pci/pci_early_quirks.c */
-	intel_graphics_stolen_res = (struct linux_resource)
-		DEFINE_RES_MEM(intel_graphics_stolen_base,
-		    intel_graphics_stolen_size);
-}
-SYSINIT(intel_freebsd, SI_SUB_DRIVERS, SI_ORDER_ANY, intel_freebsd_init, NULL);
-#endif

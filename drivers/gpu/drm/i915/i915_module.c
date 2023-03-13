@@ -80,6 +80,17 @@ static int __init i915_init(void)
 {
 	int err, i;
 
+#ifdef __FreeBSD__
+#if defined(__amd64__)
+	intel_graphics_stolen_res = (struct linux_resource)
+		DEFINE_RES_MEM(intel_graphics_stolen_base,
+		    intel_graphics_stolen_size);
+	DRM_INFO("Got Intel graphics stolen memory base 0x%x, size 0x%x\n",
+	    intel_graphics_stolen_res.start,
+	    resource_size(&intel_graphics_stolen_res));
+#endif
+#endif
+
 	for (i = 0; i < ARRAY_SIZE(init_funcs); i++) {
 		err = init_funcs[i].init();
 		if (err < 0) {
