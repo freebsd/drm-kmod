@@ -410,12 +410,6 @@ static int i915_gem_init_stolen(struct intel_memory_region *mem)
 		return 0;
 	}
 
-#ifdef __FreeBSD__
-	DRM_INFO("Got stolen memory base 0x%x, size 0x%x\n",
-	    intel_graphics_stolen_res.start,
-	    resource_size(&intel_graphics_stolen_res));
-#endif
-
 	if (resource_size(&mem->region) == 0)
 		return 0;
 
