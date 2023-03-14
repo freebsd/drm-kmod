@@ -971,7 +971,12 @@ static int amdgpu_debugfs_gem_info_show(struct seq_file *m, void *unused)
 		 * Therefore, we need to protect this ->comm access using RCU.
 		 */
 		rcu_read_lock();
+#ifdef __linux__
+		task = pid_task(file->pid, PIDTYPE_TGID);
+#elif defined(__FreeBSD__)
+		// BSDFIXME: No PIDTYPE_TGID support.
 		task = pid_task(file->pid, PIDTYPE_PID);
+#endif
 		seq_printf(m, "pid %8d command %s:\n", pid_nr(file->pid),
 			   task ? task->comm : "<unknown>");
 		rcu_read_unlock();
