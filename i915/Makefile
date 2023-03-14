@@ -147,6 +147,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_pps.c \
 	intel_qp_tables.c \
 	intel_sdvo.c \
+	intel_sprite_uapi.c \
 	intel_tc.c \
 	intel_tv.c \
 	intel_vblank.c \
