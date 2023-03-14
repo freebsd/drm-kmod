@@ -156,7 +156,12 @@ struct drm_file *drm_file_alloc(struct drm_minor *minor)
 	if (!file)
 		return ERR_PTR(-ENOMEM);
 
+#ifdef __linux__
+	file->pid = get_pid(task_tgid(current));
+#elif defined(__FreeBSD__)
+	// BSDFIXME: No task_tgid() support.
 	file->pid = get_pid(task_pid(current));
+#endif
 	file->minor = minor;
 
 	/* for compatibility root is always authenticated */
