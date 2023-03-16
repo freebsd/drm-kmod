@@ -23,6 +23,7 @@
 #include "intel_display_power_well.h"
 #include "intel_display_types.h"
 #include "intel_hdcp.h"
+#include "intel_hdcp_gsc.h"
 #include "intel_hdcp_regs.h"
 #include "intel_pcode.h"
 
@@ -203,13 +204,20 @@ bool intel_hdcp2_capable(struct intel_connector *connector)
 	struct intel_digital_port *dig_port = intel_attached_dig_port(connector);
 	struct drm_i915_private *dev_priv = to_i915(connector->base.dev);
 	struct intel_hdcp *hdcp = &connector->hdcp;
+	struct intel_gt *gt = dev_priv->media_gt;
+	struct intel_gsc_uc *gsc = &gt->uc.gsc;
 	bool capable = false;
 
 	/* I915 support for HDCP2.2 */
 	if (!hdcp->hdcp2_supported)
 		return false;
 
-	/* MEI interface is solid */
+	/* If MTL+ make sure gsc is loaded and proxy is setup */
+	if (intel_hdcp_gsc_cs_required(dev_priv))
+		if (!intel_uc_fw_is_running(&gsc->fw))
+			return false;
+
+	/* MEI/GSC interface is solid depending on which is used */
 	mutex_lock(&dev_priv->display.hdcp.comp_mutex);
 	if (!dev_priv->display.hdcp.comp_added ||  !dev_priv->display.hdcp.master) {
 		mutex_unlock(&dev_priv->display.hdcp.comp_mutex);
@@ -2235,6 +2243,9 @@ static int initialize_hdcp_port_data(struct intel_connector *connector,
 
 static bool is_hdcp2_supported(struct drm_i915_private *dev_priv)
 {
+	if (intel_hdcp_gsc_cs_required(dev_priv))
+		return true;
+
 	if (!IS_ENABLED(CONFIG_INTEL_MEI_HDCP))
 		return false;
 
@@ -2246,9 +2257,7 @@ static bool is_hdcp2_supported(struct drm_i915_private *dev_priv)
 
 void intel_hdcp_component_init(struct drm_i915_private *dev_priv)
 {
-#ifdef __linux__
 	int ret;
-#endif
 
 	if (!is_hdcp2_supported(dev_priv))
 		return;
@@ -2258,18 +2267,24 @@ void intel_hdcp_component_init(struct drm_i915_private *dev_priv)
 
 	dev_priv->display.hdcp.comp_added = true;
 	mutex_unlock(&dev_priv->display.hdcp.comp_mutex);
+	if (intel_hdcp_gsc_cs_required(dev_priv))
+		ret = intel_hdcp_gsc_init(dev_priv);
+	else
 #ifdef __linux__
-	ret = component_add_typed(dev_priv->drm.dev, &i915_hdcp_ops,
-				  I915_COMPONENT_HDCP);
+		ret = component_add_typed(dev_priv->drm.dev, &i915_hdcp_ops,
+					  I915_COMPONENT_HDCP);
+#elif defined(__FreeBSD__)
+		ret = -ENOTSUP;
+#endif
+
 	if (ret < 0) {
-		drm_dbg_kms(&dev_priv->drm, "Failed at component add(%d)\n",
+		drm_dbg_kms(&dev_priv->drm, "Failed at fw component add(%d)\n",
 			    ret);
 		mutex_lock(&dev_priv->display.hdcp.comp_mutex);
 		dev_priv->display.hdcp.comp_added = false;
 		mutex_unlock(&dev_priv->display.hdcp.comp_mutex);
 		return;
 	}
-#endif
 }
 
 static void intel_hdcp2_init(struct intel_connector *connector,
@@ -2490,8 +2505,11 @@ void intel_hdcp_component_fini(struct drm_i915_private *dev_priv)
 	dev_priv->display.hdcp.comp_added = false;
 	mutex_unlock(&dev_priv->display.hdcp.comp_mutex);
 
+	if (intel_hdcp_gsc_cs_required(dev_priv))
+		intel_hdcp_gsc_fini(dev_priv);
 #ifdef __linux__
-	component_del(dev_priv->drm.dev, &i915_hdcp_ops);
+	else
+		component_del(dev_priv->drm.dev, &i915_hdcp_ops);
 #endif
 }
 
