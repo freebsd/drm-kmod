@@ -220,6 +220,7 @@ SRCS+=	gen2_engine_cs.c \
 # gt/uc*
 SRCS+=	intel_gsc_fw.c \
 	intel_gsc_uc.c \
+	intel_gsc_uc_heci_cmd_submit.c \
 	intel_guc.c \
 	intel_guc_ads.c \
 	intel_guc_capture.c \
