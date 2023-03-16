@@ -1,31 +1,31 @@
 /* Public domain. */
 
-#ifndef _I915_MEI_HDCP_INTERFACE_H_
-#define _I915_MEI_HDCP_INTERFACE_H_
+#ifndef _I915_HDCP_INTERFACE_H_
+#define _I915_HDCP_INTERFACE_H_
 
 #include <drm/display/drm_hdcp.h>
 
-enum mei_fw_ddi {
-	MEI_DDI_INVALID_PORT = 0x0,
+enum hdcp_ddi {
+	HDCP_DDI_INVALID_PORT = 0x0,
 
-	MEI_DDI_B = 1,
-	MEI_DDI_C,
-	MEI_DDI_D,
-	MEI_DDI_E,
-	MEI_DDI_F,
-	MEI_DDI_A = 7,
-	MEI_DDI_RANGE_END = MEI_DDI_A,
+	HDCP_DDI_B = 1,
+	HDCP_DDI_C,
+	HDCP_DDI_D,
+	HDCP_DDI_E,
+	HDCP_DDI_F,
+	HDCP_DDI_A = 7,
+	HDCP_DDI_RANGE_END = HDCP_DDI_A,
 };
 
-enum mei_fw_tc {
-	MEI_INVALID_TRANSCODER = 0x00,
-	MEI_TRANSCODER_EDP,
-	MEI_TRANSCODER_DSI0,
-	MEI_TRANSCODER_DSI1,
-	MEI_TRANSCODER_A = 0x10,
-	MEI_TRANSCODER_B,
-	MEI_TRANSCODER_C,
-	MEI_TRANSCODER_D
+enum hdcp_transcoder {
+	HDCP_INVALID_TRANSCODER = 0x00,
+	HDCP_TRANSCODER_EDP,
+	HDCP_TRANSCODER_DSI0,
+	HDCP_TRANSCODER_DSI1,
+	HDCP_TRANSCODER_A = 0x10,
+	HDCP_TRANSCODER_B,
+	HDCP_TRANSCODER_C,
+	HDCP_TRANSCODER_D
 };
 
 enum hdcp_wired_protocol {
@@ -42,8 +42,8 @@ enum hdcp_port_type {
 };
 
 struct hdcp_port_data {
-	enum mei_fw_ddi fw_ddi;
-	enum mei_fw_tc fw_tc;
+	enum hdcp_ddi hdcp_ddi;
+	enum hdcp_transcoder hdcp_transcoder;
 	struct hdcp2_streamid_type *streams;
 	u8 port_type;
 	u8 protocol;
@@ -51,7 +51,7 @@ struct hdcp_port_data {
 	uint16_t k;
 };
 
-struct i915_hdcp_component_ops {
+struct i915_hdcp_ops {
 	int (*initiate_hdcp2_session)(struct device *, struct hdcp_port_data *,
 	    struct hdcp2_ake_init *);
 	int (*verify_receiver_cert_prepare_km)(struct device *,
@@ -77,9 +77,9 @@ struct i915_hdcp_component_ops {
 	int (*close_hdcp_session)(struct device *, struct hdcp_port_data *);
 };
 
-struct i915_hdcp_comp_master {
-	void *mei_dev;
-	const struct i915_hdcp_component_ops *ops;
+struct i915_hdcp_master {
+	void *hdcp_dev;
+	const struct i915_hdcp_ops *ops;
 };
 
 #endif
