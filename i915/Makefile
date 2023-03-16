@@ -368,7 +368,6 @@ CWARNFLAGS.intel_gmch.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_gt_mcr.c=	-Wno-tautological-constant-out-of-range-compare
 CWARNFLAGS.intel_guc_capture.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_guc_submission.c=	-Wno-unused-function
-CWARNFLAGS.intel_hdcp_gsc.c=	-Wno-unused-function
 CWARNFLAGS.intel_hdmi.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_hotplug.c=	-Wno-uninitialized
 CWARNFLAGS.intel_pm.c=		-Wno-incompatible-pointer-types-discards-qualifiers
