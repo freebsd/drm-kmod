@@ -56,7 +56,7 @@ SRCS=	atom.c \
 	radeon_dp_auxch.c \
 	radeon_drv.c \
 	radeon_encoders.c \
-	radeon_fb.c \
+	radeon_fbdev.c \
 	radeon_fence.c \
 	radeon_freebsd.c \
 	radeon_gart.c \
