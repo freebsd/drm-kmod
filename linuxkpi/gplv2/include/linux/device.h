@@ -3,6 +3,8 @@
 
 #include_next <linux/device.h>
 
+#if __FreeBSD_version < 1400085
+
 /* allows to add/remove a custom action to devres stack */
 int devm_add_action(struct device *dev, void (*action)(void *), void *data);
 
@@ -17,5 +19,6 @@ static inline int devm_add_action_or_reset(struct device *dev,
 
 	return ret;
 }
+#endif
 
 #endif	/* _LINUX_DEVICE_H_ */

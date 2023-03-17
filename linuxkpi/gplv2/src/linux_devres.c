@@ -1,3 +1,6 @@
+#include <sys/param.h>
+
+#if __FreeBSD_version < 1400085
 #include <linux/device.h>
 
 /*
@@ -42,3 +45,4 @@ int devm_add_action(struct device *dev, void (*action)(void *), void *data)
 	return 0;
 }
 EXPORT_SYMBOL_GPL(devm_add_action);
+#endif
