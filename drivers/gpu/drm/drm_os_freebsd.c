@@ -212,6 +212,9 @@ MODULE_DEPEND(drmn, pci, 1, 1, 1);
 MODULE_DEPEND(drmn, mem, 1, 1, 1);
 MODULE_DEPEND(drmn, linuxkpi, 1, 1, 1);
 MODULE_DEPEND(drmn, linuxkpi_gplv2, 1, 1, 1);
+#if __FreeBSD_version >= 1400085
+MODULE_DEPEND(drmn, linuxkpi_hdmi, 1, 1, 1);
+#endif
 MODULE_DEPEND(drmn, dmabuf, 1, 1, 1);
 #ifdef CONFIG_DEBUG_FS
 MODULE_DEPEND(drmn, lindebugfs, 1, 1, 1);

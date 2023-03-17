@@ -24,6 +24,8 @@
 
 #include <sys/param.h>
 
+#if __FreeBSD_version < 1400085
+
 #include <linux/bitops.h>
 #include <linux/bug.h>
 #include <linux/errno.h>
@@ -1912,3 +1914,4 @@ int hdmi_infoframe_unpack(union hdmi_infoframe *frame,
 	return ret;
 }
 EXPORT_SYMBOL(hdmi_infoframe_unpack);
+#endif

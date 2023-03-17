@@ -35,3 +35,6 @@ MODULE_DEPEND(linuxkpi_gplv2, backlight, 1, 1, 1);
 MODULE_DEPEND(linuxkpi_gplv2, dmabuf, 1, 1, 1);
 MODULE_DEPEND(linuxkpi_gplv2, firmware, 1, 1, 1);
 MODULE_DEPEND(linuxkpi_gplv2, linuxkpi, 1, 1, 1);
+#if __FreeBSD_version >= 1400085
+MODULE_DEPEND(linuxkpi_gplv2, linuxkpi_hdmi, 1, 1, 1);
+#endif
