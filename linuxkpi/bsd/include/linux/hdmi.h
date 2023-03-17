@@ -1,3 +1,7 @@
+#include <sys/param.h>
+#if __FreeBSD_version >= 1400085
+#include_next <linux/hdmi.h>
+#else
 /*
  * Copyright (C) 2012 Avionic Design GmbH
  *
@@ -439,3 +443,4 @@ void hdmi_infoframe_log(const char *level, struct device *dev,
 			const union hdmi_infoframe *frame);
 
 #endif /* _DRM_HDMI_H */
+#endif
