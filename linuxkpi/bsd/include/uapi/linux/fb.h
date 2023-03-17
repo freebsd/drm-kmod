@@ -190,6 +190,9 @@ struct fb_image {
 	uint8_t  depth;
 	const char *data;
 	struct fb_cmap cmap;
+#ifdef __FreeBSD__
+	const char *mask;
+#endif
 };
 
 struct fbcurpos {

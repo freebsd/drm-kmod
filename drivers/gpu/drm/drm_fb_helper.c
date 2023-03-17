@@ -692,6 +692,13 @@ static void drm_fb_helper_damage(struct fb_info *info, u32 x, u32 y,
 	clip->y2 = max_t(u32, clip->y2, y + height);
 	spin_unlock_irqrestore(&helper->damage_lock, flags);
 
+#ifdef __FreeBSD__
+	if (kdb_active || KERNEL_PANICKED()) {
+		drm_fb_helper_damage_work(&helper->damage_work);
+		return;
+	}
+#endif
+
 	schedule_work(&helper->damage_work);
 }
 
@@ -1884,9 +1891,7 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
 		info->flags |= FBINFO_HIDE_SMEM_START;
 
 #ifdef __FreeBSD__
-	struct vt_kms_softc *sc = (struct vt_kms_softc *)info->fbio.fb_priv;
-	if (sc)
-		sc->fb_helper = fb_helper;
+	info->fbio.fb_priv = fb_helper;
 #endif
 
 	/* Need to drop locks to avoid recursive deadlock in

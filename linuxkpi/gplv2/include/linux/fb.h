@@ -144,6 +144,7 @@ struct linux_fb_info {
 #ifdef __FreeBSD__
 	struct fb_info fbio;
 	device_t fb_bsddev;
+	struct task fb_mode_task;
 #endif
 } __aligned(sizeof(long));
 
