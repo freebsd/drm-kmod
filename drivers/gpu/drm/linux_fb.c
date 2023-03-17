@@ -39,7 +39,7 @@ __FBSDID("$FreeBSD$");
 #include <sys/fbio.h>
 
 #include <dev/vt/vt.h>
-#include <dev/vt/hw/fb/vt_fb.h>
+#include "vt_drmfb.h"
 
 #include <drm/drm_fb_helper.h>
 #include <linux/fb.h>
@@ -67,7 +67,8 @@ vt_freeze_main_vd(struct apertures_struct *a)
 	    (strcmp(main_vd->vd_driver->vd_name, "efifb") == 0
 	    || strcmp(main_vd->vd_driver->vd_name, "vbefb") == 0
 	    || strcmp(main_vd->vd_driver->vd_name, "ofwfb") == 0
-	    || strcmp(main_vd->vd_driver->vd_name, "fb") == 0)) {
+	    || strcmp(main_vd->vd_driver->vd_name, "fb") == 0
+	    || strcmp(main_vd->vd_driver->vd_name, "drmfb") == 0)) {
 		fb = main_vd->vd_softc;
 
 		for (i = 0; i < a->count; i++) {
@@ -95,6 +96,17 @@ vt_unfreeze_main_vd(void)
 	fb->fb_flags &= ~FB_FLAG_NOWRITE;
 }
 
+/* Call restore out of vt(9) locks. */
+static void
+vt_restore_fbdev_mode(void *arg, int pending)
+{
+	struct linux_fb_info *info;
+
+	info = (struct linux_fb_info *)arg;
+	linux_set_current(curthread);
+	info->fbops->fb_set_par(info);
+}
+
 void
 fb_info_print(struct fb_info *t)
 {
@@ -114,14 +126,9 @@ struct linux_fb_info *
 framebuffer_alloc(size_t size, struct device *dev)
 {
 	struct linux_fb_info *info;
-	struct vt_kms_softc *sc;
 
 	info = malloc(sizeof(*info) + size, LKPI_FB_MEM, M_WAITOK | M_ZERO);
-	sc = malloc(sizeof(*sc), LKPI_FB_MEM, M_WAITOK | M_ZERO);
-	TASK_INIT(&sc->fb_mode_task, 0, vt_restore_fbdev_mode, sc);
-
-	info->fbio.fb_priv = sc;
-	info->fbio.enter = &vt_kms_postswitch;
+	TASK_INIT(&info->fb_mode_task, 0, vt_restore_fbdev_mode, info);
 
 	if (size)
 		info->par = info + 1;
@@ -134,14 +141,9 @@ framebuffer_alloc(size_t size, struct device *dev)
 void
 framebuffer_release(struct linux_fb_info *info)
 {
-	struct vt_kms_softc *sc;
-
 	if (info == NULL)
 		return;
-	if (info->fbio.fb_priv)
-		sc = info->fbio.fb_priv;
 	kfree(info->apertures);
-	free(info->fbio.fb_priv, LKPI_FB_MEM);
 	free(info, LKPI_FB_MEM);
 }
 
@@ -194,8 +196,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	int i, err;
 	struct drm_fb_helper *fb_helper;
 
-	fb_helper =
-	    ((struct vt_kms_softc *)fb_info->fbio.fb_priv)->fb_helper;
+	fb_helper = (struct drm_fb_helper *)fb_info->fbio.fb_priv;
 	fb_info->fb_bsddev = fb_helper->dev->dev->bsddev;
 	fb_info->fbio.fb_video_dev = device_get_parent(fb_info->fb_bsddev);
 	fb_info->fbio.fb_name = device_get_nameunit(fb_info->fb_bsddev);
@@ -214,14 +215,14 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	fb_info->fbio.fb_fbd_dev = device_add_child(fb_info->fb_bsddev, "fbd",
 				device_get_unit(fb_info->fb_bsddev));
 
-	/* tell vt_fb to initialize color map */
+	/* tell vt_drmfb to initialize color map */
 	fb_info->fbio.fb_cmsize = 0;
 	if (fb_info->fbio.fb_bpp == 0) {
 		device_printf(fb_info->fbio.fb_fbd_dev,
 		    "fb_bpp not set, setting to 8\n");
 		fb_info->fbio.fb_bpp = 32;
 	}
-	if ((err = vt_fb_attach(&fb_info->fbio)) != 0) {
+	if ((err = vt_drmfb_attach(&fb_info->fbio)) != 0) {
 		switch (err) {
 		case EEXIST:
 			device_printf(fb_info->fbio.fb_fbd_dev,
@@ -262,7 +263,7 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 		mtx_unlock(&Giant);
 		fb_info->fbio.fb_fbd_dev = NULL;
 	}
-	vt_fb_detach(&fb_info->fbio);
+	vt_drmfb_detach(&fb_info->fbio);
 
 	if (fb_info->fbops->fb_destroy)
 		fb_info->fbops->fb_destroy(fb_info);
@@ -312,40 +313,179 @@ linux_fb_get_options(const char *connector_name, char **option)
 	return (*option != NULL ? 0 : -ENOENT);
 }
 
+/*
+ * Routines to write to the framebuffer. They are used to implement Linux'
+ * fbdev equivalent functions below.
+ *
+ * Copied from `sys/dev/vt/hw/fb/vt_fb.c`.
+ */
+
+static void
+fb_mem_wr1(struct linux_fb_info *info, uint32_t offset, uint8_t value)
+{
+	KASSERT(
+	    (offset < info->screen_size),
+	    ("Offset %#08x out of framebuffer size", offset));
+	*(uint8_t *)(info->screen_base + offset) = value;
+}
+
+static void
+fb_mem_wr2(struct linux_fb_info *info, uint32_t offset, uint16_t value)
+{
+	KASSERT(
+	    (offset < info->screen_size),
+	    ("Offset %#08x out of framebuffer size", offset));
+	*(uint16_t *)(info->screen_base + offset) = value;
+}
+
+static void
+fb_mem_wr4(struct linux_fb_info *info, uint32_t offset, uint32_t value)
+{
+	KASSERT(
+	    (offset < info->screen_size),
+	    ("Offset %#08x out of framebuffer size", offset));
+	*(uint32_t *)(info->screen_base + offset) = value;
+}
+
+static void
+fb_setpixel(struct linux_fb_info *info, uint32_t x, uint32_t y,
+    uint32_t color)
+{
+	uint32_t bytes_per_pixel;
+	unsigned int offset;
+
+	bytes_per_pixel = info->var.bits_per_pixel / 8;
+	offset = info->fix.line_length * y + x * bytes_per_pixel;
+
+	KASSERT((info->screen_base != 0), ("Unmapped framebuffer"));
+
+	switch (bytes_per_pixel) {
+	case 1:
+		fb_mem_wr1(info, offset, color);
+		break;
+	case 2:
+		fb_mem_wr2(info, offset, color);
+		break;
+	case 3:
+		fb_mem_wr1(info, offset, (color >> 16) & 0xff);
+		fb_mem_wr1(info, offset + 1, (color >> 8) & 0xff);
+		fb_mem_wr1(info, offset + 2, color & 0xff);
+		break;
+	case 4:
+		fb_mem_wr4(info, offset, color);
+		break;
+	default:
+		/* panic? */
+		return;
+	}
+}
+
 void
 cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
 {
+	uint32_t x, y;
+
+	if (info->fbio.fb_flags & FB_FLAG_NOWRITE)
+		return;
+
+	KASSERT(
+	    (rect->rop == ROP_COPY),
+	    ("`rect->rop=%u` is unsupported in cfb_fillrect()", rect->rop));
+
+	for (y = rect->dy; y < rect->dy + rect->height; ++y) {
+		for (x = rect->dx; x < rect->dx + rect->width; ++x) {
+			fb_setpixel(info, x, y, rect->color);
+		}
+	}
 }
 
 void
 cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area)
 {
+	panic("cfb_copyarea() not implemented");
 }
 
 void
 cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 {
+	uint32_t x, y, width, height, xi, yi;
+	uint32_t bytes_per_img_line, bit, byte, color;
+
+	if (info->fbio.fb_flags & FB_FLAG_NOWRITE)
+		return;
+
+	KASSERT(
+	    (image->depth == 1),
+	    ("`image->depth=%u` is unsupported in cfb_imageblit()",
+	     image->depth));
+
+	bytes_per_img_line = (image->width + 7) / 8;
+
+	x = image->dx;
+	y = image->dy;
+	width = image->width;
+	height = image->height;
+
+	if (x + width > info->var.xres) {
+		if (x >= info->var.xres)
+			return;
+		width = info->var.xres - x;
+	}
+	if (y + height > info->var.yres) {
+		if (y >= info->var.yres)
+			return;
+		height = info->var.yres - y;
+	}
+
+	if (image->mask == NULL) {
+		for (yi = 0; yi < height; ++yi) {
+			for (xi = 0; xi < width; ++xi) {
+				byte = yi * bytes_per_img_line + xi / 8;
+				bit = 0x80 >> (xi % 8);
+				color = image->data[byte] & bit ?
+				    image->fg_color : image->bg_color;
+
+				fb_setpixel(info, x + xi, y + yi, color);
+			}
+		}
+	} else {
+		for (yi = 0; yi < height; ++yi) {
+			for (xi = 0; xi < width; ++xi) {
+				byte = yi * bytes_per_img_line + xi / 8;
+				bit = 0x80 >> (xi % 8);
+				if (image->mask[byte] & bit) {
+					color = image->fg_color;
+
+					fb_setpixel(info, x + xi, y + yi, color);
+				}
+			}
+		}
+	}
 }
 
 void
 sys_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
 {
+	cfb_fillrect(info, rect);
 }
 
 void
 sys_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area)
 {
+	cfb_copyarea(info, area);
 }
 
 void
 sys_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 {
+	cfb_imageblit(info, image);
 }
 
 ssize_t
 fb_sys_read(struct linux_fb_info *info, char __user *buf,
     size_t count, loff_t *ppos)
 {
+	panic("fb_sys_read() not implemented");
 	return (0);
 }
 
@@ -353,5 +493,6 @@ ssize_t
 fb_sys_write(struct linux_fb_info *info, const char __user *buf,
     size_t count, loff_t *ppos)
 {
+	panic("fb_sys_write() not implemented");
 	return (0);
 }
