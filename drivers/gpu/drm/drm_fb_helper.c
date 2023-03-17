@@ -1741,13 +1741,6 @@ static void drm_fb_helper_fill_var(struct fb_info *info,
 
 	info->var.xres = fb_width;
 	info->var.yres = fb_height;
-
-#ifdef __FreeBSD__ // fbio is BSD stuff
-	info->fbio.fb_name = device_get_nameunit(fb_helper->dev->dev->bsddev);
-	info->fbio.fb_width = fb->width;
-	info->fbio.fb_height = fb->height;
-	info->fbio.fb_depth = info->var.bits_per_pixel;
-#endif
 }
 
 /**
@@ -1891,9 +1884,6 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
 		info->flags |= FBINFO_HIDE_SMEM_START;
 
 #ifdef __FreeBSD__
-	info->fbio.fb_video_dev = device_get_parent(fb_helper->dev->dev->bsddev);
-	info->fbio.fb_bpp = bpp_sel;
-	info->fb_bsddev = fb_helper->dev->dev->bsddev;
 	struct vt_kms_softc *sc = (struct vt_kms_softc *)info->fbio.fb_priv;
 	if (sc)
 		sc->fb_helper = fb_helper;
