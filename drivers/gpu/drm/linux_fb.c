@@ -108,15 +108,16 @@ vt_restore_fbdev_mode(void *arg, int pending)
 }
 
 void
-fb_info_print(struct fb_info *t)
+fb_info_print(struct linux_fb_info *info)
 {
 	printf("start FB_INFO:\n");
-	printf("type=%d height=%d width=%d depth=%d\n",
-	       t->fb_type, t->fb_height, t->fb_width, t->fb_depth);
+	printf("height=%d width=%d depth=%d\n",
+	       info->var.yres, info->var.xres, info->var.bits_per_pixel);
 	printf("pbase=0x%lx vbase=0x%lx\n",
-	       t->fb_pbase, t->fb_vbase);
-	printf("name=%s flags=0x%x stride=%d bpp=%d\n",
-	       t->fb_name, t->fb_flags, t->fb_stride, t->fb_bpp);
+	       info->fix.smem_start, info->screen_base);
+	printf("name=%s id=%s flags=0x%x stride=%d\n",
+	       info->fbio.fb_name, info->fix.id, info->fbio.fb_flags,
+	       info->fix.line_length);
 	printf("end FB_INFO\n");
 }
 
@@ -238,7 +239,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 		}
 		return (-err);
 	}
-	fb_info_print(&fb_info->fbio);
+	fb_info_print(fb_info);
 	return 0;
 }
 
