@@ -265,15 +265,15 @@ void dma_resv_add_shared_fence(struct dma_resv *obj, struct dma_fence *fence)
 	count = fobj->shared_count;
 
 #ifdef __linux__
-	preempt_disable();
+	write_seqcount_begin(&obj->seq);
 #elif defined(__FreeBSD__)
 	/*
 	 * Under FreeBSD dma_fence_is_signaled can be blocked. Prevent readers
 	 * from spinning on seqlock in that case with blocking on rwlock.
 	 */
 	rw_wlock(&obj->rw);
+	seqc_sleepable_write_begin(&obj->seq.seqc);
 #endif
-	write_seqcount_begin(&obj->seq);
 
 	for (i = 0; i < count; ++i) {
 
@@ -293,10 +293,10 @@ replace:
 	/* pointer update must be visible before we extend the shared_count */
 	smp_store_mb(fobj->shared_count, count);
 
-	write_seqcount_end(&obj->seq);
 #ifdef __linux__
-	preempt_enable();
+	write_seqcount_end(&obj->seq);
 #elif defined(__FreeBSD__)
+	seqc_sleepable_write_end(&obj->seq.seqc);
 	rw_wunlock(&obj->rw);
 #endif
 	dma_fence_put(old);
