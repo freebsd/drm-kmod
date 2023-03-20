@@ -552,6 +552,31 @@ err_release:
 EXPORT_SYMBOL(drm_fb_helper_alloc_info);
 
 /**
+ * drm_fb_helper_release_info - release fb_info and its members
+ * @fb_helper: driver-allocated fbdev helper
+ *
+ * A helper to release fb_info and the member cmap.  Drivers do not
+ * need to release the allocated fb_info structure themselves, this is
+ * automatically done when calling drm_fb_helper_fini().
+ */
+void drm_fb_helper_release_info(struct drm_fb_helper *fb_helper)
+{
+	struct fb_info *info = fb_helper->info;
+
+	if (!info)
+		return;
+
+	fb_helper->info = NULL;
+
+#ifdef __linux__
+	if (info->cmap.len)
+		fb_dealloc_cmap(&info->cmap);
+#endif
+	framebuffer_release(info);
+}
+EXPORT_SYMBOL(drm_fb_helper_release_info);
+
+/**
  * drm_fb_helper_unregister_info - unregister fb_info framebuffer device
  * @fb_helper: driver-allocated fbdev helper, can be NULL
  *
@@ -574,8 +599,6 @@ EXPORT_SYMBOL(drm_fb_helper_unregister_info);
  */
 void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 {
-	struct fb_info *info;
-
 	if (!fb_helper)
 		return;
 
@@ -587,15 +610,7 @@ void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 	cancel_work_sync(&fb_helper->resume_work);
 	cancel_work_sync(&fb_helper->damage_work);
 
-	info = fb_helper->info;
-	if (info) {
-#ifdef __linux__
-		if (info->cmap.len)
-			fb_dealloc_cmap(&info->cmap);
-#endif
-		framebuffer_release(info);
-	}
-	fb_helper->info = NULL;
+	drm_fb_helper_release_info(fb_helper);
 
 	mutex_lock(&kernel_fb_helper_lock);
 	if (!list_empty(&fb_helper->kernel_fb_list)) {
