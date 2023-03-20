@@ -49,6 +49,20 @@ struct drm_printer;
  * mode: debugfs file permissions, one of {0400, 0600, 0}, use 0 to not create
  *       debugfs file
  */
+#ifdef __FreeBSD__
+/* Changes in default values in I915_PARAMS_FOR_EACH below:
+ *
+ *   enable_psr: -1 -> 0
+ *   the console screen doesn't refresh otherwise (the computer remains
+ *   responsive).
+ *
+ *   disable_power_well: -1 -> 0
+ *   ?
+ *
+ *   enable_guc: -1 -> 0
+ *   GuC initialization freeze the computer.
+ */
+#endif
 #define I915_PARAMS_FOR_EACH(param) \
 	param(char *, vbt_firmware, NULL, 0400) \
 	param(int, modeset, -1, 0400) \
@@ -63,7 +77,7 @@ struct drm_printer;
 	param(int, disable_power_well, 0, 0400) \
 	param(int, enable_ips, 1, 0600) \
 	param(int, invert_brightness, 0, 0600) \
-	param(int, enable_guc, -1, 0400) \
+	param(int, enable_guc, 0, 0400) \
 	param(int, guc_log_level, -1, 0400) \
 	param(char *, guc_firmware_path, NULL, 0400) \
 	param(char *, huc_firmware_path, NULL, 0400) \
