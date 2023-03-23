@@ -19,17 +19,17 @@ struct intel_context;
 struct intel_engine_cs;
 
 #ifdef CONFIG_I915_PERF // Not yet. i915_perf.c opens a can of worms...
-void i915_perf_init(struct drm_i915_private *i915);
+int i915_perf_init(struct drm_i915_private *i915);
 void i915_perf_fini(struct drm_i915_private *i915);
 void i915_perf_register(struct drm_i915_private *i915);
 void i915_perf_unregister(struct drm_i915_private *i915);
 int i915_perf_ioctl_version(void);
 #else
-static inline void
+static inline int
 i915_perf_init(struct drm_i915_private *dev_priv)
 {
 
-	return;
+	return 0;
 }
 
 static inline void
