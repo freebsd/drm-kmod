@@ -5,6 +5,7 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 .PATH:	${SRCDIR} ${SRCDIR}/scheduler
 
 .include "../kconfig.mk"
+.include "../linuxkpi_version.mk"
 
 KMOD=	drm
 SRCS=	drm_atomic.c \
@@ -123,7 +124,7 @@ CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_' -DDRM_SYSCTL_PARAM_PREFIX=_dri -DLINUXKPI_VERSION=51600
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_' -DDRM_SYSCTL_PARAM_PREFIX=_dri
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 SRCS+=	device_if.h \
