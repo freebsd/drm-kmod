@@ -3,6 +3,7 @@ SRCDIR=	${.CURDIR:H}/drivers/dma-buf
 .PATH:	${SRCDIR}
 
 .include "../kconfig.mk"
+.include "../linuxkpi_version.mk"
 
 KMOD=	dmabuf
 SRCS=	dma-buf-kmod.c \
@@ -26,7 +27,6 @@ CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include # fallback to dummy
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/dummy/include
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= -DLINUXKPI_VERSION=51501
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 CWARNFLAGS.dma-buf.c+=	-Wno-pointer-arith
