@@ -6,6 +6,7 @@ DRM= ${.CURDIR:H:H}/drivers/gpu/drm
 KMOD=	amdgpu
 
 .include "../../kconfig.mk"
+.include "../../linuxkpi_version.mk"
 
 .if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
 _dml=	${SRCDIR}/display/dc/dml \
@@ -670,7 +671,7 @@ CFLAGS+= -I${SRCDIR}/pm/swsmu/smu12
 CFLAGS+= -I${DRM}/scheduler
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=amdgpu_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD} -DLINUXKPI_VERSION=50000
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=amdgpu_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h pci_iov_if.h device_if.h iicbus_if.h opt_drm.h \

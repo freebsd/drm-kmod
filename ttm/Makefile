@@ -5,6 +5,7 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/ttm
 .PATH:	${SRCDIR}
 
 .include "../kconfig.mk"
+.include "../linuxkpi_version.mk"
 
 KMOD=	ttm
 SRCS=	ttm_bo.c \
@@ -36,7 +37,7 @@ CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H:H}
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=ttm_' -DLINUXKPI_VERSION=50000
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=ttm_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 SRCS+=	device_if.h \
