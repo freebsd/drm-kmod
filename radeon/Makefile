@@ -5,6 +5,7 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/radeon
 .PATH:	${SRCDIR}
 
 .include "../kconfig.mk"
+.include "../linuxkpi_version.mk"
 
 KMOD=	radeonkms
 SRCS=	atom.c \
@@ -134,7 +135,7 @@ CFLAGS+= -I${SRCDIR:H:H}
 CFLAGS+= -I${SRCDIR:H}/amd/include
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=radeon_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD} -DLINUXKPI_VERSION=51600
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=radeon_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 CFLAGS.gcc+= -Wno-redundant-decls -Wno-cast-qual -Wno-unused-but-set-variable \
