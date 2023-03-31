@@ -30,6 +30,7 @@
 #include <linux/kthread.h>
 #include <linux/workqueue.h>
 #include <linux/mmu_notifier.h>
+#include <linux/memremap.h>
 #include <kgd_kfd_interface.h>
 #include <drm/ttm/ttm_execbuf_util.h>
 #include "amdgpu_sync.h"
@@ -105,6 +106,11 @@ struct amdgpu_kfd_dev {
 	uint64_t vram_used_aligned;
 	bool init_complete;
 	struct work_struct reset_work;
+
+	/* HMM page migration MEMORY_DEVICE_PRIVATE mapping */
+#ifdef __linux__
+	struct dev_pagemap pgmap;
+#endif
 };
 
 enum kgd_engine_type {
