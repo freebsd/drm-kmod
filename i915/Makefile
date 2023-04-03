@@ -57,6 +57,7 @@ SRCS=	\
 	intel_bw.c \
 	intel_bios.c \
 	intel_cdclk.c \
+	intel_clock_gating.c \
 	intel_color.c \
 	intel_combo_phy.c \
 	intel_connector.c \
@@ -80,7 +81,6 @@ SRCS=	\
 	intel_opregion.c \
 	intel_overlay.c \
 	intel_pcode.c \
-	intel_pm.c \
 	intel_psr.c \
 	intel_quirks.c \
 	intel_region_ttm.c \
@@ -370,7 +370,6 @@ CWARNFLAGS.intel_guc_capture.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_guc_submission.c=	-Wno-unused-function
 CWARNFLAGS.intel_hdmi.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_hotplug.c=	-Wno-uninitialized
-CWARNFLAGS.intel_pm.c=		-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.intel_psr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.intel_region_ttm.c=	-Wno-missing-prototypes
 CWARNFLAGS.intel_reset.c=	-Wno-unused-but-set-variable
