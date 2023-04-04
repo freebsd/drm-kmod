@@ -211,7 +211,6 @@ MODULE_DEPEND(drmn, iicbb, IICBB_MINVER, IICBB_PREFVER, IICBB_MAXVER);
 MODULE_DEPEND(drmn, pci, 1, 1, 1);
 MODULE_DEPEND(drmn, mem, 1, 1, 1);
 MODULE_DEPEND(drmn, linuxkpi, 1, 1, 1);
-MODULE_DEPEND(drmn, linuxkpi_gplv2, 1, 1, 1);
 #if __FreeBSD_version >= 1400085
 MODULE_DEPEND(drmn, linuxkpi_hdmi, 1, 1, 1);
 #endif
