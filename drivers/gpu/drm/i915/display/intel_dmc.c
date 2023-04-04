@@ -646,8 +646,13 @@ static void dmc_load_work_fn(struct work_struct *work)
 			   "Failed to load DMC firmware %s."
 			   " Disabling runtime power management.\n",
 			   dmc->fw_path);
+#ifdef __linux__
 		drm_notice(&dev_priv->drm, "DMC firmware homepage: %s",
 			   INTEL_UC_FIRMWARE_URL);
+#elif defined(__FreeBSD__)
+		drm_notice(&dev_priv->drm, "Run pkg install gpu-firmware-kmod" \
+		    "to install it\n");
+#endif
 	}
 
 	release_firmware(fw);
