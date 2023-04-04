@@ -1187,7 +1187,6 @@ int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 {
 #ifdef __FreeBSD__
 	// BSDFIXME
-	UNIMPLEMENTED();
 	return 0;
 #else
 	int rbar_size = pci_rebar_bytes_to_size(adev->gmc.real_vram_size);
@@ -4870,7 +4869,6 @@ static int amdgpu_device_suspend_display_audio(struct amdgpu_device *adev)
 	(void)p;
 	(void)expires;
 	/* Missing pm_runtime support */
-	UNIMPLEMENTED();
 	return -ENOSYS;
 #endif
 }
