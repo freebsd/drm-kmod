@@ -475,7 +475,7 @@ void drm_dev_unplug(struct drm_device *dev)
 #ifdef __linux__
 	unmap_mapping_range(dev->anon_inode->i_mapping, 0, 0, 1);
 #elif defined(__FreeBSD__)
-	UNIMPLEMENTED();
+	/* FreeBSD TODO */
 #endif
 }
 EXPORT_SYMBOL(drm_dev_unplug);
