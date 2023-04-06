@@ -326,16 +326,25 @@ EXPORT_SYMBOL(aperture_remove_conflicting_devices);
  */
 int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *name)
 {
+#ifdef __linux__
 	bool primary = false;
+#endif
 	resource_size_t base, size;
+#ifdef __linux__
 	int bar, ret;
+#elif defined(__FreeBSD__)
+	int bar;
+#endif
 
 #ifdef CONFIG_X86
 #ifdef __linux__
 	primary = pdev->resource[PCI_ROM_RESOURCE].flags & IORESOURCE_ROM_SHADOW;
-#elif defined(__FreeBSD__)
-	primary = NULL;
 #endif
+#endif
+
+#ifdef __linux__
+	if (primary)
+		sysfb_disable();
 #endif
 
 	for (bar = 0; bar < PCI_STD_NUM_BARS; ++bar) {
@@ -344,9 +353,7 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 
 		base = pci_resource_start(pdev, bar);
 		size = pci_resource_len(pdev, bar);
-		ret = aperture_remove_conflicting_devices(base, size, primary, name);
-		if (ret)
-			return ret;
+		aperture_detach_devices(base, size);
 	}
 
 	/*
