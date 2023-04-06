@@ -304,6 +304,41 @@ int aperture_remove_conflicting_devices(resource_size_t base, resource_size_t si
 EXPORT_SYMBOL(aperture_remove_conflicting_devices);
 
 /**
+ * __aperture_remove_legacy_vga_devices - remove legacy VGA devices of a PCI devices
+ * @pdev: PCI device
+ *
+ * This function removes VGA devices provided by @pdev, such as a VGA
+ * framebuffer or a console. This is useful if you have a VGA-compatible
+ * PCI graphics device with framebuffers in non-BAR locations. Drivers
+ * should acquire ownership of those memory areas and afterwards call
+ * this helper to release remaining VGA devices.
+ *
+ * If your hardware has its framebuffers accessible via PCI BARS, use
+ * aperture_remove_conflicting_pci_devices() instead. The function will
+ * release any VGA devices automatically.
+ *
+ * WARNING: Apparently we must remove graphics drivers before calling
+ *          this helper. Otherwise the vga fbdev driver falls over if
+ *          we have vgacon configured.
+ *
+ * Returns:
+ * 0 on success, or a negative errno code otherwise
+ */
+int __aperture_remove_legacy_vga_devices(struct pci_dev *pdev)
+{
+	/* VGA framebuffer */
+	aperture_detach_devices(VGA_FB_PHYS_BASE, VGA_FB_PHYS_SIZE);
+
+	/* VGA textmode console */
+#ifdef __linux__
+	return vga_remove_vgacon(pdev);
+#elif defined(__FreeBSD__)
+	return 0;
+#endif
+}
+EXPORT_SYMBOL(__aperture_remove_legacy_vga_devices);
+
+/**
  * aperture_remove_conflicting_pci_devices - remove existing framebuffers for PCI devices
  * @pdev: PCI device
  * @name: a descriptive name of the requesting driver
@@ -319,11 +354,7 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 {
 	bool primary = false;
 	resource_size_t base, size;
-#ifdef __linux__
-	int bar, ret;
-#elif defined(__FreeBSD__)
-	int bar;
-#endif
+	int bar, ret = 0;
 
 #ifdef __linux__
 	if (pdev == vga_default_device())
@@ -342,26 +373,15 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 		aperture_detach_devices(base, size);
 	}
 
-	if (primary) {
-		/*
-		 * If this is the primary adapter, there could be a VGA device
-		 * that consumes the VGA framebuffer I/O range. Remove this
-		 * device as well.
-		 */
-		aperture_detach_devices(VGA_FB_PHYS_BASE, VGA_FB_PHYS_SIZE);
+	/*
+	 * If this is the primary adapter, there could be a VGA device
+	 * that consumes the VGA framebuffer I/O range. Remove this
+	 * device as well.
+	 */
+	if (primary)
+		ret = __aperture_remove_legacy_vga_devices(pdev);
 
-		/*
-		 * WARNING: Apparently we must kick fbdev drivers before vgacon,
-		 * otherwise the vga fbdev driver falls over.
-		 */
-#ifdef __linux__
-		ret = vga_remove_vgacon(pdev);
-		if (ret)
-			return ret;
-#endif
-	}
-
-	return 0;
+	return ret;
 
 }
 EXPORT_SYMBOL(aperture_remove_conflicting_pci_devices);
