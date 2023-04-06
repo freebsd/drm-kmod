@@ -326,9 +326,7 @@ EXPORT_SYMBOL(aperture_remove_conflicting_devices);
  */
 int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *name)
 {
-#ifdef __linux__
 	bool primary = false;
-#endif
 	resource_size_t base, size;
 #ifdef __linux__
 	int bar, ret;
@@ -339,6 +337,8 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 #ifdef CONFIG_X86
 #ifdef __linux__
 	primary = pdev->resource[PCI_ROM_RESOURCE].flags & IORESOURCE_ROM_SHADOW;
+#elif defined(__FreeBSD__)
+	primary = NULL;
 #endif
 #endif
 
@@ -356,15 +356,17 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 		aperture_detach_devices(base, size);
 	}
 
-	/*
-	 * WARNING: Apparently we must kick fbdev drivers before vgacon,
-	 * otherwise the vga fbdev driver falls over.
-	 */
+	if (primary) {
+		/*
+		 * WARNING: Apparently we must kick fbdev drivers before vgacon,
+		 * otherwise the vga fbdev driver falls over.
+		 */
 #ifdef __linux__
-	ret = vga_remove_vgacon(pdev);
-	if (ret)
-		return ret;
+		ret = vga_remove_vgacon(pdev);
+		if (ret)
+			return ret;
 #endif
+	}
 
 	return 0;
 
