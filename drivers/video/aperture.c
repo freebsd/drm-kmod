@@ -319,11 +319,18 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 {
 	bool primary = false;
 	resource_size_t base, size;
+#ifdef __linux__
 	int bar, ret;
+#elif defined(__FreeBSD__)
+	int bar;
+#endif
 
 #ifdef __linux__
 	if (pdev == vga_default_device())
 		primary = true;
+
+	if (primary)
+		sysfb_disable();
 #endif
 
 	for (bar = 0; bar < PCI_STD_NUM_BARS; ++bar) {
@@ -332,9 +339,7 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 
 		base = pci_resource_start(pdev, bar);
 		size = pci_resource_len(pdev, bar);
-		ret = aperture_remove_conflicting_devices(base, size, name);
-		if (ret)
-			return ret;
+		aperture_detach_devices(base, size);
 	}
 
 	if (primary) {
