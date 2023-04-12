@@ -658,7 +658,7 @@ static void csr_load_work_fn(struct work_struct *work)
 			   INTEL_UC_FIRMWARE_URL);
 #elif defined(__FreeBSD__)
 		drm_notice(&dev_priv->drm, "Run pkg install gpu-firmware-kmod" \
-		    "to install it\n");
+		    " to install it\n");
 #endif
 	}
 
