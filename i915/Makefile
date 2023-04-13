@@ -111,6 +111,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_backlight.c \
 	intel_crt.c \
 	intel_crtc_state_dump.c \
+	intel_cx0_phy.c \
 	intel_ddi.c \
 	intel_ddi_buf_trans.c \
 	intel_display_power_map.c \
