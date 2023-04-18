@@ -8,6 +8,10 @@
 
 #include <linux/types.h>
 
+#ifdef __FreeBSD__
+#include <linux/kconfig.h>
+#endif
+
 enum i9xx_plane_id;
 enum pipe;
 struct drm_display_mode;
@@ -15,6 +19,16 @@ struct drm_i915_private;
 struct intel_atomic_state;
 struct intel_crtc;
 struct intel_crtc_state;
+
+/*
+ * FIXME: We should instead only take spinlocks once for the entire update
+ * instead of once per mmio.
+ */
+#if IS_ENABLED(CONFIG_PROVE_LOCKING)
+#define VBLANK_EVASION_TIME_US 250
+#else
+#define VBLANK_EVASION_TIME_US 100
+#endif
 
 int intel_usecs_to_scanlines(const struct drm_display_mode *adjusted_mode,
 			     int usecs);
