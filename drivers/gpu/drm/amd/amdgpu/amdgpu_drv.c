@@ -56,6 +56,7 @@ SYSCTL_NODE(_hw, OID_AUTO, amdgpu,
 #include "amdgpu_ras.h"
 #include "amdgpu_xgmi.h"
 #include "amdgpu_reset.h"
+#include "../amdxcp/amdgpu_xcp_drv.h"
 
 /*
  * KMS wrapper.
@@ -3008,6 +3009,7 @@ static void __exit amdgpu_exit(void)
 #ifdef __linux__
 	mmu_notifier_synchronize();
 #endif
+	amdgpu_xcp_drv_release();
 }
 
 #ifdef __linux__
