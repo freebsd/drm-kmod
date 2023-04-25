@@ -26,6 +26,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 
 .PATH:	${SRCDIR}/acp \
 	${SRCDIR}/amdgpu \
+	${SRCDIR}/amdxcp \
 	${SRCDIR}/display \
 	${SRCDIR}/display/amdgpu_dm \
 	${SRCDIR}/display/dc \
@@ -381,6 +382,9 @@ SRCS+=	amdgpu_afmt.c \
 	vega20_ih.c \
 	vega20_reg_init.c \
 	vi.c
+
+# amdxcp
+SRCS+=	amdgpu_xcp_drv.c
 
 # display/amdgpu_dm
 SRCS+=	amdgpu_dm_color.c \
