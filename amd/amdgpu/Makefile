@@ -445,7 +445,6 @@ SRCS+=	amdgpu_aca.c \
 	si.c \
 	soc15.c \
 	soc21.c \
-	smu_v13_0_10.c \
 	smuio_v9_0.c \
 	smuio_v11_0.c \
 	smuio_v11_0_6.c \
@@ -1089,8 +1088,10 @@ SRCS+=	amd_powerplay.c \
 	smu_v13_0_5_ppt.c \
 	smu_v13_0_6_ppt.c \
 	smu_v13_0_7_ppt.c \
+	smu_v13_0_10.c \
 	smu_v14_0.c \
 	smu_v14_0_0_ppt.c \
+	smu_v14_0_2_ppt.c \
 	smu_helper.c \
 	smumgr.c \
 	tonga_baco.c \
