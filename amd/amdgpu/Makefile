@@ -177,6 +177,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/pm/swsmu/smu11 \
 	${SRCDIR}/pm/swsmu/smu12 \
 	${SRCDIR}/pm/swsmu/smu13 \
+	${SRCDIR}/pm/swsmu/smu14 \
 	${DRM}/scheduler
 
 # acp
@@ -1019,6 +1020,8 @@ SRCS+=	amd_powerplay.c \
 	smu_v13_0_5_ppt.c \
 	smu_v13_0_6_ppt.c \
 	smu_v13_0_7_ppt.c \
+	smu_v14_0.c \
+	smu_v14_0_0_ppt.c \
 	smu_helper.c \
 	smumgr.c \
 	tonga_baco.c \
@@ -1089,6 +1092,7 @@ CFLAGS+= -I${SRCDIR}/pm/swsmu/inc/pmfw_if
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu11
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu12
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu13
+CFLAGS+= -I${SRCDIR}/pm/swsmu/smu14
 CFLAGS+= -I${DRM}/scheduler
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
