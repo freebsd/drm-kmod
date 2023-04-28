@@ -63,8 +63,10 @@ static const struct fb_ops drm_fbdev_generic_fb_ops = {
 	.owner		= THIS_MODULE,
 	.fb_open	= drm_fbdev_generic_fb_open,
 	.fb_release	= drm_fbdev_generic_fb_release,
+#ifdef __linux__
 	.fb_read	= drm_fb_helper_sys_read,
 	.fb_write	= drm_fb_helper_sys_write,
+#endif
 	DRM_FB_HELPER_DEFAULT_OPS,
 	.fb_fillrect	= drm_fb_helper_sys_fillrect,
 	.fb_copyarea	= drm_fb_helper_sys_copyarea,
