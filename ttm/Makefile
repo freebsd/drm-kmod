@@ -51,7 +51,6 @@ SRCS+=	device_if.h \
 	iicbus_if.h \
 	opt_drm.h \
 	opt_vm.h \
-	opt_compat.h \
 	opt_syscons.h
 
 .if ${MACHINE_CPUARCH} == "powerpc"

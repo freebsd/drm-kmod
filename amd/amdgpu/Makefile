@@ -783,7 +783,7 @@ CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=amdgpu_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h pci_iov_if.h device_if.h iicbus_if.h opt_drm.h \
-        opt_vm.h opt_compat.h opt_syscons.h opt_acpi.h
+        opt_vm.h opt_syscons.h opt_acpi.h
 
 .include <bsd.kmod.mk>
 

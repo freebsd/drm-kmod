@@ -139,7 +139,6 @@ SRCS+=	device_if.h \
 	opt_syscons.h \
 	opt_drm.h \
 	opt_vm.h \
-	opt_compat.h \
 	opt_syscons.h
 
 .if ${MACHINE_CPUARCH} == "powerpc"
