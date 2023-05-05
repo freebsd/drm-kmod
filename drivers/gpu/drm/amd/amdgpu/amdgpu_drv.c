@@ -508,7 +508,6 @@ module_param_named(pg_mask, amdgpu_pg_mask, uint, 0444);
 MODULE_PARM_DESC(sdma_phase_quantum, "SDMA context switch phase quantum (x 1K GPU clock cycles, 0 = no change (default 32))");
 module_param_named(sdma_phase_quantum, amdgpu_sdma_phase_quantum, uint, 0444);
 
-#ifdef __linux__
 /**
  * DOC: disable_cu (charp)
  * Set to disable CUs (It's set like se.sh.cu,...). The default is NULL.
@@ -526,7 +525,6 @@ module_param_named(disable_cu, amdgpu_disable_cu, charp, 0444);
 MODULE_PARM_DESC(virtual_display,
 		 "Enable virtual display feature (the virtual_display will be set like xxxx:xx:xx.x,x;xxxx:xx:xx.x,x)");
 module_param_named(virtual_display, amdgpu_virtual_display, charp, 0444);
-#endif
 
 /**
  * DOC: job_hang_limit (int)
