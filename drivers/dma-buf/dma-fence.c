@@ -415,7 +415,7 @@ dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count,
 		return (0);
 	}
 
-	cb = malloc(sizeof(*cb), M_DMABUF, M_WAITOK | M_ZERO);
+	cb = mallocarray(count, sizeof(*cb), M_DMABUF, M_WAITOK | M_ZERO);
 	for (i = 0; i < count; i++) {
 		struct dma_fence *fence = fences[i];
 		cb[i].task = current;
