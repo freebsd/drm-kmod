@@ -272,6 +272,7 @@ SRCS+=	i915_gem_busy.c \
 SRCS+=	intel_pxp.c \
 	intel_pxp_cmd.c \
 	intel_pxp_debugfs.c \
+	intel_pxp_gsccs.c \
 	intel_pxp_huc.c \
 	intel_pxp_irq.c \
 	intel_pxp_pm.c \
