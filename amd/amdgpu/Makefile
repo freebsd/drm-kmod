@@ -860,6 +860,7 @@ SRCS+=	dc_helper.c \
 # display/dmub/src
 SRCS+=	dmub_dcn20.c \
 	dmub_dcn21.c \
+	dmub_dcn314.c \
 	dmub_dcn315.c \
 	dmub_dcn316.c \
 	dmub_dcn32.c \
