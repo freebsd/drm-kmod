@@ -400,6 +400,7 @@ SRCS+=	amdgpu_dm_color.c \
 	amdgpu_dm_plane.c \
 	amdgpu_dm_pp_smu.c \
 	amdgpu_dm_psr.c \
+	amdgpu_dm_replay.c \
 	amdgpu_dm_services.c \
 	amdgpu_dm.c \
 	dc_fpu.c
