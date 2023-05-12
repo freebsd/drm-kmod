@@ -464,6 +464,7 @@ SRCS+=	dce_abm.c \
 	dmub_abm.c \
 	dmub_abm_lcd.c \
 	dmub_psr.c \
+	dmub_replay.c \
 	dmub_hw_lock_mgr.c \
 	dmub_outbox.c
 
