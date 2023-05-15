@@ -115,6 +115,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_ddi.c \
 	intel_ddi_buf_trans.c \
 	intel_display_driver.c \
+	intel_display_irq.c \
 	intel_display_power_map.c \
 	intel_display_power_well.c \
 	intel_display_reset.c \
@@ -365,6 +366,7 @@ CWARNFLAGS.intel_dp.c=		-Wno-unused-variable -Wno-sometimes-uninitialized -Wno-c
 CWARNFLAGS.intel_dp_aux_backlight.c=	-Wno-shift-count-overflow
 CWARNFLAGS.intel_dpll_mgr.c=	-Wno-compare-distinct-pointer-types
 CWARNFLAGS.intel_display.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.intel_display_irq.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_dpll.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_fb.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.intel_fbc.c=		-Wno-unused-variable
