@@ -504,7 +504,7 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 		void *data, *vaddr;
 		int err;
 #ifdef __linux__
-		char c;
+		char __maybe_unused c;
 #endif
 
 		len = PAGE_SIZE - pg;
