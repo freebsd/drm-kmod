@@ -78,7 +78,7 @@ struct i915_hdcp_ops {
 	int (*close_hdcp_session)(struct device *, struct hdcp_port_data *);
 };
 
-struct i915_hdcp_master {
+struct i915_hdcp_arbiter {
 	struct device *hdcp_dev;
 	const struct i915_hdcp_ops *ops;
 };
