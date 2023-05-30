@@ -172,6 +172,34 @@ static inline struct apertures_struct *alloc_apertures(unsigned int max_num) {
 extern void cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
 extern void cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
 extern void cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image);
+
+/*
+ * Initializes struct fb_ops for framebuffers in I/O memory.
+ */
+
+#ifdef __linux__
+#define __FB_DEFAULT_IO_OPS_RDWR \
+	.fb_read	= fb_io_read, \
+	.fb_write	= fb_io_write
+#elif defined(__FreeBSD__)
+#define	__FB_DEFAULT_IO_OPS_RDWR \
+	.fb_read	= NULL, /* Not used */ \
+	.fb_write	= NULL	/* Not used */
+#endif
+
+#define __FB_DEFAULT_IO_OPS_DRAW \
+	.fb_fillrect	= cfb_fillrect, \
+	.fb_copyarea	= cfb_copyarea, \
+	.fb_imageblit	= cfb_imageblit
+
+#define __FB_DEFAULT_IO_OPS_MMAP \
+	.fb_mmap	= NULL /* default implementation */
+
+#define FB_DEFAULT_IO_OPS \
+	__FB_DEFAULT_IO_OPS_RDWR, \
+	__FB_DEFAULT_IO_OPS_DRAW, \
+	__FB_DEFAULT_IO_OPS_MMAP
+
 /*
  * Drawing operations where framebuffer is in system RAM
  */
