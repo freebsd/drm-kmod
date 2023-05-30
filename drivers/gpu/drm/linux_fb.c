@@ -476,3 +476,26 @@ fb_sys_write(struct linux_fb_info *info, const char __user *buf,
 	panic("fb_sys_write() not implemented");
 	return (0);
 }
+
+ssize_t
+fb_io_read(struct linux_fb_info *info, char __user *buf,
+    size_t count, loff_t *ppos)
+{
+	panic("fb_io_read() not implemented");
+	return (0);
+}
+
+ssize_t
+fb_io_write(struct linux_fb_info *info, const char __user *buf,
+    size_t count, loff_t *ppos)
+{
+	panic("fb_io_write() not implemented");
+	return (0);
+}
+
+int
+fb_deferred_io_mmap(struct linux_fb_info *info, struct vm_area_struct *vma)
+{
+	panic("fb_deferred_io_mmap() not implemented");
+	return (0);
+}
