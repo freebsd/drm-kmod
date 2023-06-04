@@ -11,7 +11,7 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **FreeBSD version**
-Paste the output of `uname -a`
+Paste the output of `uname -aKU`
 
 **PCI Info**
 
