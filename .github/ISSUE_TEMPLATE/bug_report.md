@@ -18,7 +18,7 @@ Paste the output of `uname -a`
 <details>
   <summary>pciconf -lv</summary>
   
-Paste the output of `pciconf -vl`
+Paste the output of `pciconf -lv`
 
 </details>
 
