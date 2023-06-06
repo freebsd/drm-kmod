@@ -153,6 +153,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_pch_display.c \
 	intel_pch_refclk.c \
 	intel_plane_initial.c \
+	intel_pmdemand.c \
 	intel_pps.c \
 	intel_qp_tables.c \
 	intel_sdvo.c \
