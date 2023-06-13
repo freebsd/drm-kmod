@@ -394,6 +394,7 @@ SRCS+=	amdgpu_afmt.c \
 	vcn_v3_0.c \
 	vcn_v4_0.c \
 	vcn_v4_0_3.c \
+	vcn_v4_0_5.c \
 	vega10_ih.c \
 	vega10_reg_init.c \
 	vega20_ih.c \
