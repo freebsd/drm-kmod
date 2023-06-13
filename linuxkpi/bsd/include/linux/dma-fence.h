@@ -113,7 +113,7 @@ signed long dma_fence_wait_any_timeout(struct dma_fence **fences,
     uint32_t count, bool intr, signed long timeout, uint32_t *idx);
 void dma_fence_set_deadline(struct dma_fence *fence, ktime_t deadline);
 struct dma_fence *dma_fence_get_stub(void);
-struct dma_fence *dma_fence_allocate_private_stub(void);
+struct dma_fence *dma_fence_allocate_private_stub(ktime_t timestamp);
 u64 dma_fence_context_alloc(unsigned num);
 void dma_fence_put(struct dma_fence *fence);
 struct dma_fence *dma_fence_get(struct dma_fence *fence);
