@@ -688,10 +688,8 @@ static int devm_drm_dev_init(struct device *parent,
 	if (ret)
 		return ret;
 
-#ifdef __linux__
 	return devm_add_action_or_reset(parent,
 					devm_drm_dev_init_release, dev);
-#endif
 
 	return ret;
 }
