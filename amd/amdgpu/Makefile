@@ -245,7 +245,7 @@ SRCS+=	amdgpu_afmt.c \
 	atombios_dp.c \
 	atombios_encoders.c \
 	atombios_i2c.c \
-	aqua_vanjaram_reg_init.c \
+	aqua_vanjaram.c \
 	cik_ih.c \
 	cik_sdma.c \
 	cik.c \
