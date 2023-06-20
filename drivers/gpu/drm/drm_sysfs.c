@@ -102,13 +102,16 @@ void drm_sysfs_connector_hotplug_event(struct drm_connector *connector)
 	sbuf_delete(sb);
 }
 
-void drm_sysfs_connector_status_event(struct drm_connector *connector,
-				      struct drm_property *property)
+void drm_sysfs_connector_property_event(struct drm_connector *connector,
+					struct drm_property *property)
 {
 	struct drm_device *dev = connector->dev;
 	struct sbuf *sb = sbuf_new_auto();
 
-	DRM_DEBUG("generating connector status event\n");
+	drm_dbg_kms(connector->dev,
+		    "[CONNECTOR:%d:%s] generating connector property event for [PROP:%d:%s]\n",
+		    connector->base.id, connector->name,
+		    property->base.id, property->name);
 
 	sbuf_printf(sb, "cdev=dri/%s connector=%u property=%u",
 	    dev_name(dev->primary->kdev), connector->base.id, property->base.id);
