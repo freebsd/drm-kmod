@@ -384,11 +384,12 @@ int drm_prime_fd_to_handle_ioctl(struct drm_device *dev, void *data,
 {
 	struct drm_prime_handle *args = data;
 
-	if (!dev->driver->prime_fd_to_handle)
-		return -ENOSYS;
+	if (dev->driver->prime_fd_to_handle) {
+		return dev->driver->prime_fd_to_handle(dev, file_priv, args->fd,
+						       &args->handle);
+	}
 
-	return dev->driver->prime_fd_to_handle(dev, file_priv,
-			args->fd, &args->handle);
+	return drm_gem_prime_fd_to_handle(dev, file_priv, args->fd, &args->handle);
 }
 
 static struct dma_buf *export_and_register_object(struct drm_device *dev,
@@ -530,9 +531,6 @@ int drm_prime_handle_to_fd_ioctl(struct drm_device *dev, void *data,
 {
 	struct drm_prime_handle *args = data;
 
-	if (!dev->driver->prime_handle_to_fd)
-		return -ENOSYS;
-
 	/* check flags are valid */
 #if defined(__FreeBSD__) && defined(SV_ABI_LINUX)
 	if (SV_CURPROC_ABI() == SV_ABI_LINUX)
@@ -542,8 +540,13 @@ int drm_prime_handle_to_fd_ioctl(struct drm_device *dev, void *data,
 	if (args->flags & ~(DRM_CLOEXEC | DRM_RDWR))
 		return -EINVAL;
 
-	return dev->driver->prime_handle_to_fd(dev, file_priv,
-			args->handle, args->flags, &args->fd);
+	if (dev->driver->prime_handle_to_fd) {
+		return dev->driver->prime_handle_to_fd(dev, file_priv,
+						       args->handle, args->flags,
+						       &args->fd);
+	}
+	return drm_gem_prime_handle_to_fd(dev, file_priv, args->handle,
+					  args->flags, &args->fd);
 }
 
 /**
