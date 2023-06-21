@@ -160,6 +160,7 @@ CWARNFLAGS+=-Wno-cast-qual
 .endif
 CWARNFLAGS+= -Wno-pointer-sign -Wno-format
 
+CWARNFLAGS.drm_file.c+=		-Wno-unused-value
 CWARNFLAGS.drm_ioc32.c+=	-Wno-address-of-packed-member
 
 EXPORT_SYMS=	YES
