@@ -96,21 +96,28 @@ static int drm_clients_info(struct seq_file *m, void *data)
 	 */
 	mutex_lock(&dev->filelist_mutex);
 	list_for_each_entry_reverse(priv, &dev->filelist, lhead) {
-		struct task_struct *task;
 		bool is_current_master = drm_is_current_master(priv);
-
-		rcu_read_lock(); /* locks pid_task()->comm */
+		struct task_struct *task;
 #ifdef __linux__
-		task = pid_task(priv->pid, PIDTYPE_TGID);
+		struct pid *pid;
+#elif defined(__FreeBSD__)
+		pid_t pid;
+#endif
+
+		rcu_read_lock(); /* Locks priv->pid and pid_task()->comm! */
+#ifdef __linux__
+		pid = rcu_dereference(priv->pid);
+		task = pid_task(pid, PIDTYPE_TGID);
 		uid = task ? __task_cred(task)->euid : GLOBAL_ROOT_UID;
 #elif defined(__FreeBSD__)
 		// BSDFIXME: No PIDTYPE_TGID support.
-		task = pid_task(priv->pid, PIDTYPE_PID);
+		pid = priv->pid;
+		task = pid_task(pid, PIDTYPE_PID);
 		uid = task ? task_euid(task) : 0;
 #endif
 		seq_printf(m, "%20s %5d %3d   %c    %c %5d %10u\n",
 			   task ? task->comm : "<unknown>",
-			   pid_vnr(priv->pid),
+			   pid_vnr(pid),
 			   priv->minor->index,
 			   is_current_master ? 'y' : 'n',
 			   priv->authenticated ? 'y' : 'n',

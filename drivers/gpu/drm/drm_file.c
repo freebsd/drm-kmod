@@ -161,7 +161,7 @@ struct drm_file *drm_file_alloc(struct drm_minor *minor)
 	/* Get a unique identifier for fdinfo: */
 	file->client_id = atomic64_inc_return(&ident);
 #ifdef __linux__
-	file->pid = get_pid(task_tgid(current));
+	rcu_assign_pointer(file->pid, get_pid(task_tgid(current)));
 #elif defined(__FreeBSD__)
 	// BSDFIXME: No task_tgid() support.
 	file->pid = get_pid(task_pid(current));
@@ -205,7 +205,11 @@ out_prime_destroy:
 		drm_syncobj_release(file);
 	if (drm_core_check_feature(dev, DRIVER_GEM))
 		drm_gem_release(dev, file);
+#ifdef __linux__
+	put_pid(rcu_access_pointer(file->pid));
+#elif defined(__FreeBSD__)
 	put_pid(file->pid);
+#endif
 	kfree(file);
 
 	return ERR_PTR(ret);
@@ -296,7 +300,11 @@ void drm_file_free(struct drm_file *file)
 
 	WARN_ON(!list_empty(&file->event_list));
 
+#ifdef __linux__
+	put_pid(rcu_access_pointer(file->pid));
+#elif defined(__FreeBSD__)
 	put_pid(file->pid);
+#endif
 	kfree(file);
 }
 
@@ -513,6 +521,58 @@ int drm_release(struct inode *inode, struct file *filp)
 	return 0;
 }
 EXPORT_SYMBOL(drm_release);
+
+void drm_file_update_pid(struct drm_file *filp)
+{
+	struct drm_device *dev;
+#ifdef __linux__
+	struct pid *pid, *old;
+#elif defined(__FreeBSD__)
+	pid_t pid, old;
+#endif
+
+	/*
+	 * Master nodes need to keep the original ownership in order for
+	 * drm_master_check_perm to keep working correctly. (See comment in
+	 * drm_auth.c.)
+	 */
+	if (filp->was_master)
+		return;
+
+#ifdef __linux__
+	pid = task_tgid(current);
+#elif defined(__FreeBSD__)
+	// BSDFIXME: No task_tgid() support.
+	pid = task_pid(current);
+#endif
+
+	/*
+	 * Quick unlocked check since the model is a single handover followed by
+	 * exclusive repeated use.
+	 */
+#ifdef __linux__
+	if (pid == rcu_access_pointer(filp->pid))
+#elif defined(__FreeBSD__)
+	if (pid == filp->pid)
+#endif
+		return;
+
+	dev = filp->minor->dev;
+	mutex_lock(&dev->filelist_mutex);
+#ifdef __linux__
+	old = rcu_replace_pointer(filp->pid, pid, 1);
+#elif defined(__FreeBSD__)
+	old = filp->pid;
+	filp->pid = pid;
+#endif
+	mutex_unlock(&dev->filelist_mutex);
+
+	if (pid != old) {
+		get_pid(pid);
+		synchronize_rcu();
+		put_pid(old);
+	}
+}
 
 /**
  * drm_release_noglobal - release method for DRM file
