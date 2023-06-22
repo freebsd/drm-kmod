@@ -836,8 +836,10 @@ SRCS+=	link_ddc.c \
 	link_fpga.c \
 	link_hpd.c \
 	link_hwss_dio.c \
+	link_hwss_dio_fixed_vs_pe_retimer.c \
 	link_hwss_dpia.c \
 	link_hwss_hpo_dp.c \
+	link_hwss_hpo_fixed_vs_pe_retimer_dp.c \
 	link_resource.c \
 	link_validation.c
 
