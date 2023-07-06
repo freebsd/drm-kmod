@@ -73,7 +73,7 @@ dma_fence_allocate_private_stub(ktime_t timestamp)
 
 	fence = kzalloc(sizeof(*fence), GFP_KERNEL);
 	if (fence == NULL)
-		return (ERR_PTR(-ENOMEM));
+		return (NULL);
 
 	dma_fence_init(fence,
 	    &dma_fence_stub_ops, &dma_fence_stub_lock, 0, 0);
