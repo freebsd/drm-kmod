@@ -1159,7 +1159,7 @@ static struct {
 	atom_op_shr, ATOM_ARG_MC}, {
 atom_op_debug, 0},};
 
-static int atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t * params)
+static int atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t *params)
 {
 	int base = CU16(ctx->cmd_table + 4 + 2 * index);
 	int len, ws, ps, ptr;
@@ -1219,7 +1219,7 @@ free:
 	return ret;
 }
 
-int atom_execute_table_scratch_unlocked(struct atom_context *ctx, int index, uint32_t * params)
+int atom_execute_table_scratch_unlocked(struct atom_context *ctx, int index, uint32_t *params)
 {
 	int r;
 
@@ -1240,7 +1240,7 @@ int atom_execute_table_scratch_unlocked(struct atom_context *ctx, int index, uin
 	return r;
 }
 
-int atom_execute_table(struct atom_context *ctx, int index, uint32_t * params)
+int atom_execute_table(struct atom_context *ctx, int index, uint32_t *params)
 {
 	int r;
 	mutex_lock(&ctx->scratch_mutex);
@@ -1362,8 +1362,8 @@ void atom_destroy(struct atom_context *ctx)
 }
 
 bool atom_parse_data_header(struct atom_context *ctx, int index,
-			    uint16_t * size, uint8_t * frev, uint8_t * crev,
-			    uint16_t * data_start)
+			    uint16_t *size, uint8_t *frev, uint8_t *crev,
+			    uint16_t *data_start)
 {
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->data_table + offset);
@@ -1382,8 +1382,8 @@ bool atom_parse_data_header(struct atom_context *ctx, int index,
 	return true;
 }
 
-bool atom_parse_cmd_header(struct atom_context *ctx, int index, uint8_t * frev,
-			   uint8_t * crev)
+bool atom_parse_cmd_header(struct atom_context *ctx, int index, uint8_t *frev,
+			   uint8_t *crev)
 {
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->cmd_table + offset);
