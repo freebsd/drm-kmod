@@ -616,6 +616,7 @@ SRCS+=	dcn301_init.c \
 	dcn301_dio_link_encoder.c \
 	dcn301_fpu.c \
 	dcn301_hwseq.c \
+	dcn301_optc.c \
 	dcn301_panel_cntl.c \
 	dcn301_hubbub.c \
 	vg_clk_mgr.c \
