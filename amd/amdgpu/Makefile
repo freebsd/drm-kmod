@@ -168,6 +168,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_device.c \
 	amdgpu_discovery.c \
 	amdgpu_display.c \
+	amdgpu_doorbell_mgr.c \
 	amdgpu_dpm.c \
 	amdgpu_dpm_internal.c \
 	amdgpu_drv.c \
