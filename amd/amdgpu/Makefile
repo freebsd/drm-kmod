@@ -29,7 +29,8 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn32 \
 	${SRCDIR}/display/dc/dml/dcn321 \
 	${SRCDIR}/display/dc/dml/dcn35 \
-	${SRCDIR}/display/dc/dml/dsc
+	${SRCDIR}/display/dc/dml/dsc \
+	${SRCDIR}/display/dc/dml2
 .endif
 
 .PATH:	${SRCDIR}/acp \
@@ -811,6 +812,17 @@ SRCS+=	dcn32_fpu.c \
 # display/dc/dml/dcn321
 SRCS+=	dcn321_fpu.c
 
+# display/dc/dml2
+SRCS+=	display_mode_core.c \
+	display_mode_util.c \
+	dml_display_rq_dlg_calc.c \
+	dml2_dc_resource_mgmt.c \
+	dml2_mall_phantom.c \
+	dml2_policy.c \
+	dml2_translation_helper.c \
+	dml2_utils.c \
+	dml2_wrapper.c
+
 # display/dc/gpio/*
 SRCS+=	gpio_base.c \
 	gpio_service.c \
@@ -1072,6 +1084,8 @@ CFLAGS.gcc+= -Wno-redundant-decls -Wno-unused-but-set-variable
 FPUFLAGS= -msse
 .endif
 
+CFLAGS.dc.c = -Wno-typedef-redefinition
+
 CFLAGS.dcn_calcs.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn_calc_auto.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn_calc_math.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-tautological-compare
@@ -1091,6 +1105,16 @@ CFLAGS.dcn32_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource_helpers.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn321_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn35_fpu.c= ${FPUFLAGS} -mstack-alignment=4
+
+CFLAGS.display_mode_core.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.display_mode_util.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml_display_rq_dlg_calc.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_dc_resource_mgmt.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_mall_phantom.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_policy.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_translation_helper.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_utils.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_wrapper.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 
 CFLAGS.display_mode_lib.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba.c= ${FPUFLAGS} -mstack-alignment=4
