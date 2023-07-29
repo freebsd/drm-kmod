@@ -181,22 +181,22 @@ extern ssize_t fb_io_write(struct linux_fb_info *info, const char __user *buf,
  * Initializes struct fb_ops for framebuffers in I/O memory.
  */
 
-#define __FB_DEFAULT_IO_OPS_RDWR \
+#define __FB_DEFAULT_IOMEM_OPS_RDWR \
 	.fb_read	= fb_io_read, \
 	.fb_write	= fb_io_write
 
-#define __FB_DEFAULT_IO_OPS_DRAW \
+#define __FB_DEFAULT_IOMEM_OPS_DRAW \
 	.fb_fillrect	= cfb_fillrect, \
 	.fb_copyarea	= cfb_copyarea, \
 	.fb_imageblit	= cfb_imageblit
 
-#define __FB_DEFAULT_IO_OPS_MMAP \
+#define __FB_DEFAULT_IOMEM_OPS_MMAP \
 	.fb_mmap	= NULL /* default implementation */
 
-#define FB_DEFAULT_IO_OPS \
-	__FB_DEFAULT_IO_OPS_RDWR, \
-	__FB_DEFAULT_IO_OPS_DRAW, \
-	__FB_DEFAULT_IO_OPS_MMAP
+#define FB_DEFAULT_IOMEM_OPS \
+	__FB_DEFAULT_IOMEM_OPS_RDWR, \
+	__FB_DEFAULT_IOMEM_OPS_DRAW, \
+	__FB_DEFAULT_IOMEM_OPS_MMAP
 
 /*
  * Drawing operations where framebuffer is in system RAM
