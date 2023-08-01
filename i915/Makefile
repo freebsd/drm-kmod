@@ -222,6 +222,7 @@ SRCS+=	gen2_engine_cs.c \
 	intel_sa_media.c \
 	intel_sseu.c \
 	intel_timeline.c \
+	intel_tlb.c \
 	intel_wopcm.c \
 	intel_workarounds.c \
 	shmem_utils.c \
