@@ -27,7 +27,7 @@ void intel_pxp_fini_hw(struct intel_pxp *pxp);
 void intel_pxp_mark_termination_in_progress(struct intel_pxp *pxp);
 void intel_pxp_tee_end_arb_fw_session(struct intel_pxp *pxp, u32 arb_session_id);
 
-int intel_pxp_get_readiness_status(struct intel_pxp *pxp);
+int intel_pxp_get_readiness_status(struct intel_pxp *pxp, int timeout_ms);
 int intel_pxp_get_backend_timeout_ms(struct intel_pxp *pxp);
 int intel_pxp_start(struct intel_pxp *pxp);
 void intel_pxp_end(struct intel_pxp *pxp);
@@ -67,7 +67,8 @@ static inline bool intel_pxp_is_active(const struct intel_pxp *pxp)
 	return false;
 }
 
-static inline int intel_pxp_get_readiness_status(struct intel_pxp *pxp)
+static inline int intel_pxp_get_readiness_status(struct intel_pxp *pxp,
+						 int timeout_ms)
 {
 	return -ENODEV;
 }
