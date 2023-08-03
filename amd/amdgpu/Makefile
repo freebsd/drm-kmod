@@ -690,6 +690,7 @@ SRCS+=	dcn321_dio_link_encoder.c \
 SRCS+=	dcn35_dccg.c \
 	dcn35_dio_link_encoder.c \
 	dcn35_dio_stream_encoder.c \
+	dcn35_dpp.c \
 	dcn35_opp.c \
 	dcn35_optc.c \
 	dcn35_pg_cntl.c
