@@ -82,6 +82,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn316 \
 	${SRCDIR}/display/dc/dcn32 \
 	${SRCDIR}/display/dc/dcn321 \
+	${SRCDIR}/display/dc/dcn35 \
 	${SRCDIR}/display/dc/dml/calcs \
 	${SRCDIR}/display/dc/dsc \
 	${_dml} \
@@ -684,6 +685,9 @@ SRCS+=	dcn32_dccg.c \
 # display/dc/dcn321
 SRCS+=	dcn321_dio_link_encoder.c \
 	dcn321_resource.c
+
+# display/dc/dcn35
+SRCS+=	dcn35_dccg.c
 
 # display/dc/clk_mgr/dcn31
 SRCS+=	dcn31_afmt.c \
