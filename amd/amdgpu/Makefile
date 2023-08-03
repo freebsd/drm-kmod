@@ -28,6 +28,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn314 \
 	${SRCDIR}/display/dc/dml/dcn32 \
 	${SRCDIR}/display/dc/dml/dcn321 \
+	${SRCDIR}/display/dc/dml/dcn35 \
 	${SRCDIR}/display/dc/dml/dsc
 .endif
 
@@ -696,12 +697,16 @@ SRCS+=	dcn35_clk_mgr.c \
 	dcn35_dpp.c \
 	dcn35_dsc.c \
 	dcn35_dwb.c \
+	dcn35_fpu.c \
 	dcn35_hubbub.c \
 	dcn35_hubp.c \
+	dcn35_hwseq.c \
+	dcn35_init.c \
 	dcn35_mmhubbub.c \
 	dcn35_opp.c \
 	dcn35_optc.c \
 	dcn35_pg_cntl.c \
+	dcn35_resource.c \
 	dcn35_smu.c \
 	dmub_dcn35.c \
 	irq_service_dcn35.c
@@ -1332,6 +1337,7 @@ CWARNFLAGS.dcn32_resource_helpers.c=	-Wno-missing-prototypes -Wno-unused-but-set
 CWARNFLAGS.dcn321_fpu.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn321_resource.c=		-Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn35_clk_mgr.c=		-Wno-incompatible-pointer-types
+CWARNFLAGS.dcn35_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
