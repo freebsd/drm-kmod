@@ -691,6 +691,7 @@ SRCS+=	dcn35_dccg.c \
 	dcn35_dio_link_encoder.c \
 	dcn35_dio_stream_encoder.c \
 	dcn35_dpp.c \
+	dcn35_dsc.c \
 	dcn35_dwb.c \
 	dcn35_hubbub.c \
 	dcn35_hubp.c \
