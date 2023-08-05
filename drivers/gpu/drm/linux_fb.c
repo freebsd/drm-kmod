@@ -229,6 +229,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 			    "not attached to vt(4) console; "
 			    "another device has precedence (err=%d)\n",
 			    err);
+			err = 0;
 			break;
 		default:
 			device_printf(fb_info->fbio.fb_fbd_dev,
