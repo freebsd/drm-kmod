@@ -52,13 +52,6 @@ struct drm_printer;
 #ifdef __FreeBSD__
 /* Changes in default values in I915_PARAMS_FOR_EACH below:
  *
- *   enable_psr: -1 -> 0
- *   the console screen doesn't refresh otherwise (the computer remains
- *   responsive).
- *
- *   disable_power_well: -1 -> 0
- *   ?
- *
  *   enable_guc: -1 -> 0
  *   GuC initialization freeze the computer.
  */
@@ -71,10 +64,10 @@ struct drm_printer;
 	param(int, vbt_sdvo_panel_type, -1, 0400) \
 	param(int, enable_dc, -1, 0400) \
 	param(int, enable_fbc, -1, 0600) \
-	param(int, enable_psr, 0, 0600) \
+	param(int, enable_psr, -1, 0600) \
 	param(bool, psr_safest_params, false, 0400) \
 	param(bool, enable_psr2_sel_fetch, true, 0400) \
-	param(int, disable_power_well, 0, 0400) \
+	param(int, disable_power_well, -1, 0400) \
 	param(int, enable_ips, 1, 0600) \
 	param(int, invert_brightness, 0, 0600) \
 	param(int, enable_guc, 0, 0400) \
