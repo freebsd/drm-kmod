@@ -136,7 +136,7 @@ struct radeon_agp_head *radeon_agp_head_init(struct drm_device *dev)
 #ifdef __linux__
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 #endif
-	struct radeon_agp_head *head = NULL;
+	struct radeon_agp_head *head;
 
 	head = kzalloc(sizeof(*head), GFP_KERNEL);
 	if (!head)
