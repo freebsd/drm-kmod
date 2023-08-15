@@ -42,6 +42,8 @@ drm_vm.c
 drm_writeback.c
 drm_writeback.h
 linux_fb.c
+vt_drmfb.c
+vt_drmfb.h
 
 gma_drm.h
 bridge
