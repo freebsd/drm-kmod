@@ -104,6 +104,4 @@ is_firmware_framebuffer(struct apertures_struct *a __unused)
 int linux_fb_get_options(const char *name, char **option);
 #define	fb_get_options	linux_fb_get_options
 
-void vt_unfreeze_main_vd(void);
-
 #endif /* __LINUX_FB_H_ */
