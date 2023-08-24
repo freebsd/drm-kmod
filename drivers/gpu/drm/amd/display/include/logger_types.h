@@ -73,6 +73,7 @@
 #define DC_LOG_SMU(...) pr_debug("[SMU_MSG]:"__VA_ARGS__)
 #define DC_LOG_DWB(...) DRM_DEBUG_KMS(__VA_ARGS__)
 #define DC_LOG_DP2(...) DRM_DEBUG_KMS(__VA_ARGS__)
+#define DC_LOG_AUTO_DPM_TEST(...) pr_debug("[AutoDPMTest]: "__VA_ARGS__)
 
 #if defined(__FreeBSD__) && defined(LOG_WARNING)
 #undef LOG_WARNING // BSD: defined in syslog.h
@@ -133,6 +134,7 @@ enum dc_log_type {
 	LOG_SAMPLE_1DLUT,
 	LOG_DP2,
 	LOG_DC2RESERVED12,
+	LOG_AUTO_DPM_TEST,
 };
 
 #define DC_MIN_LOG_MASK ((1 << LOG_ERROR) | \
@@ -162,7 +164,8 @@ enum dc_log_type {
 		(1ULL << LOG_IF_TRACE) | \
 		(1ULL << LOG_HDMI_FRL) | \
 		(1ULL << LOG_SCALER) | \
-		(1ULL << LOG_DTN) /* | \
+		(1ULL << LOG_DTN) | \
+		(1ULL << LOG_AUTO_DPM_TEST)/* | \
 		(1ULL << LOG_DEBUG) | \
 		(1ULL << LOG_BIOS) | \
 		(1ULL << LOG_SURFACE) | \
