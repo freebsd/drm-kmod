@@ -1256,6 +1256,5 @@ void i915_pci_unregister_driver(void)
 	pci_unregister_driver(&i915_pci_driver);
 #elif defined(__FreeBSD__)
 	linux_pci_unregister_drm_driver(&i915_pci_driver);
-	vt_unfreeze_main_vd();
 #endif
 }

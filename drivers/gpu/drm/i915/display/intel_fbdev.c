@@ -269,6 +269,25 @@ static int intelfb_create(struct drm_fb_helper *helper,
 		info->fix.smem_len = vma->node.size;
 	}
 
+#ifdef __FreeBSD__
+	/*
+	 * After the if() above, we can register the fictitious memory range
+	 * based on the info->apertures->ranges[0] values.
+	 *
+	 * This was handled in register_framebuffer() in the past, also based
+	 * on the values of info->apertures->ranges[0]. However, the `amdgpu`
+	 * driver stopped setting them when it got rid of its specific
+	 * framebuffer initialization to use the generic drm_fb_helper code.
+	 *
+	 * We can't do this in register_framebuffer() anymore because the
+	 * values passed to register_fictitious_range() below are unavailable
+	 * from a generic structure set by both drivers.
+	 */
+	register_fictitious_range(
+	    info->apertures->ranges[0].base,
+	    info->apertures->ranges[0].size);
+#endif
+
 	vaddr = i915_vma_pin_iomap(vma);
 	if (IS_ERR(vaddr)) {
 		drm_err(&dev_priv->drm,
@@ -317,6 +336,12 @@ static void intel_fbdev_destroy(struct intel_fbdev *ifbdev)
 	 * the info->screen_base mmaping. Leaking the VMA is simpler than
 	 * trying to rectify all the possible error paths leading here.
 	 */
+
+#ifdef __FreeBSD__
+	unregister_fictitious_range(
+	    ifbdev->helper.fbdev->apertures->ranges[0].base,
+	    ifbdev->helper.fbdev->apertures->ranges[0].size);
+#endif
 
 	drm_fb_helper_fini(&ifbdev->helper);
 

@@ -40,6 +40,12 @@ struct drm_minor;
 int drm_dev_alias(struct device *dev, struct drm_minor *minor, const char *minor_str);
 void cancel_reset_debug_log(void);
 
+void vt_freeze_main_vd(struct apertures_struct *a);
+void vt_unfreeze_main_vd(void);
+
+int register_fictitious_range(vm_paddr_t start, vm_paddr_t end);
+void unregister_fictitious_range(vm_paddr_t start, vm_paddr_t end);
+
 void vt_restore_fbdev_mode(void *arg, int pending);
 int vt_kms_postswitch(void *arg);
 

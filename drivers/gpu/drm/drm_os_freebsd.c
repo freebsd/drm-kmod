@@ -18,6 +18,8 @@ __FBSDID("$FreeBSD$");
 #include <dev/iicbus/iicbus.h>
 #include <dev/iicbus/iiconf.h>
 
+#include <vm/vm_phys.h>
+
 #include <linux/cdev.h>
 #include <linux/fb.h>
 #undef fb_info
@@ -77,6 +79,40 @@ sysctl_pci_id(SYSCTL_HANDLER_ARGS)
 
 	snprintf(buf, sizeof(buf), "%x:%x", vid, pid);
 	return (sysctl_handle_string(oidp, buf, sizeof(buf), req));
+}
+
+int
+register_fictitious_range(vm_paddr_t base, size_t size)
+{
+	int ret;
+	struct apertures_struct *ap;
+
+	MPASS(base != 0);
+	MPASS(size != 0);
+
+	ap = alloc_apertures(1);
+	ap->ranges[0].base = base;
+	ap->ranges[0].size = size;
+	vt_freeze_main_vd(ap);
+	kfree(ap);
+
+	ret = vm_phys_fictitious_reg_range(base, base + size,
+#ifdef VM_MEMATTR_WRITE_COMBINING
+					   VM_MEMATTR_WRITE_COMBINING
+#else
+					   VM_MEMATTR_UNCACHEABLE
+#endif
+	    );
+	MPASS(ret == 0);
+
+	return (ret);
+}
+
+void
+unregister_fictitious_range(vm_paddr_t base, size_t size)
+{
+	vm_phys_fictitious_unreg_range(base, base + size);
+	vt_unfreeze_main_vd();
 }
 
 /* Framebuffer related code */

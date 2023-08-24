@@ -38,10 +38,6 @@ __FBSDID("$FreeBSD$");
 #include <sys/sx.h>
 #include <sys/fbio.h>
 
-#include <vm/vm.h>
-#include <vm/vm_page.h>
-#include <vm/vm_phys.h>
-
 #include <dev/vt/vt.h>
 #include <dev/vt/hw/fb/vt_fb.h>
 
@@ -58,7 +54,7 @@ extern struct vt_device *main_vd;
 
 static int __unregister_framebuffer(struct linux_fb_info *fb_info);
 
-static void
+void
 vt_freeze_main_vd(struct apertures_struct *a)
 {
 	struct fb_info *fb;
@@ -196,19 +192,6 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 {
 	int i, err;
 
-	vt_freeze_main_vd(fb_info->apertures);
-
-	MPASS(fb_info->apertures->ranges[0].base);
-	MPASS(fb_info->apertures->ranges[0].size);
-	vm_phys_fictitious_reg_range(fb_info->apertures->ranges[0].base,
-				     fb_info->apertures->ranges[0].base +
-				     fb_info->apertures->ranges[0].size,
-#ifdef VM_MEMATTR_WRITE_COMBINING
-				     VM_MEMATTR_WRITE_COMBINING);
-#else
-				     VM_MEMATTR_UNCACHEABLE);
-#endif
-
 	fb_info->fbio.fb_type = FBTYPE_PCIMISC;
 	fb_info->fbio.fb_height = fb_info->var.yres;
 	fb_info->fbio.fb_width = fb_info->var.xres;
@@ -264,9 +247,6 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 {
 	int ret = 0;
 
-	vm_phys_fictitious_unreg_range(fb_info->apertures->ranges[0].base,
-				     fb_info->apertures->ranges[0].base +
-				     fb_info->apertures->ranges[0].size);
 	if (fb_info->fbio.fb_fbd_dev) {
 		mtx_lock(&Giant);
 		device_delete_child(fb_info->fb_bsddev, fb_info->fbio.fb_fbd_dev);
