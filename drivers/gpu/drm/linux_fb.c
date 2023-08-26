@@ -258,16 +258,18 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 {
 	int ret = 0;
 
+	vt_drmfb_detach(&fb_info->fbio);
+
 	if (fb_info->fbio.fb_fbd_dev) {
 		mtx_lock(&Giant);
 		device_delete_child(fb_info->fb_bsddev, fb_info->fbio.fb_fbd_dev);
 		mtx_unlock(&Giant);
 		fb_info->fbio.fb_fbd_dev = NULL;
 	}
-	vt_drmfb_detach(&fb_info->fbio);
 
 	if (fb_info->fbops->fb_destroy)
 		fb_info->fbops->fb_destroy(fb_info);
+
 	return 0;
 }
 
