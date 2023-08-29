@@ -82,6 +82,7 @@ struct drm_minor {
 #ifdef __FreeBSD__
 	struct cdev *bsd_device; 	/* Device number for mknod */
 #endif
+	struct dentry *debugfs_symlink;
 	struct dentry *debugfs_root;
 
 	struct list_head debugfs_list;

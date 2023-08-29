@@ -63,7 +63,12 @@ accel_set_device_instance_params(struct device *kdev, int index)
 }
 
 static inline void
-accel_debugfs_init(struct drm_minor *minor, int minor_id)
+accel_debugfs_init(struct drm_device *dev)
+{
+}
+
+static inline void
+accel_debugfs_register(struct drm_device *dev)
 {
 }
 
