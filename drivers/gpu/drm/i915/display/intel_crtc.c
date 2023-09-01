@@ -656,10 +656,8 @@ void intel_pipe_update_end(struct intel_crtc_state *new_crtc_state)
 	ktime_t end_vbl_time = ktime_get();
 	struct drm_i915_private *dev_priv = to_i915(crtc->base.dev);
 
-	intel_psr_unlock(new_crtc_state);
-
 	if (new_crtc_state->do_async_flip)
-		return;
+		goto out;
 
 	trace_intel_pipe_update_end(crtc, end_vbl_count, scanline_end);
 
@@ -721,7 +719,7 @@ void intel_pipe_update_end(struct intel_crtc_state *new_crtc_state)
 #endif
 
 	if (intel_vgpu_active(dev_priv))
-		return;
+		goto out;
 
 	if (crtc->debug.start_vbl_count &&
 	    crtc->debug.start_vbl_count != end_vbl_count) {
@@ -736,4 +734,7 @@ void intel_pipe_update_end(struct intel_crtc_state *new_crtc_state)
 	}
 
 	dbg_vblank_evade(crtc, end_vbl_time);
+
+out:
+	intel_psr_unlock(new_crtc_state);
 }
