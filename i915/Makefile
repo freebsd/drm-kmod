@@ -379,6 +379,7 @@ CWARNFLAGS.intel_fbc.c=		-Wno-unused-variable
 CWARNFLAGS.intel_fbdev.c=	-Wno-initializer-overrides
 CWARNFLAGS.intel_freebsd.c=	-Wno-unused-function
 CWARNFLAGS.i915_gem_context.c=	-Wno-unused-function
+CWARNFLAGS.intel_ggtt.c=	-Wno-integer-overflow
 CWARNFLAGS.intel_gmch.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_gt_mcr.c=	-Wno-tautological-constant-out-of-range-compare
 CWARNFLAGS.intel_guc_capture.c=	-Wno-unused-but-set-variable
