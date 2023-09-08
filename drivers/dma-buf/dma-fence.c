@@ -645,3 +645,16 @@ dma_fence_wait(struct dma_fence *fence, bool intr)
 
 	return (ret < 0 ? ret : 0);
 }
+
+/*
+ * Helper to get the completion timestamp of a fence
+ */
+ktime_t
+dma_fence_timestamp(struct dma_fence *fence)
+{
+	if (!test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
+		return (ktime_get());
+	while (!test_bit(DMA_FENCE_FLAG_TIMESTAMP_BIT, &fence->flags))
+		cpu_relax();
+	return (fence->timestamp);
+}
