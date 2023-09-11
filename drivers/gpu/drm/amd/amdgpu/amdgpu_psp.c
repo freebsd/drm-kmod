@@ -104,7 +104,7 @@ static void psp_check_pmfw_centralized_cstate_management(struct psp_context *psp
 		return;
 	}
 
-	switch (adev->ip_versions[MP0_HWIP][0]) {
+	switch (amdgpu_ip_version(adev, MP0_HWIP, 0)) {
 	case IP_VERSION(11, 0, 0):
 	case IP_VERSION(11, 0, 4):
 	case IP_VERSION(11, 0, 5):
@@ -132,7 +132,7 @@ static int psp_init_sriov_microcode(struct psp_context *psp)
 
 	amdgpu_ucode_ip_version_decode(adev, MP0_HWIP, ucode_prefix, sizeof(ucode_prefix));
 
-	switch (adev->ip_versions[MP0_HWIP][0]) {
+	switch (amdgpu_ip_version(adev, MP0_HWIP, 0)) {
 	case IP_VERSION(9, 0, 0):
 	case IP_VERSION(11, 0, 7):
 	case IP_VERSION(11, 0, 9):
@@ -166,7 +166,7 @@ static int psp_early_init(void *handle)
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct psp_context *psp = &adev->psp;
 
-	switch (adev->ip_versions[MP0_HWIP][0]) {
+	switch (amdgpu_ip_version(adev, MP0_HWIP, 0)) {
 	case IP_VERSION(9, 0, 0):
 		psp_v3_1_set_psp_funcs(psp);
 		psp->autoload_supported = false;
@@ -338,7 +338,7 @@ static bool psp_get_runtime_db_entry(struct amdgpu_device *adev,
 	bool ret = false;
 	int i;
 
-	if (adev->ip_versions[MP0_HWIP][0] == IP_VERSION(13, 0, 6))
+	if (amdgpu_ip_version(adev, MP0_HWIP, 0) == IP_VERSION(13, 0, 6))
 		return false;
 
 	db_header_pos = adev->gmc.mc_vram_size - PSP_RUNTIME_DB_OFFSET;
@@ -417,7 +417,7 @@ static int psp_sw_init(void *handle)
 
 	adev->psp.xgmi_context.supports_extended_data =
 		!adev->gmc.xgmi.connected_to_cpu &&
-			adev->ip_versions[MP0_HWIP][0] == IP_VERSION(13, 0, 2);
+		amdgpu_ip_version(adev, MP0_HWIP, 0) == IP_VERSION(13, 0, 2);
 
 	memset(&scpm_entry, 0, sizeof(scpm_entry));
 	if ((psp_get_runtime_db_entry(adev,
@@ -777,7 +777,7 @@ static int psp_load_toc(struct psp_context *psp,
 
 static bool psp_boottime_tmr(struct psp_context *psp)
 {
-	switch (psp->adev->ip_versions[MP0_HWIP][0]) {
+	switch (amdgpu_ip_version(psp->adev, MP0_HWIP, 0)) {
 	case IP_VERSION(13, 0, 6):
 		return true;
 	default:
@@ -832,7 +832,7 @@ static int psp_tmr_init(struct psp_context *psp)
 
 static bool psp_skip_tmr(struct psp_context *psp)
 {
-	switch (psp->adev->ip_versions[MP0_HWIP][0]) {
+	switch (amdgpu_ip_version(psp->adev, MP0_HWIP, 0)) {
 	case IP_VERSION(11, 0, 9):
 	case IP_VERSION(11, 0, 7):
 	case IP_VERSION(13, 0, 2):
@@ -1219,8 +1219,8 @@ int psp_xgmi_terminate(struct psp_context *psp)
 	struct amdgpu_device *adev = psp->adev;
 
 	/* XGMI TA unload currently is not supported on Arcturus/Aldebaran A+A */
-	if (adev->ip_versions[MP0_HWIP][0] == IP_VERSION(11, 0, 4) ||
-	    (adev->ip_versions[MP0_HWIP][0] == IP_VERSION(13, 0, 2) &&
+	if (amdgpu_ip_version(adev, MP0_HWIP, 0) == IP_VERSION(11, 0, 4) ||
+	    (amdgpu_ip_version(adev, MP0_HWIP, 0) == IP_VERSION(13, 0, 2) &&
 	     adev->gmc.xgmi.connected_to_cpu))
 		return 0;
 
@@ -1317,9 +1317,11 @@ int psp_xgmi_get_node_id(struct psp_context *psp, uint64_t *node_id)
 
 static bool psp_xgmi_peer_link_info_supported(struct psp_context *psp)
 {
-	return (psp->adev->ip_versions[MP0_HWIP][0] == IP_VERSION(13, 0, 2) &&
+	return (amdgpu_ip_version(psp->adev, MP0_HWIP, 0) ==
+			IP_VERSION(13, 0, 2) &&
 		psp->xgmi_context.context.bin_desc.fw_version >= 0x2000000b) ||
-		psp->adev->ip_versions[MP0_HWIP][0] >= IP_VERSION(13, 0, 6);
+	       amdgpu_ip_version(psp->adev, MP0_HWIP, 0) >=
+		       IP_VERSION(13, 0, 6);
 }
 
 /*
@@ -1428,8 +1430,10 @@ int psp_xgmi_get_topology_info(struct psp_context *psp,
 	if (psp_xgmi_peer_link_info_supported(psp)) {
 		struct ta_xgmi_cmd_get_peer_link_info_output *link_info_output;
 		bool requires_reflection =
-			(psp->xgmi_context.supports_extended_data && get_extended_data) ||
-				psp->adev->ip_versions[MP0_HWIP][0] == IP_VERSION(13, 0, 6);
+			(psp->xgmi_context.supports_extended_data &&
+			 get_extended_data) ||
+			amdgpu_ip_version(psp->adev, MP0_HWIP, 0) ==
+				IP_VERSION(13, 0, 6);
 
 		xgmi_cmd->cmd_id = TA_COMMAND_XGMI__GET_PEER_LINKS;
 
@@ -2521,10 +2525,9 @@ static int psp_load_smu_fw(struct psp_context *psp)
 	if (!ucode->fw || amdgpu_sriov_vf(psp->adev))
 		return 0;
 
-	if ((amdgpu_in_reset(adev) &&
-	     ras && adev->ras_enabled &&
-	     (adev->ip_versions[MP0_HWIP][0] == IP_VERSION(11, 0, 4) ||
-	      adev->ip_versions[MP0_HWIP][0] == IP_VERSION(11, 0, 2)))) {
+	if ((amdgpu_in_reset(adev) && ras && adev->ras_enabled &&
+	     (amdgpu_ip_version(adev, MP0_HWIP, 0) == IP_VERSION(11, 0, 4) ||
+	      amdgpu_ip_version(adev, MP0_HWIP, 0) == IP_VERSION(11, 0, 2)))) {
 		ret = amdgpu_dpm_set_mp1_state(adev, PP_MP1_STATE_UNLOAD);
 		if (ret)
 			DRM_WARN("Failed to set MP1 state prepare for reload\n");
@@ -2607,9 +2610,12 @@ static int psp_load_non_psp_fw(struct psp_context *psp)
 			continue;
 
 		if (psp->autoload_supported &&
-		    (adev->ip_versions[MP0_HWIP][0] == IP_VERSION(11, 0, 7) ||
-		     adev->ip_versions[MP0_HWIP][0] == IP_VERSION(11, 0, 11) ||
-		     adev->ip_versions[MP0_HWIP][0] == IP_VERSION(11, 0, 12)) &&
+		    (amdgpu_ip_version(adev, MP0_HWIP, 0) ==
+			     IP_VERSION(11, 0, 7) ||
+		     amdgpu_ip_version(adev, MP0_HWIP, 0) ==
+			     IP_VERSION(11, 0, 11) ||
+		     amdgpu_ip_version(adev, MP0_HWIP, 0) ==
+			     IP_VERSION(11, 0, 12)) &&
 		    (ucode->ucode_id == AMDGPU_UCODE_ID_SDMA1 ||
 		     ucode->ucode_id == AMDGPU_UCODE_ID_SDMA2 ||
 		     ucode->ucode_id == AMDGPU_UCODE_ID_SDMA3))
@@ -3150,7 +3156,7 @@ static int psp_init_sos_base_fw(struct amdgpu_device *adev)
 		le32_to_cpu(sos_hdr->header.ucode_array_offset_bytes);
 
 	if (adev->gmc.xgmi.connected_to_cpu ||
-	    (adev->ip_versions[MP0_HWIP][0] != IP_VERSION(13, 0, 2))) {
+	    (amdgpu_ip_version(adev, MP0_HWIP, 0) != IP_VERSION(13, 0, 2))) {
 		adev->psp.sos.fw_version = le32_to_cpu(sos_hdr->header.ucode_version);
 		adev->psp.sos.feature_version = le32_to_cpu(sos_hdr->sos.fw_version);
 
