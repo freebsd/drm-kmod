@@ -35,7 +35,7 @@
 #include <linux/types.h>
 #include <linux/seq_file.h>
 
-#include <drm/drm_gpuva_mgr.h>
+#include <drm/drm_gpuvm.h>
 
 /**
  * DRM_DEBUGFS_GPUVA_INFO - &drm_info_list entry to dump a GPU VA space
@@ -153,7 +153,7 @@ void drm_debugfs_add_files(struct drm_device *dev,
 
 #ifdef __linux__
 int drm_debugfs_gpuva_info(struct seq_file *m,
-			   struct drm_gpuva_manager *mgr);
+			   struct drm_gpuvm *gpuvm);
 #endif
 #else
 static inline void drm_debugfs_create_files(const struct drm_info_list *files,
@@ -180,7 +180,7 @@ static inline void drm_debugfs_add_files(struct drm_device *dev,
 
 #ifdef __linux__
 static inline int drm_debugfs_gpuva_info(struct seq_file *m,
-					 struct drm_gpuva_manager *mgr)
+					 struct drm_gpuvm *gpuvm)
 {
 	return 0;
 }
