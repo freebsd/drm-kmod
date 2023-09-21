@@ -326,7 +326,7 @@ static int eb_pin_engine(struct i915_execbuffer *eb, bool throttle);
 static void eb_unpin_engine(struct i915_execbuffer *eb);
 static void eb_capture_release(struct i915_execbuffer *eb);
 
-static inline bool eb_use_cmdparser(const struct i915_execbuffer *eb)
+static bool eb_use_cmdparser(const struct i915_execbuffer *eb)
 {
 	return intel_engine_requires_cmd_parser(eb->context->engine) ||
 		(intel_engine_using_cmd_parser(eb->context->engine) &&
@@ -438,7 +438,7 @@ static u64 eb_pin_flags(const struct drm_i915_gem_exec_object2 *entry,
 	return pin_flags;
 }
 
-static inline int
+static int
 eb_pin_vma(struct i915_execbuffer *eb,
 	   const struct drm_i915_gem_exec_object2 *entry,
 	   struct eb_vma *ev)
@@ -491,7 +491,7 @@ eb_pin_vma(struct i915_execbuffer *eb,
 	return 0;
 }
 
-static inline void
+static void
 eb_unreserve_vma(struct eb_vma *ev)
 {
 	if (unlikely(ev->flags & __EXEC_OBJECT_HAS_FENCE))
@@ -553,7 +553,7 @@ eb_validate_vma(struct i915_execbuffer *eb,
 	return 0;
 }
 
-static inline bool
+static bool
 is_batch_buffer(struct i915_execbuffer *eb, unsigned int buffer_idx)
 {
 	return eb->args->flags & I915_EXEC_BATCH_FIRST ?
@@ -633,8 +633,8 @@ eb_add_vma(struct i915_execbuffer *eb,
 	return 0;
 }
 
-static inline int use_cpu_reloc(const struct reloc_cache *cache,
-				const struct drm_i915_gem_object *obj)
+static int use_cpu_reloc(const struct reloc_cache *cache,
+			 const struct drm_i915_gem_object *obj)
 {
 	if (!i915_gem_object_has_struct_page(obj))
 		return false;
@@ -1112,7 +1112,7 @@ static void eb_destroy(const struct i915_execbuffer *eb)
 		kfree(eb->buckets);
 }
 
-static inline u64
+static u64
 relocation_target(const struct drm_i915_gem_relocation_entry *reloc,
 		  const struct i915_vma *target)
 {
@@ -1133,19 +1133,19 @@ static void reloc_cache_init(struct reloc_cache *cache,
 	cache->node.flags = 0;
 }
 
-static inline void *unmask_page(unsigned long p)
+static void *unmask_page(unsigned long p)
 {
 	return (void *)(uintptr_t)(p & PAGE_MASK);
 }
 
-static inline unsigned int unmask_flags(unsigned long p)
+static unsigned int unmask_flags(unsigned long p)
 {
 	return p & ~PAGE_MASK;
 }
 
 #define KMAP 0x4 /* after CLFLUSH_FLAGS */
 
-static inline struct i915_ggtt *cache_to_ggtt(struct reloc_cache *cache)
+static struct i915_ggtt *cache_to_ggtt(struct reloc_cache *cache)
 {
 	struct drm_i915_private *i915 =
 		container_of(cache, struct i915_execbuffer, reloc_cache)->i915;
