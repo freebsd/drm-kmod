@@ -144,6 +144,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_hdmi.c \
 	intel_hotplug_irq.c \
 	intel_hti.c \
+	intel_link_bw.c \
 	intel_load_detect.c \
 	intel_lspcon.c \
 	intel_lvds.c \
