@@ -63,11 +63,9 @@ static DEFINE_PER_CPU(int, fpu_recursion_depth);
 inline void dc_assert_fp_enabled(void)
 {
 #ifdef __linux__
-	int *pcpu, depth = 0;
-
-	pcpu = get_cpu_ptr(&fpu_recursion_depth);
-	depth = *pcpu;
-	put_cpu_ptr(&fpu_recursion_depth);
+	int depth;
+ 
+	depth = __this_cpu_read(fpu_recursion_depth);
 
 	ASSERT(depth >= 1);
 #elif defined(__FreeBSD__)
@@ -91,32 +89,27 @@ inline void dc_assert_fp_enabled(void)
 void dc_fpu_begin(const char *function_name, const int line)
 {
 #ifdef __linux__
-	int *pcpu;
-
-	pcpu = get_cpu_ptr(&fpu_recursion_depth);
-	*pcpu += 1;
-
-	if (*pcpu == 1) {
-#if defined(CONFIG_X86) || defined(CONFIG_LOONGARCH)
-		kernel_fpu_begin();
-#elif defined(CONFIG_PPC64)
-		if (cpu_has_feature(CPU_FTR_VSX_COMP)) {
-			preempt_disable();
-			enable_kernel_vsx();
-		} else if (cpu_has_feature(CPU_FTR_ALTIVEC_COMP)) {
-			preempt_disable();
-			enable_kernel_altivec();
-		} else if (!cpu_has_feature(CPU_FTR_FPU_UNAVAILABLE)) {
-			preempt_disable();
-			enable_kernel_fp();
-		}
-#elif defined(CONFIG_ARM64)
-		kernel_neon_begin();
-#endif
-	}
-
-	TRACE_DCN_FPU(true, function_name, line, *pcpu);
-	put_cpu_ptr(&fpu_recursion_depth);
+	int depth;
+ 
+	preempt_disable();
+	depth = __this_cpu_inc_return(fpu_recursion_depth);
+ 
+	if (depth == 1) {
+ #if defined(CONFIG_X86) || defined(CONFIG_LOONGARCH)
+ 		kernel_fpu_begin();
+ #elif defined(CONFIG_PPC64)
+		if (cpu_has_feature(CPU_FTR_VSX_COMP))
+ 			enable_kernel_vsx();
+		else if (cpu_has_feature(CPU_FTR_ALTIVEC_COMP))
+ 			enable_kernel_altivec();
+		else if (!cpu_has_feature(CPU_FTR_FPU_UNAVAILABLE))
+ 			enable_kernel_fp();
+ #elif defined(CONFIG_ARM64)
+ 		kernel_neon_begin();
+ #endif
+ 	}
+ 
+	TRACE_DCN_FPU(true, function_name, line, depth);
 #elif defined(__FreeBSD__)
 	/* LKPI kernel_fpu_begin handles the above complications internally */
 	kernel_fpu_begin();
@@ -137,31 +130,28 @@ void dc_fpu_begin(const char *function_name, const int line)
 void dc_fpu_end(const char *function_name, const int line)
 {
 #ifdef __linux__
-	int *pcpu;
-
-	pcpu = get_cpu_ptr(&fpu_recursion_depth);
-	*pcpu -= 1;
-	if (*pcpu <= 0) {
-#if defined(CONFIG_X86) || defined(CONFIG_LOONGARCH)
-		kernel_fpu_end();
-#elif defined(CONFIG_PPC64)
-		if (cpu_has_feature(CPU_FTR_VSX_COMP)) {
-			disable_kernel_vsx();
-			preempt_enable();
-		} else if (cpu_has_feature(CPU_FTR_ALTIVEC_COMP)) {
-			disable_kernel_altivec();
-			preempt_enable();
-		} else if (!cpu_has_feature(CPU_FTR_FPU_UNAVAILABLE)) {
-			disable_kernel_fp();
-			preempt_enable();
-		}
-#elif defined(CONFIG_ARM64)
-		kernel_neon_end();
-#endif
-	}
-
-	TRACE_DCN_FPU(false, function_name, line, *pcpu);
-	put_cpu_ptr(&fpu_recursion_depth);
+	int depth;
+ 
+	depth = __this_cpu_dec_return(fpu_recursion_depth);
+	if (depth == 0) {
+ #if defined(CONFIG_X86) || defined(CONFIG_LOONGARCH)
+ 		kernel_fpu_end();
+ #elif defined(CONFIG_PPC64)
+		if (cpu_has_feature(CPU_FTR_VSX_COMP))
+ 			disable_kernel_vsx();
+		else if (cpu_has_feature(CPU_FTR_ALTIVEC_COMP))
+ 			disable_kernel_altivec();
+		else if (!cpu_has_feature(CPU_FTR_FPU_UNAVAILABLE))
+ 			disable_kernel_fp();
+ #elif defined(CONFIG_ARM64)
+ 		kernel_neon_end();
+ #endif
+	} else {
+		WARN_ON_ONCE(depth < 0);
+ 	}
+ 
+	TRACE_DCN_FPU(false, function_name, line, depth);
+	preempt_enable();
 #elif defined(__FreeBSD__)
 	/* LKPI kernel_fpu_end handles the above complications internally */
 	kernel_fpu_end();
