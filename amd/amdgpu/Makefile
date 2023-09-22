@@ -86,6 +86,28 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn32 \
 	${SRCDIR}/display/dc/dcn321 \
 	${SRCDIR}/display/dc/dcn35 \
+	${SRCDIR}/display/dc/hwss/dce \
+	${SRCDIR}/display/dc/hwss/dce100 \
+	${SRCDIR}/display/dc/hwss/dce110 \
+	${SRCDIR}/display/dc/hwss/dce112 \
+	${SRCDIR}/display/dc/hwss/dce120 \
+	${SRCDIR}/display/dc/hwss/dce60 \
+	${SRCDIR}/display/dc/hwss/dce80 \
+	${SRCDIR}/display/dc/hwss/dcn10 \
+	${SRCDIR}/display/dc/hwss/dcn20 \
+	${SRCDIR}/display/dc/hwss/dcn201 \
+	${SRCDIR}/display/dc/hwss/dcn21 \
+	${SRCDIR}/display/dc/hwss/dcn30 \
+	${SRCDIR}/display/dc/hwss/dcn301 \
+	${SRCDIR}/display/dc/hwss/dcn302 \
+	${SRCDIR}/display/dc/hwss/dcn303 \
+	${SRCDIR}/display/dc/hwss/dcn31 \
+	${SRCDIR}/display/dc/hwss/dcn314 \
+	${SRCDIR}/display/dc/hwss/dcn315 \
+	${SRCDIR}/display/dc/hwss/dcn316 \
+	${SRCDIR}/display/dc/hwss/dcn32 \
+	${SRCDIR}/display/dc/hwss/dcn321 \
+	${SRCDIR}/display/dc/hwss/dcn35 \
 	${SRCDIR}/display/dc/dml/calcs \
 	${SRCDIR}/display/dc/dsc \
 	${_dml} \
@@ -491,12 +513,12 @@ SRCS+=	dce_abm.c \
 	dmub_outbox.c
 
 # display/dc/dce100
-SRCS+=	dce100_hw_sequencer.c \
+SRCS+=	dce100_hwseq.c \
 	dce100_resource.c
 
 # display/dc/dce110
 SRCS+=	dce110_compressor.c \
-	dce110_hw_sequencer.c \
+	dce110_hwseq.c \
 	dce110_mem_input_v.c \
 	dce110_opp_csc_v.c \
 	dce110_opp_regamma_v.c \
@@ -508,11 +530,11 @@ SRCS+=	dce110_compressor.c \
 
 # display/dc/dce112
 SRCS+=	dce112_compressor.c \
-	dce112_hw_sequencer.c \
+	dce112_hwseq.c \
 	dce112_resource.c
 
 # display/dc/dce120
-SRCS+=	dce120_hw_sequencer.c \
+SRCS+=	dce120_hwseq.c \
 	dce120_resource.c \
 	dce120_timing_generator.c
 
@@ -522,7 +544,7 @@ SRCS+=	dce60_hw_sequencer.c \
 	dce60_timing_generator.c
 
 # display/dc/dce80
-SRCS+=	dce80_hw_sequencer.c \
+SRCS+=	dce80_hwseq.c \
 	dce80_resource.c \
 	dce80_timing_generator.c
 
@@ -545,7 +567,7 @@ SRCS+=	dcn10_cm_common.c \
 	dcn10_dpp_dscl.c \
 	dcn10_hubbub.c \
 	dcn10_hubp.c \
-	dcn10_hw_sequencer.c \
+	dcn10_hwseq.c \
 	dcn10_hw_sequencer_debug.c \
 	dcn10_init.c \
 	dcn10_ipp.c \
@@ -1045,6 +1067,7 @@ CFLAGS+= -I${SRCDIR}/display
 CFLAGS+= -I${SRCDIR}/display/amdgpu_dm
 CFLAGS+= -I${SRCDIR}/display/dc
 CFLAGS+= -I${SRCDIR}/display/dc/clk_mgr/
+CFLAGS+= -I${SRCDIR}/display/dc/hwss
 CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
 CFLAGS+= -I${SRCDIR}/display/dmub/inc
@@ -1258,12 +1281,12 @@ CWARNFLAGS.dce_opp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dce_panel_cntl.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dce100_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dce110_compressor.c=		-Wno-missing-prototypes
-CWARNFLAGS.dce110_hw_sequencer.c=	-Wno-missing-prototypes
+CWARNFLAGS.dce110_hwseq.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce110_mem_input_v.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce110_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dce110_timing_generator.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.dce112_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
-CWARNFLAGS.dce120_hw_sequencer.c=	-Wno-unused-const-variable
+CWARNFLAGS.dce120_hwseq.c=		-Wno-unused-const-variable
 CWARNFLAGS.dce120_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dce120_timing_generator.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce60_timing_generator.c=	-Wno-missing-prototypes
@@ -1275,7 +1298,7 @@ CWARNFLAGS.rv1_clk_mgr_vbios_smu.c=	-Wno-missing-prototypes
 CWARNFLAGS.rv1_clk_mgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp_dscl.c=		-Wno-missing-prototypes
-CWARNFLAGS.dcn10_hw_sequencer.c=	-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-unused-variable
+CWARNFLAGS.dcn10_hwseq.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-unused-variable
 CWARNFLAGS.dcn10_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_link_encoder.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.dcn10_stream_encoder.c=	-Wno-unused-but-set-variable
