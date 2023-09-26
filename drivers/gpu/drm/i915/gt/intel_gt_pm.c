@@ -312,6 +312,7 @@ int intel_gt_resume(struct intel_gt *gt)
 out_fw:
 	intel_uncore_forcewake_put(gt->uncore, FORCEWAKE_ALL);
 	intel_gt_pm_put(gt);
+	intel_gt_bind_context_set_ready(gt);
 	return err;
 
 err_wedged:
@@ -338,6 +339,7 @@ static void wait_for_suspend(struct intel_gt *gt)
 
 void intel_gt_suspend_prepare(struct intel_gt *gt)
 {
+	intel_gt_bind_context_set_unready(gt);
 	user_forcewake(gt, true);
 	wait_for_suspend(gt);
 }
@@ -395,6 +397,7 @@ void intel_gt_suspend_late(struct intel_gt *gt)
 
 void intel_gt_runtime_suspend(struct intel_gt *gt)
 {
+	intel_gt_bind_context_set_unready(gt);
 	intel_uc_runtime_suspend(&gt->uc);
 
 	GT_TRACE(gt, "\n");
@@ -412,6 +415,7 @@ int intel_gt_runtime_resume(struct intel_gt *gt)
 	if (ret)
 		return ret;
 
+	intel_gt_bind_context_set_ready(gt);
 	return 0;
 }
 
