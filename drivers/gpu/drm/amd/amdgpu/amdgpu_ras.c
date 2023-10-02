@@ -1378,6 +1378,22 @@ static ssize_t amdgpu_ras_sysfs_features_read(struct device *dev,
 	return sysfs_emit(buf, "feature mask: 0x%x\n", con->features);
 }
 
+static ssize_t amdgpu_ras_sysfs_version_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	struct amdgpu_ras *con =
+		container_of(attr, struct amdgpu_ras, version_attr);
+	return sysfs_emit(buf, "table version: 0x%x\n", con->eeprom_control.tbl_hdr.version);
+}
+
+static ssize_t amdgpu_ras_sysfs_schema_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	struct amdgpu_ras *con =
+		container_of(attr, struct amdgpu_ras, schema_attr);
+	return sysfs_emit(buf, "schema: 0x%x\n", con->schema);
+}
+
 static void amdgpu_ras_sysfs_remove_bad_page_node(struct amdgpu_device *adev)
 {
 #ifdef __linux__
@@ -1389,11 +1405,13 @@ static void amdgpu_ras_sysfs_remove_bad_page_node(struct amdgpu_device *adev)
 #endif
 }
 
-static int amdgpu_ras_sysfs_remove_feature_node(struct amdgpu_device *adev)
+static int amdgpu_ras_sysfs_remove_dev_attr_node(struct amdgpu_device *adev)
 {
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct attribute *attrs[] = {
 		&con->features_attr.attr,
+		&con->version_attr.attr,
+		&con->schema_attr.attr,
 		NULL
 	};
 	struct attribute_group group = {
@@ -1473,7 +1491,7 @@ static int amdgpu_ras_sysfs_remove_all(struct amdgpu_device *adev)
 	if (amdgpu_bad_page_threshold != 0)
 		amdgpu_ras_sysfs_remove_bad_page_node(adev);
 
-	amdgpu_ras_sysfs_remove_feature_node(adev);
+	amdgpu_ras_sysfs_remove_dev_attr_node(adev);
 
 	return 0;
 }
@@ -1597,6 +1615,10 @@ static BIN_ATTR(gpu_vram_bad_pages, S_IRUGO,
 		amdgpu_ras_sysfs_badpages_read, NULL, 0);
 static DEVICE_ATTR(features, S_IRUGO,
 		amdgpu_ras_sysfs_features_read, NULL);
+static DEVICE_ATTR(version, 0444,
+		amdgpu_ras_sysfs_version_show, NULL);
+static DEVICE_ATTR(schema, 0444,
+		amdgpu_ras_sysfs_schema_show, NULL);
 #endif
 static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 {
@@ -1607,6 +1629,8 @@ static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 	};
 	struct attribute *attrs[] = {
 		&con->features_attr.attr,
+		&con->version_attr.attr,
+		&con->schema_attr.attr,
 		NULL
 	};
 	struct bin_attribute *bin_attrs[] = {
@@ -1615,10 +1639,19 @@ static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 	};
 	int r;
 
+	group.attrs = attrs;
+
 	/* add features entry */
 	con->features_attr = dev_attr_features;
-	group.attrs = attrs;
 	sysfs_attr_init(attrs[0]);
+
+	/* add version entry */
+	con->version_attr = dev_attr_version;
+	sysfs_attr_init(attrs[1]);
+
+	/* add schema entry */
+	con->schema_attr = dev_attr_schema;
+	sysfs_attr_init(attrs[2]);
 
 	if (amdgpu_bad_page_threshold != 0) {
 		/* add bad_page_features entry */
@@ -2612,6 +2645,14 @@ static void amdgpu_ras_query_poison_mode(struct amdgpu_device *adev)
 	}
 }
 
+static int amdgpu_get_ras_schema(struct amdgpu_device *adev)
+{
+	return  amdgpu_ras_is_poison_mode_supported(adev) ? AMDGPU_RAS_ERROR__POISON : 0 |
+			AMDGPU_RAS_ERROR__SINGLE_CORRECTABLE |
+			AMDGPU_RAS_ERROR__MULTI_UNCORRECTABLE |
+			AMDGPU_RAS_ERROR__PARITY;
+}
+
 int amdgpu_ras_init(struct amdgpu_device *adev)
 {
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
@@ -2654,6 +2695,7 @@ int amdgpu_ras_init(struct amdgpu_device *adev)
 
 	con->update_channel_flag = false;
 	con->features = 0;
+	con->schema = 0;
 	INIT_LIST_HEAD(&con->head);
 	/* Might need get this flag from vbios. */
 	con->flags = RAS_DEFAULT_FLAGS;
@@ -2708,6 +2750,9 @@ int amdgpu_ras_init(struct amdgpu_device *adev)
 	}
 
 	amdgpu_ras_query_poison_mode(adev);
+
+	/* Get RAS schema for particular SOC */
+	con->schema = amdgpu_get_ras_schema(adev);
 
 	if (amdgpu_ras_fs_init(adev)) {
 		r = -EINVAL;
