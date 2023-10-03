@@ -428,7 +428,8 @@ SRCS+=	amdgpu_dm_color.c \
 	dc_fpu.c
 
 # display/dc/basics
-SRCS+=	conversion.c \
+SRCS+=	bw_fixed.c \
+	conversion.c \
 	custom_float.c \
 	dc_common.c \
 	dce_calcs.c \
@@ -450,9 +451,6 @@ SRCS+=	bios_parser_common.c \
 	command_table_helper_dce112.c \
 	command_table_helper_dce60.c \
 	command_table_helper_dce80.c
-
-# display/dc/calcs
-SRCS+=	bw_fixed.c
 
 # display/dc/core
 SRCS+=	dc_debug.c \
