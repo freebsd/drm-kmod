@@ -430,6 +430,7 @@ SRCS+=	amdgpu_dm_color.c \
 # display/dc/basics
 SRCS+=	conversion.c \
 	dc_common.c \
+	dce_calcs.c \
 	fixpt31_32.c \
 	vector.c
 
@@ -451,8 +452,7 @@ SRCS+=	bios_parser_common.c \
 
 # display/dc/calcs
 SRCS+=	bw_fixed.c \
-	custom_float.c \
-	dce_calcs.c
+	custom_float.c
 
 # display/dc/core
 SRCS+=	dc_debug.c \
