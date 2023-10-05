@@ -32,6 +32,10 @@ struct vt_kms_softc {
 #define	KTR_DRM		KTR_DEV
 #define	KTR_DRM_REG	KTR_SPARE3
 
+#if defined(__amd64__)
+#define CONFIG_COMPAT
+#endif
+
 MALLOC_DECLARE(DRM_MEM_DMA);
 MALLOC_DECLARE(DRM_MEM_DRIVER);
 MALLOC_DECLARE(DRM_MEM_KMS);
