@@ -154,6 +154,27 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/link/accessories \
 	${SRCDIR}/display/dc/link/hwss \
 	${SRCDIR}/display/dc/link/protocols \
+	${SRCDIR}/display/dc/resource/dce100 \
+	${SRCDIR}/display/dc/resource/dce110 \
+	${SRCDIR}/display/dc/resource/dce112 \
+	${SRCDIR}/display/dc/resource/dce120 \
+	${SRCDIR}/display/dc/resource/dce60 \
+	${SRCDIR}/display/dc/resource/dce80 \
+	${SRCDIR}/display/dc/resource/dcn10 \
+	${SRCDIR}/display/dc/resource/dcn20 \
+	${SRCDIR}/display/dc/resource/dcn201 \
+	${SRCDIR}/display/dc/resource/dcn21 \
+	${SRCDIR}/display/dc/resource/dcn30 \
+	${SRCDIR}/display/dc/resource/dcn301 \
+	${SRCDIR}/display/dc/resource/dcn302 \
+	${SRCDIR}/display/dc/resource/dcn303 \
+	${SRCDIR}/display/dc/resource/dcn31 \
+	${SRCDIR}/display/dc/resource/dcn314 \
+	${SRCDIR}/display/dc/resource/dcn315 \
+	${SRCDIR}/display/dc/resource/dcn316 \
+	${SRCDIR}/display/dc/resource/dcn32 \
+	${SRCDIR}/display/dc/resource/dcn321 \
+	${SRCDIR}/display/dc/resource/dcn35 \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
@@ -1074,6 +1095,7 @@ CFLAGS+= -I${SRCDIR}/display/dc/clk_mgr/
 CFLAGS+= -I${SRCDIR}/display/dc/hwss
 CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
+CFLAGS+= -I${SRCDIR}/display/dc/resource
 CFLAGS+= -I${SRCDIR}/display/dmub/inc
 CFLAGS+= -I${SRCDIR}/display/include
 CFLAGS+= -I${SRCDIR}/display/modules/hdcp
