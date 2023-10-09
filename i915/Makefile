@@ -141,6 +141,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_global_state.c \
 	intel_gmbus.c \
 	intel_hdcp_gsc.c \
+	intel_hdcp_gsc_message.c \
 	intel_hdmi.c \
 	intel_hotplug_irq.c \
 	intel_hti.c \
