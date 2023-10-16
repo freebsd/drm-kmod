@@ -219,6 +219,7 @@ dma_fence_chain_walk(struct dma_fence *fence)
 		dma_fence_put(prev);
 	}
 
+	dma_fence_put(fence);
 	return (prev);
 }
 
