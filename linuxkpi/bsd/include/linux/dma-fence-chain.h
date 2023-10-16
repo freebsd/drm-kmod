@@ -59,13 +59,13 @@ MALLOC_DECLARE(M_DMABUF);
 static inline struct dma_fence_chain *
 dma_fence_chain_alloc(void)
 {
-	return malloc(sizeof(struct dma_fence_chain), M_DMABUF, M_WAITOK | M_ZERO);
+	return (kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL));
 }
 
 static inline void
 dma_fence_chain_free(struct dma_fence_chain *chain)
 {
-	free(chain, M_DMABUF);
+	kfree(chain);
 }
 
 #endif /* _LINUX_DMA_FENCE_CHAIN_H_ */
