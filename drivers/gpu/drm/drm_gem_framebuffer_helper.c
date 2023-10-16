@@ -5,8 +5,6 @@
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_modeset_helper.h>
 
-MALLOC_DECLARE(DRM_MEM_KMS);
-
 void
 drm_gem_fb_destroy(struct drm_framebuffer *fb)
 {
