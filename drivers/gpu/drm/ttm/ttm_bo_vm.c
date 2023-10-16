@@ -215,9 +215,6 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 		return ret;
 
 	err = ttm_mem_io_reserve(bdev, bo->resource);
-#ifdef __FreeBSD__
-	VM_OBJECT_WLOCK(vma->vm_obj);
-#endif
 	if (unlikely(err != 0))
 		return VM_FAULT_SIGBUS;
 
@@ -249,12 +246,18 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 	 * Speculatively prefault a number of pages. Only error on
 	 * first page.
 	 */
+#ifdef __FreeBSD__
+	VM_OBJECT_WLOCK(vma->vm_obj);
+#endif
 	for (i = 0; i < num_prefault; ++i) {
 		if (bo->resource->bus.is_iomem) {
 			pfn = ttm_bo_io_mem_pfn(bo, page_offset);
 		} else {
 			page = ttm->pages[page_offset];
 			if (unlikely(!page && i == 0)) {
+#ifdef __FreeBSD__
+				VM_OBJECT_WUNLOCK(vma->vm_obj);
+#endif
 				return VM_FAULT_OOM;
 			} else if (unlikely(!page)) {
 				break;
@@ -284,9 +287,12 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 
 		/* Never error on prefaulted PTEs */
 		if (unlikely((ret & VM_FAULT_ERROR))) {
-			if (i == 0)
+			if (i == 0) {
+#ifdef __FreeBSD__
+				VM_OBJECT_WUNLOCK(vma->vm_obj);
+#endif
 				return VM_FAULT_NOPAGE;
-			else
+			} else
 				break;
 		}
 
