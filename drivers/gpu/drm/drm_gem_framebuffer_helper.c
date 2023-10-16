@@ -15,7 +15,7 @@ drm_gem_fb_destroy(struct drm_framebuffer *fb)
 	for (i = 0; i < 4; i++)
 		drm_gem_object_put(fb->obj[i]);
 	drm_framebuffer_cleanup(fb);
-	free(fb, DRM_MEM_KMS);
+	kfree(fb);
 }
 
 int
