@@ -29,6 +29,7 @@
 #include "amdgpu.h"
 #include "atom.h"
 
+#include <linux/device.h>
 #include <linux/pci.h>
 #include <linux/slab.h>
 #include <linux/acpi.h>
@@ -290,8 +291,8 @@ static bool amdgpu_atrm_get_bios(struct amdgpu_device *adev)
 	acpi_status status;
 	bool found = false;
 
-	/* ATRM is for the discrete card only */
-	if (adev->flags & AMD_IS_APU)
+	/* ATRM is for on-platform devices only */
+	if (dev_is_removable(&adev->pdev->dev))
 		return false;
 
 	while ((pdev = pci_get_base_class(PCI_BASE_CLASS_DISPLAY, pdev))) {
