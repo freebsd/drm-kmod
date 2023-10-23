@@ -1501,6 +1501,8 @@ bool amdgpu_device_should_use_aspm(struct amdgpu_device *adev)
 	default:
 		return false;
 	}
+	if (adev->flags & AMD_IS_APU)
+		return false;
 	return pcie_aspm_enabled(adev->pdev);
 }
 
