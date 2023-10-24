@@ -95,10 +95,6 @@ i915_param_named_unsafe(force_probe, charp, 0400,
 	"See CONFIG_DRM_I915_FORCE_PROBE for details.");
 #endif
 
-i915_param_named_unsafe(force_reset_modeset_test, bool, 0400,
-	"Force a modeset during gpu reset for testing (default:false). "
-	"For developers only.");
-
 i915_param_named(disable_display, bool, 0400,
 	"Disable display (default: false)");
 
