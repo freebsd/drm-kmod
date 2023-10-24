@@ -95,10 +95,6 @@ i915_param_named_unsafe(force_probe, charp, 0400,
 	"See CONFIG_DRM_I915_FORCE_PROBE for details.");
 #endif
 
-i915_param_named_unsafe(disable_power_well, int, 0400,
-	"Disable display power wells when possible "
-	"(-1=auto [default], 0=power wells always on, 1=power wells disabled when possible)");
-
 i915_param_named_unsafe(enable_ips, int, 0400, "Enable IPS (default: true)");
 
 i915_param_named_unsafe(load_detect_test, bool, 0400,
