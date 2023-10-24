@@ -117,6 +117,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_display_device.c \
 	intel_display_driver.c \
 	intel_display_irq.c \
+	intel_display_params.c \
 	intel_display_power_map.c \
 	intel_display_power_well.c \
 	intel_display_reset.c \
@@ -303,6 +304,7 @@ SRCS+=	i915_ioc32.c
 SRCS+=	i915_debugfs.c \
 	i915_debugfs_params.c \
 	intel_display_debugfs.c \
+	intel_display_debugfs_params.c \
 	intel_gt_debugfs.c \
 	intel_gt_engines_debugfs.c \
 	intel_gt_pm_debugfs.c \
