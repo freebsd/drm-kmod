@@ -1185,6 +1185,7 @@ CWARNFLAGS.amdgpu_device.c=			-Wno-missing-prototypes -Wno-unused-but-set-variab
 CWARNFLAGS.amdgpu_discovery.c=			-Wno-unused-function
 CWARNFLAGS.amdgpu_dm_debugfs.c=			-Wno-pointer-bool-conversion -Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_fence.c=			-Wno-unused-variable
+CWARNFLAGS.amdgpu_fdinfo.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_gfx.c=			-Wno-unused-but-set-variable -Wno-tautological-overlap-compare
 CWARNFLAGS.amdgpu_ioc32.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_pm.c=				-Wno-unused-const-variable
