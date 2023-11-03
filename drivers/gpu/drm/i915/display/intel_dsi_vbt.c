@@ -213,8 +213,8 @@ static const u8 *mipi_exec_delay(struct intel_dsi *intel_dsi, const u8 *data)
 }
 
 #ifdef __linux__
-static void soc_gpio_set_value(struct intel_connector *connector, const char *con_id,
-			       u8 gpio_index, bool value)
+static void soc_gpio_set_value(struct intel_connector *connector, u7 gpio_index,
+			       const char *con_id, u8 idx, bool value)
 {
 	struct drm_i915_private *dev_priv = to_i915(connector->base.dev);
 	/* XXX: this table is a quick ugly hack. */
@@ -224,8 +224,7 @@ static void soc_gpio_set_value(struct intel_connector *connector, const char *co
 	if (gpio_desc) {
 		gpiod_set_value(gpio_desc, value);
 	} else {
-		gpio_desc = devm_gpiod_get_index(dev_priv->drm.dev,
-						 con_id, gpio_index,
+		gpio_desc = devm_gpiod_get_index(dev_priv->drm.dev, con_id, idx,
 						 value ? GPIOD_OUT_HIGH : GPIOD_OUT_LOW);
 		if (IS_ERR(gpio_desc)) {
 			drm_err(&dev_priv->drm,
@@ -239,8 +238,8 @@ static void soc_gpio_set_value(struct intel_connector *connector, const char *co
 }
 
 static void soc_opaque_gpio_set_value(struct intel_connector *connector,
-				      const char *chip, const char *con_id,
-				      u8 gpio_index, bool value)
+				      u8 gpio_index, const char *chip,
+				      const char *con_id, u8 idx, bool value)
 {
 	struct gpiod_lookup_table *lookup;
 
@@ -250,11 +249,11 @@ static void soc_opaque_gpio_set_value(struct intel_connector *connector,
 
 	lookup->dev_id = "0000:00:02.0";
 	lookup->table[0] =
-		GPIO_LOOKUP_IDX(chip, gpio_index, con_id, gpio_index, GPIO_ACTIVE_HIGH);
+		GPIO_LOOKUP_IDX(chip, idx, con_id, idx, GPIO_ACTIVE_HIGH);
 
 	gpiod_add_lookup_table(lookup);
 
-	soc_gpio_set_value(connector, con_id, gpio_index, value);
+	soc_gpio_set_value(connector, gpio_index, con_id, idx, value);
 
 	gpiod_remove_lookup_table(lookup);
 	kfree(lookup);
@@ -278,7 +277,8 @@ static void vlv_gpio_set_value(struct intel_connector *connector,
 		}
 	}
 
-	soc_opaque_gpio_set_value(connector, "INT33FC:01", "Panel N", gpio_index, value);
+	soc_opaque_gpio_set_value(connector, gpio_index,
+				  "INT33FC:01", "Panel N", gpio_index, value);
 }
 
 static void chv_gpio_set_value(struct intel_connector *connector,
@@ -338,7 +338,7 @@ static void chv_gpio_set_value(struct intel_connector *connector,
 static void bxt_gpio_set_value(struct intel_connector *connector,
 			       u8 gpio_index, bool value)
 {
-	soc_gpio_set_value(connector, NULL, gpio_index, value);
+	soc_gpio_set_value(connector, gpio_index, NULL, gpio_index, value);
 }
 
 enum {
