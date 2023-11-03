@@ -32,6 +32,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     drivers/gpu/drm/*.c \
     drivers/gpu/drm/*.h \
     drivers/gpu/drm/amd/ \
+    drivers/gpu/drm/dp/ \
     drivers/gpu/drm/i915/ \
     drivers/gpu/drm/radeon/ \
     drivers/gpu/drm/scheduler/ \
@@ -43,6 +44,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     drivers/dma-buf/sync_file.c \
     drivers/video/hdmi.c \
     include/drm/*.h \
+    include/drm/dp/ \
     include/drm/ttm/ \
     include/uapi/drm/*.h \
     include/linux/hdmi.h \
