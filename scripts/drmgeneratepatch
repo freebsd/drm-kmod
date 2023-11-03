@@ -64,12 +64,13 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/i915/gem/selftests/*' \
     ':!drivers/gpu/drm/i915/i915_trace*' \
     ':!drivers/gpu/drm/selftests/*' \
+    ':!drivers/gpu/drm/dp/drm_dp_aux_bus*' \
+    ':!drivers/gpu/drm/dp/drm_dp_cec*' \
+    ':!drivers/gpu/drm/dp/drm_dp_mst_topology_internal*' \
     ':!drivers/gpu/drm/drm_bufs*' \
     ':!drivers/gpu/drm/drm_bridge_connector*' \
     ':!drivers/gpu/drm/drm_context*' \
     ':!drivers/gpu/drm/drm_dma*' \
-    ':!drivers/gpu/drm/drm_dp_aux_bus*' \
-    ':!drivers/gpu/drm/drm_dp_cec*' \
     ':!drivers/gpu/drm/drm_edid_load*' \
     ':!drivers/gpu/drm/drm_fb_cma_helper*' \
     ':!drivers/gpu/drm/drm_gem_cma_helper*' \
@@ -94,8 +95,8 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/bridge/*' \
     ':!include/drm/intel-gtt*' \
     ':!include/drm/tinydrm/*' \
+    ':!include/drm/dp/drm_dp_aux_bus*' \
     ':!include/drm/drm_bridge_connector*' \
-    ':!include/drm/drm_dp_aux_bus*' \
     ':!include/drm/drm_fb_cma_helper*' \
     ':!include/drm/drm_gem_cma*' \
     ':!include/drm/drm_gem_shmem*' \
