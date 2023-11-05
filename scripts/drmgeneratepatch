@@ -51,6 +51,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     include/linux/dma-fence.h \
     include/linux/dma-fence-array.h \
     include/linux/dma-fence-chain.h \
+    include/linux/dma-fence-unwrap.h \
     include/linux/dma-resv.h \
     include/linux/sync_file.h \
     ':!drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_*' \
