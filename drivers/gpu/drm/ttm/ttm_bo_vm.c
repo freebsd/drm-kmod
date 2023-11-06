@@ -335,12 +335,18 @@ vm_fault_t ttm_bo_vm_dummy_page(struct vm_fault *vmf, pgprot_t prot)
 	pfn = page_to_pfn(page);
 
 	/* Prefault the entire VMA range right away to avoid further faults */
+#ifdef __FreeBSD__
+	VM_OBJECT_WLOCK(vma->vm_obj);
+#endif
 	for (address = vma->vm_start; address < vma->vm_end;
 	     address += PAGE_SIZE)
 #ifdef __linux__
 		ret = vmf_insert_pfn_prot(vma, address, pfn, prot);
 #elif defined(__FreeBSD__)
 		ret = lkpi_vmf_insert_pfn_prot_locked(vma, address, pfn, prot);
+#endif
+#ifdef __FreeBSD__
+	VM_OBJECT_WUNLOCK(vma->vm_obj);
 #endif
 
 	return ret;
