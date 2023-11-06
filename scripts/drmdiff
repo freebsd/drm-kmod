@@ -12,11 +12,11 @@ usage()
 ex: `basename $0` HOME/linux/ [${DEFAULT_DRM_DIR}]
 EOF
 
-        exit 1
+	exit 1
 }
 
 if [ $# -eq 0 -o $# -gt 2 ]; then
-        usage
+	usage
 fi
 
 LINUX_DIR=$1
@@ -28,21 +28,30 @@ else
 fi
 
 if [ ! -d ${LINUX_DIR} ]; then
-        echo "No directory ${LINUX_DIR}"
-        exit 1
+	echo "No directory ${LINUX_DIR}"
+	exit 1
 fi
 
 if [ ! -d ${DRM_DIR} ]; then
-        echo "No directory ${DRM_DIR}"
-        exit 1
+	echo "No directory ${DRM_DIR}"
+	exit 1
 fi
 
-/usr/bin/find ${DRM_DIR} -type d -exec /usr/bin/diff -dpu --color=always \
-	-x drm_dp_mst_topology_internal.h \
-	-x drm_flip_work.c \
-	-x drm_gem_framebuffer_helper.c \
-	-x drm_lease.c \
-	-x drm_managed.c \
-	-x drm_sysfs.c \
-	-x i915_trace.h \
-{} ${LINUX_DIR}/{} \; | /usr/bin/less -MR
+SCRIPT_DIR=`dirname $0`
+
+dodiff()
+{
+	local SCRIPT_DIR=$1
+	local DRM_DIR=$2
+	local LINUX_DIR=$3
+	local COLOR=$4
+
+	/usr/bin/diff -rdpu --color=${COLOR} -X ${SCRIPT_DIR}/diffignore \
+		${LINUX_DIR}/${DRM_DIR} ${DRM_DIR}
+}
+
+if [ -t 1 ] ; then
+	dodiff ${SCRIPT_DIR} ${DRM_DIR} ${LINUX_DIR} "always" | /usr/bin/less -MR
+else
+	dodiff ${SCRIPT_DIR} ${DRM_DIR} ${LINUX_DIR} "never"
+fi
