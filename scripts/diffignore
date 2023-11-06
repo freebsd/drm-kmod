@@ -34,6 +34,7 @@ drm_managed.h
 drm_mipi_dbi.c
 drm_mipi_dbi.h
 drm_mipi_dsi.h
+drm_nomodeset.c
 drm_of.c
 drm_of.h
 drm_os_freebsd.c
@@ -58,6 +59,7 @@ gma_drm.h
 bridge
 i2c
 i915_mei_hdcp_interface.h
+intel_display_trace.h
 intel-gtt.h
 ttm_sysctl_freebsd.h
 
