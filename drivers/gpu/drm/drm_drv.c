@@ -691,8 +691,6 @@ static int devm_drm_dev_init(struct device *parent,
 
 	return devm_add_action_or_reset(parent,
 					devm_drm_dev_init_release, dev);
-
-	return ret;
 }
 
 void *__devm_drm_dev_alloc(struct device *parent,

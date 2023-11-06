@@ -1001,11 +1001,12 @@ struct amdgpu_device {
 	uint32_t                        ip_versions[MAX_HWIP][HWIP_MAX_INSTANCE];
 
 	bool				ram_is_direct_mapped;
-	struct amdgpu_reset_domain	*reset_domain;
 
 	struct list_head                ras_list;
 
 	struct ip_discovery_top         *ip_top;
+
+	struct amdgpu_reset_domain	*reset_domain;
 
 	struct mutex			benchmark_mutex;
 

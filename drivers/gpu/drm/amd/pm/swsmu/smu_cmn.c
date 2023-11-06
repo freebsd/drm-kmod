@@ -172,7 +172,7 @@ static void __smu_cmn_reg_print_error(struct smu_context *smu,
 			prm     = RREG32_SOC15(MP1, 0, mmMP1_SMN_C2PMSG_82);
 		}
 		dev_err_ratelimited(adev->dev,
-				    "SMU: I'm not done with your command: SMN_C2PMSG_66:0x%08X SMN_C2PMSG_82:0x%08X",
+				    "SMU: I'm not done with your previous command: SMN_C2PMSG_66:0x%08X SMN_C2PMSG_82:0x%08X",
 				    msg_idx, prm);
 		}
 		break;

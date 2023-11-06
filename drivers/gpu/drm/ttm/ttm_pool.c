@@ -33,6 +33,7 @@
 
 #include <linux/module.h>
 #include <linux/dma-mapping.h>
+#include <linux/highmem.h>
 #include <linux/sched/mm.h>
 
 #ifdef CONFIG_X86

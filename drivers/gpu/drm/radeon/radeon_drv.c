@@ -50,11 +50,11 @@
 #include <drm/radeon_drm.h>
 
 #include "radeon_drv.h"
+#include "radeon.h"
 #include "radeon_kms.h"
 #include "radeon_ttm.h"
 #include "radeon_device.h"
 #include "radeon_prime.h"
-#include "radeon.h"
 
 #ifdef __FreeBSD__
 #include <vm/vm_phys.h>
@@ -654,6 +654,7 @@ static int __init radeon_module_init(void)
 
 	DRM_INFO("radeon kernel modesetting enabled.\n");
 	radeon_register_atpx_handler();
+
 #ifdef __linux__
 	return pci_register_driver(&radeon_kms_pci_driver);
 #elif defined(__FreeBSD__)

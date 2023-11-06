@@ -1430,7 +1430,7 @@ void intel_audio_deinit(struct drm_i915_private *dev_priv)
 {
 #ifdef __linux__
 	// No lpe on BSD yet
-	if ((dev_priv)->lpe_audio.platdev != NULL)
+	if ((dev_priv)->audio.lpe.platdev != NULL)
 		intel_lpe_audio_teardown(dev_priv);
 	else
 #endif
