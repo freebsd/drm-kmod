@@ -840,6 +840,7 @@ CFLAGS.display_rq_dlg_calc_31.c= ${FPUFLAGS} -mstack-alignment=4 -Wno-unused-but
 
 CFLAGS.rc_calc.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.rc_calc_dpi.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.rc_calc_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 
 .if ${MACHINE_CPUARCH} != "powerpc"
 CWARNFLAGS+=	-Wno-expansion-to-defined
