@@ -1016,6 +1016,11 @@ bool compute_mst_dsc_configs_for_state(struct drm_atomic_state *state,
 		if (!aconnector->dc_sink->dsc_caps.dsc_dec_caps.is_dsc_supported)
 			continue;
 
+#ifdef __FreeBSD__
+		if (aconnector->mst_mgr.dev == NULL)
+			continue;
+#endif
+
 		if (computed_streams[i])
 			continue;
 
