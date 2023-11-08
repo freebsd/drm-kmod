@@ -4,13 +4,12 @@ __FBSDID("$FreeBSD$");
 #include <linux/device.h>
 #include <linux/acpi.h>
 #include <drm/i915_drm.h>
-#include "i915_trace.h"
 #include <linux/mm.h>
 #include <linux/io-mapping.h>
 
 #include <asm/pgtable.h>
 
-#include "i915_drv.h"
+#include "i915_driver.h"
 #include <linux/console.h>
 #include <linux/module.h>
 #include <linux/pm_runtime.h>
@@ -46,6 +45,36 @@ static struct _intel_private {
 	phys_addr_t gma_bus_addr;
 } intel_private;
 #endif
+
+void *
+bsd_intel_pci_bus_alloc_mem(device_t dev, int *rid, uintmax_t size,
+    resource_size_t *start, resource_size_t *end)
+{
+	struct resource *res;
+	device_t vga;
+
+	vga = device_get_parent(dev);
+	res = BUS_ALLOC_RESOURCE(device_get_parent(vga), dev, SYS_RES_MEMORY,
+	    rid, 0, ~0UL, size, RF_ACTIVE | RF_SHAREABLE);
+	if (res != NULL) {
+		*start = rman_get_start(res);
+		*end = rman_get_end(res);
+	}
+
+	return (res);
+}
+
+void
+bsd_intel_pci_bus_release_mem(device_t dev, int rid, void *res)
+{
+	device_t vga;
+
+	vga = device_get_parent(dev);
+	BUS_DEACTIVATE_RESOURCE(device_get_parent(vga),
+	    dev, SYS_RES_MEMORY, rid, res);
+	BUS_RELEASE_RESOURCE(device_get_parent(vga),
+	    dev, SYS_RES_MEMORY, rid, res);
+}
 
 bool
 intel_enable_gtt(void)

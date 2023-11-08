@@ -135,20 +135,13 @@ intel_alloc_mchbar_resource(struct drm_i915_private *dev_priv)
 
 	/* Get some space for it */
 #ifdef __FreeBSD__
-#undef resource
-	device_t vga;
 	ret = 0;
-	vga = device_get_parent(dev_priv->drm.dev->bsddev);
 	dev_priv->mch_res_rid = 0x100;
-	dev_priv->mch_res.bsd_res = BUS_ALLOC_RESOURCE(device_get_parent(vga),
-	    dev_priv->drm.dev->bsddev, SYS_RES_MEMORY, &dev_priv->mch_res_rid, 0, ~0UL,
-	    MCHBAR_SIZE, RF_ACTIVE | RF_SHAREABLE);
-	if (dev_priv->mch_res.bsd_res == NULL) {
+	dev_priv->mch_res_bsd_res = bsd_intel_pci_bus_alloc_mem(
+	    dev_priv->drm.dev->bsddev, &dev_priv->mch_res_rid, MCHBAR_SIZE,
+	    &dev_priv->mch_res.start, &dev_priv->mch_res.end);
+	if (dev_priv->mch_res_bsd_res == NULL)
 		ret = -ENOMEM;
-	} else {
-		dev_priv->mch_res.start = rman_get_start(dev_priv->mch_res.bsd_res);
-		dev_priv->mch_res.end = rman_get_end(dev_priv->mch_res.bsd_res);
-	}
 #else
 	dev_priv->mch_res.name = "i915 MCHBAR";
 	dev_priv->mch_res.flags = IORESOURCE_MEM;
@@ -240,17 +233,10 @@ intel_teardown_mchbar(struct drm_i915_private *dev_priv)
 	}
 
 #ifdef __FreeBSD__
-	if (dev_priv->mch_res.bsd_res != NULL) {
-		device_t vga;
-
-		vga = device_get_parent(dev_priv->drm.dev->bsddev);
-		BUS_DEACTIVATE_RESOURCE(device_get_parent(vga),
-		    dev_priv->drm.dev->bsddev, SYS_RES_MEMORY, dev_priv->mch_res_rid,
-		    dev_priv->mch_res.bsd_res);
-		BUS_RELEASE_RESOURCE(device_get_parent(vga),
-		    dev_priv->drm.dev->bsddev, SYS_RES_MEMORY, dev_priv->mch_res_rid,
-		    dev_priv->mch_res.bsd_res);
-		dev_priv->mch_res.bsd_res = NULL;
+	if (dev_priv->mch_res_bsd_res != NULL) {
+		bsd_intel_pci_bus_release_mem(dev_priv->drm.dev->bsddev,
+		    dev_priv->mch_res_rid, dev_priv->mch_res_bsd_res);
+		dev_priv->mch_res_bsd_res = NULL;
 	}
 #else
 	if (dev_priv->mch_res.start)

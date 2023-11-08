@@ -26,4 +26,9 @@ void i915_driver_shutdown(struct drm_i915_private *i915);
 int i915_driver_resume_switcheroo(struct drm_i915_private *i915);
 int i915_driver_suspend_switcheroo(struct drm_i915_private *i915, pm_message_t state);
 
+#ifdef __FreeBSD__
+void *bsd_intel_pci_bus_alloc_mem(device_t dev, int *rid, uintmax_t size,
+    resource_size_t *start, resource_size_t *end);
+void bsd_intel_pci_bus_release_mem(device_t dev, int rid, void *res);
+#endif
 #endif /* __I915_DRIVER_H__ */

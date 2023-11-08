@@ -871,6 +871,7 @@ struct drm_i915_private {
 
 #ifdef __FreeBSD__
 	int mch_res_rid;
+	void *mch_res_bsd_res;
 #endif
 };
 
