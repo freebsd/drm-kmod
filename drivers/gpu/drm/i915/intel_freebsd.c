@@ -21,6 +21,7 @@ __FBSDID("$FreeBSD$");
 
 #include <machine/md_var.h>
 
+#include <dev/agp/agp_i810.h>
 /*
  * intel_graphics_stolen_* are defined in sys/dev/pci/pcivar.h
  * and set at early boot from machdep.c. Copy over the values
@@ -158,4 +159,16 @@ linux_intel_gtt_insert_sg_entries(struct sg_table *st, unsigned int pg_start,
 	}
 
 	intel_gtt_read_pte(pg_start + i - 1);
+}
+
+void
+linux_intel_gtt_get(uint64_t *gtt_total, phys_addr_t *mappable_base,
+    resource_size_t *mappable_end)
+{
+	struct intel_gtt *gtt;
+
+	gtt = intel_gtt_get();
+	*gtt_total = gtt->gtt_total_entries << PAGE_SHIFT;
+	*mappable_base = gtt->gma_bus_addr;
+	*mappable_end = gtt->gtt_mappable_entries << PAGE_SHIFT;
 }

@@ -9,7 +9,6 @@ struct agp_bridge_data;
 struct pci_dev;
 struct sg_table;
 struct intel_gtt;
-struct intel_gtt *intel_gtt_get(void);
 
 int intel_gmch_probe(struct pci_dev *bridge_pdev, struct pci_dev *gpu_pdev,
 		     struct agp_bridge_data *bridge);
@@ -21,6 +20,8 @@ void intel_gtt_insert_page(dma_addr_t addr,
 			   unsigned int flags);
 void linux_intel_gtt_insert_sg_entries(struct sg_table *st,
     unsigned int pg_start, unsigned int flags);
+void linux_intel_gtt_get(uint64_t *gtt_total, phys_addr_t *mappable_base,
+    resource_size_t *mappable_end);
 void intel_gtt_clear_range(unsigned int first_entry, unsigned int num_entries);
 
 #endif

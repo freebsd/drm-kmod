@@ -25,7 +25,6 @@
 
 #ifdef __FreeBSD__
 #include <dev/agp/agpvar.h>
-#include <dev/agp/agp_i810.h>
 #endif
 
 static void i915_ggtt_color_adjust(const struct drm_mm_node *node,
@@ -1187,12 +1186,7 @@ static int i915_gmch_probe(struct i915_ggtt *ggtt)
 #ifdef __linux__
 	intel_gtt_get(&ggtt->vm.total, &gmadr_base, &ggtt->mappable_end);
 #elif defined(__FreeBSD__)
-	struct intel_gtt *gtt;
-
-	gtt = intel_gtt_get();
-	ggtt->vm.total = gtt->gtt_total_entries << PAGE_SHIFT;
-	gmadr_base = gtt->gma_bus_addr;
-	ggtt->mappable_end = gtt->gtt_mappable_entries << PAGE_SHIFT;
+	linux_intel_gtt_get(&ggtt->vm.total, &gmadr_base, &ggtt->mappable_end);
 #endif
 
 	ggtt->gmadr =
