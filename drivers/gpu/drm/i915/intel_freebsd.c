@@ -22,12 +22,6 @@ __FBSDID("$FreeBSD$");
 #include <machine/md_var.h>
 
 #include <dev/agp/agp_i810.h>
-/*
- * intel_graphics_stolen_* are defined in sys/dev/pci/pcivar.h
- * and set at early boot from machdep.c. Copy over the values
- * here to a linux_resource struct.
- */
-struct linux_resource intel_graphics_stolen_res;
 
 void *intel_gtt_get_registers(void);
 void _intel_gtt_get(size_t *gtt_total, size_t *stolen_size, unsigned long *mappable_end);

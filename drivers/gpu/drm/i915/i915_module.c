@@ -19,6 +19,15 @@
 #include "i915_vma.h"
 #include "i915_vma_resource.h"
 
+#ifdef __FreeBSD__
+/*
+ * intel_graphics_stolen_* are defined in sys/dev/pci/pcivar.h
+ * and set at early boot from machdep.c. Copy over the values
+ * here to a Linux resource struct.
+ */
+struct resource intel_graphics_stolen_res;
+#endif
+
 static int i915_check_nomodeset(void)
 {
 	bool use_kms = true;
@@ -83,7 +92,7 @@ static int __init i915_init(void)
 
 #ifdef __FreeBSD__
 #if defined(__amd64__)
-	intel_graphics_stolen_res = (struct linux_resource)
+	intel_graphics_stolen_res = (struct resource)
 		DEFINE_RES_MEM(intel_graphics_stolen_base,
 		    intel_graphics_stolen_size);
 	DRM_INFO("Got Intel graphics stolen memory base 0x%x, size 0x%x\n",
