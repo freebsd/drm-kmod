@@ -58,6 +58,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/amd/amdgpu/amdgpu_atpx_handler*' \
     ':!drivers/gpu/drm/amd/amdgpu/amdgpu_vkms.c' \
     ':!drivers/gpu/drm/amd/amdkfd/*' \
+    ':!drivers/gpu/drm/drm_gem_atomic_helper.c' \
     ':!drivers/gpu/drm/i915/display/intel_acpi.c' \
     ':!drivers/gpu/drm/i915/gvt/*' \
     ':!drivers/gpu/drm/i915/selftests/*' \
