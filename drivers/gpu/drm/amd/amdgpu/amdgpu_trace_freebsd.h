@@ -141,6 +141,12 @@ trace_amdgpu_reset_reg_dumps(uint32_t address, uint32_t value){
 	    address, value);
 }
 
+static inline void
+trace_amdgpu_runpm_reference_dumps(uint32_t index, const char *func){
+	CTR2(KTR_DRM, "amdgpu runpm reference dump 0x%x: 0x%s\n",
+	    index, func);
+}
+
 #define trace_amdgpu_mm_rreg(dev, reg, ret)	\
 	CTR3(KTR_DRM, "amdgpu_mm_rreg %p %x %d", (dev), (reg), (ret))
 

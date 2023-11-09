@@ -42,6 +42,7 @@
 #include <linux/dma-fence-array.h>
 #include <linux/pci-p2pdma.h>
 #include <linux/pm_runtime.h>
+#include "amdgpu_trace.h"
 
 /**
  * amdgpu_dma_buf_attach - &dma_buf_ops.attach implementation
@@ -65,6 +66,7 @@ static int amdgpu_dma_buf_attach(struct dma_buf *dmabuf,
 #endif
 
 	r = pm_runtime_get_sync(adev_to_drm(adev)->dev);
+	trace_amdgpu_runpm_reference_dumps(1, __func__);
 	if (r < 0)
 		goto out;
 
@@ -72,6 +74,7 @@ static int amdgpu_dma_buf_attach(struct dma_buf *dmabuf,
 
 out:
 	pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
+	trace_amdgpu_runpm_reference_dumps(0, __func__);
 	return r;
 }
 
@@ -92,6 +95,7 @@ static void amdgpu_dma_buf_detach(struct dma_buf *dmabuf,
 
 	pm_runtime_mark_last_busy(adev_to_drm(adev)->dev);
 	pm_runtime_put_autosuspend(adev_to_drm(adev)->dev);
+	trace_amdgpu_runpm_reference_dumps(0, __func__);
 }
 
 /**
