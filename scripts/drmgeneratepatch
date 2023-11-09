@@ -110,6 +110,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_mipi_dbi*' \
     ':!include/drm/drm_simple_kms_helper*' \
     ':!include/drm/drm_of*' \
+    ':!include/drm/drm_writeback.h' \
     ':!include/drm/gma*' \
     ':!include/drm/drm_*vram*' \
     ':!include/drm/i915_mei_hdcp_interface*' \
