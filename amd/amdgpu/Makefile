@@ -156,6 +156,15 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/link/accessories \
 	${SRCDIR}/display/dc/link/hwss \
 	${SRCDIR}/display/dc/link/protocols \
+	${SRCDIR}/display/dc/optc/dcn10 \
+	${SRCDIR}/display/dc/optc/dcn20 \
+	${SRCDIR}/display/dc/optc/dcn201 \
+	${SRCDIR}/display/dc/optc/dcn30 \
+	${SRCDIR}/display/dc/optc/dcn301 \
+	${SRCDIR}/display/dc/optc/dcn31 \
+	${SRCDIR}/display/dc/optc/dcn314 \
+	${SRCDIR}/display/dc/optc/dcn32 \
+	${SRCDIR}/display/dc/optc/dcn35 \
 	${SRCDIR}/display/dc/resource/dce100 \
 	${SRCDIR}/display/dc/resource/dce110 \
 	${SRCDIR}/display/dc/resource/dce112 \
@@ -1098,6 +1107,7 @@ CFLAGS+= -I${SRCDIR}/display/dc/dsc
 CFLAGS+= -I${SRCDIR}/display/dc/hwss
 CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
+CFLAGS+= -I${SRCDIR}/display/dc/optc
 CFLAGS+= -I${SRCDIR}/display/dc/resource
 CFLAGS+= -I${SRCDIR}/display/dmub/inc
 CFLAGS+= -I${SRCDIR}/display/include
