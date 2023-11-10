@@ -2571,9 +2571,6 @@ static bool dcn20_resource_construct(
 
 			ranges.num_reader_wm_sets = 1;
 		} else if (loaded_bb->num_states > 1) {
-#ifdef __FreeBSD__
-			DC_FP_START();
-#endif
 			for (i = 0; i < 4 && i < loaded_bb->num_states; i++) {
 				ranges.reader_wm_sets[i].wm_inst = i;
 				ranges.reader_wm_sets[i].min_drain_clk_mhz = PP_SMU_WM_SET_RANGE_CLK_UNCONSTRAINED_MIN;
@@ -2584,9 +2581,6 @@ static bool dcn20_resource_construct(
 
 				ranges.num_reader_wm_sets = i + 1;
 			}
-#ifdef __FreeBSD__
-			DC_FP_END();
-#endif
 
 			ranges.reader_wm_sets[0].min_fill_clk_mhz = PP_SMU_WM_SET_RANGE_CLK_UNCONSTRAINED_MIN;
 			ranges.reader_wm_sets[ranges.num_reader_wm_sets - 1].max_fill_clk_mhz = PP_SMU_WM_SET_RANGE_CLK_UNCONSTRAINED_MAX;

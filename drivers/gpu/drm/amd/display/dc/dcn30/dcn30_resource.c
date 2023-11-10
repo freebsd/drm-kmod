@@ -2057,10 +2057,6 @@ void dcn30_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_params
 	unsigned int num_dcfclk_sta_targets = 4;
 	unsigned int num_uclk_states;
 
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
-
 	struct dc_bounding_box_max_clk dcn30_bb_max_clk;
 
 	memset(&dcn30_bb_max_clk, 0, sizeof(dcn30_bb_max_clk));
@@ -2162,9 +2158,6 @@ void dcn30_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_params
 		dcn30_fpu_update_bw_bounding_box(dc, bw_params, &dcn30_bb_max_clk, dcfclk_mhz, dram_speed_mts);
 		DC_FP_END();
 	}
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 }
 
 static const struct resource_funcs dcn30_res_pool_funcs = {
