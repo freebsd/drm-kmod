@@ -667,11 +667,7 @@ __poll_t drm_poll(struct file *filp, struct poll_table_struct *wait)
 	poll_wait(filp, &file_priv->event_wait, wait);
 
 	if (!list_empty(&file_priv->event_list))
-#ifdef __linux__
 		mask |= EPOLLIN | EPOLLRDNORM;
-#elif defined(__FreeBSD__)
-		mask |= POLLIN | POLLRDNORM;
-#endif
 
 	return mask;
 }
