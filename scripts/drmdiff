@@ -3,13 +3,14 @@
 # Compares two trees recursively and outputs diff in git-like style.
 # Both trees must be at the same VCS revision.
 
-DEFAULT_DRM_DIR=drivers/gpu/drm
+DRM_SUBDIRS="drivers/gpu/drm include/drm include/drm/uapi"
+#DRM_SUBDIRS="${DRM_SUBDIRS} drivers/dma-buf"
 
 usage()
 {
 	cat << EOF
 	Usage: `basename $0` linux_dir drm_dir
-ex: `basename $0` HOME/linux/ [${DEFAULT_DRM_DIR}]
+ex: `basename $0` HOME/linux/ [HOME/drm-kmod/]
 EOF
 
 	exit 1
@@ -21,10 +22,11 @@ fi
 
 LINUX_DIR=$1
 shift
+
 if [ $# -eq 1 ]; then
-	DRM_DIR=$1
+	DRM_KMOD_DIR=$1
 else
-	DRM_DIR=${DEFAULT_DRM_DIR}
+	DRM_KMOD_DIR=.
 fi
 
 if [ ! -d ${LINUX_DIR} ]; then
@@ -37,21 +39,29 @@ if [ ! -d ${DRM_DIR} ]; then
 	exit 1
 fi
 
-SCRIPT_DIR=`dirname $0`
-
 dodiff()
 {
-	local SCRIPT_DIR=$1
-	local DRM_DIR=$2
-	local LINUX_DIR=$3
-	local COLOR=$4
+	local DRM_KMOD_DIR=$1
+	local LINUX_DIR=$2
+	local COLOR=$3
 
-	/usr/bin/diff -rdpu --color=${COLOR} -X ${SCRIPT_DIR}/diffignore \
-		${LINUX_DIR}/${DRM_DIR} ${DRM_DIR}
+	if [ "${DRM_KMOD_DIR}" = "." ] ; then
+		DRM_KMOD_PREFIX=""
+	else
+		DRM_KMOD_PREFIX="${DRM_KMOD_DIR}/"
+	fi
+
+	for SUBDIR in ${DRM_SUBDIRS}
+	do
+		/usr/bin/diff -rdpu --color=${COLOR} \
+			-X ${DRM_KMOD_DIR}/scripts/diffignore \
+			${LINUX_DIR}/${SUBDIR} \
+			${DRM_KMOD_PREFIX}${SUBDIR}
+	done
 }
 
 if [ -t 1 ] ; then
-	dodiff ${SCRIPT_DIR} ${DRM_DIR} ${LINUX_DIR} "always" | /usr/bin/less -MR
+	dodiff ${DRM_KMOD_DIR} ${LINUX_DIR} "always" | /usr/bin/less -MR
 else
-	dodiff ${SCRIPT_DIR} ${DRM_DIR} ${LINUX_DIR} "never"
+	dodiff ${DRM_KMOD_DIR} ${LINUX_DIR} "never"
 fi
