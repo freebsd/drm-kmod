@@ -28,6 +28,8 @@ static inline void intel_engine_context_in(struct intel_engine_cs *engine)
 	/* The writer is serialised; but the pmu reader may be from hardirq */
 #ifdef __linux__
 	local_irq_save(flags);
+#elif defined(__FreeBSD__)
+	preempt_disable();
 #endif
 	write_seqcount_begin(&stats->lock);
 
@@ -37,6 +39,8 @@ static inline void intel_engine_context_in(struct intel_engine_cs *engine)
 	write_seqcount_end(&stats->lock);
 #ifdef __linux__
 	local_irq_restore(flags);
+#elif defined(__FreeBSD__)
+	preempt_enable();
 #endif
 
 	GEM_BUG_ON(!stats->active);
@@ -57,6 +61,8 @@ static inline void intel_engine_context_out(struct intel_engine_cs *engine)
 
 #ifdef __linux__
 	local_irq_save(flags);
+#elif defined(__FreeBSD__)
+	preempt_disable();
 #endif
 	write_seqcount_begin(&stats->lock);
 
@@ -67,6 +73,8 @@ static inline void intel_engine_context_out(struct intel_engine_cs *engine)
 	write_seqcount_end(&stats->lock);
 #ifdef __linux__
 	local_irq_restore(flags);
+#elif defined(__FreeBSD__)
+	preempt_enable();
 #endif
 }
 
