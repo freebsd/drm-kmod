@@ -66,6 +66,8 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/i915/gt/st_shmem_utils.c' \
     ':!drivers/gpu/drm/i915/gem/selftests/*' \
     ':!drivers/gpu/drm/i915/i915_trace*' \
+    ':!drivers/gpu/drm/i915/intel_gvt_mmio_table.c' \
+    ':!drivers/gpu/drm/i915/intel_gvt.c' \
     ':!drivers/gpu/drm/selftests/*' \
     ':!drivers/gpu/drm/display/drm_dp_aux_bus*' \
     ':!drivers/gpu/drm/display/drm_dp_cec*' \
