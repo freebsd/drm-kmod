@@ -45,6 +45,8 @@ static void runtime_begin(struct intel_gt *gt)
 {
 #ifdef __linux__
 	local_irq_disable();
+#elif defined(__FreeBSD__)
+	preempt_disable();
 #endif
 	write_seqcount_begin(&gt->stats.lock);
 	gt->stats.start = ktime_get();
@@ -52,6 +54,8 @@ static void runtime_begin(struct intel_gt *gt)
 	write_seqcount_end(&gt->stats.lock);
 #ifdef __linux__
 	local_irq_enable();
+#elif defined(__FreeBSD__)
+	preempt_enable();
 #endif
 }
 
@@ -59,6 +63,8 @@ static void runtime_end(struct intel_gt *gt)
 {
 #ifdef __linux__
 	local_irq_disable();
+#elif defined(__FreeBSD__)
+	preempt_disable();
 #endif
 	write_seqcount_begin(&gt->stats.lock);
 	gt->stats.active = false;
@@ -68,6 +74,8 @@ static void runtime_end(struct intel_gt *gt)
 	write_seqcount_end(&gt->stats.lock);
 #ifdef __linux__
 	local_irq_enable();
+#elif defined(__FreeBSD__)
+	preempt_enable();
 #endif
 }
 
