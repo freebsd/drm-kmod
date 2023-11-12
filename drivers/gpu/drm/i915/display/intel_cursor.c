@@ -718,6 +718,8 @@ intel_legacy_cursor_update(struct drm_plane *_plane,
 	 */
 #ifdef __linux__
 	local_irq_disable();
+#elif defined(__FreeBSD__)
+	preempt_disable();
 #endif
 
 	if (new_plane_state->uapi.visible) {
@@ -729,6 +731,8 @@ intel_legacy_cursor_update(struct drm_plane *_plane,
 
 #ifdef __linux__
 	local_irq_enable();
+#elif defined(__FreeBSD__)
+	preempt_enable();
 #endif
 
 	intel_plane_unpin_fb(old_plane_state);
