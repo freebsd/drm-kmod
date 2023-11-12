@@ -28,9 +28,7 @@
 #include <drm/drm_atomic_state_helper.h>
 #include <drm/drm_bridge.h>
 #include <drm/drm_encoder.h>
-#ifdef __linux__
 #include <drm/drm_of.h>
-#endif
 #include <drm/drm_print.h>
 
 #include "drm_crtc_internal.h"

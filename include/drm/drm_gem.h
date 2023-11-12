@@ -37,10 +37,6 @@
 #include <linux/kref.h>
 #include <linux/dma-resv.h>
 
-#ifdef __FreeBSD__
-#include <linux/xarray.h>
-#endif
-
 #include <drm/drm_vma_manager.h>
 
 struct iosys_map;

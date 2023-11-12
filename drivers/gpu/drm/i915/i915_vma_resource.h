@@ -6,10 +6,6 @@
 #ifndef __I915_VMA_RESOURCE_H__
 #define __I915_VMA_RESOURCE_H__
 
-#ifdef __FreeBSD__
-#include <linux/rbtree.h>
-#endif
-
 #include <linux/dma-fence.h>
 #include <linux/refcount.h>
 

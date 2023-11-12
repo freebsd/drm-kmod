@@ -22,10 +22,6 @@
 #include "intel_gtt.h"
 #include "gen8_ppgtt.h"
 
-#ifdef __FreeBSD__
-#include <dev/agp/agpvar.h>
-#endif
-
 static void i915_ggtt_color_adjust(const struct drm_mm_node *node,
 				   unsigned long color,
 				   u64 *start,

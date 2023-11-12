@@ -12,11 +12,6 @@
 #include "i915_gem_lmem.h"
 #include "i915_gem_mman.h"
 
-#ifdef __FreeBSD__
-#include <linux/xarray.h>
-#include <linux/vmalloc.h>
-#endif
-
 #include "gt/intel_gt.h"
 
 void __i915_gem_object_set_pages(struct drm_i915_gem_object *obj,

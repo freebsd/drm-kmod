@@ -10,10 +10,6 @@
 
 #include <uapi/drm/i915_drm.h>
 
-#ifdef __FreeBSD__
-#include <linux/workqueue.h>	/* For struct delayed_work*/
-#endif
-
 #include "i915_user_extensions.h"
 #include "i915_utils.h"
 

@@ -98,10 +98,6 @@ typedef struct drm_dma_handle {
 	dma_addr_t busaddr;
 	void *vaddr;
 	size_t size;
-#ifdef __FreeBSD__
-	bus_dma_tag_t tag;
-	bus_dmamap_t map;
-#endif
 } drm_dma_handle_t;
 
 /**
@@ -146,11 +142,7 @@ struct drm_device_dma {
 struct drm_sg_mem {
 	unsigned long handle;
 	void *virtual;
-#ifdef __linux__
 	int pages;
-#elif defined(__FreeBSD__)
-	vm_pindex_t pages;
-#endif
 	struct page **pagelist;
 	dma_addr_t *busaddr;
 };

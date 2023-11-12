@@ -26,10 +26,6 @@
 #include <drm/drm_ioctl.h>
 #include <drm/drm_vblank.h>
 
-#ifdef __FreeBSD__
-#include <drm/drm_file.h>	/* Needed by the debugfs funcs */
-#endif
-
 #define DRM_IF_MAJOR 1
 #define DRM_IF_MINOR 4
 

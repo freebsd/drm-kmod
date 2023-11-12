@@ -28,7 +28,6 @@
 #include <linux/types.h>
 #include <linux/list.h>
 #include <linux/mutex.h>
-#include <linux/atomic.h>
 #include <linux/iosys-map.h>
 #include <linux/dma-fence.h>
 

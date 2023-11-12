@@ -25,10 +25,6 @@
 
 #include <drm/amd_asic_type.h>
 
-#ifdef __FreeBSD__
-// Fix compile error
-#include <linux/seq_file.h>
-#endif
 
 #define AMD_MAX_USEC_TIMEOUT		1000000  /* 1000 ms */
 

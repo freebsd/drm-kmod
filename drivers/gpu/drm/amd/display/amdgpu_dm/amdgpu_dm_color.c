@@ -22,12 +22,6 @@
  * Authors: AMD
  *
  */
-
-#ifdef __FreeBSD__
-/* For lower_32_bits() */
-#include <drm/drm_os_freebsd.h>
-#endif
-
 #include "amdgpu.h"
 #include "amdgpu_mode.h"
 #include "amdgpu_dm.h"

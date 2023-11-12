@@ -30,10 +30,6 @@
 #include <linux/xarray.h>
 #include <linux/workqueue.h>
 
-#ifdef __FreeBSD__
-#include <linux/workqueue.h>
-#endif
-
 #define MAX_WAIT_SCHED_ENTITY_Q_EMPTY msecs_to_jiffies(1000)
 
 struct drm_gem_object;

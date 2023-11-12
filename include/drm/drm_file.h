@@ -75,9 +75,7 @@ struct drm_minor {
 	struct drm_device *dev;
 
 #ifdef __FreeBSD__
-	device_t bsd_kdev; 		/* OS device */
 	struct cdev *bsd_device; 	/* Device number for mknod */
-	struct sigio *buf_sigio; 	/* Processes waiting for SIGIO */
 #endif
 	struct dentry *debugfs_root;
 

@@ -8,10 +8,6 @@
 #include <linux/pagemap.h>
 #include <linux/shmem_fs.h>
 
-#ifdef __FreeBSD__
-#include <linux/file.h>
-#endif
-
 #include "gem/i915_gem_object.h"
 #include "gem/i915_gem_lmem.h"
 #include "shmem_utils.h"

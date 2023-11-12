@@ -76,8 +76,6 @@ struct uc_css_header {
 	};
 	u32 header_info;
 } __packed;
-#ifdef __linux__
 static_assert(sizeof(struct uc_css_header) == 128);
-#endif
 
 #endif /* _INTEL_UC_FW_ABI_H */

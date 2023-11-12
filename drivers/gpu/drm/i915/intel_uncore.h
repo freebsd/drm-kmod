@@ -31,11 +31,6 @@
 #include <linux/io-64-nonatomic-lo-hi.h>
 #include <linux/types.h>
 
-#ifdef __FreeBSD__
-#include <linux/kernel.h>	/* For container_of */
-#include <linux/io.h>		/* For writeb/readb */
-#endif
-
 #include "i915_reg_defs.h"
 
 struct drm_i915_private;
