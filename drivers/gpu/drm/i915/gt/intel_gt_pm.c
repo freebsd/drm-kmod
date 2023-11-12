@@ -344,9 +344,7 @@ static suspend_state_t pm_suspend_target(void)
 
 void intel_gt_suspend_late(struct intel_gt *gt)
 {
-#ifdef __linux__
 	intel_wakeref_t wakeref;
-#endif
 
 	/* We expect to be idle already; but also want to be independent */
 	wait_for_suspend(gt);
@@ -372,6 +370,7 @@ void intel_gt_suspend_late(struct intel_gt *gt)
 #ifdef __linux__
 	if (pm_suspend_target() == PM_SUSPEND_TO_IDLE)
 		return;
+#endif
 
 	with_intel_runtime_pm(gt->uncore->rpm, wakeref) {
 		intel_rps_disable(&gt->rps);
@@ -382,7 +381,6 @@ void intel_gt_suspend_late(struct intel_gt *gt)
 	gt_sanitize(gt, false);
 
 	GT_TRACE(gt, "\n");
-#endif
 }
 
 void intel_gt_runtime_suspend(struct intel_gt *gt)
