@@ -54,9 +54,6 @@
 #  define PAGE_AGP	PAGE_KERNEL
 # endif
 #endif
-#ifdef __FreeBSD__
-#include <dev/agp/agpvar.h>
-#endif
 
 static void *agp_remap(unsigned long offset, unsigned long size,
 		       struct drm_device *dev)
@@ -109,44 +106,6 @@ static void *agp_remap(unsigned long offset, unsigned long size,
 	return NULL;
 #endif
 }
-
-#if defined(__FreeBSD__)
-/** Wrapper around agp_free_memory() */
-void drm_free_agp(struct agp_memory *handle, int pages)
-{
-	device_t agpdev;
-
-	agpdev = agp_find_device();
-	if (!agpdev || !handle)
-		return;
-
-	agp_free_memory(agpdev, handle);
-}
-
-/** Wrapper around agp_bind_memory() */
-int drm_bind_agp(struct agp_memory *handle, unsigned int start)
-{
-	device_t agpdev;
-
-	agpdev = agp_find_device();
-	if (!agpdev || !handle)
-		return -EINVAL;
-
-	return -agp_bind_memory(agpdev, handle, start * PAGE_SIZE);
-}
-
-/** Wrapper around agp_unbind_memory() */
-int drm_unbind_agp(struct agp_memory *handle)
-{
-	device_t agpdev;
-
-	agpdev = agp_find_device();
-	if (!agpdev || !handle)
-		return -EINVAL;
-
-	return -agp_unbind_memory(agpdev, handle);
-}
-#endif
 
 #else /*  CONFIG_AGP  */
 static inline void *agp_remap(unsigned long offset, unsigned long size,

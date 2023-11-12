@@ -246,11 +246,17 @@ struct drm_agp_head {
 	struct agp_kern_info agp_info;
 	struct list_head memory;
 	unsigned long mode;
+#ifdef __linux__
 	struct agp_bridge_data *bridge;
+#elif defined(__FreeBSD__)
+	device_t bridge;
+#endif
 	int enabled;
 	int acquired;
 	unsigned long base;
+#ifdef __linux__
 	int agp_mtrr;
+#endif
 	int cant_use_aperture;
 	unsigned long page_mask;
 };

@@ -282,8 +282,8 @@ int drm_legacy_pci_init(const struct drm_driver *driver,
 			drm_legacy_get_pci_dev(pdev, pid, driver);
 		}
 	}
-	return 0;
 #endif
+	return 0;
 }
 EXPORT_SYMBOL(drm_legacy_pci_init);
 

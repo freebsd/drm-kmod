@@ -32,6 +32,10 @@
 
 #include "radeon.h"
 
+#ifdef __FreeBSD__
+#include <dev/agp/agpvar.h>
+#endif
+
 #if IS_ENABLED(CONFIG_AGP)
 
 struct radeon_agpmode_quirk {
@@ -129,12 +133,15 @@ static struct radeon_agpmode_quirk radeon_agpmode_quirk_list[] = {
 
 struct radeon_agp_head *radeon_agp_head_init(struct drm_device *dev)
 {
+#ifdef __linux__
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
+#endif
 	struct radeon_agp_head *head = NULL;
 
 	head = kzalloc(sizeof(*head), GFP_KERNEL);
 	if (!head)
 		return NULL;
+#ifdef __linux__
 	head->bridge = agp_find_bridge(pdev);
 	if (!head->bridge) {
 		head->bridge = agp_backend_acquire(pdev);
@@ -151,6 +158,28 @@ struct radeon_agp_head *radeon_agp_head_init(struct drm_device *dev)
 		kfree(head);
 		return NULL;
 	}
+#elif defined(__FreeBSD__)
+	head->bridge = agp_find_device();
+	if (!head->bridge) {
+		kfree(head);
+		return NULL;
+	} else {
+		struct agp_info agp_info;
+
+		agp_get_info(head->bridge, &agp_info);
+		head->agp_info.version.major = 1;
+		head->agp_info.version.minor = 0;
+		head->agp_info.vendor = agp_info.ai_devid & 0xffff;
+		head->agp_info.device = agp_info.ai_devid >> 16;
+		head->agp_info.mode = agp_info.ai_mode;
+		head->agp_info.aper_base = agp_info.ai_aperture_base;
+		head->agp_info.aper_size = agp_info.ai_aperture_size >> 20;
+		head->agp_info.max_memory = agp_info.ai_memory_allowed >> PAGE_SHIFT;
+		head->agp_info.current_memory = agp_info.ai_memory_used >> PAGE_SHIFT;
+		head->agp_info.cant_use_aperture = 0;
+		head->agp_info.page_mask = ~0UL;
+	}
+#endif
 	INIT_LIST_HEAD(&head->memory);
 	head->cant_use_aperture = head->agp_info.cant_use_aperture;
 	head->page_mask = head->agp_info.page_mask;
@@ -161,16 +190,24 @@ struct radeon_agp_head *radeon_agp_head_init(struct drm_device *dev)
 
 static int radeon_agp_head_acquire(struct radeon_device *rdev)
 {
+#ifdef __linux__
 	struct drm_device *dev = rdev->ddev;
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
+#endif
 
 	if (!rdev->agp)
 		return -ENODEV;
 	if (rdev->agp->acquired)
 		return -EBUSY;
+#ifdef __linux__
 	rdev->agp->bridge = agp_backend_acquire(pdev);
 	if (!rdev->agp->bridge)
 		return -ENODEV;
+#elif defined(__FreeBSD__)
+	int retcode = agp_acquire(rdev->agp->bridge);
+	if (retcode)
+		return -retcode;
+#endif
 	rdev->agp->acquired = 1;
 	return 0;
 }
@@ -179,7 +216,11 @@ static int radeon_agp_head_release(struct radeon_device *rdev)
 {
 	if (!rdev->agp || !rdev->agp->acquired)
 		return -EINVAL;
+#ifdef __linux__
 	agp_backend_release(rdev->agp->bridge);
+#elif defined(__FreeBSD__)
+	agp_release(rdev->agp->bridge);
+#endif
 	rdev->agp->acquired = 0;
 	return 0;
 }
@@ -210,8 +251,13 @@ static int radeon_agp_head_info(struct radeon_device *rdev, struct radeon_agp_in
 	info->aperture_size = kern->aper_size * 1024 * 1024;
 	info->memory_allowed = kern->max_memory << PAGE_SHIFT;
 	info->memory_used = kern->current_memory << PAGE_SHIFT;
+#ifdef __linux__
 	info->id_vendor = kern->device->vendor;
 	info->id_device = kern->device->device;
+#elif defined(__FreeBSD__)
+	info->id_vendor = kern->vendor;
+	info->id_device = kern->device;
+#endif
 
 	return 0;
 }
