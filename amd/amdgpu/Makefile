@@ -220,7 +220,8 @@ SRCS=	acp_hw.c
 # amdgpu_acp.c \ # not yet - need i2s
 # amdgpu_hmm.c \  # disabled
 
-SRCS+=	amdgpu_afmt.c \
+SRCS+=	amdgpu_aca.c \
+	amdgpu_afmt.c \
 	amdgpu_amdkfd.c \
 	amdgpu_atombios.c \
 	amdgpu_atomfirmware.c \
