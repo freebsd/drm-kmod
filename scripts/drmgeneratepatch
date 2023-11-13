@@ -134,4 +134,5 @@ git format-patch -o ${PATCH_DIR} ${REV} \
 # Fixup some paths
 for file in ${PATCH_DIR}/*; do
 	sed -i '' 's/\([ab]\)\/drivers\/video\/hdmi/\1\/linuxkpi\/gplv2\/src\/linux_hdmi/' ${file}
+	sed -i '' 's/\([ab]\)\/include\/linux\/dma-fence-unwrap\.h/\1\/linuxkpi\/gplv2\/include\/linux\/dma-fence-unwrap.h/' ${file}
 done
