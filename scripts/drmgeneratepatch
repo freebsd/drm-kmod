@@ -43,11 +43,13 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     drivers/dma-buf/dma-fence-unwrap.c \
     drivers/dma-buf/dma-resv.c \
     drivers/dma-buf/sync_file.c \
+    drivers/video/aperture.c \
     drivers/video/hdmi.c \
     include/drm/*.h \
     include/drm/display/ \
     include/drm/ttm/ \
     include/uapi/drm/*.h \
+    include/linux/aperture.h \
     include/linux/hdmi.h \
     include/linux/dma-fence.h \
     include/linux/dma-fence-array.h \
@@ -134,5 +136,6 @@ git format-patch -o ${PATCH_DIR} ${REV} \
 # Fixup some paths
 for file in ${PATCH_DIR}/*; do
 	sed -i '' 's/\([ab]\)\/drivers\/video\/hdmi/\1\/linuxkpi\/gplv2\/src\/linux_hdmi/' ${file}
+	sed -i '' 's/\([ab]\)\/include\/linux\/aperture\.h/\1\/linuxkpi\/bsd\/include\/linux\/aperture.h/g' ${file}
 	sed -i '' 's/\([ab]\)\/include\/linux\/dma-fence-unwrap\.h/\1\/linuxkpi\/gplv2\/include\/linux\/dma-fence-unwrap.h/' ${file}
 done
