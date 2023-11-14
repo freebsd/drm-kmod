@@ -131,10 +131,19 @@ ktime_t dma_fence_timestamp(struct dma_fence *fence);
 signed long dma_fence_wait(struct dma_fence *fence, bool intr);
 bool dma_fence_is_array(struct dma_fence *fence);
 bool dma_fence_is_chain(struct dma_fence *fence);
+
 static inline bool
 dma_fence_is_container(struct dma_fence *fence)
 {
 	return (dma_fence_is_array(fence) || dma_fence_is_chain(fence));
+}
+
+static inline bool
+dma_fence_is_later_or_same(struct dma_fence *f1,
+	struct dma_fence *f2)
+{
+
+	return ((f1 == f2) || dma_fence_is_later(f1, f2));
 }
 
 #define	dma_fence_begin_signalling() true
