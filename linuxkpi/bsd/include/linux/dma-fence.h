@@ -124,6 +124,7 @@ bool dma_fence_is_signaled(struct dma_fence *fence);
 bool __dma_fence_is_later(uint64_t f1, uint64_t f2,
     const struct dma_fence_ops *ops);
 bool dma_fence_is_later(struct dma_fence *f1, struct dma_fence *f2);
+bool dma_fence_is_later_or_same(struct dma_fence *f1, struct dma_fence *f2);
 struct dma_fence *dma_fence_later(struct dma_fence *f1, struct dma_fence *f2);
 int dma_fence_get_status_locked(struct dma_fence *fence);
 void dma_fence_set_error(struct dma_fence *fence, int error);

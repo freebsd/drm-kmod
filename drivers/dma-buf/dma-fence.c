@@ -613,6 +613,13 @@ dma_fence_is_later(struct dma_fence *f1,
 	return (__dma_fence_is_later(f1->seqno, f2->seqno, f1->ops));
 }
 
+bool
+dma_fence_is_later_or_same(struct dma_fence *f1, struct dma_fence *f2)
+{
+
+	return (f1 == f2 || dma_fence_is_later(f1, f2));
+}
+
 /*
  * return the chronologically later fence
  */
