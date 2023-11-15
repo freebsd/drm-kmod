@@ -319,7 +319,8 @@ SRCS+=	i915_debugfs.c \
 .endif
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
-SRCS+=	intel_fbdev.c
+SRCS+=	intel_fbdev.c \
+	intel_fbdev_fb.c
 .endif
 
 .if !empty(KCONFIG:MDRM_I915_CAPTURE_ERROR)
