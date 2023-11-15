@@ -437,7 +437,24 @@ int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
 	__force_fw_fetch_failures(uc_fw, -EINVAL);
 	__force_fw_fetch_failures(uc_fw, -ESTALE);
 
-	err = request_firmware(&fw, uc_fw->path, dev);
+	err = firmware_request_nowarn(&fw, uc_fw->path, dev);
+	if (err && !intel_uc_fw_is_overridden(uc_fw) && uc_fw->fallback.path) {
+		err = firmware_request_nowarn(&fw, uc_fw->fallback.path, dev);
+		if (!err) {
+			drm_notice(&i915->drm,
+				   "%s firmware %s is recommended, but only %s was found\n",
+				   intel_uc_fw_type_repr(uc_fw->type),
+				   uc_fw->wanted_path,
+				   uc_fw->fallback.path);
+			drm_info(&i915->drm,
+				 "Consider updating your linux-firmware pkg or downloading from %s\n",
+				 INTEL_UC_FIRMWARE_URL);
+
+			uc_fw->path = uc_fw->fallback.path;
+			uc_fw->major_ver_wanted = uc_fw->fallback.major_ver;
+			uc_fw->minor_ver_wanted = uc_fw->fallback.minor_ver;
+		}
+	}
 	if (err)
 		goto fail;
 

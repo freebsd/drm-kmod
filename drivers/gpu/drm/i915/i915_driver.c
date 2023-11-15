@@ -1464,8 +1464,6 @@ static int i915_pm_prepare(struct device *kdev)
 		return -ENODEV;
 	}
 
-	i915_ggtt_mark_pte_lost(i915, false);
-
 	if (i915->drm.switch_power_state == DRM_SWITCH_POWER_OFF)
 		return 0;
 
@@ -1480,6 +1478,8 @@ static int i915_pm_suspend(struct device *kdev)
 		dev_err(kdev, "DRM not initialized, aborting suspend.\n");
 		return -ENODEV;
 	}
+
+	i915_ggtt_mark_pte_lost(i915, false);
 
 	if (i915->drm.switch_power_state == DRM_SWITCH_POWER_OFF)
 		return 0;
