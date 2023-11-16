@@ -104,9 +104,6 @@ MODULE_DEPEND(ttm, agp, 1, 1, 1);
 #endif
 MODULE_DEPEND(ttm, drmn, 2, 2, 2);
 MODULE_DEPEND(ttm, linuxkpi, 1, 1, 1);
-#if __FreeBSD_version >= 1400085
-MODULE_DEPEND(ttm, linuxkpi_hdmi, 1, 1, 1);
-#endif
 MODULE_DEPEND(ttm, dmabuf, 1, 1, 1);
 #ifdef CONFIG_DEBUG_FS
 MODULE_DEPEND(amdgpu, lindebugfs, 1, 1, 1);

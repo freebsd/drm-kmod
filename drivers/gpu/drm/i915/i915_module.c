@@ -155,9 +155,7 @@ MODULE_DEPEND(i915kms, drmn, 2, 2, 2);
 MODULE_DEPEND(i915kms, ttm, 1, 1, 1);
 MODULE_DEPEND(i915kms, agp, 1, 1, 1);
 MODULE_DEPEND(i915kms, linuxkpi, 1, 1, 1);
-#if __FreeBSD_version >= 1400085
-MODULE_DEPEND(i915kms, linuxkpi_hdmi, 1, 1, 1);
-#endif
+MODULE_DEPEND(i915kms, linuxkpi_video, 1, 1, 1);
 MODULE_DEPEND(i915kms, dmabuf, 1, 1, 1);
 MODULE_DEPEND(i915kms, firmware, 1, 1, 1);
 #ifdef CONFIG_DEBUG_FS

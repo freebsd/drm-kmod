@@ -49,6 +49,11 @@ linuxkpi/i386
 linuxkpi/x86
 linuxkpi/machine
 linuxkpi/export_syms
+linuxkpi_video/*.h
+linuxkpi_video/i386
+linuxkpi_video/x86
+linuxkpi_video/machine
+linuxkpi_video/export_syms
 radeon/*.h
 radeon/i386
 radeon/x86

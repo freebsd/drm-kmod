@@ -2,8 +2,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
-.PATH:	${SRCDIR} ${SRCDIR}/display ${SRCDIR}/scheduler \
-	${.CURDIR:H}/drivers/video
+.PATH:	${SRCDIR} ${SRCDIR}/display ${SRCDIR}/scheduler
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
@@ -100,10 +99,6 @@ SRCS+=	drm_panel_orientation_quirks.c
 .if !empty(KCONFIG:MDRM_PRIVACY_SCREEN)
 SRCS+=	drm_privacy_screen.c \
 	drm_privacy_screen_x86.c
-.endif
-
-.if !empty(KCONFIG:MAPERTURE_HELPERS)
-SRCS+=	aperture.c
 .endif
 
 # drm scheduler (moved from amdgpu)
