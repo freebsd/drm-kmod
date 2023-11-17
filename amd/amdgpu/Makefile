@@ -516,6 +516,7 @@ SRCS+=	dc_debug.c \
 	dc_link_exports.c \
 	dc_resource.c \
 	dc_sink.c \
+	dc_state.c \
 	dc_stream.c \
 	dc_link_enc_cfg.c \
 	dc_surface.c \
