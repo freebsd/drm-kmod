@@ -1364,7 +1364,11 @@ u64 intel_engine_get_last_batch_head(const struct intel_engine_cs *engine)
 
 static unsigned long stop_timeout(const struct intel_engine_cs *engine)
 {
+#ifdef __linux__
 	if (in_atomic() || irqs_disabled()) /* inside atomic preempt-reset? */
+#elif defined (__FreeBSD__)
+	if (!drm_can_sleep())
+#endif
 		return 0;
 
 	/*

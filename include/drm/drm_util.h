@@ -80,7 +80,12 @@
  */
 static inline bool drm_can_sleep(void)
 {
+#ifdef __linux__
 	if (in_atomic() || in_dbg_master() || irqs_disabled())
+#elif defined (__FreeBSD__)
+	if (in_atomic() || in_dbg_master() || curthread->td_critnest != 0 ||
+	    curthread->td_intr_nesting_level != 0)
+#endif
 		return false;
 	return true;
 }
