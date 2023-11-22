@@ -56,8 +56,7 @@ KCONFIG+=	ACPI \
 		X86_PAT
 
 .if ${MACHINE_CPUARCH} == "i386"
-KCONFIG+=	AGP \
-		DRM_LEGACY
+KCONFIG+=	AGP
 .endif
 
 .if ${MACHINE_CPUARCH} == "amd64"
