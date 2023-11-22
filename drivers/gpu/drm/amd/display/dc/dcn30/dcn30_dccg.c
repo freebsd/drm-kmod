@@ -83,13 +83,7 @@ struct dccg *dccg30_create(
 	const struct dccg_shift *dccg_shift,
 	const struct dccg_mask *dccg_mask)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct dcn_dccg *dccg_dcn = kzalloc(sizeof(*dccg_dcn), GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 	struct dccg *base;
 
 	if (dccg_dcn == NULL) {

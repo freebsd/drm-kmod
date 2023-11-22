@@ -438,14 +438,8 @@ static void dcn30_irq_construct(
 struct irq_service *dal_irq_service_dcn30_create(
 	struct irq_service_init_data *init_data)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct irq_service *irq_service = kzalloc(sizeof(*irq_service),
 						  GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!irq_service)
 		return NULL;

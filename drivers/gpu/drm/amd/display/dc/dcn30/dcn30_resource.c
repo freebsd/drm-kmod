@@ -757,14 +757,8 @@ static struct dpp *dcn30_dpp_create(
 	struct dc_context *ctx,
 	uint32_t inst)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct dcn3_dpp *dpp =
 		kzalloc(sizeof(struct dcn3_dpp), GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!dpp)
 		return NULL;
@@ -781,14 +775,8 @@ static struct dpp *dcn30_dpp_create(
 static struct output_pixel_processor *dcn30_opp_create(
 	struct dc_context *ctx, uint32_t inst)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct dcn20_opp *opp =
 		kzalloc(sizeof(struct dcn20_opp), GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!opp) {
 		BREAK_TO_DEBUGGER();
@@ -804,14 +792,8 @@ static struct dce_aux *dcn30_aux_engine_create(
 	struct dc_context *ctx,
 	uint32_t inst)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct aux_engine_dce110 *aux_engine =
 		kzalloc(sizeof(struct aux_engine_dce110), GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!aux_engine)
 		return NULL;
@@ -849,14 +831,8 @@ static struct dce_i2c_hw *dcn30_i2c_hw_create(
 	struct dc_context *ctx,
 	uint32_t inst)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct dce_i2c_hw *dce_i2c_hw =
 		kzalloc(sizeof(struct dce_i2c_hw), GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!dce_i2c_hw)
 		return NULL;
@@ -872,14 +848,8 @@ static struct mpc *dcn30_mpc_create(
 		int num_mpcc,
 		int num_rmu)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct dcn30_mpc *mpc30 = kzalloc(sizeof(struct dcn30_mpc),
 					  GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!mpc30)
 		return NULL;
@@ -898,14 +868,8 @@ static struct hubbub *dcn30_hubbub_create(struct dc_context *ctx)
 {
 	int i;
 
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct dcn20_hubbub *hubbub3 = kzalloc(sizeof(struct dcn20_hubbub),
 					  GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!hubbub3)
 		return NULL;
@@ -933,14 +897,8 @@ static struct timing_generator *dcn30_timing_generator_create(
 		struct dc_context *ctx,
 		uint32_t instance)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct optc *tgn10 =
 		kzalloc(sizeof(struct optc), GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!tgn10)
 		return NULL;
@@ -1251,14 +1209,8 @@ static struct hubp *dcn30_hubp_create(
 	struct dc_context *ctx,
 	uint32_t inst)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct dcn20_hubp *hubp2 =
 		kzalloc(sizeof(struct dcn20_hubp), GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!hubp2)
 		return NULL;
@@ -1278,14 +1230,8 @@ static bool dcn30_dwbc_create(struct dc_context *ctx, struct resource_pool *pool
 	uint32_t pipe_count = pool->res_cap->num_dwb;
 
 	for (i = 0; i < pipe_count; i++) {
-#ifdef __FreeBSD__
-		DC_FP_END();
-#endif
 		struct dcn30_dwbc *dwbc30 = kzalloc(sizeof(struct dcn30_dwbc),
 						    GFP_KERNEL);
-#ifdef __FreeBSD__
-		DC_FP_START();
-#endif
 
 		if (!dwbc30) {
 			dm_error("DC: failed to create dwbc30!\n");
@@ -1309,14 +1255,8 @@ static bool dcn30_mmhubbub_create(struct dc_context *ctx, struct resource_pool *
 	uint32_t pipe_count = pool->res_cap->num_dwb;
 
 	for (i = 0; i < pipe_count; i++) {
-#ifdef __FreeBSD__
-		DC_FP_END();
-#endif
 		struct dcn30_mmhubbub *mcif_wb30 = kzalloc(sizeof(struct dcn30_mmhubbub),
 						    GFP_KERNEL);
-#ifdef __FreeBSD__
-		DC_FP_START();
-#endif
 
 		if (!mcif_wb30) {
 			dm_error("DC: failed to create mcif_wb30!\n");
@@ -1337,14 +1277,8 @@ static bool dcn30_mmhubbub_create(struct dc_context *ctx, struct resource_pool *
 static struct display_stream_compressor *dcn30_dsc_create(
 	struct dc_context *ctx, uint32_t inst)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct dcn20_dsc *dsc =
 		kzalloc(sizeof(struct dcn20_dsc), GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!dsc) {
 		BREAK_TO_DEBUGGER();
@@ -1377,14 +1311,8 @@ static struct clock_source *dcn30_clock_source_create(
 		const struct dce110_clk_src_regs *regs,
 		bool dp_clk_src)
 {
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	struct dce110_clk_src *clk_src =
 		kzalloc(sizeof(struct dce110_clk_src), GFP_KERNEL);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (!clk_src)
 		return NULL;
@@ -2558,13 +2486,7 @@ static bool dcn30_resource_construct(
 	}
 	pool->base.timing_generator_count = i;
 	/* PSR */
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	pool->base.psr = dmub_psr_create(ctx);
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	if (pool->base.psr == NULL) {
 		dm_error("DC: failed to create PSR obj!\n");
@@ -2574,16 +2496,10 @@ static bool dcn30_resource_construct(
 
 	/* ABM */
 	for (i = 0; i < pool->base.res_cap->num_timing_generator; i++) {
-#ifdef __FreeBSD__
-		DC_FP_END();
-#endif
 		pool->base.multiple_abms[i] = dmub_abm_create(ctx,
 				&abm_regs[i],
 				&abm_shift,
 				&abm_mask);
-#ifdef __FreeBSD__
-		DC_FP_START();
-#endif
 		if (pool->base.multiple_abms[i] == NULL) {
 			dm_error("DC: failed to create abm for pipe %d!\n", i);
 			BREAK_TO_DEBUGGER();
@@ -2640,16 +2556,10 @@ static bool dcn30_resource_construct(
 	}
 
 	/* Audio, Stream Encoders including DIG and virtual, MPC 3D LUTs */
-#ifdef __FreeBSD__
-	DC_FP_END();
-#endif
 	if (!resource_construct(num_virtual_links, dc, &pool->base,
 			(!IS_FPGA_MAXIMUS_DC(dc->ctx->dce_environment) ?
 			&res_create_funcs : &res_create_maximus_funcs)))
 		goto create_fail;
-#ifdef __FreeBSD__
-	DC_FP_START();
-#endif
 
 	/* HW Sequencer and Plane caps */
 	dcn30_hw_sequencer_construct(dc);
@@ -2667,13 +2577,7 @@ static bool dcn30_resource_construct(
 		ddc_init_data.id.id = dc->ctx->dc_bios->fw_info.oem_i2c_obj_id;
 		ddc_init_data.id.enum_id = 0;
 		ddc_init_data.id.type = OBJECT_TYPE_GENERIC;
-#ifdef __FreeBSD__
-		DC_FP_END();
-#endif
 		pool->base.oem_device = dal_ddc_service_create(&ddc_init_data);
-#ifdef __FreeBSD__
-		DC_FP_START();
-#endif
 	} else {
 		pool->base.oem_device = NULL;
 	}
