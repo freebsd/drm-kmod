@@ -48,7 +48,6 @@
 
 #include "drm_crtc_internal.h"
 #include "drm_internal.h"
-#include "drm_legacy.h"
 
 MODULE_AUTHOR("Gareth Hughes, Leif Delgass, José Fonseca, Jon Smirl");
 MODULE_DESCRIPTION("DRM shared core routines");
@@ -591,8 +590,6 @@ static void drm_fs_inode_free(struct inode *inode)
 
 static void drm_dev_init_release(struct drm_device *dev, void *res)
 {
-	drm_legacy_ctxbitmap_cleanup(dev);
-	drm_legacy_remove_map_hash(dev);
 #ifdef __linux__
 	drm_fs_inode_free(dev->anon_inode);
 #endif
@@ -605,7 +602,6 @@ static void drm_dev_init_release(struct drm_device *dev, void *res)
 	mutex_destroy(&dev->clientlist_mutex);
 	mutex_destroy(&dev->filelist_mutex);
 	mutex_destroy(&dev->struct_mutex);
-	drm_legacy_destroy_members(dev);
 }
 
 static int drm_dev_init(struct drm_device *dev,
@@ -640,7 +636,6 @@ static int drm_dev_init(struct drm_device *dev,
 		return -EINVAL;
 	}
 
-	drm_legacy_init_members(dev);
 	INIT_LIST_HEAD(&dev->filelist);
 	INIT_LIST_HEAD(&dev->filelist_internal);
 	INIT_LIST_HEAD(&dev->clientlist);
@@ -682,12 +677,6 @@ static int drm_dev_init(struct drm_device *dev,
 		if (ret)
 			goto err;
 	}
-
-	ret = drm_legacy_create_map_hash(dev);
-	if (ret)
-		goto err;
-
-	drm_legacy_ctxbitmap_init(dev);
 
 	if (drm_core_check_feature(dev, DRIVER_GEM)) {
 		ret = drm_gem_init(dev);
@@ -1006,9 +995,6 @@ EXPORT_SYMBOL(drm_dev_register);
  */
 void drm_dev_unregister(struct drm_device *dev)
 {
-	if (drm_core_check_feature(dev, DRIVER_LEGACY))
-		drm_lastclose(dev);
-
 	dev->registered = false;
 
 	drm_client_dev_unregister(dev);
@@ -1018,9 +1004,6 @@ void drm_dev_unregister(struct drm_device *dev)
 
 	if (dev->driver->unload)
 		dev->driver->unload(dev);
-
-	drm_legacy_pci_agp_destroy(dev);
-	drm_legacy_rmmaps(dev);
 
 	remove_compat_control_link(dev);
 	drm_minor_unregister(dev, DRM_MINOR_ACCEL);
