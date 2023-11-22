@@ -29,12 +29,12 @@ __FBSDID("$FreeBSD$");
  * debug information.
  */
 
+#include <drm/drm_auth.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_print.h>
 #include <drm/drm_vblank.h>
 #include <uapi/drm/drm.h>
 #include "drm_internal.h"
-#include "drm_legacy.h"
 
 #include <sys/sysctl.h>
 
