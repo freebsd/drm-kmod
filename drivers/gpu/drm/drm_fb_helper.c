@@ -169,7 +169,11 @@ int drm_fb_helper_debug_enter(struct fb_info *info)
 				continue;
 
 			funcs =	mode_set->crtc->helper_private;
+#ifdef __linux__
 			if (funcs->mode_set_base_atomic == NULL)
+#elif defined(__FreeBSD__)
+			if (funcs == NULL || funcs->mode_set_base_atomic == NULL)
+#endif
 				continue;
 
 			if (drm_drv_uses_atomic_modeset(mode_set->crtc->dev))
