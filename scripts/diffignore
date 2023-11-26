@@ -2,6 +2,7 @@ Kconfig
 Kconfig.*
 Makefile
 
+drm_accel.h
 drm_bridge_connector.c
 drm_bridge_connector.h
 drm_bufs.c

@@ -105,6 +105,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/intel-gtt*' \
     ':!include/drm/tinydrm/*' \
     ':!include/drm/display/drm_dp_aux_bus*' \
+    ':!include/drm/drm_accel.h' \
     ':!include/drm/drm_bridge_connector*' \
     ':!include/drm/drm_fb_cma_helper*' \
     ':!include/drm/drm_gem_atomic_helper.h' \
