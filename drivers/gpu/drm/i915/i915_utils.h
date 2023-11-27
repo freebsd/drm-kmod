@@ -122,6 +122,9 @@ bool i915_error_injected(void);
 	range_overflows_end((type)(start), (type)(size), (type)(max))
 
 /* Note we don't consider signbits :| */
+#ifdef __FreeBSD__
+#undef overflows_type
+#endif
 #define overflows_type(x, T) \
 	(sizeof(x) > sizeof(T) && (x) >> BITS_PER_TYPE(T))
 
