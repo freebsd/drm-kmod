@@ -168,8 +168,9 @@ trace_switch_mm(void *ring, void *to) {
 }
 
 #define	trace_i915_context(ctx) \
-    CTR3(KTR_DRM, \
-	__func__ " dev=%u, ctx=%p, ctx_vm=%p", \
+    CTR4(KTR_DRM, \
+	"%s dev=%u, ctx=%p, ctx_vm=%p", \
+	__func__, \
 	ctx->i915->drm.primary->index, \
 	ctx, \
 	rcu_access_pointer(ctx->vm))
@@ -187,8 +188,9 @@ trace_i915_context_free(struct i915_gem_context *ctx)
 }
 
 #define	trace_intel_context(ctx) \
-    CTR5(KTR_DRM, \
-	__func__ " guc_id=%d, pin_count=%d sched_state=0x%x,0x%x, guc_prio=%u", \
+    CTR6(KTR_DRM, \
+	"%s guc_id=%d, pin_count=%d sched_state=0x%x,0x%x, guc_prio=%u", \
+	__func__, \
 	ctx->guc_id, \
 	atomic_read(&ctx->pin_count), \
 	ctx->guc_state.sched_state, \
@@ -373,14 +375,19 @@ trace_i915_pipe_update_end(void *crtc, u32 end_vbl_count, int scanline_end)
 }
 
 #define	trace_i915_request(req) \
-    CTR6(KTR_DRM, \
-	__func__ " dev=%u, engine=%u:%u, ctx=%llu, seqno=%u, tail=%u", \
+do { \
+    CTR5(KTR_DRM, \
+	"%s dev=%u, engine=%u:%u, ctx=%llu", \
+	__func__, \
 	req->engine->i915->drm.primary->index, \
 	req->engine->uabi_class, \
 	req->engine->uabi_instance, \
-	req->fence.context, \
+	req->fence.context); \
+    CTR2(KTR_DRM, \
+	"seqno=%u, tail=%u", \
 	req->fence.seqno, \
-	req->tail)
+	req->tail); \
+} while(0)
 
 static inline void
 trace_i915_request_add(struct i915_request *req)
