@@ -312,7 +312,7 @@ static inline void trace_ ## name(const struct drm_atomic_state *state) \
 	CTR3(KTR_DRM, \
 	    #name "[1/2] " \
 	    "state=%p allow_modeset=%d legacy_cursor_update=%d", \
-	    state, allow_modeset, legacy_cursor_update); \
+	    state_state, allow_modeset, legacy_cursor_update); \
 	CTR4(KTR_DRM, \
 	    #name "[2/2] " \
 	    "async_update=%d duplicated=%d num_connector=%d " \
@@ -361,7 +361,7 @@ trace_amdgpu_dm_atomic_check_finish(
 	CTR4(KTR_DRM, \
 	    "amdgpu_dm_atomic_check_finish " \
 	    "state=%p res=%d async_update=%d allow_modeset=%d",
-	    state, res, async_update, allow_modeset);
+	    state_state, res, async_update, allow_modeset);
 }
 
 /* TRACE_EVENT(amdgpu_dm_dc_pipe_state, */
@@ -491,6 +491,7 @@ trace_amdgpu_dm_dc_clocks_state(const struct dc_clocks *clk)
 
 	dispclk_khz = clk->dispclk_khz;
 	dppclk_khz = clk->dppclk_khz;
+	disp_dpp_voltage_level_khz = -1;
 	dcfclk_khz = clk->dcfclk_khz;
 	socclk_khz = clk->socclk_khz;
 	dcfclk_deep_sleep_khz = clk->dcfclk_deep_sleep_khz;
