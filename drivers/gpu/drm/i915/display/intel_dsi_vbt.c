@@ -945,7 +945,7 @@ void intel_dsi_vbt_gpio_init(struct intel_dsi *intel_dsi, bool panel_is_on)
 		gpiod_add_lookup_table(gpiod_lookup_table);
 
 	if (want_panel_gpio) {
-		intel_dsi->gpio_panel = gpiod_get(dev->dev, "panel", flags);
+		intel_dsi->gpio_panel = devm_gpiod_get(dev->dev, "panel", flags);
 		if (IS_ERR(intel_dsi->gpio_panel)) {
 			drm_err(&dev_priv->drm,
 				"Failed to own gpio for panel control\n");
@@ -955,7 +955,7 @@ void intel_dsi_vbt_gpio_init(struct intel_dsi *intel_dsi, bool panel_is_on)
 
 	if (want_backlight_gpio) {
 		intel_dsi->gpio_backlight =
-			gpiod_get(dev->dev, "backlight", flags);
+			devm_gpiod_get(dev->dev, "backlight", flags);
 		if (IS_ERR(intel_dsi->gpio_backlight)) {
 			drm_err(&dev_priv->drm,
 				"Failed to own gpio for backlight control\n");
@@ -965,20 +965,5 @@ void intel_dsi_vbt_gpio_init(struct intel_dsi *intel_dsi, bool panel_is_on)
 
 	if (gpiod_lookup_table)
 		gpiod_remove_lookup_table(gpiod_lookup_table);
-#endif
-}
-
-void intel_dsi_vbt_gpio_cleanup(struct intel_dsi *intel_dsi)
-{
-#ifdef __linux__
-	if (intel_dsi->gpio_panel) {
-		gpiod_put(intel_dsi->gpio_panel);
-		intel_dsi->gpio_panel = NULL;
-	}
-
-	if (intel_dsi->gpio_backlight) {
-		gpiod_put(intel_dsi->gpio_backlight);
-		intel_dsi->gpio_backlight = NULL;
-	}
 #endif
 }
