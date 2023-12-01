@@ -740,13 +740,8 @@ int amdgpu_acpi_power_shift_control(struct amdgpu_device *adev,
 	atcs_input.dev_acpi_state = dev_state;
 	atcs_input.drv_state = drv_state;
 
-#ifdef __linux__
-	params.length = sizeof(struct atcs_pwr_shift_input);
-	params.pointer = &atcs_input;
-#elif defined(__FreeBSD__)
 	params.Length = sizeof(struct atcs_pwr_shift_input);
 	params.Pointer = &atcs_input;
-#endif
 
 	info = amdgpu_atcs_call(atcs, ATCS_FUNCTION_POWER_SHIFT_CONTROL, &params);
 	if (!info) {
@@ -1097,11 +1092,7 @@ bool amdgpu_acpi_is_s0ix_active(struct amdgpu_device *adev)
 	 * S0ix even though the system is suspending to idle, so return false
 	 * in that case.
 	 */
-#ifdef __linux__
-	if (!(acpi_gbl_FADT.flags & ACPI_FADT_LOW_POWER_S0))
-#elif defined(__FreeBSD__)
 	if (!(AcpiGbl_FADT.Flags & ACPI_FADT_LOW_POWER_S0))
-#endif
 		dev_warn_once(adev->dev,
 			      "Power consumption will be higher as BIOS has not been configured for suspend-to-idle.\n"
 			      "To use suspend-to-idle change the sleep mode in BIOS setup.\n");
