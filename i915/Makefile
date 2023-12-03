@@ -139,6 +139,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_dsb.c \
 	intel_dsb_buffer.c \
 	intel_fb.c \
+	intel_fb_bo.c \
 	intel_fb_pin.c \
 	intel_dvo.c \
 	intel_global_state.c \
