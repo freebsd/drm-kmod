@@ -83,9 +83,9 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_fb_cma_helper*' \
     ':!drivers/gpu/drm/drm_gem_atomic_helper.c' \
     ':!drivers/gpu/drm/drm_gem_cma_helper*' \
+    ':!drivers/gpu/drm/drm_gem_dma_helper.c' \
     ':!drivers/gpu/drm/drm_gem_framebuffer_helper*' \
     ':!drivers/gpu/drm/drm_gem_shmem_helper*' \
-    ':!drivers/gpu/drm/drm_gem_ttm_helper*' \
     ':!drivers/gpu/drm/drm_gem_vram_helper*' \
     ':!drivers/gpu/drm/drm_hdcp*' \
     ':!drivers/gpu/drm/drm_kms_helper*' \
@@ -111,7 +111,6 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_gem_atomic_helper.h' \
     ':!include/drm/drm_gem_cma*' \
     ':!include/drm/drm_gem_shmem*' \
-    ':!include/drm/drm_gem_ttm_helper*' \
     ':!include/drm/drm_gem_vram*' \
     ':!include/drm/drm_lease*' \
     ':!include/drm/drm_managed*' \
