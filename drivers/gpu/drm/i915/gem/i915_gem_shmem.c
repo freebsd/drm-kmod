@@ -542,11 +542,13 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 			return err;
 #endif
 
-		vaddr = kmap_atomic(page);
+		vaddr = kmap_local_page(page);
+		pagefault_disable();
 		unwritten = __copy_from_user_inatomic(vaddr + pg,
 						      user_data,
 						      len);
-		kunmap_atomic(vaddr);
+		pagefault_enable();
+		kunmap_local(vaddr);
 
 #ifdef __linux__
 		err = aops->write_end(obj->base.filp, mapping, offset, len,
