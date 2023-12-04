@@ -655,6 +655,26 @@ static bool guc_check_version_range(struct intel_uc_fw *uc_fw)
 	return true;
 }
 
+static int check_fw_header(struct intel_gt *gt,
+			   const struct firmware *fw,
+			   struct intel_uc_fw *uc_fw)
+{
+	int err = 0;
+
+	/* GSC FW version is queried after the FW is loaded */
+	if (uc_fw->type == INTEL_UC_FW_TYPE_GSC)
+		return 0;
+
+	if (uc_fw->loaded_via_gsc)
+		err = check_gsc_manifest(fw, uc_fw);
+	else
+		err = check_ccs_header(gt, fw, uc_fw);
+	if (err)
+		return err;
+
+	return 0;
+}
+
 static int try_firmware_load(struct intel_uc_fw *uc_fw, const struct firmware **fw)
 {
 	struct intel_gt *gt = __uc_fw_to_gt(uc_fw);
@@ -677,26 +697,6 @@ static int try_firmware_load(struct intel_uc_fw *uc_fw, const struct firmware **
 		*fw = NULL;
 		return -ENOENT;
 	}
-
-	return 0;
-}
-
-static int check_fw_header(struct intel_gt *gt,
-			   const struct firmware *fw,
-			   struct intel_uc_fw *uc_fw)
-{
-	int err = 0;
-
-	/* GSC FW version is queried after the FW is loaded */
-	if (uc_fw->type == INTEL_UC_FW_TYPE_GSC)
-		return 0;
-
-	if (uc_fw->loaded_via_gsc)
-		err = check_gsc_manifest(fw, uc_fw);
-	else
-		err = check_ccs_header(gt, fw, uc_fw);
-	if (err)
-		return err;
 
 	return 0;
 }
