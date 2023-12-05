@@ -74,6 +74,7 @@ lp_read_dpcd(void *handle, uint32_t address, uint8_t *data, uint32_t size)
 	return dm_helpers_dp_read_dpcd(link->ctx, link, address, data, size);
 }
 
+#ifdef __linux__
 static uint8_t *psp_get_srm(struct psp_context *psp, uint32_t *srm_version, uint32_t *srm_size)
 {
 
@@ -99,6 +100,7 @@ static uint8_t *psp_get_srm(struct psp_context *psp, uint32_t *srm_version, uint
 
 	return hdcp_cmd->out_msg.hdcp_get_srm.srm_buf;
 }
+#endif
 
 static int psp_set_srm(struct psp_context *psp, uint8_t *srm, uint32_t srm_size, uint32_t *srm_version)
 {
@@ -148,6 +150,7 @@ static void process_output(struct hdcp_workqueue *hdcp_work)
 	schedule_delayed_work(&hdcp_work->property_validate_dwork, msecs_to_jiffies(0));
 }
 
+#ifdef __linux__
 static void link_lock(struct hdcp_workqueue *work, bool lock)
 {
 
@@ -160,6 +163,7 @@ static void link_lock(struct hdcp_workqueue *work, bool lock)
 			mutex_unlock(&work[i].mutex);
 	}
 }
+#endif
 void hdcp_update_display(struct hdcp_workqueue *hdcp_work,
 			 unsigned int link_index,
 			 struct amdgpu_dm_connector *aconnector,
@@ -472,7 +476,9 @@ void hdcp_destroy(struct kobject *kobj, struct hdcp_workqueue *hdcp_work)
 		cancel_delayed_work_sync(&hdcp_work[i].watchdog_timer_dwork);
 	}
 
+#ifdef __linux__
 	sysfs_remove_bin_file(kobj, &hdcp_work[0].attr);
+#endif
 	kfree(hdcp_work->srm);
 	kfree(hdcp_work->srm_temp);
 	kfree(hdcp_work);
@@ -621,6 +627,7 @@ static void update_config(void *handle, struct cp_psp_stream_config *config)
  * 	-if we try to "1. SET" a newer version and PSP rejects it. That means the format is
  * 	incorrect/corrupted and we should correct our SRM by getting it from PSP
  */
+#ifdef __linux__
 static ssize_t srm_data_write(struct file *filp, struct kobject *kobj, struct bin_attribute *bin_attr, char *buffer,
 			      loff_t pos, size_t count)
 {
@@ -708,6 +715,7 @@ static const struct bin_attribute data_attr = {
 	.write = srm_data_write,
 	.read = srm_data_read,
 };
+#endif
 
 
 struct hdcp_workqueue *hdcp_create_workqueue(struct amdgpu_device *adev, struct cp_psp *cp_psp, struct dc *dc)
@@ -767,11 +775,13 @@ struct hdcp_workqueue *hdcp_create_workqueue(struct amdgpu_device *adev, struct 
 	cp_psp->handle = hdcp_work;
 
 	/* File created at /sys/class/drm/card0/device/hdcp_srm*/
+#ifdef __linux__
 	hdcp_work[0].attr = data_attr;
 	sysfs_bin_attr_init(&hdcp_work[0].attr);
 
 	if (sysfs_create_bin_file(&adev->dev->kobj, &hdcp_work[0].attr))
 		DRM_WARN("Failed to create device file hdcp_srm");
+#endif
 
 	return hdcp_work;
 
