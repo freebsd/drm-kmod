@@ -50,6 +50,11 @@
  * present for a given platform.
  */
 
+static struct drm_i915_private *rpm_to_i915(struct intel_runtime_pm *rpm)
+{
+	return container_of(rpm, struct drm_i915_private, runtime_pm);
+}
+
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM)
 
 static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
@@ -158,9 +163,7 @@ intel_runtime_pm_release(struct intel_runtime_pm *rpm, int wakelock)
 static intel_wakeref_t __intel_runtime_pm_get(struct intel_runtime_pm *rpm,
 					      bool wakelock)
 {
-	struct drm_i915_private *i915 = container_of(rpm,
-						     struct drm_i915_private,
-						     runtime_pm);
+	struct drm_i915_private *i915 = rpm_to_i915(rpm);
 	int ret;
 
 	ret = pm_runtime_get_sync(rpm->kdev);
@@ -369,9 +372,7 @@ void intel_runtime_pm_put(struct intel_runtime_pm *rpm, intel_wakeref_t wref)
  */
 void intel_runtime_pm_enable(struct intel_runtime_pm *rpm)
 {
-	struct drm_i915_private *i915 = container_of(rpm,
-						     struct drm_i915_private,
-						     runtime_pm);
+	struct drm_i915_private *i915 = rpm_to_i915(rpm);
 	struct device *kdev = rpm->kdev;
 
 	/*
@@ -424,9 +425,7 @@ void intel_runtime_pm_enable(struct intel_runtime_pm *rpm)
 
 void intel_runtime_pm_disable(struct intel_runtime_pm *rpm)
 {
-	struct drm_i915_private *i915 = container_of(rpm,
-						     struct drm_i915_private,
-						     runtime_pm);
+	struct drm_i915_private *i915 = rpm_to_i915(rpm);
 	struct device *kdev = rpm->kdev;
 
 	/* Transfer rpm ownership back to core */
@@ -441,9 +440,7 @@ void intel_runtime_pm_disable(struct intel_runtime_pm *rpm)
 
 void intel_runtime_pm_driver_release(struct intel_runtime_pm *rpm)
 {
-	struct drm_i915_private *i915 = container_of(rpm,
-						     struct drm_i915_private,
-						     runtime_pm);
+	struct drm_i915_private *i915 = rpm_to_i915(rpm);
 	int count = atomic_read(&rpm->wakeref_count);
 
 	intel_wakeref_auto_fini(&rpm->userfault_wakeref);
@@ -462,8 +459,7 @@ void intel_runtime_pm_driver_last_release(struct intel_runtime_pm *rpm)
 
 void intel_runtime_pm_init_early(struct intel_runtime_pm *rpm)
 {
-	struct drm_i915_private *i915 =
-			container_of(rpm, struct drm_i915_private, runtime_pm);
+	struct drm_i915_private *i915 = rpm_to_i915(rpm);
 	struct pci_dev *pdev = to_pci_dev(i915->drm.dev);
 	struct device *kdev = &pdev->dev;
 
