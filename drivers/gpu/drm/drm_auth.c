@@ -249,7 +249,7 @@ drm_master_check_perm(struct drm_device *dev, struct drm_file *file_priv)
 {
 #ifdef __linux__
 	if (file_priv->was_master &&
-	    rcu_access_pointer(file_priv->pid) == task_pid(current))
+	    rcu_access_pointer(file_priv->pid) == task_tgid(current))
 #elif defined(__FreeBSD__)
 	if (file_priv->was_master &&
 	    file_priv->pid == task_pid(current))
