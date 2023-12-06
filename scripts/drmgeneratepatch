@@ -121,9 +121,10 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_writeback.h' \
     ':!include/drm/gma*' \
     ':!include/drm/drm_*vram*' \
-    ':!include/drm/i915_mei_hdcp_interface*' \
+    ':!include/drm/i915_hdcp_interface.h' \
     ':!include/uapi/drm/etnaviv*' \
     ':!include/uapi/drm/exynos_drm*' \
+    ':!include/uapi/drm/habanalabs_accel.h' \
     ':!include/uapi/drm/lima*' \
     ':!include/uapi/drm/msm*' \
     ':!include/uapi/drm/omap*' \
@@ -136,6 +137,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
 # Fixup some paths
 for file in ${PATCH_DIR}/*; do
 	sed -i '' 's/\([ab]\)\/include\/linux\/aperture\.h/\1\/linuxkpi\/bsd\/include\/linux\/aperture.h/g' ${file}
+	sed -i '' 's/\([ab]\)\/include\/linux\/dma-resv\.h/\1\/linuxkpi\/bsd\/include\/linux\/dma-resv.h/g' ${file}
 	sed -i '' 's/\([ab]\)\/include\/linux\/dma-fence-unwrap\.h/\1\/linuxkpi\/gplv2\/include\/linux\/dma-fence-unwrap.h/' ${file}
 	sed -i '' 's/\([ab]\)\/include\/linux\/hdmi\.h/\1\/linuxkpi\/bsd\/include\/linux\/hdmi.h/g' ${file}
 done

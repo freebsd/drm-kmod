@@ -59,7 +59,7 @@ vt_drmfb.h
 gma_drm.h
 bridge
 i2c
-i915_mei_hdcp_interface.h
+i915_hdcp_interface.h
 intel_display_trace.h
 intel-gtt.h
 ttm_sysctl_freebsd.h
