@@ -112,11 +112,7 @@ static int drm_clients_info(struct seq_file *m, void *data)
 			   priv->minor->index,
 			   is_current_master ? 'y' : 'n',
 			   priv->authenticated ? 'y' : 'n',
-#ifdef __linux__
 			   from_kuid_munged(seq_user_ns(m), uid),
-#elif defined(__FreeBSD__)
-		    	   uid,
-#endif
 			   priv->magic);
 		rcu_read_unlock();
 	}
