@@ -18,7 +18,7 @@ mkdir -p "$1"/alreadyapplied/
 scriptdir=$(dirname "$0")
 log="$scriptdir/log.txt"
 
-git log --oneline > "$log"
+git log --pretty=format:'%aD %s' > "$log"
 
 for file in "$1"/*.patch; do
 	subject=$("$scriptdir/extract-commit-title-from-patch.awk" "$file")
