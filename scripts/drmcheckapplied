@@ -17,8 +17,13 @@ mkdir -p "$1"/alreadyapplied/
 
 scriptdir=$(dirname "$0")
 log="$scriptdir/log.txt"
+sep="<<<>>>"
 
-git log --pretty=format:'%aD %s' > "$log"
+git log --pretty=format:"%aD|%s|%n%b${sep}" | \
+	gsed -e "/^[(]cherry[ -]pick/,/^${sep}$/{/^${sep}$/!d}" \
+	     -e "/^[A-Z][a-z-]*:/d" | \
+	tr   -d '\n' | \
+	gsed -e "s/${sep}/\n/g" > "$log"
 
 for file in "$1"/*.patch; do
 	subject=$("$scriptdir/extract-commit-title-from-patch.awk" "$file")
@@ -26,6 +31,19 @@ for file in "$1"/*.patch; do
 	if [ $? -eq 0 ]; then
 		echo "$file already applied"
 		mv $file $1/alreadyapplied
+	fi
+done
+
+: > "$log"
+
+for file in "$1"/*.patch; do
+	subject=$("$scriptdir/extract-commit-title-from-patch.awk" "$file")
+	grep -q -F "${subject}" "$log"
+	if [ $? -eq 0 ]; then
+		echo "$file duplicated"
+		mv $file $1/alreadyapplied
+	else
+		echo "${subject}" >> "$log"
 	fi
 done
 
