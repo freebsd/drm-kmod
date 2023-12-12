@@ -4107,6 +4107,7 @@ void amdgpu_device_fini_sw(struct amdgpu_device *adev)
 	adev->reset_domain = NULL;
 
 	kfree(adev->pci_state);
+
 }
 
 /**
@@ -4506,6 +4507,8 @@ static int amdgpu_device_reset_sriov(struct amdgpu_device *adev,
 	int retry_limit = 0;
 
 retry:
+	amdgpu_amdkfd_pre_reset(adev);
+
 	amdgpu_amdkfd_pre_reset(adev);
 
 	if (from_hypervisor)

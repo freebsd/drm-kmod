@@ -463,7 +463,8 @@ EXPORT_SYMBOL(drm_gem_vram_vmap);
  * A call to drm_gem_vram_vunmap() unmaps and unpins a GEM VRAM buffer. See
  * the documentation for drm_gem_vram_vmap() for more information.
  */
-void drm_gem_vram_vunmap(struct drm_gem_vram_object *gbo, struct iosys_map *map)
+void drm_gem_vram_vunmap(struct drm_gem_vram_object *gbo,
+			 struct iosys_map *map)
 {
 	int ret;
 
@@ -802,7 +803,8 @@ static void drm_gem_vram_object_unpin(struct drm_gem_object *gem)
  * Returns:
  * 0 on success, or a negative error code otherwise.
  */
-static int drm_gem_vram_object_vmap(struct drm_gem_object *gem, struct iosys_map *map)
+static int drm_gem_vram_object_vmap(struct drm_gem_object *gem,
+				    struct iosys_map *map)
 {
 	struct drm_gem_vram_object *gbo = drm_gem_vram_of_gem(gem);
 
@@ -815,7 +817,8 @@ static int drm_gem_vram_object_vmap(struct drm_gem_object *gem, struct iosys_map
  * @gem: The GEM object to unmap
  * @map: Kernel virtual address where the VRAM GEM object was mapped
  */
-static void drm_gem_vram_object_vunmap(struct drm_gem_object *gem, struct iosys_map *map)
+static void drm_gem_vram_object_vunmap(struct drm_gem_object *gem,
+				       struct iosys_map *map)
 {
 	struct drm_gem_vram_object *gbo = drm_gem_vram_of_gem(gem);
 

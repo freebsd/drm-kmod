@@ -26,9 +26,7 @@
  *          Jerome Glisse
  */
 
-#ifdef CONFIG_ACPI
 #include <linux/acpi.h>
-#endif
 #include <linux/pci.h>
 #include <linux/slab.h>
 

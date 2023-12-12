@@ -10,6 +10,7 @@
 
 struct drm_mm_node;
 struct i915_address_space;
+struct i915_gem_ww_ctx;
 
 int __must_check i915_gem_evict_something(struct i915_address_space *vm,
 					  struct i915_gem_ww_ctx *ww,

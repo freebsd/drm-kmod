@@ -691,8 +691,6 @@ static int devm_drm_dev_init(struct device *parent,
 
 	return devm_add_action_or_reset(parent,
 					devm_drm_dev_init_release, dev);
-
-	return ret;
 }
 
 void *__devm_drm_dev_alloc(struct device *parent,
@@ -1051,9 +1049,7 @@ static void drm_core_exit(void)
 {
 	drm_privacy_screen_lookup_exit();
 	unregister_chrdev(DRM_MAJOR, "drm");
-#ifdef CONFIG_DEBUG_FS
 	debugfs_remove(drm_debugfs_root);
-#endif
 	drm_sysfs_destroy();
 	idr_destroy(&drm_minors_idr);
 	drm_connector_ida_destroy();
@@ -1073,9 +1069,7 @@ static int __init drm_core_init(void)
 		goto error;
 	}
 
-#ifdef CONFIG_DEBUG_FS
 	drm_debugfs_root = debugfs_create_dir("dri", NULL);
-#endif
 
 #ifdef __linux__
 	ret = register_chrdev(DRM_MAJOR, "drm", &drm_stub_fops);

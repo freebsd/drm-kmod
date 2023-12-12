@@ -77,10 +77,10 @@ static int drm_clients_info(struct seq_file *m, void *data)
 	struct drm_file *priv;
 #ifdef __linux__
 	kuid_t uid;
-
 #elif defined(__FreeBSD__)
 	uid_t uid;
 #endif
+
 	seq_printf(m,
 		   "%20s %5s %3s master a %5s %10s\n",
 		   "command",

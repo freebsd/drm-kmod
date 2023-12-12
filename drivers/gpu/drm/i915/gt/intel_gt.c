@@ -3,9 +3,19 @@
  * Copyright © 2019 Intel Corporation
  */
 
+#ifdef __FreeBSD__
+/*
+ * Include this header first on FreeBSD to silence a compilation error:
+ * .../drm_managed.h:10:41: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Werror,-Wimplicit-int]
+ * void *drmm_kzalloc(struct drm_device *, size_t, int);
+ *                                         ^
+ *                                         int
+ */
 #include <drm/intel-gtt.h>
+#endif
 
 #include <drm/drm_managed.h>
+#include <drm/intel-gtt.h>
 
 #include "gem/i915_gem_internal.h"
 #include "gem/i915_gem_lmem.h"

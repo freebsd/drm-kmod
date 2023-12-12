@@ -50,11 +50,11 @@
 #include <drm/radeon_drm.h>
 
 #include "radeon_drv.h"
+#include "radeon.h"
 #include "radeon_kms.h"
 #include "radeon_ttm.h"
 #include "radeon_device.h"
 #include "radeon_prime.h"
-#include "radeon.h"
 
 #ifdef __FreeBSD__
 #include <vm/vm_phys.h>

@@ -42,9 +42,6 @@
 #include "radeon_trace.h"
 #include "radeon_ttm.h"
 
-#undef min_offset
-#undef max_offset
-
 static void radeon_bo_clear_surface_reg(struct radeon_bo *bo);
 
 /*

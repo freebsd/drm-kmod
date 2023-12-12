@@ -1150,6 +1150,7 @@ static int intel_fbc_check_plane(struct intel_atomic_state *state,
 	return 0;
 }
 
+
 static bool intel_fbc_can_flip_nuke(struct intel_atomic_state *state,
 				    struct intel_crtc *crtc,
 				    struct intel_plane *plane)
