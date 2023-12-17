@@ -27,7 +27,6 @@
 /*
  * Authors: Thomas Hellström <thomas-at-tungstengraphics-dot-com>
  */
-
 #include <linux/cc_platform.h>
 #include <linux/export.h>
 #include <linux/highmem.h>

@@ -482,6 +482,7 @@ static void amdgpu_xgmi_sysfs_rem_dev_info(struct amdgpu_device *adev,
 	sprintf(node, "node%d", atomic_read(&hive->number_devices));
 	sysfs_remove_link(&hive->kobj, node);
 #endif
+
 }
 
 
