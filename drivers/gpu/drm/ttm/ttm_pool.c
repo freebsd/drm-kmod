@@ -416,6 +416,7 @@ static int ttm_pool_page_allocated(struct ttm_pool *pool, unsigned int order,
 		**orders = order;
 	}
 #endif
+
 	return 0;
 }
 
