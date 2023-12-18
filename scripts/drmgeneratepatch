@@ -81,6 +81,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_dma*' \
     ':!drivers/gpu/drm/drm_edid_load*' \
     ':!drivers/gpu/drm/drm_fb_cma_helper*' \
+    ':!drivers/gpu/drm/drm_fbdev_dma.c' \
     ':!drivers/gpu/drm/drm_gem_atomic_helper.c' \
     ':!drivers/gpu/drm/drm_gem_cma_helper*' \
     ':!drivers/gpu/drm/drm_gem_dma_helper.c' \
@@ -100,7 +101,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_trace*' \
     ':!drivers/gpu/drm/drm_vm.c' \
     ':!drivers/gpu/drm/drm_*vram*' \
-    ':!drivers/gpu/drm/amd/radeon/radeon_atpx_handler*' \
+    ':!drivers/gpu/drm/radeon/radeon_atpx_handler*' \
     ':!include/drm/bridge/*' \
     ':!include/drm/intel-gtt*' \
     ':!include/drm/tinydrm/*' \
