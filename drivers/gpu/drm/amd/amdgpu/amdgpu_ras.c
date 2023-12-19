@@ -2560,7 +2560,7 @@ int amdgpu_ras_recovery_init(struct amdgpu_device *adev)
 		return 0;
 
 	data = &con->eh_data;
-	*data = kmalloc(sizeof(**data), GFP_KERNEL | __GFP_ZERO);
+	*data = kzalloc(sizeof(**data), GFP_KERNEL);
 	if (!*data) {
 		ret = -ENOMEM;
 		goto out;
@@ -2847,10 +2847,10 @@ int amdgpu_ras_init(struct amdgpu_device *adev)
 	if (con)
 		return 0;
 
-	con = kmalloc(sizeof(struct amdgpu_ras) +
+	con = kzalloc(sizeof(*con) +
 			sizeof(struct ras_manager) * AMDGPU_RAS_BLOCK_COUNT +
 			sizeof(struct ras_manager) * AMDGPU_RAS_MCA_BLOCK_COUNT,
-			GFP_KERNEL|__GFP_ZERO);
+			GFP_KERNEL);
 	if (!con)
 		return -ENOMEM;
 
