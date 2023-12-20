@@ -61,6 +61,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/amd/amdgpu/amdgpu_atpx_handler*' \
     ':!drivers/gpu/drm/amd/amdgpu/amdgpu_vkms.c' \
     ':!drivers/gpu/drm/amd/amdkfd/*' \
+    ':!drivers/gpu/drm/amd/display/dc/dce/dce_clk_mgr.c' \
     ':!drivers/gpu/drm/drm_gem_atomic_helper.c' \
     ':!drivers/gpu/drm/i915/display/intel_acpi.c' \
     ':!drivers/gpu/drm/i915/gvt/*' \
@@ -102,6 +103,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_vm.c' \
     ':!drivers/gpu/drm/drm_*vram*' \
     ':!drivers/gpu/drm/radeon/radeon_atpx_handler*' \
+    ':!drivers/gpu/drm/ttm/tests/*'
     ':!include/drm/bridge/*' \
     ':!include/drm/intel-gtt*' \
     ':!include/drm/tinydrm/*' \
@@ -111,8 +113,11 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_fb_cma_helper*' \
     ':!include/drm/drm_gem_atomic_helper.h' \
     ':!include/drm/drm_gem_cma*' \
+    ':!include/drm/drm_gem_dma_helper.h' \
     ':!include/drm/drm_gem_shmem*' \
     ':!include/drm/drm_gem_vram*' \
+    ':!include/drm/drm_gpuva_mgr.h' \
+    ':!include/drm/drm_kunit_helpers.h' \
     ':!include/drm/drm_lease*' \
     ':!include/drm/drm_managed*' \
     ':!include/drm/drm_mipi_dsi*' \
@@ -126,6 +131,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/uapi/drm/etnaviv*' \
     ':!include/uapi/drm/exynos_drm*' \
     ':!include/uapi/drm/habanalabs_accel.h' \
+    ':!include/uapi/drm/ivpu_accel.h' \
     ':!include/uapi/drm/lima*' \
     ':!include/uapi/drm/msm*' \
     ':!include/uapi/drm/omap*' \
