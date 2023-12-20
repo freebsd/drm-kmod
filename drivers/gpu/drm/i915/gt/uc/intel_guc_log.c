@@ -14,12 +14,6 @@
 #include "intel_guc_log.h"
 #include "intel_guc_print.h"
 
-#ifdef __FreeBSD__
-static bool intel_guc_log_relay_enabled(const struct intel_guc_log *log) {
-	return false;
-}
-#endif
-
 #if defined(CONFIG_DRM_I915_DEBUG_GUC)
 #define GUC_LOG_DEFAULT_CRASH_BUFFER_SIZE	SZ_2M
 #define GUC_LOG_DEFAULT_DEBUG_BUFFER_SIZE	SZ_16M
@@ -408,10 +402,9 @@ static void _guc_log_copy_debuglogs_for_relay(struct intel_guc_log *log)
 	if (guc_WARN_ON(guc, !intel_guc_log_relay_created(log)))
 		goto out_unlock;
 #elif defined(__FreeBSD__)
-	if (!intel_guc_log_relay_enabled(log)) {
-		DRM_WARN("guc log relay not enabled");
-		goto out_unlock;
-	}
+	/* BSDFIXME: No kernel->userspace relay file support */
+	DRM_WARN("guc log relay not enabled");
+	goto out_unlock;
 #endif
 
 	/* Get the pointer to shared GuC log buffer */
