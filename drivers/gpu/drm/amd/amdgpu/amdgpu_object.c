@@ -1050,7 +1050,13 @@ int amdgpu_bo_init(struct amdgpu_device *adev)
 
 		if (r) {
 			DRM_ERROR("Unable to set WC memtype for the aperture base\n");
+#ifdef __linux__
+			/*
+			 * BSDFIXME: On recent AMD GPU requested area crosses
+			 * DMAP boundries resulting in error. Ignore it for now
+			 */
 			return r;
+#endif
 		}
 
 		/* Add an MTRR for the VRAM */
