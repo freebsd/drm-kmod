@@ -15,17 +15,45 @@ if [ $# -ne 1 ]; then
 	usage
 fi
 
+if [ `git status --porcelain drivers include linuxkpi Makefile */Makefile */*/Makefile *.mk | wc -l` -gt 0 ]; then
+	echo "Cannot proceed, you have uncommitted changes"
+	exit 1
+fi
+
+if ! command -v gpatch 1>/dev/null; then
+	echo "GNU patch not found, install devel/patch"
+	exit 1
+fi
+
 mkdir -p $1/alreadyapplied/
 mkdir -p $1/applied/
 mkdir -p $1/rej/
 
 for file in $1/*.patch; do
-	echo "Trying to apply $file"
+	echo "Trying to apply $file with git am"
 	git am --3way ${file}
 	if [ $? -ne 0 ]; then
 		echo "Patch $file failed"
 		mv $file $1/rej
-		exit 1
+		rejfile=$1/rej/`basename ${file}`
+		read -p "Apply it with GNU patch (y/n) ? [n] " yn
+		case ${yn} in
+			[Yy]* ) ;;
+			* ) exit 1;;
+		esac
+		gpatch -p1 -B /tmp/ -E -V none -i ${rejfile}
+		if [ $? -ne 0 ]; then
+			echo "Patch $rejfile failed"
+			exit 1
+		fi
+		read -p "Commit changes (y/n) ? [n] " yn
+		case ${yn} in
+			[Yy]* ) ;;
+			* ) exit 1;;
+		esac
+		git add drivers include linuxkpi
+		git am --continue
+		mv ${rejfile} $1
 	fi
 	mv $file $1/applied
 	patchfile=$(echo $file | awk -F '/' '{print $NF}')
