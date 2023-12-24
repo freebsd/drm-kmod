@@ -66,6 +66,8 @@ inline void dc_assert_fp_enabled(void)
 	put_cpu_ptr(&fpu_recursion_depth);
 
 	ASSERT(depth >= 1);
+#elif defined(__FreeBSD__)
+	ASSERT(current->fpu_ctx_level >= 1);
 #endif
 }
 
@@ -91,11 +93,9 @@ void dc_fpu_begin(const char *function_name, const int line)
 	*pcpu += 1;
 
 	if (*pcpu == 1) {
-#endif
 #if defined(CONFIG_X86)
 		kernel_fpu_begin();
 #elif defined(CONFIG_PPC64)
-#ifdef __linux__
 		if (cpu_has_feature(CPU_FTR_VSX_COMP)) {
 			preempt_disable();
 			enable_kernel_vsx();
@@ -107,13 +107,13 @@ void dc_fpu_begin(const char *function_name, const int line)
 			enable_kernel_fp();
 		}
 #endif
-#endif
-#ifdef __linux__
 	}
 
 	TRACE_DCN_FPU(true, function_name, line, *pcpu);
 	put_cpu_ptr(&fpu_recursion_depth);
 #elif defined(__FreeBSD__)
+	/* LKPI kernel_fpu_begin handles the above complications internally */
+	kernel_fpu_begin();
 	TRACE_DCN_FPU(true, function_name, line, 0);
 #endif
 }
@@ -136,11 +136,9 @@ void dc_fpu_end(const char *function_name, const int line)
 	pcpu = get_cpu_ptr(&fpu_recursion_depth);
 	*pcpu -= 1;
 	if (*pcpu <= 0) {
-#endif
 #if defined(CONFIG_X86)
 		kernel_fpu_end();
 #elif defined(CONFIG_PPC64)
-#ifdef __linux__
 		if (cpu_has_feature(CPU_FTR_VSX_COMP)) {
 			disable_kernel_vsx();
 			preempt_enable();
@@ -152,13 +150,13 @@ void dc_fpu_end(const char *function_name, const int line)
 			preempt_enable();
 		}
 #endif
-#endif
-#ifdef __linux__
 	}
 
 	TRACE_DCN_FPU(false, function_name, line, *pcpu);
 	put_cpu_ptr(&fpu_recursion_depth);
 #elif defined(__FreeBSD__)
+	/* LKPI kernel_fpu_end handles the above complications internally */
+	kernel_fpu_end();
 	TRACE_DCN_FPU(false, function_name, line, 0);
 #endif
 }
