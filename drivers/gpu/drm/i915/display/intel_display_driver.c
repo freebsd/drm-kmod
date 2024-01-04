@@ -313,6 +313,8 @@ static void set_display_access(struct drm_i915_private *i915,
 void intel_display_driver_enable_user_access(struct drm_i915_private *i915)
 {
 	set_display_access(i915, true, NULL);
+
+	intel_hpd_enable_detection_work(i915);
 }
 
 /**
@@ -334,6 +336,8 @@ void intel_display_driver_enable_user_access(struct drm_i915_private *i915)
  */
 void intel_display_driver_disable_user_access(struct drm_i915_private *i915)
 {
+	intel_hpd_disable_detection_work(i915);
+
 	set_display_access(i915, false, current);
 }
 
