@@ -151,6 +151,7 @@ CWARNFLAGS.cik_sdma.c=			-Wno-missing-prototypes
 CWARNFLAGS.dce3_1_afmt.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce6_afmt.c=			-Wno-missing-prototypes
 CWARNFLAGS.evergreen.c=			-Wno-missing-prototypes -Wno-cast-qual -Wno-unused-but-set-variable
+CWARNFLAGS.evergreen_cs.c=		-Wno-macro-redefined
 CWARNFLAGS.evergreen_hdmi.c=		-Wno-missing-prototypes
 CWARNFLAGS.kv_dpm.c=			-Wno-unused-const-variable
 CWARNFLAGS.ni.c=			-Wno-missing-prototypes -Wno-cast-qual -Wno-unused-but-set-variable
