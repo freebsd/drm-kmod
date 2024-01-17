@@ -121,6 +121,9 @@ int amdgpu_gart_table_ram_alloc(struct amdgpu_device *adev)
 	struct amdgpu_bo_param bp;
 	dma_addr_t dma_addr;
 	struct page *p;
+#ifdef __linux__
+	unsigned long x;
+#endif
 	int ret;
 
 	if (adev->gart.bo != NULL)
@@ -129,6 +132,12 @@ int amdgpu_gart_table_ram_alloc(struct amdgpu_device *adev)
 	p = alloc_pages(gfp_flags, order);
 	if (!p)
 		return -ENOMEM;
+
+#ifdef __linux__
+	/* assign pages to this device */
+	for (x = 0; x < (1UL << order); x++)
+		p[x].mapping = adev->mman.bdev.dev_mapping;
+#endif
 
 	/* If the hardware does not support UTCL2 snooping of the CPU caches
 	 * then set_memory_wc() could be used as a workaround to mark the pages
@@ -223,6 +232,9 @@ void amdgpu_gart_table_ram_free(struct amdgpu_device *adev)
 	unsigned int order = get_order(adev->gart.table_size);
 	struct sg_table *sg = adev->gart.bo->tbo.sg;
 	struct page *p;
+#ifdef __linux__
+	unsigned long x;
+#endif
 	int ret;
 
 	ret = amdgpu_bo_reserve(adev->gart.bo, false);
@@ -234,6 +246,10 @@ void amdgpu_gart_table_ram_free(struct amdgpu_device *adev)
 	sg_free_table(sg);
 	kfree(sg);
 	p = virt_to_page(adev->gart.ptr);
+#ifdef __linux__
+	for (x = 0; x < (1UL << order); x++)
+		p[x].mapping = NULL;
+#endif
 	__free_pages(p, order);
 
 	adev->gart.ptr = NULL;
