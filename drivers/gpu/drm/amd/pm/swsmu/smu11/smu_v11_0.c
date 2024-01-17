@@ -1441,18 +1441,15 @@ static int smu_v11_0_irq_process(struct amdgpu_device *adev,
 			switch (ctxid) {
 			case 0x3:
 				dev_dbg(adev->dev, "Switched to AC mode!\n");
-#ifdef __linux__
 				schedule_work(&smu->interrupt_work);
-#endif
+				adev->pm.ac_power = true;
 				break;
 			case 0x4:
 				dev_dbg(adev->dev, "Switched to DC mode!\n");
-#ifdef __linux__
 				schedule_work(&smu->interrupt_work);
-#endif
+				adev->pm.ac_power = false;
 				break;
 			case 0x7:
-#ifdef __linux__
 				/*
 				 * Increment the throttle interrupt counter
 				 */
@@ -1463,7 +1460,6 @@ static int smu_v11_0_irq_process(struct amdgpu_device *adev,
 
 				if (__ratelimit(&adev->throttling_logging_rs))
 					schedule_work(&smu->throttling_logging_work);
-#endif
 
 				break;
 			}
