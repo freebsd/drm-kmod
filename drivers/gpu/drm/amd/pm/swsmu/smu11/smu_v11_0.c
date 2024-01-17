@@ -1443,12 +1443,14 @@ static int smu_v11_0_irq_process(struct amdgpu_device *adev,
 #ifdef __linux__
 				schedule_work(&smu->interrupt_work);
 #endif
+				adev->pm.ac_power = true;
 				break;
 			case 0x4:
 				dev_dbg(adev->dev, "Switched to DC mode!\n");
 #ifdef __linux__
 				schedule_work(&smu->interrupt_work);
 #endif
+				adev->pm.ac_power = true;
 				break;
 			case 0x7:
 #ifdef __linux__
