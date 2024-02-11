@@ -1578,7 +1578,13 @@ static bool dcn10_resource_construct(
 		DC_FP_END();
 	}
 
+#ifdef __FreeBSD__
+	DC_FP_START();
+#endif
 	dcn_bw_sync_calcs_and_dml(dc);
+#ifdef __FreeBSD__
+	DC_FP_END();
+#endif
 	if (!dc->debug.disable_pplib_wm_range) {
 		dc->res_pool = &pool->base;
 		DC_FP_START();
