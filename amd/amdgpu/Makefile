@@ -783,6 +783,7 @@ SRCS+=	dcn35_clk_mgr.c \
 	dcn35_resource.c \
 	dcn35_smu.c \
 	dmub_dcn35.c \
+	dmub_dcn351.c \
 	irq_service_dcn35.c
 
 # display/dc/clk_mgr/dcn31
