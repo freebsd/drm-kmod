@@ -153,6 +153,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn315 \
 	${SRCDIR}/display/dc/irq/dcn32 \
 	${SRCDIR}/display/dc/irq/dcn35 \
+	${SRCDIR}/display/dc/irq/dcn351 \
 	${SRCDIR}/display/dc/link \
 	${SRCDIR}/display/dc/link/accessories \
 	${SRCDIR}/display/dc/link/hwss \
@@ -783,8 +784,11 @@ SRCS+=	dcn35_clk_mgr.c \
 	dcn35_resource.c \
 	dcn35_smu.c \
 	dmub_dcn35.c \
-	dmub_dcn351.c \
 	irq_service_dcn35.c
+
+# display/dc/dcn351
+SRCS+=	dmub_dcn351.c \
+	irq_service_dcn351.c
 
 # display/dc/clk_mgr/dcn31
 SRCS+=	dcn31_afmt.c \
