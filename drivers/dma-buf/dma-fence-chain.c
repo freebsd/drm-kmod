@@ -158,7 +158,7 @@ dma_fence_chain_init(struct dma_fence_chain *chain,
 
 	spin_lock_init(&chain->lock);
 	chain->fence = fence;
-	chain->prev = prev;
+	rcu_assign_pointer(chain->prev, prev);
 	prev_chain = to_dma_fence_chain(prev);
 	if (prev_chain != NULL &&
 	    __dma_fence_is_later(seqno, prev->seqno, prev->ops)) {
@@ -195,6 +195,18 @@ dma_fence_chain_find_seqno(struct dma_fence **fence, uint64_t seqno)
 	return (0);
 }
 
+static struct dma_fence *
+dma_fence_chain_get_prev(struct dma_fence_chain *chain)
+{
+	struct dma_fence *prev;
+
+	rcu_read_lock();
+	prev = dma_fence_get_rcu_safe(&chain->prev);
+	rcu_read_unlock();
+
+	return (prev);
+}
+
 struct dma_fence *
 dma_fence_chain_walk(struct dma_fence *fence)
 {
@@ -206,11 +218,11 @@ dma_fence_chain_walk(struct dma_fence *fence)
 		return (NULL);
 	}
 
-	while ((prev = dma_fence_get(chain->prev)) != NULL) {
+	while ((prev = dma_fence_chain_get_prev(chain)) != NULL) {
 		if ((prev_chain = to_dma_fence_chain(prev)) != NULL) {
 			if (dma_fence_is_signaled(prev_chain->fence) == false)
 				break;
-			new_prev = dma_fence_get(prev_chain->prev);
+			new_prev = dma_fence_chain_get_prev(prev_chain);
 		} else {
 			if (dma_fence_is_signaled(prev) == false)
 				break;
