@@ -328,6 +328,10 @@ SRCS+=	intel_fbdev.c \
 SRCS+=	i915_gpu_error.c
 .endif
 
+.if !empty(KCONFIG:MDRM_I915_DP_TUNNEL)
+SRCS+=	intel_dp_tunnel.c
+.endif
+
 .if !empty(KCONFIG:MHWMON)
 SRCS+=	i915_hwmon.c
 .endif
