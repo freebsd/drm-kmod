@@ -5112,9 +5112,10 @@ static int intel_dp_prep_phy_test(struct intel_dp *intel_dp,
 		if (!crtc_state->hw.active)
 			continue;
 
-		if (conn_state->commit &&
-		    !try_wait_for_completion(&conn_state->commit->hw_done))
-			continue;
+		if (conn_state->commit)
+			drm_WARN_ON(&i915->drm,
+				    !wait_for_completion_timeout(&conn_state->commit->hw_done,
+								 msecs_to_jiffies(5000)));
 
 		*pipe_mask |= BIT(crtc->pipe);
 	}
