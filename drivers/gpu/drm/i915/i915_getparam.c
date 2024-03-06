@@ -162,6 +162,12 @@ int i915_getparam_ioctl(struct drm_device *dev, void *data,
 		value = 0;
 		break;
 #endif
+	case I915_PARAM_HAS_CONTEXT_FREQ_HINT:
+		if (intel_uc_uses_guc_submission(&to_gt(i915)->uc))
+			value = 1;
+		else
+			value = -EINVAL;
+		break;
 	case I915_PARAM_HAS_CONTEXT_ISOLATION:
 		value = intel_engines_has_context_isolation(i915);
 		break;
