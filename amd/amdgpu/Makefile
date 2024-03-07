@@ -1456,6 +1456,7 @@ CWARNFLAGS.dcn321_resource.c=		-Wno-initializer-overrides -Wno-unused-const-vari
 CWARNFLAGS.dcn35_clk_mgr.c=		-Wno-incompatible-pointer-types
 CWARNFLAGS.dcn35_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn351_resource.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn351_fpu.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
