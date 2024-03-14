@@ -234,12 +234,21 @@ intel_teardown_mchbar(struct drm_i915_private *dev_priv)
 		device_t vga;
 
 		vga = device_get_parent(dev_priv->drm.dev->bsddev);
+#if __FreeBSD_version < 1500015
 		BUS_DEACTIVATE_RESOURCE(device_get_parent(vga),
 		    dev_priv->drm.dev->bsddev, SYS_RES_MEMORY, dev_priv->mch_res_rid,
 		    dev_priv->mch_res.bsd_res);
 		BUS_RELEASE_RESOURCE(device_get_parent(vga),
 		    dev_priv->drm.dev->bsddev, SYS_RES_MEMORY, dev_priv->mch_res_rid,
 		    dev_priv->mch_res.bsd_res);
+#else
+		BUS_DEACTIVATE_RESOURCE(device_get_parent(vga),
+		    dev_priv->drm.dev->bsddev,
+		    dev_priv->mch_res.bsd_res);
+		BUS_RELEASE_RESOURCE(device_get_parent(vga),
+		    dev_priv->drm.dev->bsddev,
+		    dev_priv->mch_res.bsd_res);
+#endif
 		dev_priv->mch_res.bsd_res = NULL;
 	}
 #else
