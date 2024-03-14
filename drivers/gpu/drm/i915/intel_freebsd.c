@@ -73,10 +73,15 @@ bsd_intel_pci_bus_release_mem(device_t dev, int rid, void *res)
 	device_t vga;
 
 	vga = device_get_parent(dev);
+#if __FreeBSD_version < 1500015
 	BUS_DEACTIVATE_RESOURCE(device_get_parent(vga),
 	    dev, SYS_RES_MEMORY, rid, res);
 	BUS_RELEASE_RESOURCE(device_get_parent(vga),
 	    dev, SYS_RES_MEMORY, rid, res);
+#else
+	BUS_DEACTIVATE_RESOURCE(device_get_parent(vga), dev, res);
+	BUS_RELEASE_RESOURCE(device_get_parent(vga), dev, res);
+#endif
 }
 
 bool
