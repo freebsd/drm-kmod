@@ -1962,9 +1962,6 @@ intel_hdmi_mode_valid(struct drm_connector *connector,
 	bool has_hdmi_sink = intel_has_hdmi_sink(hdmi, connector->state);
 	bool ycbcr_420_only;
 
-	if (mode->flags & DRM_MODE_FLAG_DBLSCAN)
-		return MODE_NO_DBLESCAN;
-
 	if ((mode->flags & DRM_MODE_FLAG_3D_MASK) == DRM_MODE_FLAG_3D_FRAME_PACKING)
 		clock *= 2;
 
@@ -2195,6 +2192,10 @@ int intel_hdmi_compute_config(struct intel_encoder *encoder,
 	int ret;
 
 	if (adjusted_mode->flags & DRM_MODE_FLAG_DBLSCAN)
+		return -EINVAL;
+
+	if (!connector->interlace_allowed &&
+	    adjusted_mode->flags & DRM_MODE_FLAG_INTERLACE)
 		return -EINVAL;
 
 	pipe_config->output_format = INTEL_OUTPUT_FORMAT_RGB;
@@ -2902,9 +2903,12 @@ void intel_hdmi_init_connector(struct intel_digital_port *dig_port,
 				    ddc);
 	drm_connector_helper_add(connector, &intel_hdmi_connector_helper_funcs);
 
-	connector->interlace_allowed = 1;
+	if (DISPLAY_VER(dev_priv) < 12)
+		connector->interlace_allowed = true;
+
 	connector->doublescan_allowed = 0;
-	connector->stereo_allowed = 1;
+
+	connector->stereo_allowed = true;
 
 	if (DISPLAY_VER(dev_priv) >= 10)
 		connector->ycbcr_420_allowed = true;

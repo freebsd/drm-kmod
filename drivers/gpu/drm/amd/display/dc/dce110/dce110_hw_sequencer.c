@@ -46,6 +46,7 @@
 #include "transform.h"
 #include "stream_encoder.h"
 #include "link_encoder.h"
+#include "link_enc_cfg.h"
 #include "link_hwss.h"
 #include "dc_link_dp.h"
 #if defined(CONFIG_DRM_AMD_DC_DCN)
@@ -57,7 +58,8 @@
 #include "audio.h"
 #include "reg_helper.h"
 #include "panel_cntl.h"
-
+#include "inc/link_dpcd.h"
+#include "dpcd_defs.h"
 /* include DCE11 register header files */
 #include "dce/dce_11_0_d.h"
 #include "dce/dce_11_0_sh_mask.h"
@@ -980,7 +982,9 @@ void dce110_edp_backlight_control(
 		return;
 	}
 
-	if (link->panel_cntl) {
+	if (link->panel_cntl && !(link->dpcd_sink_ext_caps.bits.oled ||
+		link->dpcd_sink_ext_caps.bits.hdr_aux_backlight_control == 1 ||
+		link->dpcd_sink_ext_caps.bits.sdr_aux_backlight_control == 1)) {
 		bool is_backlight_on = link->panel_cntl->funcs->is_panel_backlight_on(link->panel_cntl);
 
 		if ((enable && is_backlight_on) || (!enable && !is_backlight_on)) {
@@ -1113,6 +1117,9 @@ void dce110_enable_audio_stream(struct pipe_ctx *pipe_ctx)
 		if (pipe_ctx->stream_res.audio)
 			pipe_ctx->stream_res.audio->enabled = true;
 	}
+
+	if (dc_is_dp_signal(pipe_ctx->stream->signal))
+		dp_source_sequence_trace(pipe_ctx->stream->link, DPCD_SOURCE_SEQ_AFTER_ENABLE_AUDIO_STREAM);
 }
 
 void dce110_disable_audio_stream(struct pipe_ctx *pipe_ctx)
@@ -1151,6 +1158,9 @@ void dce110_disable_audio_stream(struct pipe_ctx *pipe_ctx)
 		 * stream->stream_engine_id);
 		 */
 	}
+
+	if (dc_is_dp_signal(pipe_ctx->stream->signal))
+		dp_source_sequence_trace(pipe_ctx->stream->link, DPCD_SOURCE_SEQ_AFTER_DISABLE_AUDIO_STREAM);
 }
 
 void dce110_disable_stream(struct pipe_ctx *pipe_ctx)
@@ -1158,6 +1168,7 @@ void dce110_disable_stream(struct pipe_ctx *pipe_ctx)
 	struct dc_stream_state *stream = pipe_ctx->stream;
 	struct dc_link *link = stream->link;
 	struct dc *dc = pipe_ctx->stream->ctx->dc;
+	struct link_encoder *link_enc = NULL;
 
 	if (dc_is_hdmi_tmds_signal(pipe_ctx->stream->signal)) {
 		pipe_ctx->stream_res.stream_enc->funcs->stop_hdmi_info_packets(
@@ -1172,11 +1183,21 @@ void dce110_disable_stream(struct pipe_ctx *pipe_ctx)
 
 	dc->hwss.disable_audio_stream(pipe_ctx);
 
-	link->link_enc->funcs->connect_dig_be_to_fe(
+	/* Link encoder may have been dynamically assigned to non-physical display endpoint. */
+	if (link->ep_type == DISPLAY_ENDPOINT_PHY)
+		link_enc = link->link_enc;
+	else if (dc->res_pool->funcs->link_encs_assign)
+		link_enc = link_enc_cfg_get_link_enc_used_by_link(link->ctx->dc, link);
+	ASSERT(link_enc);
+
+	if (link_enc)
+		link_enc->funcs->connect_dig_be_to_fe(
 			link->link_enc,
 			pipe_ctx->stream_res.stream_enc->id,
 			false);
 
+	if (dc_is_dp_signal(pipe_ctx->stream->signal))
+		dp_source_sequence_trace(link, DPCD_SOURCE_SEQ_AFTER_DISCONNECT_DIG_FE_BE);
 }
 
 void dce110_unblank_stream(struct pipe_ctx *pipe_ctx,
@@ -1192,7 +1213,7 @@ void dce110_unblank_stream(struct pipe_ctx *pipe_ctx,
 	params.link_settings.link_rate = link_settings->link_rate;
 
 	if (dc_is_dp_signal(pipe_ctx->stream->signal))
-		pipe_ctx->stream_res.stream_enc->funcs->dp_unblank(pipe_ctx->stream_res.stream_enc, &params);
+		pipe_ctx->stream_res.stream_enc->funcs->dp_unblank(link, pipe_ctx->stream_res.stream_enc, &params);
 
 	if (link->local_sink && link->local_sink->sink_signal == SIGNAL_TYPE_EDP) {
 		hws->funcs.edp_backlight_control(link, true);
@@ -1211,7 +1232,7 @@ void dce110_blank_stream(struct pipe_ctx *pipe_ctx)
 	}
 
 	if (dc_is_dp_signal(pipe_ctx->stream->signal)) {
-		pipe_ctx->stream_res.stream_enc->funcs->dp_blank(pipe_ctx->stream_res.stream_enc);
+		pipe_ctx->stream_res.stream_enc->funcs->dp_blank(link, pipe_ctx->stream_res.stream_enc);
 
 		if (!dc_is_embedded_signal(pipe_ctx->stream->signal)) {
 			/*
@@ -1436,6 +1457,7 @@ static enum dc_status apply_single_controller_ctx_to_hw(
 		struct dc *dc)
 {
 	struct dc_stream_state *stream = pipe_ctx->stream;
+	struct dc_link *link = stream->link;
 	struct drr_params params = {0};
 	unsigned int event_triggers = 0;
 	struct pipe_ctx *odm_pipe = pipe_ctx->next_odm_pipe;
@@ -1499,6 +1521,9 @@ static enum dc_status apply_single_controller_ctx_to_hw(
 			pipe_ctx->stream_res.stream_enc,
 			pipe_ctx->stream_res.tg->inst);
 
+	if (dc_is_dp_signal(pipe_ctx->stream->signal))
+		dp_source_sequence_trace(link, DPCD_SOURCE_SEQ_AFTER_CONNECT_DIG_FE_OTG);
+
 	pipe_ctx->stream_res.opp->funcs->opp_set_dyn_expansion(
 			pipe_ctx->stream_res.opp,
 			COLOR_SPACE_YCBCR601,
@@ -1539,27 +1564,17 @@ static void power_down_encoders(struct dc *dc)
 {
 	int i;
 
-	/* do not know BIOS back-front mapping, simply blank all. It will not
-	 * hurt for non-DP
-	 */
-	for (i = 0; i < dc->res_pool->stream_enc_count; i++) {
-		dc->res_pool->stream_enc[i]->funcs->dp_blank(
-					dc->res_pool->stream_enc[i]);
-	}
-
 	for (i = 0; i < dc->link_count; i++) {
 		enum signal_type signal = dc->links[i]->connector_signal;
 
-		if ((signal == SIGNAL_TYPE_EDP) ||
-			(signal == SIGNAL_TYPE_DISPLAY_PORT))
-			if (!dc->links[i]->wa_flags.dp_keep_receiver_powered)
-				dp_receiver_power_ctrl(dc->links[i], false);
+		dc_link_blank_dp_stream(dc->links[i], false);
 
 		if (signal != SIGNAL_TYPE_EDP)
 			signal = SIGNAL_TYPE_NONE;
 
-		dc->links[i]->link_enc->funcs->disable_output(
-				dc->links[i]->link_enc, signal);
+		if (dc->links[i]->ep_type == DISPLAY_ENDPOINT_PHY)
+			dc->links[i]->link_enc->funcs->disable_output(
+					dc->links[i]->link_enc, signal);
 
 		dc->links[i]->link_status.link_active = false;
 		memset(&dc->links[i]->cur_link_settings, 0,
@@ -1744,10 +1759,13 @@ void dce110_enable_accelerated_mode(struct dc *dc, struct dc_state *context)
 			hws->funcs.edp_backlight_control(edp_link_with_sink, false);
 		}
 		/*resume from S3, no vbios posting, no need to power down again*/
+		clk_mgr_exit_optimized_pwr_state(dc, dc->clk_mgr);
+
 		power_down_all_hw_blocks(dc);
 		disable_vga_and_power_gate_all_controllers(dc);
 		if (edp_link_with_sink && !keep_edp_vdd_on)
 			dc->hwss.edp_power_control(edp_link_with_sink, false);
+		clk_mgr_optimize_pwr_state(dc, dc->clk_mgr);
 	}
 	bios_set_scratch_acc_mode_change(dc->ctx->dc_bios, 1);
 }

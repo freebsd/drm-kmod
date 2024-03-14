@@ -359,6 +359,7 @@ SRCS+=	dc_debug.c \
 	dc_hw_sequencer.c \
 	dc_link_ddc.c \
 	dc_link_dp.c \
+	dc_link_dpia.c \
 	dc_link_hwss.c \
 	dc_link.c \
 	dc_resource.c \
@@ -900,6 +901,7 @@ CWARNFLAGS.dc.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_hw_sequencer.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_link.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dc_link_dp.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.dc_link_enc_cfg.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dc_resource.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce_aux.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dce_audio.c=			-Wno-missing-prototypes

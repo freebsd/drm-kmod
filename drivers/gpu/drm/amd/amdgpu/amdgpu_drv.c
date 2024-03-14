@@ -2288,7 +2288,6 @@ static int amdgpu_pmops_suspend(struct device *dev)
 	return amdgpu_device_suspend(drm_dev, true);
 }
 
-#ifdef __linux__
 static int amdgpu_pmops_suspend_noirq(struct device *dev)
 {
 	struct drm_device *drm_dev = dev_get_drvdata(dev);
@@ -2299,7 +2298,6 @@ static int amdgpu_pmops_suspend_noirq(struct device *dev)
 
 	return 0;
 }
-#endif
 
 static int amdgpu_pmops_resume(struct device *dev)
 {
@@ -2540,6 +2538,8 @@ static const struct dev_pm_ops amdgpu_pm_ops = {
 	.suspend = amdgpu_pmops_suspend,
 #ifdef __linux__
 	.suspend_noirq = amdgpu_pmops_suspend_noirq,
+#elif defined(__FreeBSD__)
+	.suspend_late = amdgpu_pmops_suspend_noirq,
 #endif
 	.resume = amdgpu_pmops_resume,
 	.freeze = amdgpu_pmops_freeze,

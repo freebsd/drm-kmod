@@ -1818,8 +1818,6 @@ valid_fb:
 	plane_state->uapi.crtc = &crtc->base;
 	intel_plane_copy_uapi_to_hw_state(plane_state, plane_state, crtc);
 
-	intel_frontbuffer_flush(to_intel_frontbuffer(fb), ORIGIN_DIRTYFB);
-
 	atomic_or(plane->frontbuffer_bit, &to_intel_frontbuffer(fb)->bits);
 }
 
@@ -1994,26 +1992,6 @@ unlock:
 	clear_bit_unlock(I915_RESET_MODESET, &dev_priv->gt.reset.flags);
 }
 
-static bool underrun_recovery_supported(const struct intel_crtc_state *crtc_state)
-{
-	if (crtc_state->pch_pfit.enabled &&
-	    (crtc_state->pipe_src_w > drm_rect_width(&crtc_state->pch_pfit.dst) ||
-	     crtc_state->pipe_src_h > drm_rect_height(&crtc_state->pch_pfit.dst) ||
-	     crtc_state->output_format == INTEL_OUTPUT_FORMAT_YCBCR420))
-		return false;
-
-	if (crtc_state->dsc.compression_enable)
-		return false;
-
-	if (crtc_state->has_psr2)
-		return false;
-
-	if (crtc_state->splitter.enable)
-		return false;
-
-	return true;
-}
-
 static void icl_set_pipe_chicken(const struct intel_crtc_state *crtc_state)
 {
 	struct intel_crtc *crtc = to_intel_crtc(crtc_state->uapi.crtc);
@@ -2037,19 +2015,14 @@ static void icl_set_pipe_chicken(const struct intel_crtc_state *crtc_state)
 	 */
 	tmp |= PIXEL_ROUNDING_TRUNC_FB_PASSTHRU;
 
-	if (IS_DG2(dev_priv)) {
-		/*
-		 * Underrun recovery must always be disabled on DG2.  However
-		 * the chicken bit meaning is inverted compared to other
-		 * platforms.
-		 */
+	/*
+	 * Underrun recovery must always be disabled on display 13+.
+	 * DG2 chicken bit meaning is inverted compared to other platforms.
+	 */
+	if (IS_DG2(dev_priv))
 		tmp &= ~UNDERRUN_RECOVERY_ENABLE_DG2;
-	} else if (DISPLAY_VER(dev_priv) >= 13) {
-		if (underrun_recovery_supported(crtc_state))
-			tmp &= ~UNDERRUN_RECOVERY_DISABLE_ADLP;
-		else
-			tmp |= UNDERRUN_RECOVERY_DISABLE_ADLP;
-	}
+	else if (DISPLAY_VER(dev_priv) >= 13)
+		tmp |= UNDERRUN_RECOVERY_DISABLE_ADLP;
 
 	intel_de_write(dev_priv, PIPE_CHICKEN(pipe), tmp);
 }
@@ -3640,11 +3613,7 @@ enum intel_display_power_domain intel_port_to_power_domain(enum port port)
 enum intel_display_power_domain
 intel_aux_power_domain(struct intel_digital_port *dig_port)
 {
-	struct drm_i915_private *dev_priv = to_i915(dig_port->base.base.dev);
-	enum phy phy = intel_port_to_phy(dev_priv, dig_port->base.port);
-
-	if (intel_phy_is_tc(dev_priv, phy) &&
-	    dig_port->tc_mode == TC_PORT_TBT_ALT) {
+	if (intel_tc_port_in_tbt_alt_mode(dig_port)) {
 		switch (dig_port->aux_ch) {
 		case AUX_CH_C:
 			return POWER_DOMAIN_AUX_C_TBT;
@@ -11070,7 +11039,6 @@ intel_prepare_plane_fb(struct drm_plane *_plane,
 		return ret;
 
 	i915_gem_object_wait_priority(obj, 0, &attr);
-	i915_gem_object_flush_frontbuffer(obj, ORIGIN_DIRTYFB);
 
 	if (!new_plane_state->uapi.fence) { /* implicit fencing */
 		struct dma_fence *fence;
@@ -12656,13 +12624,8 @@ static void intel_sanitize_crtc(struct intel_crtc *crtc,
 				intel_plane_disable_noatomic(crtc, plane);
 		}
 
-		/*
-		 * Disable any background color set by the BIOS, but enable the
-		 * gamma and CSC to match how we program our planes.
-		 */
-		if (DISPLAY_VER(dev_priv) >= 9)
-			intel_de_write(dev_priv, SKL_BOTTOM_COLOR(crtc->pipe),
-				       SKL_BOTTOM_COLOR_GAMMA_ENABLE | SKL_BOTTOM_COLOR_CSC_ENABLE);
+		/* Disable any background color/etc. set by the BIOS */
+		intel_color_commit(crtc_state);
 	}
 
 	/* Adjust the state of the output pipe according to whether we

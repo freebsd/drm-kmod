@@ -44,6 +44,8 @@
 
 /* forward declaration */
 struct aux_payload;
+struct set_config_cmd_payload;
+struct dmub_notification;
 
 #define DC_VER "3.2.149"
 
@@ -164,6 +166,11 @@ struct dc_caps {
 	uint32_t dmdata_alloc_size;
 	unsigned int max_cursor_size;
 	unsigned int max_video_width;
+	/*
+	 * max video plane width that can be safely assumed to be always
+	 * supported by single DPP pipe.
+	 */
+	unsigned int max_optimizable_video_width;
 	unsigned int min_horizontal_blanking_period;
 	int linear_pitch_alignment;
 	bool dcc_const_color;
@@ -461,6 +468,17 @@ union mem_low_power_enable_options {
 	uint32_t u32All;
 };
 
+union dpia_debug_options {
+	struct {
+		uint32_t disable_dpia:1;
+		uint32_t force_non_lttpr:1;
+		uint32_t extend_aux_rd_interval:1;
+		uint32_t disable_mst_dsc_work_around:1;
+		uint32_t reserved:28;
+	} bits;
+	uint32_t raw;
+};
+
 struct dc_debug_data {
 	uint32_t ltFailCount;
 	uint32_t i2cErrorCount;
@@ -625,9 +643,11 @@ struct dc_debug_options {
 	bool force_enable_edp_fec;
 	/* FEC/PSR1 sequence enable delay in 100us */
 	uint8_t fec_enable_delay_in100us;
+	bool enable_driver_sequence_debug;
 #if defined(CONFIG_DRM_AMD_DC_DCN)
 	bool disable_z10;
 	bool enable_sw_cntl_psr;
+	union dpia_debug_options dpia_debug;
 #endif
 };
 
@@ -1146,6 +1166,7 @@ struct dpcd_caps {
 	struct dpcd_dsc_capabilities dsc_caps;
 	struct dc_lttpr_caps lttpr_caps;
 	struct psr_caps psr_caps;
+	struct dpcd_usb4_dp_tunneling_info usb4_dp_tun_info;
 
 };
 
@@ -1342,11 +1363,28 @@ void dc_z10_restore(struct dc *dc);
 void dc_z10_save_init(struct dc *dc);
 #endif
 
+bool dc_is_dmub_outbox_supported(struct dc *dc);
 bool dc_enable_dmub_notifications(struct dc *dc);
+
+void dc_enable_dmub_outbox(struct dc *dc);
 
 bool dc_process_dmub_aux_transfer_async(struct dc *dc,
 				uint32_t link_index,
 				struct aux_payload *payload);
+
+/* Get dc link index from dpia port index */
+uint8_t get_link_index_from_dpia_port_index(const struct dc *dc,
+				uint8_t dpia_port_index);
+
+bool dc_process_dmub_set_config_async(struct dc *dc,
+				uint32_t link_index,
+				struct set_config_cmd_payload *payload,
+				struct dmub_notification *notify);
+
+enum dc_status dc_process_dmub_set_mst_slots(const struct dc *dc,
+				uint32_t link_index,
+				uint8_t mst_alloc_slots,
+				uint8_t *mst_slots_in_use);
 
 /*******************************************************************************
  * DSC Interfaces

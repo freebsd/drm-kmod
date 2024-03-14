@@ -175,6 +175,8 @@ struct dc_link {
 		bool dp_keep_receiver_powered;
 		bool dp_skip_DID2;
 		bool dp_skip_reset_segment;
+		/* Some USB4 docks do not handle turning off MST DSC once it has been enabled. */
+		bool dpia_mst_dsc_always_on;
 	} wa_flags;
 	struct link_mst_stream_allocation_table mst_stream_alloc_table;
 
@@ -270,6 +272,10 @@ bool dc_link_setup_psr(struct dc_link *dc_link,
 		struct psr_context *psr_context);
 
 void dc_link_get_psr_residency(const struct dc_link *link, uint32_t *residency);
+
+void dc_link_blank_all_dp_displays(struct dc *dc);
+
+void dc_link_blank_dp_stream(struct dc_link *link, bool hw_init);
 
 /* Request DC to detect if there is a Panel connected.
  * boot - If this call is during initial boot.

@@ -304,6 +304,22 @@ enum drm_panel_orientation {
 };
 
 /**
+ * struct drm_luminance_range_info - Panel's luminance range for
+ * &drm_display_info. Calculated using data in EDID
+ *
+ * This struct is used to store a luminance range supported by panel
+ * as calculated using data from EDID's static hdr metadata.
+ *
+ * @min_luminance: This is the min supported luminance value
+ *
+ * @max_luminance: This is the max supported luminance value
+ */
+struct drm_luminance_range_info {
+	u32 min_luminance;
+	u32 max_luminance;
+};
+
+/**
  * struct drm_monitor_range_info - Panel's Monitor range in EDID for
  * &drm_display_info
  *
@@ -596,6 +612,11 @@ struct drm_display_info {
 	 * @monitor_range: Frequency range supported by monitor range descriptor
 	 */
 	struct drm_monitor_range_info monitor_range;
+
+	/**
+	 * @luminance_range: Luminance range supported by panel
+	 */
+	struct drm_luminance_range_info luminance_range;
 };
 
 int drm_display_info_set_bus_formats(struct drm_display_info *info,
