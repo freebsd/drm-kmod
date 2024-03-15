@@ -66,18 +66,19 @@ dma_fence_get_stub(void)
 	return (dma_fence_get(&dma_fence_stub));
 }
 
-struct dma_fence *dma_fence_allocate_private_stub(void)
+struct dma_fence *
+dma_fence_allocate_private_stub(ktime_t timestamp)
 {
 	struct dma_fence *fence;
 
 	fence = kzalloc(sizeof(*fence), GFP_KERNEL);
 	if (fence == NULL)
-		return (ERR_PTR(-ENOMEM));
+		return (NULL);
 
 	dma_fence_init(fence,
 	    &dma_fence_stub_ops, &dma_fence_stub_lock, 0, 0);
-	set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &dma_fence_stub.flags);
-	dma_fence_signal(fence);
+	set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT, &fence->flags);
+	dma_fence_signal_timestamp(fence, timestamp);
 
 	return (fence);
 }
@@ -164,6 +165,21 @@ dma_fence_signal(struct dma_fence *fence)
 	rv = dma_fence_signal_timestamp_locked(fence, ktime_get());
 	spin_unlock(fence->lock);
 	return (rv);
+}
+
+/*
+ * get completion timestamp of a fence
+ */
+ktime_t
+dma_fence_timestamp(struct dma_fence *fence)
+{
+	if (!test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags))
+		return (ktime_get());
+
+	while (!test_bit(DMA_FENCE_FLAG_TIMESTAMP_BIT, &fence->flags))
+		cpu_relax();
+
+	return (fence->timestamp);
 }
 
 /*
@@ -438,6 +454,13 @@ cb_cleanup:
 		dma_fence_remove_callback(fences[i], &cb[i].base);
 	free(cb, M_DMABUF);
 	return (rv);
+}
+
+void
+dma_fence_set_deadline(struct dma_fence *fence, ktime_t deadline)
+{
+	if (fence->ops->set_deadline != NULL && !dma_fence_is_signaled(fence))
+		fence->ops->set_deadline(fence, deadline);
 }
 
 void

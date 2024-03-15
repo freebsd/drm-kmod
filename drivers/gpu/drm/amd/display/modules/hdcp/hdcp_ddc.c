@@ -25,6 +25,10 @@
 
 #include "hdcp.h"
 
+#ifdef __FreeBSD__
+#undef MIN
+#endif
+
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define HDCP_I2C_ADDR 0x3a	/* 0x74 >> 1*/
 #define KSV_READ_SIZE 0xf	/* 0x6803b - 0x6802c */

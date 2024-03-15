@@ -2,6 +2,7 @@ Kconfig
 Kconfig.*
 Makefile
 
+drm_accel.h
 drm_bridge_connector.c
 drm_bridge_connector.h
 drm_bufs.c
@@ -23,6 +24,7 @@ drm_gem_shmem_helper.h
 drm_gem_vram_helper.c
 drm_gem_vram_helper.h
 drm_gem_framebuffer_helper.c
+drm_gpuva_mgr.h
 drm_hdcp.c
 drm_kms_helper_common.c
 drm_lease.c
@@ -58,7 +60,7 @@ vt_drmfb.h
 gma_drm.h
 bridge
 i2c
-i915_mei_hdcp_interface.h
+i915_hdcp_interface.h
 intel_display_trace.h
 intel-gtt.h
 ttm_sysctl_freebsd.h

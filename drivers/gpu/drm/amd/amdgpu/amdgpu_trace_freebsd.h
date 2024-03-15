@@ -157,6 +157,25 @@ trace_amdgpu_reset_reg_dumps(uint32_t address, uint32_t value){
 		CTR3(KTR_DRM, "amdgpu_ttm_bo_move %p new %d old %d", (bo), (new), (old_mem_type)); \
 	} while (0)
 
+static inline void
+trace_amdgpu_vm_update_ptes(struct amdgpu_vm_update_params *p, uint64_t start,
+    uint64_t end, unsigned int nptes, uint64_t dst, uint64_t incr,
+    uint64_t flags, pid_t pid, uint64_t vm_ctx)
+{
+	CTR6(KTR_DRM, "amdgpu_vm_update_ptes pid:%u vm_ctx:0x%llx "
+	    "start:0x%010llx end:0x%010llx flags:0x%llx incr:%llu",
+	    pid, vm_ctx, start, end, flags, incr);
+#ifdef __FreeBSD_not_yet
+	for (int i = 0; i < nptes; ++i) {
+		uint64_t addr = p->pages_addr ? amdgpu_vm_map_gart(
+		    p->pages_addr, dst) : dst;
+		((u64 *)__get_dynamic_array(dst))[i] = addr;
+		dst += incr;
+	}
+	CTR1(KTR_DRM, "dst:\n%s", __print_array(__get_dynamic_array(dst), nptes, 8));
+#endif
+}
+
 #define trace_amdgpu_vm_set_ptes(pe, addr, count, incr, flags, direct)		\
 	CTR5(KTR_DRM, "amdgpu_vm_set_ptes %lx %lx %u %u %x", pe, addr, count, incr, flags)
 

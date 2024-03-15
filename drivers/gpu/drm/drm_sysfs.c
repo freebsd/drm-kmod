@@ -27,6 +27,7 @@
 #include <linux/device.h>
 #include <linux/err.h>
 
+#include <drm/drm_accel.h>
 #include <drm/drm_connector.h>
 #include <drm/drm_device.h>
 #include <drm/drm_print.h>
@@ -57,7 +58,7 @@ int drm_sysfs_init(void)
 {
 	int err;
 
-	drm_class = class_create(THIS_MODULE, "drm");
+	drm_class = class_create("drm");
 	if (drm_class == NULL)
 		return PTR_ERR(drm_class);
 
@@ -101,13 +102,16 @@ void drm_sysfs_connector_hotplug_event(struct drm_connector *connector)
 	sbuf_delete(sb);
 }
 
-void drm_sysfs_connector_status_event(struct drm_connector *connector,
-				      struct drm_property *property)
+void drm_sysfs_connector_property_event(struct drm_connector *connector,
+					struct drm_property *property)
 {
 	struct drm_device *dev = connector->dev;
 	struct sbuf *sb = sbuf_new_auto();
 
-	DRM_DEBUG("generating connector status event\n");
+	drm_dbg_kms(connector->dev,
+		    "[CONNECTOR:%d:%s] generating connector property event for [PROP:%d:%s]\n",
+		    connector->base.id, connector->name,
+		    property->base.id, property->name);
 
 	sbuf_printf(sb, "cdev=dri/%s connector=%u property=%u",
 	    dev_name(dev->primary->kdev), connector->base.id, property->base.id);
@@ -172,21 +176,34 @@ struct device *drm_sysfs_minor_alloc(struct drm_minor *minor)
 	struct device *kdev;
 	int rv;
 
-	if (minor->type == DRM_MINOR_RENDER)
-		minor_str = "renderD%d";
-	else
-		minor_str = "card%d";
-
 	kdev = kzalloc(sizeof(*kdev), GFP_KERNEL);
 	if (kdev == NULL)
 		return ERR_PTR(-ENOMEM);
 
-	kdev->devt = MKDEV(DRM_MAJOR, minor->index);
-	kdev->class = drm_class;
-	kdev->type = &drm_sysfs_device_minor;
+#ifdef __linux__
+	device_initialize(kdev);
+#endif
+
+	if (minor->type == DRM_MINOR_ACCEL) {
+		minor_str = "accel%d";
+		accel_set_device_instance_params(kdev, minor->index);
+	} else {
+		if (minor->type == DRM_MINOR_RENDER)
+			minor_str = "renderD%d";
+		else
+			minor_str = "card%d";
+
+		kdev->devt = MKDEV(DRM_MAJOR, minor->index);
+		kdev->class = drm_class;
+		kdev->type = &drm_sysfs_device_minor;
+	}
+
 	kdev->parent = minor->dev->dev;
 	kdev->release = drm_sysfs_release;
+#ifdef __FreeBSD__
+	/* FreeBSD depends on kdev->devt initialized already */
 	device_initialize(kdev);
+#endif
 	dev_set_drvdata(kdev, minor);
 
 	rv = dev_set_name(kdev, minor_str, minor->index);

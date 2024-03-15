@@ -19,17 +19,17 @@ struct intel_context;
 struct intel_engine_cs;
 
 #ifdef CONFIG_I915_PERF // Not yet. i915_perf.c opens a can of worms...
-void i915_perf_init(struct drm_i915_private *i915);
+int i915_perf_init(struct drm_i915_private *i915);
 void i915_perf_fini(struct drm_i915_private *i915);
 void i915_perf_register(struct drm_i915_private *i915);
 void i915_perf_unregister(struct drm_i915_private *i915);
-int i915_perf_ioctl_version(void);
+int i915_perf_ioctl_version(struct drm_i915_private *i915);
 #else
-static inline void
+static inline int
 i915_perf_init(struct drm_i915_private *dev_priv)
 {
 
-	return;
+	return 0;
 }
 
 static inline void
@@ -53,7 +53,7 @@ i915_perf_unregister(struct drm_i915_private *dev_priv)
 	return;
 }
 
-static inline int i915_perf_ioctl_version(void)
+static inline int i915_perf_ioctl_version(struct drm_i915_private *i915)
 {
 	return 1;
 }
@@ -128,5 +128,15 @@ static inline void i915_oa_config_put(struct i915_oa_config *oa_config)
 	kref_put(&oa_config->ref, i915_oa_config_release);
 #endif
 }
+
+#if defined(CONFIG_I915_PERF)
+u32 i915_perf_oa_timestamp_frequency(struct drm_i915_private *i915);
+#else
+static inline u32
+i915_perf_oa_timestamp_frequency(struct drm_i915_private *i915)
+{
+	return (to_gt(i915)->clock_frequency);
+}
+#endif
 
 #endif /* __I915_PERF_H__ */
