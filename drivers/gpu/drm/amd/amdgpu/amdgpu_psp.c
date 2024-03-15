@@ -1834,6 +1834,10 @@ static int psp_hdcp_initialize(struct psp_context *psp)
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
 
+	/* bypass hdcp initialization if dmu is harvested */
+	if (!amdgpu_device_has_display_hardware(psp->adev))
+		return 0;
+
 	if (!psp->hdcp_context.context.bin_desc.size_bytes ||
 	    !psp->hdcp_context.context.bin_desc.start_addr) {
 		dev_info(psp->adev->dev, "HDCP: optional hdcp ta ucode is not available\n");
@@ -1864,6 +1868,9 @@ int psp_hdcp_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 	 * TODO: bypass the loading in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
+		return 0;
+
+	if (!psp->hdcp_context.context.initialized)
 		return 0;
 
 	return psp_ta_invoke(psp, ta_cmd_id, &psp->hdcp_context.context);
@@ -1901,6 +1908,10 @@ static int psp_dtm_initialize(struct psp_context *psp)
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
 
+	/* bypass dtm initialization if dmu is harvested */
+	if (!amdgpu_device_has_display_hardware(psp->adev))
+		return 0;
+
 	if (!psp->dtm_context.context.bin_desc.size_bytes ||
 	    !psp->dtm_context.context.bin_desc.start_addr) {
 		dev_info(psp->adev->dev, "DTM: optional dtm ta ucode is not available\n");
@@ -1931,6 +1942,9 @@ int psp_dtm_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 	 * TODO: bypass the loading in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
+		return 0;
+
+	if (!psp->dtm_context.context.initialized)
 		return 0;
 
 	return psp_ta_invoke(psp, ta_cmd_id, &psp->dtm_context.context);
@@ -2065,6 +2079,10 @@ static int psp_securedisplay_initialize(struct psp_context *psp)
 	 * TODO: bypass the initialize in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
+		return 0;
+
+	/* bypass securedisplay initialization if dmu is harvested */
+	if (!amdgpu_device_has_display_hardware(psp->adev))
 		return 0;
 
 	if (!psp->securedisplay_context.context.bin_desc.size_bytes ||
