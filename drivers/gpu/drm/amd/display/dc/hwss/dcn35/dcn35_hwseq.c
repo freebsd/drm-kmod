@@ -1009,6 +1009,9 @@ void dcn35_calc_blocks_to_gate(struct dc *dc, struct dc_state *context,
 	if (!hpo_frl_stream_enc_acquired && !hpo_dp_stream_enc_acquired)
 		update_state->pg_res_update[PG_HPO] = true;
 
+	if (hpo_frl_stream_enc_acquired)
+		update_state->pg_pipe_res_update[PG_HDMISTREAM][0] = true;
+
 	update_state->pg_res_update[PG_DWB] = true;
 
 	for (i = 0; i < dc->res_pool->pipe_count; i++) {
@@ -1146,6 +1149,9 @@ void dcn35_calc_blocks_to_ungate(struct dc *dc, struct dc_state *context,
 	if (hpo_frl_stream_enc_acquired || hpo_dp_stream_enc_acquired)
 		update_state->pg_res_update[PG_HPO] = true;
 
+	if (hpo_frl_stream_enc_acquired)
+		update_state->pg_pipe_res_update[PG_HDMISTREAM][0] = true;
+
 }
 
 /**
@@ -1270,7 +1276,7 @@ void dcn35_root_clock_control(struct dc *dc,
 	if (!pg_cntl)
 		return;
 	/*enable root clock first when power up*/
-	if (power_on)
+	if (power_on) {
 		for (i = 0; i < dc->res_pool->pipe_count; i++) {
 			if (update_state->pg_pipe_res_update[PG_HUBP][i] &&
 				update_state->pg_pipe_res_update[PG_DPP][i]) {
@@ -1281,6 +1287,8 @@ void dcn35_root_clock_control(struct dc *dc,
 				if (dc->hwseq->funcs.dpstream_root_clock_control)
 					dc->hwseq->funcs.dpstream_root_clock_control(dc->hwseq, i, power_on);
 		}
+
+	}
 	for (i = 0; i < dc->res_pool->res_cap->num_dsc; i++) {
 		if (update_state->pg_pipe_res_update[PG_DSC][i]) {
 			if (power_on) {
@@ -1293,7 +1301,7 @@ void dcn35_root_clock_control(struct dc *dc,
 		}
 	}
 	/*disable root clock first when power down*/
-	if (!power_on)
+	if (!power_on) {
 		for (i = 0; i < dc->res_pool->pipe_count; i++) {
 			if (update_state->pg_pipe_res_update[PG_HUBP][i] &&
 				update_state->pg_pipe_res_update[PG_DPP][i]) {
@@ -1304,6 +1312,8 @@ void dcn35_root_clock_control(struct dc *dc,
 				if (dc->hwseq->funcs.dpstream_root_clock_control)
 					dc->hwseq->funcs.dpstream_root_clock_control(dc->hwseq, i, power_on);
 		}
+
+	}
 }
 
 void dcn35_prepare_bandwidth(
