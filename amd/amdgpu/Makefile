@@ -452,6 +452,7 @@ SRCS+=	amdgpu_aca.c \
 	smuio_v13_0.c \
 	smuio_v13_0_3.c \
 	smuio_v13_0_6.c \
+	smuio_v14_0_2.c \
 	tonga_ih.c \
 	umc_v6_0.c \
 	umc_v6_1.c \
