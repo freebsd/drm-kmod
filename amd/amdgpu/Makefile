@@ -313,6 +313,7 @@ SRCS+=	amdgpu_aca.c \
 	amdgpu_vm_cpu.c \
 	amdgpu_vm_pt.c \
 	amdgpu_vm_sdma.c \
+	amdgpu_vm_tlb_fence.c \
 	amdgpu_vram_mgr.c \
 	amdgpu_xcp.c \
 	amdgpu_xgmi.c \
