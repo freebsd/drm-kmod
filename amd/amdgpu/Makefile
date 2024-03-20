@@ -30,8 +30,17 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn321 \
 	${SRCDIR}/display/dc/dml/dcn35 \
 	${SRCDIR}/display/dc/dml/dcn351 \
+	${SRCDIR}/display/dc/dml/dcn401 \
 	${SRCDIR}/display/dc/dml/dsc \
-	${SRCDIR}/display/dc/dml2
+	${SRCDIR}/display/dc/dml2 \
+	${SRCDIR}/display/dc/dml2/dml21 \
+	${SRCDIR}/display/dc/dml2/dml21/src/dml2_core \
+	${SRCDIR}/display/dc/dml2/dml21/src/dml2_dpmm \
+	${SRCDIR}/display/dc/dml2/dml21/src/dml2_mcg \
+	${SRCDIR}/display/dc/dml2/dml21/src/dml2_pmo \
+	${SRCDIR}/display/dc/dml2/dml21/src/dml2_standalone_libraries \
+	${SRCDIR}/display/dc/dml2/dml21/src/dml2_top \
+	${SRCDIR}/display/dc/dml2/dml21/src/inc
 .endif
 
 .PATH:	${SRCDIR}/acp \
@@ -65,6 +74,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/clk_mgr/dcn316 \
 	${SRCDIR}/display/dc/clk_mgr/dcn32 \
 	${SRCDIR}/display/dc/clk_mgr/dcn35 \
+	${SRCDIR}/display/dc/clk_mgr/dcn401 \
 	${SRCDIR}/display/dc/dce \
 	${SRCDIR}/display/dc/dce100 \
 	${SRCDIR}/display/dc/dce110 \
@@ -87,12 +97,14 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn32 \
 	${SRCDIR}/display/dc/dcn321 \
 	${SRCDIR}/display/dc/dcn35 \
+	${SRCDIR}/display/dc/dcn401 \
 	${SRCDIR}/display/dc/dpp/dcn10 \
 	${SRCDIR}/display/dc/dpp/dcn20 \
 	${SRCDIR}/display/dc/dpp/dcn201 \
 	${SRCDIR}/display/dc/dpp/dcn30 \
 	${SRCDIR}/display/dc/dpp/dcn32 \
 	${SRCDIR}/display/dc/dpp/dcn35 \
+	${SRCDIR}/display/dc/dpp/dcn401 \
 	${SRCDIR}/display/dc/hwss/dce \
 	${SRCDIR}/display/dc/hwss/dce100 \
 	${SRCDIR}/display/dc/hwss/dce110 \
@@ -116,10 +128,12 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/hwss/dcn321 \
 	${SRCDIR}/display/dc/hwss/dcn35 \
 	${SRCDIR}/display/dc/hwss/dcn351 \
+	${SRCDIR}/display/dc/hwss/dcn401 \
 	${SRCDIR}/display/dc/dml/calcs \
 	${SRCDIR}/display/dc/dsc \
 	${SRCDIR}/display/dc/dsc/dcn20 \
 	${SRCDIR}/display/dc/dsc/dcn35 \
+	${SRCDIR}/display/dc/dsc/dcn401 \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
 	${SRCDIR}/display/dc/gpio/dce110 \
@@ -132,6 +146,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/gpio/dcn30 \
 	${SRCDIR}/display/dc/gpio/dcn315 \
 	${SRCDIR}/display/dc/gpio/dcn32 \
+	${SRCDIR}/display/dc/gpio/dcn401 \
 	${SRCDIR}/display/dc/hdcp \
 	${SRCDIR}/display/dc/i2caux \
 	${SRCDIR}/display/dc/i2caux/dce100 \
@@ -161,6 +176,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn32 \
 	${SRCDIR}/display/dc/irq/dcn35 \
 	${SRCDIR}/display/dc/irq/dcn351 \
+	${SRCDIR}/display/dc/irq/dcn401 \
 	${SRCDIR}/display/dc/link \
 	${SRCDIR}/display/dc/link/accessories \
 	${SRCDIR}/display/dc/link/hwss \
@@ -174,6 +190,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/optc/dcn314 \
 	${SRCDIR}/display/dc/optc/dcn32 \
 	${SRCDIR}/display/dc/optc/dcn35 \
+	${SRCDIR}/display/dc/optc/dcn401 \
 	${SRCDIR}/display/dc/resource/dce100 \
 	${SRCDIR}/display/dc/resource/dce110 \
 	${SRCDIR}/display/dc/resource/dce112 \
@@ -196,6 +213,8 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/resource/dcn321 \
 	${SRCDIR}/display/dc/resource/dcn35 \
 	${SRCDIR}/display/dc/resource/dcn351 \
+	${SRCDIR}/display/dc/resource/dcn401 \
+	${SRCDIR}/display/dc/spl \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
@@ -801,6 +820,28 @@ SRCS+=	dcn351_fpu.c \
 	dcn351_resource.c \
 	irq_service_dcn351.c
 
+# display/dc/dcn401
+SRCS+=	dcn401_clk_mgr.c \
+	dcn401_clk_mgr_smu_msg.c \
+	dcn401_dccg.c \
+	dcn401_dio_link_encoder.c \
+	dcn401_dio_stream_encoder.c \
+	dcn401_dpp.c \
+	dcn401_dpp_cm.c \
+	dcn401_dpp_dscl.c \
+	dcn401_dsc.c \
+	dcn401_fpu.c \
+	dcn401_hubbub.c \
+	dcn401_hubp.c \
+	dcn401_hwseq.c \
+	dcn401_init.c \
+	dcn401_mpc.c \
+	dcn401_optc.c \
+	dcn401_resource.c \
+	hw_factory_dcn401.c \
+	hw_translate_dcn401.c \
+	irq_service_dcn401.c
+
 # display/dc/clk_mgr/dcn31
 SRCS+=	dcn31_afmt.c \
 	dcn31_apg.c \
@@ -885,12 +926,32 @@ SRCS+=	dcn321_fpu.c
 SRCS+=	display_mode_core.c \
 	display_mode_util.c \
 	dml_display_rq_dlg_calc.c \
+	dml_top.c \
+	dml_top_mcache.c \
+	dml2_core_dcn4.c \
+	dml2_core_factory.c \
+	dml2_core_dcn4_calcs.c \
+	dml2_core_shared.c \
 	dml2_dc_resource_mgmt.c \
+	dml2_debug.c \
+	dml2_dpmm_dcn4.c \
+	dml2_dpmm_factory.c \
 	dml2_mall_phantom.c \
+	dml2_mcg_dcn4.c \
+	dml2_mcg_factory.c \
+	dml2_pmo_dcn3.c \
+	dml2_pmo_dcn4_fams2.c \
+	dml2_pmo_dcn4.c \
+	dml2_pmo_factory.c \
 	dml2_policy.c \
 	dml2_translation_helper.c \
 	dml2_utils.c \
-	dml2_wrapper.c
+	dml2_top_optimization.c \
+	dml2_wrapper.c \
+	dml21_translation_helper.c \
+	dml21_utils.c \
+	dml21_wrapper.c \
+	lib_float_math.c
 
 # display/dc/dsc
 SRCS+=	rc_calc_fpu.c
@@ -903,7 +964,11 @@ SRCS+=	dc_vm_helper.c
 # display/dc/dsc
 SRCS+=	rc_calc.c \
 	rc_calc_dpi.c \
-	dc_dsc.c
+	dc_dsc.c \
+	dc_spl.c \
+	dc_spl_isharp_filters.c \
+	dc_spl_scl_filters.c \
+	dc_spl_translate.c
 
 # display/dc/gpio/*
 SRCS+=	gpio_base.c \
@@ -1019,6 +1084,7 @@ SRCS+=	dmub_dcn20.c \
 	dmub_dcn315.c \
 	dmub_dcn316.c \
 	dmub_dcn351.c \
+	dmub_dcn401.c \
 	dmub_reg.c \
 	dmub_srv.c \
 	dmub_srv_stat.c
@@ -1140,6 +1206,15 @@ CFLAGS+= -I${SRCDIR}/display
 CFLAGS+= -I${SRCDIR}/display/amdgpu_dm
 CFLAGS+= -I${SRCDIR}/display/dc
 CFLAGS+= -I${SRCDIR}/display/dc/clk_mgr
+CFLAGS+= -I${SRCDIR}/display/dc/dml2
+CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21
+CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/dml2_core
+CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/dml2_mcg
+CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/dml2_dpmm
+CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/dml2_pmo
+CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/dml2_standalone_libraries
+CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/inc
+CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/inc
 CFLAGS+= -I${SRCDIR}/display/dc/dpp
 CFLAGS+= -I${SRCDIR}/display/dc/dsc
 CFLAGS+= -I${SRCDIR}/display/dc/hwss
@@ -1147,6 +1222,7 @@ CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
 CFLAGS+= -I${SRCDIR}/display/dc/optc
 CFLAGS+= -I${SRCDIR}/display/dc/resource
+CFLAGS+= -I${SRCDIR}/display/dc/spl
 CFLAGS+= -I${SRCDIR}/display/dmub/inc
 CFLAGS+= -I${SRCDIR}/display/include
 CFLAGS+= -I${SRCDIR}/display/modules/hdcp
@@ -1207,16 +1283,24 @@ CFLAGS.dcn32_resource_helpers.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn321_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn35_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn351_fpu.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn401_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_mode_core.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
-CFLAGS.display_mode_util.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
-CFLAGS.dml_display_rq_dlg_calc.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
-CFLAGS.dml2_dc_resource_mgmt.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
-CFLAGS.dml2_mall_phantom.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
-CFLAGS.dml2_policy.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
-CFLAGS.dml2_translation_helper.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
-CFLAGS.dml2_utils.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.display_mode_util.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml_display_rq_dlg_calc.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml_top_mcache.c = ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dml2_core_dcn4.c = ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dml2_core_dcn4_calcs.c = ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dml2_core_shared.c = ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dml2_dc_resource_mgmt.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_dpmm_dcn4.c = ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dml2_mall_phantom.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_pmo_dcn4_fams2.c = ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dml2_policy.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_translation_helper.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_utils.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.dml2_wrapper.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.lib_float_math.c = ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_mode_lib.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba.c= ${FPUFLAGS} -mstack-alignment=4
@@ -1473,6 +1557,7 @@ CWARNFLAGS.dcn35_clk_mgr.c=		-Wno-incompatible-pointer-types
 CWARNFLAGS.dcn35_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn351_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn351_fpu.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn401_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
