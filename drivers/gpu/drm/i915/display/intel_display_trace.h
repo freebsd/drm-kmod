@@ -207,7 +207,8 @@ trace_intel_plane_disable_arm(struct drm_plane *plane, struct intel_crtc *crtc)
 	CTR4(KTR_DRM,
 	    "intel_plane_disable_arm: pipe %c, plane %s, frame=%u, scanline=%u",
 	    pipe_name(crtc->pipe), plane->name,
-	    intel_crtc_get_vblank_counter(crtc), __entry->scanline);
+	    intel_crtc_get_vblank_counter(crtc),
+	    intel_get_crtc_scanline(crtc));
 }
 
 static inline void
