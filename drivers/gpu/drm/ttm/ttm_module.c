@@ -98,6 +98,9 @@ MODULE_AUTHOR("Thomas Hellstrom, Jerome Glisse");
 MODULE_DESCRIPTION("TTM memory manager subsystem (for DRM device)");
 MODULE_LICENSE("GPL and additional rights");
 #elif defined(__FreeBSD__)
+// Workaround for THIS_MODULE. Since ttm.ko doesn't use LKPI_DRIVER_MODULE we
+// need to manually create the global variable that THIS_MODULE points at.
+char *THIS_MODULE_VAL = KBUILD_MODNAME;
 MODULE_VERSION(ttm, 1);
 #ifdef CONFIG_AGP
 MODULE_DEPEND(ttm, agp, 1, 1, 1);

@@ -176,6 +176,9 @@ static moduledata_t drm_mod = {
 	0
 };
 
+// Workaround for THIS_MODULE. Since drm.ko doesn't use LKPI_DRIVER_MODULE we
+// need to manually create the global variable that THIS_MODULE points at.
+char *THIS_MODULE_VAL = KBUILD_MODNAME;
 DECLARE_MODULE(drmn, drm_mod, SI_SUB_DRIVERS, SI_ORDER_FIRST);
 MODULE_VERSION(drmn, 2);
 #ifdef CONFIG_AGP
