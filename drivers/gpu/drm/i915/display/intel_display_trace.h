@@ -204,10 +204,10 @@ trace_intel_plane_update_arm(struct drm_plane *plane, struct intel_crtc *crtc)
 static inline void
 trace_intel_plane_disable_arm(struct drm_plane *plane, struct intel_crtc *crtc)
 {
-	CTR4(KTR_DRM,
-	    "intel_plane_disable_arm: pipe %c, plane %s, frame=%u, scanline=%u",
+	CTR3(KTR_DRM,
+	    "intel_plane_disable_arm: pipe %c, plane %s, frame=%u",
 	    pipe_name(crtc->pipe), plane->name,
-	    intel_crtc_get_vblank_counter(crtc), __entry->scanline);
+	    intel_crtc_get_vblank_counter(crtc));
 }
 
 static inline void
