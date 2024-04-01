@@ -188,14 +188,13 @@ trace_i915_context_free(struct i915_gem_context *ctx)
 }
 
 #define	trace_intel_context(ctx) \
-    CTR6(KTR_DRM, \
-	"%s guc_id=%d, pin_count=%d sched_state=0x%x,0x%x, guc_prio=%u", \
+    CTR5(KTR_DRM, \
+	"%s guc_id=%d, pin_count=%d sched_state=0x%x, guc_prio=%u", \
 	__func__, \
-	ctx->guc_id, \
+	ctx->guc_id.id, \
 	atomic_read(&ctx->pin_count), \
 	ctx->guc_state.sched_state, \
-	atomic_read(&ctx->guc_sched_state_no_lock), \
-	ctx->guc_prio)
+	ctx->guc_state.prio)
 
 static inline void
 trace_intel_context_set_prio(struct intel_context *ctx)
