@@ -38,6 +38,8 @@
  * low-power state and comes back to normal.
  */
 
+#define INTEL_DMC_FIRMWARE_URL "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git"
+
 enum intel_dmc_id {
 	DMC_FW_MAIN = 0,
 	DMC_FW_PIPEA,
@@ -954,7 +956,7 @@ static void dmc_load_work_fn(struct work_struct *work)
 			   dmc->fw_path);
 #ifdef __linux__
 		drm_notice(&i915->drm, "DMC firmware homepage: %s",
-			   INTEL_UC_FIRMWARE_URL);
+			   INTEL_DMC_FIRMWARE_URL);
 #elif defined(__FreeBSD__)
 		drm_notice(&i915->drm, "Run pkg install gpu-firmware-kmod" \
 		    " to install it\n");
