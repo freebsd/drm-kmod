@@ -141,7 +141,8 @@ SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h pci_iov_if.h device_if.h iicbus_
 
 CWARNFLAGS+= -Wno-format
 CWARNFLAGS+= -Wno-expansion-to-defined
-CWARNFLAGS+=			-Wno-pointer-arith ${CWARNFLAGS.${.IMPSRC:T}}
+CWARNFLAGS+= -Wno-pointer-arith ${CWARNFLAGS.${.IMPSRC:T}}
+CWARNFLAGS+= -Wno-bounds-safety-counted-by-elt-type-unknown-size
 
 CWARNFLAGS.atombios_encoders.c=		-Wno-missing-prototypes
 CWARNFLAGS.atombios_i2c.c=		-Wno-missing-prototypes
