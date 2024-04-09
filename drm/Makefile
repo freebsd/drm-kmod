@@ -126,6 +126,10 @@ SRCS+=	drm_dp_tunnel.c
 SRCS+=	drm_exec.c
 .endif
 
+.if !empty(KCONFIG:MDRM_PANIC)
+SRCS+=	drm_panic.c
+.endif
+
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
