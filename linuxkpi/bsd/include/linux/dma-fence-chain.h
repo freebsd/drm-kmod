@@ -61,11 +61,8 @@ dma_fence_chain_contained(struct dma_fence *fence)
 
 MALLOC_DECLARE(M_DMABUF);
 
-static inline struct dma_fence_chain *
-dma_fence_chain_alloc(void)
-{
-	return (kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL));
-}
+#define dma_fence_chain_alloc() \
+    ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL))
 
 static inline void
 dma_fence_chain_free(struct dma_fence_chain *chain)
