@@ -2374,7 +2374,7 @@ validate_out:
 
 static struct _vcs_dpi_voltage_scaling_st construct_low_pstate_lvl(struct clk_limit_table *clk_table, unsigned int high_voltage_lvl)
 {
-	struct _vcs_dpi_voltage_scaling_st low_pstate_lvl;
+	struct _vcs_dpi_voltage_scaling_st low_pstate_lvl = {0};
 	int i;
 
 	low_pstate_lvl.state = 1;
@@ -2479,7 +2479,7 @@ void dcn201_populate_dml_writeback_from_context_fpu(struct dc *dc,
 	int pipe_cnt, i, j;
 	double max_calc_writeback_dispclk;
 	double writeback_dispclk;
-	struct writeback_st dout_wb;
+	struct writeback_st dout_wb = {0};
 
 	dc_assert_fp_enabled();
 
