@@ -105,6 +105,15 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dpp/dcn32 \
 	${SRCDIR}/display/dc/dpp/dcn35 \
 	${SRCDIR}/display/dc/dpp/dcn401 \
+	${SRCDIR}/display/dc/hubbub/dcn10 \
+	${SRCDIR}/display/dc/hubbub/dcn20 \
+	${SRCDIR}/display/dc/hubbub/dcn201 \
+	${SRCDIR}/display/dc/hubbub/dcn21 \
+	${SRCDIR}/display/dc/hubbub/dcn30 \
+	${SRCDIR}/display/dc/hubbub/dcn301 \
+	${SRCDIR}/display/dc/hubbub/dcn31 \
+	${SRCDIR}/display/dc/hubbub/dcn32 \
+	${SRCDIR}/display/dc/hubbub/dcn35 \
 	${SRCDIR}/display/dc/hwss/dce \
 	${SRCDIR}/display/dc/hwss/dce100 \
 	${SRCDIR}/display/dc/hwss/dce110 \
@@ -1218,6 +1227,7 @@ CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/inc
 CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/inc
 CFLAGS+= -I${SRCDIR}/display/dc/dpp
 CFLAGS+= -I${SRCDIR}/display/dc/dsc
+CFLAGS+= -I${SRCDIR}/display/dc/hubbub
 CFLAGS+= -I${SRCDIR}/display/dc/hwss
 CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
