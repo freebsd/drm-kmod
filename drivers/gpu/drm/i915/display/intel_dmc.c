@@ -942,6 +942,21 @@ static void dmc_load_work_fn(struct work_struct *work)
 		}
 	}
 
+	if (err) {
+		drm_notice(&i915->drm,
+			   "Failed to load DMC firmware %s (%pe). Disabling runtime power management.\n",
+			   dmc->fw_path, ERR_PTR(err));
+#ifdef __linux__
+		drm_notice(&i915->drm, "DMC firmware homepage: %s",
+			   INTEL_DMC_FIRMWARE_URL);
+#elif defined(__FreeBSD__)
+		drm_notice(&i915->drm, "Run pkg install gpu-firmware-kmod" \
+		    " to install it\n");
+#endif
+
+		return;
+	}
+
 	parse_dmc_fw(dmc, fw);
 
 	if (intel_dmc_has_payload(i915)) {
@@ -956,13 +971,6 @@ static void dmc_load_work_fn(struct work_struct *work)
 			   "Failed to load DMC firmware %s."
 			   " Disabling runtime power management.\n",
 			   dmc->fw_path);
-#ifdef __linux__
-		drm_notice(&i915->drm, "DMC firmware homepage: %s",
-			   INTEL_DMC_FIRMWARE_URL);
-#elif defined(__FreeBSD__)
-		drm_notice(&i915->drm, "Run pkg install gpu-firmware-kmod" \
-		    " to install it\n");
-#endif
 	}
 
 	release_firmware(fw);
