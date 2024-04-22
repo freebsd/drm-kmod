@@ -75,6 +75,17 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/clk_mgr/dcn32 \
 	${SRCDIR}/display/dc/clk_mgr/dcn35 \
 	${SRCDIR}/display/dc/clk_mgr/dcn401 \
+	${SRCDIR}/display/dc/dccg/dcn20 \
+	${SRCDIR}/display/dc/dccg/dcn201 \
+	${SRCDIR}/display/dc/dccg/dcn21 \
+	${SRCDIR}/display/dc/dccg/dcn30 \
+	${SRCDIR}/display/dc/dccg/dcn301 \
+	${SRCDIR}/display/dc/dccg/dcn302 \
+	${SRCDIR}/display/dc/dccg/dcn303 \
+	${SRCDIR}/display/dc/dccg/dcn31 \
+	${SRCDIR}/display/dc/dccg/dcn314 \
+	${SRCDIR}/display/dc/dccg/dcn32 \
+	${SRCDIR}/display/dc/dccg/dcn35 \
 	${SRCDIR}/display/dc/dce \
 	${SRCDIR}/display/dc/dce100 \
 	${SRCDIR}/display/dc/dce110 \
@@ -1223,6 +1234,7 @@ CFLAGS+= -I${SRCDIR}/display
 CFLAGS+= -I${SRCDIR}/display/amdgpu_dm
 CFLAGS+= -I${SRCDIR}/display/dc
 CFLAGS+= -I${SRCDIR}/display/dc/clk_mgr
+CFLAGS+= -I${SRCDIR}/display/dc/dccg
 CFLAGS+= -I${SRCDIR}/display/dc/dml2
 CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21
 CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/dml2_core
