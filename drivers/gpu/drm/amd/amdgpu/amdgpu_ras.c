@@ -1769,6 +1769,9 @@ int amdgpu_ras_sysfs_create(struct amdgpu_device *adev,
 {
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, head);
 
+	if (amdgpu_aca_is_enabled(adev))
+		return 0;
+
 	if (!obj || obj->attr_inuse)
 		return -EINVAL;
 
@@ -1802,6 +1805,9 @@ int amdgpu_ras_sysfs_remove(struct amdgpu_device *adev,
 		struct ras_common_if *head)
 {
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, head);
+
+	if (amdgpu_aca_is_enabled(adev))
+		return 0;
 
 	if (!obj || !obj->attr_inuse)
 		return -EINVAL;
