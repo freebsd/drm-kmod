@@ -26,6 +26,7 @@ struct mipi_dsi_host {
 
 struct mipi_dsi_device {
 	struct mipi_dsi_host *host;
+	struct device dev;
 	bool attached;
 	uint32_t channel;
 	uint32_t mode_flags;
