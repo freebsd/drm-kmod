@@ -478,6 +478,10 @@ static int __drm_helper_update_and_validate(struct drm_connector *connector,
 		if (mode->status != MODE_OK)
 			continue;
 
+		mode->status = drm_mode_validate_ycbcr420(mode, connector);
+		if (mode->status != MODE_OK)
+			continue;
+
 		ret = drm_mode_validate_pipeline(mode, connector, ctx,
 						 &mode->status);
 		if (ret) {
@@ -490,10 +494,6 @@ static int __drm_helper_update_and_validate(struct drm_connector *connector,
 			else
 				return -EDEADLK;
 		}
-
-		if (mode->status != MODE_OK)
-			continue;
-		mode->status = drm_mode_validate_ycbcr420(mode, connector);
 	}
 
 	return 0;
