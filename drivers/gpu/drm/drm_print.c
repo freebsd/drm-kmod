@@ -385,54 +385,6 @@ void __drm_dev_dbg(struct _ddebug *desc, const struct device *dev,
 #endif
 
 #ifdef __linux__
-void ___drm_dbg(struct _ddebug *desc, enum drm_debug_category category, const char *format, ...)
-{
-	struct va_format vaf;
-	va_list args;
-
-	if (!__drm_debug_enabled(category))
-		return;
-
-	va_start(args, format);
-	vaf.fmt = format;
-	vaf.va = &args;
-
-	printk(KERN_DEBUG "[" DRM_NAME ":%ps] %pV",
-	       __builtin_return_address(0), &vaf);
-
-	va_end(args);
-}
-EXPORT_SYMBOL(___drm_dbg);
-#elif defined(__FreeBSD__)
-void ___drm_dbg(struct _ddebug *desc, enum drm_debug_category category,
-		const char *function_name, const char *format, ...)
-{
-	struct va_format vaf;
-	va_list args;
-
-	if (!(__drm_debug & category))
-		return;
-
-	va_start(args, format);
-	vaf.fmt = format;
-	vaf.va = &args;
-
-	if (SCHEDULER_STOPPED() || kdb_active) {
-		printf(" ");
-		return;
-	}
-	if (panicstr != NULL)
-		return;
-
-	printf("[" DRM_NAME "] ");
-	vprintf(format, args);
-
-	va_end(args);
-}
-EXPORT_SYMBOL(___drm_dbg);
-#endif
-
-#ifdef __linux__
 void __drm_err(const char *format, ...)
 {
 	struct va_format vaf;
