@@ -447,6 +447,8 @@ SRCS+=	amdgpu_aca.c \
 	imu_v11_0.c \
 	imu_v11_0_3.c \
 	imu_v12_0.c \
+	isp_v4_1_0.c \
+	isp_v4_1_1.c \
 	jpeg_v1_0.c \
 	jpeg_v2_0.c \
 	jpeg_v2_5.c \
