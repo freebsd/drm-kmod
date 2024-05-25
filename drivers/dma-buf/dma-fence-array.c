@@ -76,7 +76,7 @@ dma_fence_array_enable_signaling(struct dma_fence *fence)
 	int i;
 
 	array = to_dma_fence_array(fence);
-	cb = (void *)(&array[1]);
+	cb = array->callbacks;
 	if (array == NULL)
 		return (false);
 
@@ -188,15 +188,14 @@ dma_fence_array_create(int num_fences,
 {
 	struct dma_fence_array *array;
 
-	array = malloc(sizeof(*array) +
-	    (num_fences * sizeof(struct dma_fence_array_cb)),
+	array = malloc(struct_size(array, callbacks, num_fences),
 	    M_DMABUF, M_WAITOK | M_ZERO);
 
+	array->num_fences = num_fences;
 	spin_lock_init(&array->lock);
 	dma_fence_init(&array->base, &dma_fence_array_ops,
 	  &array->lock, context, seqno);
 	init_irq_work(&array->work, irq_dma_fence_array_work);
-	array->num_fences = num_fences;
 	atomic_set(&array->num_pending, signal_on_any ? 1 : num_fences);
 	array->fences = fences;
 
