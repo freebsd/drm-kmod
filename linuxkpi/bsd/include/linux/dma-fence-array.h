@@ -42,6 +42,7 @@ struct dma_fence_array {
 	atomic_t num_pending;
 	struct dma_fence **fences;
 	struct irq_work work;
+	struct dma_fence_array_cb callbacks[] __counted_by(num_fences);
 };
 
 #define dma_fence_array_for_each(fence, index, head)			\
