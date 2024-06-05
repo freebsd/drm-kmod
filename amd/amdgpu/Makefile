@@ -110,6 +110,10 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn321 \
 	${SRCDIR}/display/dc/dcn35 \
 	${SRCDIR}/display/dc/dcn401 \
+	${SRCDIR}/display/dc/dio/dcn32 \
+	${SRCDIR}/display/dc/dio/dcn321 \
+	${SRCDIR}/display/dc/dio/dcn35 \
+	${SRCDIR}/display/dc/dio/dcn401 \
 	${SRCDIR}/display/dc/dpp/dcn10 \
 	${SRCDIR}/display/dc/dpp/dcn20 \
 	${SRCDIR}/display/dc/dpp/dcn201 \
@@ -117,6 +121,8 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dpp/dcn32 \
 	${SRCDIR}/display/dc/dpp/dcn35 \
 	${SRCDIR}/display/dc/dpp/dcn401 \
+	${SRCDIR}/display/dc/dwb/dcn35 \
+	${SRCDIR}/display/dc/hpo/dcn32 \
 	${SRCDIR}/display/dc/hubp/dcn10 \
 	${SRCDIR}/display/dc/hubp/dcn20 \
 	${SRCDIR}/display/dc/hubp/dcn201 \
@@ -211,6 +217,11 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/link/accessories \
 	${SRCDIR}/display/dc/link/hwss \
 	${SRCDIR}/display/dc/link/protocols \
+	${SRCDIR}/display/dc/mmhubbub/dcn32 \
+	${SRCDIR}/display/dc/mmhubbub/dcn35 \
+	${SRCDIR}/display/dc/mpc/dcn32 \
+	${SRCDIR}/display/dc/mpc/dcn401 \
+	${SRCDIR}/display/dc/opp/dcn35 \
 	${SRCDIR}/display/dc/optc/dcn10 \
 	${SRCDIR}/display/dc/optc/dcn20 \
 	${SRCDIR}/display/dc/optc/dcn201 \
@@ -221,6 +232,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/optc/dcn32 \
 	${SRCDIR}/display/dc/optc/dcn35 \
 	${SRCDIR}/display/dc/optc/dcn401 \
+	${SRCDIR}/display/dc/pg/dcn35 \
 	${SRCDIR}/display/dc/resource/dce100 \
 	${SRCDIR}/display/dc/resource/dce110 \
 	${SRCDIR}/display/dc/resource/dce112 \
@@ -1253,14 +1265,21 @@ CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/dml2_pmo
 CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/dml2_standalone_libraries
 CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/src/inc
 CFLAGS+= -I${SRCDIR}/display/dc/dml2/dml21/inc
+CFLAGS+= -I${SRCDIR}/display/dc/dio
 CFLAGS+= -I${SRCDIR}/display/dc/dpp
 CFLAGS+= -I${SRCDIR}/display/dc/dsc
+CFLAGS+= -I${SRCDIR}/display/dc/dwb
+CFLAGS+= -I${SRCDIR}/display/dc/hpo
 CFLAGS+= -I${SRCDIR}/display/dc/hubp
 CFLAGS+= -I${SRCDIR}/display/dc/hubbub
 CFLAGS+= -I${SRCDIR}/display/dc/hwss
 CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
+CFLAGS+= -I${SRCDIR}/display/dc/mmhubbub
+CFLAGS+= -I${SRCDIR}/display/dc/mpc
+CFLAGS+= -I${SRCDIR}/display/dc/opp
 CFLAGS+= -I${SRCDIR}/display/dc/optc
+CFLAGS+= -I${SRCDIR}/display/dc/pg
 CFLAGS+= -I${SRCDIR}/display/dc/resource
 CFLAGS+= -I${SRCDIR}/display/dc/spl
 CFLAGS+= -I${SRCDIR}/display/dmub/inc
