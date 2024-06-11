@@ -179,6 +179,17 @@ trace_vlv_fifo_size(struct intel_crtc *crtc, u32 sprite0_start, u32 sprite1_star
 }
 
 static inline void
+trace_intel_plane_async_flip(struct intel_plane *plane, struct intel_crtc *crtc, bool async_flip)
+{
+	CTR6(KTR_DRM,
+	    "intel_plane_async_flip: dev %s, pipe %c, plane %s, frame=%u, scanline=%u, async_flip=%s",
+	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
+	    intel_crtc_get_vblank_counter(crtc),
+	    intel_get_crtc_scanline(crtc),
+	    str_yes_no(async_flip));
+}
+
+static inline void
 trace_intel_plane_update_noarm(struct intel_plane *plane, struct intel_crtc *crtc)
 {
 	CTR5(KTR_DRM,
