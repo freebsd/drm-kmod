@@ -65,6 +65,16 @@ trace_intel_pipe_disable(struct intel_crtc *crtc)
 }
 
 static inline void
+trace_intel_crtc_flip_done(struct intel_crtc *crtc)
+{
+	CTR4(KTR_DRM,
+	    "intel_crtc_flip_done: dev %s, pipe %c, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe),
+	    intel_crtc_get_vblank_counter(crtc),
+	    intel_get_crtc_scanline(crtc));
+}
+
+static inline void
 trace_intel_pipe_crc(struct intel_crtc *crtc, const u32 *crcs)
 {
 	CTR4(KTR_DRM,
