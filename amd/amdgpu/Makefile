@@ -1024,7 +1024,9 @@ SRCS+=	rc_calc.c \
 	rc_calc_dpi.c \
 	dc_dsc.c \
 	dc_spl.c \
+	dc_spl_filters.c \
 	dc_spl_isharp_filters.c \
+	dc_spl_scl_easf_filters.c \
 	dc_spl_scl_filters.c \
 	dc_spl_translate.c
 
