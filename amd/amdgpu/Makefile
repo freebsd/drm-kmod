@@ -225,6 +225,9 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/mmhubbub/dcn20 \
 	${SRCDIR}/display/dc/mmhubbub/dcn32 \
 	${SRCDIR}/display/dc/mmhubbub/dcn35 \
+	${SRCDIR}/display/dc/mpc/dcn10 \
+	${SRCDIR}/display/dc/mpc/dcn20 \
+	${SRCDIR}/display/dc/mpc/dcn30 \
 	${SRCDIR}/display/dc/mpc/dcn32 \
 	${SRCDIR}/display/dc/mpc/dcn401 \
 	${SRCDIR}/display/dc/opp/dcn10 \
