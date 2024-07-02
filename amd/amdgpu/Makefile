@@ -222,6 +222,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/link/accessories \
 	${SRCDIR}/display/dc/link/hwss \
 	${SRCDIR}/display/dc/link/protocols \
+	${SRCDIR}/display/dc/mmhubbub/dcn20 \
 	${SRCDIR}/display/dc/mmhubbub/dcn32 \
 	${SRCDIR}/display/dc/mmhubbub/dcn35 \
 	${SRCDIR}/display/dc/mpc/dcn32 \
