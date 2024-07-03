@@ -1110,6 +1110,9 @@ SRCS+=	link_ddc.c \
 	link_resource.c \
 	link_validation.c
 
+# display/dc/spl
+SRCS+=	spl_fixpt31_32.c
+
 # display/dc/virtual
 SRCS+=	virtual_link_encoder.c \
 	virtual_link_hwss.c \
@@ -1646,6 +1649,7 @@ CWARNFLAGS.dcn351_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn351_fpu.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn401_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
+CWARNFLAGS.spl_fixpt31_32.c=		-Wno-incompatible-pointer-types
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.hw_factory.c=		-Wno-missing-prototypes
