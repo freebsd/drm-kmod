@@ -2901,7 +2901,11 @@ static const struct attribute_group *amdgpu_sysfs_groups[] = {
 #endif
 
 static struct pci_driver amdgpu_kms_pci_driver = {
+#ifdef __linux__
 	.name = DRIVER_NAME,
+#elif defined(__FreeBSD__)
+	.name = "drmn",	/* LinuxKPI expects this name to enable drm support */
+#endif
 	.id_table = pciidlist,
 	.probe = amdgpu_pci_probe,
 	.remove = amdgpu_pci_remove,
@@ -2935,13 +2939,8 @@ static int __init amdgpu_init(void)
 	/* Ignore KFD init failures. Normal when CONFIG_HSA_AMD is not set. */
 	amdgpu_amdkfd_init();
 
-#ifdef __linux__
 	/* let modprobe override vga console setting */
 	return pci_register_driver(&amdgpu_kms_pci_driver);
-#elif defined(__FreeBSD__)
-	amdgpu_kms_pci_driver.bsdclass = drm_devclass;
-	return linux_pci_register_drm_driver(&amdgpu_kms_pci_driver);
-#endif
 
 error_fence:
 	amdgpu_sync_fini();
@@ -2953,11 +2952,7 @@ error_sync:
 static void __exit amdgpu_exit(void)
 {
 	amdgpu_amdkfd_fini();
-#ifdef __linux__
 	pci_unregister_driver(&amdgpu_kms_pci_driver);
-#elif defined(__FreeBSD__)
-	linux_pci_unregister_drm_driver(&amdgpu_kms_pci_driver);
-#endif
 	amdgpu_unregister_atpx_handler();
 	amdgpu_acpi_release();
 	amdgpu_sync_fini();

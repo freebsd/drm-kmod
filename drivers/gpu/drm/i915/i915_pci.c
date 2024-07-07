@@ -1090,7 +1090,11 @@ static void i915_pci_shutdown(struct pci_dev *pdev)
 }
 
 static struct pci_driver i915_pci_driver = {
+#ifdef __linux__
 	.name = DRIVER_NAME,
+#elif defined(__FreeBSD__)
+	.name = "drmn",	/* LinuxKPI expects this name to enable drm support */
+#endif
 	.id_table = pciidlist,
 	.probe = i915_pci_probe,
 	.remove = i915_pci_remove,
@@ -1100,19 +1104,10 @@ static struct pci_driver i915_pci_driver = {
 
 int i915_pci_register_driver(void)
 {
-#ifdef __linux__
 	return pci_register_driver(&i915_pci_driver);
-#elif defined(__FreeBSD__)
-	i915_pci_driver.bsdclass = drm_devclass;
-	return linux_pci_register_drm_driver(&i915_pci_driver);
-#endif
 }
 
 void i915_pci_unregister_driver(void)
 {
-#ifdef __linux__
 	pci_unregister_driver(&i915_pci_driver);
-#elif defined(__FreeBSD__)
-	linux_pci_unregister_drm_driver(&i915_pci_driver);
-#endif
 }

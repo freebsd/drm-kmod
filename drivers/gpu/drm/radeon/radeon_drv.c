@@ -602,7 +602,11 @@ static const struct drm_driver kms_driver = {
 };
 
 static struct pci_driver radeon_kms_pci_driver = {
+#ifdef __linux__
 	.name = DRIVER_NAME,
+#elif defined(__FreeBSD__)
+	.name = "drmn", /* LinuxKPI expects this name to enable drm support */
+#endif
 	.id_table = pciidlist,
 	.probe = radeon_pci_probe,
 	.remove = radeon_pci_remove,
@@ -621,21 +625,12 @@ static int __init radeon_module_init(void)
 	DRM_INFO("radeon kernel modesetting enabled.\n");
 	radeon_register_atpx_handler();
 
-#ifdef __linux__
 	return pci_register_driver(&radeon_kms_pci_driver);
-#elif defined(__FreeBSD__)
-	radeon_kms_pci_driver.bsdclass = drm_devclass;
-	return linux_pci_register_drm_driver(&radeon_kms_pci_driver);
-#endif
 }
 
 static void __exit radeon_module_exit(void)
 {
-#ifdef __linux__
 	pci_unregister_driver(&radeon_kms_pci_driver);
-#elif defined(__FreeBSD__)
-	linux_pci_unregister_drm_driver(&radeon_kms_pci_driver);
-#endif
 	radeon_unregister_atpx_handler();
 #ifdef __linux__
 	mmu_notifier_synchronize();

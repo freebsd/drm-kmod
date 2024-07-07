@@ -29,7 +29,6 @@ __FBSDID("$FreeBSD$");
 
 MALLOC_DECLARE(DRM_MEM_DRIVER);
 
-extern devclass_t drm_devclass;
 extern int skip_ddb;
 
 struct drm_minor;

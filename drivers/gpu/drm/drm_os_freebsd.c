@@ -25,8 +25,6 @@ __FBSDID("$FreeBSD$");
 #undef fb_info
 #undef cdev
 
-devclass_t drm_devclass;
-
 MALLOC_DEFINE(DRM_MEM_DRIVER, "drm_driver", "DRM DRIVER Data Structures");
 
 SYSCTL_NODE(_dev, OID_AUTO, drm, CTLFLAG_RW, 0, "DRM args (compat)");
