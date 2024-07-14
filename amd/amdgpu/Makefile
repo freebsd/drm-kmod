@@ -1029,13 +1029,7 @@ SRCS+=	dc_vm_helper.c
 # display/dc/dsc
 SRCS+=	rc_calc.c \
 	rc_calc_dpi.c \
-	dc_dsc.c \
-	dc_spl.c \
-	dc_spl_filters.c \
-	dc_spl_isharp_filters.c \
-	dc_spl_scl_easf_filters.c \
-	dc_spl_scl_filters.c \
-	dc_spl_translate.c
+	dc_dsc.c
 
 # display/dc/gpio/*
 SRCS+=	gpio_base.c \
@@ -1113,7 +1107,11 @@ SRCS+=	link_ddc.c \
 	link_validation.c
 
 # display/dc/spl
-SRCS+=	spl_fixpt31_32.c
+SRCS+=	dc_spl.c \
+	dc_spl_isharp_filters.c \
+	dc_spl_scl_filters.c \
+	dc_spl_scl_filters_old.c \
+	dc_spl_translate.c
 
 # display/dc/virtual
 SRCS+=	virtual_link_encoder.c \
