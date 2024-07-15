@@ -342,10 +342,23 @@ void drm_kms_helper_poll_reschedule(struct drm_device *dev)
 }
 EXPORT_SYMBOL(drm_kms_helper_poll_reschedule);
 
+static int detect_connector_status(struct drm_connector *connector,
+				   struct drm_modeset_acquire_ctx *ctx,
+				   bool force)
+{
+	const struct drm_connector_helper_funcs *funcs = connector->helper_private;
+
+	if (funcs->detect_ctx)
+		return funcs->detect_ctx(connector, ctx, force);
+	else if (connector->funcs->detect)
+		return connector->funcs->detect(connector, force);
+
+	return connector_status_connected;
+}
+
 static enum drm_connector_status
 drm_helper_probe_detect_ctx(struct drm_connector *connector, bool force)
 {
-	const struct drm_connector_helper_funcs *funcs = connector->helper_private;
 	struct drm_modeset_acquire_ctx ctx;
 	int ret;
 
@@ -353,14 +366,8 @@ drm_helper_probe_detect_ctx(struct drm_connector *connector, bool force)
 
 retry:
 	ret = drm_modeset_lock(&connector->dev->mode_config.connection_mutex, &ctx);
-	if (!ret) {
-		if (funcs->detect_ctx)
-			ret = funcs->detect_ctx(connector, &ctx, force);
-		else if (connector->funcs->detect)
-			ret = connector->funcs->detect(connector, force);
-		else
-			ret = connector_status_connected;
-	}
+	if (!ret)
+		ret = detect_connector_status(connector, &ctx, force);
 
 	if (ret == -EDEADLK) {
 		drm_modeset_backoff(&ctx);
@@ -394,7 +401,6 @@ drm_helper_probe_detect(struct drm_connector *connector,
 			struct drm_modeset_acquire_ctx *ctx,
 			bool force)
 {
-	const struct drm_connector_helper_funcs *funcs = connector->helper_private;
 	struct drm_device *dev = connector->dev;
 	int ret;
 
@@ -405,12 +411,7 @@ drm_helper_probe_detect(struct drm_connector *connector,
 	if (ret)
 		return ret;
 
-	if (funcs->detect_ctx)
-		ret = funcs->detect_ctx(connector, ctx, force);
-	else if (connector->funcs->detect)
-		ret = connector->funcs->detect(connector, force);
-	else
-		ret = connector_status_connected;
+	ret = detect_connector_status(connector, ctx, force);
 
 	if (ret != connector->status)
 		connector->epoch_counter += 1;
