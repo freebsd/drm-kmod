@@ -473,7 +473,8 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 	const struct address_space_operations *aops = mapping->a_ops;
 #endif
 	char __user *user_data = u64_to_user_ptr(arg->data_ptr);
-	u64 remain, offset;
+	u64 remain;
+	loff_t pos;
 	unsigned int pg;
 
 	/* Caller already validated user args */
@@ -506,12 +507,12 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 	 */
 
 	remain = arg->size;
-	offset = arg->offset;
-	pg = offset_in_page(offset);
+	pos = arg->offset;
+	pg = offset_in_page(pos);
 
 	do {
 		unsigned int len, unwritten;
-		struct page *page;
+		struct folio *folio;
 		void *data, *vaddr;
 		int err;
 #ifdef __linux__
@@ -525,7 +526,7 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 #ifdef __FreeBSD__
 		(void)data;
 		(void)err;
-		page = shmem_read_mapping_page(mapping, OFF_TO_IDX(offset));
+		folio = shmem_read_folio_gfp(mapping, OFF_TO_IDX(pos), 0);
 #else
 		/* Prefault the user page to reduce potential recursion */
 		err = __get_user(c, user_data);
@@ -536,27 +537,25 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 		if (err)
 			return err;
 
-		err = aops->write_begin(obj->base.filp, mapping, offset, len,
-					&page, &data);
+		err = aops->write_begin(obj->base.filp, mapping, pos, len,
+					&folio, &data);
 		if (err < 0)
 			return err;
 #endif
 
-		vaddr = kmap_local_page(page);
+		vaddr = kmap_local_folio(folio, offset_in_folio(folio, pos));
 		pagefault_disable();
-		unwritten = __copy_from_user_inatomic(vaddr + pg,
-						      user_data,
-						      len);
+		unwritten = __copy_from_user_inatomic(vaddr, user_data, len);
 		pagefault_enable();
 		kunmap_local(vaddr);
 
 #ifdef __linux__
-		err = aops->write_end(obj->base.filp, mapping, offset, len,
-				      len - unwritten, page_folio(page), data);
+		err = aops->write_end(obj->base.filp, mapping, pos, len,
+				      len - unwritten, folio, data);
 		if (err < 0)
 			return err;
 #else
-		put_page(page);
+		folio_put(folio);
 #endif
 
 		/* We don't handle -EFAULT, leave it to the caller to check */
@@ -565,7 +564,7 @@ shmem_pwrite(struct drm_i915_gem_object *obj,
 
 		remain -= len;
 		user_data += len;
-		offset += len;
+		pos += len;
 		pg = 0;
 	} while (remain);
 
@@ -734,7 +733,7 @@ i915_gem_object_create_shmem_from_data(struct drm_i915_private *i915,
 #ifdef __linux__
 	const struct address_space_operations *aops;
 #endif
-	resource_size_t offset;
+	loff_t pos;
 	int err;
 
 	GEM_WARN_ON(IS_DGFX(i915));
@@ -748,39 +747,37 @@ i915_gem_object_create_shmem_from_data(struct drm_i915_private *i915,
 #ifdef __linux__
 	aops = file->f_mapping->a_ops;
 #endif
-	offset = 0;
+	pos = 0;
 	do {
 		unsigned int len = min_t(typeof(size), size, PAGE_SIZE);
-		struct page *page;
-		void *pgdata, *vaddr;
+		struct folio *folio;
+		void *fsdata;
 
 #ifdef __linux__
-		err = aops->write_begin(file, file->f_mapping, offset, len,
-					&page, &pgdata);
+		err = aops->write_begin(file, file->f_mapping, pos, len,
+					&folio, &fsdata);
 		if (err < 0)
 			goto fail;
 #elif defined(__FreeBSD__)
 		(void)err;
-		(void)pgdata;
-		page = shmem_read_mapping_page(obj->base.filp->f_shmem, OFF_TO_IDX(offset));
+		(void)fsdata;
+		folio = shmem_read_folio_gfp(obj->base.filp->f_shmem, OFF_TO_IDX(pos), 0);
 #endif
 
-		vaddr = kmap(page);
-		memcpy(vaddr, data, len);
-		kunmap(page);
+		memcpy_to_folio(folio, offset_in_folio(folio, pos), data, len);
 
 #ifdef __linux__
-		err = aops->write_end(file, file->f_mapping, offset, len, len,
-				      page_folio(page), pgdata);
+		err = aops->write_end(file, file->f_mapping, pos, len, len,
+				      folio, fsdata);
 		if (err < 0)
 			goto fail;
 #elif defined(__FreeBSD__)
-		put_page(page);
+		folio_put(folio);
 #endif
 
 		size -= len;
 		data += len;
-		offset += len;
+		pos += len;
 	} while (size);
 
 	return obj;
