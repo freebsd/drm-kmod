@@ -44,6 +44,7 @@
 #include <drm/drm_vblank.h>
 
 #include "drm_internal.h"
+#include "drm_crtc_internal.h"
 
 #ifdef __FreeBSD__
 #define register_framebuffer linux_register_framebuffer
@@ -540,6 +541,7 @@ struct fb_info *drm_fb_helper_alloc_info(struct drm_fb_helper *fb_helper)
 	fb_helper->info = info;
 	info->skip_vt_switch = true;
 
+	info->skip_panic = drm_panic_is_enabled(fb_helper->dev);
 	return info;
 
 err_release:
