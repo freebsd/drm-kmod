@@ -2476,6 +2476,7 @@ out:
  */
 static int amdgpu_device_ip_early_init(struct amdgpu_device *adev)
 {
+	struct amdgpu_ip_block *ip_block;
 #ifdef __linux__
 	struct pci_dev *parent;
 #endif
@@ -2620,7 +2621,10 @@ static int amdgpu_device_ip_early_init(struct amdgpu_device *adev)
 	if (!total)
 		return -ENODEV;
 
-	amdgpu_amdkfd_device_probe(adev);
+	ip_block = amdgpu_device_ip_get_ip_block(adev, AMD_IP_BLOCK_TYPE_GFX);
+	if (ip_block->status.valid != false)
+		amdgpu_amdkfd_device_probe(adev);
+
 	adev->cg_flags &= amdgpu_cg_mask;
 	adev->pg_flags &= amdgpu_pg_mask;
 
