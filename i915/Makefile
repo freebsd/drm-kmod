@@ -8,7 +8,8 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 	${SRCDIR}/gt \
 	${SRCDIR}/gt/uc \
 	${SRCDIR}/oa \
-	${SRCDIR}/pxp
+	${SRCDIR}/pxp \
+	${SRCDIR}/soc
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
@@ -56,6 +57,7 @@ SRCS=	\
 	intel_bw.c \
 	intel_bios.c \
 	intel_cdclk.c \
+	intel_clock_gating.c \
 	intel_color.c \
 	intel_combo_phy.c \
 	intel_connector.c \
@@ -68,7 +70,6 @@ SRCS=	\
 	intel_dpio_phy.c \
 	intel_dpll.c \
 	intel_dpll_mgr.c \
-	intel_dram.c \
 	intel_fbc.c \
 	intel_fdi.c \
 	intel_fifo_underrun.c \
@@ -79,9 +80,7 @@ SRCS=	\
 	intel_memory_region.c \
 	intel_opregion.c \
 	intel_overlay.c \
-	intel_pch.c \
 	intel_pcode.c \
-	intel_pm.c \
 	intel_psr.c \
 	intel_quirks.c \
 	intel_region_ttm.c \
@@ -93,7 +92,6 @@ SRCS=	\
 	intel_uncore.c \
 	i915_utils.c \
 	intel_wakeref.c \
-	intel_wopcm.c \
 	vlv_sideband.c \
 	vlv_suspend.c
 
@@ -107,14 +105,22 @@ SRCS+=	dvo_ch7017.c \
 	g4x_dp.c \
 	g4x_hdmi.c \
 	hsw_ips.c \
+	i9xx_plane.c \
+	i9xx_wm.c \
 	icl_dsi.c \
 	intel_backlight.c \
 	intel_crt.c \
 	intel_crtc_state_dump.c \
+	intel_cx0_phy.c \
 	intel_ddi.c \
 	intel_ddi_buf_trans.c \
+	intel_display_device.c \
+	intel_display_driver.c \
+	intel_display_irq.c \
 	intel_display_power_map.c \
 	intel_display_power_well.c \
+	intel_display_reset.c \
+	intel_display_rps.c \
 	intel_dkl_phy.c \
 	intel_dp.c \
 	intel_dp_aux.c \
@@ -133,24 +139,32 @@ SRCS+=	dvo_ch7017.c \
 	intel_dvo.c \
 	intel_global_state.c \
 	intel_gmbus.c \
+	intel_hdcp_gsc.c \
 	intel_hdmi.c \
+	intel_hotplug_irq.c \
+	intel_hti.c \
+	intel_load_detect.c \
 	intel_lspcon.c \
 	intel_lvds.c \
+	intel_modeset_lock.c \
 	intel_modeset_setup.c \
 	intel_modeset_verify.c \
 	intel_panel.c \
 	intel_pch_display.c \
 	intel_pch_refclk.c \
 	intel_plane_initial.c \
+	intel_pmdemand.c \
 	intel_pps.c \
 	intel_qp_tables.c \
 	intel_sdvo.c \
+	intel_sprite_uapi.c \
 	intel_tc.c \
 	intel_tv.c \
+	intel_vblank.c \
 	intel_vdsc.c \
 	intel_vrr.c \
 	intel_vga.c \
-	i9xx_plane.c \
+	intel_wm.c \
 	skl_scaler.c \
 	skl_universal_plane.c \
 	skl_watermark.c \
@@ -208,12 +222,19 @@ SRCS+=	gen2_engine_cs.c \
 	intel_sa_media.c \
 	intel_sseu.c \
 	intel_timeline.c \
+	intel_tlb.c \
+	intel_wopcm.c \
 	intel_workarounds.c \
 	shmem_utils.c \
 	sysfs_engines.c
 
 # gt/uc*
-SRCS+=	intel_guc.c \
+SRCS+=	intel_gsc_fw.c \
+	intel_gsc_proxy.c \
+	intel_gsc_uc.c \
+	intel_gsc_uc_debugfs.c \
+	intel_gsc_uc_heci_cmd_submit.c \
+	intel_guc.c \
 	intel_guc_ads.c \
 	intel_guc_capture.c \
 	intel_guc_ct.c \
@@ -258,11 +279,18 @@ SRCS+=	i915_gem_busy.c \
 SRCS+=	intel_pxp.c \
 	intel_pxp_cmd.c \
 	intel_pxp_debugfs.c \
+	intel_pxp_gsccs.c \
+	intel_pxp_huc.c \
 	intel_pxp_irq.c \
 	intel_pxp_pm.c \
 	intel_pxp_session.c \
 	intel_pxp_tee.c
 .endif
+
+# soc/*
+SRCS+=	intel_dram.c \
+	intel_gmch.c \
+	intel_pch.c
 
 .if !empty(KCONFIG:MCOMPAT)
 SRCS+=	i915_ioc32.c
@@ -289,6 +317,10 @@ SRCS+=	intel_fbdev.c
 
 .if !empty(KCONFIG:MDRM_I915_CAPTURE_ERROR)
 SRCS+=	i915_gpu_error.c
+.endif
+
+.if !empty(KCONFIG:MHWMON)
+SRCS+=	i915_hwmon.c
 .endif
 
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
@@ -332,26 +364,33 @@ CWARNFLAGS += -Wno-pointer-arith -Wno-format -Wno-cast-qual
 
 CWARNFLAGS.intel_acpi.c=	-Wno-incompatible-pointer-types
 CWARNFLAGS.intel_audio.c=	-Wno-unused-function
+CWARNFLAGS.intel_backlight.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_combo_phy.c=	-Wno-uninitialized
 CWARNFLAGS.intel_ddi.c=		-Wno-unused-but-set-variable -Wno-missing-prototypes
 CWARNFLAGS.intel_dp.c=		-Wno-unused-variable -Wno-sometimes-uninitialized -Wno-constant-logical-operand
 CWARNFLAGS.intel_dp_aux_backlight.c=	-Wno-shift-count-overflow
 CWARNFLAGS.intel_dpll_mgr.c=	-Wno-compare-distinct-pointer-types
 CWARNFLAGS.intel_display.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.intel_display_device.c=	-Wno-initializer-overrides
+CWARNFLAGS.intel_display_irq.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_dpll.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_fb.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.intel_fbc.c=		-Wno-unused-variable
 CWARNFLAGS.intel_fbdev.c=	-Wno-initializer-overrides
 CWARNFLAGS.intel_freebsd.c=	-Wno-unused-function
 CWARNFLAGS.i915_gem_context.c=	-Wno-unused-function
+CWARNFLAGS.intel_ggtt.c=	-Wno-integer-overflow
+CWARNFLAGS.intel_gmch.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.intel_gt_mcr.c=	-Wno-tautological-constant-out-of-range-compare
 CWARNFLAGS.intel_guc_capture.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.intel_guc_submission.c=	-Wno-unused-function
 CWARNFLAGS.intel_hdmi.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_hotplug.c=	-Wno-uninitialized
-CWARNFLAGS.intel_pm.c=		-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.intel_psr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.intel_region_ttm.c=	-Wno-missing-prototypes
 CWARNFLAGS.intel_reset.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_sseu.c=	-Wno-incompatible-pointer-types-discards-qualifiers
+CWARNFLAGS.intel_workarounds.c=	-Wno-unused-variable
 CWARNFLAGS.i915_debugfs.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.i915_driver.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.i915_irq.c=		-Wno-unused-but-set-variable

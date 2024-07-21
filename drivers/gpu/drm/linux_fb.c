@@ -43,6 +43,7 @@ __FBSDID("$FreeBSD$");
 
 #include <drm/drm_fb_helper.h>
 #include <linux/fb.h>
+#include <video/cmdline.h>
 #undef fb_info
 #include <drm/drm_os_freebsd.h>
 
@@ -288,32 +289,7 @@ linux_unregister_framebuffer(struct linux_fb_info *fb_info)
 int
 linux_fb_get_options(const char *connector_name, char **option)
 {
-	char tunable[64];
-
-	/*
-	 * A user may use loader tunables to set a specific mode for the
-	 * console. Tunables are read in the following order:
-	 *     1. kern.vt.fb.modes.$connector_name
-	 *     2. kern.vt.fb.default_mode
-	 *
-	 * Example of a mode specific to the LVDS connector:
-	 *     kern.vt.fb.modes.LVDS="1024x768"
-	 *
-	 * Example of a mode applied to all connectors not having a
-	 * connector-specific mode:
-	 *     kern.vt.fb.default_mode="640x480"
-	 */
-	snprintf(tunable, sizeof(tunable), "kern.vt.fb.modes.%s",
-	    connector_name);
-	if (bootverbose) {
-		printf("[drm] Connector %s: get mode from tunables:\n", connector_name);
-		printf("[drm]  - %s\n", tunable);
-		printf("[drm]  - kern.vt.fb.default_mode\n");
-	}
-	*option = kern_getenv(tunable);
-	if (*option == NULL)
-		*option = kern_getenv("kern.vt.fb.default_mode");
-
+	*option = __DECONST(char *, video_get_options(connector_name));
 	return (*option != NULL ? 0 : -ENOENT);
 }
 
@@ -498,5 +474,28 @@ fb_sys_write(struct linux_fb_info *info, const char __user *buf,
     size_t count, loff_t *ppos)
 {
 	panic("fb_sys_write() not implemented");
+	return (0);
+}
+
+ssize_t
+fb_io_read(struct linux_fb_info *info, char __user *buf,
+    size_t count, loff_t *ppos)
+{
+	panic("fb_io_read() not implemented");
+	return (0);
+}
+
+ssize_t
+fb_io_write(struct linux_fb_info *info, const char __user *buf,
+    size_t count, loff_t *ppos)
+{
+	panic("fb_io_write() not implemented");
+	return (0);
+}
+
+int
+fb_deferred_io_mmap(struct linux_fb_info *info, struct vm_area_struct *vma)
+{
+	panic("fb_deferred_io_mmap() not implemented");
 	return (0);
 }

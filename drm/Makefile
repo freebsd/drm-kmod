@@ -47,7 +47,6 @@ SRCS=	drm_atomic.c \
 	drm_mode_object.c \
 	drm_modeset_lock.c \
 	drm_modeset_helper.c \
-	drm_nomodeset.c \
 	drm_os_freebsd.c \
 	drm_panel.c \
 	drm_pci.c \
@@ -59,6 +58,7 @@ SRCS=	drm_atomic.c \
 	drm_property.c \
 	drm_rect.c \
 	drm_self_refresh_helper.c \
+	drm_suballoc.c \
 	drm_syncobj.c \
 	drm_sysctl_freebsd.c \
 	drm_sysfs.c \
@@ -69,7 +69,8 @@ SRCS=	drm_atomic.c \
 	vt_drmfb.c
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
-SRCS+=	drm_fb_helper.c
+SRCS+=	drm_fb_helper.c \
+	drm_fbdev_generic.c
 .endif
 
 .if !empty(KCONFIG:MDRM_LEGACY)
@@ -118,6 +119,10 @@ SRCS+=	drm_scdc_helper.c \
 
 .if !empty(KCONFIG:MDRM_DP_AUX_CHARDEV)
 SRCS+=	drm_dp_aux_dev.c
+.endif
+
+.if !empty(KCONFIG:MDRM_EXEC)
+SRCS+=	drm_exec.c
 .endif
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug

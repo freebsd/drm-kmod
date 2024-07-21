@@ -76,6 +76,7 @@ struct dma_fence_ops {
 	void (*fence_value_str)(struct dma_fence *fence, char *str, int size);
 	void (*timeline_value_str)(struct dma_fence *fence,
 				   char *str, int size);
+	void (*set_deadline)(struct dma_fence *fence, ktime_t deadline);
 };
 
 enum dma_fence_flag_bits {
@@ -110,8 +111,9 @@ signed long dma_fence_wait_timeout(struct dma_fence *,
     bool intr, signed long timeout);
 signed long dma_fence_wait_any_timeout(struct dma_fence **fences,
     uint32_t count, bool intr, signed long timeout, uint32_t *idx);
+void dma_fence_set_deadline(struct dma_fence *fence, ktime_t deadline);
 struct dma_fence *dma_fence_get_stub(void);
-struct dma_fence *dma_fence_allocate_private_stub(void);
+struct dma_fence *dma_fence_allocate_private_stub(ktime_t timestamp);
 u64 dma_fence_context_alloc(unsigned num);
 void dma_fence_put(struct dma_fence *fence);
 struct dma_fence *dma_fence_get(struct dma_fence *fence);
@@ -125,6 +127,7 @@ bool dma_fence_is_later(struct dma_fence *f1, struct dma_fence *f2);
 struct dma_fence *dma_fence_later(struct dma_fence *f1, struct dma_fence *f2);
 int dma_fence_get_status_locked(struct dma_fence *fence);
 void dma_fence_set_error(struct dma_fence *fence, int error);
+ktime_t dma_fence_timestamp(struct dma_fence *fence);
 signed long dma_fence_wait(struct dma_fence *fence, bool intr);
 bool dma_fence_is_array(struct dma_fence *fence);
 bool dma_fence_is_chain(struct dma_fence *fence);

@@ -8,7 +8,7 @@ KMOD=	amdgpu
 .include "../../kconfig.mk"
 .include "../../linuxkpi_version.mk"
 
-.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn10 \
 	${SRCDIR}/display/dc/dml/dcn20 \
@@ -26,6 +26,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 
 .PATH:	${SRCDIR}/acp \
 	${SRCDIR}/amdgpu \
+	${SRCDIR}/amdxcp \
 	${SRCDIR}/display \
 	${SRCDIR}/display/amdgpu_dm \
 	${SRCDIR}/display/dc \
@@ -88,6 +89,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/gpio/dcn30 \
 	${SRCDIR}/display/dc/gpio/dcn315 \
 	${SRCDIR}/display/dc/gpio/dcn32 \
+	${SRCDIR}/display/dc/hdcp \
 	${SRCDIR}/display/dc/i2caux \
 	${SRCDIR}/display/dc/i2caux/dce100 \
 	${SRCDIR}/display/dc/i2caux/dce110 \
@@ -115,11 +117,15 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn315 \
 	${SRCDIR}/display/dc/irq/dcn32 \
 	${SRCDIR}/display/dc/link \
+	${SRCDIR}/display/dc/link/accessories \
+	${SRCDIR}/display/dc/link/hwss \
+	${SRCDIR}/display/dc/link/protocols \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
 	${SRCDIR}/display/modules/color \
 	${SRCDIR}/display/modules/freesync \
+	${SRCDIR}/display/modules/hdcp \
 	${SRCDIR}/display/modules/inc \
 	${SRCDIR}/display/modules/info_packet \
 	${SRCDIR}/display/modules/power \
@@ -144,7 +150,7 @@ SRCS=	acp_hw.c
 
 # amdgpu
 # amdgpu_acp.c \ # not yet - need i2s
-# amdgpu_mn.c \  # disabled
+# amdgpu_hmm.c \  # disabled
 
 SRCS+=	amdgpu_afmt.c \
 	amdgpu_amdkfd.c \
@@ -162,6 +168,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_device.c \
 	amdgpu_discovery.c \
 	amdgpu_display.c \
+	amdgpu_doorbell_mgr.c \
 	amdgpu_dpm.c \
 	amdgpu_dpm_internal.c \
 	amdgpu_drv.c \
@@ -179,6 +186,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_gmc.c \
 	amdgpu_gtt_mgr.c \
 	amdgpu_preempt_mgr.c \
+	amdgpu_hdp.c \
 	amdgpu_i2c.c \
 	amdgpu_ib.c \
 	amdgpu_ids.c \
@@ -191,6 +199,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_lsdma.c \
 	amdgpu_mca.c \
 	amdgpu_mes.c \
+	amdgpu_mmhub.c \
 	amdgpu_nbio.c \
 	amdgpu_object.c \
 	amdgpu_pll.c \
@@ -203,6 +212,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_ras.c \
 	amdgpu_ras_eeprom.c \
 	amdgpu_reset.c \
+	amdgpu_ring_mux.c \
 	amdgpu_rlc.c \
 	amdgpu_sa.c \
 	amdgpu_sched.c \
@@ -224,6 +234,7 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_vm_pt.c \
 	amdgpu_vm_sdma.c \
 	amdgpu_vram_mgr.c \
+	amdgpu_xcp.c \
 	amdgpu_xgmi.c \
 	arct_reg_init.c \
 	athub_v1_0.c \
@@ -235,6 +246,7 @@ SRCS+=	amdgpu_afmt.c \
 	atombios_dp.c \
 	atombios_encoders.c \
 	atombios_i2c.c \
+	aqua_vanjaram.c \
 	cik_ih.c \
 	cik_sdma.c \
 	cik.c \
@@ -246,6 +258,7 @@ SRCS+=	amdgpu_afmt.c \
 	dimgrey_cavefish_reg_init.c \
 	df_v1_7.c \
 	df_v3_6.c \
+	df_v4_3.c \
 	emu_soc.c \
 	gfx_v6_0.c \
 	gfx_v7_0.c \
@@ -253,10 +266,13 @@ SRCS+=	amdgpu_afmt.c \
 	gfx_v9_0.c \
 	gfx_v9_4.c \
 	gfx_v9_4_2.c \
+	gfx_v9_4_3.c \
 	gfx_v10_0.c \
 	gfx_v11_0.c \
+	gfx_v11_0_3.c \
 	gfxhub_v1_0.c \
 	gfxhub_v1_1.c \
+	gfxhub_v1_2.c \
 	gfxhub_v2_0.c \
 	gfxhub_v2_1.c \
 	gfxhub_v3_0.c \
@@ -275,6 +291,7 @@ SRCS+=	amdgpu_afmt.c \
 	aldebaran.c \
 	iceland_ih.c \
 	ih_v6_0.c \
+	ih_v6_1.c \
 	imu_v11_0.c \
 	imu_v11_0_3.c \
 	jpeg_v1_0.c \
@@ -282,6 +299,7 @@ SRCS+=	amdgpu_afmt.c \
 	jpeg_v2_5.c \
 	jpeg_v3_0.c \
 	jpeg_v4_0.c \
+	jpeg_v4_0_3.c \
 	kv_dpm.c \
 	kv_smc.c \
 	legacy_dpm.c \
@@ -291,6 +309,7 @@ SRCS+=	amdgpu_afmt.c \
 	mes_v11_0.c \
 	mmhub_v1_0.c \
 	mmhub_v1_7.c \
+	mmhub_v1_8.c \
 	mmhub_v2_0.c \
 	mmhub_v2_3.c \
 	mmhub_v3_0.c \
@@ -307,6 +326,7 @@ SRCS+=	amdgpu_afmt.c \
 	nbio_v7_2.c \
 	nbio_v7_4.c \
 	nbio_v7_7.c \
+	nbio_v7_9.c \
 	navi10_ih.c \
 	nv.c \
 	psp_v3_1.c \
@@ -320,6 +340,7 @@ SRCS+=	amdgpu_afmt.c \
 	sdma_v3_0.c \
 	sdma_v4_0.c \
 	sdma_v4_4.c \
+	sdma_v4_4_2.c \
 	sdma_v5_0.c \
 	sdma_v5_2.c \
 	sdma_v6_0.c \
@@ -330,10 +351,12 @@ SRCS+=	amdgpu_afmt.c \
 	si.c \
 	soc15.c \
 	soc21.c \
+	smu_v13_0_10.c \
 	smuio_v9_0.c \
 	smuio_v11_0.c \
 	smuio_v11_0_6.c \
 	smuio_v13_0.c \
+	smuio_v13_0_3.c \
 	smuio_v13_0_6.c \
 	tonga_ih.c \
 	umc_v6_0.c \
@@ -355,23 +378,29 @@ SRCS+=	amdgpu_afmt.c \
 	vcn_v2_5.c \
 	vcn_v3_0.c \
 	vcn_v4_0.c \
+	vcn_v4_0_3.c \
 	vega10_ih.c \
 	vega10_reg_init.c \
 	vega20_ih.c \
 	vega20_reg_init.c \
 	vi.c
 
+# amdxcp
+SRCS+=	amdgpu_xcp_drv.c
+
 # display/amdgpu_dm
 SRCS+=	amdgpu_dm_color.c \
 	amdgpu_dm_crc.c \
 	amdgpu_dm_crtc.c \
 	amdgpu_dm_debugfs.c \
+	amdgpu_dm_hdcp.c \
 	amdgpu_dm_helpers.c \
 	amdgpu_dm_irq.c \
 	amdgpu_dm_mst_types.c \
 	amdgpu_dm_plane.c \
 	amdgpu_dm_pp_smu.c \
 	amdgpu_dm_psr.c \
+	amdgpu_dm_replay.c \
 	amdgpu_dm_services.c \
 	amdgpu_dm.c \
 	dc_fpu.c
@@ -406,14 +435,11 @@ SRCS+=	bw_fixed.c \
 # display/dc/core
 SRCS+=	dc_debug.c \
 	dc_hw_sequencer.c \
-	dc_link_ddc.c \
-	dc_link_dp.c \
-	dc_link.c \
+	dc_link_exports.c \
 	dc_resource.c \
 	dc_sink.c \
 	dc_stream.c \
 	dc_link_enc_cfg.c \
-	dc_link_dpcd.c \
 	dc_surface.c \
 	dc.c \
 	dc_stat.c
@@ -437,7 +463,9 @@ SRCS+=	dce_abm.c \
 	dce_stream_encoder.c \
 	dce_transform.c \
 	dmub_abm.c \
+	dmub_abm_lcd.c \
 	dmub_psr.c \
+	dmub_replay.c \
 	dmub_hw_lock_mgr.c \
 	dmub_outbox.c
 
@@ -489,7 +517,7 @@ SRCS+=	clk_mgr.c \
 	rv2_clk_mgr.c
 
 # display/dc/dcn10
-.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 SRCS+=	dcn10_cm_common.c \
 	dcn10_dpp.c \
 	dcn10_dpp_cm.c \
@@ -556,7 +584,7 @@ SRCS+=	dcn21_dccg.c \
 	dcn21_resource.c
 
 # display/dc/dcn30
-.if !empty(KCONFIG:MDRM_AMD_DC_DCN3_0*)
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 SRCS+=	dcn30_dio_link_encoder.c \
 	dcn30_clk_mgr.c \
 	dcn30_clk_mgr_smu_msg.c \
@@ -592,6 +620,7 @@ SRCS+=	dcn301_init.c \
 	dcn301_dio_link_encoder.c \
 	dcn301_fpu.c \
 	dcn301_hwseq.c \
+	dcn301_optc.c \
 	dcn301_panel_cntl.c \
 	dcn301_hubbub.c \
 	vg_clk_mgr.c \
@@ -685,8 +714,7 @@ SRCS+=	dcn32_clk_mgr.c \
 	dcn32_clk_mgr_smu_msg.c
 
 # display/dc/core
-SRCS+=	dc_link_dpia.c \
-	dc_vm_helper.c
+SRCS+=	dc_vm_helper.c
 
 # display/dc/clk_mgr
 SRCS+=	rn_clk_mgr.c \
@@ -701,7 +729,7 @@ SRCS+=	rc_calc.c \
 .endif
 
 # display/dc/dml
-.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 SRCS+=	display_mode_lib.c \
 	display_mode_vba.c \
 	display_mode_vba_20.c \
@@ -769,6 +797,9 @@ SRCS+=	gpio_base.c \
 	hw_translate_dcn315.c \
 	hw_translate_dcn32.c
 
+# display/dc/hdcp
+SRCS+=	hdcp_msg.c \
+
 # display/dc/irq/*
 SRCS+=	irq_service.c \
 	irq_service_dce110.c \
@@ -783,10 +814,34 @@ SRCS+=	irq_service.c \
 	irq_service_dcn32.c
 
 # display/dc/link/*
-SRCS+=	link_dp_trace.c \
+SRCS+=	link_ddc.c \
+	link_detection.c \
+	link_dp_capability.c \
+	link_dp_cts.c \
+	link_dp_dpia.c \
+	link_dp_dpia_bw.c \
+	link_dp_irq_handler.c \
+	link_dp_phy.c \
+	link_dp_trace.c \
+	link_dp_training.c \
+	link_dp_training_128b_132b.c \
+	link_dp_training_8b_10b.c \
+	link_dp_training_auxless.c \
+	link_dp_training_dpia.c \
+	link_dp_training_fixed_vs_pe_retimer.c \
+	link_dpcd.c \
+	link_dpms.c \
+	link_edp_panel_control.c \
+	link_factory.c \
+	link_fpga.c \
+	link_hpd.c \
 	link_hwss_dio.c \
+	link_hwss_dio_fixed_vs_pe_retimer.c \
 	link_hwss_dpia.c \
-	link_hwss_hpo_dp.c
+	link_hwss_hpo_dp.c \
+	link_hwss_hpo_fixed_vs_pe_retimer_dp.c \
+	link_resource.c \
+	link_validation.c
 
 # display/dc/virtual
 SRCS+=	virtual_link_encoder.c \
@@ -797,6 +852,14 @@ SRCS+=	virtual_link_encoder.c \
 SRCS+=	color_gamma.c \
 	color_table.c \
 	freesync.c \
+	hdcp.c \
+	hdcp_ddc.c \
+	hdcp_log.c \
+	hdcp_psp.c \
+	hdcp1_execution.c \
+	hdcp1_transition.c \
+	hdcp2_execution.c \
+	hdcp2_transition.c \
 	info_packet.c \
 	power_helpers.c
 
@@ -808,6 +871,7 @@ SRCS+=	dc_helper.c \
 # display/dmub/src
 SRCS+=	dmub_dcn20.c \
 	dmub_dcn21.c \
+	dmub_dcn314.c \
 	dmub_dcn315.c \
 	dmub_dcn316.c \
 	dmub_dcn32.c \
@@ -824,7 +888,7 @@ SRCS+=	amdgpu_acpi.c
 .else
 .endif
 
-.if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 SRCS+=	dcn_calc_auto.c \
 	dcn_calc_math.c \
 	dcn_calcs.c
@@ -878,6 +942,7 @@ SRCS+=	amd_powerplay.c \
 	smu_v13_0_0_ppt.c \
 	smu_v13_0_4_ppt.c \
 	smu_v13_0_5_ppt.c \
+	smu_v13_0_6_ppt.c \
 	smu_v13_0_7_ppt.c \
 	smu_helper.c \
 	smumgr.c \
@@ -932,6 +997,7 @@ CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
 CFLAGS+= -I${SRCDIR}/display/dmub/inc
 CFLAGS+= -I${SRCDIR}/display/include
+CFLAGS+= -I${SRCDIR}/display/modules/hdcp
 CFLAGS+= -I${SRCDIR}/display/modules/inc
 CFLAGS+= -I${SRCDIR}/include
 CFLAGS+= -I${SRCDIR}/include/asic_reg
@@ -979,6 +1045,7 @@ CFLAGS.dcn301_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn303_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn314_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource_helpers.c= ${FPUFLAGS} -mstack-alignment=4
@@ -1018,6 +1085,7 @@ CWARNFLAGS+=	-Wno-pointer-arith -Wno-format -Wno-cast-qual
 CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
 
 # amdgpu/
+CWARNFLAGS.amdgpu_acpi.c=			-Wno-missing-prototypes -Wno-incompatible-pointer-types
 CWARNFLAGS.amdgpu_atpx_handler.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_bo_list.c=			-Wno-unused-but-set-variable -Wno-tautological-constant-out-of-range-compare
 CWARNFLAGS.amdgpu_csa.c=			-Wno-unused-but-set-variable
@@ -1025,22 +1093,26 @@ CWARNFLAGS.amdgpu_device.c=			-Wno-missing-prototypes -Wno-unused-but-set-variab
 CWARNFLAGS.amdgpu_discovery.c=			-Wno-unused-function
 CWARNFLAGS.amdgpu_dm_debugfs.c=			-Wno-pointer-bool-conversion -Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_fence.c=			-Wno-unused-variable
+CWARNFLAGS.amdgpu_gfx.c=			-Wno-unused-but-set-variable -Wno-tautological-overlap-compare
 CWARNFLAGS.amdgpu_ioc32.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_pm.c=				-Wno-unused-const-variable
 CWARNFLAGS.amdgpu_fw_attestation.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_securedisplay.c=		-Wno-unused-const-variable
 CWARNFLAGS.amdgpu_kms.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_mes.c=			-Wno-unused-but-set-variable
-CWARNFLAGS.amdgpu_psp.c=			-Wno-missing-prototypes
+CWARNFLAGS.amdgpu_psp.c=			-Wno-missing-prototypes -Wno-unused-variable
 CWARNFLAGS.amdgpu_ras.c=			-Wno-missing-prototypes -Wno-unused-function -Wno-undefined-inline
+CWARNFLAGS.amdgpu_ring_mux.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_sched.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_ttm.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_ucode.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_virt.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_vram_mgr.c=			-Wno-unused-variable
+CWARNFLAGS.amdgpu_xgmi.c=			-Wno-unused-variable
 CWARNFLAGS.aldebaran_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.aldebaran.c=				-Wno-unused-variable
 CWARNFLAGS.arcturus_ppt.c=			-Wno-uninitialized
+CWARNFLAGS.aqua_vanjaram_reg_init.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-unused-function
 CWARNFLAGS.dimgrey_cavefish_reg_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.yellow_carp_ppt.c=			-Wno-sometimes-uninitialized
 CWARNFLAGS.atombios_encoders.c=			-Wno-unused-but-set-variable
@@ -1050,16 +1122,22 @@ CWARNFLAGS.gmc_v9_0.c=				-Wno-initializer-overrides
 CWARNFLAGS.gfx_v7_0.c=				-Wno-unused-const-variable
 CWARNFLAGS.gfx_v9_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.gfx_v9_4_2.c=			-Wno-missing-prototypes
-CWARNFLAGS.gfx_v10_0.c=				-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-sometimes-uninitialized
+CWARNFLAGS.gfx_v9_4_3.c=			-Wno-unused-but-set-variable -Wno-sometimes-uninitialized -Wno-unused-function -Wno-unused-const-variable
+CWARNFLAGS.gfx_v10_0.c=				-Wno-unused-variable
 CWARNFLAGS.gfx_v11_0.c=				-Wno-sometimes-uninitialized
+CWARNFLAGS.gfxhub_v1_2.c=			-Wno-sometimes-uninitialized
 CWARNFLAGS.jpeg_v2_5.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.jpeg_v3_0.c=				-Wno-unused-but-set-variable
+CWARNFLAGS.jpeg_v4_0_3.c=			-Wno-uninitialized -Wno-unused-function
 CWARNFLAGS.imu_v11_0_3.c=			-Wno-missing-prototypes
 CWARNFLAGS.kv_dpm.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.mmhub_v1_7.c=			-Wno-missing-prototypes
+CWARNFLAGS.mmhub_v1_8.c=			-Wno-unused-function -Wno-unused-const-variable
 CWARNFLAGS.nv.c=				-Wno-unused-const-variable
+CWARNFLAGS.psp_v10_0.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.psp_v11_0.c=				-Wno-missing-prototypes
 CWARNFLAGS.sdma_v4_0.c=				-Wno-unused-but-set-variable
+CWARNFLAGS.sdma_v4_4_2.c=			-Wno-unused-but-set-variable -Wno-unused-function
 CWARNFLAGS.si_dma.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.si_dpm.c=				-Wno-gnu-variable-sized-type-not-at-end
 CWARNFLAGS.si_smc.c=				-Wno-gnu-variable-sized-type-not-at-end
@@ -1069,13 +1147,16 @@ CWARNFLAGS.smuio_v9_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.smuio_v11_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.smuio_v13_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.umc_v6_7.c=				-Wno-unused-function
+CWARNFLAGS.umc_v8_10.c=				-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.vangogh_ppt.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.vcn_sw_ring.c=			-Wno-missing-prototypes
 CWARNFLAGS.vcn_v3_0.c=				-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.vcn_v4_0.c=				-Wno-unused-but-set-variable
+CWARNFLAGS.vcn_v4_0_3.c=			-Wno-unused-function
 
 # display/amdgpu_dm
 CWARNFLAGS.amdgpu_dm_helpers.c=		-Wno-int-in-bool-context
-CWARNFLAGS.amdgpu_dm_mst_types.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.amdgpu_dm_mst_types.c=	-Wno-unused-but-set-variable -Wno-missing-prototypes
 CWARNFLAGS.amdgpu_dm_plane.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_dm_pp_smu.c=		-Wno-missing-prototypes -Wno-incompatible-function-pointer-types
 CWARNFLAGS.amdgpu_dm_psr.c=		-Wno-unused-but-set-variable
@@ -1090,13 +1171,12 @@ CWARNFLAGS.fixpt31_32.c=		-Wno-incompatible-pointer-types
 CWARNFLAGS.vector.c=			-Wno-missing-prototypes
 CWARNFLAGS.bios_parser.c=		-Wno-missing-prototypes
 CWARNFLAGS.bios_parser2.c=		-Wno-unused-but-set-variable
-CWARNFLAGS.dc.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.dc.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-unused-variable
 CWARNFLAGS.dc_hw_sequencer.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_link.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_link_ddc.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dc_link_enc_cfg.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dc_link_dp.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
-CWARNFLAGS.dc_link_dpia.c=		-Wno-sometimes-uninitialized -Wno-unused-but-set-variable -Wno-unused-variable
 CWARNFLAGS.dc_resource.c=		-Wno-missing-prototypes
 CWARNFLAGS.dc_stat.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dce_aux.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
@@ -1136,7 +1216,7 @@ CWARNFLAGS.dcn10_link_encoder.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.dcn10_stream_encoder.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.dcn10_opp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn10_optc.c=		-Wno-missing-prototypes
-CWARNFLAGS.dcn10_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
+CWARNFLAGS.dcn10_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn20_dpp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn20_dwb_scl.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn20_hwseq.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
@@ -1153,11 +1233,11 @@ CWARNFLAGS.dcn201_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn201_hwseq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn201_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn201_link_encoder.c=	-Wno-missing-prototypes
-CWARNFLAGS.dcn201_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
+CWARNFLAGS.dcn201_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn21_dccg.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_hubp.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn21_hubbub.c=		-Wno-missing-prototypes
-CWARNFLAGS.dcn21_hwseq.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.dcn21_hwseq.c=		-Wno-unused-variable
 CWARNFLAGS.dcn21_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn21_link_encoder.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn21_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-variable
@@ -1167,28 +1247,30 @@ CWARNFLAGS.dcn30_mpc.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn30_mmhubbub.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn30_dio_stream_encoder.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn30_hwseq.c=		-Wno-unused-but-set-variable
-CWARNFLAGS.dcn30_resource.c=		-Wno-initializer-overrides -Wno-missing-prototypes
+CWARNFLAGS.dcn30_optc.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn30_resource.c=		-Wno-initializer-overrides -Wno-missing-prototypes -Wno-unused-const-variable
 CWARNFLAGS.dcn30_afmt.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn30_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn301_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn301_panel_cntl.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
-CWARNFLAGS.dcn301_resource.c=		-Wno-initializer-overrides -Wno-missing-prototypes
+CWARNFLAGS.dcn301_resource.c=		-Wno-initializer-overrides -Wno-missing-prototypes -Wno-unused-const-variable
 CWARNFLAGS.dcn301_smu.c=		-Wno-missing-prototypes
 CWARNFLAGS.vg_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types
 CWARNFLAGS.dcn302_init.c=		-Wno-missing-prototypes
-CWARNFLAGS.dcn302_resource.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn302_resource.c=		-Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn303_init.c=		-Wno-missing-prototypes
-CWARNFLAGS.dcn303_resource.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn303_resource.c=		-Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn31_apg.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dcn31_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types -Wno-unused-but-set-variable
 CWARNFLAGS.dcn31_dccg.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn31_dio_link_encoder.c=	-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn31_hpo_dp_stream_encoder.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.dcn31_hubbub.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn31_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn31_hwseq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn31_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn31_panel_cntl.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
-CWARNFLAGS.dcn31_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
+CWARNFLAGS.dcn31_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn31_smu.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn314_clk_mgr.c=		-Wno-incompatible-pointer-types
 CWARNFLAGS.dcn314_dccg.c=		-Wno-missing-prototypes
@@ -1196,10 +1278,10 @@ CWARNFLAGS.dcn314_dio_stream_encoder.c=	-Wno-missing-prototypes
 CWARNFLAGS.dcn314_optc.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dcn314_resource.c=		-Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn315_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types -Wno-unused-but-set-variable
-CWARNFLAGS.dcn315_resource.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn315_resource.c=		-Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn315_smu.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn316_clk_mgr.c=		-Wno-missing-prototypes -Wno-incompatible-pointer-types -Wno-unused-but-set-variable
-CWARNFLAGS.dcn316_resource.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn316_resource.c=		-Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn316_smu.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn32_clk_mgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn32_dccg.c=		-Wno-missing-prototypes
@@ -1209,6 +1291,7 @@ CWARNFLAGS.dcn32_dpp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn32_fpu.c=			-Wno-unused-but-set-variable -Wno-missing-prototypes
 CWARNFLAGS.dcn32_hwseq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn32_hubbub.c=		-Wno-missing-prototypes
+CWARNFLAGS.dcn32_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn32_hwseq.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn32_init.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn32_mmhubbub.c=		-Wno-missing-prototypes
@@ -1233,12 +1316,19 @@ CWARNFLAGS.irq_service_dcn21.c=		-Wno-missing-prototypes -Wno-unused-const-varia
 CWARNFLAGS.irq_service_dcn30.c=		-Wno-missing-prototypes -Wno-unused-const-variable
 CWARNFLAGS.irq_service_dcn31.c=		-Wno-missing-prototypes
 CWARNFLAGS.irq_service_dcn315.c=	-Wno-missing-prototypes
+CWARNFLAGS.link_detection.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.link_dp_capability.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.link_dp_dpia_bw.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.link_dp_trace.c=		-Wno-missing-prototypes
+CWARNFLAGS.link_dp_training.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.link_validation.c=		-Wno-missing-prototypes
 CWARNFLAGS.power_helpers.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dc_helper.c=			-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn_calcs.c+=		-Wno-missing-prototypes
 CWARNFLAGS.dc_dmub_srv.c=		-Wno-unused-but-set-variable -Wno-missing-prototypes
 CWARNFLAGS.dmub_psr.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.dmub_abm.c=			-Wno-unused-but-set-variable
+CWARNFLAGS.dmub_abm_lcd.c=		-Wno-missing-prototypes
 CWARNFLAGS.dmub_hw_lock_mgr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.virtual_link_hwss.c=		-Wno-missing-prototypes
 
@@ -1259,6 +1349,8 @@ CWARNFLAGS.dmub_srv_stat.c=		-Wno-unused-but-set-variable
 
 # display/dc/dml/
 CWARNFLAGS.display_mode_vba_30.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.display_mode_vba_31.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.display_mode_vba_314.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.display_mode_vba_32.c=	-Wno-enum-conversion -Wno-unused-const-variable
 CWARNFLAGS.display_mode_vba_util_32.c=	-Wno-enum-conversion -Wno-missing-prototypes -Wno-unused-local-typedef
 CWARNFLAGS.display_rq_dlg_calc_314.c=	-Wno-unused-but-set-variable
@@ -1277,6 +1369,9 @@ CWARNFLAGS.smu7_hwmgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu8_hwmgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu9_smumgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.smu_cmn.c=			-Wno-implicit-function-declaration -Wno-sometimes-uninitialized
+CWARNFLAGS.smu_v13_0_0_ppt.c=		-Wno-unused-variable
+CWARNFLAGS.smu_v13_0_6_ppt.c=		-Wno-missing-prototypes -Wno-initializer-overrides
+CWARNFLAGS.smu_v13_0_7_ppt.c=		-Wno-unused-variable
 CWARNFLAGS.tonga_smumgr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.vega10_hwmgr.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.vega10_processpptables.c=	-Wno-missing-prototypes

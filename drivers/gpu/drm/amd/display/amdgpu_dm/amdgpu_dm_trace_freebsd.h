@@ -11,6 +11,7 @@
 #include <drm/drm_atomic.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_os_freebsd.h>	/* KTR_DRM */
+#include "dcn10/dcn10_optc.h"
 
 #include "dc/inc/core_types.h"
 
@@ -618,6 +619,62 @@ trace_dcn_fpu(bool begin, const char *function, const int line, const int recurs
 	    "dcn_fpu "
 	    "%s: recursion_depth: %d: %s()+%d:",
 	    begin ? "begin" : "end", recursion_depth, function, line);
+}
+
+/* TRACE_EVENT(dcn_optc_lock_unlock_state, */
+/*            TP_PROTO(const struct optc *optc_state, int instance, bool lock, const char *function, const int line), */
+
+static inline void
+trace_dcn_optc_lock_unlock_state(const struct optc *optc_state, int instance,
+    bool lock, const char *function, const int line)
+{
+#ifdef KTR
+	int opp_count;
+	int max_h_total;
+	int max_v_total;
+	int min_h_blank;
+	int min_h_sync_width;
+	int min_v_sync_width;
+	int min_v_blank;
+	int min_v_blank_interlace;
+	int vstartup_start;
+	int vupdate_offset;
+	int vupdate_width;
+	int vready_offset;
+
+	opp_count = optc_state->opp_count;
+	max_h_total = optc_state->max_h_total;
+	max_v_total = optc_state->max_v_total;
+	min_h_blank = optc_state->min_h_blank;
+	min_h_sync_width = optc_state->min_h_sync_width;
+	min_v_sync_width = optc_state->min_v_sync_width;
+	min_v_blank = optc_state->min_v_blank;
+	min_v_blank_interlace = optc_state->min_v_blank_interlace;
+	vstartup_start = optc_state->vstartup_start;
+	vupdate_offset = optc_state->vupdate_offset;
+	vupdate_width = optc_state->vupdate_width;
+	vready_offset = optc_state->vupdate_offset;
+#endif
+  
+	CTR5(KTR_DRM,
+	    "dcn_optc_lock_unlock_state[1/4] "
+	    "%s: %s()+%d: optc_instance=%d opp_count=%d",
+	    lock ? "Lock" : "Unlock", function, line, instance, opp_count);
+	CTR5(KTR_DRM,
+	    "dcn_optc_lock_unlock_state[2/4] "
+	    "max_h_total=%d max_v_total=%d min_h_blank=%d min_h_sync_width=%d "
+	    "min_v_sync_width=%d",
+	    max_h_total, max_v_total, min_h_blank, min_h_sync_width,
+	    min_v_sync_width);
+	CTR5(KTR_DRM,
+	    "dcn_optc_lock_unlock_state[3/4] "
+	    "min_v_blank=%d min_v_blank_interlace=%d vstartup_start=%d "
+	    "vupdate_offset=%d vupdate_width=%d",
+	    min_v_blank, min_v_blank_interlace, vstartup_start, vupdate_offset,
+	    vupdate_width);
+	CTR1(KTR_DRM,
+	    "dcn_optc_lock_unlock_state[4/4] "
+	    "vready_offset=%d", vready_offset);
 }
 
 #endif /* _AMDGPU_DM_TRACE_FREEBSD_H_ */
