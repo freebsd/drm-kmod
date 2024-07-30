@@ -1722,6 +1722,7 @@ CWARNFLAGS.smu_cmn.c=			-Wno-implicit-function-declaration -Wno-sometimes-uninit
 CWARNFLAGS.smu_v13_0_0_ppt.c=		-Wno-unused-variable
 CWARNFLAGS.smu_v13_0_6_ppt.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.smu_v13_0_7_ppt.c=		-Wno-unused-variable
+CWARNFLAGS.smu_v14_0_2_ppt.c=		-Wno-unused-variable
 CWARNFLAGS.tonga_smumgr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.vega10_hwmgr.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.vega10_processpptables.c=	-Wno-missing-prototypes
