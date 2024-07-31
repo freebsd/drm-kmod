@@ -456,7 +456,7 @@ void intel_backlight_disable(const struct drm_connector_state *old_conn_state)
 
 #ifdef __linux__
 	if (panel->backlight.device)
-		panel->backlight.device->props.power = FB_BLANK_POWERDOWN;
+		panel->backlight.device->props.power = BACKLIGHT_POWER_OFF;
 #endif
 	panel->backlight.enabled = false;
 	panel->backlight.funcs->disable(old_conn_state, 0);
@@ -776,7 +776,7 @@ static void __intel_backlight_enable(const struct intel_crtc_state *crtc_state,
 	panel->backlight.enabled = true;
 #ifdef __linux__
 	if (panel->backlight.device)
-		panel->backlight.device->props.power = FB_BLANK_UNBLANK;
+		panel->backlight.device->props.power = BACKLIGHT_POWER_ON;
 #endif
 }
 
@@ -875,7 +875,7 @@ static int intel_backlight_device_update_status(struct backlight_device *bd)
 	if (panel->backlight.enabled) {
 		if (panel->backlight.power) {
 #ifdef __linux__
-			bool enable = bd->props.power == FB_BLANK_UNBLANK &&
+			bool enable = bd->props.power == BACKLIGHT_POWER_ON &&
 				bd->props.brightness != 0;
 #elif defined(__FreeBSD__)
 			bool enable = bd->props.brightness != 0;
@@ -884,7 +884,7 @@ static int intel_backlight_device_update_status(struct backlight_device *bd)
 		}
 	} else {
 #ifdef __linux__
-		bd->props.power = FB_BLANK_POWERDOWN;
+		bd->props.power = BACKLIGHT_POWER_OFF;
 #endif
 	}
 
@@ -956,9 +956,9 @@ int intel_backlight_device_register(struct intel_connector *connector)
 
 #ifdef __linux__
 	if (panel->backlight.enabled)
-		props.power = FB_BLANK_UNBLANK;
+		props.power = BACKLIGHT_POWER_ON;
 	else
-		props.power = FB_BLANK_POWERDOWN;
+		props.power = BACKLIGHT_POWER_OFF;
 #endif
 
 	name = kstrdup_const("intel_backlight", GFP_KERNEL);
