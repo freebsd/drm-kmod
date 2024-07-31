@@ -216,7 +216,7 @@ void amdgpu_atombios_encoder_init_backlight(struct amdgpu_encoder *amdgpu_encode
 
 	bd->props.brightness = amdgpu_atombios_encoder_get_backlight_brightness(bd);
 #ifdef __linux__
-	bd->props.power = FB_BLANK_UNBLANK;
+	bd->props.power = BACKLIGHT_POWER_ON;
 #endif
 	backlight_update_status(bd);
 
