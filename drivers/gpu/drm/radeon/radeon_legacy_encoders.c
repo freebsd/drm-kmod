@@ -451,7 +451,7 @@ void radeon_legacy_backlight_init(struct radeon_encoder *radeon_encoder,
 
 	bd->props.brightness = radeon_legacy_backlight_get_brightness(bd);
 #ifdef __linux__
-	bd->props.power = FB_BLANK_UNBLANK;
+	bd->props.power = BACKLIGHT_POWER_ON;
 #endif
 	backlight_update_status(bd);
 

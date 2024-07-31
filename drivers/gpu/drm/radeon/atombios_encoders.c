@@ -250,7 +250,7 @@ void radeon_atom_backlight_init(struct radeon_encoder *radeon_encoder,
 	if (bd->props.brightness == 0)
 		bd->props.brightness = RADEON_MAX_BL_LEVEL;
 #ifdef __linux__
-	bd->props.power = FB_BLANK_UNBLANK;
+	bd->props.power = BACKLIGHT_POWER_ON;
 #endif
 	backlight_update_status(bd);
 
