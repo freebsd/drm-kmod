@@ -116,6 +116,10 @@ int drm_atomic_helper_dirtyfb(struct drm_framebuffer *fb,
 	struct drm_plane *plane;
 	int ret = 0;
 
+#ifdef __FreeBSD__
+	if (kdb_active || KERNEL_PANICKED())
+		return 0;
+#endif
 	/*
 	 * When called from ioctl, we are interruptible, but not when called
 	 * internally (ie. defio worker)
