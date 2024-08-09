@@ -442,6 +442,7 @@ static int i915_pcode_init(struct drm_i915_private *i915)
  */
 static int i915_driver_hw_probe(struct drm_i915_private *dev_priv)
 {
+	struct intel_display *display = &dev_priv->display;
 	struct pci_dev *pdev = to_pci_dev(dev_priv->drm.dev);
 	int ret;
 
@@ -542,7 +543,7 @@ static int i915_driver_hw_probe(struct drm_i915_private *dev_priv)
 	if (ret)
 		goto err_msi;
 
-	intel_opregion_setup(dev_priv);
+	intel_opregion_setup(display);
 
 	ret = i915_pcode_init(dev_priv);
 	if (ret)
@@ -559,7 +560,7 @@ static int i915_driver_hw_probe(struct drm_i915_private *dev_priv)
 	return 0;
 
 err_opregion:
-	intel_opregion_cleanup(dev_priv);
+	intel_opregion_cleanup(display);
 err_msi:
 	if (pdev->msi_enabled)
 		pci_disable_msi(pdev);
@@ -580,11 +581,12 @@ err_perf:
  */
 static void i915_driver_hw_remove(struct drm_i915_private *dev_priv)
 {
+	struct intel_display *display = &dev_priv->display;
 	struct pci_dev *pdev = to_pci_dev(dev_priv->drm.dev);
 
 	i915_perf_fini(dev_priv);
 
-	intel_opregion_cleanup(dev_priv);
+	intel_opregion_cleanup(display);
 
 	if (pdev->msi_enabled)
 		pci_disable_msi(pdev);
@@ -1018,6 +1020,7 @@ static int i915_drm_prepare(struct drm_device *dev)
 static int i915_drm_suspend(struct drm_device *dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
+	struct intel_display *display = &dev_priv->display;
 	struct pci_dev *pdev = to_pci_dev(dev_priv->drm.dev);
 	pci_power_t opregion_target_state;
 
@@ -1053,7 +1056,7 @@ static int i915_drm_suspend(struct drm_device *dev)
 	i915_save_display(dev_priv);
 
 	opregion_target_state = suspend_to_idle(dev_priv) ? PCI_D1 : PCI_D3cold;
-	intel_opregion_suspend(dev_priv, opregion_target_state);
+	intel_opregion_suspend(display, opregion_target_state);
 
 	dev_priv->suspend_count++;
 
@@ -1142,6 +1145,7 @@ int i915_driver_suspend_switcheroo(struct drm_i915_private *i915,
 static int i915_drm_resume(struct drm_device *dev)
 {
 	struct drm_i915_private *dev_priv = to_i915(dev);
+	struct intel_display *display = &dev_priv->display;
 	struct intel_gt *gt;
 	int ret, i;
 
@@ -1209,7 +1213,7 @@ static int i915_drm_resume(struct drm_device *dev)
 	}
 	intel_hpd_poll_disable(dev_priv);
 
-	intel_opregion_resume(dev_priv);
+	intel_opregion_resume(display);
 
 	intel_fbdev_set_suspend(dev, FBINFO_STATE_RUNNING, false);
 
@@ -1458,6 +1462,7 @@ static int i915_pm_restore(struct device *kdev)
 static int intel_runtime_suspend(struct device *kdev)
 {
 	struct drm_i915_private *dev_priv = kdev_to_i915(kdev);
+	struct intel_display *display = &dev_priv->display;
 	struct intel_runtime_pm *rpm = &dev_priv->runtime_pm;
 #ifdef __linux__
 	struct pci_dev *pdev = to_pci_dev(dev_priv->drm.dev);
@@ -1536,7 +1541,7 @@ static int intel_runtime_suspend(struct device *kdev)
 		 * won't be able to restore them. Since PCI_D3hot matches the
 		 * actual specification and appears to be working, use it.
 		 */
-		intel_opregion_notify_adapter(dev_priv, PCI_D3hot);
+		intel_opregion_notify_adapter(display, PCI_D3hot);
 	} else {
 		/*
 		 * current versions of firmware which depend on this opregion
@@ -1545,7 +1550,7 @@ static int intel_runtime_suspend(struct device *kdev)
 		 * to distinguish it from notifications that might be sent via
 		 * the suspend path.
 		 */
-		intel_opregion_notify_adapter(dev_priv, PCI_D1);
+		intel_opregion_notify_adapter(display, PCI_D1);
 	}
 
 	assert_forcewakes_inactive(&dev_priv->uncore);
@@ -1560,6 +1565,7 @@ static int intel_runtime_suspend(struct device *kdev)
 static int intel_runtime_resume(struct device *kdev)
 {
 	struct drm_i915_private *dev_priv = kdev_to_i915(kdev);
+	struct intel_display *display = &dev_priv->display;
 	struct intel_runtime_pm *rpm = &dev_priv->runtime_pm;
 #ifdef __linux__
 	struct pci_dev *pdev = to_pci_dev(dev_priv->drm.dev);
@@ -1576,7 +1582,7 @@ static int intel_runtime_resume(struct device *kdev)
 	drm_WARN_ON_ONCE(&dev_priv->drm, atomic_read(&rpm->wakeref_count));
 	disable_rpm_wakeref_asserts(rpm);
 
-	intel_opregion_notify_adapter(dev_priv, PCI_D0);
+	intel_opregion_notify_adapter(display, PCI_D0);
 
 #ifdef __linux__
 	root_pdev = pcie_find_root_port(pdev);
