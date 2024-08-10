@@ -20,7 +20,6 @@ SUPPORTED_ARCH=	amd64 \
 DEFAULT_KMODS=	dmabuf		\
 		ttm		\
 		drm		\
-		linuxkpi_video	\
 		amd		\
 		radeon
 
@@ -30,6 +29,10 @@ DEFAULT_KMODS+=	i915
 
 .if defined(DUMMYGFX)
 _dummygfx = dummygfx
+.endif
+
+.if defined(DEVELOPER)
+DEFAULT_KMODS+=	linuxkpi_video
 .endif
 
 # Calling kldxref(8) for each module is expensive.
