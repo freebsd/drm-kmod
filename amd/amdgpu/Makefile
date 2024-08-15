@@ -999,7 +999,7 @@ SRCS+=	display_mode_core.c \
 	dml2_core_dcn4.c \
 	dml2_core_factory.c \
 	dml2_core_dcn4_calcs.c \
-	dml2_core_shared.c \
+	dml2_core_utils.c \
 	dml2_dc_resource_mgmt.c \
 	dml2_debug.c \
 	dml2_dpmm_dcn4.c \
@@ -1381,6 +1381,7 @@ CFLAGS.dml_top_mcache.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_core_dcn4.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_core_dcn4_calcs.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_core_shared.c = ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dml2_core_utils.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_dc_resource_mgmt.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.dml2_dpmm_dcn4.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_mall_phantom.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
