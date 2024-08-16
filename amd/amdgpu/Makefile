@@ -1110,10 +1110,12 @@ SRCS+=	link_ddc.c \
 
 # display/dc/spl
 SRCS+=	dc_spl.c \
+	dc_spl_filters.c \
 	dc_spl_isharp_filters.c \
+	dc_spl_scl_easf_filters.c \
 	dc_spl_scl_filters.c \
-	dc_spl_scl_filters_old.c \
-	dc_spl_translate.c
+	dc_spl_translate.c \
+	spl_fixpt31_32.c
 
 # display/dc/virtual
 SRCS+=	virtual_link_encoder.c \
