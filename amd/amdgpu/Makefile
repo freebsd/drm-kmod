@@ -5,6 +5,13 @@ DRM= ${.CURDIR:H:H}/drivers/gpu/drm
 
 KMOD=	amdgpu
 
+#
+# Work around ctfmerge(1) segfaults with recent amdgpu.ko
+#
+# https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=276828
+#
+MK_CTF=	no
+
 .include "../../kconfig.mk"
 .include "../../linuxkpi_version.mk"
 
