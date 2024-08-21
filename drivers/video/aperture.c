@@ -294,7 +294,7 @@ int aperture_remove_conflicting_devices(resource_size_t base, resource_size_t si
 	 * was already probed and prevent sysfb to register devices later.
 	 */
 #ifdef __linux__
-	sysfb_disable();
+	sysfb_disable(NULL);
 #endif
 
 	aperture_detach_devices(base, size);
@@ -352,16 +352,11 @@ EXPORT_SYMBOL(__aperture_remove_legacy_vga_devices);
  */
 int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *name)
 {
-	bool primary = false;
 	resource_size_t base, size;
 	int bar, ret = 0;
 
 #ifdef __linux__
-	if (pdev == vga_default_device())
-		primary = true;
-
-	if (primary)
-		sysfb_disable();
+	sysfb_disable(&pdev->dev);
 #endif
 
 	for (bar = 0; bar < PCI_STD_NUM_BARS; ++bar) {
@@ -378,7 +373,7 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 	 * that consumes the VGA framebuffer I/O range. Remove this
 	 * device as well.
 	 */
-	if (primary)
+	if (pdev == vga_default_device())
 		ret = __aperture_remove_legacy_vga_devices(pdev);
 
 	return ret;
