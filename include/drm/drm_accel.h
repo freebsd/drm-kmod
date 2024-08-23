@@ -30,6 +30,8 @@
 
 #include <drm/drm_file.h>
 
+#define	ACCEL_MAX_MINORS	256
+
 static inline void
 accel_core_exit(void)
 {
