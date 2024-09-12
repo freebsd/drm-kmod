@@ -350,8 +350,6 @@ struct drm_i915_private {
 
 	struct intel_pxp *pxp;
 
-	bool irq_enabled;
-
 	struct i915_pmu pmu;
 
 	/* The TTM device structure. */
