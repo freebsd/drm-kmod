@@ -9,7 +9,7 @@
 #include <linux/errno.h>
 #include <linux/types.h>
 
-struct drm_i915_gem_object;
+struct drm_gem_object;
 struct drm_i915_private;
 struct intel_pxp;
 
@@ -33,7 +33,7 @@ int intel_pxp_start(struct intel_pxp *pxp);
 void intel_pxp_end(struct intel_pxp *pxp);
 
 int intel_pxp_key_check(struct intel_pxp *pxp,
-			struct drm_i915_gem_object *obj,
+			struct drm_gem_object *obj,
 			bool assign);
 
 void intel_pxp_invalidate(struct intel_pxp *pxp);
@@ -74,7 +74,7 @@ static inline int intel_pxp_get_readiness_status(struct intel_pxp *pxp,
 }
 
 static inline int intel_pxp_key_check(struct intel_pxp *pxp,
-				      struct drm_i915_gem_object *obj,
+				      struct drm_gem_object *obj,
 				      bool assign)
 {
 	return -ENODEV;
