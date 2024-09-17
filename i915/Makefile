@@ -55,6 +55,7 @@ SRCS=	\
 	intel_atomic.c \
 	intel_atomic_plane.c \
 	intel_audio.c \
+	intel_bo.c \
 	intel_bw.c \
 	intel_bios.c \
 	intel_cdclk.c \
