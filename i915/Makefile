@@ -170,6 +170,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_pmdemand.c \
 	intel_pps.c \
 	intel_qp_tables.c \
+	intel_rom.c \
 	intel_sdvo.c \
 	intel_sprite_uapi.c \
 	intel_tc.c \
