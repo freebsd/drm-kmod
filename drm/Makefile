@@ -78,6 +78,7 @@ SRCS+=	drm_writeback.c
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
 SRCS+=	drm_fb_helper.c \
+	drm_fbdev_client.c \
 	drm_fbdev_ttm.c
 .endif
 
