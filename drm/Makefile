@@ -31,6 +31,7 @@ SRCS=	drm_atomic.c \
 	drm_eld.c \
 	drm_displayid.c \
 	drm_encoder.c \
+	drm_fbdev_client.c \
 	drm_file.c \
 	drm_flip_work.c \
 	drm_fourcc.c \
