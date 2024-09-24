@@ -136,6 +136,10 @@ SRCS+=	drm_exec.c
 SRCS+=	drm_panic.c
 .endif
 
+.if !empty(KCONFIG:MDRM_CLIENT_SETUP)
+SRCS+= drm_client_setup.c
+.endif
+
 SRCS+=	device_if.h \
 	vnode_if.h \
 	bus_if.h \
