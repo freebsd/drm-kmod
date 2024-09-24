@@ -182,6 +182,7 @@ CWARNFLAGS.drm_dp_mst_topology.c+=		-Wno-missing-prototypes
 CWARNFLAGS.drm_dp_tunnel.c+=			-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.drm_drv.c+=				-Wno-unused-variable
 CWARNFLAGS.drm_edid.c+=				-Wno-cast-qual
+CWARNFLAGS.drm_fb_helper.c+=			-Wno-unused-variable
 CWARNFLAGS.drm_file.c+=				-Wno-unused-but-set-variable
 CWARNFLAGS.drm_file.c+=				-Wno-unused-value
 CWARNFLAGS.drm_gem_atomic_helper.c+=		-Wno-missing-prototypes
