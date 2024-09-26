@@ -1243,9 +1243,9 @@ static bool smu_is_workload_profile_available(struct smu_context *smu,
 	return smu->workload_map && smu->workload_map[profile].valid_mapping;
 }
 
-static int smu_sw_init(void *handle)
+static int smu_sw_init(struct amdgpu_ip_block *ip_block)
 {
-	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
+	struct amdgpu_device *adev = ip_block->adev;
 	struct smu_context *smu = adev->powerplay.pp_handle;
 	int ret;
 
