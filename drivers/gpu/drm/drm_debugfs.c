@@ -82,12 +82,14 @@ static int drm_clients_info(struct seq_file *m, void *data)
 #endif
 
 	seq_printf(m,
-		   "%20s %5s %3s master a %5s %10s\n",
+		   "%20s %5s %3s master a %5s %10s %*s\n",
 		   "command",
 		   "tgid",
 		   "dev",
 		   "uid",
-		   "magic");
+		   "magic",
+		   DRM_CLIENT_NAME_MAX_LEN,
+		   "name");
 
 	/* dev->filelist is sorted youngest first, but we want to present
 	 * oldest first (i.e. kernel, servers, clients), so walk backwardss.
@@ -102,6 +104,7 @@ static int drm_clients_info(struct seq_file *m, void *data)
 		pid_t pid;
 #endif
 
+		mutex_lock(&priv->client_name_lock);
 		rcu_read_lock(); /* Locks priv->pid and pid_task()->comm! */
 #ifdef __linux__
 		pid = rcu_dereference(priv->pid);
@@ -113,15 +116,18 @@ static int drm_clients_info(struct seq_file *m, void *data)
 		task = pid_task(pid, PIDTYPE_PID);
 		uid = task ? task_euid(task) : 0;
 #endif
-		seq_printf(m, "%20s %5d %3d   %c    %c %5d %10u\n",
+		seq_printf(m, "%20s %5d %3d   %c    %c %5d %10u %*s\n",
 			   task ? task->comm : "<unknown>",
 			   pid_vnr(pid),
 			   priv->minor->index,
 			   is_current_master ? 'y' : 'n',
 			   priv->authenticated ? 'y' : 'n',
 			   from_kuid_munged(seq_user_ns(m), uid),
-			   priv->magic);
+			   priv->magic,
+			   DRM_CLIENT_NAME_MAX_LEN,
+			   priv->client_name ? priv->client_name : "<unset>");
 		rcu_read_unlock();
+		mutex_unlock(&priv->client_name_lock);
 	}
 	mutex_unlock(&dev->filelist_mutex);
 	return 0;
