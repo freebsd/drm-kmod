@@ -1133,7 +1133,7 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 #elif defined(__FreeBSD__)
 	TAILQ_INIT(&dst->page_list);
 #endif
-	strcpy(dst->name, name);
+	strscpy(dst->name, name);
 	dst->next = NULL;
 
 	dst->gtt_offset = vma_res->start;
@@ -1440,7 +1440,7 @@ static bool record_context(struct i915_gem_context_coredump *e,
 	rcu_read_lock();
 	task = pid_task(ctx->pid, PIDTYPE_PID);
 	if (task) {
-		strcpy(e->comm, task->comm);
+		strscpy(e->comm, task->comm);
 		e->pid = task->pid;
 	}
 	rcu_read_unlock();
@@ -1486,7 +1486,7 @@ capture_vma_snapshot(struct intel_engine_capture_vma *next,
 		return next;
 	}
 
-	strcpy(c->name, name);
+	strscpy(c->name, name);
 	c->vma_res = i915_vma_resource_get(vma_res);
 
 	c->next = next;
