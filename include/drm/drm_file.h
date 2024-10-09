@@ -404,7 +404,10 @@ struct drm_file {
 	 * Userspace-provided name; useful for accounting and debugging.
 	 */
 	const char *client_name;
-	/** @name_lock: Protects @client_name. */
+
+	/**
+	 * @client_name_lock: Protects @client_name.
+	 */
 	struct mutex client_name_lock;
 };
 
