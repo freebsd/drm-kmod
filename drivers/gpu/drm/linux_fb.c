@@ -434,7 +434,8 @@ cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 				byte = yi * bytes_per_img_line + xi / 8;
 				bit = 0x80 >> (xi % 8);
 				if (image->mask[byte] & bit) {
-					color = image->fg_color;
+					color = image->data[byte] & bit ?
+					    image->fg_color : image->bg_color;
 
 					fb_setpixel(info, x + xi, y + yi, color);
 				}
