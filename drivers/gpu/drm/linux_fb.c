@@ -395,11 +395,11 @@ cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 		return;
 
 	KASSERT(
-	    (image->depth == 1),
+	    (image->depth == 1 || image->depth == 32),
 	    ("`image->depth=%u` is unsupported in cfb_imageblit()",
 	     image->depth));
 
-	bytes_per_img_line = (image->width + 7) / 8;
+	bytes_per_img_line = (image->width * image->depth + 7) / 8;
 
 	x = image->dx;
 	y = image->dy;
@@ -417,29 +417,29 @@ cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 		height = info->var.yres - y;
 	}
 
-	if (image->mask == NULL) {
-		for (yi = 0; yi < height; ++yi) {
-			for (xi = 0; xi < width; ++xi) {
+	for (yi = 0; yi < height; ++yi) {
+		for (xi = 0; xi < width; ++xi) {
+			switch (image->depth) {
+			case 32:
+				byte = yi * bytes_per_img_line + xi * 4;
+				color = (image->data[byte] << 16) |
+					(image->data[byte + 1] << 8) |
+					(image->data[byte + 2]) |
+					(image->data[byte + 3] << 24);
+				break;
+			case 1:
 				byte = yi * bytes_per_img_line + xi / 8;
 				bit = 0x80 >> (xi % 8);
+				if (image->mask != NULL &&
+				    (image->mask[byte] & bit) == 0)
+					continue;
 				color = image->data[byte] & bit ?
 				    image->fg_color : image->bg_color;
-
-				fb_setpixel(info, x + xi, y + yi, color);
+				break;
+			default:
+				break;
 			}
-		}
-	} else {
-		for (yi = 0; yi < height; ++yi) {
-			for (xi = 0; xi < width; ++xi) {
-				byte = yi * bytes_per_img_line + xi / 8;
-				bit = 0x80 >> (xi % 8);
-				if (image->mask[byte] & bit) {
-					color = image->data[byte] & bit ?
-					    image->fg_color : image->bg_color;
-
-					fb_setpixel(info, x + xi, y + yi, color);
-				}
-			}
+			fb_setpixel(info, x + xi, y + yi, color);
 		}
 	}
 }
