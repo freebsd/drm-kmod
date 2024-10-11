@@ -65,6 +65,7 @@ vd_init_t		vt_drmfb_init;
 vd_fini_t		vt_drmfb_fini;
 vd_blank_t		vt_drmfb_blank;
 vd_bitblt_bmp_t		vt_drmfb_bitblt_bitmap;
+vd_bitblt_argb_t	vt_drmfb_bitblt_argb;
 vd_drawrect_t		vt_drmfb_drawrect;
 vd_setpixel_t		vt_drmfb_setpixel;
 vd_invalidate_text_t	vt_drmfb_invalidate_text;
@@ -85,6 +86,7 @@ static struct vt_driver vt_drmfb_driver = {
 	 * `vt_drmfb_bitblt_bitmap()` may sleep.
 	 */
 	.vd_bitblt_bmp = vt_drmfb_bitblt_bitmap,
+	.vd_bitblt_argb = vt_drmfb_bitblt_argb,
 	.vd_drawrect = vt_drmfb_drawrect,
 	.vd_setpixel = vt_drmfb_setpixel,
 	.vd_invalidate_text = vt_drmfb_invalidate_text,
@@ -204,6 +206,45 @@ vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
 		linux_set_current(curthread);
 
 	info->fbops->fb_imageblit(info, &image);
+}
+
+int
+vt_drmfb_bitblt_argb(struct vt_device *vd, const struct vt_window *vw,
+    const uint8_t *argb,
+    unsigned int width, unsigned int height,
+    unsigned int x, unsigned int y)
+{
+	struct fb_info *fbio;
+	struct linux_fb_info *info;
+	struct fb_image image;
+
+	fbio = vd->vd_softc;
+	info = to_linux_fb_info(fbio);
+	if (info->fbops->fb_imageblit == NULL)
+		return (ENOTSUP);
+
+	/* Bound by right and bottom edges. */
+	if (y + height > vw->vw_draw_area.tr_end.tp_row) {
+		if (y >= vw->vw_draw_area.tr_end.tp_row)
+			return (EINVAL);
+		height = vw->vw_draw_area.tr_end.tp_row - y;
+	}
+	if (x + width > vw->vw_draw_area.tr_end.tp_col) {
+		if (x >= vw->vw_draw_area.tr_end.tp_col)
+			return (EINVAL);
+		width = vw->vw_draw_area.tr_end.tp_col - x;
+	}
+
+	image.dx = x;
+	image.dy = y;
+	image.width = width;
+	image.height = height;
+	image.depth = 32;
+	image.data = argb;
+
+	info->fbops->fb_imageblit(info, &image);
+
+	return (0);
 }
 
 void
