@@ -403,7 +403,7 @@ cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 
 	x = image->dx;
 	y = image->dy;
-	width = image->width;
+	width = image->vt_width == 0 ? image->width : image->vt_width;
 	height = image->height;
 
 	if (x + width > info->var.xres) {
