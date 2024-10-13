@@ -389,7 +389,7 @@ void
 cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 {
 	uint32_t x, y, width, height, xi, yi;
-	uint32_t bytes_per_img_line, bit, byte, color;
+	uint32_t bytes_per_img_line, bit, byte, color, line;
 
 	if (info->fbio.fb_flags & FB_FLAG_NOWRITE)
 		return;
@@ -417,19 +417,19 @@ cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 		height = info->var.yres - y;
 	}
 
-	for (yi = 0; yi < height; ++yi) {
+	for (yi = 0, line = 0; yi < height; ++yi, line += bytes_per_img_line) {
 		for (xi = 0; xi < width; ++xi) {
 			switch (image->depth) {
 			case 32:
-				byte = yi * bytes_per_img_line + xi * 4;
+				byte = line + (xi << 2);
 				color = (image->data[byte] << 16) |
 					(image->data[byte + 1] << 8) |
 					(image->data[byte + 2]) |
 					(image->data[byte + 3] << 24);
 				break;
 			case 1:
-				byte = yi * bytes_per_img_line + xi / 8;
-				bit = 0x80 >> (xi % 8);
+				byte = line + (xi >> 3);
+				bit = 0x80 >> (xi & 0x07);
 				if (image->mask != NULL &&
 				    (image->mask[byte] & bit) == 0)
 					continue;
