@@ -24,11 +24,6 @@
  *
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
-#undef fb_info
-
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/kernel.h>
@@ -41,11 +36,8 @@ __FBSDID("$FreeBSD$");
 #include <dev/vt/vt.h>
 #include "vt_drmfb.h"
 
-#include <drm/drm_fb_helper.h>
 #include <linux/fb.h>
 #include <video/cmdline.h>
-#undef fb_info
-#include <drm/drm_os_freebsd.h>
 
 MALLOC_DEFINE(LKPI_FB_MEM, "fb_kms", "FB KMS Data Structures");
 
@@ -196,10 +188,7 @@ static int
 __register_framebuffer(struct linux_fb_info *fb_info)
 {
 	int i, err;
-	struct drm_fb_helper *fb_helper;
 
-	fb_helper = (struct drm_fb_helper *)fb_info->fbio.fb_priv;
-	fb_info->fb_bsddev = fb_helper->dev->dev->bsddev;
 	fb_info->fbio.fb_video_dev = device_get_parent(fb_info->fb_bsddev);
 	fb_info->fbio.fb_name = device_get_nameunit(fb_info->fb_bsddev);
 
