@@ -49,11 +49,15 @@
  */
 #undef	fb_info
 
-#include <drm/drm_os_freebsd.h>
-
 #include "vt_drmfb.h"
 
 #define	to_linux_fb_info(f)	container_of(f, struct linux_fb_info, fbio);
+
+/*
+ * skip_ddb is controlled via sysctls in drm_os_freebsd.c in drm.ko
+ * TODO: Move these sysctl definitions here.
+ */
+int skip_ddb = 0;
 
 vd_init_t		vt_drmfb_init;
 vd_fini_t		vt_drmfb_fini;
