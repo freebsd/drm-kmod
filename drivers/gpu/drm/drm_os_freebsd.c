@@ -79,44 +79,6 @@ sysctl_pci_id(SYSCTL_HANDLER_ARGS)
 	return (sysctl_handle_string(oidp, buf, sizeof(buf), req));
 }
 
-int
-register_fictitious_range(struct drm_device *ddev, vm_paddr_t base, size_t size)
-{
-	int ret;
-	struct apertures_struct *ap;
-
-	MPASS(base != 0);
-	MPASS(size != 0);
-
-	ap = alloc_apertures(1);
-	ap->ranges[0].base = base;
-	ap->ranges[0].size = size;
-	vt_freeze_main_vd(ap);
-	kfree(ap);
-
-	ret = vm_phys_fictitious_reg_range(base, base + size,
-#ifdef VM_MEMATTR_WRITE_COMBINING
-					   VM_MEMATTR_WRITE_COMBINING
-#else
-					   VM_MEMATTR_UNCACHEABLE
-#endif
-	    );
-	MPASS(ret == 0);
-
-	ddev->fictitious_range_registered = true;
-
-	return (ret);
-}
-
-void
-unregister_fictitious_range(struct drm_device *ddev, vm_paddr_t base, size_t size)
-{
-	if (ddev->fictitious_range_registered) {
-		vm_phys_fictitious_unreg_range(base, base + size);
-		vt_unfreeze_main_vd();
-	}
-}
-
 /* Framebuffer related code */
 
 int

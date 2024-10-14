@@ -33,6 +33,7 @@ struct drm_minor;
 int drm_dev_alias(struct device *dev, struct drm_minor *minor, const char *minor_str);
 void cancel_reset_debug_log(void);
 
+#if 0
 void vt_freeze_main_vd(struct apertures_struct *a);
 void vt_unfreeze_main_vd(void);
 
@@ -40,7 +41,6 @@ struct drm_device;
 int register_fictitious_range(struct drm_device *ddev, vm_paddr_t start, vm_paddr_t end);
 void unregister_fictitious_range(struct drm_device *ddev, vm_paddr_t start, vm_paddr_t end);
 
-#if 0
 struct linux_fb_info;
 static inline void vga_switcheroo_unregister_client(struct pci_dev *pdev) {}
 static inline int vga_switcheroo_register_client(struct pci_dev *pdev,
