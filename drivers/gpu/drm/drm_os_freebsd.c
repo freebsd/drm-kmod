@@ -1,29 +1,14 @@
+#include <sys/types.h>
+#include <sys/bus.h>
+#include <sys/reboot.h>
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+#include <linux/cdev.h>
+#undef cdev
 
 #include <drm/drm_file.h>
 #include <drm/drm_ioctl.h>
 #include <drm/drm_print.h>
-#include <drm/drm_fb_helper.h>
 #include <drm/drm_os_freebsd.h>
-
-#include <sys/types.h>
-#include <sys/bus.h>
-#include <dev/agp/agpreg.h>
-#include <dev/pci/pcireg.h>
-#include <sys/reboot.h>
-#include <sys/fbio.h>
-#include <dev/vt/vt.h>
-#include <dev/iicbus/iicbus.h>
-#include <dev/iicbus/iiconf.h>
-
-#include <vm/vm_phys.h>
-
-#include <linux/cdev.h>
-#include <linux/fb.h>
-#undef fb_info
-#undef cdev
 
 #include "vt_drmfb.h"	/* skip_ddb */
 
@@ -146,13 +131,6 @@ MODULE_VERSION(drmn, 2);
 #ifdef CONFIG_AGP
 MODULE_DEPEND(drmn, agp, 1, 1, 1);
 #endif
-DRIVER_MODULE(iicbus, drmn, iicbus_driver, NULL, NULL);
-DRIVER_MODULE(acpi_iicbus, drmn, acpi_iicbus_driver, NULL, NULL);
-MODULE_DEPEND(drmn, iicbus, IICBUS_MINVER, IICBUS_PREFVER, IICBUS_MAXVER);
-MODULE_DEPEND(drmn, iic, 1, 1, 1);
-MODULE_DEPEND(drmn, iicbb, IICBB_MINVER, IICBB_PREFVER, IICBB_MAXVER);
-MODULE_DEPEND(drmn, pci, 1, 1, 1);
-MODULE_DEPEND(drmn, mem, 1, 1, 1);
 MODULE_DEPEND(drmn, linuxkpi, 1, 1, 1);
 MODULE_DEPEND(drmn, linuxkpi_video, 1, 1, 1);
 MODULE_DEPEND(drmn, dmabuf, 1, 1, 1);
