@@ -21,9 +21,6 @@ SRCS=	drm_atomic.c \
 	drm_blend.c \
 	drm_bridge.c \
 	drm_cache.c \
-	drm_client.c \
-	drm_client_event.c \
-	drm_client_modeset.c \
 	drm_color_mgmt.c \
 	drm_connector.c \
 	drm_crtc.c \
@@ -137,8 +134,13 @@ SRCS+=	drm_exec.c
 SRCS+=	drm_panic.c
 .endif
 
+.if !empty(KCONFIG:MDRM_CLIENT)
+SRCS+= 	drm_client.c \
+	drm_client_event.c \
+	drm_client_modeset.c
+.endif
 .if !empty(KCONFIG:MDRM_CLIENT_SETUP)
-SRCS+= drm_client_setup.c
+SRCS+= 	drm_client_setup.c
 .endif
 
 SRCS+=	device_if.h \
