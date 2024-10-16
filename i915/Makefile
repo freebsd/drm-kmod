@@ -163,6 +163,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_modeset_lock.c \
 	intel_modeset_setup.c \
 	intel_modeset_verify.c \
+	intel_pfit.c \
 	intel_panel.c \
 	intel_pch_display.c \
 	intel_pch_refclk.c \
