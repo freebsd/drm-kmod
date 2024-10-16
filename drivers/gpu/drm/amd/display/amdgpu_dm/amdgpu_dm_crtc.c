@@ -252,10 +252,8 @@ static void amdgpu_dm_crtc_vblank_control_worker(struct work_struct *work)
 	else if (dm->active_vblank_irq_count)
 		dm->active_vblank_irq_count--;
 
-	if (dm->active_vblank_irq_count > 0) {
-		DRM_DEBUG_KMS("Allow idle optimizations (MALL): false\n");
+	if (dm->active_vblank_irq_count > 0)
 		dc_allow_idle_optimizations(dm->dc, false);
-	}
 
 	/*
 	 * Control PSR based on vblank requirements from OS
@@ -273,10 +271,8 @@ static void amdgpu_dm_crtc_vblank_control_worker(struct work_struct *work)
 			vblank_work->acrtc->dm_irq_params.allow_sr_entry);
 	}
 
-	if (dm->active_vblank_irq_count == 0) {
-		DRM_DEBUG_KMS("Allow idle optimizations (MALL): true\n");
+	if (dm->active_vblank_irq_count == 0)
 		dc_allow_idle_optimizations(dm->dc, true);
-	}
 
 	mutex_unlock(&dm->dc_lock);
 
