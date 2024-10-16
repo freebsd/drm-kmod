@@ -8,6 +8,7 @@
 
 #include "i915_drv.h"
 #include "intel_crtc.h"
+#include "intel_display_limits.h"
 #include "intel_display_types.h"
 #include "intel_vblank.h"
 
@@ -20,7 +21,7 @@ trace_intel_pipe_enable(struct intel_crtc *crtc)
 #ifdef KTR
 	struct intel_display *display = to_intel_display(crtc);
 	struct intel_crtc *it__;
-	uint32_t frame[3], scanline[3];
+	uint32_t frame[I915_MAX_PIPES], scanline[I915_MAX_PIPES];
 
 	for_each_intel_crtc(display->drm, it__) {
 		frame[it__->pipe] = intel_crtc_get_vblank_counter(it__);
@@ -45,7 +46,7 @@ trace_intel_pipe_disable(struct intel_crtc *crtc)
 #ifdef KTR
 	struct intel_display *display = to_intel_display(crtc);
 	struct intel_crtc *it__;
-	uint32_t frame[3], scanline[3];
+	uint32_t frame[I915_MAX_PIPES], scanline[I915_MAX_PIPES];
 
 	for_each_intel_crtc(display->drm, it__) {
 		frame[it__->pipe] = intel_crtc_get_vblank_counter(it__);
@@ -119,7 +120,7 @@ trace_intel_memory_cxsr(struct intel_display *display, bool old, bool new)
 {
 #ifdef KTR
 	struct intel_crtc *crtc;
-	uint32_t frame[3], scanline[3];
+	uint32_t frame[I915_MAX_PIPES], scanline[I915_MAX_PIPES];
 
 	for_each_intel_crtc(display->drm, crtc) {
 		frame[crtc->pipe] = intel_crtc_get_vblank_counter(crtc);
