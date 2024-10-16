@@ -15,6 +15,21 @@
 #define __dev_name_display(display) dev_name((display)->drm->dev)
 #define __dev_name_kms(obj) dev_name((obj)->base.dev->dev)
 
+/*
+ * Using identifiers from enum pipe in TP_printk() will confuse tools that
+ * parse /sys/kernel/debug/tracing/{xe,i915}/<event>/format. So we use CPP
+ * macros instead.
+ */
+#define _TRACE_PIPE_A	0
+#define _TRACE_PIPE_B	1
+#define _TRACE_PIPE_C	2
+
+/*
+ * Paranoid sanity check that at least the enumeration starts at the
+ * same value as _TRACE_PIPE_A.
+ */
+static_assert(PIPE_A == _TRACE_PIPE_A);
+
 static inline void
 trace_intel_pipe_enable(struct intel_crtc *crtc)
 {
@@ -37,9 +52,9 @@ trace_intel_pipe_enable(struct intel_crtc *crtc)
 	CTR6(KTR_DRM,
 	    "intel_pipe_enable[2/2]: "
 	    "pipe A: frame=%u, scanline=%u, pipe B: frame=%u, scanline=%u, pipe C: frame=%u, scanline=%u",
-	    frame[PIPE_A], scanline[PIPE_A],
-	    frame[PIPE_B], scanline[PIPE_B],
-	    frame[PIPE_C], scanline[PIPE_C]);
+	    frame[_TRACE_PIPE_A], scanline[_TRACE_PIPE_A],
+	    frame[_TRACE_PIPE_B], scanline[_TRACE_PIPE_B],
+	    frame[_TRACE_PIPE_C], scanline[_TRACE_PIPE_C]);
 }
 
 static inline void
@@ -64,9 +79,9 @@ trace_intel_pipe_disable(struct intel_crtc *crtc)
 	CTR6(KTR_DRM,
 	    "intel_pipe_disable[2/2]: "
 	    "pipe A: frame=%u, scanline=%u, pipe B: frame=%u, scanline=%u, pipe C: frame=%u, scanline=%u",
-	    frame[PIPE_A], scanline[PIPE_A],
-	    frame[PIPE_B], scanline[PIPE_B],
-	    frame[PIPE_C], scanline[PIPE_C]);
+	    frame[_TRACE_PIPE_A], scanline[_TRACE_PIPE_A],
+	    frame[_TRACE_PIPE_B], scanline[_TRACE_PIPE_B],
+	    frame[_TRACE_PIPE_C], scanline[_TRACE_PIPE_C]);
 }
 
 static inline void
@@ -140,9 +155,9 @@ trace_intel_memory_cxsr(struct intel_display *display, bool old, bool new)
 	CTR6(KTR_DRM, 
 	    "intel_memory_cxsr[2/2]: "
 	    "pipe A: frame=%u, scanline=%u, pipe B: frame=%u, scanline=%u, pipe C: frame=%u, scanline=%u",
-	    frame[PIPE_A], scanline[PIPE_A],
-	    frame[PIPE_B], scanline[PIPE_B],
-	    frame[PIPE_C], scanline[PIPE_C]);
+	    frame[_TRACE_PIPE_A], scanline[_TRACE_PIPE_A],
+	    frame[_TRACE_PIPE_B], scanline[_TRACE_PIPE_B],
+	    frame[_TRACE_PIPE_C], scanline[_TRACE_PIPE_C]);
 }
 
 static inline void
