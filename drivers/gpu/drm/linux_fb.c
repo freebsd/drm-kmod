@@ -411,10 +411,10 @@ cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 			switch (image->depth) {
 			case 32:
 				byte = line + (xi << 2);
-				color = (image->data[byte] << 16) |
-					(image->data[byte + 1] << 8) |
-					(image->data[byte + 2]) |
-					(image->data[byte + 3] << 24);
+				color = ((uint8_t)image->data[byte] << 16) |
+					((uint8_t)image->data[byte + 1] << 8) |
+					((uint8_t)image->data[byte + 2]) |
+					((uint8_t)image->data[byte + 3] << 24);
 				break;
 			case 1:
 				byte = line + (xi >> 3);
