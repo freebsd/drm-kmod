@@ -40,7 +40,6 @@ CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
-CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/dummy/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/dummy/include
 
 CFLAGS+= -I${.CURDIR:H:H}/include
