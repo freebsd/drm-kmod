@@ -21,7 +21,6 @@ SRCS+=	bus_if.h \
 CFLAGS+=	-I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+=	-I${.CURDIR:H}/linuxkpi/bsd/include
 CFLAGS+=	-I${SYSDIR}/compat/linuxkpi/common/include
-CFLAGS+=	-I${.CURDIR:H}/linuxkpi/dummy/include
 CFLAGS+=	-I${SYSDIR}/compat/linuxkpi/dummy/include
 CFLAGS+=	-I${.CURDIR:H}/include
 
