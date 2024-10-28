@@ -3032,7 +3032,6 @@ void intel_hdmi_init_connector(struct intel_digital_port *dig_port,
 	struct intel_hdmi *intel_hdmi = &dig_port->hdmi;
 	struct intel_encoder *intel_encoder = &dig_port->base;
 	struct drm_device *dev = intel_encoder->base.dev;
-	struct drm_i915_private *dev_priv = to_i915(dev);
 	enum port port = intel_encoder->port;
 #ifdef __linux__
 	struct cec_connector_info conn_info;
@@ -3084,7 +3083,7 @@ void intel_hdmi_init_connector(struct intel_digital_port *dig_port,
 	intel_connector_attach_encoder(intel_connector, intel_encoder);
 	intel_hdmi->attached_connector = intel_connector;
 
-	if (is_hdcp_supported(dev_priv, port)) {
+	if (is_hdcp_supported(display, port)) {
 		int ret = intel_hdcp_init(intel_connector, dig_port,
 					  &intel_hdmi_hdcp_shim);
 		if (ret)
