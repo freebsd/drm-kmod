@@ -72,9 +72,9 @@ struct i915_pmu {
 	struct pmu base;
 #endif
 	/**
-	 * @closed: i915 is unregistering.
+	 * @registered: PMU is registered and not in the unregistering process.
 	 */
-	bool closed;
+	bool registered;
 	/**
 	 * @name: Name as registered with perf core.
 	 */
