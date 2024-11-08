@@ -5,7 +5,10 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
-.PATH:	${SRCDIR} ${SRCDIR}/display ${SRCDIR}/scheduler
+.PATH:	${SRCDIR} \
+	${SRCDIR}/clients \
+	${SRCDIR}/display \
+	${SRCDIR}/scheduler
 
 KMOD=	drm
 
