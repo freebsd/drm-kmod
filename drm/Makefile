@@ -101,6 +101,10 @@ SRCS+=	drm_mipi_dsi.c
 SRCS+=	drm_panel_orientation_quirks.c
 .endif
 
+.if !empty(KCONFIG:MDRM_PANEL_BACKLIGHT_QUIRKS)
+SRCS+=	drm_panel_backlight_quirks.c
+.endif
+
 .if !empty(KCONFIG:MDRM_PRIVACY_SCREEN)
 SRCS+=	drm_privacy_screen.c \
 	drm_privacy_screen_x86.c
