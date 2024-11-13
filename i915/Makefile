@@ -40,7 +40,6 @@ SRCS=	\
 	i915_request.c \
 	i915_scatterlist.c \
 	i915_scheduler.c \
-	i915_suspend.c \
 	i915_sw_fence.c \
 	i915_sw_fence_work.c \
 	i915_switcheroo.c \
@@ -51,6 +50,7 @@ SRCS=	\
 	i915_ttm_buddy_manager.c \
 	i915_vma.c \
 	i915_vma_resource.c \
+	i9xx_display_sr.c \
 	intel_acpi.c \
 	intel_atomic.c \
 	intel_atomic_plane.c \
