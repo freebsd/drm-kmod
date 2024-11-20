@@ -95,6 +95,7 @@ SRCS=	\
 	intel_step.c \
 	intel_sprite.c \
 	intel_uncore.c \
+	intel_uncore_trace.c \
 	i915_utils.c \
 	intel_wakeref.c \
 	vlv_sideband.c \
