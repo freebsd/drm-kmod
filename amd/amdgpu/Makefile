@@ -997,12 +997,9 @@ SRCS+=	dcn321_fpu.c
 SRCS+=	display_mode_core.c \
 	display_mode_util.c \
 	dml_display_rq_dlg_calc.c \
-	dml_top.c \
-	dml_top_mcache.c \
 	dml2_core_dcn4.c \
 	dml2_core_factory.c \
 	dml2_core_dcn4_calcs.c \
-	dml2_core_utils.c \
 	dml2_dc_resource_mgmt.c \
 	dml2_debug.c \
 	dml2_dpmm_dcn4.c \
@@ -1016,7 +1013,8 @@ SRCS+=	display_mode_core.c \
 	dml2_policy.c \
 	dml2_translation_helper.c \
 	dml2_utils.c \
-	dml2_top_optimization.c \
+	dml2_top_interfaces.c \
+	dml2_top_soc15.c \
 	dml2_wrapper.c \
 	dml21_translation_helper.c \
 	dml21_utils.c \
@@ -1387,11 +1385,8 @@ CFLAGS.dcn401_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_core.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.display_mode_util.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.dml_display_rq_dlg_calc.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
-CFLAGS.dml_top_mcache.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_core_dcn4.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_core_dcn4_calcs.c = ${FPUFLAGS} -mstack-alignment=4
-CFLAGS.dml2_core_shared.c = ${FPUFLAGS} -mstack-alignment=4
-CFLAGS.dml2_core_utils.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_dc_resource_mgmt.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.dml2_dpmm_dcn4.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_mall_phantom.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
@@ -1399,6 +1394,7 @@ CFLAGS.dml2_pmo_dcn3.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_pmo_dcn4_fams2.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_policy.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.dml2_translation_helper.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_top_soc15.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_utils.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.dml2_wrapper.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.dml21_translation_helper.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
