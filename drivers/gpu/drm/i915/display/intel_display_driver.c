@@ -246,6 +246,7 @@ int intel_display_driver_probe_noirq(struct drm_i915_private *i915)
 #elif defined(__FreeBSD__)
 						WQ_UNBOUND, 512);
 #endif
+	i915->display.wq.cleanup = alloc_workqueue("i915_cleanup", WQ_HIGHPRI, 0);
 
 	intel_mode_config_init(i915);
 
@@ -575,6 +576,7 @@ void intel_display_driver_remove(struct drm_i915_private *i915)
 
 	flush_workqueue(i915->display.wq.flip);
 	flush_workqueue(i915->display.wq.modeset);
+	flush_workqueue(i915->display.wq.cleanup);
 
 	/*
 	 * MST topology needs to be suspended so we don't have any calls to
@@ -619,6 +621,7 @@ void intel_display_driver_remove_noirq(struct drm_i915_private *i915)
 
 	destroy_workqueue(i915->display.wq.flip);
 	destroy_workqueue(i915->display.wq.modeset);
+	destroy_workqueue(i915->display.wq.cleanup);
 
 	intel_fbc_cleanup(&i915->display);
 }
