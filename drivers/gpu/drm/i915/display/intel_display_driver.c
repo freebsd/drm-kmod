@@ -226,13 +226,13 @@ int intel_display_driver_probe_noirq(struct drm_i915_private *i915)
 		goto cleanup_bios;
 
 	/* FIXME: completely on the wrong abstraction layer */
-	ret = intel_power_domains_init(i915);
+	ret = intel_power_domains_init(display);
 	if (ret < 0)
 		goto cleanup_vga;
 
 	intel_pmdemand_init_early(i915);
 
-	intel_power_domains_init_hw(i915, false);
+	intel_power_domains_init_hw(display, false);
 
 	if (!HAS_DISPLAY(i915))
 		return 0;
@@ -278,7 +278,7 @@ int intel_display_driver_probe_noirq(struct drm_i915_private *i915)
 
 cleanup_vga_client_pw_domain_dmc:
 	intel_dmc_fini(display);
-	intel_power_domains_driver_remove(i915);
+	intel_power_domains_driver_remove(display);
 cleanup_vga:
 	intel_vga_unregister(display);
 cleanup_bios:
@@ -633,7 +633,7 @@ void intel_display_driver_remove_nogem(struct drm_i915_private *i915)
 
 	intel_dmc_fini(display);
 
-	intel_power_domains_driver_remove(i915);
+	intel_power_domains_driver_remove(display);
 
 	intel_vga_unregister(display);
 
