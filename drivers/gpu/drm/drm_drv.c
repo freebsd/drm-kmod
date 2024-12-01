@@ -594,7 +594,9 @@ static void drm_dev_init_release(struct drm_device *dev, void *res)
 	drm_fs_inode_free(dev->anon_inode);
 #endif
 
+#ifdef __linux__
 	put_device(dev->dev);
+#endif
 	/* Prevent use-after-free in drm_managed_release when debugging is
 	 * enabled. Slightly awkward, but can't really be helped. */
 	dev->dev = NULL;
@@ -620,7 +622,11 @@ static int drm_dev_init(struct drm_device *dev,
 		return -EINVAL;
 
 	kref_init(&dev->ref);
+#ifdef __linux__
 	dev->dev = get_device(parent);
+#elif defined (__FreeBSD__)
+	dev->dev = parent;
+#endif
 	dev->driver = driver;
 
 	INIT_LIST_HEAD(&dev->managed.resources);
