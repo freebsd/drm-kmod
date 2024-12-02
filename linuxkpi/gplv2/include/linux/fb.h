@@ -149,12 +149,12 @@ struct linux_fb_info {
      *  `Generic' versions of the frame buffer device operations
      */
 
-extern void cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
-extern void cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
-extern void cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image);
-extern ssize_t fb_io_read(struct linux_fb_info *info, char __user *buf,
+void cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
+void cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
+void cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image);
+ssize_t fb_io_read(struct linux_fb_info *info, char __user *buf,
     size_t count, loff_t *ppos);
-extern ssize_t fb_io_write(struct linux_fb_info *info, const char __user *buf,
+ssize_t fb_io_write(struct linux_fb_info *info, const char __user *buf,
     size_t count, loff_t *ppos);
 
 /*
@@ -213,7 +213,7 @@ fb_sys_write(struct linux_fb_info *info, const char __user *buf, size_t count,
 	return (fb_io_write(info, buf, count, ppos));
 }
 
-extern int fb_deferred_io_mmap(struct linux_fb_info *info,
+int fb_deferred_io_mmap(struct linux_fb_info *info,
     struct vm_area_struct *vma);
 
 /*
