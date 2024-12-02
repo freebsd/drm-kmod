@@ -181,14 +181,40 @@ extern ssize_t fb_io_write(struct linux_fb_info *info, const char __user *buf,
 /*
  * Drawing operations where framebuffer is in system RAM
  */
-extern void sys_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
-extern void sys_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
-extern void sys_imageblit(struct linux_fb_info *info, const struct fb_image *image);
-extern ssize_t fb_sys_read(struct linux_fb_info *info, char __user *buf,
-			   size_t count, loff_t *ppos);
-extern ssize_t fb_sys_write(struct linux_fb_info *info, const char __user *buf,
-			    size_t count, loff_t *ppos);
-extern int fb_deferred_io_mmap(struct linux_fb_info *info, struct vm_area_struct *vma);
+static inline void
+sys_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
+{
+	cfb_fillrect(info, rect);
+}
+
+static inline void
+sys_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area)
+{
+	cfb_copyarea(info, area);
+}
+
+static inline void
+sys_imageblit(struct linux_fb_info *info, const struct fb_image *image)
+{
+	cfb_imageblit(info, image);
+}
+
+static inline ssize_t
+fb_sys_read(struct linux_fb_info *info, char __user *buf, size_t count,
+    loff_t *ppos)
+{
+	return (fb_io_read(info, buf, count, ppos));
+}
+
+static inline ssize_t
+fb_sys_write(struct linux_fb_info *info, const char __user *buf, size_t count,
+    loff_t *ppos)
+{
+	return (fb_io_write(info, buf, count, ppos));
+}
+
+extern int fb_deferred_io_mmap(struct linux_fb_info *info,
+    struct vm_area_struct *vma);
 
 /*
  * Generate callbacks for deferred I/O

@@ -433,40 +433,6 @@ cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 	}
 }
 
-void
-sys_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
-{
-	cfb_fillrect(info, rect);
-}
-
-void
-sys_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area)
-{
-	cfb_copyarea(info, area);
-}
-
-void
-sys_imageblit(struct linux_fb_info *info, const struct fb_image *image)
-{
-	cfb_imageblit(info, image);
-}
-
-ssize_t
-fb_sys_read(struct linux_fb_info *info, char __user *buf,
-    size_t count, loff_t *ppos)
-{
-	panic("fb_sys_read() not implemented");
-	return (0);
-}
-
-ssize_t
-fb_sys_write(struct linux_fb_info *info, const char __user *buf,
-    size_t count, loff_t *ppos)
-{
-	panic("fb_sys_write() not implemented");
-	return (0);
-}
-
 ssize_t
 fb_io_read(struct linux_fb_info *info, char __user *buf,
     size_t count, loff_t *ppos)
