@@ -65,7 +65,7 @@
 #include "sys/cdefs.h" // for __DECONST()
 #endif
 
-MODULE_IMPORT_NS(DMA_BUF);
+MODULE_IMPORT_NS("DMA_BUF");
 
 #define AMDGPU_TTM_VRAM_MAX_DW_READ	((size_t)128)
 
