@@ -209,4 +209,61 @@ struct fb_cursor {
 	struct fb_image	image;
 };
 
+#define __FB_DEFAULT_IOMEM_OPS_RDWR \
+	.fb_read	= fb_io_read, \
+	.fb_write	= fb_io_write
+
+#define __FB_DEFAULT_IOMEM_OPS_DRAW \
+	.fb_fillrect	= cfb_fillrect, \
+	.fb_copyarea	= cfb_copyarea, \
+	.fb_imageblit	= cfb_imageblit
+
+#define __FB_DEFAULT_IOMEM_OPS_MMAP \
+	.fb_mmap	= NULL /* default implementation */
+
+#define FB_DEFAULT_IOMEM_OPS \
+	__FB_DEFAULT_IOMEM_OPS_RDWR, \
+	__FB_DEFAULT_IOMEM_OPS_DRAW, \
+	__FB_DEFAULT_IOMEM_OPS_MMAP
+
+#define FB_GEN_DEFAULT_DEFERRED_IOMEM_OPS(_pfx, _range, _area)		\
+	static void							\
+	_pfx ## _fillrect(struct linux_fb_info *fi, const struct fb_fillrect *fr) \
+	{								\
+		cfb_fillrect(fi, fr);					\
+		_area(fi, fr->dx, fr->dy, fr->width, fr->height);	\
+	}								\
+	static void							\
+	_pfx ## _copyarea(struct linux_fb_info *fi, const struct fb_copyarea *fca) \
+	{								\
+		cfb_copyarea(fi, fca);					\
+		_area(fi, fca->dx, fca->dy, fca->width, fca->height);	\
+	}								\
+	static void							\
+	_pfx ## _imageblit(struct linux_fb_info *fi, const struct fb_image *img) \
+	{								\
+		cfb_imageblit(fi, img);					\
+		_area(fi, img->dx, img->dy, img->width, img->height);	\
+	}
+
+#define FB_GEN_DEFAULT_DEFERRED_SYSMEM_OPS(...) \
+	FB_GEN_DEFAULT_DEFERRED_IOMEM_OPS(__VA_ARGS__)
+
+#define __FB_DEFAULT_DEFERRED_OPS_RDWR(...)	\
+	.fb_read	= fb_io_read,		\
+	.fb_write	= fb_io_write
+
+#define __FB_DEFAULT_DEFERRED_OPS_DRAW(_pfx)	\
+	.fb_fillrect	= _pfx ## _fillrect,	\
+	.fb_copyarea	= _pfx ## _copyarea,	\
+	.fb_imageblit	= _pfx ## _imageblit
+
+#define __FB_DEFAULT_DEFERRED_OPS_MMAP(...)	\
+	.fb_mmap	= fb_deferred_io_mmap
+
+#define FB_DEFAULT_DEFERRED_OPS(_pfx)		\
+	__FB_DEFAULT_DEFERRED_OPS_RDWR(),	\
+	__FB_DEFAULT_DEFERRED_OPS_DRAW(_pfx),	\
+	__FB_DEFAULT_DEFERRED_OPS_MMAP()
+
 #endif
