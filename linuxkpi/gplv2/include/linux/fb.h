@@ -145,30 +145,6 @@ struct linux_fb_info {
 #endif
 } __aligned(sizeof(long));
 
-    /*
-     *  `Generic' versions of the frame buffer device operations
-     */
-
-extern void cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
-extern void cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
-extern void cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image);
-extern ssize_t fb_io_read(struct linux_fb_info *info, char __user *buf,
-    size_t count, loff_t *ppos);
-extern ssize_t fb_io_write(struct linux_fb_info *info, const char __user *buf,
-    size_t count, loff_t *ppos);
-
-/*
- * Drawing operations where framebuffer is in system RAM
- */
-extern void sys_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
-extern void sys_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
-extern void sys_imageblit(struct linux_fb_info *info, const struct fb_image *image);
-extern ssize_t fb_sys_read(struct linux_fb_info *info, char __user *buf,
-			   size_t count, loff_t *ppos);
-extern ssize_t fb_sys_write(struct linux_fb_info *info, const char __user *buf,
-			    size_t count, loff_t *ppos);
-extern int fb_deferred_io_mmap(struct linux_fb_info *info, struct vm_area_struct *vma);
-
 int linux_register_framebuffer(struct linux_fb_info *fb_info);
 int linux_unregister_framebuffer(struct linux_fb_info *fb_info);
 int remove_conflicting_framebuffers(resource_size_t base, resource_size_t size,

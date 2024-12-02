@@ -27,6 +27,8 @@
 #ifndef _BSD_LKPI_UAPI_LINUX_FB_H_
 #define	_BSD_LKPI_UAPI_LINUX_FB_H_
 
+#include <linux/types.h>
+
 #define	FB_ROTATE_UR	0
 #define	FB_ROTATE_CW	1
 #define	FB_ROTATE_UD	2
@@ -53,6 +55,9 @@
 #define FB_VISUAL_FOURCC		6
 
 #define FB_ACCEL_NONE		0
+
+struct linux_fb_info;
+struct vm_area_struct;
 
 struct fb_fix_screeninfo {
 	char id[16];
@@ -265,5 +270,47 @@ struct fb_cursor {
 	__FB_DEFAULT_DEFERRED_OPS_RDWR(),	\
 	__FB_DEFAULT_DEFERRED_OPS_DRAW(_pfx),	\
 	__FB_DEFAULT_DEFERRED_OPS_MMAP()
+
+void cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
+void cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
+void cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image);
+ssize_t fb_io_read(struct linux_fb_info *info, char __user *buf,
+    size_t count, loff_t *ppos);
+ssize_t fb_io_write(struct linux_fb_info *info, const char __user *buf,
+    size_t count, loff_t *ppos);
+int fb_deferred_io_mmap(struct linux_fb_info *info,
+    struct vm_area_struct *vma);
+
+static inline void
+sys_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
+{
+	cfb_fillrect(info, rect);
+}
+
+static inline void
+sys_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area)
+{
+	cfb_copyarea(info, area);
+}
+
+static inline void
+sys_imageblit(struct linux_fb_info *info, const struct fb_image *image)
+{
+	cfb_imageblit(info, image);
+}
+
+static inline ssize_t
+fb_sys_read(struct linux_fb_info *info, char __user *buf, size_t count,
+    loff_t *ppos)
+{
+	return (fb_io_read(info, buf, count, ppos));
+}
+
+static inline ssize_t
+fb_sys_write(struct linux_fb_info *info, const char __user *buf, size_t count,
+    loff_t *ppos)
+{
+	return (fb_io_write(info, buf, count, ppos));
+}
 
 #endif
