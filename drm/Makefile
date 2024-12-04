@@ -141,6 +141,10 @@ SRCS+=	drm_exec.c
 SRCS+=	drm_panic.c
 .endif
 
+.if !empty(KCONFIG:MDRM_DRAW)
+SRCS+=	drm_draw.c
+.endif
+
 .if !empty(KCONFIG:MDRM_CLIENT)
 SRCS+= 	drm_client.c \
 	drm_client_event.c \
