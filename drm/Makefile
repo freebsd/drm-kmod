@@ -25,6 +25,7 @@ SRCS=	drm_atomic.c \
 	drm_crtc.c \
 	drm_crtc_helper.c \
 	drm_damage_helper.c \
+	drm_draw.c \
 	drm_drv.c \
 	drm_dumb_buffers.c \
 	drm_edid.c \
