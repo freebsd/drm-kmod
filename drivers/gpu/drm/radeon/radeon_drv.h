@@ -47,7 +47,6 @@ SYSCTL_DECL(_hw_radeonkms);
 
 #define DRIVER_NAME		"radeon"
 #define DRIVER_DESC		"ATI Radeon"
-#define DRIVER_DATE		"20080528"
 
 /* Interface history:
  *
