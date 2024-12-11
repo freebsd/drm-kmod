@@ -1704,6 +1704,8 @@ mst_topology_add_connector(struct drm_dp_mst_topology_mgr *mgr,
 	if (!intel_connector)
 		return NULL;
 
+	connector = &intel_connector->base;
+
 	intel_connector->get_hw_state = mst_connector_get_hw_state;
 	intel_connector->sync_state = intel_dp_connector_sync_state;
 	intel_connector->mst_port = intel_dp;
@@ -1722,19 +1724,18 @@ mst_topology_add_connector(struct drm_dp_mst_topology_mgr *mgr,
 	 */
 	intel_connector->base.dev = mgr->dev;
 
-	intel_connector->dp.dsc_decompression_aux = drm_dp_mst_dsc_aux_for_port(port);
-	intel_dp_mst_read_decompression_port_dsc_caps(intel_dp, intel_connector);
-	intel_connector->dp.dsc_hblank_expansion_quirk =
-		detect_dsc_hblank_expansion_quirk(intel_connector);
-
-	connector = &intel_connector->base;
-	ret = drm_connector_init(display->drm, connector, &mst_connector_funcs,
-				 DRM_MODE_CONNECTOR_DisplayPort);
+	ret = drm_connector_dynamic_init(display->drm, connector, &mst_connector_funcs,
+					 DRM_MODE_CONNECTOR_DisplayPort, NULL);
 	if (ret) {
 		drm_dp_mst_put_port_malloc(port);
 		intel_connector_free(intel_connector);
 		return NULL;
 	}
+
+	intel_connector->dp.dsc_decompression_aux = drm_dp_mst_dsc_aux_for_port(port);
+	intel_dp_mst_read_decompression_port_dsc_caps(intel_dp, intel_connector);
+	intel_connector->dp.dsc_hblank_expansion_quirk =
+		detect_dsc_hblank_expansion_quirk(intel_connector);
 
 	drm_connector_helper_add(connector, &mst_connector_helper_funcs);
 
