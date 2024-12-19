@@ -288,6 +288,44 @@ trace_intel_plane_disable_arm(struct intel_plane *plane, struct intel_crtc *crtc
 }
 
 static inline void
+trace_intel_plane_scaler_update_arm(struct intel_plane *plane, int scaler_id, int x, int y, int w, int h)
+{
+#ifdef KTR
+	struct intel_display *display = to_intel_display(plane);
+	struct intel_crtc *crtc = intel_crtc_for_pipe(display, plane->pipe);
+#endif
+
+	CTR6(KTR_DRM,
+	    "intel_plane_scaler_update_arm[1/2]: dev %s, pipe %c, scaler %d, plane %s, frame=%u, scanline=%u",
+	    __dev_name_kms(plane), pipe_name(crtc->pipe), scaler_id,
+	    plane->base.name, intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR4(KTR_DRM,
+	    "intel_plane_scaler_update_arm[2/2]: " DRM_RECT_FMT,
+	    w, h, x, y);
+}
+
+static inline void
+trace_intel_pipe_scaler_update_arm(struct intel_crtc *crtc, int scaler_id, int x, int y, int w, int h)
+{
+	CTR5(KTR_DRM,
+	    "intel_pipe_scaler_update_arm[1/2]: dev %s, pipe %c, scaler %d frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe), scaler_id,
+	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR4(KTR_DRM,
+	    "intel_pipe_scaler_update_arm[2/2]: " DRM_RECT_FMT,
+	    w, h, x, y);
+}
+
+static inline void
+trace_intel_scaler_disable_arm(struct intel_crtc *crtc, int scaler_id)
+{
+	CTR5(KTR_DRM,
+	    "intel_scaler_disable_arm: dev %s, pipe %c, scaler %d, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe), scaler_id,
+	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+}
+
+static inline void
 trace_intel_fbc_activate(struct intel_plane *plane)
 {
 #ifdef KTR
