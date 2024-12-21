@@ -283,7 +283,6 @@ int amdgpu_irq_init(struct amdgpu_device *adev)
 	adev->irq.msi_enabled = false;
 
 	if (amdgpu_msi_ok(adev)) {
-#ifdef __linux__
 		int nvec = pci_msix_vec_count(adev->pdev);
 		unsigned int flags;
 
@@ -295,10 +294,6 @@ int amdgpu_irq_init(struct amdgpu_device *adev)
 		/* we only need one vector */
 		nvec = pci_alloc_irq_vectors(adev->pdev, 1, 1, flags);
 		if (nvec > 0) {
-#elif defined(__FreeBSD__)
-		int ret = pci_enable_msi(adev->pdev);
-		if (!ret) {
-#endif
 			adev->irq.msi_enabled = true;
 			dev_dbg(adev->dev, "using MSI/MSI-X.\n");
 		}
@@ -308,12 +303,8 @@ int amdgpu_irq_init(struct amdgpu_device *adev)
 	INIT_WORK(&adev->irq.ih2_work, amdgpu_irq_handle_ih2);
 	INIT_WORK(&adev->irq.ih_soft_work, amdgpu_irq_handle_ih_soft);
 
-#ifdef __linux__
 	/* Use vector 0 for MSI-X. */
 	r = pci_irq_vector(adev->pdev, 0);
-#elif defined(__FreeBSD__)
-	r = adev->pdev->irq;
-#endif
 	if (r < 0)
 		return r;
 	irq = r;
