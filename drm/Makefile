@@ -68,6 +68,9 @@ SRCS=	drm_atomic.c \
 	linux_fb.c \
 	vt_drmfb.c
 
+# GPL-2.0.
+SRCS+=	drm_writeback.c
+
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
 SRCS+=	drm_fb_helper.c \
 	drm_fbdev_generic.c
