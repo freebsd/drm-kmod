@@ -43,6 +43,7 @@ SRCS=	drm_atomic.c \
 	drm_gem_atomic_helper.c \
 	drm_gem_framebuffer_helper.c \
 	drm_gpuvm.c \
+	drm_hdmi_audio_helper.c \
 	drm_hdmi_state_helper.c \
 	drm_ioctl.c \
 	drm_lease.c \
