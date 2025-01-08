@@ -394,7 +394,7 @@ CFLAGS+= -DI915
 CWARNFLAGS += -Wno-pointer-arith -Wno-format -Wno-cast-qual
 
 CWARNFLAGS.intel_acpi.c=	-Wno-incompatible-pointer-types
-CWARNFLAGS.intel_audio.c=	-Wno-unused-function
+CWARNFLAGS.intel_audio.c=	-Wno-unused-function -Wno-unused-variable
 CWARNFLAGS.intel_backlight.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_bios.c=	-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.intel_combo_phy.c=	-Wno-uninitialized
