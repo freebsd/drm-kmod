@@ -221,6 +221,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn32 \
 	${SRCDIR}/display/dc/irq/dcn35 \
 	${SRCDIR}/display/dc/irq/dcn351 \
+	${SRCDIR}/display/dc/irq/dcn36 \
 	${SRCDIR}/display/dc/irq/dcn401 \
 	${SRCDIR}/display/dc/link \
 	${SRCDIR}/display/dc/link/accessories \
@@ -891,6 +892,9 @@ SRCS+=	dcn351_clk_mgr.c \
 	dcn351_hwseq.c \
 	dcn351_resource.c \
 	irq_service_dcn351.c
+
+# display/dc/dcn36
+SRCS+=	irq_service_dcn36.c
 
 # display/dc/dcn401
 SRCS+=	dcn401_clk_mgr.c \
