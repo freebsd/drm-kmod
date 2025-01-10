@@ -271,6 +271,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/resource/dcn321 \
 	${SRCDIR}/display/dc/resource/dcn35 \
 	${SRCDIR}/display/dc/resource/dcn351 \
+	${SRCDIR}/display/dc/resource/dcn36 \
 	${SRCDIR}/display/dc/resource/dcn401 \
 	${SRCDIR}/display/dc/sspl \
 	${SRCDIR}/display/dc/virtual \
@@ -894,7 +895,8 @@ SRCS+=	dcn351_clk_mgr.c \
 	irq_service_dcn351.c
 
 # display/dc/dcn36
-SRCS+=	irq_service_dcn36.c
+SRCS+=	dcn36_resource.c \
+	irq_service_dcn36.c
 
 # display/dc/dcn401
 SRCS+=	dcn401_clk_mgr.c \
@@ -1664,6 +1666,7 @@ CWARNFLAGS.dcn35_clk_mgr.c=		-Wno-incompatible-pointer-types
 CWARNFLAGS.dcn35_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn351_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn351_fpu.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn36_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn401_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 CWARNFLAGS.spl_fixpt31_32.c=		-Wno-incompatible-pointer-types
