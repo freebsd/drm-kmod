@@ -58,4 +58,6 @@ CWARNFLAGS+=-Wno-cast-qual
 CWARNFLAGS+= -Wno-pointer-arith -Wno-pointer-sign -Wno-format
 CWARNFLAGS+= -Wno-expansion-to-defined
 
+EXPORT_SYMS=	YES
+
 .include <bsd.kmod.mk>

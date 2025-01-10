@@ -184,3 +184,5 @@ CWARNFLAGS.trinity_dpm.c=		-Wno-unused-const-variable
 CWARNFLAGS.vce_v1_0.c=			-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.vce_v2_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.radeon_atpx_handler.c=	-Wno-missing-prototypes -Wno-unused-but-set-variable
+
+EXPORT_SYMS=	YES
