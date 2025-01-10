@@ -316,3 +316,5 @@ CWARNFLAGS.i915_vma.c=		-Wno-unused-function -Wno-unused-but-set-variable
 CWARNFLAGS.i9xx_plane.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.skl_universal_plane.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.vlv_dsi.c=		-Wno-unused-but-set-variable
+
+EXPORT_SYMS=	YES

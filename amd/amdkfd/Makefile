@@ -71,3 +71,5 @@ CWARNFLAGS.kfd_device_queue_manager.c=	-Wno-format -Wno-strict-prototypes -Wno-i
 CWARNFLAGS.kfd_doorbell.c=	-Wno-format
 CWARNFLAGS.kfd_packet_manager.c=	-Wno-format
 CWARNFLAGS.kfd_queue.c= -Wno-format
+
+EXPORT_SYMS=	YES

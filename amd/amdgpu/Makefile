@@ -1033,3 +1033,5 @@ CWARNFLAGS.vegam_smumgr.c=		-Wno-missing-prototypes
 
 # modules/*
 CWARNFLAGS.freesync.c=			-Wno-unused-but-set-variable
+
+EXPORT_SYMS=	YES
