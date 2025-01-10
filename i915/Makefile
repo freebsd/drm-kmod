@@ -368,3 +368,5 @@ CWARNFLAGS.i9xx_plane.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.g4x_dp.c=		-Wno-shift-count-overflow
 CWARNFLAGS.skl_universal_plane.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.vlv_dsi.c=		-Wno-unused-but-set-variable
+
+EXPORT_SYMS=	YES

@@ -38,6 +38,8 @@ SRCS	+=			\
 	pci_if.h		\
 	vnode_if.h
 
+EXPORT_SYMS=	YES
+
 .include <bsd.kmod.mk>
 
 CWARNFLAGS += -Wno-cast-qual
