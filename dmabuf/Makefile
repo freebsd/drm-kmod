@@ -31,4 +31,6 @@ CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 CWARNFLAGS.dma-buf.c+=	-Wno-pointer-arith
 
+EXPORT_SYMS=	YES
+
 .include <bsd.kmod.mk>
