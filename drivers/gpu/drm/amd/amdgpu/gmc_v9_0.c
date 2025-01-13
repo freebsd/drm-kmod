@@ -1242,7 +1242,7 @@ static void gmc_v9_0_override_vm_pte_flags(struct amdgpu_device *adev,
 					   struct amdgpu_vm *vm,
 					   uint64_t addr, uint64_t *flags)
 {
-#ifdef CONFIG_NUMA
+#ifdef __linux__
 	int local_node, nid;
 #endif
 
@@ -1252,7 +1252,7 @@ static void gmc_v9_0_override_vm_pte_flags(struct amdgpu_device *adev,
 	if (amdgpu_ip_version(adev, GC_HWIP, 0) != IP_VERSION(9, 4, 3))
 		return;
 
-#ifdef CONFIG_NUMA
+#ifdef __linux__
 	/* Only direct-mapped memory allows us to determine the NUMA node from
 	 * the DMA address.
 	 */

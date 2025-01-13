@@ -15,10 +15,16 @@ drm_dp_mst_topology_internal.h
 drm_edid_load.c
 drm_fb_cma_helper.c
 drm_fb_cma_helper.h
+drm_fb_dma_helper.c
+drm_fb_dma_helper.h
+drm_fbdev_dma.c
+drm_fbdev_dma.h
 drm_gem_atomic_helper.c
 drm_gem_atomic_helper.h
 drm_gem_cma_helper.c
 drm_gem_cma_helper.h
+drm_gem_dma_helper.c
+drm_gem_dma_helper.h
 drm_gem_shmem_helper.c
 drm_gem_shmem_helper.h
 drm_gem_vram_helper.c
@@ -27,6 +33,7 @@ drm_gem_framebuffer_helper.c
 drm_gpuva_mgr.h
 drm_hdcp.c
 drm_kms_helper_common.c
+drm_kunit_helpers.h
 drm_lease.c
 drm_lease.h
 drm_legacy_misc.c
@@ -66,6 +73,7 @@ intel-gtt.h
 ttm_sysctl_freebsd.h
 
 amdkfd
+amdgpu_amdkfd_*
 amdgpu_atpx_handler.c
 amdgpu_trace_freebsd.h
 amdgpu_dm_trace_freebsd.h
@@ -76,6 +84,8 @@ i915_trace.h
 i915_trace_points.c
 intel_acpi.c
 intel_freebsd.c
+intel_gvt.c
+intel_gvt_mmio_table.c
 selftests
 selftest_*.c
 selftest_*.h
