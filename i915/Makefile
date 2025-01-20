@@ -91,6 +91,7 @@ SRCS=	\
 	intel_region_ttm.c \
 	intel_runtime_pm.c \
 	intel_sbi.c \
+	intel_snps_hdmi_pll.c \
 	intel_snps_phy.c \
 	intel_step.c \
 	intel_sprite.c \
