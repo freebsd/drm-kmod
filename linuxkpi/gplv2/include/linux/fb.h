@@ -149,10 +149,6 @@ struct linux_fb_info {
 	struct fb_info fbio;
 	device_t fb_bsddev;
 	struct task fb_mode_task;
-
-	/* i915 fictitious pages area */
-	resource_size_t aperture_base;
-	resource_size_t aperture_size;
 #endif
 } __aligned(sizeof(long));
 
