@@ -1230,6 +1230,7 @@ SRCS+=	amd_powerplay.c \
 	smu_v13_0_6_ppt.c \
 	smu_v13_0_7_ppt.c \
 	smu_v13_0_10.c \
+	smu_v13_0_12_ppt.c \
 	smu_v14_0.c \
 	smu_v14_0_0_ppt.c \
 	smu_v14_0_2_ppt.c \
