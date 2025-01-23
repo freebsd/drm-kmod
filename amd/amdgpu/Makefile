@@ -271,7 +271,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/resource/dcn35 \
 	${SRCDIR}/display/dc/resource/dcn351 \
 	${SRCDIR}/display/dc/resource/dcn401 \
-	${SRCDIR}/display/dc/spl \
+	${SRCDIR}/display/dc/sspl \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
@@ -1110,7 +1110,7 @@ SRCS+=	link_ddc.c \
 	link_resource.c \
 	link_validation.c
 
-# display/dc/spl
+# display/dc/sspl
 SRCS+=	dc_spl.c \
 	dc_spl_filters.c \
 	dc_spl_isharp_filters.c \
@@ -1326,7 +1326,7 @@ CFLAGS+= -I${SRCDIR}/display/dc/opp
 CFLAGS+= -I${SRCDIR}/display/dc/optc
 CFLAGS+= -I${SRCDIR}/display/dc/pg
 CFLAGS+= -I${SRCDIR}/display/dc/resource
-CFLAGS+= -I${SRCDIR}/display/dc/spl
+CFLAGS+= -I${SRCDIR}/display/dc/sspl
 CFLAGS+= -I${SRCDIR}/display/dmub/inc
 CFLAGS+= -I${SRCDIR}/display/include
 CFLAGS+= -I${SRCDIR}/display/modules/hdcp
