@@ -60,6 +60,7 @@ SRCS=	\
 	intel_bios.c \
 	intel_cdclk.c \
 	intel_clock_gating.c \
+	intel_cmtg.c \
 	intel_color.c \
 	intel_combo_phy.c \
 	intel_connector.c \
