@@ -317,6 +317,7 @@ SRCS+=	amdgpu_aca.c \
 	amdgpu_bo_list.c \
 	amdgpu_cgs.c \
 	amdgpu_connectors.c \
+	amdgpu_cper.c \
 	amdgpu_cs.c \
 	amdgpu_csa.c \
 	amdgpu_ctx.c \
