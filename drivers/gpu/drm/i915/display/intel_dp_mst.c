@@ -367,7 +367,7 @@ int intel_dp_mtp_tu_compute_config(struct intel_dp *intel_dp,
 static int mst_stream_find_vcpi_slots_for_bpp(struct intel_dp *intel_dp,
 					      struct intel_crtc_state *crtc_state,
 					      int max_bpp, int min_bpp,
-					      struct link_config_limits *limits,
+					      const struct link_config_limits *limits,
 					      struct drm_connector_state *conn_state,
 					      int step, bool dsc)
 {
@@ -392,7 +392,7 @@ static int mst_stream_find_vcpi_slots_for_bpp(struct intel_dp *intel_dp,
 static int mst_stream_compute_link_config(struct intel_dp *intel_dp,
 					  struct intel_crtc_state *crtc_state,
 					  struct drm_connector_state *conn_state,
-					  struct link_config_limits *limits)
+					  const struct link_config_limits *limits)
 {
 	/*
 	 * FIXME: allocate the BW according to link_bpp, which in the case of
@@ -408,7 +408,7 @@ static int mst_stream_compute_link_config(struct intel_dp *intel_dp,
 static int mst_stream_dsc_compute_link_config(struct intel_dp *intel_dp,
 					      struct intel_crtc_state *crtc_state,
 					      struct drm_connector_state *conn_state,
-					      struct link_config_limits *limits)
+					      const struct link_config_limits *limits)
 {
 	struct intel_display *display = to_intel_display(intel_dp);
 	struct intel_connector *connector = to_intel_connector(conn_state->connector);
