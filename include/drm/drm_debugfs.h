@@ -35,7 +35,7 @@
 #include <linux/types.h>
 #include <linux/seq_file.h>
 
-#include <drm/drm_gpuva_mgr.h>
+#include <drm/drm_gpuvm.h>
 
 /**
  * DRM_DEBUGFS_GPUVA_INFO - &drm_info_list entry to dump a GPU VA space
@@ -142,8 +142,8 @@ struct drm_debugfs_entry {
 void drm_debugfs_create_files(const struct drm_info_list *files,
 			      int count, struct dentry *root,
 			      struct drm_minor *minor);
-int drm_debugfs_remove_files(const struct drm_info_list *files,
-			     int count, struct drm_minor *minor);
+int drm_debugfs_remove_files(const struct drm_info_list *files, int count,
+			     struct dentry *root, struct drm_minor *minor);
 
 void drm_debugfs_add_file(struct drm_device *dev, const char *name,
 			  int (*show)(struct seq_file*, void*), void *data);
@@ -153,7 +153,7 @@ void drm_debugfs_add_files(struct drm_device *dev,
 
 #ifdef __linux__
 int drm_debugfs_gpuva_info(struct seq_file *m,
-			   struct drm_gpuva_manager *mgr);
+			   struct drm_gpuvm *gpuvm);
 #endif
 #else
 static inline void drm_debugfs_create_files(const struct drm_info_list *files,
@@ -162,7 +162,8 @@ static inline void drm_debugfs_create_files(const struct drm_info_list *files,
 {}
 
 static inline int drm_debugfs_remove_files(const struct drm_info_list *files,
-					   int count, struct drm_minor *minor)
+					   int count, struct dentry *root,
+					   struct drm_minor *minor)
 {
 	return 0;
 }
@@ -179,7 +180,7 @@ static inline void drm_debugfs_add_files(struct drm_device *dev,
 
 #ifdef __linux__
 static inline int drm_debugfs_gpuva_info(struct seq_file *m,
-					 struct drm_gpuva_manager *mgr)
+					 struct drm_gpuvm *gpuvm)
 {
 	return 0;
 }

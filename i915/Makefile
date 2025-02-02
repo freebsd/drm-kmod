@@ -121,6 +121,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_display_power_well.c \
 	intel_display_reset.c \
 	intel_display_rps.c \
+	intel_display_wa.c \
 	intel_dkl_phy.c \
 	intel_dp.c \
 	intel_dp_aux.c \
@@ -140,9 +141,11 @@ SRCS+=	dvo_ch7017.c \
 	intel_global_state.c \
 	intel_gmbus.c \
 	intel_hdcp_gsc.c \
+	intel_hdcp_gsc_message.c \
 	intel_hdmi.c \
 	intel_hotplug_irq.c \
 	intel_hti.c \
+	intel_link_bw.c \
 	intel_load_detect.c \
 	intel_lspcon.c \
 	intel_lvds.c \
@@ -341,6 +344,7 @@ CFLAGS+= -I${SRCDIR:H:H} -I${SRCDIR} -I${SRCDIR}/display
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=i915_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
+CFLAGS+= -DI915
 
 SRCS	+=			\
 	opt_acpi.h		\
@@ -383,7 +387,7 @@ CWARNFLAGS.intel_gmch.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_gt_mcr.c=	-Wno-tautological-constant-out-of-range-compare
 CWARNFLAGS.intel_guc_capture.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_guc_submission.c=	-Wno-unused-function
-CWARNFLAGS.intel_hdmi.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.intel_hdmi.c=	-Wno-unused-but-set-variable -Wno-unused-variable
 CWARNFLAGS.intel_hotplug.c=	-Wno-uninitialized
 CWARNFLAGS.intel_psr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.intel_region_ttm.c=	-Wno-missing-prototypes

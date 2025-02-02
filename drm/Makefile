@@ -37,6 +37,7 @@ SRCS=	drm_atomic.c \
 	drm_gem.c \
 	drm_gem_atomic_helper.c \
 	drm_gem_framebuffer_helper.c \
+	drm_gpuvm.c \
 	drm_hashtab.c \
 	drm_ioctl.c \
 	drm_lease.c \
@@ -67,6 +68,9 @@ SRCS=	drm_atomic.c \
 	drm_vma_manager.c \
 	linux_fb.c \
 	vt_drmfb.c
+
+# GPL-2.0.
+SRCS+=	drm_writeback.c
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
 SRCS+=	drm_fb_helper.c \
@@ -160,6 +164,7 @@ CWARNFLAGS+=-Wno-cast-qual
 .endif
 CWARNFLAGS+= -Wno-pointer-sign -Wno-format
 
+CWARNFLAGS.drm_file.c+=		-Wno-unused-value
 CWARNFLAGS.drm_ioc32.c+=	-Wno-address-of-packed-member
 
 .include <bsd.kmod.mk>
