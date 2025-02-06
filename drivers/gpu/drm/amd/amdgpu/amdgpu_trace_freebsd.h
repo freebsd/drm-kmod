@@ -59,6 +59,11 @@ trace_amdgpu_isolation(void *prev, void *next) {
 	CTR2(KTR_DRM, "prev=%p, next=%p", prev, next);
 }
 
+static inline void
+trace_amdgpu_cleaner_shader(struct amdgpu_ring *ring, struct dma_fence *fence) {
+	CTR2(KTR_DRM, "ring=%s, seqno=%Lu", ring->name, fence->seqno);
+}
+
 #define	trace_amdgpu_vm_grab_id(vm, idx, job) \
         CTR3(KTR_DRM, "amdgpu_vm_grab_id %p %u %p", (vm), (idx), (job));
 
