@@ -54,6 +54,11 @@ trace_amdgpu_pasid_freed(unsigned pasid) {
 	CTR1(KTR_DRM, "amdgpu_pasid_freed %u", pasid);	
 }
 
+static inline void
+trace_amdgpu_isolation(void *prev, void *next) {
+	CTR2(KTR_DRM, "prev=%p, next=%p", prev, next);
+}
+
 #define	trace_amdgpu_vm_grab_id(vm, idx, job) \
         CTR3(KTR_DRM, "amdgpu_vm_grab_id %p %u %p", (vm), (idx), (job));
 
