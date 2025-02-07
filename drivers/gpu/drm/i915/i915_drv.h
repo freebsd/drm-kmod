@@ -281,7 +281,6 @@ struct drm_i915_private {
 
 	/* PCH chipset type */
 	enum intel_pch pch_type;
-	unsigned short pch_id;
 
 	unsigned long gem_quirks;
 
