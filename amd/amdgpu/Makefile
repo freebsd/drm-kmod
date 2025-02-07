@@ -1387,3 +1387,7 @@ CWARNFLAGS.vegam_smumgr.c=		-Wno-missing-prototypes
 
 # modules/*
 CWARNFLAGS.freesync.c=			-Wno-unused-but-set-variable
+
+# drivers/gpu/drm/amd/amdxcp/amdgpu_xcp_drv.c
+EXPORT_SYMS+=	amdgpu_xcp_drm_dev_alloc
+EXPORT_SYMS+=	amdgpu_xcp_drv_release

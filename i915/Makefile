@@ -406,3 +406,10 @@ CWARNFLAGS.i9xx_plane.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.g4x_dp.c=		-Wno-shift-count-overflow
 CWARNFLAGS.skl_universal_plane.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.vlv_dsi.c=		-Wno-unused-but-set-variable
+
+# drivers/gpu/drm/i915/gt/intel_rps.c
+EXPORT_SYMS+=	i915_gpu_busy
+EXPORT_SYMS+=	i915_gpu_lower
+EXPORT_SYMS+=	i915_gpu_raise
+EXPORT_SYMS+=	i915_gpu_turbo_disable
+EXPORT_SYMS+=	i915_read_mch_val
