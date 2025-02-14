@@ -93,10 +93,17 @@ int ttm_tt_create(struct ttm_buffer_object *bo, bool zero_alloc)
 	 * mapped TT pages need to be decrypted or otherwise the drivers
 	 * will end up sending encrypted mem to the gpu.
 	 */
+#ifdef __linux__
+        /*
+         * TODO FreeBSD
+         * We can't check CC_ATTR_GUEST_MEM_ENCRYPT as it's in an enum
+         * and we don't support guest memory encryption anyway so skip this for now.
+         */
 	if (bdev->pool.use_dma_alloc && cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT)) {
 		page_flags |= TTM_TT_FLAG_DECRYPTED;
 		drm_info(ddev, "TT memory decryption enabled.");
 	}
+#endif
 
 	bo->ttm = bdev->funcs->ttm_tt_create(bo, page_flags);
 	if (unlikely(bo->ttm == NULL))
