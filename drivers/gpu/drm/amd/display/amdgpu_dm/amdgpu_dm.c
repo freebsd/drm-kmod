@@ -3710,7 +3710,7 @@ void amdgpu_dm_update_connector_after_detect(
 		 * For S3 resume with headless use eml_sink to fake stream
 		 * because on resume connector->sink is set to NULL
 		 */
-		mutex_lock(&dev->mode_config.mutex);
+		guard(mutex)(&dev->mode_config.mutex);
 
 		if (sink) {
 			if (aconnector->dc_sink) {
@@ -3734,8 +3734,6 @@ void amdgpu_dm_update_connector_after_detect(
 				dc_sink_retain(aconnector->dc_sink);
 			}
 		}
-
-		mutex_unlock(&dev->mode_config.mutex);
 
 		if (sink)
 			dc_sink_release(sink);
@@ -3766,7 +3764,7 @@ void amdgpu_dm_update_connector_after_detect(
 	drm_dbg_kms(dev, "DCHPD: connector_id=%d: Old sink=%p New sink=%p\n",
 		    aconnector->connector_id, aconnector->dc_sink, sink);
 
-	mutex_lock(&dev->mode_config.mutex);
+	guard(mutex)(&dev->mode_config.mutex);
 
 	/*
 	 * 1. Update status of the drm connector
@@ -3827,8 +3825,6 @@ void amdgpu_dm_update_connector_after_detect(
 		if (connector->state->content_protection == DRM_MODE_CONTENT_PROTECTION_ENABLED)
 			connector->state->content_protection = DRM_MODE_CONTENT_PROTECTION_DESIRED;
 	}
-
-	mutex_unlock(&dev->mode_config.mutex);
 
 	update_subconnector_property(aconnector);
 
