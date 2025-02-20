@@ -129,7 +129,6 @@ int mipi_dsi_dcs_set_display_off(struct mipi_dsi_device *);
 int mipi_dsi_dcs_set_display_on(struct mipi_dsi_device *);
 int mipi_dsi_dcs_set_column_address(struct mipi_dsi_device *, u16, u16);
 int mipi_dsi_dcs_set_page_address(struct mipi_dsi_device *, u16, u16);
-int mipi_dsi_dcs_set_tear_off(struct mipi_dsi_device *);
 int mipi_dsi_dcs_set_tear_on(struct mipi_dsi_device *,
     enum mipi_dsi_dcs_tear_mode);
 int mipi_dsi_dcs_set_pixel_format(struct mipi_dsi_device *, u8);
@@ -157,6 +156,7 @@ void mipi_dsi_dcs_set_page_address_multi(struct mipi_dsi_multi_context *,
     u16, u16);
 void mipi_dsi_dcs_set_tear_scanline_multi(struct mipi_dsi_multi_context *,
     u16);
+void mipi_dsi_dcs_set_tear_off_multi(struct mipi_dsi_multi_context *ctx);
 
 static inline int
 mipi_dsi_pixel_format_to_bpp(enum mipi_dsi_pixel_format fmt)
