@@ -162,4 +162,6 @@ CWARNFLAGS+= -Wno-pointer-sign -Wno-format
 
 CWARNFLAGS.drm_ioc32.c+=	-Wno-address-of-packed-member
 
+EXPORT_SYMS=	yes
+
 .include <bsd.kmod.mk>
