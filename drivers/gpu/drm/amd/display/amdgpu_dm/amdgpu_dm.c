@@ -4836,6 +4836,7 @@ amdgpu_dm_register_backlight_device(struct amdgpu_dm_connector *aconnector)
 		backlight_device_register(bl_name, aconnector->base.dev->dev, dm,
 #endif
 					  &amdgpu_dm_backlight_ops, &props);
+	dm->brightness[aconnector->bl_idx] = props.brightness;
 
 	if (IS_ERR(dm->backlight_dev[aconnector->bl_idx])) {
 		DRM_ERROR("DM: Backlight registration failed!\n");
@@ -4903,7 +4904,6 @@ static void setup_backlight_device(struct amdgpu_display_manager *dm,
 	aconnector->bl_idx = bl_idx;
 
 	amdgpu_dm_update_backlight_caps(dm, bl_idx);
-	dm->brightness[bl_idx] = AMDGPU_MAX_BL_LEVEL;
 	dm->backlight_link[bl_idx] = link;
 	dm->num_of_edps++;
 
