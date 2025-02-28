@@ -472,7 +472,6 @@ static bool enable_assr(void *handle, struct dc_link *link)
 	struct mod_hdcp hdcp = hdcp_work->hdcp;
 	struct psp_context *psp = hdcp.config.psp.handle;
 	struct ta_dtm_shared_memory *dtm_cmd;
-	bool res = true;
 
 	if (!psp->dtm_context.context.initialized) {
 		DRM_INFO("Failed to enable ASSR, DTM TA is not initialized.");
@@ -493,10 +492,10 @@ static bool enable_assr(void *handle, struct dc_link *link)
 
 	if (dtm_cmd->dtm_status != TA_DTM_STATUS__SUCCESS) {
 		DRM_INFO("Failed to enable ASSR");
-		res = false;
+		return false;
 	}
 
-	return res;
+	return true;
 }
 
 static void update_config(void *handle, struct cp_psp_stream_config *config)
