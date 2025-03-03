@@ -8,6 +8,8 @@
 
 #include <linux/types.h>
 
+struct cea_sad;
+
 /* ELD Header Block */
 #define DRM_ELD_HEADER_BLOCK_SIZE	4
 
@@ -70,16 +72,19 @@
  * drm_eld_mnl - Get ELD monitor name length in bytes.
  * @eld: pointer to an eld memory structure with mnl set
  */
-static inline int drm_eld_mnl(const uint8_t *eld)
+static inline int drm_eld_mnl(const u8 *eld)
 {
 	return (eld[DRM_ELD_CEA_EDID_VER_MNL] & DRM_ELD_MNL_MASK) >> DRM_ELD_MNL_SHIFT;
 }
+
+int drm_eld_sad_get(const u8 *eld, int sad_index, struct cea_sad *cta_sad);
+int drm_eld_sad_set(u8 *eld, int sad_index, const struct cea_sad *cta_sad);
 
 /**
  * drm_eld_sad - Get ELD SAD structures.
  * @eld: pointer to an eld memory structure with sad_count set
  */
-static inline const uint8_t *drm_eld_sad(const uint8_t *eld)
+static inline const u8 *drm_eld_sad(const u8 *eld)
 {
 	unsigned int ver, mnl;
 
@@ -98,7 +103,7 @@ static inline const uint8_t *drm_eld_sad(const uint8_t *eld)
  * drm_eld_sad_count - Get ELD SAD count.
  * @eld: pointer to an eld memory structure with sad_count set
  */
-static inline int drm_eld_sad_count(const uint8_t *eld)
+static inline int drm_eld_sad_count(const u8 *eld)
 {
 	return (eld[DRM_ELD_SAD_COUNT_CONN_TYPE] & DRM_ELD_SAD_COUNT_MASK) >>
 		DRM_ELD_SAD_COUNT_SHIFT;
@@ -111,7 +116,7 @@ static inline int drm_eld_sad_count(const uint8_t *eld)
  * This is a helper for determining the payload size of the baseline block, in
  * bytes, for e.g. setting the Baseline_ELD_Len field in the ELD header block.
  */
-static inline int drm_eld_calc_baseline_block_size(const uint8_t *eld)
+static inline int drm_eld_calc_baseline_block_size(const u8 *eld)
 {
 	return DRM_ELD_MONITOR_NAME_STRING - DRM_ELD_HEADER_BLOCK_SIZE +
 		drm_eld_mnl(eld) + drm_eld_sad_count(eld) * 3;
@@ -127,7 +132,7 @@ static inline int drm_eld_calc_baseline_block_size(const uint8_t *eld)
  *
  * The returned value is guaranteed to be a multiple of 4.
  */
-static inline int drm_eld_size(const uint8_t *eld)
+static inline int drm_eld_size(const u8 *eld)
 {
 	return DRM_ELD_HEADER_BLOCK_SIZE + eld[DRM_ELD_BASELINE_ELD_LEN] * 4;
 }
@@ -139,7 +144,7 @@ static inline int drm_eld_size(const uint8_t *eld)
  * The returned value is the speakers mask. User has to use %DRM_ELD_SPEAKER
  * field definitions to identify speakers.
  */
-static inline u8 drm_eld_get_spk_alloc(const uint8_t *eld)
+static inline u8 drm_eld_get_spk_alloc(const u8 *eld)
 {
 	return eld[DRM_ELD_SPEAKER] & DRM_ELD_SPEAKER_MASK;
 }
@@ -151,7 +156,7 @@ static inline u8 drm_eld_get_spk_alloc(const uint8_t *eld)
  * The caller need to use %DRM_ELD_CONN_TYPE_HDMI or %DRM_ELD_CONN_TYPE_DP to
  * identify the display type connected.
  */
-static inline u8 drm_eld_get_conn_type(const uint8_t *eld)
+static inline u8 drm_eld_get_conn_type(const u8 *eld)
 {
 	return eld[DRM_ELD_SAD_COUNT_CONN_TYPE] & DRM_ELD_CONN_TYPE_MASK;
 }
