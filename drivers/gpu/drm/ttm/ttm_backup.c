@@ -21,6 +21,7 @@ static struct ttm_backup *ttm_file_to_backup(struct file *file)
 	return (void *)file;
 }
 
+#ifdef __linux__
 /*
  * Need to map shmem indices to handle since a handle value
  * of 0 means error, following the swp_entry_t convention.
@@ -29,6 +30,7 @@ static unsigned long ttm_backup_shmem_idx_to_handle(pgoff_t idx)
 {
 	return (unsigned long)idx + 1;
 }
+#endif
 
 static pgoff_t ttm_backup_handle_to_shmem_idx(pgoff_t handle)
 {
@@ -119,6 +121,7 @@ ttm_backup_backup_page(struct ttm_backup *backup, struct page *page,
 		       bool writeback, pgoff_t idx, gfp_t page_gfp,
 		       gfp_t alloc_gfp)
 {
+#ifdef __linux__
 	struct file *filp = ttm_backup_to_file(backup);
 #ifdef __linux__
 	struct address_space *mapping = filp->f_mapping;
@@ -127,9 +130,7 @@ ttm_backup_backup_page(struct ttm_backup *backup, struct page *page,
 #endif
 	unsigned long handle = 0;
 	struct folio *to_folio;
-#ifdef __linux__
 	int ret;
-#endif
 
 	to_folio = shmem_read_folio_gfp(mapping, idx, alloc_gfp);
 	if (IS_ERR(to_folio))
@@ -141,7 +142,6 @@ ttm_backup_backup_page(struct ttm_backup *backup, struct page *page,
 	copy_highpage(folio_file_page(to_folio, idx), page);
 	handle = ttm_backup_shmem_idx_to_handle(idx);
 
-#ifdef __linux__
 	if (writeback && !folio_mapped(to_folio) &&
 	    folio_clear_dirty_for_io(to_folio)) {
 		struct writeback_control wbc = {
@@ -165,14 +165,15 @@ ttm_backup_backup_page(struct ttm_backup *backup, struct page *page,
 	} else {
 		folio_unlock(to_folio);
 	}
-#elif defined(__FreeBSD)
-	pr_debug("%s: TODO\n", __func__);
-	folio_unlock(to_folio);
-#endif
 
 	folio_put(to_folio);
 
 	return handle;
+#elif defined(__FreeBSD__)
+	pr_debug("%s: TODO\n", __func__);
+
+	return -EOPNOTSUPP;
+#endif
 }
 
 /**
