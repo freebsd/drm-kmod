@@ -236,6 +236,9 @@ static unsigned int tile_row_pages(const struct drm_i915_gem_object *obj)
  * 4 - Support multiple fault handlers per object depending on object's
  *     backing storage (a.k.a. MMAP_OFFSET).
  *
+ * 5 - Support multiple partial mmaps(mmap part of BO + unmap a offset, multiple
+ *     times with different size and offset).
+ *
  * Restrictions:
  *
  *  * snoopable objects cannot be accessed via the GTT. It can cause machine
@@ -266,7 +269,7 @@ int i915_gem_mmap_gtt_version(void)
 #if __FreeBSD_version < 1500508 || (__FreeBSD_version >= 1600000 && __FreeBSD_version < 1600015)
 	return 3;
 #else
-	return 4;
+	return 5;
 #endif
 }
 
