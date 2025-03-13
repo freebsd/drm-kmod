@@ -189,64 +189,64 @@ i915_error_printer(struct drm_i915_error_state_buf *e)
 }
 
 /* single threaded page allocator with a reserved stash for emergencies */
-static void pool_fini(struct pagevec *pv)
+static void pool_fini(struct folio_batch *fbatch)
 {
-	pagevec_release(pv);
+	folio_batch_release(fbatch);
 }
 
-static int pool_refill(struct pagevec *pv, gfp_t gfp)
+static int pool_refill(struct folio_batch *fbatch, gfp_t gfp)
 {
-	while (pagevec_space(pv)) {
-		struct page *p;
+	while (folio_batch_space(fbatch)) {
+		struct folio *folio;
 
-		p = alloc_page(gfp);
-		if (!p)
+		folio = folio_alloc(gfp, 0);
+		if (!folio)
 			return -ENOMEM;
 
-		pagevec_add(pv, p);
+		folio_batch_add(fbatch, folio);
 	}
 
 	return 0;
 }
 
-static int pool_init(struct pagevec *pv, gfp_t gfp)
+static int pool_init(struct folio_batch *fbatch, gfp_t gfp)
 {
 	int err;
 
-	pagevec_init(pv);
+	folio_batch_init(fbatch);
 
-	err = pool_refill(pv, gfp);
+	err = pool_refill(fbatch, gfp);
 	if (err)
-		pool_fini(pv);
+		pool_fini(fbatch);
 
 	return err;
 }
 
-static void *pool_alloc(struct pagevec *pv, gfp_t gfp)
+static void *pool_alloc(struct folio_batch *fbatch, gfp_t gfp)
 {
-	struct page *p;
+	struct folio *folio;
 
-	p = alloc_page(gfp);
-	if (!p && pagevec_count(pv))
-		p = pv->pages[--pv->nr];
+	folio = folio_alloc(gfp, 0);
+	if (!folio && folio_batch_count(fbatch))
+		folio = fbatch->folios[--fbatch->nr];
 
-	return p ? page_address(p) : NULL;
+	return folio ? folio_address(folio) : NULL;
 }
 
-static void pool_free(struct pagevec *pv, void *addr)
+static void pool_free(struct folio_batch *fbatch, void *addr)
 {
-	struct page *p = virt_to_page(addr);
+	struct folio *folio = virt_to_folio(addr);
 
-	if (pagevec_space(pv))
-		pagevec_add(pv, p);
+	if (folio_batch_space(fbatch))
+		folio_batch_add(fbatch, folio);
 	else
-		__free_page(p);
+		folio_put(folio);
 }
 
 #ifdef CONFIG_DRM_I915_COMPRESS_ERROR
 
 struct i915_vma_compress {
-	struct pagevec pool;
+	struct folio_batch pool;
 	struct z_stream_s zstream;
 	void *tmp;
 };
@@ -387,7 +387,7 @@ static void err_compression_marker(struct drm_i915_error_state_buf *m)
 #else
 
 struct i915_vma_compress {
-	struct pagevec pool;
+	struct folio_batch pool;
 };
 
 static bool compress_init(struct i915_vma_compress *c)
@@ -1276,7 +1276,16 @@ static void engine_record_registers(struct intel_engine_coredump *ee)
 	if (GRAPHICS_VER(i915) >= 6) {
 		ee->rc_psmi = ENGINE_READ(engine, RING_PSMI_CTL);
 
-		if (GRAPHICS_VER_FULL(i915) >= IP_VER(12, 50))
+		/*
+		 * For the media GT, this ring fault register is not replicated,
+		 * so don't do multicast/replicated register read/write
+		 * operation on it.
+		 */
+		if (MEDIA_VER(i915) >= 13 && engine->gt->type == GT_MEDIA)
+			ee->fault_reg = intel_uncore_read(engine->uncore,
+							  XELPMP_RING_FAULT_REG);
+
+		else if (GRAPHICS_VER_FULL(i915) >= IP_VER(12, 50))
 			ee->fault_reg = intel_gt_mcr_read_any(engine->gt,
 							      XEHP_RING_FAULT_REG);
 		else if (GRAPHICS_VER(i915) >= 12)
@@ -1799,7 +1808,7 @@ static void gt_record_display_regs(struct intel_gt_coredump *gt)
 	struct intel_uncore *uncore = gt->_gt->uncore;
 	struct drm_i915_private *i915 = uncore->i915;
 
-	if (GRAPHICS_VER(i915) >= 6)
+	if (DISPLAY_VER(i915) >= 6 && DISPLAY_VER(i915) < 20)
 		gt->derrmr = intel_uncore_read(uncore, DERRMR);
 
 	if (GRAPHICS_VER(i915) >= 8)
@@ -2014,7 +2023,7 @@ static void capture_gen(struct i915_gpu_coredump *error)
 	struct drm_i915_private *i915 = error->i915;
 
 	error->wakelock = atomic_read(&i915->runtime_pm.wakeref_count);
-	error->suspended = i915->runtime_pm.suspended;
+	error->suspended = pm_runtime_suspended(i915->drm.dev);
 
 	error->iommu = i915_vtd_active(i915);
 	error->reset_count = i915_reset_count(&i915->gpu_error);

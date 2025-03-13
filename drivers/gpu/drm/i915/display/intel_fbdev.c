@@ -288,22 +288,12 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	if (i915_gem_object_is_lmem(obj)) {
 		struct intel_memory_region *mem = obj->mm.region;
 
-#ifdef __FreeBSD__
-		info->aperture_base = mem->io_start;
-		info->aperture_size = mem->io_size;
-#endif
-
 		/* Use fbdev's framebuffer from lmem for discrete */
 		info->fix.smem_start =
 			(unsigned long)(mem->io_start +
 					i915_gem_object_get_dma_address(obj, 0));
 		info->fix.smem_len = obj->base.size;
 	} else {
-#ifdef __FreeBSD__
-		info->aperture_base = ggtt->gmadr.start;
-		info->aperture_size = ggtt->mappable_end;
-#endif
-
 		/* Our framebuffer is the entirety of fbdev's system memory */
 		info->fix.smem_start =
 			(unsigned long)(ggtt->gmadr.start + i915_ggtt_offset(vma));
@@ -313,10 +303,10 @@ static int intelfb_create(struct drm_fb_helper *helper,
 #ifdef __FreeBSD__
 	/*
 	 * After the if() above, we can register the fictitious memory range
-	 * based on the info->apertures->ranges[0] values.
+	 * based on the info->fix.smem_* values.
 	 *
-	 * This was handled in register_framebuffer() in the past, also based
-	 * on the values of info->apertures->ranges[0]. However, the `amdgpu`
+	 * This was handled in register_framebuffer() in the past, but based on
+	 * the values of info->apertures->ranges[0]. However, the `amdgpu`
 	 * driver stopped setting them when it got rid of its specific
 	 * framebuffer initialization to use the generic drm_fb_helper code.
 	 *
@@ -324,7 +314,7 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	 * values passed to register_fictitious_range() below are unavailable
 	 * from a generic structure set by both drivers.
 	 */
-	register_fictitious_range(info->aperture_base, info->aperture_size);
+	register_fictitious_range(info->fix.smem_start, info->fix.smem_len);
 #endif
 
 	for_i915_gem_ww(&ww, ret, false) {
@@ -401,8 +391,8 @@ static void intel_fbdev_destroy(struct intel_fbdev *ifbdev)
 
 #ifdef __FreeBSD__
 	unregister_fictitious_range(
-	    ifbdev->helper.info->aperture_base,
-	    ifbdev->helper.info->aperture_size);
+		ifbdev->helper.info->fix.smem_start,
+		ifbdev->helper.info->fix.smem_len);
 #endif
 
 	drm_fb_helper_fini(&ifbdev->helper);
