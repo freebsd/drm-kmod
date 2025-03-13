@@ -24,6 +24,7 @@ struct mipi_dsi_host {
 
 struct mipi_dsi_device {
 	struct mipi_dsi_host *host;
+	bool attached;
 	uint32_t channel;
 	uint32_t mode_flags;
 #define MIPI_DSI_MODE_LPM	(1 << 0)

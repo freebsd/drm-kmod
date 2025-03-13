@@ -43,7 +43,6 @@
 #include <drm/drm_fourcc.h>
 #include <drm/drm_gem_framebuffer_helper.h>
 
-#include "gem/i915_gem_lmem.h"
 #include "gem/i915_gem_mman.h"
 
 #include "i915_drv.h"
@@ -51,6 +50,7 @@
 #include "intel_fb.h"
 #include "intel_fb_pin.h"
 #include "intel_fbdev.h"
+#include "intel_fbdev_fb.h"
 #include "intel_frontbuffer.h"
 
 struct intel_fbdev {
@@ -148,65 +148,6 @@ static const struct fb_ops intelfb_ops = {
 	.fb_mmap = intel_fbdev_mmap,
 };
 
-static int intelfb_alloc(struct drm_fb_helper *helper,
-			 struct drm_fb_helper_surface_size *sizes)
-{
-	struct intel_fbdev *ifbdev = to_intel_fbdev(helper);
-	struct drm_framebuffer *fb;
-	struct drm_device *dev = helper->dev;
-	struct drm_i915_private *dev_priv = to_i915(dev);
-	struct drm_mode_fb_cmd2 mode_cmd = {};
-	struct drm_i915_gem_object *obj;
-	int size;
-
-	/* we don't do packed 24bpp */
-	if (sizes->surface_bpp == 24)
-		sizes->surface_bpp = 32;
-
-	mode_cmd.width = sizes->surface_width;
-	mode_cmd.height = sizes->surface_height;
-
-	mode_cmd.pitches[0] = ALIGN(mode_cmd.width *
-				    DIV_ROUND_UP(sizes->surface_bpp, 8), 64);
-	mode_cmd.pixel_format = drm_mode_legacy_fb_format(sizes->surface_bpp,
-							  sizes->surface_depth);
-
-	size = mode_cmd.pitches[0] * mode_cmd.height;
-	size = PAGE_ALIGN(size);
-
-	obj = ERR_PTR(-ENODEV);
-	if (HAS_LMEM(dev_priv)) {
-		obj = i915_gem_object_create_lmem(dev_priv, size,
-						  I915_BO_ALLOC_CONTIGUOUS |
-						  I915_BO_ALLOC_USER);
-	} else {
-		/*
-		 * If the FB is too big, just don't use it since fbdev is not very
-		 * important and we should probably use that space with FBC or other
-		 * features.
-		 *
-		 * Also skip stolen on MTL as Wa_22018444074 mitigation.
-		 */
-		if (!(IS_METEORLAKE(dev_priv)) && size * 2 < dev_priv->dsm.usable_size)
-			obj = i915_gem_object_create_stolen(dev_priv, size);
-		if (IS_ERR(obj))
-			obj = i915_gem_object_create_shmem(dev_priv, size);
-	}
-
-	if (IS_ERR(obj)) {
-		drm_err(&dev_priv->drm, "failed to allocate framebuffer (%pe)\n", obj);
-		return PTR_ERR(obj);
-	}
-
-	fb = intel_framebuffer_create(obj, &mode_cmd);
-	i915_gem_object_put(obj);
-	if (IS_ERR(fb))
-		return PTR_ERR(fb);
-
-	ifbdev->fb = to_intel_framebuffer(fb);
-	return 0;
-}
-
 static int intelfb_create(struct drm_fb_helper *helper,
 			  struct drm_fb_helper_surface_size *sizes)
 {
@@ -215,7 +156,6 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	struct drm_device *dev = helper->dev;
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	struct pci_dev *pdev = to_pci_dev(dev_priv->drm.dev);
-	struct i915_ggtt *ggtt = to_gt(dev_priv)->ggtt;
 	const struct i915_gtt_view view = {
 		.type = I915_GTT_VIEW_NORMAL,
 	};
@@ -224,9 +164,7 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	struct i915_vma *vma;
 	unsigned long flags = 0;
 	bool prealloc = false;
-	void __iomem *vaddr;
 	struct drm_i915_gem_object *obj;
-	struct i915_gem_ww_ctx ww;
 	int ret;
 
 	mutex_lock(&ifbdev->hpd_lock);
@@ -247,12 +185,13 @@ static int intelfb_create(struct drm_fb_helper *helper,
 		intel_fb = ifbdev->fb = NULL;
 	}
 	if (!intel_fb || drm_WARN_ON(dev, !intel_fb_obj(&intel_fb->base))) {
+		struct drm_framebuffer *fb;
 		drm_dbg_kms(&dev_priv->drm,
 			    "no BIOS fb, allocating a new one\n");
-		ret = intelfb_alloc(helper, sizes);
-		if (ret)
-			return ret;
-		intel_fb = ifbdev->fb;
+		fb = intel_fbdev_fb_alloc(helper, sizes);
+		if (IS_ERR(fb))
+			return PTR_ERR(fb);
+		intel_fb = ifbdev->fb = to_intel_framebuffer(fb);
 	} else {
 		drm_dbg_kms(&dev_priv->drm, "re-using BIOS fb\n");
 		prealloc = true;
@@ -285,38 +224,18 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	info->fbops = &intelfb_ops;
 
 	obj = intel_fb_obj(&intel_fb->base);
-	if (i915_gem_object_is_lmem(obj)) {
-		struct intel_memory_region *mem = obj->mm.region;
 
-#ifdef __FreeBSD__
-		info->aperture_base = mem->io_start;
-		info->aperture_size = mem->io_size;
-#endif
-
-		/* Use fbdev's framebuffer from lmem for discrete */
-		info->fix.smem_start =
-			(unsigned long)(mem->io_start +
-					i915_gem_object_get_dma_address(obj, 0));
-		info->fix.smem_len = obj->base.size;
-	} else {
-#ifdef __FreeBSD__
-		info->aperture_base = ggtt->gmadr.start;
-		info->aperture_size = ggtt->mappable_end;
-#endif
-
-		/* Our framebuffer is the entirety of fbdev's system memory */
-		info->fix.smem_start =
-			(unsigned long)(ggtt->gmadr.start + i915_ggtt_offset(vma));
-		info->fix.smem_len = vma->size;
-	}
+	ret = intel_fbdev_fb_fill_info(dev_priv, info, obj, vma);
+	if (ret)
+		goto out_unpin;
 
 #ifdef __FreeBSD__
 	/*
 	 * After the if() above, we can register the fictitious memory range
-	 * based on the info->apertures->ranges[0] values.
+	 * based on the info->fix.smem_* values.
 	 *
-	 * This was handled in register_framebuffer() in the past, also based
-	 * on the values of info->apertures->ranges[0]. However, the `amdgpu`
+	 * This was handled in register_framebuffer() in the past, but based on
+	 * the values of info->apertures->ranges[0]. However, the `amdgpu`
 	 * driver stopped setting them when it got rid of its specific
 	 * framebuffer initialization to use the generic drm_fb_helper code.
 	 *
@@ -324,29 +243,8 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	 * values passed to register_fictitious_range() below are unavailable
 	 * from a generic structure set by both drivers.
 	 */
-	register_fictitious_range(info->aperture_base, info->aperture_size);
+	register_fictitious_range(info->fix.smem_start, info->fix.smem_len);
 #endif
-
-	for_i915_gem_ww(&ww, ret, false) {
-		ret = i915_gem_object_lock(vma->obj, &ww);
-
-		if (ret)
-			continue;
-
-		vaddr = i915_vma_pin_iomap(vma);
-		if (IS_ERR(vaddr)) {
-			drm_err(&dev_priv->drm,
-				"Failed to remap framebuffer into virtual memory (%pe)\n", vaddr);
-			ret = PTR_ERR(vaddr);
-			continue;
-		}
-	}
-
-	if (ret)
-		goto out_unpin;
-
-	info->screen_base = vaddr;
-	info->screen_size = vma->size;
 
 	drm_fb_helper_fill_info(info, &ifbdev->helper, sizes);
 
@@ -354,7 +252,7 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	 * If the object is stolen however, it will be full of whatever
 	 * garbage was left in there.
 	 */
-	if (!i915_gem_object_is_shmem(vma->obj) && !prealloc)
+	if (!i915_gem_object_is_shmem(obj) && !prealloc)
 		memset_io(info->screen_base, 0, info->screen_size);
 
 	/* Use default scratch pixmap (info->pixmap.flags = FB_PIXMAP_SYSTEM) */
@@ -401,8 +299,8 @@ static void intel_fbdev_destroy(struct intel_fbdev *ifbdev)
 
 #ifdef __FreeBSD__
 	unregister_fictitious_range(
-	    ifbdev->helper.info->aperture_base,
-	    ifbdev->helper.info->aperture_size);
+		ifbdev->helper.info->fix.smem_start,
+		ifbdev->helper.info->fix.smem_len);
 #endif
 
 	drm_fb_helper_fini(&ifbdev->helper);
@@ -459,12 +357,12 @@ static bool intel_fbdev_init_bios(struct drm_device *dev,
 			continue;
 		}
 
-		if (obj->base.size > max_size) {
+		if (intel_bo_to_drm_bo(obj)->size > max_size) {
 			drm_dbg_kms(&i915->drm,
 				    "found possible fb from [PLANE:%d:%s]\n",
 				    plane->base.base.id, plane->base.name);
 			fb = to_intel_framebuffer(plane_state->uapi.fb);
-			max_size = obj->base.size;
+			max_size = intel_bo_to_drm_bo(obj)->size;
 		}
 	}
 
