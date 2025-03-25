@@ -444,6 +444,23 @@ success:
 	return true;
 }
 
+static bool amdgpu_prefer_rom_resource(struct amdgpu_device *adev)
+{
+#ifdef __linux__
+	struct resource *res = &adev->pdev->resource[PCI_ROM_RESOURCE];
+
+	return (res->flags & IORESOURCE_ROM_SHADOW);
+#elif defined(__FreeBSD__)
+	/*
+	 * On Linux, the `IORESOURCE_ROM_SHADOW` flag is set in
+	 * `arch/x86/pci/fixup.c` to work around the behaviour of some specific
+	 * BIOS/firmware with some cards without a display. We don't have this
+	 * kind of detection on FreeBSD.
+	 */
+	return (false);
+#endif
+}
+
 static bool amdgpu_get_bios_dgpu(struct amdgpu_device *adev)
 {
 	if (amdgpu_atrm_get_bios(adev)) {
@@ -462,14 +479,27 @@ static bool amdgpu_get_bios_dgpu(struct amdgpu_device *adev)
 		goto success;
 	}
 
-	if (amdgpu_read_platform_bios(adev)) {
-		dev_info(adev->dev, "Fetched VBIOS from platform\n");
-		goto success;
-	}
+	if (amdgpu_prefer_rom_resource(adev)) {
+		if (amdgpu_read_bios(adev)) {
+			dev_info(adev->dev, "Fetched VBIOS from ROM BAR\n");
+			goto success;
+		}
 
-	if (amdgpu_read_bios(adev)) {
-		dev_info(adev->dev, "Fetched VBIOS from ROM BAR\n");
-		goto success;
+		if (amdgpu_read_platform_bios(adev)) {
+			dev_info(adev->dev, "Fetched VBIOS from platform\n");
+			goto success;
+		}
+
+	} else {
+		if (amdgpu_read_platform_bios(adev)) {
+			dev_info(adev->dev, "Fetched VBIOS from platform\n");
+			goto success;
+		}
+
+		if (amdgpu_read_bios(adev)) {
+			dev_info(adev->dev, "Fetched VBIOS from ROM BAR\n");
+			goto success;
+		}
 	}
 
 	if (amdgpu_read_bios_from_rom(adev)) {
