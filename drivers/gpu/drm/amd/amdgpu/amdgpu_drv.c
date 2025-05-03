@@ -2835,8 +2835,12 @@ static const struct drm_driver amdgpu_kms_driver = {
 	.driver_features =
 	    DRIVER_ATOMIC |
 	    DRIVER_GEM |
+#ifdef __linux__
 	    DRIVER_RENDER | DRIVER_MODESET | DRIVER_SYNCOBJ |
 	    DRIVER_SYNCOBJ_TIMELINE,
+#elif defined(__FreeBSD__)
+	    DRIVER_RENDER | DRIVER_MODESET | DRIVER_SYNCOBJ,
+#endif
 	.open = amdgpu_driver_open_kms,
 	.postclose = amdgpu_driver_postclose_kms,
 	.lastclose = amdgpu_driver_lastclose_kms,
@@ -2862,8 +2866,12 @@ static const struct drm_driver amdgpu_kms_driver = {
 
 const struct drm_driver amdgpu_partition_driver = {
 	.driver_features =
+#ifdef __linux__
 	    DRIVER_GEM | DRIVER_RENDER | DRIVER_SYNCOBJ |
 	    DRIVER_SYNCOBJ_TIMELINE,
+#elif defined(__FreeBSD__)
+	    DRIVER_GEM | DRIVER_RENDER | DRIVER_SYNCOBJ,
+#endif
 	.open = amdgpu_driver_open_kms,
 	.postclose = amdgpu_driver_postclose_kms,
 	.lastclose = amdgpu_driver_lastclose_kms,
