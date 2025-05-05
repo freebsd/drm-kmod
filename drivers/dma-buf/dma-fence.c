@@ -168,7 +168,7 @@ dma_fence_signal(struct dma_fence *fence)
 signed long
 dma_fence_wait_timeout(struct dma_fence *fence, bool intr, signed long timeout)
 {
-	int rv;
+	signed long rv;
 
 	if (fence == NULL)
 		return (-EINVAL);
