@@ -1827,8 +1827,12 @@ static const struct drm_driver i915_drm_driver = {
 	 */
 	.driver_features =
 	    DRIVER_GEM |
+#ifdef __linux__
 	    DRIVER_RENDER | DRIVER_MODESET | DRIVER_ATOMIC | DRIVER_SYNCOBJ |
 	    DRIVER_SYNCOBJ_TIMELINE,
+#elif defined(__FreeBSD__)
+	    DRIVER_RENDER | DRIVER_MODESET | DRIVER_ATOMIC | DRIVER_SYNCOBJ,
+#endif
 	.release = i915_driver_release,
 	.open = i915_driver_open,
 	.lastclose = i915_driver_lastclose,
