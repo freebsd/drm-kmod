@@ -28,7 +28,9 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn314 \
 	${SRCDIR}/display/dc/dml/dcn32 \
 	${SRCDIR}/display/dc/dml/dcn321 \
-	${SRCDIR}/display/dc/dml/dsc
+	${SRCDIR}/display/dc/dml/dcn35 \
+	${SRCDIR}/display/dc/dml/dsc \
+	${SRCDIR}/display/dc/dml2
 .endif
 
 .PATH:	${SRCDIR}/acp \
@@ -61,6 +63,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/clk_mgr/dcn315 \
 	${SRCDIR}/display/dc/clk_mgr/dcn316 \
 	${SRCDIR}/display/dc/clk_mgr/dcn32 \
+	${SRCDIR}/display/dc/clk_mgr/dcn35 \
 	${SRCDIR}/display/dc/dce \
 	${SRCDIR}/display/dc/dce100 \
 	${SRCDIR}/display/dc/dce110 \
@@ -82,8 +85,34 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn316 \
 	${SRCDIR}/display/dc/dcn32 \
 	${SRCDIR}/display/dc/dcn321 \
+	${SRCDIR}/display/dc/dcn35 \
+	${SRCDIR}/display/dc/hwss/dce \
+	${SRCDIR}/display/dc/hwss/dce100 \
+	${SRCDIR}/display/dc/hwss/dce110 \
+	${SRCDIR}/display/dc/hwss/dce112 \
+	${SRCDIR}/display/dc/hwss/dce120 \
+	${SRCDIR}/display/dc/hwss/dce60 \
+	${SRCDIR}/display/dc/hwss/dce80 \
+	${SRCDIR}/display/dc/hwss/dcn10 \
+	${SRCDIR}/display/dc/hwss/dcn20 \
+	${SRCDIR}/display/dc/hwss/dcn201 \
+	${SRCDIR}/display/dc/hwss/dcn21 \
+	${SRCDIR}/display/dc/hwss/dcn30 \
+	${SRCDIR}/display/dc/hwss/dcn301 \
+	${SRCDIR}/display/dc/hwss/dcn302 \
+	${SRCDIR}/display/dc/hwss/dcn303 \
+	${SRCDIR}/display/dc/hwss/dcn31 \
+	${SRCDIR}/display/dc/hwss/dcn314 \
+	${SRCDIR}/display/dc/hwss/dcn315 \
+	${SRCDIR}/display/dc/hwss/dcn316 \
+	${SRCDIR}/display/dc/hwss/dcn32 \
+	${SRCDIR}/display/dc/hwss/dcn321 \
+	${SRCDIR}/display/dc/hwss/dcn35 \
+	${SRCDIR}/display/dc/hwss/dcn351 \
 	${SRCDIR}/display/dc/dml/calcs \
 	${SRCDIR}/display/dc/dsc \
+	${SRCDIR}/display/dc/dsc/dcn20 \
+	${SRCDIR}/display/dc/dsc/dcn35 \
 	${_dml} \
 	${SRCDIR}/display/dc/gpio \
 	${SRCDIR}/display/dc/gpio/dce110 \
@@ -123,10 +152,41 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn314 \
 	${SRCDIR}/display/dc/irq/dcn315 \
 	${SRCDIR}/display/dc/irq/dcn32 \
+	${SRCDIR}/display/dc/irq/dcn35 \
 	${SRCDIR}/display/dc/link \
 	${SRCDIR}/display/dc/link/accessories \
 	${SRCDIR}/display/dc/link/hwss \
 	${SRCDIR}/display/dc/link/protocols \
+	${SRCDIR}/display/dc/optc/dcn10 \
+	${SRCDIR}/display/dc/optc/dcn20 \
+	${SRCDIR}/display/dc/optc/dcn201 \
+	${SRCDIR}/display/dc/optc/dcn30 \
+	${SRCDIR}/display/dc/optc/dcn301 \
+	${SRCDIR}/display/dc/optc/dcn31 \
+	${SRCDIR}/display/dc/optc/dcn314 \
+	${SRCDIR}/display/dc/optc/dcn32 \
+	${SRCDIR}/display/dc/optc/dcn35 \
+	${SRCDIR}/display/dc/resource/dce100 \
+	${SRCDIR}/display/dc/resource/dce110 \
+	${SRCDIR}/display/dc/resource/dce112 \
+	${SRCDIR}/display/dc/resource/dce120 \
+	${SRCDIR}/display/dc/resource/dce60 \
+	${SRCDIR}/display/dc/resource/dce80 \
+	${SRCDIR}/display/dc/resource/dcn10 \
+	${SRCDIR}/display/dc/resource/dcn20 \
+	${SRCDIR}/display/dc/resource/dcn201 \
+	${SRCDIR}/display/dc/resource/dcn21 \
+	${SRCDIR}/display/dc/resource/dcn30 \
+	${SRCDIR}/display/dc/resource/dcn301 \
+	${SRCDIR}/display/dc/resource/dcn302 \
+	${SRCDIR}/display/dc/resource/dcn303 \
+	${SRCDIR}/display/dc/resource/dcn31 \
+	${SRCDIR}/display/dc/resource/dcn314 \
+	${SRCDIR}/display/dc/resource/dcn315 \
+	${SRCDIR}/display/dc/resource/dcn316 \
+	${SRCDIR}/display/dc/resource/dcn32 \
+	${SRCDIR}/display/dc/resource/dcn321 \
+	${SRCDIR}/display/dc/resource/dcn35 \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
@@ -150,6 +210,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/pm/swsmu/smu11 \
 	${SRCDIR}/pm/swsmu/smu12 \
 	${SRCDIR}/pm/swsmu/smu13 \
+	${SRCDIR}/pm/swsmu/smu14 \
 	${DRM}/scheduler
 
 # acp
@@ -224,7 +285,10 @@ SRCS+=	amdgpu_afmt.c \
 	amdgpu_sa.c \
 	amdgpu_sched.c \
 	amdgpu_sdma.c \
+	amdgpu_umsch_mm.c \
+	amdgpu_vpe.c \
 	sienna_cichlid.c \
+	amdgpu_seq64.c \
 	amdgpu_sync.c \
 	amdgpu_trace_points.c \
 	amdgpu_ttm.c \
@@ -266,6 +330,7 @@ SRCS+=	amdgpu_afmt.c \
 	df_v1_7.c \
 	df_v3_6.c \
 	df_v4_3.c \
+	df_v4_6_2.c \
 	emu_soc.c \
 	gfx_v6_0.c \
 	gfx_v7_0.c \
@@ -284,6 +349,7 @@ SRCS+=	amdgpu_afmt.c \
 	gfxhub_v2_1.c \
 	gfxhub_v3_0.c \
 	gfxhub_v3_0_3.c \
+	gfxhub_v11_5_0.c \
 	gmc_v6_0.c \
 	gmc_v7_0.c \
 	gmc_v8_0.c \
@@ -307,6 +373,7 @@ SRCS+=	amdgpu_afmt.c \
 	jpeg_v3_0.c \
 	jpeg_v4_0.c \
 	jpeg_v4_0_3.c \
+	jpeg_v4_0_5.c \
 	kv_dpm.c \
 	kv_smc.c \
 	legacy_dpm.c \
@@ -322,6 +389,7 @@ SRCS+=	amdgpu_afmt.c \
 	mmhub_v3_0.c \
 	mmhub_v3_0_1.c \
 	mmhub_v3_0_2.c \
+	mmhub_v3_3.c \
 	mmhub_v9_4.c \
 	mxgpu_ai.c \
 	mxgpu_nv.c \
@@ -334,6 +402,7 @@ SRCS+=	amdgpu_afmt.c \
 	nbio_v7_4.c \
 	nbio_v7_7.c \
 	nbio_v7_9.c \
+	nbio_v7_11.c \
 	navi10_ih.c \
 	nv.c \
 	psp_v3_1.c \
@@ -371,6 +440,8 @@ SRCS+=	amdgpu_afmt.c \
 	umc_v6_7.c \
 	umc_v8_10.c \
 	umc_v8_7.c \
+	umc_v12_0.c \
+	umsch_mm_v4_0.c \
 	uvd_v3_1.c \
 	uvd_v4_2.c \
 	uvd_v5_0.c \
@@ -386,11 +457,13 @@ SRCS+=	amdgpu_afmt.c \
 	vcn_v3_0.c \
 	vcn_v4_0.c \
 	vcn_v4_0_3.c \
+	vcn_v4_0_5.c \
 	vega10_ih.c \
 	vega10_reg_init.c \
 	vega20_ih.c \
 	vega20_reg_init.c \
-	vi.c
+	vi.c \
+	vpe_v6_1.c
 
 # amdxcp
 SRCS+=	amdgpu_xcp_drv.c
@@ -409,12 +482,16 @@ SRCS+=	amdgpu_dm_color.c \
 	amdgpu_dm_psr.c \
 	amdgpu_dm_replay.c \
 	amdgpu_dm_services.c \
+	amdgpu_dm_wb.c \
 	amdgpu_dm.c \
 	dc_fpu.c
 
 # display/dc/basics
-SRCS+=	conversion.c \
+SRCS+=	bw_fixed.c \
+	conversion.c \
+	custom_float.c \
 	dc_common.c \
+	dce_calcs.c \
 	fixpt31_32.c \
 	vector.c
 
@@ -434,17 +511,13 @@ SRCS+=	bios_parser_common.c \
 	command_table_helper_dce60.c \
 	command_table_helper_dce80.c
 
-# display/dc/calcs
-SRCS+=	bw_fixed.c \
-	custom_float.c \
-	dce_calcs.c
-
 # display/dc/core
 SRCS+=	dc_debug.c \
 	dc_hw_sequencer.c \
 	dc_link_exports.c \
 	dc_resource.c \
 	dc_sink.c \
+	dc_state.c \
 	dc_stream.c \
 	dc_link_enc_cfg.c \
 	dc_surface.c \
@@ -477,12 +550,12 @@ SRCS+=	dce_abm.c \
 	dmub_outbox.c
 
 # display/dc/dce100
-SRCS+=	dce100_hw_sequencer.c \
+SRCS+=	dce100_hwseq.c \
 	dce100_resource.c
 
 # display/dc/dce110
 SRCS+=	dce110_compressor.c \
-	dce110_hw_sequencer.c \
+	dce110_hwseq.c \
 	dce110_mem_input_v.c \
 	dce110_opp_csc_v.c \
 	dce110_opp_regamma_v.c \
@@ -494,11 +567,11 @@ SRCS+=	dce110_compressor.c \
 
 # display/dc/dce112
 SRCS+=	dce112_compressor.c \
-	dce112_hw_sequencer.c \
+	dce112_hwseq.c \
 	dce112_resource.c
 
 # display/dc/dce120
-SRCS+=	dce120_hw_sequencer.c \
+SRCS+=	dce120_hwseq.c \
 	dce120_resource.c \
 	dce120_timing_generator.c
 
@@ -508,7 +581,7 @@ SRCS+=	dce60_hw_sequencer.c \
 	dce60_timing_generator.c
 
 # display/dc/dce80
-SRCS+=	dce80_hw_sequencer.c \
+SRCS+=	dce80_hwseq.c \
 	dce80_resource.c \
 	dce80_timing_generator.c
 
@@ -531,7 +604,7 @@ SRCS+=	dcn10_cm_common.c \
 	dcn10_dpp_dscl.c \
 	dcn10_hubbub.c \
 	dcn10_hubp.c \
-	dcn10_hw_sequencer.c \
+	dcn10_hwseq.c \
 	dcn10_hw_sequencer_debug.c \
 	dcn10_init.c \
 	dcn10_ipp.c \
@@ -682,6 +755,28 @@ SRCS+=	dcn32_dccg.c \
 SRCS+=	dcn321_dio_link_encoder.c \
 	dcn321_resource.c
 
+# display/dc/dcn35
+SRCS+=	dcn35_clk_mgr.c \
+	dcn35_dccg.c \
+	dcn35_dio_link_encoder.c \
+	dcn35_dio_stream_encoder.c \
+	dcn35_dpp.c \
+	dcn35_dsc.c \
+	dcn35_dwb.c \
+	dcn35_fpu.c \
+	dcn35_hubbub.c \
+	dcn35_hubp.c \
+	dcn35_hwseq.c \
+	dcn35_init.c \
+	dcn35_mmhubbub.c \
+	dcn35_opp.c \
+	dcn35_optc.c \
+	dcn35_pg_cntl.c \
+	dcn35_resource.c \
+	dcn35_smu.c \
+	dmub_dcn35.c \
+	irq_service_dcn35.c
+
 # display/dc/clk_mgr/dcn31
 SRCS+=	dcn31_afmt.c \
 	dcn31_apg.c \
@@ -776,6 +871,17 @@ SRCS+=	dcn32_fpu.c \
 # display/dc/dml/dcn321
 SRCS+=	dcn321_fpu.c
 
+# display/dc/dml2
+SRCS+=	display_mode_core.c \
+	display_mode_util.c \
+	dml_display_rq_dlg_calc.c \
+	dml2_dc_resource_mgmt.c \
+	dml2_mall_phantom.c \
+	dml2_policy.c \
+	dml2_translation_helper.c \
+	dml2_utils.c \
+	dml2_wrapper.c
+
 # display/dc/gpio/*
 SRCS+=	gpio_base.c \
 	gpio_service.c \
@@ -840,7 +946,6 @@ SRCS+=	link_ddc.c \
 	link_dpms.c \
 	link_edp_panel_control.c \
 	link_factory.c \
-	link_fpga.c \
 	link_hpd.c \
 	link_hwss_dio.c \
 	link_hwss_dio_fixed_vs_pe_retimer.c \
@@ -951,6 +1056,8 @@ SRCS+=	amd_powerplay.c \
 	smu_v13_0_5_ppt.c \
 	smu_v13_0_6_ppt.c \
 	smu_v13_0_7_ppt.c \
+	smu_v14_0.c \
+	smu_v14_0_0_ppt.c \
 	smu_helper.c \
 	smumgr.c \
 	tonga_baco.c \
@@ -999,8 +1106,12 @@ CFLAGS+= -I${SRCDIR}/display
 CFLAGS+= -I${SRCDIR}/display/amdgpu_dm
 CFLAGS+= -I${SRCDIR}/display/dc
 CFLAGS+= -I${SRCDIR}/display/dc/clk_mgr/
+CFLAGS+= -I${SRCDIR}/display/dc/dsc
+CFLAGS+= -I${SRCDIR}/display/dc/hwss
 CFLAGS+= -I${SRCDIR}/display/dc/inc
 CFLAGS+= -I${SRCDIR}/display/dc/inc/hw
+CFLAGS+= -I${SRCDIR}/display/dc/optc
+CFLAGS+= -I${SRCDIR}/display/dc/resource
 CFLAGS+= -I${SRCDIR}/display/dmub/inc
 CFLAGS+= -I${SRCDIR}/display/include
 CFLAGS+= -I${SRCDIR}/display/modules/hdcp
@@ -1020,6 +1131,7 @@ CFLAGS+= -I${SRCDIR}/pm/swsmu/inc/pmfw_if
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu11
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu12
 CFLAGS+= -I${SRCDIR}/pm/swsmu/smu13
+CFLAGS+= -I${SRCDIR}/pm/swsmu/smu14
 CFLAGS+= -I${DRM}/scheduler
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
@@ -1037,6 +1149,8 @@ CFLAGS.gcc+= -Wno-redundant-decls -Wno-unused-but-set-variable
 .if ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "amd64"
 FPUFLAGS= -msse
 .endif
+
+CFLAGS.dc.c = -Wno-typedef-redefinition
 
 CFLAGS.dcn_calcs.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn_calc_auto.c= ${FPUFLAGS} -mstack-alignment=4
@@ -1056,6 +1170,17 @@ CFLAGS.dcn32_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource_helpers.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn321_fpu.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn35_fpu.c= ${FPUFLAGS} -mstack-alignment=4
+
+CFLAGS.display_mode_core.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.display_mode_util.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml_display_rq_dlg_calc.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_dc_resource_mgmt.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_mall_phantom.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_policy.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_translation_helper.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_utils.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_wrapper.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 
 CFLAGS.display_mode_lib.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.display_mode_vba.c= ${FPUFLAGS} -mstack-alignment=4
@@ -1099,6 +1224,7 @@ CWARNFLAGS.amdgpu_device.c=			-Wno-missing-prototypes -Wno-unused-but-set-variab
 CWARNFLAGS.amdgpu_discovery.c=			-Wno-unused-function
 CWARNFLAGS.amdgpu_dm_debugfs.c=			-Wno-pointer-bool-conversion -Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_fence.c=			-Wno-unused-variable
+CWARNFLAGS.amdgpu_fdinfo.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.amdgpu_gfx.c=			-Wno-unused-but-set-variable -Wno-tautological-overlap-compare
 CWARNFLAGS.amdgpu_ioc32.c=			-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_pm.c=				-Wno-unused-const-variable
@@ -1161,7 +1287,7 @@ CWARNFLAGS.vcn_v4_0.c=				-Wno-unused-but-set-variable
 CWARNFLAGS.vcn_v4_0_3.c=			-Wno-unused-function
 
 # display/amdgpu_dm
-CWARNFLAGS.amdgpu_dm_helpers.c=		-Wno-int-in-bool-context
+CWARNFLAGS.amdgpu_dm_helpers.c=		-Wno-int-in-bool-context -Wno-uninitialized
 CWARNFLAGS.amdgpu_dm_mst_types.c=	-Wno-unused-but-set-variable -Wno-missing-prototypes
 CWARNFLAGS.amdgpu_dm_plane.c=		-Wno-missing-prototypes
 CWARNFLAGS.amdgpu_dm_pp_smu.c=		-Wno-missing-prototypes -Wno-incompatible-function-pointer-types
@@ -1199,12 +1325,12 @@ CWARNFLAGS.dce_opp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dce_panel_cntl.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dce100_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dce110_compressor.c=		-Wno-missing-prototypes
-CWARNFLAGS.dce110_hw_sequencer.c=	-Wno-missing-prototypes
+CWARNFLAGS.dce110_hwseq.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce110_mem_input_v.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce110_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dce110_timing_generator.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.dce112_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
-CWARNFLAGS.dce120_hw_sequencer.c=	-Wno-unused-const-variable
+CWARNFLAGS.dce120_hwseq.c=		-Wno-unused-const-variable
 CWARNFLAGS.dce120_resource.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.dce120_timing_generator.c=	-Wno-missing-prototypes
 CWARNFLAGS.dce60_timing_generator.c=	-Wno-missing-prototypes
@@ -1216,7 +1342,7 @@ CWARNFLAGS.rv1_clk_mgr_vbios_smu.c=	-Wno-missing-prototypes
 CWARNFLAGS.rv1_clk_mgr.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp.c=			-Wno-missing-prototypes
 CWARNFLAGS.dcn10_dpp_dscl.c=		-Wno-missing-prototypes
-CWARNFLAGS.dcn10_hw_sequencer.c=	-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-unused-variable
+CWARNFLAGS.dcn10_hwseq.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable -Wno-unused-variable
 CWARNFLAGS.dcn10_hubp.c=		-Wno-missing-prototypes
 CWARNFLAGS.dcn10_link_encoder.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.dcn10_stream_encoder.c=	-Wno-unused-but-set-variable
@@ -1307,6 +1433,8 @@ CWARNFLAGS.dcn32_resource.c=		-Wno-missing-prototypes -Wno-unused-but-set-variab
 CWARNFLAGS.dcn32_resource_helpers.c=	-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.dcn321_fpu.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn321_resource.c=		-Wno-initializer-overrides -Wno-unused-const-variable
+CWARNFLAGS.dcn35_clk_mgr.c=		-Wno-incompatible-pointer-types
+CWARNFLAGS.dcn35_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
