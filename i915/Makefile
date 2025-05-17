@@ -117,10 +117,12 @@ SRCS+=	dvo_ch7017.c \
 	intel_display_device.c \
 	intel_display_driver.c \
 	intel_display_irq.c \
+	intel_display_params.c \
 	intel_display_power_map.c \
 	intel_display_power_well.c \
 	intel_display_reset.c \
 	intel_display_rps.c \
+	intel_display_wa.c \
 	intel_dkl_phy.c \
 	intel_dp.c \
 	intel_dp_aux.c \
@@ -129,20 +131,25 @@ SRCS+=	dvo_ch7017.c \
 	intel_dp_link_training.c \
 	intel_dp_mst.c \
 	intel_dpt.c \
+	intel_dpt_common.c \
 	intel_drrs.c \
 	intel_dsi.c \
 	intel_dsi_dcs_backlight.c \
 	intel_dsi_vbt.c \
 	intel_dsb.c \
+	intel_dsb_buffer.c \
 	intel_fb.c \
+	intel_fb_bo.c \
 	intel_fb_pin.c \
 	intel_dvo.c \
 	intel_global_state.c \
 	intel_gmbus.c \
 	intel_hdcp_gsc.c \
+	intel_hdcp_gsc_message.c \
 	intel_hdmi.c \
 	intel_hotplug_irq.c \
 	intel_hti.c \
+	intel_link_bw.c \
 	intel_load_detect.c \
 	intel_lspcon.c \
 	intel_lvds.c \
@@ -300,6 +307,7 @@ SRCS+=	i915_ioc32.c
 SRCS+=	i915_debugfs.c \
 	i915_debugfs_params.c \
 	intel_display_debugfs.c \
+	intel_display_debugfs_params.c \
 	intel_gt_debugfs.c \
 	intel_gt_engines_debugfs.c \
 	intel_gt_pm_debugfs.c \
@@ -312,7 +320,8 @@ SRCS+=	i915_debugfs.c \
 .endif
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
-SRCS+=	intel_fbdev.c
+SRCS+=	intel_fbdev.c \
+	intel_fbdev_fb.c
 .endif
 
 .if !empty(KCONFIG:MDRM_I915_CAPTURE_ERROR)
@@ -341,6 +350,7 @@ CFLAGS+= -I${SRCDIR:H:H} -I${SRCDIR} -I${SRCDIR}/display
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=i915_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
+CFLAGS+= -DI915
 
 SRCS	+=			\
 	opt_acpi.h		\
@@ -383,7 +393,7 @@ CWARNFLAGS.intel_gmch.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_gt_mcr.c=	-Wno-tautological-constant-out-of-range-compare
 CWARNFLAGS.intel_guc_capture.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_guc_submission.c=	-Wno-unused-function
-CWARNFLAGS.intel_hdmi.c=	-Wno-unused-but-set-variable
+CWARNFLAGS.intel_hdmi.c=	-Wno-unused-but-set-variable -Wno-unused-variable
 CWARNFLAGS.intel_hotplug.c=	-Wno-uninitialized
 CWARNFLAGS.intel_psr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.intel_region_ttm.c=	-Wno-missing-prototypes

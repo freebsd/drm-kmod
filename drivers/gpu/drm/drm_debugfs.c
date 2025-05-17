@@ -40,7 +40,7 @@
 #include <drm/drm_file.h>
 #include <drm/drm_gem.h>
 #include <drm/drm_managed.h>
-#include <drm/drm_gpuva_mgr.h>
+#include <drm/drm_gpuvm.h>
 
 #include "drm_crtc_internal.h"
 #include "drm_internal.h"
@@ -96,21 +96,28 @@ static int drm_clients_info(struct seq_file *m, void *data)
 	 */
 	mutex_lock(&dev->filelist_mutex);
 	list_for_each_entry_reverse(priv, &dev->filelist, lhead) {
-		struct task_struct *task;
 		bool is_current_master = drm_is_current_master(priv);
-
-		rcu_read_lock(); /* locks pid_task()->comm */
+		struct task_struct *task;
 #ifdef __linux__
-		task = pid_task(priv->pid, PIDTYPE_TGID);
+		struct pid *pid;
+#elif defined(__FreeBSD__)
+		pid_t pid;
+#endif
+
+		rcu_read_lock(); /* Locks priv->pid and pid_task()->comm! */
+#ifdef __linux__
+		pid = rcu_dereference(priv->pid);
+		task = pid_task(pid, PIDTYPE_TGID);
 		uid = task ? __task_cred(task)->euid : GLOBAL_ROOT_UID;
 #elif defined(__FreeBSD__)
 		// BSDFIXME: No PIDTYPE_TGID support.
-		task = pid_task(priv->pid, PIDTYPE_PID);
+		pid = priv->pid;
+		task = pid_task(pid, PIDTYPE_PID);
 		uid = task ? task_euid(task) : 0;
 #endif
 		seq_printf(m, "%20s %5d %3d   %c    %c %5d %10u\n",
 			   task ? task->comm : "<unknown>",
-			   pid_vnr(priv->pid),
+			   pid_vnr(pid),
 			   priv->minor->index,
 			   is_current_master ? 'y' : 'n',
 			   priv->authenticated ? 'y' : 'n',
@@ -160,6 +167,9 @@ static int drm_debugfs_open(struct inode *inode, struct file *file)
 {
 	struct drm_info_node *node = inode->i_private;
 
+	if (!device_is_registered(node->minor->kdev))
+		return -ENODEV;
+
 	return single_open(file, node->info_ent->show, node);
 }
 
@@ -167,6 +177,10 @@ static int drm_debugfs_entry_open(struct inode *inode, struct file *file)
 {
 	struct drm_debugfs_entry *entry = inode->i_private;
 	struct drm_debugfs_info *node = &entry->file;
+	struct drm_minor *minor = entry->dev->primary ?: entry->dev->accel;
+
+	if (!device_is_registered(minor->kdev))
+		return -ENODEV;
 
 	return single_open(file, node->show, entry);
 }
@@ -191,31 +205,31 @@ static const struct file_operations drm_debugfs_fops = {
 /**
  * drm_debugfs_gpuva_info - dump the given DRM GPU VA space
  * @m: pointer to the &seq_file to write
- * @mgr: the &drm_gpuva_manager representing the GPU VA space
+ * @gpuvm: the &drm_gpuvm representing the GPU VA space
  *
  * Dumps the GPU VA mappings of a given DRM GPU VA manager.
  *
  * For each DRM GPU VA space drivers should call this function from their
  * &drm_info_list's show callback.
  *
- * Returns: 0 on success, -ENODEV if the &mgr is not initialized
+ * Returns: 0 on success, -ENODEV if the &gpuvm is not initialized
  */
 int drm_debugfs_gpuva_info(struct seq_file *m,
-			   struct drm_gpuva_manager *mgr)
+			   struct drm_gpuvm *gpuvm)
 {
-	struct drm_gpuva *va, *kva = &mgr->kernel_alloc_node;
+	struct drm_gpuva *va, *kva = &gpuvm->kernel_alloc_node;
 
-	if (!mgr->name)
+	if (!gpuvm->name)
 		return -ENODEV;
 
 	seq_printf(m, "DRM GPU VA space (%s) [0x%016llx;0x%016llx]\n",
-		   mgr->name, mgr->mm_start, mgr->mm_start + mgr->mm_range);
+		   gpuvm->name, gpuvm->mm_start, gpuvm->mm_start + gpuvm->mm_range);
 	seq_printf(m, "Kernel reserved node [0x%016llx;0x%016llx]\n",
 		   kva->va.addr, kva->va.addr + kva->va.range);
 	seq_puts(m, "\n");
 	seq_puts(m, " VAs | start              | range              | end                | object             | object offset\n");
 	seq_puts(m, "-------------------------------------------------------------------------------------------------------------\n");
-	drm_gpuva_for_each_va(va, mgr) {
+	drm_gpuvm_for_each_va(va, gpuvm) {
 		if (unlikely(va == kva))
 			continue;
 
@@ -239,7 +253,7 @@ EXPORT_SYMBOL(drm_debugfs_gpuva_info);
  *
  * Create a given set of debugfs files represented by an array of
  * &struct drm_info_list in the given root directory. These files will be removed
- * automatically on drm_debugfs_cleanup().
+ * automatically on drm_debugfs_dev_fini().
  */
 void drm_debugfs_create_files(const struct drm_info_list *files, int count,
 			      struct dentry *root, struct drm_minor *minor)
@@ -254,7 +268,7 @@ void drm_debugfs_create_files(const struct drm_info_list *files, int count,
 		if (features && !drm_core_check_all_features(dev, features))
 			continue;
 
-		tmp = kmalloc(sizeof(struct drm_info_node), GFP_KERNEL);
+		tmp = drmm_kzalloc(dev, sizeof(*tmp), GFP_KERNEL);
 		if (tmp == NULL)
 			continue;
 
@@ -263,27 +277,73 @@ void drm_debugfs_create_files(const struct drm_info_list *files, int count,
 						0444, root, tmp,
 						&drm_debugfs_fops);
 		tmp->info_ent = &files[i];
-
-		mutex_lock(&minor->debugfs_lock);
-		list_add(&tmp->list, &minor->debugfs_list);
-		mutex_unlock(&minor->debugfs_lock);
 	}
 }
 EXPORT_SYMBOL(drm_debugfs_create_files);
 
-int drm_debugfs_init(struct drm_minor *minor, int minor_id,
-		     struct dentry *root)
+int drm_debugfs_remove_files(const struct drm_info_list *files, int count,
+			     struct dentry *root, struct drm_minor *minor)
+{
+	int i;
+
+	for (i = 0; i < count; i++) {
+		struct dentry *dent = debugfs_lookup(files[i].name, root);
+
+		if (!dent)
+			continue;
+
+		drmm_kfree(minor->dev, d_inode(dent)->i_private);
+		debugfs_remove(dent);
+	}
+	return 0;
+}
+EXPORT_SYMBOL(drm_debugfs_remove_files);
+
+/**
+ * drm_debugfs_dev_init - create debugfs directory for the device
+ * @dev: the device which we want to create the directory for
+ * @root: the parent directory depending on the device type
+ *
+ * Creates the debugfs directory for the device under the given root directory.
+ */
+void drm_debugfs_dev_init(struct drm_device *dev, struct dentry *root)
+{
+	dev->debugfs_root = debugfs_create_dir(dev->unique, root);
+}
+
+/**
+ * drm_debugfs_dev_fini - cleanup debugfs directory
+ * @dev: the device to cleanup the debugfs stuff
+ *
+ * Remove the debugfs directory, might be called multiple times.
+ */
+void drm_debugfs_dev_fini(struct drm_device *dev)
+{
+	debugfs_remove_recursive(dev->debugfs_root);
+	dev->debugfs_root = NULL;
+}
+
+void drm_debugfs_dev_register(struct drm_device *dev)
+{
+	drm_debugfs_add_files(dev, drm_debugfs_list, DRM_DEBUGFS_ENTRIES);
+
+	if (drm_core_check_feature(dev, DRIVER_MODESET)) {
+		drm_framebuffer_debugfs_init(dev);
+		drm_client_debugfs_init(dev);
+	}
+	if (drm_drv_uses_atomic_modeset(dev))
+		drm_atomic_debugfs_init(dev);
+}
+
+int drm_debugfs_register(struct drm_minor *minor, int minor_id,
+			 struct dentry *root)
 {
 	struct drm_device *dev = minor->dev;
-	struct drm_debugfs_entry *entry, *tmp;
 	char name[64];
 
-	INIT_LIST_HEAD(&minor->debugfs_list);
-	mutex_init(&minor->debugfs_lock);
 	sprintf(name, "%d", minor_id);
-	minor->debugfs_root = debugfs_create_dir(name, root);
-
-	drm_debugfs_add_files(minor->dev, drm_debugfs_list, DRM_DEBUGFS_ENTRIES);
+	minor->debugfs_symlink = debugfs_create_symlink(name, root,
+							dev->unique);
 
 	/* NOTE Linux<->FreeBSD: Mesa needs the hw.dri sysctl tree. */
 #ifdef __FreeBSD__
@@ -291,93 +351,23 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 		drm_sysctl_init(minor->dev);
 #endif
 
-	if (drm_drv_uses_atomic_modeset(dev)) {
-		drm_atomic_debugfs_init(minor);
-		drm_bridge_debugfs_init(minor);
-	}
+	/* TODO: Only for compatibility with drivers */
+	minor->debugfs_root = dev->debugfs_root;
 
-	if (drm_core_check_feature(dev, DRIVER_MODESET)) {
-		drm_framebuffer_debugfs_init(minor);
-
-		drm_client_debugfs_init(minor);
-	}
-
-	if (dev->driver->debugfs_init)
+	if (dev->driver->debugfs_init && dev->render != minor)
 		dev->driver->debugfs_init(minor);
 
-	list_for_each_entry_safe(entry, tmp, &dev->debugfs_list, list) {
-		debugfs_create_file(entry->file.name, 0444,
-				    minor->debugfs_root, entry, &drm_debugfs_entry_fops);
-		list_del(&entry->list);
-	}
-
 	return 0;
 }
 
-void drm_debugfs_late_register(struct drm_device *dev)
+void drm_debugfs_unregister(struct drm_minor *minor)
 {
-	struct drm_minor *minor = dev->primary;
-	struct drm_debugfs_entry *entry, *tmp;
-
-	if (!minor)
-		return;
-
-	list_for_each_entry_safe(entry, tmp, &dev->debugfs_list, list) {
-		debugfs_create_file(entry->file.name, 0444,
-				    minor->debugfs_root, entry, &drm_debugfs_entry_fops);
-		list_del(&entry->list);
-	}
-}
-
-int drm_debugfs_remove_files(const struct drm_info_list *files, int count,
-			     struct drm_minor *minor)
-{
-	struct list_head *pos, *q;
-	struct drm_info_node *tmp;
-	int i;
-
-	mutex_lock(&minor->debugfs_lock);
-	for (i = 0; i < count; i++) {
-		list_for_each_safe(pos, q, &minor->debugfs_list) {
-			tmp = list_entry(pos, struct drm_info_node, list);
-			if (tmp->info_ent == &files[i]) {
-				debugfs_remove(tmp->dent);
-				list_del(pos);
-				kfree(tmp);
-			}
-		}
-	}
-	mutex_unlock(&minor->debugfs_lock);
-	return 0;
-}
-EXPORT_SYMBOL(drm_debugfs_remove_files);
-
-static void drm_debugfs_remove_all_files(struct drm_minor *minor)
-{
-	struct drm_info_node *node, *tmp;
-
-	mutex_lock(&minor->debugfs_lock);
-	list_for_each_entry_safe(node, tmp, &minor->debugfs_list, list) {
-		debugfs_remove(node->dent);
-		list_del(&node->list);
-		kfree(node);
-	}
-	mutex_unlock(&minor->debugfs_lock);
-}
-
-void drm_debugfs_cleanup(struct drm_minor *minor)
-{
-	if (!minor->debugfs_root)
-		return;
-
 	/* NOTE Linux<->FreeBSD: Mesa needs the hw.dri sysctl tree. */
 #ifdef __FreeBSD__
 	drm_sysctl_cleanup(minor->dev);
 #endif
-	drm_debugfs_remove_all_files(minor);
-
-	debugfs_remove_recursive(minor->debugfs_root);
-	minor->debugfs_root = NULL;
+	debugfs_remove(minor->debugfs_symlink);
+	minor->debugfs_symlink = NULL;
 }
 
 /**
@@ -403,9 +393,8 @@ void drm_debugfs_add_file(struct drm_device *dev, const char *name,
 	entry->file.data = data;
 	entry->dev = dev;
 
-	mutex_lock(&dev->debugfs_mutex);
-	list_add(&entry->list, &dev->debugfs_list);
-	mutex_unlock(&dev->debugfs_mutex);
+	debugfs_create_file(name, 0444, dev->debugfs_root, entry,
+			    &drm_debugfs_entry_fops);
 }
 EXPORT_SYMBOL(drm_debugfs_add_file);
 
@@ -562,13 +551,13 @@ static const struct file_operations drm_connector_fops = {
 
 void drm_debugfs_connector_add(struct drm_connector *connector)
 {
-	struct drm_minor *minor = connector->dev->primary;
+	struct drm_device *dev = connector->dev;
 	struct dentry *root;
 
-	if (!minor->debugfs_root)
+	if (!dev->debugfs_root)
 		return;
 
-	root = debugfs_create_dir(connector->name, minor->debugfs_root);
+	root = debugfs_create_dir(connector->name, dev->debugfs_root);
 	connector->debugfs_entry = root;
 
 	/* force */
@@ -603,7 +592,7 @@ void drm_debugfs_connector_remove(struct drm_connector *connector)
 
 void drm_debugfs_crtc_add(struct drm_crtc *crtc)
 {
-	struct drm_minor *minor = crtc->dev->primary;
+	struct drm_device *dev = crtc->dev;
 	struct dentry *root;
 	char *name;
 
@@ -611,7 +600,7 @@ void drm_debugfs_crtc_add(struct drm_crtc *crtc)
 	if (!name)
 		return;
 
-	root = debugfs_create_dir(name, minor->debugfs_root);
+	root = debugfs_create_dir(name, dev->debugfs_root);
 	kfree(name);
 
 	crtc->debugfs_entry = root;
@@ -623,6 +612,67 @@ void drm_debugfs_crtc_remove(struct drm_crtc *crtc)
 {
 	debugfs_remove_recursive(crtc->debugfs_entry);
 	crtc->debugfs_entry = NULL;
+}
+
+static int bridges_show(struct seq_file *m, void *data)
+{
+	struct drm_encoder *encoder = m->private;
+	struct drm_printer p = drm_seq_file_printer(m);
+	struct drm_bridge *bridge;
+	unsigned int idx = 0;
+
+	drm_for_each_bridge_in_chain(encoder, bridge) {
+		drm_printf(&p, "bridge[%d]: %ps\n", idx++, bridge->funcs);
+		drm_printf(&p, "\ttype: [%d] %s\n",
+			   bridge->type,
+			   drm_get_connector_type_name(bridge->type));
+#ifdef CONFIG_OF
+		if (bridge->of_node)
+			drm_printf(&p, "\tOF: %pOFfc\n", bridge->of_node);
+#endif
+		drm_printf(&p, "\tops: [0x%x]", bridge->ops);
+		if (bridge->ops & DRM_BRIDGE_OP_DETECT)
+			drm_puts(&p, " detect");
+		if (bridge->ops & DRM_BRIDGE_OP_EDID)
+			drm_puts(&p, " edid");
+		if (bridge->ops & DRM_BRIDGE_OP_HPD)
+			drm_puts(&p, " hpd");
+		if (bridge->ops & DRM_BRIDGE_OP_MODES)
+			drm_puts(&p, " modes");
+		drm_puts(&p, "\n");
+	}
+
+	return 0;
+}
+DEFINE_SHOW_ATTRIBUTE(bridges);
+
+void drm_debugfs_encoder_add(struct drm_encoder *encoder)
+{
+	struct drm_minor *minor = encoder->dev->primary;
+	struct dentry *root;
+	char *name;
+
+	name = kasprintf(GFP_KERNEL, "encoder-%d", encoder->index);
+	if (!name)
+		return;
+
+	root = debugfs_create_dir(name, minor->debugfs_root);
+	kfree(name);
+
+	encoder->debugfs_entry = root;
+
+	/* bridges list */
+	debugfs_create_file("bridges", 0444, root, encoder,
+			    &bridges_fops);
+
+	if (encoder->funcs && encoder->funcs->debugfs_init)
+		encoder->funcs->debugfs_init(encoder, root);
+}
+
+void drm_debugfs_encoder_remove(struct drm_encoder *encoder)
+{
+	debugfs_remove_recursive(encoder->debugfs_entry);
+	encoder->debugfs_entry = NULL;
 }
 
 #endif /* CONFIG_DEBUG_FS */

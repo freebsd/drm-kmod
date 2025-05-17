@@ -39,7 +39,9 @@
  * __drm_debug: Enable debug output.
  * Bitmask of DRM_UT_x. See include/drm/drm_print.h for details.
  */
-#ifdef __FreeBSD__
+#ifdef __linux__
+unsigned long __drm_debug;
+#elif defined(__FreeBSD__)
 #if defined(DRM_DEBUG_LOG_ALL) || defined(INVARIANTS)
 unsigned long __drm_debug = 0xffffffff;	/* bitmask of DRM_UT_x */
 #else
@@ -452,7 +454,7 @@ void __drm_err(const char *function_name, const char *format, ...)
 #endif
 EXPORT_SYMBOL(__drm_err);
 
-#ifdef CONFIG_DEBUGSFS
+#ifdef __linux__
 /**
  * drm_print_regset32 - print the contents of registers to a
  * &drm_printer stream.
