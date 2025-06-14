@@ -666,8 +666,7 @@ static const struct drm_ioctl_desc drm_ioctls[] = {
 		      DRM_RENDER_ALLOW),
 	DRM_IOCTL_DEF(DRM_IOCTL_SYNCOBJ_TIMELINE_WAIT, drm_syncobj_timeline_wait_ioctl,
 		      DRM_RENDER_ALLOW),
-#ifdef __linux__
-	// BSDFIXME: No eventfd support in LKPI
+#if __FreeBSD_version >= 1600011
 	DRM_IOCTL_DEF(DRM_IOCTL_SYNCOBJ_EVENTFD, drm_syncobj_eventfd_ioctl,
 		      DRM_RENDER_ALLOW),
 #endif
