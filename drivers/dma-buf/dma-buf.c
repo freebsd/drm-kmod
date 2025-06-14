@@ -51,7 +51,9 @@ __FBSDID("$FreeBSD$");
 
 #include <linux/list.h>
 #include <linux/dma-buf.h>
+#include <linux/dma-fence-unwrap.h>
 #include <linux/dma-resv.h>
+#include <linux/sync_file.h>
 
 #include <uapi/linux/dma-buf.h>
 
@@ -205,6 +207,109 @@ dma_buf_poll(struct file *fp, int events,
 	return (ENOTSUP);
 }
 
+static long
+dma_buf_export_sync_file(struct dma_buf *db, void *data)
+{
+	struct dma_buf_export_sync_file *arg;
+	enum dma_resv_usage usage;
+	struct dma_fence *fence;
+	struct sync_file *sync_file;
+	int fd, ret;
+
+	arg = data;
+
+	/*
+	 * Only DMA_BUF_SYNC_READ and/or DMA_BUF_SYNC_WRITE must be specified
+	 * in the flags.
+	 */
+	if ((arg->flags & ~DMA_BUF_SYNC_RW) != 0 ||
+	    (arg->flags & DMA_BUF_SYNC_RW) == 0)
+		return (EINVAL);
+
+	fd = get_unused_fd_flags(O_CLOEXEC);
+	if (fd < 0)
+		return (-fd);
+
+	fence = NULL;
+	usage = dma_resv_usage_rw(arg->flags & DMA_BUF_SYNC_WRITE);
+	ret = -dma_resv_get_singleton(db->resv, usage, &fence);
+	if (ret) {
+		put_unused_fd(fd);
+		return (ret);
+	}
+
+	if (!fence)
+		fence = dma_fence_get_stub();
+
+	sync_file = sync_file_create(fence);
+	dma_fence_put(fence);
+
+	if (sync_file == NULL)
+		return (ENOMEM);
+
+	arg->fd = fd;
+
+	/*
+	 * `struct sync_file` field is named `file`. However, linuxkpi
+	 * redefines `file` to `linux_file` to work around the conflict with
+	 * FreeBSD's own `struct file`. As a side effect, `struct sync_file`
+	 * member is also renamed.
+	 */
+	fd_install(fd, sync_file->linux_file);
+
+	return (0);
+}
+
+static long
+dma_buf_import_sync_file(struct dma_buf *db, const void *data)
+{
+	const struct dma_buf_import_sync_file *arg;
+	enum dma_resv_usage usage;
+	struct dma_fence *fence, *f;
+	struct dma_fence_unwrap iter;
+	unsigned int num_fences;
+	int ret;
+
+	arg = data;
+
+	/*
+	 * Only DMA_BUF_SYNC_READ and/or DMA_BUF_SYNC_WRITE must be specified
+	 * in the flags.
+	 */
+	if ((arg->flags & ~DMA_BUF_SYNC_RW) != 0 ||
+	    (arg->flags & DMA_BUF_SYNC_RW) == 0)
+		return (EINVAL);
+
+	fence = sync_file_get_fence(arg->fd);
+	if (fence == NULL)
+		return (EINVAL);
+
+	usage = arg->flags & DMA_BUF_SYNC_WRITE ?
+		DMA_RESV_USAGE_WRITE : DMA_RESV_USAGE_READ;
+
+	ret = 0;
+	num_fences = 0;
+	dma_fence_unwrap_for_each(f, &iter, fence) {
+		++num_fences;
+	}
+
+	if (num_fences > 0) {
+		dma_resv_lock(db->resv, NULL);
+
+		ret = -dma_resv_reserve_fences(db->resv, num_fences);
+		if (!ret) {
+			dma_fence_unwrap_for_each(f, &iter, fence) {
+				dma_resv_add_fence(db->resv, f, usage);
+			}
+		}
+
+		dma_resv_unlock(db->resv);
+	}
+
+	dma_fence_put(fence);
+
+	return (ret);
+}
 
 static int
 dma_buf_begin_cpu_access(struct dma_buf *db, enum dma_data_direction dir)
@@ -238,11 +343,11 @@ dma_buf_ioctl(struct file *fp, u_long com, void *data,
 		return (EINVAL);
 
 	db = fp->f_data;
-	sync = data;
 	rc = 0;
 
 	switch (com) {
 	case DMA_BUF_IOCTL_SYNC:
+		sync = data;
 		if (sync->flags & ~DMA_BUF_SYNC_VALID_FLAGS_MASK)
 			return (EINVAL);
 
@@ -264,6 +369,12 @@ dma_buf_ioctl(struct file *fp, u_long com, void *data,
 		else
 			rc = dma_buf_begin_cpu_access(db, dir);
 		return (-rc);
+
+	case DMA_BUF_IOCTL_EXPORT_SYNC_FILE:
+		return (dma_buf_export_sync_file(db, (void *)data));
+	case DMA_BUF_IOCTL_IMPORT_SYNC_FILE:
+		return (dma_buf_import_sync_file(db, (const void *)data));
+
 	default:
 		return (ENOTTY);
 	}
