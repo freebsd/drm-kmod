@@ -418,8 +418,9 @@ dma_buf_fd(struct dma_buf *db, int flags)
 	if (db == NULL || db->linux_file == NULL)
 		return (-EINVAL);
 
-	/* XXX ignore flags for now */
-	if ((err = finstall(curthread, db->linux_file, &fd, 0, NULL)) != 0)
+	flags &= O_CLOEXEC;
+	err = finstall(curthread, db->linux_file, &fd, flags, NULL);
+	if (err != 0)
 		return (err);
 
 	/* drop extra reference */
@@ -465,7 +466,7 @@ dma_buf_export(const struct dma_buf_export_info *exp_info)
 	if ((err = falloc_noinstall(curthread, &fp)) != 0)
 		goto err;
 
-	finit(fp, FREAD | FWRITE, DTYPE_DMABUF, db, &dma_buf_fileops);
+	finit(fp, exp_info->flags, DTYPE_DMABUF, db, &dma_buf_fileops);
 
 	db->linux_file = fp;
 	mutex_init(&db->lock);
