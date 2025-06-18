@@ -416,9 +416,7 @@ struct amdgpu_ras {
 	struct device_attribute features_attr;
 	struct device_attribute version_attr;
 	struct device_attribute schema_attr;
-#ifdef __linux__
 	struct bin_attribute badpages_attr;
-#endif
 	struct dentry *de_ras_eeprom_table;
 	/* block array */
 	struct ras_manager *objs;
