@@ -1589,7 +1589,6 @@ static char *amdgpu_ras_badpage_flags_str(unsigned int flags)
  *
  */
 
-#ifdef __linux__
 static ssize_t amdgpu_ras_sysfs_badpages_read(struct file *f,
 		struct kobject *kobj, struct bin_attribute *attr,
 		char *buf, loff_t ppos, size_t count)
@@ -1621,7 +1620,6 @@ static ssize_t amdgpu_ras_sysfs_badpages_read(struct file *f,
 
 	return s;
 }
-#endif
 
 static ssize_t amdgpu_ras_sysfs_features_read(struct device *dev,
 		struct device_attribute *attr, char *buf)
@@ -1650,14 +1648,14 @@ static ssize_t amdgpu_ras_sysfs_schema_show(struct device *dev,
 
 static void amdgpu_ras_sysfs_remove_bad_page_node(struct amdgpu_device *adev)
 {
-#ifdef __linux__
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 
+#ifdef __linux__
 	if (adev->dev->kobj.sd)
+#endif
 		sysfs_remove_file_from_group(&adev->dev->kobj,
 				&con->badpages_attr.attr,
 				RAS_FS_NAME);
-#endif
 }
 
 static int amdgpu_ras_sysfs_remove_dev_attr_node(struct amdgpu_device *adev)
@@ -1704,14 +1702,12 @@ int amdgpu_ras_sysfs_create(struct amdgpu_device *adev,
 	};
 	sysfs_attr_init(&obj->sysfs_attr.attr);
 
-#ifdef __linux__
 	if (sysfs_add_file_to_group(&adev->dev->kobj,
 				&obj->sysfs_attr.attr,
 				RAS_FS_NAME)) {
 		put_obj(obj);
 		return -EINVAL;
 	}
-#endif
 
 	obj->attr_inuse = 1;
 
@@ -1728,10 +1724,10 @@ int amdgpu_ras_sysfs_remove(struct amdgpu_device *adev,
 
 #ifdef __linux__
 	if (adev->dev->kobj.sd)
+#endif
 		sysfs_remove_file_from_group(&adev->dev->kobj,
 				&obj->sysfs_attr.attr,
 				RAS_FS_NAME);
-#endif
 	obj->attr_inuse = 0;
 	put_obj(obj);
 
@@ -1875,16 +1871,15 @@ void amdgpu_ras_debugfs_create_all(struct amdgpu_device *adev)
 #ifdef __linux__
 static BIN_ATTR(gpu_vram_bad_pages, S_IRUGO,
 		amdgpu_ras_sysfs_badpages_read, NULL, 0);
+#endif
 static DEVICE_ATTR(features, S_IRUGO,
 		amdgpu_ras_sysfs_features_read, NULL);
 static DEVICE_ATTR(version, 0444,
 		amdgpu_ras_sysfs_version_show, NULL);
 static DEVICE_ATTR(schema, 0444,
 		amdgpu_ras_sysfs_schema_show, NULL);
-#endif
 static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 {
-#ifdef __linux__
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct attribute_group group = {
 		.name = RAS_FS_NAME,
@@ -1895,10 +1890,12 @@ static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 		&con->schema_attr.attr,
 		NULL
 	};
+#ifdef __linux__
 	struct bin_attribute *bin_attrs[] = {
 		NULL,
 		NULL,
 	};
+#endif
 	int r;
 
 	group.attrs = attrs;
@@ -1915,6 +1912,7 @@ static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 	con->schema_attr = dev_attr_schema;
 	sysfs_attr_init(attrs[2]);
 
+#ifdef __linux__
 	if (amdgpu_bad_page_threshold != 0) {
 		/* add bad_page_features entry */
 		bin_attr_gpu_vram_bad_pages.private = NULL;
@@ -1923,11 +1921,11 @@ static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 		group.bin_attrs = bin_attrs;
 		sysfs_bin_attr_init(bin_attrs[0]);
 	}
+#endif
 
 	r = sysfs_create_group(&adev->dev->kobj, &group);
 	if (r)
 		dev_err(adev->dev, "Failed to create RAS sysfs group!");
-#endif
 
 	return 0;
 }
