@@ -376,7 +376,7 @@ int of_drm_get_panel_orientation(const struct device_node *np,
 }
 EXPORT_SYMBOL(of_drm_get_panel_orientation);
 #endif
- 
+
 #ifdef __linux__
 /**
  * drm_is_panel_follower() - Check if the device is a panel follower

@@ -64,7 +64,7 @@ inline void dc_assert_fp_enabled(void)
 {
 #ifdef __linux__
 	int depth;
- 
+
 	depth = __this_cpu_read(fpu_recursion_depth);
 
 	ASSERT(depth >= 1);
@@ -90,26 +90,26 @@ void dc_fpu_begin(const char *function_name, const int line)
 {
 #ifdef __linux__
 	int depth;
- 
+
 	WARN_ON_ONCE(!in_task());
 	preempt_disable();
 	depth = __this_cpu_inc_return(fpu_recursion_depth);
- 
+
 	if (depth == 1) {
- #if defined(CONFIG_X86) || defined(CONFIG_LOONGARCH)
- 		kernel_fpu_begin();
- #elif defined(CONFIG_PPC64)
+#if defined(CONFIG_X86) || defined(CONFIG_LOONGARCH)
+		kernel_fpu_begin();
+#elif defined(CONFIG_PPC64)
 		if (cpu_has_feature(CPU_FTR_VSX_COMP))
- 			enable_kernel_vsx();
+			enable_kernel_vsx();
 		else if (cpu_has_feature(CPU_FTR_ALTIVEC_COMP))
- 			enable_kernel_altivec();
+			enable_kernel_altivec();
 		else if (!cpu_has_feature(CPU_FTR_FPU_UNAVAILABLE))
- 			enable_kernel_fp();
- #elif defined(CONFIG_ARM64)
- 		kernel_neon_begin();
- #endif
- 	}
- 
+			enable_kernel_fp();
+#elif defined(CONFIG_ARM64)
+		kernel_neon_begin();
+#endif
+	}
+
 	TRACE_DCN_FPU(true, function_name, line, depth);
 #elif defined(__FreeBSD__)
 	/* LKPI kernel_fpu_begin handles the above complications internally */
@@ -132,25 +132,25 @@ void dc_fpu_end(const char *function_name, const int line)
 {
 #ifdef __linux__
 	int depth;
- 
+
 	depth = __this_cpu_dec_return(fpu_recursion_depth);
 	if (depth == 0) {
- #if defined(CONFIG_X86) || defined(CONFIG_LOONGARCH)
- 		kernel_fpu_end();
- #elif defined(CONFIG_PPC64)
+#if defined(CONFIG_X86) || defined(CONFIG_LOONGARCH)
+		kernel_fpu_end();
+#elif defined(CONFIG_PPC64)
 		if (cpu_has_feature(CPU_FTR_VSX_COMP))
- 			disable_kernel_vsx();
+			disable_kernel_vsx();
 		else if (cpu_has_feature(CPU_FTR_ALTIVEC_COMP))
- 			disable_kernel_altivec();
+			disable_kernel_altivec();
 		else if (!cpu_has_feature(CPU_FTR_FPU_UNAVAILABLE))
- 			disable_kernel_fp();
- #elif defined(CONFIG_ARM64)
- 		kernel_neon_end();
- #endif
+			disable_kernel_fp();
+#elif defined(CONFIG_ARM64)
+		kernel_neon_end();
+#endif
 	} else {
 		WARN_ON_ONCE(depth < 0);
- 	}
- 
+	}
+
 	TRACE_DCN_FPU(false, function_name, line, depth);
 	preempt_enable();
 #elif defined(__FreeBSD__)

@@ -200,7 +200,7 @@ static const u8 *mipi_exec_delay(struct intel_dsi *intel_dsi, const u8 *data)
 }
 
 #ifdef __linux__
-static void soc_gpio_set_value(struct intel_connector *connector, u7 gpio_index,
+static void soc_gpio_set_value(struct intel_connector *connector, u8 gpio_index,
 			       const char *con_id, u8 idx, bool value)
 {
 	struct drm_i915_private *dev_priv = to_i915(connector->base.dev);
