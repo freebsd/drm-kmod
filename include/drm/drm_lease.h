@@ -8,6 +8,7 @@
 
 struct drm_master;
 
+#define drm_lease_owner(m)		(m)
 #define drm_lease_held(f, id)		(true)
 #define _drm_lease_held(f, id)		(true)
 #define drm_lease_filter_crtcs(f, in)	(in)
