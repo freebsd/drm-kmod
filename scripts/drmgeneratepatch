@@ -100,7 +100,6 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_scatter*' \
     ':!drivers/gpu/drm/drm_simple*' \
     ':!drivers/gpu/drm/drm_trace*' \
-    ':!drivers/gpu/drm/drm_vm.c' \
     ':!drivers/gpu/drm/drm_*vram*' \
     ':!drivers/gpu/drm/radeon/radeon_atpx_handler*' \
     ':!drivers/gpu/drm/ttm/tests/*'

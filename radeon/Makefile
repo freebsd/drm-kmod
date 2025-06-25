@@ -141,7 +141,8 @@ SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h pci_iov_if.h device_if.h iicbus_
 
 CWARNFLAGS+= -Wno-format
 CWARNFLAGS+= -Wno-expansion-to-defined
-CWARNFLAGS+=			-Wno-pointer-arith ${CWARNFLAGS.${.IMPSRC:T}}
+CWARNFLAGS+= -Wno-pointer-arith ${CWARNFLAGS.${.IMPSRC:T}}
+CWARNFLAGS+= -Wno-bounds-safety-counted-by-elt-type-unknown-size
 
 CWARNFLAGS.atombios_encoders.c=		-Wno-missing-prototypes
 CWARNFLAGS.atombios_i2c.c=		-Wno-missing-prototypes
@@ -151,6 +152,7 @@ CWARNFLAGS.cik_sdma.c=			-Wno-missing-prototypes
 CWARNFLAGS.dce3_1_afmt.c=		-Wno-missing-prototypes
 CWARNFLAGS.dce6_afmt.c=			-Wno-missing-prototypes
 CWARNFLAGS.evergreen.c=			-Wno-missing-prototypes -Wno-cast-qual -Wno-unused-but-set-variable
+CWARNFLAGS.evergreen_cs.c=		-Wno-macro-redefined
 CWARNFLAGS.evergreen_hdmi.c=		-Wno-missing-prototypes
 CWARNFLAGS.kv_dpm.c=			-Wno-unused-const-variable
 CWARNFLAGS.ni.c=			-Wno-missing-prototypes -Wno-cast-qual -Wno-unused-but-set-variable

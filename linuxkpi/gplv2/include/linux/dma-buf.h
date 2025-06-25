@@ -164,6 +164,11 @@ get_dma_buf(struct dma_buf *dmabuf)
 #endif
 }
 
+static inline bool
+dma_buf_is_dynamic(struct dma_buf *dmabuf)
+{
+	return !!dmabuf->ops->pin;
+}
 
 struct dma_buf_attachment *dma_buf_attach(struct dma_buf *, struct device *);
 struct dma_buf_attachment *dma_buf_dynamic_attach(struct dma_buf *,

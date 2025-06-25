@@ -118,6 +118,10 @@ SRCS+=	drm_scdc_helper.c \
 SRCS+=	drm_dp_aux_dev.c
 .endif
 
+.if !empty(KCONFIG:MDRM_DISPLAY_DP_TUNNEL)
+SRCS+=	drm_dp_tunnel.c
+.endif
+
 .if !empty(KCONFIG:MDRM_EXEC)
 SRCS+=	drm_exec.c
 .endif
@@ -159,6 +163,7 @@ CWARNFLAGS+= -Wno-pointer-sign -Wno-format
 
 CWARNFLAGS.drm_file.c+=		-Wno-unused-value
 CWARNFLAGS.drm_ioc32.c+=	-Wno-address-of-packed-member
+CWARNFLAGS.drm_dp_tunnel.c+=	-Wno-incompatible-pointer-types-discards-qualifiers
 
 EXPORT_SYMS=	YES
 

@@ -29,6 +29,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn32 \
 	${SRCDIR}/display/dc/dml/dcn321 \
 	${SRCDIR}/display/dc/dml/dcn35 \
+	${SRCDIR}/display/dc/dml/dcn351 \
 	${SRCDIR}/display/dc/dml/dsc \
 	${SRCDIR}/display/dc/dml2
 .endif
@@ -153,6 +154,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn315 \
 	${SRCDIR}/display/dc/irq/dcn32 \
 	${SRCDIR}/display/dc/irq/dcn35 \
+	${SRCDIR}/display/dc/irq/dcn351 \
 	${SRCDIR}/display/dc/link \
 	${SRCDIR}/display/dc/link/accessories \
 	${SRCDIR}/display/dc/link/hwss \
@@ -187,6 +189,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/resource/dcn32 \
 	${SRCDIR}/display/dc/resource/dcn321 \
 	${SRCDIR}/display/dc/resource/dcn35 \
+	${SRCDIR}/display/dc/resource/dcn351 \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
@@ -220,7 +223,8 @@ SRCS=	acp_hw.c
 # amdgpu_acp.c \ # not yet - need i2s
 # amdgpu_hmm.c \  # disabled
 
-SRCS+=	amdgpu_afmt.c \
+SRCS+=	amdgpu_aca.c \
+	amdgpu_afmt.c \
 	amdgpu_amdkfd.c \
 	amdgpu_atombios.c \
 	amdgpu_atomfirmware.c \
@@ -312,6 +316,7 @@ SRCS+=	amdgpu_afmt.c \
 	athub_v2_0.c \
 	athub_v2_1.c \
 	athub_v3_0.c \
+	athub_v4_1_0.c \
 	atom.c \
 	atombios_crtc.c \
 	atombios_dp.c \
@@ -360,11 +365,13 @@ SRCS+=	amdgpu_afmt.c \
 	hdp_v5_0.c \
 	hdp_v5_2.c \
 	hdp_v6_0.c \
+	hdp_v7_0.c \
 	aldebaran_reg_init.c \
 	aldebaran.c \
 	iceland_ih.c \
 	ih_v6_0.c \
 	ih_v6_1.c \
+	ih_v7_0.c \
 	imu_v11_0.c \
 	imu_v11_0_3.c \
 	jpeg_v1_0.c \
@@ -374,10 +381,12 @@ SRCS+=	amdgpu_afmt.c \
 	jpeg_v4_0.c \
 	jpeg_v4_0_3.c \
 	jpeg_v4_0_5.c \
+	jpeg_v5_0_0.c \
 	kv_dpm.c \
 	kv_smc.c \
 	legacy_dpm.c \
 	lsdma_v6_0.c \
+	lsdma_v7_0.c \
 	mca_v3_0.c \
 	mes_v10_1.c \
 	mes_v11_0.c \
@@ -394,6 +403,7 @@ SRCS+=	amdgpu_afmt.c \
 	mxgpu_ai.c \
 	mxgpu_nv.c \
 	mxgpu_vi.c \
+	nbif_v6_3_1.c \
 	nbio_v2_3.c \
 	nbio_v4_3.c \
 	nbio_v6_1.c \
@@ -412,6 +422,7 @@ SRCS+=	amdgpu_afmt.c \
 	psp_v12_0.c \
 	psp_v13_0.c \
 	psp_v13_0_4.c \
+	psp_v14_0.c \
 	sdma_v2_4.c \
 	sdma_v3_0.c \
 	sdma_v4_0.c \
@@ -458,6 +469,7 @@ SRCS+=	amdgpu_afmt.c \
 	vcn_v4_0.c \
 	vcn_v4_0_3.c \
 	vcn_v4_0_5.c \
+	vcn_v5_0_0.c \
 	vega10_ih.c \
 	vega10_reg_init.c \
 	vega20_ih.c \
@@ -776,6 +788,13 @@ SRCS+=	dcn35_clk_mgr.c \
 	dcn35_smu.c \
 	dmub_dcn35.c \
 	irq_service_dcn35.c
+
+# display/dc/dcn351
+SRCS+=	dcn351_fpu.c \
+	dcn351_init.c \
+	dcn351_resource.c \
+	dmub_dcn351.c \
+	irq_service_dcn351.c
 
 # display/dc/clk_mgr/dcn31
 SRCS+=	dcn31_afmt.c \
@@ -1171,6 +1190,7 @@ CFLAGS.dcn32_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn32_resource_helpers.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn321_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn35_fpu.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn351_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 
 CFLAGS.display_mode_core.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.display_mode_util.c  = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
@@ -1435,6 +1455,8 @@ CWARNFLAGS.dcn321_fpu.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.dcn321_resource.c=		-Wno-initializer-overrides -Wno-unused-const-variable
 CWARNFLAGS.dcn35_clk_mgr.c=		-Wno-incompatible-pointer-types
 CWARNFLAGS.dcn35_resource.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn351_resource.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn351_fpu.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable

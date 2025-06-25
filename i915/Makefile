@@ -203,6 +203,7 @@ SRCS+=	gen2_engine_cs.c \
 	intel_gsc.c \
 	intel_gt.c \
 	intel_gt_buffer_pool.c \
+	intel_gt_ccs_mode.c \
 	intel_gt_clock_utils.c \
 	intel_gt_irq.c \
 	intel_gt_mcr.c \
@@ -326,6 +327,10 @@ SRCS+=	intel_fbdev.c \
 
 .if !empty(KCONFIG:MDRM_I915_CAPTURE_ERROR)
 SRCS+=	i915_gpu_error.c
+.endif
+
+.if !empty(KCONFIG:MDRM_I915_DP_TUNNEL)
+SRCS+=	intel_dp_tunnel.c
 .endif
 
 .if !empty(KCONFIG:MHWMON)
