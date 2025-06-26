@@ -912,6 +912,15 @@ static struct amdgpu_numa_info *amdgpu_acpi_get_numa_info(uint32_t pxm)
  *
  * Returns ACPI STATUS OK with Node ID on success or the corresponding failure reason
  */
+#if defined(__FreeBSD__)
+#include "opt_acpi.h"
+
+#ifdef ACPI_DEBUG
+void AcpiUtStatusExit(UINT32, const char *, const char *, UINT32, ACPI_STATUS);
+ACPI_MODULE_NAME("AMDGPU")
+#define	_COMPONENT	ACPI_HARDWARE
+#endif
+#endif
 static acpi_status amdgpu_acpi_get_node_id(acpi_handle handle,
 				    struct amdgpu_numa_info **numa_info)
 {
