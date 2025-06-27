@@ -1186,6 +1186,7 @@ SRCS+=	amd_powerplay.c \
 	ci_smumgr.c \
 	ci_baco.c \
 	cyan_skillfish_ppt.c \
+	cyan_skillfish_reg_init.c \
 	fiji_smumgr.c \
 	fiji_baco.c \
 	hardwaremanager.c \
