@@ -2473,11 +2473,7 @@ void intel_engine_dump(struct intel_engine_cs *engine,
 	intel_execlists_show_requests(engine, m, i915_request_show, 8);
 
 	drm_printf(m, "HWSP:\n");
-#ifdef __linux__
 	hexdump(m, engine->status_page.addr, PAGE_SIZE);
-#elif defined(__FreeBSD__)
-	linux_hexdump(m, engine->status_page.addr, PAGE_SIZE);
-#endif
 
 	drm_printf(m, "Idle? %s\n", str_yes_no(intel_engine_is_idle(engine)));
 
