@@ -102,7 +102,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/drm_trace*' \
     ':!drivers/gpu/drm/drm_*vram*' \
     ':!drivers/gpu/drm/radeon/radeon_atpx_handler*' \
-    ':!drivers/gpu/drm/ttm/tests/*'
+    ':!drivers/gpu/drm/ttm/tests/*' \
     ':!include/drm/bridge/*' \
     ':!include/drm/intel-gtt*' \
     ':!include/drm/tinydrm/*' \
