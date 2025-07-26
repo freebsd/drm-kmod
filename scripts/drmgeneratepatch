@@ -115,7 +115,6 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_gem_dma_helper.h' \
     ':!include/drm/drm_gem_shmem*' \
     ':!include/drm/drm_gem_vram*' \
-    ':!include/drm/drm_gpuva_mgr.h' \
     ':!include/drm/drm_kunit_helpers.h' \
     ':!include/drm/drm_lease*' \
     ':!include/drm/drm_managed*' \
@@ -127,6 +126,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/gma*' \
     ':!include/drm/drm_*vram*' \
     ':!include/drm/i915_hdcp_interface.h' \
+    ':!include/drm/xe_pciids.h' \
     ':!include/uapi/drm/etnaviv*' \
     ':!include/uapi/drm/exynos_drm*' \
     ':!include/uapi/drm/habanalabs_accel.h' \
@@ -135,10 +135,13 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/uapi/drm/msm*' \
     ':!include/uapi/drm/omap*' \
     ':!include/uapi/drm/panfrost*' \
+    ':!include/uapi/drm/panthor_drm.h' \
     ':!include/uapi/drm/v3d*' \
     ':!include/uapi/drm/vc4*' \
+    ':!include/uapi/drm/xe_drm.h' \
     ':!*Makefile' \
-    ':!*Kconfig*'
+    ':!*Kconfig*' \
+    ':!*CMakeLists.txt'
 
 # Fixup some paths
 for file in ${PATCH_DIR}/*; do
