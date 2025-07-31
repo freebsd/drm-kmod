@@ -170,14 +170,13 @@ drm_add_busid_modesetting(struct drm_device *dev, struct sysctl_ctx_list *ctx,
     struct sysctl_oid *top)
 {
 	struct sysctl_oid *oid;
-	device_t bsddev;
 	int domain, bus, slot, func;
+	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
-	bsddev = dev->dev->bsddev;
-	domain = pci_get_domain(bsddev);
-	bus    = pci_get_bus(bsddev);
-	slot   = pci_get_slot(bsddev);
-	func   = pci_get_function(bsddev);
+	domain = pci_domain_nr(pdev->bus);
+	bus    = pdev->bus->number;
+	slot   = PCI_SLOT(pdev->devfn);
+	func   = PCI_FUNC(pdev->devfn);
 
 	snprintf(dev->busid_str, sizeof(dev->busid_str),
 	    "pci:%04x:%02x:%02x.%d", domain, bus, slot, func);
