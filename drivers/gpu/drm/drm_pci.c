@@ -57,30 +57,18 @@ static int drm_get_pci_domain(struct drm_device *dev)
 		return 0;
 #endif /* __alpha__ */
 
-#ifdef __FreeBSD__
-	return pci_get_domain(dev->dev->bsddev);
-#else
 	return pci_domain_nr(to_pci_dev(dev->dev)->bus);
-#endif
 }
 
 int drm_pci_set_busid(struct drm_device *dev, struct drm_master *master)
 {
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
-#ifdef __FreeBSD__
-	master->unique = kasprintf(GFP_KERNEL, "pci:%04x:%02x:%02x.%d",
-					drm_get_pci_domain(dev),
-					pci_get_bus(dev->dev->bsddev),
-					pci_get_slot(dev->dev->bsddev),
-					PCI_FUNC(pdev->devfn));
-#else
 	master->unique = kasprintf(GFP_KERNEL, "pci:%04x:%02x:%02x.%d",
 					drm_get_pci_domain(dev),
 					pdev->bus->number,
 					PCI_SLOT(pdev->devfn),
 					PCI_FUNC(pdev->devfn));
-#endif
 	if (!master->unique)
 		return -ENOMEM;
 
@@ -93,16 +81,17 @@ int
 drm_getpciinfo(struct drm_device *dev, void *data, struct drm_file *file_priv)
 {
 	struct drm_pciinfo *info = data;
+	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
-	info->domain = pci_get_domain(dev->dev->bsddev);
-	info->bus = pci_get_bus(dev->dev->bsddev);
-	info->dev = pci_get_slot(dev->dev->bsddev);
-	info->func = pci_get_function(dev->dev->bsddev);
-	info->vendor_id = pci_get_vendor(dev->dev->bsddev);
-	info->device_id = pci_get_device(dev->dev->bsddev);
-	info->subvendor_id = pci_get_subvendor(dev->dev->bsddev);
-	info->subdevice_id = pci_get_subdevice(dev->dev->bsddev);
-	info->revision_id = pci_get_revid(dev->dev->bsddev);
+	info->domain = drm_get_pci_domain(dev);
+	info->bus = pdev->bus->number;
+	info->dev = PCI_SLOT(pdev->devfn);
+	info->func = PCI_FUNC(pdev->devfn);
+	info->vendor_id = pdev->vendor;
+	info->device_id = pdev->device;
+	info->subvendor_id = pdev->subsystem_vendor;
+	info->subdevice_id = pdev->subsystem_device;
+	info->revision_id = pdev->revision;
 
 	return 0;
 }
