@@ -79,13 +79,20 @@ static fo_seek_t dma_buf_seek;
 static fo_ioctl_t dma_buf_ioctl;
 
 struct fileops dma_buf_fileops  = {
-	.fo_close = dma_buf_close,
+	.fo_read = invfo_rdwr,
+	.fo_write = invfo_rdwr,
+	.fo_truncate = invfo_truncate,
+	.fo_ioctl = dma_buf_ioctl,
+	.fo_poll = dma_buf_poll,
+	.fo_kqfilter = invfo_kqfilter,
 	.fo_stat = dma_buf_stat,
+	.fo_close = dma_buf_close,
+	.fo_chmod = invfo_chmod,
+	.fo_chown = invfo_chown,
+	.fo_sendfile = invfo_sendfile,
+	.fo_seek = dma_buf_seek,
 	.fo_fill_kinfo = dma_buf_fill_kinfo,
 	.fo_mmap = dma_buf_mmap_fileops,
-	.fo_poll = dma_buf_poll,
-	.fo_seek = dma_buf_seek,
-	.fo_ioctl = dma_buf_ioctl,
 	.fo_flags = DFLAG_PASSABLE|DFLAG_SEEKABLE,
 };
 
