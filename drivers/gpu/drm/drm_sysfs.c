@@ -78,7 +78,7 @@ void drm_sysfs_hotplug_event(struct drm_device *dev)
 {
 	struct sbuf *sb = sbuf_new_auto();
 
-	DRM_DEBUG("generating hotplug event\n");
+	drm_dbg_kms(dev, "generating hotplug event\n");
 
 	sbuf_printf(sb, "cdev=dri/%s", dev_name(dev->primary->kdev));
 	sbuf_finish(sb);

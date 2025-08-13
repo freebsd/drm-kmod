@@ -28,6 +28,7 @@ SRCS=	drm_atomic.c \
 	drm_drv.c \
 	drm_dumb_buffers.c \
 	drm_edid.c \
+	drm_eld.c \
 	drm_displayid.c \
 	drm_encoder.c \
 	drm_file.c \
@@ -124,6 +125,10 @@ SRCS+=	drm_dp_tunnel.c
 
 .if !empty(KCONFIG:MDRM_EXEC)
 SRCS+=	drm_exec.c
+.endif
+
+.if !empty(KCONFIG:MDRM_PANIC)
+SRCS+=	drm_panic.c
 .endif
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug

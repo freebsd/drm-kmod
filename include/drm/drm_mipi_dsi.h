@@ -59,6 +59,11 @@ enum mipi_dsi_pixel_format {
 	MIPI_DSI_FMT_RGB565,
 };
 
+enum mipi_dsi_compression_algo {
+	MIPI_DSI_COMPRESSION_DSC = 0,
+	MIPI_DSI_COMPRESSION_VENDOR = 3,
+};
+
 int mipi_dsi_attach(struct mipi_dsi_device *);
 int mipi_dsi_create_packet(struct mipi_dsi_packet *,
     const struct mipi_dsi_msg *);
@@ -70,8 +75,10 @@ ssize_t mipi_dsi_dcs_write(struct mipi_dsi_device *, u8, const void *, size_t);
 int mipi_dsi_dcs_nop(struct mipi_dsi_device *);
 int mipi_dsi_set_maximum_return_packet_size(struct mipi_dsi_device *, u16);
 bool mipi_dsi_packet_format_is_long(u8);
-ssize_t mipi_dsi_compression_mode(struct mipi_dsi_device *, bool);
-ssize_t mipi_dsi_picture_parameter_set(struct mipi_dsi_device *,
+int mipi_dsi_compression_mode(struct mipi_dsi_device *, bool);
+int mipi_dsi_compression_mode_ext(struct mipi_dsi_device *dsi, bool enable,
+    enum mipi_dsi_compression_algo algo, unsigned int pps_selector);
+int mipi_dsi_picture_parameter_set(struct mipi_dsi_device *,
     const struct drm_dsc_picture_parameter_set *);
 
 static inline int

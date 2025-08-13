@@ -538,24 +538,6 @@
 #define CHV_TX_DW14(ch, lane) _TXLANE(ch, lane, 0xb8)
 #define   DPIO_UPAR_SHIFT		30
 
-/* BXT PHY registers */
-#define _BXT_PHY0_BASE			0x6C000
-#define _BXT_PHY1_BASE			0x162000
-#define _BXT_PHY2_BASE			0x163000
-#define BXT_PHY_BASE(phy)							\
-	 _PICK_EVEN_2RANGES(phy, 1,						\
-			    _BXT_PHY0_BASE, _BXT_PHY0_BASE,			\
-			    _BXT_PHY1_BASE, _BXT_PHY2_BASE)
-
-#define _BXT_PHY(phy, reg)						\
-	_MMIO(BXT_PHY_BASE(phy) - _BXT_PHY0_BASE + (reg))
-
-#define _BXT_PHY_CH(phy, ch, reg_ch0, reg_ch1)		\
-	(BXT_PHY_BASE(phy) + _PIPE((ch), (reg_ch0) - _BXT_PHY0_BASE,	\
-					 (reg_ch1) - _BXT_PHY0_BASE))
-#define _MMIO_BXT_PHY_CH(phy, ch, reg_ch0, reg_ch1)		\
-	_MMIO(_BXT_PHY_CH(phy, ch, reg_ch0, reg_ch1))
-
 #define BXT_P_CR_GT_DISP_PWRON		_MMIO(0x138090)
 #define  MIPIO_RST_CTRL				(1 << 2)
 
@@ -576,250 +558,6 @@
 	 _MMIO(_PICK_EVEN_2RANGES(phy, 1,					\
 				  _PHY_CTL_FAMILY_DDI, _PHY_CTL_FAMILY_DDI,	\
 				  _PHY_CTL_FAMILY_EDP, _PHY_CTL_FAMILY_DDI_C))
-
-/* BXT PHY PLL registers */
-#define _PORT_PLL_A			0x46074
-#define _PORT_PLL_B			0x46078
-#define _PORT_PLL_C			0x4607c
-#define   PORT_PLL_ENABLE		REG_BIT(31)
-#define   PORT_PLL_LOCK			REG_BIT(30)
-#define   PORT_PLL_REF_SEL		REG_BIT(27)
-#define   PORT_PLL_POWER_ENABLE		REG_BIT(26)
-#define   PORT_PLL_POWER_STATE		REG_BIT(25)
-#define BXT_PORT_PLL_ENABLE(port)	_MMIO_PORT(port, _PORT_PLL_A, _PORT_PLL_B)
-
-#define _PORT_PLL_EBB_0_A		0x162034
-#define _PORT_PLL_EBB_0_B		0x6C034
-#define _PORT_PLL_EBB_0_C		0x6C340
-#define   PORT_PLL_P1_MASK		REG_GENMASK(15, 13)
-#define   PORT_PLL_P1(p1)		REG_FIELD_PREP(PORT_PLL_P1_MASK, (p1))
-#define   PORT_PLL_P2_MASK		REG_GENMASK(12, 8)
-#define   PORT_PLL_P2(p2)		REG_FIELD_PREP(PORT_PLL_P2_MASK, (p2))
-#define BXT_PORT_PLL_EBB_0(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_PLL_EBB_0_B, \
-							 _PORT_PLL_EBB_0_C)
-
-#define _PORT_PLL_EBB_4_A		0x162038
-#define _PORT_PLL_EBB_4_B		0x6C038
-#define _PORT_PLL_EBB_4_C		0x6C344
-#define   PORT_PLL_RECALIBRATE		REG_BIT(14)
-#define   PORT_PLL_10BIT_CLK_ENABLE	REG_BIT(13)
-#define BXT_PORT_PLL_EBB_4(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_PLL_EBB_4_B, \
-							 _PORT_PLL_EBB_4_C)
-
-#define _PORT_PLL_0_A			0x162100
-#define _PORT_PLL_0_B			0x6C100
-#define _PORT_PLL_0_C			0x6C380
-/* PORT_PLL_0_A */
-#define   PORT_PLL_M2_INT_MASK		REG_GENMASK(7, 0)
-#define   PORT_PLL_M2_INT(m2_int)	REG_FIELD_PREP(PORT_PLL_M2_INT_MASK, (m2_int))
-/* PORT_PLL_1_A */
-#define   PORT_PLL_N_MASK		REG_GENMASK(11, 8)
-#define   PORT_PLL_N(n)			REG_FIELD_PREP(PORT_PLL_N_MASK, (n))
-/* PORT_PLL_2_A */
-#define   PORT_PLL_M2_FRAC_MASK		REG_GENMASK(21, 0)
-#define   PORT_PLL_M2_FRAC(m2_frac)	REG_FIELD_PREP(PORT_PLL_M2_FRAC_MASK, (m2_frac))
-/* PORT_PLL_3_A */
-#define   PORT_PLL_M2_FRAC_ENABLE	REG_BIT(16)
-/* PORT_PLL_6_A */
-#define   PORT_PLL_GAIN_CTL_MASK	REG_GENMASK(18, 16)
-#define   PORT_PLL_GAIN_CTL(x)		REG_FIELD_PREP(PORT_PLL_GAIN_CTL_MASK, (x))
-#define   PORT_PLL_INT_COEFF_MASK	REG_GENMASK(12, 8)
-#define   PORT_PLL_INT_COEFF(x)		REG_FIELD_PREP(PORT_PLL_INT_COEFF_MASK, (x))
-#define   PORT_PLL_PROP_COEFF_MASK	REG_GENMASK(3, 0)
-#define   PORT_PLL_PROP_COEFF(x)	REG_FIELD_PREP(PORT_PLL_PROP_COEFF_MASK, (x))
-/* PORT_PLL_8_A */
-#define   PORT_PLL_TARGET_CNT_MASK	REG_GENMASK(9, 0)
-#define   PORT_PLL_TARGET_CNT(x)	REG_FIELD_PREP(PORT_PLL_TARGET_CNT_MASK, (x))
-/* PORT_PLL_9_A */
-#define  PORT_PLL_LOCK_THRESHOLD_MASK	REG_GENMASK(3, 1)
-#define  PORT_PLL_LOCK_THRESHOLD(x)	REG_FIELD_PREP(PORT_PLL_LOCK_THRESHOLD_MASK, (x))
-/* PORT_PLL_10_A */
-#define  PORT_PLL_DCO_AMP_OVR_EN_H	REG_BIT(27)
-#define  PORT_PLL_DCO_AMP_MASK		REG_GENMASK(13, 10)
-#define  PORT_PLL_DCO_AMP(x)		REG_FIELD_PREP(PORT_PLL_DCO_AMP_MASK, (x))
-#define _PORT_PLL_BASE(phy, ch)		_BXT_PHY_CH(phy, ch, \
-						    _PORT_PLL_0_B, \
-						    _PORT_PLL_0_C)
-#define BXT_PORT_PLL(phy, ch, idx)	_MMIO(_PORT_PLL_BASE(phy, ch) + \
-					      (idx) * 4)
-
-/* BXT PHY common lane registers */
-#define _PORT_CL1CM_DW0_A		0x162000
-#define _PORT_CL1CM_DW0_BC		0x6C000
-#define   PHY_POWER_GOOD		(1 << 16)
-#define   PHY_RESERVED			(1 << 7)
-#define BXT_PORT_CL1CM_DW0(phy)		_BXT_PHY((phy), _PORT_CL1CM_DW0_BC)
-
-#define _PORT_CL1CM_DW9_A		0x162024
-#define _PORT_CL1CM_DW9_BC		0x6C024
-#define   IREF0RC_OFFSET_SHIFT		8
-#define   IREF0RC_OFFSET_MASK		(0xFF << IREF0RC_OFFSET_SHIFT)
-#define BXT_PORT_CL1CM_DW9(phy)		_BXT_PHY((phy), _PORT_CL1CM_DW9_BC)
-
-#define _PORT_CL1CM_DW10_A		0x162028
-#define _PORT_CL1CM_DW10_BC		0x6C028
-#define   IREF1RC_OFFSET_SHIFT		8
-#define   IREF1RC_OFFSET_MASK		(0xFF << IREF1RC_OFFSET_SHIFT)
-#define BXT_PORT_CL1CM_DW10(phy)	_BXT_PHY((phy), _PORT_CL1CM_DW10_BC)
-
-#define _PORT_CL1CM_DW28_A		0x162070
-#define _PORT_CL1CM_DW28_BC		0x6C070
-#define   OCL1_POWER_DOWN_EN		(1 << 23)
-#define   DW28_OLDO_DYN_PWR_DOWN_EN	(1 << 22)
-#define   SUS_CLK_CONFIG		0x3
-#define BXT_PORT_CL1CM_DW28(phy)	_BXT_PHY((phy), _PORT_CL1CM_DW28_BC)
-
-#define _PORT_CL1CM_DW30_A		0x162078
-#define _PORT_CL1CM_DW30_BC		0x6C078
-#define   OCL2_LDOFUSE_PWR_DIS		(1 << 6)
-#define BXT_PORT_CL1CM_DW30(phy)	_BXT_PHY((phy), _PORT_CL1CM_DW30_BC)
-
-/* The spec defines this only for BXT PHY0, but lets assume that this
- * would exist for PHY1 too if it had a second channel.
- */
-#define _PORT_CL2CM_DW6_A		0x162358
-#define _PORT_CL2CM_DW6_BC		0x6C358
-#define BXT_PORT_CL2CM_DW6(phy)		_BXT_PHY((phy), _PORT_CL2CM_DW6_BC)
-#define   DW6_OLDO_DYN_PWR_DOWN_EN	(1 << 28)
-
-/* BXT PHY Ref registers */
-#define _PORT_REF_DW3_A			0x16218C
-#define _PORT_REF_DW3_BC		0x6C18C
-#define   GRC_DONE			(1 << 22)
-#define BXT_PORT_REF_DW3(phy)		_BXT_PHY((phy), _PORT_REF_DW3_BC)
-
-#define _PORT_REF_DW6_A			0x162198
-#define _PORT_REF_DW6_BC		0x6C198
-#define   GRC_CODE_SHIFT		24
-#define   GRC_CODE_MASK			(0xFF << GRC_CODE_SHIFT)
-#define   GRC_CODE_FAST_SHIFT		16
-#define   GRC_CODE_FAST_MASK		(0xFF << GRC_CODE_FAST_SHIFT)
-#define   GRC_CODE_SLOW_SHIFT		8
-#define   GRC_CODE_SLOW_MASK		(0xFF << GRC_CODE_SLOW_SHIFT)
-#define   GRC_CODE_NOM_MASK		0xFF
-#define BXT_PORT_REF_DW6(phy)		_BXT_PHY((phy), _PORT_REF_DW6_BC)
-
-#define _PORT_REF_DW8_A			0x1621A0
-#define _PORT_REF_DW8_BC		0x6C1A0
-#define   GRC_DIS			(1 << 15)
-#define   GRC_RDY_OVRD			(1 << 1)
-#define BXT_PORT_REF_DW8(phy)		_BXT_PHY((phy), _PORT_REF_DW8_BC)
-
-/* BXT PHY PCS registers */
-#define _PORT_PCS_DW10_LN01_A		0x162428
-#define _PORT_PCS_DW10_LN01_B		0x6C428
-#define _PORT_PCS_DW10_LN01_C		0x6C828
-#define _PORT_PCS_DW10_GRP_A		0x162C28
-#define _PORT_PCS_DW10_GRP_B		0x6CC28
-#define _PORT_PCS_DW10_GRP_C		0x6CE28
-#define BXT_PORT_PCS_DW10_LN01(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_PCS_DW10_LN01_B, \
-							 _PORT_PCS_DW10_LN01_C)
-#define BXT_PORT_PCS_DW10_GRP(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_PCS_DW10_GRP_B, \
-							 _PORT_PCS_DW10_GRP_C)
-
-#define   TX2_SWING_CALC_INIT		(1 << 31)
-#define   TX1_SWING_CALC_INIT		(1 << 30)
-
-#define _PORT_PCS_DW12_LN01_A		0x162430
-#define _PORT_PCS_DW12_LN01_B		0x6C430
-#define _PORT_PCS_DW12_LN01_C		0x6C830
-#define _PORT_PCS_DW12_LN23_A		0x162630
-#define _PORT_PCS_DW12_LN23_B		0x6C630
-#define _PORT_PCS_DW12_LN23_C		0x6CA30
-#define _PORT_PCS_DW12_GRP_A		0x162c30
-#define _PORT_PCS_DW12_GRP_B		0x6CC30
-#define _PORT_PCS_DW12_GRP_C		0x6CE30
-#define   LANESTAGGER_STRAP_OVRD	(1 << 6)
-#define   LANE_STAGGER_MASK		0x1F
-#define BXT_PORT_PCS_DW12_LN01(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_PCS_DW12_LN01_B, \
-							 _PORT_PCS_DW12_LN01_C)
-#define BXT_PORT_PCS_DW12_LN23(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_PCS_DW12_LN23_B, \
-							 _PORT_PCS_DW12_LN23_C)
-#define BXT_PORT_PCS_DW12_GRP(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_PCS_DW12_GRP_B, \
-							 _PORT_PCS_DW12_GRP_C)
-
-/* BXT PHY TX registers */
-#define _BXT_LANE_OFFSET(lane)           (((lane) >> 1) * 0x200 +	\
-					  ((lane) & 1) * 0x80)
-
-#define _PORT_TX_DW2_LN0_A		0x162508
-#define _PORT_TX_DW2_LN0_B		0x6C508
-#define _PORT_TX_DW2_LN0_C		0x6C908
-#define _PORT_TX_DW2_GRP_A		0x162D08
-#define _PORT_TX_DW2_GRP_B		0x6CD08
-#define _PORT_TX_DW2_GRP_C		0x6CF08
-#define BXT_PORT_TX_DW2_LN0(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_TX_DW2_LN0_B, \
-							 _PORT_TX_DW2_LN0_C)
-#define BXT_PORT_TX_DW2_GRP(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_TX_DW2_GRP_B, \
-							 _PORT_TX_DW2_GRP_C)
-#define   MARGIN_000_SHIFT		16
-#define   MARGIN_000			(0xFF << MARGIN_000_SHIFT)
-#define   UNIQ_TRANS_SCALE_SHIFT	8
-#define   UNIQ_TRANS_SCALE		(0xFF << UNIQ_TRANS_SCALE_SHIFT)
-
-#define _PORT_TX_DW3_LN0_A		0x16250C
-#define _PORT_TX_DW3_LN0_B		0x6C50C
-#define _PORT_TX_DW3_LN0_C		0x6C90C
-#define _PORT_TX_DW3_GRP_A		0x162D0C
-#define _PORT_TX_DW3_GRP_B		0x6CD0C
-#define _PORT_TX_DW3_GRP_C		0x6CF0C
-#define BXT_PORT_TX_DW3_LN0(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_TX_DW3_LN0_B, \
-							 _PORT_TX_DW3_LN0_C)
-#define BXT_PORT_TX_DW3_GRP(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_TX_DW3_GRP_B, \
-							 _PORT_TX_DW3_GRP_C)
-#define   SCALE_DCOMP_METHOD		(1 << 26)
-#define   UNIQUE_TRANGE_EN_METHOD	(1 << 27)
-
-#define _PORT_TX_DW4_LN0_A		0x162510
-#define _PORT_TX_DW4_LN0_B		0x6C510
-#define _PORT_TX_DW4_LN0_C		0x6C910
-#define _PORT_TX_DW4_GRP_A		0x162D10
-#define _PORT_TX_DW4_GRP_B		0x6CD10
-#define _PORT_TX_DW4_GRP_C		0x6CF10
-#define BXT_PORT_TX_DW4_LN0(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_TX_DW4_LN0_B, \
-							 _PORT_TX_DW4_LN0_C)
-#define BXT_PORT_TX_DW4_GRP(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_TX_DW4_GRP_B, \
-							 _PORT_TX_DW4_GRP_C)
-#define   DEEMPH_SHIFT			24
-#define   DE_EMPHASIS			(0xFF << DEEMPH_SHIFT)
-
-#define _PORT_TX_DW5_LN0_A		0x162514
-#define _PORT_TX_DW5_LN0_B		0x6C514
-#define _PORT_TX_DW5_LN0_C		0x6C914
-#define _PORT_TX_DW5_GRP_A		0x162D14
-#define _PORT_TX_DW5_GRP_B		0x6CD14
-#define _PORT_TX_DW5_GRP_C		0x6CF14
-#define BXT_PORT_TX_DW5_LN0(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_TX_DW5_LN0_B, \
-							 _PORT_TX_DW5_LN0_C)
-#define BXT_PORT_TX_DW5_GRP(phy, ch)	_MMIO_BXT_PHY_CH(phy, ch, \
-							 _PORT_TX_DW5_GRP_B, \
-							 _PORT_TX_DW5_GRP_C)
-#define   DCC_DELAY_RANGE_1		(1 << 9)
-#define   DCC_DELAY_RANGE_2		(1 << 8)
-
-#define _PORT_TX_DW14_LN0_A		0x162538
-#define _PORT_TX_DW14_LN0_B		0x6C538
-#define _PORT_TX_DW14_LN0_C		0x6C938
-#define   LATENCY_OPTIM_SHIFT		30
-#define   LATENCY_OPTIM			(1 << LATENCY_OPTIM_SHIFT)
-#define BXT_PORT_TX_DW14_LN(phy, ch, lane)				\
-	_MMIO(_BXT_PHY_CH(phy, ch, _PORT_TX_DW14_LN0_B,			\
-				   _PORT_TX_DW14_LN0_C) +		\
-	      _BXT_LANE_OFFSET(lane))
 
 /* UAIMI scratch pad register 1 */
 #define UAIMI_SPR1			_MMIO(0x4F074)
@@ -1235,13 +973,13 @@
 #define VLV_AUD_CHICKEN_BIT_REG		_MMIO(VLV_DISPLAY_BASE + 0x62F38)
 #define VLV_CHICKEN_BIT_DBG_ENABLE	(1 << 0)
 
-#define _VLV_AUD_PORT_EN_B_DBG		(VLV_DISPLAY_BASE + 0x62F20)
-#define _VLV_AUD_PORT_EN_C_DBG		(VLV_DISPLAY_BASE + 0x62F30)
-#define _VLV_AUD_PORT_EN_D_DBG		(VLV_DISPLAY_BASE + 0x62F34)
-#define VLV_AUD_PORT_EN_DBG(port)	_MMIO_PORT3((port) - PORT_B,	   \
-						    _VLV_AUD_PORT_EN_B_DBG, \
-						    _VLV_AUD_PORT_EN_C_DBG, \
-						    _VLV_AUD_PORT_EN_D_DBG)
+#define _VLV_AUD_PORT_EN_B_DBG		0x62F20
+#define _VLV_AUD_PORT_EN_C_DBG		0x62F30
+#define _VLV_AUD_PORT_EN_D_DBG		0x62F34
+#define VLV_AUD_PORT_EN_DBG(port)	_MMIO_BASE_PORT3(VLV_DISPLAY_BASE, (port) - PORT_B, \
+							 _VLV_AUD_PORT_EN_B_DBG, \
+							 _VLV_AUD_PORT_EN_C_DBG, \
+							 _VLV_AUD_PORT_EN_D_DBG)
 #define VLV_AMP_MUTE		        (1 << 1)
 
 #define GEN6_BSD_RNCID			_MMIO(0x12198)
@@ -1409,10 +1147,11 @@
 /*
  * Clock control & power management
  */
-#define _DPLL_A (DISPLAY_MMIO_BASE(dev_priv) + 0x6014)
-#define _DPLL_B (DISPLAY_MMIO_BASE(dev_priv) + 0x6018)
-#define _CHV_DPLL_C (DISPLAY_MMIO_BASE(dev_priv) + 0x6030)
-#define DPLL(pipe) _MMIO_PIPE3((pipe), _DPLL_A, _DPLL_B, _CHV_DPLL_C)
+#define _DPLL_A			0x6014
+#define _DPLL_B			0x6018
+#define _CHV_DPLL_C		0x6030
+#define DPLL(pipe)		_MMIO_BASE_PIPE3(DISPLAY_MMIO_BASE(dev_priv), \
+						 (pipe), _DPLL_A, _DPLL_B, _CHV_DPLL_C)
 
 #define VGA0	_MMIO(0x6000)
 #define VGA1	_MMIO(0x6004)
@@ -1508,10 +1247,11 @@
 #define   SDVO_MULTIPLIER_SHIFT_HIRES		4
 #define   SDVO_MULTIPLIER_SHIFT_VGA		0
 
-#define _DPLL_A_MD (DISPLAY_MMIO_BASE(dev_priv) + 0x601c)
-#define _DPLL_B_MD (DISPLAY_MMIO_BASE(dev_priv) + 0x6020)
-#define _CHV_DPLL_C_MD (DISPLAY_MMIO_BASE(dev_priv) + 0x603c)
-#define DPLL_MD(pipe) _MMIO_PIPE3((pipe), _DPLL_A_MD, _DPLL_B_MD, _CHV_DPLL_C_MD)
+#define _DPLL_A_MD		0x601c
+#define _DPLL_B_MD		0x6020
+#define _CHV_DPLL_C_MD		0x603c
+#define DPLL_MD(pipe)		_MMIO_BASE_PIPE3(DISPLAY_MMIO_BASE(dev_priv), \
+						 (pipe), _DPLL_A_MD, _DPLL_B_MD, _CHV_DPLL_C_MD)
 
 /*
  * UDI pixel divider, controlling how many pixels are stuffed into a packet.
@@ -1750,8 +1490,6 @@
 
 #define BXT_RP_STATE_CAP        _MMIO(0x138170)
 #define GEN9_RP_STATE_LIMITS	_MMIO(0x138148)
-#define XEHPSDV_RP_STATE_CAP	_MMIO(0x250014)
-#define PVC_RP_STATE_CAP	_MMIO(0x281014)
 
 #define MTL_RP_STATE_CAP	_MMIO(0x138000)
 #define MTL_MEDIAP_STATE_CAP	_MMIO(0x138020)
@@ -1911,18 +1649,18 @@
 #define _PIPE_CRC_RES_4_B_IVB		0x61070
 #define _PIPE_CRC_RES_5_B_IVB		0x61074
 
-#define PIPE_CRC_CTL(pipe)		_MMIO_TRANS2(pipe, _PIPE_CRC_CTL_A)
-#define PIPE_CRC_RES_1_IVB(pipe)	_MMIO_TRANS2(pipe, _PIPE_CRC_RES_1_A_IVB)
-#define PIPE_CRC_RES_2_IVB(pipe)	_MMIO_TRANS2(pipe, _PIPE_CRC_RES_2_A_IVB)
-#define PIPE_CRC_RES_3_IVB(pipe)	_MMIO_TRANS2(pipe, _PIPE_CRC_RES_3_A_IVB)
-#define PIPE_CRC_RES_4_IVB(pipe)	_MMIO_TRANS2(pipe, _PIPE_CRC_RES_4_A_IVB)
-#define PIPE_CRC_RES_5_IVB(pipe)	_MMIO_TRANS2(pipe, _PIPE_CRC_RES_5_A_IVB)
+#define PIPE_CRC_CTL(pipe)		_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_CTL_A)
+#define PIPE_CRC_RES_1_IVB(pipe)	_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_RES_1_A_IVB)
+#define PIPE_CRC_RES_2_IVB(pipe)	_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_RES_2_A_IVB)
+#define PIPE_CRC_RES_3_IVB(pipe)	_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_RES_3_A_IVB)
+#define PIPE_CRC_RES_4_IVB(pipe)	_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_RES_4_A_IVB)
+#define PIPE_CRC_RES_5_IVB(pipe)	_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_RES_5_A_IVB)
 
-#define PIPE_CRC_RES_RED(pipe)		_MMIO_TRANS2(pipe, _PIPE_CRC_RES_RED_A)
-#define PIPE_CRC_RES_GREEN(pipe)	_MMIO_TRANS2(pipe, _PIPE_CRC_RES_GREEN_A)
-#define PIPE_CRC_RES_BLUE(pipe)		_MMIO_TRANS2(pipe, _PIPE_CRC_RES_BLUE_A)
-#define PIPE_CRC_RES_RES1_I915(pipe)	_MMIO_TRANS2(pipe, _PIPE_CRC_RES_RES1_A_I915)
-#define PIPE_CRC_RES_RES2_G4X(pipe)	_MMIO_TRANS2(pipe, _PIPE_CRC_RES_RES2_A_G4X)
+#define PIPE_CRC_RES_RED(pipe)		_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_RES_RED_A)
+#define PIPE_CRC_RES_GREEN(pipe)	_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_RES_GREEN_A)
+#define PIPE_CRC_RES_BLUE(pipe)		_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_RES_BLUE_A)
+#define PIPE_CRC_RES_RES1_I915(pipe)	_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_RES_RES1_A_I915)
+#define PIPE_CRC_RES_RES2_G4X(pipe)	_MMIO_TRANS2(dev_priv, pipe, _PIPE_CRC_RES_RES2_A_G4X)
 
 /* Pipe/transcoder A timing regs */
 #define _TRANS_HTOTAL_A		0x60000
@@ -1991,23 +1729,23 @@
 #define _TRANS_VSYNC_DSI1	0x6b814
 #define _TRANS_VSYNCSHIFT_DSI1	0x6b828
 
-#define TRANS_HTOTAL(trans)	_MMIO_TRANS2((trans), _TRANS_HTOTAL_A)
-#define TRANS_HBLANK(trans)	_MMIO_TRANS2((trans), _TRANS_HBLANK_A)
-#define TRANS_HSYNC(trans)	_MMIO_TRANS2((trans), _TRANS_HSYNC_A)
-#define TRANS_VTOTAL(trans)	_MMIO_TRANS2((trans), _TRANS_VTOTAL_A)
-#define TRANS_VBLANK(trans)	_MMIO_TRANS2((trans), _TRANS_VBLANK_A)
-#define TRANS_VSYNC(trans)	_MMIO_TRANS2((trans), _TRANS_VSYNC_A)
-#define BCLRPAT(trans)		_MMIO_TRANS2((trans), _BCLRPAT_A)
-#define TRANS_VSYNCSHIFT(trans)	_MMIO_TRANS2((trans), _TRANS_VSYNCSHIFT_A)
-#define PIPESRC(pipe)		_MMIO_TRANS2((pipe), _PIPEASRC)
-#define TRANS_MULT(trans)	_MMIO_TRANS2((trans), _TRANS_MULT_A)
+#define TRANS_HTOTAL(trans)	_MMIO_TRANS2(dev_priv, (trans), _TRANS_HTOTAL_A)
+#define TRANS_HBLANK(trans)	_MMIO_TRANS2(dev_priv, (trans), _TRANS_HBLANK_A)
+#define TRANS_HSYNC(trans)	_MMIO_TRANS2(dev_priv, (trans), _TRANS_HSYNC_A)
+#define TRANS_VTOTAL(trans)	_MMIO_TRANS2(dev_priv, (trans), _TRANS_VTOTAL_A)
+#define TRANS_VBLANK(trans)	_MMIO_TRANS2(dev_priv, (trans), _TRANS_VBLANK_A)
+#define TRANS_VSYNC(trans)	_MMIO_TRANS2(dev_priv, (trans), _TRANS_VSYNC_A)
+#define BCLRPAT(trans)		_MMIO_TRANS2(dev_priv, (trans), _BCLRPAT_A)
+#define TRANS_VSYNCSHIFT(trans)	_MMIO_TRANS2(dev_priv, (trans), _TRANS_VSYNCSHIFT_A)
+#define PIPESRC(pipe)		_MMIO_TRANS2(dev_priv, (pipe), _PIPEASRC)
+#define TRANS_MULT(trans)	_MMIO_TRANS2(dev_priv, (trans), _TRANS_MULT_A)
 
 /* VRR registers */
 #define _TRANS_VRR_CTL_A		0x60420
 #define _TRANS_VRR_CTL_B		0x61420
 #define _TRANS_VRR_CTL_C		0x62420
 #define _TRANS_VRR_CTL_D		0x63420
-#define TRANS_VRR_CTL(trans)			_MMIO_TRANS2(trans, _TRANS_VRR_CTL_A)
+#define TRANS_VRR_CTL(trans)			_MMIO_TRANS2(dev_priv, trans, _TRANS_VRR_CTL_A)
 #define   VRR_CTL_VRR_ENABLE			REG_BIT(31)
 #define   VRR_CTL_IGN_MAX_SHIFT			REG_BIT(30)
 #define   VRR_CTL_FLIP_LINE_EN			REG_BIT(29)
@@ -2021,21 +1759,21 @@
 #define _TRANS_VRR_VMAX_B		0x61424
 #define _TRANS_VRR_VMAX_C		0x62424
 #define _TRANS_VRR_VMAX_D		0x63424
-#define TRANS_VRR_VMAX(trans)		_MMIO_TRANS2(trans, _TRANS_VRR_VMAX_A)
+#define TRANS_VRR_VMAX(trans)		_MMIO_TRANS2(dev_priv, trans, _TRANS_VRR_VMAX_A)
 #define   VRR_VMAX_MASK			REG_GENMASK(19, 0)
 
 #define _TRANS_VRR_VMIN_A		0x60434
 #define _TRANS_VRR_VMIN_B		0x61434
 #define _TRANS_VRR_VMIN_C		0x62434
 #define _TRANS_VRR_VMIN_D		0x63434
-#define TRANS_VRR_VMIN(trans)		_MMIO_TRANS2(trans, _TRANS_VRR_VMIN_A)
+#define TRANS_VRR_VMIN(trans)		_MMIO_TRANS2(dev_priv, trans, _TRANS_VRR_VMIN_A)
 #define   VRR_VMIN_MASK			REG_GENMASK(15, 0)
 
 #define _TRANS_VRR_VMAXSHIFT_A		0x60428
 #define _TRANS_VRR_VMAXSHIFT_B		0x61428
 #define _TRANS_VRR_VMAXSHIFT_C		0x62428
 #define _TRANS_VRR_VMAXSHIFT_D		0x63428
-#define TRANS_VRR_VMAXSHIFT(trans)	_MMIO_TRANS2(trans, \
+#define TRANS_VRR_VMAXSHIFT(trans)	_MMIO_TRANS2(dev_priv, trans, \
 					_TRANS_VRR_VMAXSHIFT_A)
 #define   VRR_VMAXSHIFT_DEC_MASK	REG_GENMASK(29, 16)
 #define   VRR_VMAXSHIFT_DEC		REG_BIT(16)
@@ -2045,7 +1783,7 @@
 #define _TRANS_VRR_STATUS_B		0x6142C
 #define _TRANS_VRR_STATUS_C		0x6242C
 #define _TRANS_VRR_STATUS_D		0x6342C
-#define TRANS_VRR_STATUS(trans)		_MMIO_TRANS2(trans, _TRANS_VRR_STATUS_A)
+#define TRANS_VRR_STATUS(trans)		_MMIO_TRANS2(dev_priv, trans, _TRANS_VRR_STATUS_A)
 #define   VRR_STATUS_VMAX_REACHED	REG_BIT(31)
 #define   VRR_STATUS_NOFLIP_TILL_BNDR	REG_BIT(30)
 #define   VRR_STATUS_FLIP_BEF_BNDR	REG_BIT(29)
@@ -2065,7 +1803,7 @@
 #define _TRANS_VRR_VTOTAL_PREV_B	0x61480
 #define _TRANS_VRR_VTOTAL_PREV_C	0x62480
 #define _TRANS_VRR_VTOTAL_PREV_D	0x63480
-#define TRANS_VRR_VTOTAL_PREV(trans)	_MMIO_TRANS2(trans, \
+#define TRANS_VRR_VTOTAL_PREV(trans)	_MMIO_TRANS2(dev_priv, trans, \
 					_TRANS_VRR_VTOTAL_PREV_A)
 #define   VRR_VTOTAL_FLIP_BEFR_BNDR	REG_BIT(31)
 #define   VRR_VTOTAL_FLIP_AFTER_BNDR	REG_BIT(30)
@@ -2076,7 +1814,7 @@
 #define _TRANS_VRR_FLIPLINE_B		0x61438
 #define _TRANS_VRR_FLIPLINE_C		0x62438
 #define _TRANS_VRR_FLIPLINE_D		0x63438
-#define TRANS_VRR_FLIPLINE(trans)	_MMIO_TRANS2(trans, \
+#define TRANS_VRR_FLIPLINE(trans)	_MMIO_TRANS2(dev_priv, trans, \
 					_TRANS_VRR_FLIPLINE_A)
 #define   VRR_FLIPLINE_MASK		REG_GENMASK(19, 0)
 
@@ -2084,16 +1822,23 @@
 #define _TRANS_VRR_STATUS2_B		0x6143C
 #define _TRANS_VRR_STATUS2_C		0x6243C
 #define _TRANS_VRR_STATUS2_D		0x6343C
-#define TRANS_VRR_STATUS2(trans)	_MMIO_TRANS2(trans, _TRANS_VRR_STATUS2_A)
+#define TRANS_VRR_STATUS2(trans)	_MMIO_TRANS2(dev_priv, trans, _TRANS_VRR_STATUS2_A)
 #define   VRR_STATUS2_VERT_LN_CNT_MASK	REG_GENMASK(19, 0)
 
 #define _TRANS_PUSH_A			0x60A70
 #define _TRANS_PUSH_B			0x61A70
 #define _TRANS_PUSH_C			0x62A70
 #define _TRANS_PUSH_D			0x63A70
-#define TRANS_PUSH(trans)		_MMIO_TRANS2(trans, _TRANS_PUSH_A)
+#define TRANS_PUSH(trans)		_MMIO_TRANS2(dev_priv, trans, _TRANS_PUSH_A)
 #define   TRANS_PUSH_EN			REG_BIT(31)
 #define   TRANS_PUSH_SEND		REG_BIT(30)
+
+#define _TRANS_VRR_VSYNC_A		0x60078
+#define TRANS_VRR_VSYNC(trans)		_MMIO_TRANS2(dev_priv, trans, _TRANS_VRR_VSYNC_A)
+#define VRR_VSYNC_END_MASK		REG_GENMASK(28, 16)
+#define VRR_VSYNC_END(vsync_end)	REG_FIELD_PREP(VRR_VSYNC_END_MASK, (vsync_end))
+#define VRR_VSYNC_START_MASK		REG_GENMASK(12, 0)
+#define VRR_VSYNC_START(vsync_start)	REG_FIELD_PREP(VRR_VSYNC_START_MASK, (vsync_start))
 
 /* VGA port control */
 #define ADPA			_MMIO(0x61100)
@@ -2312,6 +2057,7 @@
  * (Haswell and newer) to see which VIDEO_DIP_DATA byte corresponds to each byte
  * of the infoframe structure specified by CEA-861. */
 #define   VIDEO_DIP_DATA_SIZE	32
+#define   VIDEO_DIP_ASYNC_DATA_SIZE	36
 #define   VIDEO_DIP_GMP_DATA_SIZE	36
 #define   VIDEO_DIP_VSC_DATA_SIZE	36
 #define   VIDEO_DIP_PPS_DATA_SIZE	132
@@ -2350,6 +2096,8 @@
 #define   VIDEO_DIP_ENABLE_VS_HSW	(1 << 8)
 #define   VIDEO_DIP_ENABLE_GMP_HSW	(1 << 4)
 #define   VIDEO_DIP_ENABLE_SPD_HSW	(1 << 0)
+/* ADL and later: */
+#define   VIDEO_DIP_ENABLE_AS_ADL	REG_BIT(23)
 
 /* Panel fitting */
 #define PFIT_CONTROL	_MMIO(DISPLAY_MMIO_BASE(dev_priv) + 0x61230)
@@ -2588,6 +2336,9 @@
 #define   TRANSCONF_DITHER_TYPE_ST1		REG_FIELD_PREP(TRANSCONF_DITHER_TYPE_MASK, 1)
 #define   TRANSCONF_DITHER_TYPE_ST2		REG_FIELD_PREP(TRANSCONF_DITHER_TYPE_MASK, 2)
 #define   TRANSCONF_DITHER_TYPE_TEMP		REG_FIELD_PREP(TRANSCONF_DITHER_TYPE_MASK, 3)
+#define   TRANSCONF_PIXEL_COUNT_SCALING_MASK	REG_GENMASK(1, 0)
+#define   TRANSCONF_PIXEL_COUNT_SCALING_X4	1
+
 #define _PIPEASTAT		0x70024
 #define   PIPE_FIFO_UNDERRUN_STATUS		(1UL << 31)
 #define   SPRITE1_FLIP_DONE_INT_EN_VLV		(1UL << 30)
@@ -2639,18 +2390,18 @@
 #define PIPESTAT_INT_ENABLE_MASK		0x7fff0000
 #define PIPESTAT_INT_STATUS_MASK		0x0000ffff
 
-#define TRANSCONF(trans)	_MMIO_PIPE2((trans), _TRANSACONF)
-#define PIPEDSL(pipe)		_MMIO_PIPE2(pipe, _PIPEADSL)
-#define PIPEFRAME(pipe)		_MMIO_PIPE2(pipe, _PIPEAFRAMEHIGH)
-#define PIPEFRAMEPIXEL(pipe)	_MMIO_PIPE2(pipe, _PIPEAFRAMEPIXEL)
-#define PIPESTAT(pipe)		_MMIO_PIPE2(pipe, _PIPEASTAT)
+#define TRANSCONF(trans)	_MMIO_PIPE2(dev_priv, (trans), _TRANSACONF)
+#define PIPEDSL(pipe)		_MMIO_PIPE2(dev_priv, pipe, _PIPEADSL)
+#define PIPEFRAME(pipe)		_MMIO_PIPE2(dev_priv, pipe, _PIPEAFRAMEHIGH)
+#define PIPEFRAMEPIXEL(pipe)	_MMIO_PIPE2(dev_priv, pipe, _PIPEAFRAMEPIXEL)
+#define PIPESTAT(pipe)		_MMIO_PIPE2(dev_priv, pipe, _PIPEASTAT)
 
 #define  _PIPEAGCMAX           0x70010
 #define  _PIPEBGCMAX           0x71010
-#define PIPEGCMAX(pipe, i)     _MMIO_PIPE2(pipe, _PIPEAGCMAX + (i) * 4) /* u1.16 */
+#define PIPEGCMAX(pipe, i)     _MMIO_PIPE2(dev_priv, pipe, _PIPEAGCMAX + (i) * 4) /* u1.16 */
 
 #define _PIPE_ARB_CTL_A			0x70028 /* icl+ */
-#define PIPE_ARB_CTL(pipe)		_MMIO_PIPE2(pipe, _PIPE_ARB_CTL_A)
+#define PIPE_ARB_CTL(pipe)		_MMIO_PIPE2(dev_priv, pipe, _PIPE_ARB_CTL_A)
 #define   PIPE_ARB_USE_PROG_SLOTS	REG_BIT(13)
 
 #define _PIPE_MISC_A			0x70030
@@ -2694,7 +2445,7 @@
 #define PIPE_MISC2(pipe)		_MMIO_PIPE(pipe, _PIPE_MISC2_A, _PIPE_MISC2_B)
 
 #define _ICL_PIPE_A_STATUS			0x70058
-#define ICL_PIPESTATUS(pipe)			_MMIO_PIPE2(pipe, _ICL_PIPE_A_STATUS)
+#define ICL_PIPESTATUS(pipe)			_MMIO_PIPE2(dev_priv, pipe, _ICL_PIPE_A_STATUS)
 #define   PIPE_STATUS_UNDERRUN				REG_BIT(31)
 #define   PIPE_STATUS_SOFT_UNDERRUN_XELPD		REG_BIT(28)
 #define   PIPE_STATUS_HARD_UNDERRUN_XELPD		REG_BIT(27)
@@ -2969,8 +2720,8 @@
 #define _WM0_PIPEA_ILK		0x45100
 #define _WM0_PIPEB_ILK		0x45104
 #define _WM0_PIPEC_IVB		0x45200
-#define WM0_PIPE_ILK(pipe)	_MMIO_PIPE3((pipe), _WM0_PIPEA_ILK, \
-					    _WM0_PIPEB_ILK, _WM0_PIPEC_IVB)
+#define WM0_PIPE_ILK(pipe)	_MMIO_BASE_PIPE3(0, (pipe), _WM0_PIPEA_ILK, \
+						 _WM0_PIPEB_ILK, _WM0_PIPEC_IVB)
 #define  WM0_PIPE_PRIMARY_MASK	REG_GENMASK(31, 16)
 #define  WM0_PIPE_SPRITE_MASK	REG_GENMASK(15, 8)
 #define  WM0_PIPE_CURSOR_MASK	REG_GENMASK(7, 0)
@@ -3024,8 +2775,8 @@
 /* GM45+ just has to be different */
 #define _PIPEA_FRMCOUNT_G4X	0x70040
 #define _PIPEA_FLIPCOUNT_G4X	0x70044
-#define PIPE_FRMCOUNT_G4X(pipe) _MMIO_PIPE2(pipe, _PIPEA_FRMCOUNT_G4X)
-#define PIPE_FLIPCOUNT_G4X(pipe) _MMIO_PIPE2(pipe, _PIPEA_FLIPCOUNT_G4X)
+#define PIPE_FRMCOUNT_G4X(pipe) _MMIO_PIPE2(dev_priv, pipe, _PIPEA_FRMCOUNT_G4X)
+#define PIPE_FLIPCOUNT_G4X(pipe) _MMIO_PIPE2(dev_priv, pipe, _PIPEA_FLIPCOUNT_G4X)
 
 /* Cursor A & B regs */
 #define _CURACNTR		0x70080
@@ -3053,6 +2804,7 @@
 #define   MCURSOR_MODE_DISABLE		0x00
 #define   MCURSOR_MODE_128_32B_AX	0x02
 #define   MCURSOR_MODE_256_32B_AX	0x03
+#define   MCURSOR_MODE_64_2B		0x04
 #define   MCURSOR_MODE_64_32B_AX	0x07
 #define   MCURSOR_MODE_128_ARGB_AX	(0x20 | MCURSOR_MODE_128_32B_AX)
 #define   MCURSOR_MODE_256_ARGB_AX	(0x20 | MCURSOR_MODE_256_32B_AX)
@@ -3085,14 +2837,14 @@
 #define _CURBBASE_IVB		0x71084
 #define _CURBPOS_IVB		0x71088
 
-#define CURCNTR(pipe) _MMIO_CURSOR2(pipe, _CURACNTR)
-#define CURBASE(pipe) _MMIO_CURSOR2(pipe, _CURABASE)
-#define CURPOS(pipe) _MMIO_CURSOR2(pipe, _CURAPOS)
-#define CURPOS_ERLY_TPT(pipe) _MMIO_CURSOR2(pipe, _CURAPOS_ERLY_TPT)
-#define CURSIZE(pipe) _MMIO_CURSOR2(pipe, _CURASIZE)
-#define CUR_FBC_CTL(pipe) _MMIO_CURSOR2(pipe, _CUR_FBC_CTL_A)
-#define CUR_CHICKEN(pipe) _MMIO_CURSOR2(pipe, _CUR_CHICKEN_A)
-#define CURSURFLIVE(pipe) _MMIO_CURSOR2(pipe, _CURASURFLIVE)
+#define CURCNTR(pipe) _MMIO_CURSOR2(dev_priv, pipe, _CURACNTR)
+#define CURBASE(pipe) _MMIO_CURSOR2(dev_priv, pipe, _CURABASE)
+#define CURPOS(pipe) _MMIO_CURSOR2(dev_priv, pipe, _CURAPOS)
+#define CURPOS_ERLY_TPT(pipe) _MMIO_CURSOR2(dev_priv, pipe, _CURAPOS_ERLY_TPT)
+#define CURSIZE(pipe) _MMIO_CURSOR2(dev_priv, pipe, _CURASIZE)
+#define CUR_FBC_CTL(pipe) _MMIO_CURSOR2(dev_priv, pipe, _CUR_FBC_CTL_A)
+#define CUR_CHICKEN(pipe) _MMIO_CURSOR2(dev_priv, pipe, _CUR_CHICKEN_A)
+#define CURSURFLIVE(pipe) _MMIO_CURSOR2(dev_priv, pipe, _CURASURFLIVE)
 
 /* Display A control */
 #define _DSPAADDR_VLV				0x7017C /* vlv/chv */
@@ -3149,18 +2901,18 @@
 #define _DSPASURFLIVE				0x701AC
 #define _DSPAGAMC				0x701E0
 
-#define DSPADDR_VLV(plane)	_MMIO_PIPE2(plane, _DSPAADDR_VLV)
-#define DSPCNTR(plane)		_MMIO_PIPE2(plane, _DSPACNTR)
-#define DSPADDR(plane)		_MMIO_PIPE2(plane, _DSPAADDR)
-#define DSPSTRIDE(plane)	_MMIO_PIPE2(plane, _DSPASTRIDE)
-#define DSPPOS(plane)		_MMIO_PIPE2(plane, _DSPAPOS)
-#define DSPSIZE(plane)		_MMIO_PIPE2(plane, _DSPASIZE)
-#define DSPSURF(plane)		_MMIO_PIPE2(plane, _DSPASURF)
-#define DSPTILEOFF(plane)	_MMIO_PIPE2(plane, _DSPATILEOFF)
+#define DSPADDR_VLV(plane)	_MMIO_PIPE2(dev_priv, plane, _DSPAADDR_VLV)
+#define DSPCNTR(plane)		_MMIO_PIPE2(dev_priv, plane, _DSPACNTR)
+#define DSPADDR(plane)		_MMIO_PIPE2(dev_priv, plane, _DSPAADDR)
+#define DSPSTRIDE(plane)	_MMIO_PIPE2(dev_priv, plane, _DSPASTRIDE)
+#define DSPPOS(plane)		_MMIO_PIPE2(dev_priv, plane, _DSPAPOS)
+#define DSPSIZE(plane)		_MMIO_PIPE2(dev_priv, plane, _DSPASIZE)
+#define DSPSURF(plane)		_MMIO_PIPE2(dev_priv, plane, _DSPASURF)
+#define DSPTILEOFF(plane)	_MMIO_PIPE2(dev_priv, plane, _DSPATILEOFF)
 #define DSPLINOFF(plane)	DSPADDR(plane)
-#define DSPOFFSET(plane)	_MMIO_PIPE2(plane, _DSPAOFFSET)
-#define DSPSURFLIVE(plane)	_MMIO_PIPE2(plane, _DSPASURFLIVE)
-#define DSPGAMC(plane, i)	_MMIO_PIPE2(plane, _DSPAGAMC + (5 - (i)) * 4) /* plane C only, 6 x u0.8 */
+#define DSPOFFSET(plane)	_MMIO_PIPE2(dev_priv, plane, _DSPAOFFSET)
+#define DSPSURFLIVE(plane)	_MMIO_PIPE2(dev_priv, plane, _DSPASURFLIVE)
+#define DSPGAMC(plane, i)	_MMIO_PIPE2(dev_priv, plane, _DSPAGAMC + (5 - (i)) * 4) /* plane C only, 6 x u0.8 */
 
 /* CHV pipe B blender and primary plane */
 #define _CHV_BLEND_A		0x60a00
@@ -3187,11 +2939,11 @@
 #define   PRIM_CONST_ALPHA_MASK		REG_GENMASK(7, 0)
 #define   PRIM_CONST_ALPHA(alpha)	REG_FIELD_PREP(PRIM_CONST_ALPHA_MASK, (alpha))
 
-#define CHV_BLEND(pipe)		_MMIO_TRANS2(pipe, _CHV_BLEND_A)
-#define CHV_CANVAS(pipe)	_MMIO_TRANS2(pipe, _CHV_CANVAS_A)
-#define PRIMPOS(plane)		_MMIO_TRANS2(plane, _PRIMPOS_A)
-#define PRIMSIZE(plane)		_MMIO_TRANS2(plane, _PRIMSIZE_A)
-#define PRIMCNSTALPHA(plane)	_MMIO_TRANS2(plane, _PRIMCNSTALPHA_A)
+#define CHV_BLEND(pipe)		_MMIO_TRANS2(dev_priv, pipe, _CHV_BLEND_A)
+#define CHV_CANVAS(pipe)	_MMIO_TRANS2(dev_priv, pipe, _CHV_CANVAS_A)
+#define PRIMPOS(plane)		_MMIO_TRANS2(dev_priv, plane, _PRIMPOS_A)
+#define PRIMSIZE(plane)		_MMIO_TRANS2(dev_priv, plane, _PRIMSIZE_A)
+#define PRIMCNSTALPHA(plane)	_MMIO_TRANS2(dev_priv, plane, _PRIMCNSTALPHA_A)
 
 /* Display/Sprite base address macros */
 #define DISP_BASEADDR_MASK	(0xfffff000)
@@ -3990,14 +3742,14 @@
 #define _PIPEB_LINK_M2		0x61048
 #define _PIPEB_LINK_N2		0x6104c
 
-#define PIPE_DATA_M1(tran) _MMIO_TRANS2(tran, _PIPEA_DATA_M1)
-#define PIPE_DATA_N1(tran) _MMIO_TRANS2(tran, _PIPEA_DATA_N1)
-#define PIPE_DATA_M2(tran) _MMIO_TRANS2(tran, _PIPEA_DATA_M2)
-#define PIPE_DATA_N2(tran) _MMIO_TRANS2(tran, _PIPEA_DATA_N2)
-#define PIPE_LINK_M1(tran) _MMIO_TRANS2(tran, _PIPEA_LINK_M1)
-#define PIPE_LINK_N1(tran) _MMIO_TRANS2(tran, _PIPEA_LINK_N1)
-#define PIPE_LINK_M2(tran) _MMIO_TRANS2(tran, _PIPEA_LINK_M2)
-#define PIPE_LINK_N2(tran) _MMIO_TRANS2(tran, _PIPEA_LINK_N2)
+#define PIPE_DATA_M1(tran) _MMIO_TRANS2(dev_priv, tran, _PIPEA_DATA_M1)
+#define PIPE_DATA_N1(tran) _MMIO_TRANS2(dev_priv, tran, _PIPEA_DATA_N1)
+#define PIPE_DATA_M2(tran) _MMIO_TRANS2(dev_priv, tran, _PIPEA_DATA_M2)
+#define PIPE_DATA_N2(tran) _MMIO_TRANS2(dev_priv, tran, _PIPEA_DATA_N2)
+#define PIPE_LINK_M1(tran) _MMIO_TRANS2(dev_priv, tran, _PIPEA_LINK_M1)
+#define PIPE_LINK_N1(tran) _MMIO_TRANS2(dev_priv, tran, _PIPEA_LINK_N1)
+#define PIPE_LINK_M2(tran) _MMIO_TRANS2(dev_priv, tran, _PIPEA_LINK_M2)
+#define PIPE_LINK_N2(tran) _MMIO_TRANS2(dev_priv, tran, _PIPEA_LINK_N2)
 
 /* CPU panel fitter */
 /* IVB+ has 3 fitters, 0 is 7x5 capable, the other two only 3x3 */
@@ -4555,6 +4307,11 @@
 #define   GLK_CL1_PWR_DOWN		REG_BIT(11)
 #define   GLK_CL0_PWR_DOWN		REG_BIT(10)
 
+#define CHICKEN_MISC_3		_MMIO(0x42088)
+#define   DP_MST_DPT_DPTP_ALIGN_WA(trans)	REG_BIT(9 + (trans) - TRANSCODER_A)
+#define   DP_MST_SHORT_HBLANK_WA(trans)		REG_BIT(5 + (trans) - TRANSCODER_A)
+#define   DP_MST_FEC_BS_JITTER_WA(trans)	REG_BIT(0 + (trans) - TRANSCODER_A)
+
 #define CHICKEN_MISC_4		_MMIO(0x4208c)
 #define   CHICKEN_FBC_STRIDE_OVERRIDE	REG_BIT(13)
 #define   CHICKEN_FBC_STRIDE_MASK	REG_GENMASK(12, 0)
@@ -4611,7 +4368,9 @@
 #define   DDIE_TRAINING_OVERRIDE_ENABLE	REG_BIT(17) /* CHICKEN_TRANS_A only */
 #define   DDIE_TRAINING_OVERRIDE_VALUE	REG_BIT(16) /* CHICKEN_TRANS_A only */
 #define   PSR2_ADD_VERTICAL_LINE_COUNT	REG_BIT(15)
+#define   DP_FEC_BS_JITTER_WA		REG_BIT(15)
 #define   PSR2_VSC_ENABLE_PROG_HEADER	REG_BIT(12)
+#define   DP_DSC_INSERT_SF_AT_EOL_WA	REG_BIT(4)
 
 #define DISP_ARB_CTL	_MMIO(0x45000)
 #define   DISP_FBC_MEMORY_WAKE		REG_BIT(31)
@@ -5010,27 +4769,29 @@
 #define TVIDEO_DIP_GCP(pipe) _MMIO_PIPE(pipe, _VIDEO_DIP_GCP_A, _VIDEO_DIP_GCP_B)
 
 /* Per-transcoder DIP controls (VLV) */
-#define _VLV_VIDEO_DIP_CTL_A		(VLV_DISPLAY_BASE + 0x60200)
-#define _VLV_VIDEO_DIP_DATA_A		(VLV_DISPLAY_BASE + 0x60208)
-#define _VLV_VIDEO_DIP_GDCP_PAYLOAD_A	(VLV_DISPLAY_BASE + 0x60210)
+#define _VLV_VIDEO_DIP_CTL_A		0x60200
+#define _VLV_VIDEO_DIP_CTL_B		0x61170
+#define _CHV_VIDEO_DIP_CTL_C		0x611f0
+#define VLV_TVIDEO_DIP_CTL(pipe)	_MMIO_BASE_PIPE3(VLV_DISPLAY_BASE, (pipe), \
+							 _VLV_VIDEO_DIP_CTL_A, \
+							 _VLV_VIDEO_DIP_CTL_B, \
+							 _CHV_VIDEO_DIP_CTL_C)
 
-#define _VLV_VIDEO_DIP_CTL_B		(VLV_DISPLAY_BASE + 0x61170)
-#define _VLV_VIDEO_DIP_DATA_B		(VLV_DISPLAY_BASE + 0x61174)
-#define _VLV_VIDEO_DIP_GDCP_PAYLOAD_B	(VLV_DISPLAY_BASE + 0x61178)
+#define _VLV_VIDEO_DIP_DATA_A		0x60208
+#define _VLV_VIDEO_DIP_DATA_B		0x61174
+#define _CHV_VIDEO_DIP_DATA_C		0x611f4
+#define VLV_TVIDEO_DIP_DATA(pipe)	_MMIO_BASE_PIPE3(VLV_DISPLAY_BASE, (pipe), \
+							 _VLV_VIDEO_DIP_DATA_A, \
+							 _VLV_VIDEO_DIP_DATA_B, \
+							 _CHV_VIDEO_DIP_DATA_C)
 
-#define _CHV_VIDEO_DIP_CTL_C		(VLV_DISPLAY_BASE + 0x611f0)
-#define _CHV_VIDEO_DIP_DATA_C		(VLV_DISPLAY_BASE + 0x611f4)
-#define _CHV_VIDEO_DIP_GDCP_PAYLOAD_C	(VLV_DISPLAY_BASE + 0x611f8)
-
-#define VLV_TVIDEO_DIP_CTL(pipe) \
-	_MMIO_PIPE3((pipe), _VLV_VIDEO_DIP_CTL_A, \
-	       _VLV_VIDEO_DIP_CTL_B, _CHV_VIDEO_DIP_CTL_C)
-#define VLV_TVIDEO_DIP_DATA(pipe) \
-	_MMIO_PIPE3((pipe), _VLV_VIDEO_DIP_DATA_A, \
-	       _VLV_VIDEO_DIP_DATA_B, _CHV_VIDEO_DIP_DATA_C)
-#define VLV_TVIDEO_DIP_GCP(pipe) \
-	_MMIO_PIPE3((pipe), _VLV_VIDEO_DIP_GDCP_PAYLOAD_A, \
-		_VLV_VIDEO_DIP_GDCP_PAYLOAD_B, _CHV_VIDEO_DIP_GDCP_PAYLOAD_C)
+#define _VLV_VIDEO_DIP_GDCP_PAYLOAD_A	0x60210
+#define _VLV_VIDEO_DIP_GDCP_PAYLOAD_B	0x61178
+#define _CHV_VIDEO_DIP_GDCP_PAYLOAD_C	0x611f8
+#define VLV_TVIDEO_DIP_GCP(pipe)	_MMIO_BASE_PIPE3(VLV_DISPLAY_BASE, (pipe), \
+							 _VLV_VIDEO_DIP_GDCP_PAYLOAD_A, \
+							 _VLV_VIDEO_DIP_GDCP_PAYLOAD_B, \
+							 _CHV_VIDEO_DIP_GDCP_PAYLOAD_C)
 
 /* Haswell DIP controls */
 
@@ -5040,6 +4801,7 @@
 #define _HSW_VIDEO_DIP_SPD_DATA_A	0x602A0
 #define _HSW_VIDEO_DIP_GMP_DATA_A	0x602E0
 #define _HSW_VIDEO_DIP_VSC_DATA_A	0x60320
+#define	_ADL_VIDEO_DIP_AS_DATA_A	0x60484
 #define _GLK_VIDEO_DIP_DRM_DATA_A	0x60440
 #define _HSW_VIDEO_DIP_AVI_ECC_A	0x60240
 #define _HSW_VIDEO_DIP_VS_ECC_A		0x60280
@@ -5054,6 +4816,7 @@
 #define _HSW_VIDEO_DIP_SPD_DATA_B	0x612A0
 #define _HSW_VIDEO_DIP_GMP_DATA_B	0x612E0
 #define _HSW_VIDEO_DIP_VSC_DATA_B	0x61320
+#define _ADL_VIDEO_DIP_AS_DATA_B	0x61484
 #define _GLK_VIDEO_DIP_DRM_DATA_B	0x61440
 #define _HSW_VIDEO_DIP_BVI_ECC_B	0x61240
 #define _HSW_VIDEO_DIP_VS_ECC_B		0x61280
@@ -5073,22 +4836,25 @@
 #define _ICL_VIDEO_DIP_PPS_ECC_A	0x603D4
 #define _ICL_VIDEO_DIP_PPS_ECC_B	0x613D4
 
-#define HSW_TVIDEO_DIP_CTL(trans)		_MMIO_TRANS2(trans, _HSW_VIDEO_DIP_CTL_A)
-#define HSW_TVIDEO_DIP_GCP(trans)		_MMIO_TRANS2(trans, _HSW_VIDEO_DIP_GCP_A)
-#define HSW_TVIDEO_DIP_AVI_DATA(trans, i)	_MMIO_TRANS2(trans, _HSW_VIDEO_DIP_AVI_DATA_A + (i) * 4)
-#define HSW_TVIDEO_DIP_VS_DATA(trans, i)	_MMIO_TRANS2(trans, _HSW_VIDEO_DIP_VS_DATA_A + (i) * 4)
-#define HSW_TVIDEO_DIP_SPD_DATA(trans, i)	_MMIO_TRANS2(trans, _HSW_VIDEO_DIP_SPD_DATA_A + (i) * 4)
-#define HSW_TVIDEO_DIP_GMP_DATA(trans, i)	_MMIO_TRANS2(trans, _HSW_VIDEO_DIP_GMP_DATA_A + (i) * 4)
-#define HSW_TVIDEO_DIP_VSC_DATA(trans, i)	_MMIO_TRANS2(trans, _HSW_VIDEO_DIP_VSC_DATA_A + (i) * 4)
-#define GLK_TVIDEO_DIP_DRM_DATA(trans, i)	_MMIO_TRANS2(trans, _GLK_VIDEO_DIP_DRM_DATA_A + (i) * 4)
-#define ICL_VIDEO_DIP_PPS_DATA(trans, i)	_MMIO_TRANS2(trans, _ICL_VIDEO_DIP_PPS_DATA_A + (i) * 4)
-#define ICL_VIDEO_DIP_PPS_ECC(trans, i)		_MMIO_TRANS2(trans, _ICL_VIDEO_DIP_PPS_ECC_A + (i) * 4)
+#define HSW_TVIDEO_DIP_CTL(trans)		_MMIO_TRANS2(dev_priv, trans, _HSW_VIDEO_DIP_CTL_A)
+#define HSW_TVIDEO_DIP_GCP(trans)		_MMIO_TRANS2(dev_priv, trans, _HSW_VIDEO_DIP_GCP_A)
+#define HSW_TVIDEO_DIP_AVI_DATA(trans, i)	_MMIO_TRANS2(dev_priv, trans, _HSW_VIDEO_DIP_AVI_DATA_A + (i) * 4)
+#define HSW_TVIDEO_DIP_VS_DATA(trans, i)	_MMIO_TRANS2(dev_priv, trans, _HSW_VIDEO_DIP_VS_DATA_A + (i) * 4)
+#define HSW_TVIDEO_DIP_SPD_DATA(trans, i)	_MMIO_TRANS2(dev_priv, trans, _HSW_VIDEO_DIP_SPD_DATA_A + (i) * 4)
+#define HSW_TVIDEO_DIP_GMP_DATA(trans, i)	_MMIO_TRANS2(dev_priv, trans, _HSW_VIDEO_DIP_GMP_DATA_A + (i) * 4)
+#define HSW_TVIDEO_DIP_VSC_DATA(trans, i)	_MMIO_TRANS2(dev_priv, trans, _HSW_VIDEO_DIP_VSC_DATA_A + (i) * 4)
+#define GLK_TVIDEO_DIP_DRM_DATA(trans, i)	_MMIO_TRANS2(dev_priv, trans, _GLK_VIDEO_DIP_DRM_DATA_A + (i) * 4)
+#define ICL_VIDEO_DIP_PPS_DATA(trans, i)	_MMIO_TRANS2(dev_priv, trans, _ICL_VIDEO_DIP_PPS_DATA_A + (i) * 4)
+#define ICL_VIDEO_DIP_PPS_ECC(trans, i)		_MMIO_TRANS2(dev_priv, trans, _ICL_VIDEO_DIP_PPS_ECC_A + (i) * 4)
+/*ADLP and later: */
+#define ADL_TVIDEO_DIP_AS_SDP_DATA(trans, i)	_MMIO_TRANS2(dev_priv, trans,\
+							     _ADL_VIDEO_DIP_AS_DATA_A + (i) * 4)
 
 #define _HSW_STEREO_3D_CTL_A		0x70020
 #define   S3D_ENABLE			(1 << 31)
 #define _HSW_STEREO_3D_CTL_B		0x71020
 
-#define HSW_STEREO_3D_CTL(trans)	_MMIO_PIPE2(trans, _HSW_STEREO_3D_CTL_A)
+#define HSW_STEREO_3D_CTL(trans)	_MMIO_PIPE2(dev_priv, trans, _HSW_STEREO_3D_CTL_A)
 
 #define _PCH_TRANS_HTOTAL_B          0xe1000
 #define _PCH_TRANS_HBLANK_B          0xe1004
@@ -5401,7 +5167,7 @@
 #define	    POWER_SETUP_I1_SHIFT		6	/* 10.6 fixed point format */
 #define	    POWER_SETUP_I1_DATA_MASK		REG_GENMASK(15, 0)
 #define GEN12_PCODE_READ_SAGV_BLOCK_TIME_US	0x23
-#define   XEHP_PCODE_FREQUENCY_CONFIG		0x6e	/* xehpsdv, pvc */
+#define   XEHP_PCODE_FREQUENCY_CONFIG		0x6e	/* pvc */
 /* XEHP_PCODE_FREQUENCY_CONFIG sub-commands (param1) */
 #define     PCODE_MBOX_FC_SC_READ_FUSED_P0	0x0
 #define     PCODE_MBOX_FC_SC_READ_FUSED_PN	0x1
@@ -5566,15 +5332,6 @@ enum skl_power_gate {
 	((pw_idx) - ICL_PW_CTL_IDX_PW_1 + SKL_PG1)
 #define  SKL_FUSE_PG_DIST_STATUS(pg)		(1 << (27 - (pg)))
 
-#define _ICL_AUX_REG_IDX(pw_idx)	((pw_idx) - ICL_PW_CTL_IDX_AUX_A)
-#define _ICL_AUX_ANAOVRD1_A		0x162398
-#define _ICL_AUX_ANAOVRD1_B		0x6C398
-#define ICL_AUX_ANAOVRD1(pw_idx)	_MMIO(_PICK(_ICL_AUX_REG_IDX(pw_idx), \
-						    _ICL_AUX_ANAOVRD1_A, \
-						    _ICL_AUX_ANAOVRD1_B))
-#define   ICL_AUX_ANAOVRD1_LDO_BYPASS	(1 << 7)
-#define   ICL_AUX_ANAOVRD1_ENABLE	(1 << 0)
-
 /* Per-pipe DDI Function Control */
 #define _TRANS_DDI_FUNC_CTL_A		0x60400
 #define _TRANS_DDI_FUNC_CTL_B		0x61400
@@ -5583,7 +5340,7 @@ enum skl_power_gate {
 #define _TRANS_DDI_FUNC_CTL_EDP		0x6F400
 #define _TRANS_DDI_FUNC_CTL_DSI0	0x6b400
 #define _TRANS_DDI_FUNC_CTL_DSI1	0x6bc00
-#define TRANS_DDI_FUNC_CTL(tran) _MMIO_TRANS2(tran, _TRANS_DDI_FUNC_CTL_A)
+#define TRANS_DDI_FUNC_CTL(tran) _MMIO_TRANS2(dev_priv, tran, _TRANS_DDI_FUNC_CTL_A)
 
 #define  TRANS_DDI_FUNC_ENABLE		(1 << 31)
 /* Those bits are ignored by pipe EDP since it can only connect to DDI A */
@@ -5638,7 +5395,7 @@ enum skl_power_gate {
 #define _TRANS_DDI_FUNC_CTL2_EDP	0x6f404
 #define _TRANS_DDI_FUNC_CTL2_DSI0	0x6b404
 #define _TRANS_DDI_FUNC_CTL2_DSI1	0x6bc04
-#define TRANS_DDI_FUNC_CTL2(tran)	_MMIO_TRANS2(tran, _TRANS_DDI_FUNC_CTL2_A)
+#define TRANS_DDI_FUNC_CTL2(tran)	_MMIO_TRANS2(dev_priv, tran, _TRANS_DDI_FUNC_CTL2_A)
 #define  PORT_SYNC_MODE_ENABLE			REG_BIT(4)
 #define  PORT_SYNC_MODE_MASTER_SELECT_MASK	REG_GENMASK(2, 0)
 #define  PORT_SYNC_MODE_MASTER_SELECT(x)	REG_FIELD_PREP(PORT_SYNC_MODE_MASTER_SELECT_MASK, (x))
@@ -5651,7 +5408,7 @@ enum skl_power_gate {
 #define _DP_TP_CTL_B			0x64140
 #define _TGL_DP_TP_CTL_A		0x60540
 #define DP_TP_CTL(port) _MMIO_PORT(port, _DP_TP_CTL_A, _DP_TP_CTL_B)
-#define TGL_DP_TP_CTL(tran) _MMIO_TRANS2((tran), _TGL_DP_TP_CTL_A)
+#define TGL_DP_TP_CTL(tran) _MMIO_TRANS2(dev_priv, (tran), _TGL_DP_TP_CTL_A)
 #define  DP_TP_CTL_ENABLE			(1 << 31)
 #define  DP_TP_CTL_FEC_ENABLE			(1 << 30)
 #define  DP_TP_CTL_MODE_SST			(0 << 27)
@@ -5677,7 +5434,7 @@ enum skl_power_gate {
 #define _DP_TP_STATUS_B			0x64144
 #define _TGL_DP_TP_STATUS_A		0x60544
 #define DP_TP_STATUS(port) _MMIO_PORT(port, _DP_TP_STATUS_A, _DP_TP_STATUS_B)
-#define TGL_DP_TP_STATUS(tran) _MMIO_TRANS2((tran), _TGL_DP_TP_STATUS_A)
+#define TGL_DP_TP_STATUS(tran) _MMIO_TRANS2(dev_priv, (tran), _TGL_DP_TP_STATUS_A)
 #define  DP_TP_STATUS_FEC_ENABLE_LIVE		(1 << 28)
 #define  DP_TP_STATUS_IDLE_DONE			(1 << 25)
 #define  DP_TP_STATUS_ACT_SENT			(1 << 24)
@@ -5858,14 +5615,14 @@ enum skl_power_gate {
 #define _TRANSB_MSA_MISC		0x61410
 #define _TRANSC_MSA_MISC		0x62410
 #define _TRANS_EDP_MSA_MISC		0x6f410
-#define TRANS_MSA_MISC(tran) _MMIO_TRANS2(tran, _TRANSA_MSA_MISC)
+#define TRANS_MSA_MISC(tran) _MMIO_TRANS2(dev_priv, tran, _TRANSA_MSA_MISC)
 /* See DP_MSA_MISC_* for the bit definitions */
 
 #define _TRANS_A_SET_CONTEXT_LATENCY		0x6007C
 #define _TRANS_B_SET_CONTEXT_LATENCY		0x6107C
 #define _TRANS_C_SET_CONTEXT_LATENCY		0x6207C
 #define _TRANS_D_SET_CONTEXT_LATENCY		0x6307C
-#define TRANS_SET_CONTEXT_LATENCY(tran)		_MMIO_TRANS2(tran, _TRANS_A_SET_CONTEXT_LATENCY)
+#define TRANS_SET_CONTEXT_LATENCY(tran)		_MMIO_TRANS2(dev_priv, tran, _TRANS_A_SET_CONTEXT_LATENCY)
 #define  TRANS_SET_CONTEXT_LATENCY_MASK		REG_GENMASK(15, 0)
 #define  TRANS_SET_CONTEXT_LATENCY_VALUE(x)	REG_FIELD_PREP(TRANS_SET_CONTEXT_LATENCY_MASK, (x))
 
@@ -5900,7 +5657,9 @@ enum skl_power_gate {
 #define  CDCLK_FREQ_540		REG_FIELD_PREP(CDCLK_FREQ_SEL_MASK, 1)
 #define  CDCLK_FREQ_337_308		REG_FIELD_PREP(CDCLK_FREQ_SEL_MASK, 2)
 #define  CDCLK_FREQ_675_617		REG_FIELD_PREP(CDCLK_FREQ_SEL_MASK, 3)
-#define  MDCLK_SOURCE_SEL_CDCLK_PLL	REG_BIT(25)
+#define  MDCLK_SOURCE_SEL_MASK		REG_GENMASK(25, 25)
+#define  MDCLK_SOURCE_SEL_CD2XCLK	REG_FIELD_PREP(MDCLK_SOURCE_SEL_MASK, 0)
+#define  MDCLK_SOURCE_SEL_CDCLK_PLL	REG_FIELD_PREP(MDCLK_SOURCE_SEL_MASK, 1)
 #define  BXT_CDCLK_CD2X_DIV_SEL_MASK	REG_GENMASK(23, 22)
 #define  BXT_CDCLK_CD2X_DIV_SEL_1	REG_FIELD_PREP(BXT_CDCLK_CD2X_DIV_SEL_MASK, 0)
 #define  BXT_CDCLK_CD2X_DIV_SEL_1_5	REG_FIELD_PREP(BXT_CDCLK_CD2X_DIV_SEL_MASK, 1)
@@ -6317,7 +6076,7 @@ enum skl_power_gate {
 
 #define _VLV_PIPE_MSA_MISC_A			0x70048
 #define VLV_PIPE_MSA_MISC(pipe)		\
-			_MMIO_PIPE2(pipe, _VLV_PIPE_MSA_MISC_A)
+			_MMIO_PIPE2(dev_priv, pipe, _VLV_PIPE_MSA_MISC_A)
 #define   VLV_MSA_MISC1_HW_ENABLE			REG_BIT(31)
 #define   VLV_MSA_MISC1_SW_S3D_MASK			REG_GENMASK(2, 0) /* MSA MISC1 3:1 */
 
@@ -6390,7 +6149,7 @@ enum skl_power_gate {
 
 #define _MTL_CLKGATE_DIS_TRANS_A			0x604E8
 #define _MTL_CLKGATE_DIS_TRANS_B			0x614E8
-#define MTL_CLKGATE_DIS_TRANS(trans)			_MMIO_TRANS2(trans, _MTL_CLKGATE_DIS_TRANS_A)
+#define MTL_CLKGATE_DIS_TRANS(trans)			_MMIO_TRANS2(dev_priv, trans, _MTL_CLKGATE_DIS_TRANS_A)
 #define  MTL_CLKGATE_DIS_TRANS_DMASC_GATING_DIS		REG_BIT(7)
 
 #define MTL_MEM_SS_INFO_GLOBAL			_MMIO(0x45700)

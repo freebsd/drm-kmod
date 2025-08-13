@@ -87,6 +87,12 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dcn32 \
 	${SRCDIR}/display/dc/dcn321 \
 	${SRCDIR}/display/dc/dcn35 \
+	${SRCDIR}/display/dc/dpp/dcn10 \
+	${SRCDIR}/display/dc/dpp/dcn20 \
+	${SRCDIR}/display/dc/dpp/dcn201 \
+	${SRCDIR}/display/dc/dpp/dcn30 \
+	${SRCDIR}/display/dc/dpp/dcn32 \
+	${SRCDIR}/display/dc/dpp/dcn35 \
 	${SRCDIR}/display/dc/hwss/dce \
 	${SRCDIR}/display/dc/hwss/dce100 \
 	${SRCDIR}/display/dc/hwss/dce110 \
@@ -238,6 +244,7 @@ SRCS+=	amdgpu_aca.c \
 	amdgpu_ctx.c \
 	amdgpu_debugfs.c \
 	amdgpu_device.c \
+	amdgpu_dev_coredump.c \
 	amdgpu_discovery.c \
 	amdgpu_display.c \
 	amdgpu_doorbell_mgr.c \
@@ -308,6 +315,7 @@ SRCS+=	amdgpu_aca.c \
 	amdgpu_vm_cpu.c \
 	amdgpu_vm_pt.c \
 	amdgpu_vm_sdma.c \
+	amdgpu_vm_tlb_fence.c \
 	amdgpu_vram_mgr.c \
 	amdgpu_xcp.c \
 	amdgpu_xgmi.c \
@@ -438,13 +446,13 @@ SRCS+=	amdgpu_aca.c \
 	si.c \
 	soc15.c \
 	soc21.c \
-	smu_v13_0_10.c \
 	smuio_v9_0.c \
 	smuio_v11_0.c \
 	smuio_v11_0_6.c \
 	smuio_v13_0.c \
 	smuio_v13_0_3.c \
 	smuio_v13_0_6.c \
+	smuio_v14_0_2.c \
 	tonga_ih.c \
 	umc_v6_0.c \
 	umc_v6_1.c \
@@ -792,6 +800,7 @@ SRCS+=	dcn35_clk_mgr.c \
 # display/dc/dcn351
 SRCS+=	dcn351_fpu.c \
 	dcn351_init.c \
+	dcn351_hwseq.c \
 	dcn351_resource.c \
 	dmub_dcn351.c \
 	irq_service_dcn351.c
@@ -1075,8 +1084,10 @@ SRCS+=	amd_powerplay.c \
 	smu_v13_0_5_ppt.c \
 	smu_v13_0_6_ppt.c \
 	smu_v13_0_7_ppt.c \
+	smu_v13_0_10.c \
 	smu_v14_0.c \
 	smu_v14_0_0_ppt.c \
+	smu_v14_0_2_ppt.c \
 	smu_helper.c \
 	smumgr.c \
 	tonga_baco.c \
@@ -1124,7 +1135,8 @@ CFLAGS+= -I${SRCDIR}/amdkfd
 CFLAGS+= -I${SRCDIR}/display
 CFLAGS+= -I${SRCDIR}/display/amdgpu_dm
 CFLAGS+= -I${SRCDIR}/display/dc
-CFLAGS+= -I${SRCDIR}/display/dc/clk_mgr/
+CFLAGS+= -I${SRCDIR}/display/dc/clk_mgr
+CFLAGS+= -I${SRCDIR}/display/dc/dpp
 CFLAGS+= -I${SRCDIR}/display/dc/dsc
 CFLAGS+= -I${SRCDIR}/display/dc/hwss
 CFLAGS+= -I${SRCDIR}/display/dc/inc
