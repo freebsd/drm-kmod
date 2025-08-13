@@ -2090,10 +2090,12 @@ static void linux_hexdump(struct drm_printer *m, const void *buf, size_t len)
 			continue;
 		}
 
+#ifdef __linux__
 		WARN_ON_ONCE(hex_dump_to_buffer(buf + pos, len - pos,
 						rowsize, sizeof(u32),
 						line, sizeof(line),
 						false) >= sizeof(line));
+#endif
 		drm_printf(m, "[%04zx] %s\n", pos, line);
 
 		prev = buf + pos;
