@@ -3,6 +3,8 @@
 #ifndef _DRM_LEASE_H
 #define _DRM_LEASE_H
 
+#include <linux/types.h>
+
 #include <drm/drm_device.h>
 #include <drm/drm_file.h>
 

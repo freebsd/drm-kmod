@@ -38,10 +38,6 @@
 #include <linux/slab.h>
 #include <linux/vga_switcheroo.h>
 
-#ifdef __FreeBSD__
-#include <linux/string_helpers.h>
-#endif
-
 #include <drm/drm_displayid.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_edid.h>

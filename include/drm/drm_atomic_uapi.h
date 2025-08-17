@@ -29,9 +29,6 @@
 #ifndef DRM_ATOMIC_UAPI_H_
 #define DRM_ATOMIC_UAPI_H_
 
-#ifdef __FreeBSD__
-#include <linux/compiler.h>
-#endif
 struct drm_crtc_state;
 struct drm_display_mode;
 struct drm_property_blob;

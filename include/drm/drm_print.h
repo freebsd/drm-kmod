@@ -32,9 +32,6 @@
 #include <linux/device.h>
 #include <linux/debugfs.h>
 #include <linux/dynamic_debug.h>
-#ifdef __FreeBSD__
-#include <linux/math64.h>
-#endif
 
 #include <drm/drm.h>
 
