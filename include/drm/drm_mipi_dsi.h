@@ -3,6 +3,8 @@
 #ifndef _DRM_MIPI_DSI_H_
 #define _DRM_MIPI_DSI_H_
 
+#include <linux/device.h>
+
 #include <sys/types.h>
 #include <linux/errno.h>
 #include <linux/types.h>
