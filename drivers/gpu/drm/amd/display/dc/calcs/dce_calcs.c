@@ -3018,8 +3018,13 @@ bool bw_calcs(struct dc_context *ctx,
 	int pipe_count,
 	struct dce_bw_output *calcs_output)
 {
+#ifdef __FreeBSD__
+	struct bw_calcs_data *data = kvzalloc(sizeof(struct bw_calcs_data),
+					      GFP_KERNEL);
+#else
 	struct bw_calcs_data *data = kzalloc(sizeof(struct bw_calcs_data),
 					     GFP_KERNEL);
+#endif
 	if (!data)
 		return false;
 
