@@ -3047,8 +3047,8 @@ bool bw_calcs(struct dc_context *ctx,
 	int pipe_count,
 	struct dce_bw_output *calcs_output)
 {
-	struct bw_calcs_data *data = kzalloc(sizeof(struct bw_calcs_data),
-					     GFP_KERNEL);
+	struct bw_calcs_data *data = kvzalloc(sizeof(struct bw_calcs_data),
+					      GFP_KERNEL);
 	if (!data)
 		return false;
 
