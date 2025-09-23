@@ -328,8 +328,7 @@ static void *i915_gem_object_map_pfn(struct drm_i915_gem_object *obj,
 				     enum i915_map_type type)
 {
 #ifdef __FreeBSD__
-	// BSDFIXME: Need vmap_pfn() implementation.
-	return NULL;
+	panic("vmap_pfn() is not implemented");
 #else
 	resource_size_t iomap = obj->mm.region->iomap.base -
 		obj->mm.region->region.start;
