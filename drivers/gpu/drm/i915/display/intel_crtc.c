@@ -514,8 +514,6 @@ void intel_pipe_update_start(struct intel_atomic_state *state,
 
 #ifdef __linux__
 	local_irq_disable();
-#elif defined(__FreeBSD__)
-	preempt_disable();
 #endif
 
 	crtc->debug.min_vbl = evade.min;
@@ -537,7 +535,7 @@ irq_disable:
 #ifdef __linux__
 	local_irq_disable();
 #elif defined(__FreeBSD__)
-	preempt_disable();
+	return;
 #endif
 }
 
@@ -642,8 +640,6 @@ void intel_pipe_update_end(struct intel_atomic_state *state,
 
 #ifdef __linux__
 	local_irq_enable();
-#elif defined(__FreeBSD__)
-	preempt_enable();
 #endif
 
 	if (intel_vgpu_active(dev_priv))
