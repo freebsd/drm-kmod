@@ -777,8 +777,6 @@ intel_legacy_cursor_update(struct drm_plane *_plane,
 
 #ifdef __linux__
 		local_irq_disable();
-#elif defined(__FreeBSD__)
-		preempt_disable();
 #endif
 
 		intel_vblank_evade(&evade);
@@ -787,8 +785,6 @@ intel_legacy_cursor_update(struct drm_plane *_plane,
 	} else {
 #ifdef __linux__
 		local_irq_disable();
-#elif defined(__FreeBSD__)
-		preempt_disable();
 #endif
 	}
 
@@ -801,8 +797,6 @@ intel_legacy_cursor_update(struct drm_plane *_plane,
 
 #ifdef __linux__
 	local_irq_enable();
-#elif defined(__FreeBSD__)
-	preempt_enable();
 #endif
 
 	intel_psr_unlock(crtc_state);
