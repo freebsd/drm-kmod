@@ -57,8 +57,13 @@ bsd_intel_pci_bus_alloc_mem(device_t dev, int *rid, uintmax_t size,
 	device_t vga;
 
 	vga = device_get_parent(dev);
+#if __FreeBSD_version < 1600005
 	res = BUS_ALLOC_RESOURCE(device_get_parent(vga), dev, SYS_RES_MEMORY,
 	    rid, 0, ~0UL, size, RF_ACTIVE | RF_SHAREABLE);
+#else
+	res = BUS_ALLOC_RESOURCE(device_get_parent(vga), dev, SYS_RES_MEMORY,
+	    *rid, 0, ~0UL, size, RF_ACTIVE | RF_SHAREABLE);
+#endif
 	if (res != NULL) {
 		*start = rman_get_start(res);
 		*end = rman_get_end(res);
