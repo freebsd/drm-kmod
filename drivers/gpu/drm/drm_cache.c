@@ -34,6 +34,10 @@
 #include <linux/iosys-map.h>
 #include <xen/xen.h>
 
+#if defined(__FreeBSD__) && defined(__aarch64__)
+#include <linux/preempt.h>
+#endif
+
 #include <drm/drm_cache.h>
 
 /* A small bounce buffer that fits on the stack. */
