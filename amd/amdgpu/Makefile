@@ -498,8 +498,11 @@ SRCS+=	amdgpu_dm_color.c \
 	amdgpu_dm_replay.c \
 	amdgpu_dm_services.c \
 	amdgpu_dm_wb.c \
-	amdgpu_dm.c \
-	dc_fpu.c
+	amdgpu_dm.c
+
+.if !empty(KCONFIG:MDRM_AMD_DC_FP)
+SRCS+=	dc_fpu.c
+.endif
 
 # display/dc/basics
 SRCS+=	bw_fixed.c \
@@ -679,7 +682,6 @@ SRCS+=	dcn21_dccg.c \
 	dcn21_resource.c
 
 # display/dc/dcn30
-.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 SRCS+=	dcn30_dio_link_encoder.c \
 	dcn30_clk_mgr.c \
 	dcn30_clk_mgr_smu_msg.c \
@@ -701,12 +703,8 @@ SRCS+=	dcn30_dio_link_encoder.c \
 	dcn30_vpg.c \
 	dcn30_init.c \
 	irq_service_dcn30.c \
-	hw_factory_dcn30.c \
-	hw_translate_dcn30.c \
-	dmub_dcn30.c \
 	display_mode_vba_30.c \
 	display_rq_dlg_calc_30.c
-.endif
 
 # display/dc/dcn301
 SRCS+=	dcn301_init.c \
@@ -719,22 +717,19 @@ SRCS+=	dcn301_init.c \
 	dcn301_panel_cntl.c \
 	dcn301_hubbub.c \
 	vg_clk_mgr.c \
-	dcn301_smu.c \
-	dmub_dcn301.c
+	dcn301_smu.c
 
 # display/dc/dcn302
 SRCS+=	dcn302_init.c \
 	dcn302_hwseq.c \
 	dcn302_resource.c \
-	irq_service_dcn302.c \
-	dmub_dcn302.c
+	irq_service_dcn302.c
 
 # display/dc/dcn303
 SRCS+=	dcn303_hwseq.c \
 	dcn303_init.c \
 	dcn303_resource.c \
-	irq_service_dcn303.c \
-	dmub_dcn303.c
+	irq_service_dcn303.c
 
 # display/dc/dcn314
 SRCS+=	dcn314_dccg.c \
@@ -789,14 +784,12 @@ SRCS+=	dcn35_clk_mgr.c \
 	dcn35_pg_cntl.c \
 	dcn35_resource.c \
 	dcn35_smu.c \
-	dmub_dcn35.c \
 	irq_service_dcn35.c
 
 # display/dc/dcn351
 SRCS+=	dcn351_fpu.c \
 	dcn351_init.c \
 	dcn351_resource.c \
-	dmub_dcn351.c \
 	irq_service_dcn351.c
 
 # display/dc/clk_mgr/dcn31
@@ -818,7 +811,6 @@ SRCS+=	dcn31_afmt.c \
 	dcn31_vpg.c \
 	display_mode_vba_31.c \
 	display_rq_dlg_calc_31.c \
-	dmub_dcn31.c \
 	irq_service_dcn31.c
 
 # display/dc/clk_mgr/dcn314
@@ -837,23 +829,7 @@ SRCS+=	dcn316_clk_mgr.c \
 SRCS+=	dcn32_clk_mgr.c \
 	dcn32_clk_mgr_smu_msg.c
 
-# display/dc/core
-SRCS+=	dc_vm_helper.c
-
-# display/dc/clk_mgr
-SRCS+=	rn_clk_mgr.c \
-	rn_clk_mgr_vbios_smu.c
-
-# display/dc/dsc
-SRCS+=	rc_calc.c \
-	rc_calc_dpi.c \
-	rc_calc_fpu.c \
-	dc_dsc.c
-
-.endif
-
 # display/dc/dml
-.if !empty(KCONFIG:MDRM_AMD_DC_FP)
 SRCS+=	display_mode_lib.c \
 	display_mode_vba.c \
 	display_mode_vba_20.c \
@@ -862,7 +838,10 @@ SRCS+=	display_mode_lib.c \
 	display_rq_dlg_calc_20.c \
 	display_rq_dlg_calc_21.c \
 	dml1_display_rq_dlg_calc.c
-.endif
+
+# display/dc/clk_mgr
+SRCS+=	rn_clk_mgr.c \
+	rn_clk_mgr_vbios_smu.c
 
 # display/dc/dml/dcn10
 SRCS+=	dcn10_fpu.c
@@ -904,6 +883,19 @@ SRCS+=	display_mode_core.c \
 	dml2_utils.c \
 	dml2_wrapper.c
 
+# display/dc/dsc
+SRCS+=	rc_calc_fpu.c
+
+.endif
+
+# display/dc/core
+SRCS+=	dc_vm_helper.c
+
+# display/dc/dsc
+SRCS+=	rc_calc.c \
+	rc_calc_dpi.c \
+	dc_dsc.c
+
 # display/dc/gpio/*
 SRCS+=	gpio_base.c \
 	gpio_service.c \
@@ -921,7 +913,9 @@ SRCS+=	gpio_base.c \
 	hw_factory_dcn20.c \
 	hw_factory_dcn21.c \
 	hw_factory_dcn315.c \
+	hw_factory_dcn30.c \
 	hw_factory_dcn32.c \
+	hw_translate_dcn30.c \
 	hw_translate_dce110.c \
 	hw_translate_dce120.c \
 	hw_translate_dce60.c \
@@ -1005,10 +999,17 @@ SRCS+=	dc_helper.c \
 # display/dmub/src
 SRCS+=	dmub_dcn20.c \
 	dmub_dcn21.c \
+	dmub_dcn30.c \
+	dmub_dcn31.c \
+	dmub_dcn32.c \
+	dmub_dcn35.c \
+	dmub_dcn301.c \
+	dmub_dcn302.c \
+	dmub_dcn303.c \
 	dmub_dcn314.c \
 	dmub_dcn315.c \
 	dmub_dcn316.c \
-	dmub_dcn32.c \
+	dmub_dcn351.c \
 	dmub_reg.c \
 	dmub_srv.c \
 	dmub_srv_stat.c
