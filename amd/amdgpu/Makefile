@@ -263,7 +263,6 @@ SRCS+=	amdgpu_aca.c \
 	amdgpu_ib.c \
 	amdgpu_ids.c \
 	amdgpu_ih.c \
-	amdgpu_ioc32.c \
 	amdgpu_irq.c \
 	amdgpu_job.c \
 	amdgpu_jpeg.c \
@@ -476,6 +475,10 @@ SRCS+=	amdgpu_aca.c \
 	vega20_reg_init.c \
 	vi.c \
 	vpe_v6_1.c
+
+.if !empty(KCONFIG:MCONFIG_COMPAT)
+SRCS+=	amdgpu_ioc32.c
+.endif
 
 # amdxcp
 SRCS+=	amdgpu_xcp_drv.c
