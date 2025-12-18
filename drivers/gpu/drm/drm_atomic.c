@@ -319,6 +319,8 @@ void __drm_atomic_state_free(struct kref *ref)
 		kfree(state);
 	}
 
+
+	drm_dev_put(dev);
 	drm_dev_put(dev);
 }
 EXPORT_SYMBOL(__drm_atomic_state_free);
