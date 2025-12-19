@@ -476,7 +476,7 @@ SRCS+=	amdgpu_aca.c \
 	vi.c \
 	vpe_v6_1.c
 
-.if !empty(KCONFIG:MCONFIG_COMPAT)
+.if !empty(KCONFIG:MCOMPAT)
 SRCS+=	amdgpu_ioc32.c
 .endif
 
