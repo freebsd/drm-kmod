@@ -352,7 +352,7 @@ void radeon_uvd_free_handles(struct radeon_device *rdev, struct drm_file *filp)
 	}
 }
 
-static int radeon_uvd_cs_msg_decode(volatile uint32_t *msg, unsigned buf_sizes[])
+static int radeon_uvd_cs_msg_decode(uint32_t *msg, unsigned buf_sizes[])
 {
 	unsigned stream_type = msg[4];
 	unsigned width = msg[6];
@@ -466,7 +466,7 @@ static int radeon_uvd_validate_codec(struct radeon_cs_parser *p,
 static int radeon_uvd_cs_msg(struct radeon_cs_parser *p, struct radeon_bo *bo,
 			     unsigned offset, unsigned buf_sizes[])
 {
-	volatile int32_t *msg, msg_type, handle;
+	int32_t *msg, msg_type, handle;
 	unsigned img_size = 0;
 	void *ptr;
 	int i, r;

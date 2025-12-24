@@ -26,9 +26,9 @@
 #include "dm_services.h"
 #include "core_types.h"
 #include "reg_helper.h"
-#include "dcn30_dpp.h"
+#include "dcn30/dcn30_dpp.h"
 #include "basics/conversion.h"
-#include "dcn30_cm_common.h"
+#include "dcn30/dcn30_cm_common.h"
 
 #define REG(reg)\
 	dpp->tf_regs->reg
@@ -445,7 +445,7 @@ void dpp3_cm_get_gamut_remap(struct dpp *dpp_base,
 			     struct dpp_grph_csc_adjustment *adjust)
 {
 	struct dcn3_dpp *dpp = TO_DCN30_DPP(dpp_base);
-	uint16_t arr_reg_val[12];
+	uint16_t arr_reg_val[12] = {0};
 	int select;
 
 	read_gamut_remap(dpp, arr_reg_val, &select);

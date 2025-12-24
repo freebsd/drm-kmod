@@ -28,7 +28,7 @@
 #include "core_types.h"
 
 #include "reg_helper.h"
-#include "dcn20_dpp.h"
+#include "dcn20/dcn20_dpp.h"
 #include "basics/conversion.h"
 
 #include "dcn10/dcn10_cm_common.h"
@@ -274,7 +274,7 @@ void dpp2_cm_get_gamut_remap(struct dpp *dpp_base,
 			     struct dpp_grph_csc_adjustment *adjust)
 {
 	struct dcn20_dpp *dpp = TO_DCN20_DPP(dpp_base);
-	uint16_t arr_reg_val[12];
+	uint16_t arr_reg_val[12] = {0};
 	enum dcn20_gamut_remap_select select;
 
 	read_gamut_remap(dpp, arr_reg_val, &select);
@@ -1114,15 +1114,15 @@ static void dpp20_select_3dlut_ram_mask(
 
 bool dpp20_program_3dlut(
 		struct dpp *dpp_base,
-		struct tetrahedral_params *params)
+		const struct tetrahedral_params *params)
 {
 	enum dc_lut_mode mode;
 	bool is_17x17x17;
 	bool is_12bits_color_channel;
-	struct dc_rgb *lut0;
-	struct dc_rgb *lut1;
-	struct dc_rgb *lut2;
-	struct dc_rgb *lut3;
+	const struct dc_rgb *lut0;
+	const struct dc_rgb *lut1;
+	const struct dc_rgb *lut2;
+	const struct dc_rgb *lut3;
 	int lut_size0;
 	int lut_size;
 
