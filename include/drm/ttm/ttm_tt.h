@@ -46,7 +46,7 @@ struct ttm_operation_ctx;
 struct ttm_tt {
 	/** @pages: Array of pages backing the data. */
 	struct page **pages;
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) && !defined(PAGE_IS_LKPI_PAGE)
 	/* On Linux, `struct page` has a private field. It is used by
 	 * `ttm_pool` to store private data. FreeBSD's `struct vm_page` does
 	 * not have that, so we use an extra field in `struct ttm_tt` */
