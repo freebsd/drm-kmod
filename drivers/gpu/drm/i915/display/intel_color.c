@@ -1902,6 +1902,14 @@ void intel_color_prepare_commit(struct intel_crtc_state *crtc_state)
 	struct intel_crtc *crtc = to_intel_crtc(crtc_state->uapi.crtc);
 	struct drm_i915_private *i915 = to_i915(crtc->base.dev);
 
+#ifdef __FreeBSD__
+	/*
+	 * BSDFIXME: This causes color corruption.
+	 * See https://github.com/freebsd/drm-kmod/pull/332#issuecomment-2585288390
+	 */
+	return;
+#endif
+
 	if (!crtc_state->hw.active ||
 	    intel_crtc_needs_modeset(crtc_state))
 		return;
