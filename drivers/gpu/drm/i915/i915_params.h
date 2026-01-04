@@ -49,9 +49,19 @@ struct drm_printer;
  * mode: debugfs file permissions, one of {0400, 0600, 0}, use 0 to not create
  *       debugfs file
  */
+#ifdef __FreeBSD__
+/* Changes in default values in I915_PARAMS_FOR_EACH below:
+ *
+ *   enable_guc: -1 -> 0
+ *   When the GuC is used, there is a great chance that the computer freezes
+ *   when it reboots or is powered off. The symptom is that the scree is
+ *   powered off at the time of reboot/shutdown, but the computer remains
+ *   powered on.
+ */
+#endif
 #define I915_PARAMS_FOR_EACH(param) \
 	param(int, modeset, -1, 0400) \
-	param(int, enable_guc, -1, 0400) \
+	param(int, enable_guc, 0, 0400) \
 	param(int, guc_log_level, -1, 0400) \
 	param(char *, guc_firmware_path, NULL, 0400) \
 	param(char *, huc_firmware_path, NULL, 0400) \
