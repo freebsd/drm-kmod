@@ -40,6 +40,19 @@ struct dma_buf_sync {
 #define	DMA_BUF_SYNC_END		(1 << 2)
 #define	DMA_BUF_SYNC_VALID_FLAGS_MASK	(DMA_BUF_SYNC_RW | DMA_BUF_SYNC_END)
 
-#define	DMA_BUF_IOCTL_SYNC		_IOW('b', 0, struct dma_buf_sync)
+struct dma_buf_export_sync_file {
+	uint32_t	flags;
+	int32_t		fd;
+};
+
+struct dma_buf_import_sync_file {
+	uint32_t	flags;
+	int32_t		fd;
+};
+
+#define	DMA_BUF_BASE			'b'
+#define	DMA_BUF_IOCTL_SYNC		_IOW(DMA_BUF_BASE, 0, struct dma_buf_sync)
+#define	DMA_BUF_IOCTL_EXPORT_SYNC_FILE	_IOWR(DMA_BUF_BASE, 2, struct dma_buf_export_sync_file)
+#define	DMA_BUF_IOCTL_IMPORT_SYNC_FILE	_IOW(DMA_BUF_BASE, 3, struct dma_buf_import_sync_file)
 
 #endif	/* _BSD_LKPI_UAPI_LINUX_DMA_BUF_H_ */
