@@ -1084,6 +1084,143 @@ CFLAGS.rc_calc.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.rc_calc_dpi.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.rc_calc_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 
+.if ${MACHINE_ARCH} == "aarch64"
+
+dcn_calcs.o: dcn_calcs.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn_calc_auto.o: dcn_calc_auto.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn_calc_math.o: dcn_calc_math.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn20_fpu.o: dcn20_fpu.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn20_resource.o: dcn20_resource.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn21_resource.o: dcn21_resource.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn30_fpu.o: dcn30_fpu.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn30_resource.o: dcn30_resource.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn301_fpu.o: dcn301_fpu.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn302_fpu.o: dcn302_fpu.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn301_resource.o: dcn301_resource.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn303_fpu.o: dcn303_fpu.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn31_fpu.o: dcn31_fpu.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn31_resource.o: dcn31_resource.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn314_fpu.o: dcn314_fpu.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn32_fpu.o: dcn32_fpu.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn32_resource.o: dcn32_resource.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn32_resource_helpers.o: dcn32_resource_helpers.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dcn321_fpu.o: dcn321_fpu.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+
+display_mode_lib.o: display_mode_lib.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_mode_vba.o: display_mode_vba.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_mode_vba_20.o: display_mode_vba_20.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_mode_vba_21.o: display_mode_vba_21.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_mode_vba_30.o: display_mode_vba_30.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_mode_vba_31.o: display_mode_vba_31.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_mode_vba_314.o: display_mode_vba_314.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_mode_vba_32.o: display_mode_vba_32.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_mode_vba_util_32.o: display_mode_vba_util_32.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_pipe_clocks.o: display_pipe_clocks.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+dml1_display_rq_dlg_calc.o: dml1_display_rq_dlg_calc.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_rq_dlg_helpers.o: display_rq_dlg_helpers.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_rq_dlg_calc_20.o: display_rq_dlg_calc_20.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_rq_dlg_calc_21.o: display_rq_dlg_calc_21.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_rq_dlg_calc_314.o: display_rq_dlg_calc_314.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_rq_dlg_calc_32.o: display_rq_dlg_calc_32.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+soc_bounding_box.o: soc_bounding_box.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+
+display_rq_dlg_calc_20v2.o: display_rq_dlg_calc_20v2.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_mode_vba_20v2.o: display_mode_vba_20v2.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_rq_dlg_calc_30.o: display_rq_dlg_calc_30.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+display_rq_dlg_calc_31.o: display_rq_dlg_calc_31.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+
+rc_calc.o: rc_calc.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+rc_calc_dpi.o: rc_calc_dpi.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+rc_calc_fpu.o: rc_calc_fpu.c
+	${CC} ${STATIC_CFLAGS} ${CFLAGS:N-mgeneral-regs-only} -c ${.IMPSRC} \
+		-o ${.TARGET}
+
+.endif
+
 .if ${MACHINE_CPUARCH} != "powerpc"
 CWARNFLAGS+=	-Wno-expansion-to-defined
 .endif
