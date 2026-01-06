@@ -34,6 +34,11 @@
 #include <linux/iosys-map.h>
 #include <xen/xen.h>
 
+/* XXX-DSL: For FreeBSD and LinuxKPI only! */
+#if defined(CONFIG_ARM64)
+#include <linux/preempt.h>
+#endif
+
 #include <drm/drm_cache.h>
 
 /* A small bounce buffer that fits on the stack. */
