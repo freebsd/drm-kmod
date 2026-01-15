@@ -51,7 +51,9 @@ __FBSDID("$FreeBSD$");
 
 #include <linux/list.h>
 #include <linux/dma-buf.h>
+#include <linux/dma-fence-unwrap.h>
 #include <linux/dma-resv.h>
+#include <linux/sync_file.h>
 
 #include <uapi/linux/dma-buf.h>
 
@@ -226,6 +228,78 @@ dma_buf_end_cpu_access(struct dma_buf *db, enum dma_data_direction dir)
 }
 
 static int
+dma_buf_export_sync_file(struct dma_buf *db, struct thread *td,
+		struct dma_buf_export_sync_file *export_sync_file)
+{
+	int usage = dma_resv_usage_rw(export_sync_file->flags & DMA_BUF_SYNC_WRITE);
+	int fd, rc;
+	struct dma_fence *fence;
+	struct sync_file *sync_file;
+	struct file *file;
+
+	rc = dma_resv_get_singleton(db->resv, usage, &fence);
+	if (rc != 0)
+		return (rc);
+	if (fence == NULL)
+		return (-ENXIO);
+
+	sync_file = sync_file_create(fence);
+	if (sync_file == NULL)
+		return (-ENOMEM);
+
+	rc = falloc(td, &file, &fd, O_CLOEXEC);
+	if (rc != 0)
+		return (-rc);
+
+	sync_file->linux_file->_file = file;
+
+	/* We need to set these for linux_fget to work in sync_file_fdget. */
+	sync_file->linux_file->_file->f_ops = &linuxfileops;
+	sync_file->linux_file->_file->f_data = sync_file->linux_file;
+
+	/* Transfer reference count from Linux file to BSD file (cf fd_install). */
+	while (refcount_release(&sync_file->linux_file->f_count) == 0)
+		refcount_acquire(&file->f_count);
+	fput(sync_file->linux_file);
+
+	export_sync_file->fd = fd;
+	dma_fence_put(fence);
+
+	return (0);
+}
+
+static int
+dma_buf_import_sync_file(struct dma_buf *db,
+		struct dma_buf_import_sync_file *import_sync_file)
+{
+	int usage = dma_resv_usage_rw(import_sync_file->flags & DMA_BUF_SYNC_WRITE);
+	int rc = 0;
+	size_t fence_count = 0;
+	struct dma_fence_unwrap cursor;
+	struct dma_fence *f, *fence;
+
+	fence = sync_file_get_fence(import_sync_file->fd);
+	if (fence == NULL)
+		return (-EINVAL);
+
+	dma_fence_unwrap_for_each(f, &cursor, fence)
+		fence_count++;
+
+	dma_resv_lock(db->resv, NULL);
+
+	rc = dma_resv_reserve_fences(db->resv, fence_count);
+	if (rc != 0)
+		goto out;
+	dma_fence_unwrap_for_each(f, &cursor, fence)
+		dma_resv_add_fence(db->resv, f, usage);
+
+out:
+	dma_resv_unlock(db->resv);
+	dma_fence_put(fence);
+	return (rc);
+}
+
+static int
 dma_buf_ioctl(struct file *fp, u_long com, void *data,
 	      struct ucred *active_cred, struct thread *td)
 {
@@ -238,11 +312,12 @@ dma_buf_ioctl(struct file *fp, u_long com, void *data,
 		return (EINVAL);
 
 	db = fp->f_data;
-	sync = data;
 	rc = 0;
 
 	switch (com) {
 	case DMA_BUF_IOCTL_SYNC:
+		sync = data;
+
 		if (sync->flags & ~DMA_BUF_SYNC_VALID_FLAGS_MASK)
 			return (EINVAL);
 
@@ -264,6 +339,10 @@ dma_buf_ioctl(struct file *fp, u_long com, void *data,
 		else
 			rc = dma_buf_begin_cpu_access(db, dir);
 		return (-rc);
+	case DMA_BUF_IOCTL_EXPORT_SYNC_FILE:
+		return (-dma_buf_export_sync_file(db, td, data));
+	case DMA_BUF_IOCTL_IMPORT_SYNC_FILE:
+		return (-dma_buf_import_sync_file(db, data));
 	default:
 		return (ENOTTY);
 	}
