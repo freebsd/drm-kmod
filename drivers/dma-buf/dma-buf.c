@@ -465,7 +465,7 @@ dma_buf_export(const struct dma_buf_export_info *exp_info)
 	if ((err = falloc_noinstall(curthread, &fp)) != 0)
 		goto err;
 
-	finit(fp, 0, DTYPE_DMABUF, db, &dma_buf_fileops);
+	finit(fp, FREAD | FWRITE, DTYPE_DMABUF, db, &dma_buf_fileops);
 
 	db->linux_file = fp;
 	mutex_init(&db->lock);
