@@ -42,4 +42,18 @@ struct dma_buf_sync {
 
 #define	DMA_BUF_IOCTL_SYNC		_IOW('b', 0, struct dma_buf_sync)
 
+struct dma_buf_export_sync_file {
+	__u32	flags;
+	__s32	fd;
+};
+
+#define	DMA_BUF_IOCTL_EXPORT_SYNC_FILE	_IOWR('b', 1, struct dma_buf_export_sync_file)
+
+struct dma_buf_import_sync_file {
+	__u32	flags;
+	__s32	fd;
+};
+
+#define	DMA_BUF_IOCTL_IMPORT_SYNC_FILE	_IOW('b', 2, struct dma_buf_import_sync_file)
+
 #endif	/* _BSD_LKPI_UAPI_LINUX_DMA_BUF_H_ */
