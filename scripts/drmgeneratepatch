@@ -125,8 +125,8 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_writeback.h' \
     ':!include/drm/gma*' \
     ':!include/drm/drm_*vram*' \
-    ':!include/drm/i915_hdcp_interface.h' \
-    ':!include/drm/xe_pciids.h' \
+    ':!include/drm/intel/i915_hdcp_interface.h' \
+    ':!include/drm/intel/xe_pciids.h' \
     ':!include/uapi/drm/etnaviv*' \
     ':!include/uapi/drm/exynos_drm*' \
     ':!include/uapi/drm/habanalabs_accel.h' \
