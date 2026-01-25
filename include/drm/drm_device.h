@@ -310,6 +310,8 @@ struct drm_device {
 	void *sysctl_private;
 	char busid_str[128];
 	int modesetting;
+	resource_size_t aperture_base;
+	resource_size_t aperture_size;
 /* FIXME: Should be defined in linux/mmzone.h and include linux/mmzone.h in the
  * correct headers, such as gfp.h. */
 #define	MAX_ORDER 11

@@ -132,45 +132,29 @@ struct linux_fb_info {
 	u32 state;			/* Hardware state i.e suspend */
 	/* From here on everything is device dependent */
 	void *par;
-	/* we need the PCI or similar aperture base/size not
-	   smem_start/size as smem_start may just be an object
-	   allocated inside the aperture so may not actually overlap */
-	struct apertures_struct {
-		unsigned int count;
-		struct aperture {
-			resource_size_t base;
-			resource_size_t size;
-		} ranges[0];
-	} *apertures;
-
 	bool skip_vt_switch; /* no VT switch on suspend/resume required */
 
 #ifdef __FreeBSD__
 	struct fb_info fbio;
 	device_t fb_bsddev;
 	struct task fb_mode_task;
+
+	/* i915 fictitious pages area */
+	resource_size_t aperture_base;
+	resource_size_t aperture_size;
 #endif
 } __aligned(sizeof(long));
-
-static inline struct apertures_struct *alloc_apertures(unsigned int max_num) {
-	struct apertures_struct *a = kzalloc(sizeof(struct apertures_struct)
-			+ max_num * sizeof(struct aperture), GFP_KERNEL);
-	if (!a)
-		return NULL;
-	a->count = max_num;
-	return a;
-}
 
     /*
      *  `Generic' versions of the frame buffer device operations
      */
 
-extern void cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
-extern void cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
-extern void cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image);
-extern ssize_t fb_io_read(struct linux_fb_info *info, char __user *buf,
+void cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
+void cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
+void cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image);
+ssize_t fb_io_read(struct linux_fb_info *info, char __user *buf,
     size_t count, loff_t *ppos);
-extern ssize_t fb_io_write(struct linux_fb_info *info, const char __user *buf,
+ssize_t fb_io_write(struct linux_fb_info *info, const char __user *buf,
     size_t count, loff_t *ppos);
 
 /*
@@ -197,99 +181,98 @@ extern ssize_t fb_io_write(struct linux_fb_info *info, const char __user *buf,
 /*
  * Drawing operations where framebuffer is in system RAM
  */
-extern void sys_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect);
-extern void sys_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area);
-extern void sys_imageblit(struct linux_fb_info *info, const struct fb_image *image);
-extern ssize_t fb_sys_read(struct linux_fb_info *info, char __user *buf,
-			   size_t count, loff_t *ppos);
-extern ssize_t fb_sys_write(struct linux_fb_info *info, const char __user *buf,
-			    size_t count, loff_t *ppos);
-extern int fb_deferred_io_mmap(struct linux_fb_info *info, struct vm_area_struct *vma);
+static inline void
+sys_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
+{
+	cfb_fillrect(info, rect);
+}
+
+static inline void
+sys_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area)
+{
+	cfb_copyarea(info, area);
+}
+
+static inline void
+sys_imageblit(struct linux_fb_info *info, const struct fb_image *image)
+{
+	cfb_imageblit(info, image);
+}
+
+static inline ssize_t
+fb_sys_read(struct linux_fb_info *info, char __user *buf, size_t count,
+    loff_t *ppos)
+{
+	return (fb_io_read(info, buf, count, ppos));
+}
+
+static inline ssize_t
+fb_sys_write(struct linux_fb_info *info, const char __user *buf, size_t count,
+    loff_t *ppos)
+{
+	return (fb_io_write(info, buf, count, ppos));
+}
+
+int fb_deferred_io_mmap(struct linux_fb_info *info,
+    struct vm_area_struct *vma);
 
 /*
  * Generate callbacks for deferred I/O
  */
 
-#define __FB_GEN_DEFAULT_DEFERRED_OPS_RDWR(__prefix, __damage_range, __mode) \
-	static ssize_t __prefix ## _defio_read(struct fb_info *info, char __user *buf, \
-					       size_t count, loff_t *ppos) \
-	{ \
-		return fb_ ## __mode ## _read(info, buf, count, ppos); \
-	} \
-	static ssize_t __prefix ## _defio_write(struct fb_info *info, const char __user *buf, \
-						size_t count, loff_t *ppos) \
-	{ \
-		unsigned long offset = *ppos; \
-		ssize_t ret = fb_ ## __mode ## _write(info, buf, count, ppos); \
-		if (ret > 0) \
-			__damage_range(info, offset, ret); \
-		return ret; \
+#define FB_GEN_DEFAULT_DEFERRED_IOMEM_OPS(_pfx, _range, _area)		\
+	static void							\
+	_pfx ## _fillrect(struct fb_info *fi, const struct fb_fillrect *fr) \
+	{								\
+		cfb_fillrect(fi, fr);					\
+		_area(fi, fr->dx, fr->dy, fr->width, fr->height);	\
+	}								\
+	static void							\
+	_pfx ## _copyarea(struct fb_info *fi, const struct fb_copyarea *fca) \
+	{								\
+		cfb_copyarea(fi, fca);					\
+		_area(fi, fca->dx, fca->dy, fca->width, fca->height);	\
+	}								\
+	static void							\
+	_pfx ## _imageblit(struct fb_info *fi, const struct fb_image *img) \
+	{								\
+		cfb_imageblit(fi, img);					\
+		_area(fi, img->dx, img->dy, img->width, img->height);	\
 	}
 
-#define __FB_GEN_DEFAULT_DEFERRED_OPS_DRAW(__prefix, __damage_area, __mode) \
-	static void __prefix ## _defio_fillrect(struct fb_info *info, \
-						const struct fb_fillrect *rect) \
-	{ \
-		__mode ## _fillrect(info, rect); \
-		__damage_area(info, rect->dx, rect->dy, rect->width, rect->height); \
-	} \
-	static void __prefix ## _defio_copyarea(struct fb_info *info, \
-						const struct fb_copyarea *area) \
-	{ \
-		__mode ## _copyarea(info, area); \
-		__damage_area(info, area->dx, area->dy, area->width, area->height); \
-	} \
-	static void __prefix ## _defio_imageblit(struct fb_info *info, \
-						 const struct fb_image *image) \
-	{ \
-		__mode ## _imageblit(info, image); \
-		__damage_area(info, image->dx, image->dy, image->width, image->height); \
-	}
-
-#define FB_GEN_DEFAULT_DEFERRED_IOMEM_OPS(__prefix, __damage_range, __damage_area) \
-	__FB_GEN_DEFAULT_DEFERRED_OPS_RDWR(__prefix, __damage_range, io) \
-	__FB_GEN_DEFAULT_DEFERRED_OPS_DRAW(__prefix, __damage_area, cfb)
-
-#define FB_GEN_DEFAULT_DEFERRED_SYSMEM_OPS(__prefix, __damage_range, __damage_area) \
-	__FB_GEN_DEFAULT_DEFERRED_OPS_RDWR(__prefix, __damage_range, sys) \
-	__FB_GEN_DEFAULT_DEFERRED_OPS_DRAW(__prefix, __damage_area, sys)
+#define FB_GEN_DEFAULT_DEFERRED_SYSMEM_OPS(...) \
+	FB_GEN_DEFAULT_DEFERRED_IOMEM_OPS(__VA_ARGS__)
 
 /*
  * Initializes struct fb_ops for deferred I/O.
  */
 
-#define __FB_DEFAULT_DEFERRED_OPS_RDWR(__prefix) \
-	.fb_read	= __prefix ## _defio_read, \
-	.fb_write	= __prefix ## _defio_write
+#define __FB_DEFAULT_DEFERRED_OPS_RDWR(...)	\
+	.fb_read	= fb_io_read,		\
+	.fb_write	= fb_io_write
 
-#define __FB_DEFAULT_DEFERRED_OPS_DRAW(__prefix) \
-	.fb_fillrect	= __prefix ## _defio_fillrect, \
-	.fb_copyarea	= __prefix ## _defio_copyarea, \
-	.fb_imageblit	= __prefix ## _defio_imageblit
+#define __FB_DEFAULT_DEFERRED_OPS_DRAW(_pfx)	\
+	.fb_fillrect	= _pfx ## _fillrect,	\
+	.fb_copyarea	= _pfx ## _copyarea,	\
+	.fb_imageblit	= _pfx ## _imageblit
 
-#define __FB_DEFAULT_DEFERRED_OPS_MMAP(__prefix) \
+#define __FB_DEFAULT_DEFERRED_OPS_MMAP(...)	\
 	.fb_mmap	= fb_deferred_io_mmap
 
-#define FB_DEFAULT_DEFERRED_OPS(__prefix) \
-        __FB_DEFAULT_DEFERRED_OPS_RDWR(__prefix), \
-        __FB_DEFAULT_DEFERRED_OPS_DRAW(__prefix), \
-        __FB_DEFAULT_DEFERRED_OPS_MMAP(__prefix)
+#define FB_DEFAULT_DEFERRED_OPS(_pfx)		\
+	__FB_DEFAULT_DEFERRED_OPS_RDWR(),	\
+	__FB_DEFAULT_DEFERRED_OPS_DRAW(_pfx),	\
+	__FB_DEFAULT_DEFERRED_OPS_MMAP()
 
 
 int linux_register_framebuffer(struct linux_fb_info *fb_info);
 int linux_unregister_framebuffer(struct linux_fb_info *fb_info);
-int remove_conflicting_framebuffers(struct apertures_struct *a,
+int remove_conflicting_framebuffers(resource_size_t base, resource_size_t size,
 	const char *name, bool primary);
 int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name);
 struct linux_fb_info *framebuffer_alloc(size_t size, struct device *dev);
 void framebuffer_release(struct linux_fb_info *info);
 #define	fb_set_suspend(x, y)	0
-
-static inline bool
-is_firmware_framebuffer(struct apertures_struct *a __unused)
-{
-	return false;
-}
 
 /* updated FreeBSD fb_info */
 int linux_fb_get_options(const char *name, char **option);

@@ -4243,11 +4243,12 @@ fence_driver_init:
 	 * stopped setting them when it got rid of its specific framebuffer
 	 * initialization to use the generic drm_fb_helper code.
 	 *
-	 * We can't do this in register_framebuffer() anymore because the
-	 * values passed to register_fictitious_range() below are unavailable
-	 * from a generic structure set by both drivers.
+	 * To keep doing this in register_framebuffer() the values are passed
+	 * to register_fictitious_range() in additional FreeBSD-specific fields
+	 * of drm_driver structure.
 	 */
-	register_fictitious_range(adev->gmc.aper_base, adev->gmc.aper_size);
+	adev_to_drm(adev)->aperture_base = adev->gmc.aper_base;
+	adev_to_drm(adev)->aperture_size = adev->gmc.aper_size;
 #endif
 
 	amdgpu_fence_driver_hw_init(adev);
@@ -4459,10 +4460,6 @@ void amdgpu_device_fini_hw(struct amdgpu_device *adev)
 
 	/* disable ras feature must before hw fini */
 	amdgpu_ras_pre_fini(adev);
-
-#ifdef __FreeBSD__
-	unregister_fictitious_range(adev->gmc.aper_base, adev->gmc.aper_size);
-#endif
 
 	amdgpu_ttm_set_buffer_funcs_status(adev, false);
 

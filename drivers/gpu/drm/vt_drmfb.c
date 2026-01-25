@@ -31,9 +31,6 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 #include <sys/reboot.h>
 #include <sys/fbio.h>
 #include <dev/vt/vt.h>
@@ -41,8 +38,6 @@ __FBSDID("$FreeBSD$");
 #include <dev/vt/colors/vt_termcolors.h>
 
 #include <linux/fb.h>
-
-#include <drm/drm_fb_helper.h>
 
 /*
  * `drm_fb_helper.h` redefines `fb_info` to be `linux_fb_info` to manage the
@@ -54,17 +49,21 @@ __FBSDID("$FreeBSD$");
  */
 #undef	fb_info
 
-#include <drm/drm_os_freebsd.h>
-
 #include "vt_drmfb.h"
 
-#define	to_drm_fb_helper(fbio) ((struct drm_fb_helper *)fbio->fb_priv)
-#define	to_linux_fb_info(fbio) (to_drm_fb_helper(fbio)->info)
+#define	to_linux_fb_info(f)	container_of(f, struct linux_fb_info, fbio);
+
+/*
+ * skip_ddb is controlled via sysctls in drm_os_freebsd.c in drm.ko
+ * TODO: Move these sysctl definitions here.
+ */
+int skip_ddb = 0;
 
 vd_init_t		vt_drmfb_init;
 vd_fini_t		vt_drmfb_fini;
 vd_blank_t		vt_drmfb_blank;
 vd_bitblt_bmp_t		vt_drmfb_bitblt_bitmap;
+vd_bitblt_argb_t	vt_drmfb_bitblt_argb;
 vd_drawrect_t		vt_drmfb_drawrect;
 vd_setpixel_t		vt_drmfb_setpixel;
 vd_invalidate_text_t	vt_drmfb_invalidate_text;
@@ -85,6 +84,7 @@ static struct vt_driver vt_drmfb_driver = {
 	 * `vt_drmfb_bitblt_bitmap()` may sleep.
 	 */
 	.vd_bitblt_bmp = vt_drmfb_bitblt_bitmap,
+	.vd_bitblt_argb = vt_drmfb_bitblt_argb,
 	.vd_drawrect = vt_drmfb_drawrect,
 	.vd_setpixel = vt_drmfb_setpixel,
 	.vd_invalidate_text = vt_drmfb_invalidate_text,
@@ -172,6 +172,7 @@ vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
 	struct fb_info *fbio;
 	struct linux_fb_info *info;
 	struct fb_image image;
+	uint32_t vt_width;
 
 	fbio = vd->vd_softc;
 	info = to_linux_fb_info(fbio);
@@ -184,10 +185,11 @@ vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
 			return;
 		height = vw->vw_draw_area.tr_end.tp_row - y;
 	}
+	vt_width = width;
 	if (x + width > vw->vw_draw_area.tr_end.tp_col) {
 		if (x >= vw->vw_draw_area.tr_end.tp_col)
 			return;
-		width = vw->vw_draw_area.tr_end.tp_col - x;
+		vt_width = vw->vw_draw_area.tr_end.tp_col - x;
 	}
 
 	image.dx = x;
@@ -199,11 +201,54 @@ vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
 	image.depth = 1;
 	image.data = pattern;
 	image.mask = mask; // Specific to FreeBSD to display the mouse pointer.
+	image.vt_width = vt_width; // FreeBSD. Stores truncated width.
 
 	if (!kdb_active && !KERNEL_PANICKED())
 		linux_set_current(curthread);
 
 	info->fbops->fb_imageblit(info, &image);
+}
+
+int
+vt_drmfb_bitblt_argb(struct vt_device *vd, const struct vt_window *vw,
+    const uint8_t *argb,
+    unsigned int width, unsigned int height,
+    unsigned int x, unsigned int y)
+{
+	struct fb_info *fbio;
+	struct linux_fb_info *info;
+	struct fb_image image;
+	uint32_t vt_width;
+
+	fbio = vd->vd_softc;
+	info = to_linux_fb_info(fbio);
+	if (info->fbops->fb_imageblit == NULL)
+		return (ENOTSUP);
+
+	/* Bound by right and bottom edges. */
+	if (y + height > vw->vw_draw_area.tr_end.tp_row) {
+		if (y >= vw->vw_draw_area.tr_end.tp_row)
+			return (EINVAL);
+		height = vw->vw_draw_area.tr_end.tp_row - y;
+	}
+	vt_width = width;
+	if (x + width > vw->vw_draw_area.tr_end.tp_col) {
+		if (x >= vw->vw_draw_area.tr_end.tp_col)
+			return (EINVAL);
+		vt_width = vw->vw_draw_area.tr_end.tp_col - x;
+	}
+
+	image.dx = x;
+	image.dy = y;
+	image.width = width;
+	image.height = height;
+	image.depth = 32;
+	image.data = argb;
+	image.vt_width = vt_width; // FreeBSD. Stores truncated width.
+
+	info->fbops->fb_imageblit(info, &image);
+
+	return (0);
 }
 
 void

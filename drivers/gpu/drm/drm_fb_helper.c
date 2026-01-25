@@ -1896,15 +1896,16 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper)
 	if (!drm_leak_fbdev_smem)
 		info->flags |= FBINFO_HIDE_SMEM_START;
 
-#ifdef __FreeBSD__
-	info->fbio.fb_priv = fb_helper;
-#endif
-
 	/* Need to drop locks to avoid recursive deadlock in
 	 * register_framebuffer. This is ok because the only thing left to do is
 	 * register the fbdev emulation instance in kernel_fb_helper_list. */
 	mutex_unlock(&fb_helper->lock);
 
+#ifdef __FreeBSD__
+	info->fb_bsddev = dev->dev->bsddev;
+	info->aperture_base = dev->aperture_base;
+	info->aperture_size = dev->aperture_size;
+#endif
 	ret = register_framebuffer(info);
 	if (ret < 0)
 		return ret;
