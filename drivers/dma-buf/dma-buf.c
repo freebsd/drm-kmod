@@ -136,6 +136,7 @@ dma_buf_stat(struct file *fp, struct stat *sb,
 {
 
 	/* XXX need to define flags for st_mode */
+	bzero(sb, sizeof(*sb));
 	return (0);
 }
 
