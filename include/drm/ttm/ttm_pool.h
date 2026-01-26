@@ -54,7 +54,7 @@ struct ttm_pool_type {
 	struct list_head shrinker_list;
 
 	spinlock_t lock;
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	struct list_head pages;
 #elif defined(__FreeBSD__)
 	struct pglist pages;

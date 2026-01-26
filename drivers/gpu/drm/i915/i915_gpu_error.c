@@ -296,7 +296,7 @@ static void *compress_next_page(struct i915_vma_compress *c,
 		return ERR_PTR(-ENOMEM);
 
 	page = virt_to_page(page_addr);
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	list_add_tail(&page->lru, &dst->page_list);
 #elif defined(__FreeBSD__)
 	TAILQ_INSERT_TAIL(&dst->page_list, page, plinks.q);
@@ -414,7 +414,7 @@ static int compress_page(struct i915_vma_compress *c,
 
 	if (!(wc && i915_memcpy_from_wc(ptr, src, PAGE_SIZE)))
 		memcpy(ptr, src, PAGE_SIZE);
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	list_add_tail(&virt_to_page(ptr)->lru, &dst->page_list);
 #elif defined(__FreeBSD__)
 	TAILQ_INSERT_TAIL(&dst->page_list, virt_to_page(ptr), plinks.q);
@@ -626,7 +626,7 @@ static void intel_gpu_error_print_vma(struct drm_i915_error_state_buf *m,
 				      const struct intel_engine_cs *engine,
 				      const struct i915_vma_coredump *vma)
 {
-#ifdef __linux__
+#ifdef __linux__		/* XXX-BZ why linux-only? */
 	char out[ASCII85_BUFSZ];
 	struct page *page;
 
@@ -642,7 +642,7 @@ static void intel_gpu_error_print_vma(struct drm_i915_error_state_buf *m,
 		err_printf(m, "gtt_page_sizes = 0x%08x\n", vma->gtt_page_sizes);
 
 	err_compression_marker(m);
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	list_for_each_entry(page, &vma->page_list, lru) {
 #elif defined(__FreeBSD__)
 	TAILQ_FOREACH(page, &vma->page_list, plinks.q) {
@@ -651,7 +651,7 @@ static void intel_gpu_error_print_vma(struct drm_i915_error_state_buf *m,
 		const u32 *addr = page_address(page);
 
 		len = PAGE_SIZE;
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 		if (page == list_last_entry(&vma->page_list, typeof(*page), lru))
 #elif defined(__FreeBSD__)
 		if (page == TAILQ_LAST(&vma->page_list, pglist))
@@ -1040,7 +1040,7 @@ static void i915_vma_coredump_free(struct i915_vma_coredump *vma)
 		struct i915_vma_coredump *next = vma->next;
 		struct page *page, *n;
 
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 		list_for_each_entry_safe(page, n, &vma->page_list, lru) {
 			list_del_init(&page->lru);
 			__free_page(page);
@@ -1140,7 +1140,7 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 		return NULL;
 	}
 
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	INIT_LIST_HEAD(&dst->page_list);
 #elif defined(__FreeBSD__)
 	TAILQ_INIT(&dst->page_list);
@@ -1227,7 +1227,7 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 	if (ret || compress_flush(compress, dst)) {
 		struct page *page, *n;
 
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 		list_for_each_entry_safe_reverse(page, n, &dst->page_list, lru) {
 			list_del_init(&page->lru);
 			pool_free(&compress->pool, page_address(page));
