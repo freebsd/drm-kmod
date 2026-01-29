@@ -59,21 +59,22 @@ for file in $1/*.patch; do
 	patchfile=$(echo $file | awk -F '/' '{print $NF}')
 	newfiles=$(awk '$0 == "--- /dev/null" { getline; print $2 }' $1/applied/${patchfile} | sed 's/^b\///')
 	if [ -n "${newfiles}" ]; then
-	    echo "New files appeared, makefiles needs modification"
-	    echo "New files in questions : ${newfiles}"
+	    echo "New files appeared. Makefiles may need modification"
+	    echo "New files in question: "
+	    echo "${newfiles}"
 	    exit 1
 	fi
 	renames=$(awk '($1 == "rename" && $2 == "from") {print $3" renamed to "; getline; print $3}' $1/applied/${patchfile})
 	if [ -n "${renames}" ]; then
-	    echo "files got renamed, makefiles needs modification"
-	    echo "renamed files in questions : "
+	    echo "Files got renamed. Makefiles may need modification"
+	    echo "Renamed files in question: "
 	    echo "${renames}"
 	    exit 1
 	fi
 	deleted=$(awk '$1 == "deleted" { getline; getline; print $2 }' $1/applied/${patchfile} | sed 's/\(a\/\)\(.*\)/\2/')
 	if [ -n "${deleted}" ]; then
-	    echo "files got deleted, makefiles needs modification"
-	    echo "deleted files in questions : "
+	    echo "Files got deleted. Makefiles may need modification"
+	    echo "Deleted files in question: "
 	    echo "${deleted}"
 	    exit 1
 	fi
