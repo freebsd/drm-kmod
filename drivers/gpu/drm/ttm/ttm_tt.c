@@ -115,7 +115,7 @@ EXPORT_SYMBOL_FOR_TESTS_ONLY(ttm_tt_create);
  */
 static int ttm_tt_alloc_page_directory(struct ttm_tt *ttm)
 {
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	ttm->pages = kvcalloc(ttm->num_pages, sizeof(void*), GFP_KERNEL);
 #elif defined(__FreeBSD__)
 	ttm->pages = kvcalloc(ttm->num_pages,
@@ -124,7 +124,7 @@ static int ttm_tt_alloc_page_directory(struct ttm_tt *ttm)
 #endif
 	if (!ttm->pages)
 		return -ENOMEM;
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) && !defined(PAGE_IS_LKPI_PAGE)
 	ttm->orders = (void *)(ttm->pages + ttm->num_pages);
 #endif
 
@@ -133,7 +133,7 @@ static int ttm_tt_alloc_page_directory(struct ttm_tt *ttm)
 
 static int ttm_dma_tt_alloc_page_directory(struct ttm_tt *ttm)
 {
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	ttm->pages = kvcalloc(ttm->num_pages, sizeof(*ttm->pages) +
 			      sizeof(*ttm->dma_address), GFP_KERNEL);
 #elif defined(__FreeBSD__)
@@ -145,7 +145,7 @@ static int ttm_dma_tt_alloc_page_directory(struct ttm_tt *ttm)
 		return -ENOMEM;
 
 	ttm->dma_address = (void *)(ttm->pages + ttm->num_pages);
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) && !defined(PAGE_IS_LKPI_PAGE)
 	ttm->orders = (void *)(ttm->dma_address + ttm->num_pages);
 #endif
 	return 0;

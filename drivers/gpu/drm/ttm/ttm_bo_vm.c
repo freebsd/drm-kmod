@@ -242,7 +242,7 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 	 * Speculatively prefault a number of pages. Only error on
 	 * first page.
 	 */
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__)
 	VM_OBJECT_WLOCK(vma->vm_obj);
 #endif
 	for (i = 0; i < num_prefault; ++i) {
@@ -251,20 +251,24 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 		} else {
 			page = ttm->pages[page_offset];
 			if (unlikely(!page && i == 0)) {
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__)
 				VM_OBJECT_WUNLOCK(vma->vm_obj);
 #endif
 				return VM_FAULT_OOM;
 			} else if (unlikely(!page)) {
 				break;
 			}
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__)
+#if defined(PAGE_IS_LKPI_PAGE)
+			page->vm_page->oflags &= ~VPO_UNMANAGED;
+#else
 			page->oflags &= ~VPO_UNMANAGED;
+#endif
 #endif
 			pfn = page_to_pfn(page);
 		}
 
-#ifdef __linux__
+#if defined(__linux__)
 		/*
 		 * Note that the value of @prot at this point may differ from
 		 * the value of @vma->vm_page_prot in the caching- and
@@ -281,7 +285,7 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 		/* Never error on prefaulted PTEs */
 		if (unlikely((ret & VM_FAULT_ERROR))) {
 			if (i == 0) {
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__)
 				VM_OBJECT_WUNLOCK(vma->vm_obj);
 #endif
 				return VM_FAULT_NOPAGE;
@@ -293,7 +297,7 @@ vm_fault_t ttm_bo_vm_fault_reserved(struct vm_fault *vmf,
 		if (unlikely(++page_offset >= page_last))
 			break;
 	}
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__)
 	VM_OBJECT_WUNLOCK(vma->vm_obj);
 #endif
 	return ret;
