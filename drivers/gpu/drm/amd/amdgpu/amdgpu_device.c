@@ -4557,7 +4557,8 @@ void amdgpu_device_fini_hw(struct amdgpu_device *adev)
 	amdgpu_ras_pre_fini(adev);
 
 #ifdef __FreeBSD__
-	unregister_fictitious_range(adev->gmc.aper_base, adev->gmc.aper_size);
+	if (adev->gmc.aper_size > 0)
+		unregister_fictitious_range(adev->gmc.aper_base, adev->gmc.aper_size);
 #endif
 
 	amdgpu_ttm_set_buffer_funcs_status(adev, false);
