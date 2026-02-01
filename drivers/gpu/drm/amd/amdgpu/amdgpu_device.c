@@ -4343,7 +4343,7 @@ fence_driver_init:
 	 * values passed to register_fictitious_range() below are unavailable
 	 * from a generic structure set by both drivers.
 	 */
-	register_fictitious_range(adev->gmc.aper_base, adev->gmc.aper_size);
+	register_fictitious_range(ddev, adev->gmc.aper_base, adev->gmc.aper_size);
 #endif
 
 	amdgpu_fence_driver_hw_init(adev);
@@ -4557,7 +4557,7 @@ void amdgpu_device_fini_hw(struct amdgpu_device *adev)
 	amdgpu_ras_pre_fini(adev);
 
 #ifdef __FreeBSD__
-	unregister_fictitious_range(adev->gmc.aper_base, adev->gmc.aper_size);
+	unregister_fictitious_range(adev_to_drm(adev), adev->gmc.aper_base, adev->gmc.aper_size);
 #endif
 
 	amdgpu_ttm_set_buffer_funcs_status(adev, false);

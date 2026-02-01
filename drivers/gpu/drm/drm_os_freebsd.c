@@ -2,6 +2,7 @@
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
+#include <drm/drm_device.h>
 #include <drm/drm_file.h>
 #include <drm/drm_ioctl.h>
 #include <drm/drm_print.h>
@@ -78,7 +79,7 @@ sysctl_pci_id(SYSCTL_HANDLER_ARGS)
 }
 
 int
-register_fictitious_range(vm_paddr_t base, size_t size)
+register_fictitious_range(struct drm_device *ddev, vm_paddr_t base, size_t size)
 {
 	int ret;
 	struct apertures_struct *ap;
@@ -101,14 +102,18 @@ register_fictitious_range(vm_paddr_t base, size_t size)
 	    );
 	MPASS(ret == 0);
 
+	ddev->fictitious_range_registered = true;
+
 	return (ret);
 }
 
 void
-unregister_fictitious_range(vm_paddr_t base, size_t size)
+unregister_fictitious_range(struct drm_device *ddev, vm_paddr_t base, size_t size)
 {
-	vm_phys_fictitious_unreg_range(base, base + size);
-	vt_unfreeze_main_vd();
+	if (ddev->fictitious_range_registered) {
+		vm_phys_fictitious_unreg_range(base, base + size);
+		vt_unfreeze_main_vd();
+	}
 }
 
 /* Framebuffer related code */

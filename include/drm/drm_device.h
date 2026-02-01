@@ -310,6 +310,7 @@ struct drm_device {
 	void *sysctl_private;
 	char busid_str[128];
 	int modesetting;
+	bool fictitious_range_registered;
 /* FIXME: Should be defined in linux/mmzone.h and include linux/mmzone.h in the
  * correct headers, such as gfp.h. */
 #define	MAX_ORDER 11

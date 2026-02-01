@@ -179,7 +179,7 @@ static void radeon_fbdev_fb_destroy(struct fb_info *info)
 
 #ifdef __FreeBSD__
 	struct radeon_device *rdev = fb_helper->dev->dev_private;
-	unregister_fictitious_range(rdev->mc.aper_base, rdev->mc.aper_size);
+	unregister_fictitious_range(fb_helper->dev, rdev->mc.aper_base, rdev->mc.aper_size);
 #endif
 
 	drm_fb_helper_fini(fb_helper);
@@ -288,7 +288,7 @@ static int radeon_fbdev_fb_helper_fb_probe(struct drm_fb_helper *fb_helper,
 	 * values passed to register_fictitious_range() below are unavailable
 	 * from a generic structure set by both drivers.
 	 */
-	register_fictitious_range(rdev->mc.aper_base, rdev->mc.aper_size);
+	register_fictitious_range(fb_helper->dev, rdev->mc.aper_base, rdev->mc.aper_size);
 #endif
 
 	/* Use default scratch pixmap (info->pixmap.flags = FB_PIXMAP_SYSTEM) */
