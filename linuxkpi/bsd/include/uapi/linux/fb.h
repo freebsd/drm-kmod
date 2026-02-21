@@ -27,7 +27,11 @@
 #ifndef _BSD_LKPI_UAPI_LINUX_FB_H_
 #define	_BSD_LKPI_UAPI_LINUX_FB_H_
 
+#include <sys/fbio.h>
+
 #include <linux/types.h>
+#include <linux/fs.h>
+#include <linux/pci.h>
 
 #define	FB_ROTATE_UR	0
 #define	FB_ROTATE_CW	1
@@ -55,6 +59,12 @@
 #define FB_VISUAL_FOURCC		6
 
 #define FB_ACCEL_NONE		0
+
+#define	FBINFO_DEFAULT		0
+#define	FBINFO_VIRTFB		1
+#define	FBINFO_READS_FAST	2
+
+#define FBINFO_HIDE_SMEM_START  0x200000
 
 struct linux_fb_info;
 struct vm_area_struct;
@@ -214,6 +224,74 @@ struct fb_cursor {
 	struct fb_image	image;
 };
 
+struct fb_blit_caps {
+	uint32_t x;
+	uint32_t y;
+	uint32_t len;
+	uint32_t flags;
+};
+
+struct fb_ops {
+	struct module *owner;
+	int (*fb_open)(struct linux_fb_info *, int);
+	int (*fb_release)(struct linux_fb_info *, int);
+	ssize_t (*fb_read)(struct linux_fb_info *, char *, size_t, loff_t *);
+	ssize_t (*fb_write)(struct linux_fb_info *, const char *, size_t, loff_t *);
+	int (*fb_check_var)(struct fb_var_screeninfo *, struct linux_fb_info *);
+	int (*fb_set_par)(struct linux_fb_info *);
+	int (*fb_setcolreg)(unsigned, unsigned, unsigned, unsigned, unsigned,
+	    struct linux_fb_info *);
+	int (*fb_setcmap)(struct fb_cmap *, struct linux_fb_info *);
+	int (*fb_blank)(int, struct linux_fb_info *);
+	int (*fb_pan_display)(struct fb_var_screeninfo *, struct linux_fb_info *);
+	void (*fb_fillrect) (struct linux_fb_info *, const struct fb_fillrect *);
+	void (*fb_copyarea) (struct linux_fb_info *, const struct fb_copyarea *);
+	void (*fb_imageblit) (struct linux_fb_info *, const struct fb_image *);
+	int (*fb_cursor) (struct linux_fb_info *, struct fb_cursor *);
+	int (*fb_sync)(struct linux_fb_info *);
+	int (*fb_ioctl)(struct linux_fb_info *, unsigned int, unsigned long);
+	int (*fb_compat_ioctl)(struct linux_fb_info *, unsigned, unsigned long);
+	int (*fb_mmap)(struct linux_fb_info *, struct vm_area_struct *);
+	void (*fb_get_caps)(struct linux_fb_info *, struct fb_blit_caps *,
+	    struct fb_var_screeninfo *);
+	void (*fb_destroy)(struct linux_fb_info *);
+	int (*fb_debug_enter)(struct linux_fb_info *);
+	int (*fb_debug_leave)(struct linux_fb_info *);
+};
+
+struct linux_fb_info {
+	int flags;
+	int fbcon_rotate_hint;
+
+	struct fb_var_screeninfo var;
+	struct fb_fix_screeninfo fix;
+
+	const struct fb_ops *fbops;
+	struct device *device;
+	struct device *dev;
+	union {
+		char __iomem *screen_base;
+		char *screen_buffer;
+	};
+	unsigned long screen_size;
+	void *pseudo_palette;
+#define FBINFO_STATE_RUNNING	0
+#define FBINFO_STATE_SUSPENDED	1
+	uint32_t state;
+	void *par;
+	bool skip_vt_switch;
+
+#ifdef __FreeBSD__
+	struct fb_info fbio;
+	device_t fb_bsddev;
+	struct task fb_mode_task;
+
+	/* i915 fictitious pages area */
+	resource_size_t aperture_base;
+	resource_size_t aperture_size;
+#endif
+} __aligned(sizeof(long));
+
 #define __FB_DEFAULT_IOMEM_OPS_RDWR \
 	.fb_read	= fb_io_read, \
 	.fb_write	= fb_io_write
@@ -312,5 +390,18 @@ fb_sys_write(struct linux_fb_info *info, const char __user *buf, size_t count,
 {
 	return (fb_io_write(info, buf, count, ppos));
 }
+
+int linux_register_framebuffer(struct linux_fb_info *fb_info);
+int linux_unregister_framebuffer(struct linux_fb_info *fb_info);
+int remove_conflicting_framebuffers(resource_size_t base, resource_size_t size,
+	const char *name, bool primary);
+int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name);
+struct linux_fb_info *framebuffer_alloc(size_t size, struct device *dev);
+void framebuffer_release(struct linux_fb_info *info);
+#define	fb_set_suspend(x, y)	0
+
+/* updated FreeBSD fb_info */
+int linux_fb_get_options(const char *name, char **option);
+#define	fb_get_options	linux_fb_get_options
 
 #endif
