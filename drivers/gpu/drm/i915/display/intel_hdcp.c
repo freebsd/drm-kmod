@@ -2279,6 +2279,15 @@ static int initialize_hdcp_port_data(struct intel_connector *connector,
 
 static bool is_hdcp2_supported(struct drm_i915_private *i915)
 {
+#ifdef __FreeBSD__
+	/*
+	 * HDCP is not supported on meteorlake because it requires
+	 * GSC which depends on the MEI driver, which we do not have.
+	 */
+	if (!IS_ENABLED(CONFIG_INTEL_MEI_HDCP))
+		return false;
+#endif
+
 	if (intel_hdcp_gsc_cs_required(i915))
 		return true;
 
