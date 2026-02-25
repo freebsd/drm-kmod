@@ -1229,7 +1229,22 @@ static int gen8_gmch_probe(struct i915_ggtt *ggtt)
 	unsigned int size;
 	u16 snb_gmch_ctl;
 
+#ifdef __linux__
 	if (!HAS_LMEM(i915) && !HAS_LMEMBAR_SMEM_STOLEN(i915)) {
+#elif defined(__FreeBSD__)
+	/*
+	 * We need to initialize GMADR on freebsd in order to use shmem
+	 * framebuffers. We are falling back to shmem framebuffers on freebsd
+	 * because the Wa_22018444074 mtl hardware workaround disabled using stolen
+	 * memory on mtl. Unlike on linux, when this happens we end up passing an
+	 * invalid phys address to register_fictitious_range which causes a panic.
+	 * Because GMADR is not valid we end up with a value such as 0x2000 instead
+	 * of a valid pointer.
+	 * MTL has LMEMBAR for stolen but still needs GMADR for shmem objects.
+	 */
+	if ((!HAS_LMEM(i915) && !HAS_LMEMBAR_SMEM_STOLEN(i915))
+			|| HAS_LMEMBAR_SMEM_STOLEN(i915)) {
+#endif
 		if (!i915_pci_resource_valid(pdev, GEN4_GMADR_BAR))
 			return -ENXIO;
 
