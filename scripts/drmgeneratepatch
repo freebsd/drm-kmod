@@ -47,6 +47,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     drivers/video/hdmi.c \
     include/drm/*.h \
     include/drm/display/ \
+    include/drm/intel/ \
     include/drm/ttm/ \
     include/uapi/drm/*.h \
     include/linux/aperture.h \
