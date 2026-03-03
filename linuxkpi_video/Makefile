@@ -39,7 +39,6 @@ CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=ttm_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 CWARNFLAGS.hdmi.c=	-Wno-cast-qual
-CWARNFLAGS.linux_fb.c=	-Wno-unused-variable -Wno-format
 
 EXPORT_SYMS=    YES
 

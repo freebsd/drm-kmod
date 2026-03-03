@@ -55,8 +55,6 @@ static void
 vt_freeze_main_vd(unsigned long base, unsigned long size)
 {
 	struct fb_info *fb;
-	int i;
-	bool overlap = false;
 
 	if (main_vd && main_vd->vd_driver && main_vd->vd_softc &&
 	    /* For these, we know the softc (or its first field) is of type fb_info */
@@ -100,7 +98,7 @@ fb_info_print(struct linux_fb_info *info)
 	printf("height=%d width=%d depth=%d\n",
 	       info->var.yres, info->var.xres, info->var.bits_per_pixel);
 	printf("pbase=0x%lx vbase=0x%lx\n",
-	       info->fix.smem_start, info->screen_base);
+	       info->fix.smem_start, (unsigned long)info->screen_base);
 	printf("name=%s id=%s flags=0x%x stride=%d\n",
 	       info->fbio.fb_name, info->fix.id, info->fbio.fb_flags,
 	       info->fix.line_length);
@@ -150,7 +148,6 @@ linuxkpi_remove_conflicting_pci_framebuffers(struct pci_dev *pdev,
     const char *name)
 {
 	unsigned long base, size;
-	bool primary = false;
 	int bar;
 
 	sx_xlock(&linux_fb_mtx);
@@ -169,7 +166,7 @@ linuxkpi_remove_conflicting_pci_framebuffers(struct pci_dev *pdev,
 static int
 __register_framebuffer(struct linux_fb_info *fb_info)
 {
-	int i, err;
+	int err;
 
 	MPASS(fb_info->aperture_base != 0);
 	MPASS(fb_info->aperture_size != 0);
@@ -243,8 +240,6 @@ linuxkpi_register_framebuffer(struct linux_fb_info *fb_info)
 static int
 __unregister_framebuffer(struct linux_fb_info *fb_info)
 {
-	int ret = 0;
-
 	vt_drmfb_detach(&fb_info->fbio);
 
 	if (fb_info->fbio.fb_fbd_dev) {
