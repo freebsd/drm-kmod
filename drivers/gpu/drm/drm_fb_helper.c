@@ -45,11 +45,6 @@
 
 #include "drm_internal.h"
 
-#ifdef __FreeBSD__
-#define register_framebuffer linux_register_framebuffer
-#define unregister_framebuffer linux_unregister_framebuffer
-#endif
-
 static bool drm_fbdev_emulation = true;
 module_param_named(fbdev_emulation, drm_fbdev_emulation, bool, 0600);
 MODULE_PARM_DESC(fbdev_emulation,

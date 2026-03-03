@@ -110,7 +110,7 @@ fb_info_print(struct linux_fb_info *info)
 CTASSERT((sizeof(struct linux_fb_info) % sizeof(long)) == 0);
 
 struct linux_fb_info *
-framebuffer_alloc(size_t size, struct device *dev)
+linuxkpi_framebuffer_alloc(size_t size, struct device *dev)
 {
 	struct linux_fb_info *info;
 
@@ -126,7 +126,7 @@ framebuffer_alloc(size_t size, struct device *dev)
 }
 
 void
-framebuffer_release(struct linux_fb_info *info)
+linuxkpi_framebuffer_release(struct linux_fb_info *info)
 {
 	if (info == NULL)
 		return;
@@ -134,8 +134,8 @@ framebuffer_release(struct linux_fb_info *info)
 }
 
 int
-remove_conflicting_framebuffers(resource_size_t base, resource_size_t size,
-				const char *name, bool primary)
+linuxkpi_remove_conflicting_framebuffers(resource_size_t base,
+    resource_size_t size, const char *name, bool primary)
 {
 
 	sx_xlock(&linux_fb_mtx);
@@ -146,7 +146,8 @@ remove_conflicting_framebuffers(resource_size_t base, resource_size_t size,
 
 #define	PCI_STD_NUM_BARS	6
 int
-remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
+linuxkpi_remove_conflicting_pci_framebuffers(struct pci_dev *pdev,
+    const char *name)
 {
 	unsigned long base, size;
 	bool primary = false;
@@ -229,7 +230,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 }
 
 int
-linux_register_framebuffer(struct linux_fb_info *fb_info)
+linuxkpi_register_framebuffer(struct linux_fb_info *fb_info)
 {
 	int rc;
 
@@ -265,7 +266,7 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 }
 
 int
-linux_unregister_framebuffer(struct linux_fb_info *fb_info)
+linuxkpi_unregister_framebuffer(struct linux_fb_info *fb_info)
 {
 	int rc;
 
@@ -276,7 +277,7 @@ linux_unregister_framebuffer(struct linux_fb_info *fb_info)
 }
 
 int
-linux_fb_get_options(const char *connector_name, char **option)
+linuxkpi_fb_get_options(const char *connector_name, char **option)
 {
 	*option = __DECONST(char *, video_get_options(connector_name));
 	return (*option != NULL ? 0 : -ENOENT);
@@ -350,7 +351,8 @@ fb_setpixel(struct linux_fb_info *info, uint32_t x, uint32_t y,
 }
 
 void
-cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
+linuxkpi_cfb_fillrect(struct linux_fb_info *info,
+    const struct fb_fillrect *rect)
 {
 	uint32_t x, y;
 
@@ -369,13 +371,15 @@ cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
 }
 
 void
-cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area)
+linuxkpi_cfb_copyarea(struct linux_fb_info *info,
+    const struct fb_copyarea *area)
 {
 	panic("cfb_copyarea() not implemented");
 }
 
 void
-cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
+linuxkpi_cfb_imageblit(struct linux_fb_info *info,
+    const struct fb_image *image)
 {
 	uint32_t x, y, width, height, xi, yi;
 	uint32_t bytes_per_img_line, bit, byte, color, line;
@@ -434,7 +438,7 @@ cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 }
 
 ssize_t
-fb_io_read(struct linux_fb_info *info, char __user *buf,
+linuxkpi_fb_io_read(struct linux_fb_info *info, char __user *buf,
     size_t count, loff_t *ppos)
 {
 	panic("fb_io_read() not implemented");
@@ -442,7 +446,7 @@ fb_io_read(struct linux_fb_info *info, char __user *buf,
 }
 
 ssize_t
-fb_io_write(struct linux_fb_info *info, const char __user *buf,
+linuxkpi_fb_io_write(struct linux_fb_info *info, const char __user *buf,
     size_t count, loff_t *ppos)
 {
 	panic("fb_io_write() not implemented");
@@ -450,7 +454,8 @@ fb_io_write(struct linux_fb_info *info, const char __user *buf,
 }
 
 int
-fb_deferred_io_mmap(struct linux_fb_info *info, struct vm_area_struct *vma)
+linuxkpi_fb_deferred_io_mmap(struct linux_fb_info *info,
+    struct vm_area_struct *vma)
 {
 	panic("fb_deferred_io_mmap() not implemented");
 	return (0);
