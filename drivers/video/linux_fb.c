@@ -39,6 +39,7 @@
 #include <vm/vm.h>
 #include <vm/vm_phys.h>
 
+#include <linux/aperture.h>
 #include <linux/fb.h>
 #include <video/cmdline.h>
 
@@ -132,8 +133,8 @@ linuxkpi_framebuffer_release(struct linux_fb_info *info)
 }
 
 int
-linuxkpi_remove_conflicting_framebuffers(resource_size_t base,
-    resource_size_t size, const char *name, bool primary)
+aperture_remove_conflicting_devices(resource_size_t base,
+    resource_size_t size, const char *name)
 {
 
 	sx_xlock(&linux_fb_mtx);
@@ -144,7 +145,7 @@ linuxkpi_remove_conflicting_framebuffers(resource_size_t base,
 
 #define	PCI_STD_NUM_BARS	6
 int
-linuxkpi_remove_conflicting_pci_framebuffers(struct pci_dev *pdev,
+aperture_remove_conflicting_pci_devices(struct pci_dev *pdev,
     const char *name)
 {
 	unsigned long base, size;

@@ -406,14 +406,6 @@ int linuxkpi_register_framebuffer(struct linux_fb_info *fb_info);
 int linuxkpi_unregister_framebuffer(struct linux_fb_info *fb_info);
 #define	unregister_framebuffer(...)	\
     linuxkpi_unregister_framebuffer(__VA_ARGS__)
-int linuxkpi_remove_conflicting_framebuffers(resource_size_t base,
-    resource_size_t size, const char *name, bool primary);
-#define	remove_conflicting_framebuffers(...)	\
-    linuxkpi_remove_conflicting_framebuffers(__VA_ARGS__)
-int linuxkpi_remove_conflicting_pci_framebuffers(struct pci_dev *pdev,
-    const char *name);
-#define	remove_conflicting_pci_framebuffers(...)	\
-    linuxkpi_remove_conflicting_pci_framebuffers(__VA_ARGS__)
 struct linux_fb_info *linuxkpi_framebuffer_alloc(size_t size, struct device *dev);
 #define	framebuffer_alloc(...)	linuxkpi_framebuffer_alloc(__VA_ARGS__)
 void linuxkpi_framebuffer_release(struct linux_fb_info *info);
