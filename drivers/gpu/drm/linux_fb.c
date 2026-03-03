@@ -51,7 +51,7 @@ extern struct vt_device *main_vd;
 
 static int __unregister_framebuffer(struct linux_fb_info *fb_info);
 
-void
+static void
 vt_freeze_main_vd(unsigned long base, unsigned long size)
 {
 	struct fb_info *fb;
@@ -73,7 +73,7 @@ vt_freeze_main_vd(unsigned long base, unsigned long size)
 	}
 }
 
-void
+static void
 vt_unfreeze_main_vd(void)
 {
 	struct fb_info *fb;
@@ -93,7 +93,7 @@ vt_restore_fbdev_mode(void *arg, int pending)
 	info->fbops->fb_set_par(info);
 }
 
-void
+static void
 fb_info_print(struct linux_fb_info *info)
 {
 	printf("start FB_INFO:\n");
