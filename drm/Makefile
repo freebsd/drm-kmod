@@ -65,9 +65,7 @@ SRCS=	drm_atomic.c \
 	drm_sysfs.c \
 	drm_vblank.c \
 	drm_vblank_work.c \
-	drm_vma_manager.c \
-	linux_fb.c \
-	vt_drmfb.c
+	drm_vma_manager.c
 
 # GPL-2.0.
 SRCS+=	drm_writeback.c
@@ -142,6 +140,7 @@ CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm
 CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H}
+CFLAGS+= -I${.CURDIR:H}/drivers/video
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_' -DDRM_SYSCTL_PARAM_PREFIX=_dri
