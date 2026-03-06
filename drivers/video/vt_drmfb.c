@@ -90,8 +90,10 @@ static struct vt_driver vt_drmfb_driver = {
 	.vd_invalidate_text = vt_drmfb_invalidate_text,
 	.vd_postswitch = vt_drmfb_postswitch,
 	.vd_priority = VD_PRIORITY_GENERIC+20,
-	.vd_suspend = vt_drmfb_suspend,
-	.vd_resume = vt_drmfb_resume,
+
+	/* Use generic implementation */
+	.vd_suspend = vt_suspend,
+	.vd_resume = vt_resume,
 
 	/* Use vt_fb implementation */
 	.vd_fb_ioctl = vt_fb_ioctl,
@@ -403,16 +405,4 @@ vt_drmfb_detach(struct fb_info *fbio)
 	ret = vt_deallocate(&vt_drmfb_driver, fbio);
 
 	return (ret);
-}
-
-void
-vt_drmfb_suspend(struct vt_device *vd)
-{
-	vt_suspend(vd);
-}
-
-void
-vt_drmfb_resume(struct vt_device *vd)
-{
-	vt_resume(vd);
 }
