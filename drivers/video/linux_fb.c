@@ -169,19 +169,19 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 {
 	int err;
 
-	MPASS(fb_info->aperture_base != 0);
-	MPASS(fb_info->aperture_size != 0);
-
 	vt_freeze_main_vd(fb_info->aperture_base, fb_info->aperture_size);
 
-	err = vm_phys_fictitious_reg_range(fb_info->aperture_base,
-	    fb_info->aperture_base + fb_info->aperture_size,
+	if (fb_info->aperture_base != 0 && fb_info->aperture_size != 0) {
+		err = vm_phys_fictitious_reg_range(fb_info->aperture_base,
+		    fb_info->aperture_base + fb_info->aperture_size,
 #ifdef VM_MEMATTR_WRITE_COMBINING
-	    VM_MEMATTR_WRITE_COMBINING);
+		    VM_MEMATTR_WRITE_COMBINING);
 #else
-	    VM_MEMATTR_UNCACHEABLE);
+		    VM_MEMATTR_UNCACHEABLE);
 #endif
-	MPASS(err == 0);
+		MPASS(err == 0);
+	} else
+		device_printf(fb_info->fb_bsddev, "Aperture undefined\n");
 
 	fb_info->fbio.fb_video_dev = device_get_parent(fb_info->fb_bsddev);
 	fb_info->fbio.fb_name = device_get_nameunit(fb_info->fb_bsddev);
@@ -250,8 +250,9 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 		fb_info->fbio.fb_fbd_dev = NULL;
 	}
 
-	vm_phys_fictitious_unreg_range(fb_info->aperture_base,
-	    fb_info->aperture_base + fb_info->aperture_size);
+	if (fb_info->aperture_base != 0 && fb_info->aperture_size != 0)
+		vm_phys_fictitious_unreg_range(fb_info->aperture_base,
+		    fb_info->aperture_base + fb_info->aperture_size);
 
 	if (fb_info->fbops->fb_destroy)
 		fb_info->fbops->fb_destroy(fb_info);
