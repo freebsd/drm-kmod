@@ -388,7 +388,7 @@ vt_drmfb_fini(struct vt_device *vd, void *softc)
 }
 
 int
-vt_drmfb_attach(struct fb_info *fbio)
+lkpi_vt_drmfb_attach(struct fb_info *fbio)
 {
 	int ret;
 
@@ -398,7 +398,7 @@ vt_drmfb_attach(struct fb_info *fbio)
 }
 
 int
-vt_drmfb_detach(struct fb_info *fbio)
+lkpi_vt_drmfb_detach(struct fb_info *fbio)
 {
 	int ret;
 

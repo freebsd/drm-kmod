@@ -39,7 +39,7 @@
 struct fb_info;
 
 /* Generic framebuffer interface call vt_drmfb_attach to init VT(9) */
-int vt_drmfb_attach(struct fb_info *info);
-int vt_drmfb_detach(struct fb_info *info);
+int lkpi_vt_drmfb_attach(struct fb_info *info);
+int lkpi_vt_drmfb_detach(struct fb_info *info);
 
 #endif /* _DEV_VT_HW_FB_VT_DRMFB_H_ */

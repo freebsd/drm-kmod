@@ -207,7 +207,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 		    "fb_bpp not set, setting to 8\n");
 		fb_info->fbio.fb_bpp = 32;
 	}
-	if ((err = vt_drmfb_attach(&fb_info->fbio)) != 0) {
+	if ((err = lkpi_vt_drmfb_attach(&fb_info->fbio)) != 0) {
 		switch (err) {
 		case EEXIST:
 			device_printf(fb_info->fbio.fb_fbd_dev,
@@ -241,7 +241,7 @@ linuxkpi_register_framebuffer(struct linux_fb_info *fb_info)
 static int
 __unregister_framebuffer(struct linux_fb_info *fb_info)
 {
-	vt_drmfb_detach(&fb_info->fbio);
+	lkpi_vt_drmfb_detach(&fb_info->fbio);
 
 	if (fb_info->fbio.fb_fbd_dev) {
 		mtx_lock(&Giant);
