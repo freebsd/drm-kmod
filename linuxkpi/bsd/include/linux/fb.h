@@ -69,6 +69,10 @@
 struct linux_fb_info;
 struct vm_area_struct;
 
+#ifdef __FreeBSD__
+extern int linuxkpi_skip_ddb;
+#endif
+
 struct fb_fix_screeninfo {
 	char id[16];
 #ifdef __linux__

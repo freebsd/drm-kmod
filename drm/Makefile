@@ -140,7 +140,6 @@ CFLAGS+= -I${.CURDIR:H}/include
 CFLAGS+= -I${.CURDIR:H}/include/drm
 CFLAGS+= -I${.CURDIR:H}/include/uapi
 CFLAGS+= -I${SRCDIR:H}
-CFLAGS+= -I${.CURDIR:H}/drivers/video
 
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_' -DDRM_SYSCTL_PARAM_PREFIX=_dri
