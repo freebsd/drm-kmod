@@ -1237,6 +1237,26 @@ static int gen8_gmch_probe(struct i915_ggtt *ggtt)
 		ggtt->gmadr = pci_resource(pdev, GEN4_GMADR_BAR);
 		ggtt->mappable_end = resource_size(&ggtt->gmadr);
 	}
+#ifdef __FreeBSD__
+	/*
+	 * We need to initialize GMADR on freebsd in order to use shmem
+	 * framebuffers. We are falling back to shmem framebuffers on freebsd
+	 * because the Wa_22018444074 mtl hardware workaround disabled using stolen
+	 * memory on mtl. Unlike on linux, when this happens we end up passing an
+	 * invalid phys address to register_fictitious_range which causes a panic.
+	 * Because GMADR is not valid we end up with a value such as 0x2000 instead
+	 * of a valid pointer.
+	 */
+	else if (HAS_LMEMBAR_SMEM_STOLEN(i915)) {
+		/* MTL has LMEMBAR for stolen but still needs GMADR for shmem objects */
+		if (i915_pci_resource_valid(pdev, GEN4_GMADR_BAR)) {
+			ggtt->gmadr = pci_resource(pdev, GEN4_GMADR_BAR);
+			ggtt->mappable_end = resource_size(&ggtt->gmadr);
+			drm_dbg(&i915->drm, "GMADR: %pR (size %lluM)\n",
+					&ggtt->gmadr, resource_size(&ggtt->gmadr) >> 20);
+		}
+	}
+#endif
 
 	pci_read_config_word(pdev, SNB_GMCH_CTRL, &snb_gmch_ctl);
 	if (IS_CHERRYVIEW(i915))
