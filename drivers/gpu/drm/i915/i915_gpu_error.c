@@ -154,7 +154,6 @@ static void i915_error_vprintf(struct drm_i915_error_state_buf *e,
 	e->bytes += len;
 }
 
-#ifdef __linux__
 static void i915_error_puts(struct drm_i915_error_state_buf *e, const char *str)
 {
 	unsigned len;
@@ -170,7 +169,6 @@ static void i915_error_puts(struct drm_i915_error_state_buf *e, const char *str)
 	memcpy(e->buf + e->bytes, str, len);
 	e->bytes += len;
 }
-#endif
 
 #define err_printf(e, ...) i915_error_printf(e, __VA_ARGS__)
 #define err_puts(e, s) i915_error_puts(e, s)
@@ -440,12 +438,10 @@ static void compress_fini(struct i915_vma_compress *c)
 	pool_fini(&c->pool);
 }
 
-#ifdef __linux__
 static void err_compression_marker(struct drm_i915_error_state_buf *m)
 {
 	err_puts(m, "~");
 }
-#endif
 
 #endif
 
@@ -627,7 +623,6 @@ static void intel_gpu_error_print_vma(struct drm_i915_error_state_buf *m,
 				      const struct intel_engine_cs *engine,
 				      const struct i915_vma_coredump *vma)
 {
-#ifdef __linux__		/* XXX-BZ why linux-only? */
 	char out[ASCII85_BUFSZ];
 	struct page *page;
 
@@ -664,7 +659,6 @@ static void intel_gpu_error_print_vma(struct drm_i915_error_state_buf *m,
 			err_puts(m, ascii85_encode(addr[i], out));
 	}
 	err_puts(m, "\n");
-#endif
 }
 
 static void err_print_capabilities(struct drm_i915_error_state_buf *m,
