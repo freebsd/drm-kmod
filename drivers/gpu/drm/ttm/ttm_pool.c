@@ -98,7 +98,7 @@ static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
 
 	if (!pool->use_dma_alloc) {
 		p = alloc_pages_node(pool->nid, gfp_flags, order);
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 		if (p)
 			p->private = order;
 #endif
@@ -249,12 +249,19 @@ static void ttm_pool_type_give(struct ttm_pool_type *pt, struct page *p)
 		else
 			clear_page(page_address(p + i));
 #elif defined(__FreeBSD__)
+#ifdef PAGE_IS_LKPI_PAGE
+		struct page *pp;
+
+		pp = p + i;
+		pmap_zero_page(pp->vm_page);
+#else
 		pmap_zero_page(p + i);
+#endif
 #endif
 	}
 
 	spin_lock(&pt->lock);
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	list_add(&p->lru, &pt->pages);
 #elif defined(__FreeBSD__)
 	TAILQ_INSERT_HEAD(&pt->pages, p, plinks.q);
@@ -269,14 +276,14 @@ static struct page *ttm_pool_type_take(struct ttm_pool_type *pt)
 	struct page *p;
 
 	spin_lock(&pt->lock);
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	p = list_first_entry_or_null(&pt->pages, typeof(*p), lru);
 #elif defined(__FreeBSD__)
 	p = TAILQ_FIRST(&pt->pages);
 #endif
 	if (p) {
 		atomic_long_sub(1 << pt->order, &allocated_pages);
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 		list_del(&p->lru);
 #elif defined(__FreeBSD__)
 		TAILQ_REMOVE(&pt->pages, p, plinks.q);
@@ -295,7 +302,7 @@ static void ttm_pool_type_init(struct ttm_pool_type *pt, struct ttm_pool *pool,
 	pt->caching = caching;
 	pt->order = order;
 	spin_lock_init(&pt->lock);
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	INIT_LIST_HEAD(&pt->pages);
 #elif defined(__FreeBSD__)
 	TAILQ_INIT(&pt->pages);
@@ -378,7 +385,7 @@ static unsigned int ttm_pool_shrink(void)
 	return num_pages;
 }
 
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 /* Return the allocation order based for a page */
 static unsigned int ttm_pool_page_order(struct ttm_pool *pool, struct page *p)
 {
@@ -399,7 +406,7 @@ static unsigned int ttm_pool_page_order(struct ttm_pool *pool, struct page *p)
 static int ttm_pool_page_allocated(struct ttm_pool *pool, unsigned int order,
 				   struct page *p, dma_addr_t **dma_addr,
 				   unsigned long *num_pages,
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 				   struct page ***pages)
 #elif defined(__FreeBSD__)
 				   struct page ***pages,
@@ -416,7 +423,7 @@ static int ttm_pool_page_allocated(struct ttm_pool *pool, unsigned int order,
 	}
 
 	*num_pages -= 1 << order;
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	for (i = 1 << order; i; --i, ++(*pages), ++p)
 		**pages = p;
 #elif defined(__FreeBSD__)
@@ -453,7 +460,7 @@ static void ttm_pool_free_range(struct ttm_pool *pool, struct ttm_tt *tt,
 	for (i = start_page; i < end_page; i += nr, pages += nr) {
 		struct ttm_pool_type *pt = NULL;
 
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 		order = ttm_pool_page_order(pool, *pages);
 #elif defined(__FreeBSD__)
 		order = tt->orders[i];
@@ -489,7 +496,7 @@ int ttm_pool_alloc(struct ttm_pool *pool, struct ttm_tt *tt,
 	dma_addr_t *dma_addr = tt->dma_address;
 	struct page **caching = tt->pages;
 	struct page **pages = tt->pages;
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) && !defined(PAGE_IS_LKPI_PAGE)
 	unsigned int *orders = tt->orders;
 #endif
 	enum ttm_caching page_caching;
@@ -529,7 +536,7 @@ int ttm_pool_alloc(struct ttm_pool *pool, struct ttm_tt *tt,
 
 			caching = pages;
 			do {
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 				r = ttm_pool_page_allocated(pool, order, p,
 							    &dma_addr,
 							    &num_pages,
@@ -563,7 +570,7 @@ int ttm_pool_alloc(struct ttm_pool *pool, struct ttm_tt *tt,
 					goto error_free_page;
 				caching = pages;
 			}
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 			r = ttm_pool_page_allocated(pool, order, p, &dma_addr,
 						    &num_pages, &pages);
 #elif defined(__FreeBSD__)
@@ -738,7 +745,7 @@ static unsigned int ttm_pool_type_count(struct ttm_pool_type *pt)
 
 	spin_lock(&pt->lock);
 	/* Only used for debugfs, the overhead doesn't matter */
-#ifdef __linux__
+#if defined(__linux__) || defined(PAGE_IS_LKPI_PAGE)
 	list_for_each_entry(p, &pt->pages, lru)
 		++count;
 #elif defined(__FreeBSD__)
