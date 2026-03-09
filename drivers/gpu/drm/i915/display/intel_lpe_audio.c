@@ -77,7 +77,7 @@
 
 #endif
 
-#include <drm/intel_lpe_audio.h>
+#include <drm/intel/intel_lpe_audio.h>
 
 #include "i915_drv.h"
 #include "i915_irq.h"

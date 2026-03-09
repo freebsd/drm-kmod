@@ -109,6 +109,7 @@ SRCS+=	dvo_ch7017.c \
 	i9xx_plane.c \
 	i9xx_wm.c \
 	icl_dsi.c \
+	intel_alpm.c \
 	intel_backlight.c \
 	intel_crt.c \
 	intel_crtc_state_dump.c \
@@ -139,6 +140,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_dsi_vbt.c \
 	intel_dsb.c \
 	intel_dsb_buffer.c \
+	intel_encoder.c \
 	intel_fb.c \
 	intel_fb_bo.c \
 	intel_fb_pin.c \

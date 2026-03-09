@@ -65,6 +65,16 @@ trace_intel_pipe_disable(struct intel_crtc *crtc)
 }
 
 static inline void
+trace_intel_crtc_flip_done(struct intel_crtc *crtc)
+{
+	CTR4(KTR_DRM,
+	    "intel_crtc_flip_done: dev %s, pipe %c, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe),
+	    intel_crtc_get_vblank_counter(crtc),
+	    intel_get_crtc_scanline(crtc));
+}
+
+static inline void
 trace_intel_pipe_crc(struct intel_crtc *crtc, const u32 *crcs)
 {
 	CTR4(KTR_DRM,
@@ -176,6 +186,17 @@ trace_vlv_fifo_size(struct intel_crtc *crtc, u32 sprite0_start, u32 sprite1_star
 	CTR3(KTR_DRM,
 	    "vlv_fifo_size[2/2]: %d/%d/%d",
 	    sprite0_start, sprite1_start, fifo_size);
+}
+
+static inline void
+trace_intel_plane_async_flip(struct intel_plane *plane, struct intel_crtc *crtc, bool async_flip)
+{
+	CTR6(KTR_DRM,
+	    "intel_plane_async_flip: dev %s, pipe %c, plane %s, frame=%u, scanline=%u, async_flip=%s",
+	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
+	    intel_crtc_get_vblank_counter(crtc),
+	    intel_get_crtc_scanline(crtc),
+	    str_yes_no(async_flip));
 }
 
 static inline void

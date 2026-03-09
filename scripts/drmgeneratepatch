@@ -47,6 +47,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     drivers/video/hdmi.c \
     include/drm/*.h \
     include/drm/display/ \
+    include/drm/intel/ \
     include/drm/ttm/ \
     include/uapi/drm/*.h \
     include/linux/aperture.h \
@@ -125,8 +126,6 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!include/drm/drm_writeback.h' \
     ':!include/drm/gma*' \
     ':!include/drm/drm_*vram*' \
-    ':!include/drm/i915_hdcp_interface.h' \
-    ':!include/drm/xe_pciids.h' \
     ':!include/uapi/drm/etnaviv*' \
     ':!include/uapi/drm/exynos_drm*' \
     ':!include/uapi/drm/habanalabs_accel.h' \

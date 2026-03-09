@@ -26,10 +26,16 @@ struct mipi_dsi_host {
 
 struct mipi_dsi_device {
 	struct mipi_dsi_host *host;
+	struct device dev;
 	bool attached;
 	uint32_t channel;
 	uint32_t mode_flags;
 #define MIPI_DSI_MODE_LPM	(1 << 0)
+};
+
+struct mipi_dsi_multi_context {
+	struct mipi_dsi_device	*dsi;
+	int			 accum_err;
 };
 
 struct mipi_dsi_msg {
