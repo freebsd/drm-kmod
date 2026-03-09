@@ -244,6 +244,7 @@ int devm_aperture_acquire_for_platform_device(struct platform_device *pdev,
 }
 EXPORT_SYMBOL(devm_aperture_acquire_for_platform_device);
 
+#ifdef __linux__
 static void aperture_detach_devices(resource_size_t base, resource_size_t size)
 {
 	resource_size_t end = base + size;
@@ -293,9 +294,7 @@ int aperture_remove_conflicting_devices(resource_size_t base, resource_size_t si
 	 * ask for this, so let's assume that a real driver for the display
 	 * was already probed and prevent sysfb to register devices later.
 	 */
-#ifdef __linux__
 	sysfb_disable();
-#endif
 
 	aperture_detach_devices(base, size);
 
@@ -330,11 +329,7 @@ int __aperture_remove_legacy_vga_devices(struct pci_dev *pdev)
 	aperture_detach_devices(VGA_FB_PHYS_BASE, VGA_FB_PHYS_SIZE);
 
 	/* VGA textmode console */
-#ifdef __linux__
 	return vga_remove_vgacon(pdev);
-#elif defined(__FreeBSD__)
-	return 0;
-#endif
 }
 EXPORT_SYMBOL(__aperture_remove_legacy_vga_devices);
 
@@ -356,13 +351,11 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 	resource_size_t base, size;
 	int bar, ret = 0;
 
-#ifdef __linux__
 	if (pdev == vga_default_device())
 		primary = true;
 
 	if (primary)
 		sysfb_disable();
-#endif
 
 	for (bar = 0; bar < PCI_STD_NUM_BARS; ++bar) {
 		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
@@ -384,4 +377,5 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 	return ret;
 
 }
+#endif
 EXPORT_SYMBOL(aperture_remove_conflicting_pci_devices);

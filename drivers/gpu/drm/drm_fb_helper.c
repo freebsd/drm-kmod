@@ -45,11 +45,6 @@
 
 #include "drm_internal.h"
 
-#ifdef __FreeBSD__
-#define register_framebuffer linux_register_framebuffer
-#define unregister_framebuffer linux_unregister_framebuffer
-#endif
-
 static bool drm_fbdev_emulation = true;
 module_param_named(fbdev_emulation, drm_fbdev_emulation, bool, 0600);
 MODULE_PARM_DESC(fbdev_emulation,
@@ -1896,15 +1891,17 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper)
 	info = fb_helper->info;
 	info->var.pixclock = 0;
 
-#ifdef __FreeBSD__
-	info->fbio.fb_priv = fb_helper;
-#endif
 
 	/* Need to drop locks to avoid recursive deadlock in
 	 * register_framebuffer. This is ok because the only thing left to do is
 	 * register the fbdev emulation instance in kernel_fb_helper_list. */
 	mutex_unlock(&fb_helper->lock);
 
+#ifdef __FreeBSD__
+	info->fb_bsddev = dev->dev->bsddev;
+	info->aperture_base = dev->aperture_base;
+	info->aperture_size = dev->aperture_size;
+#endif
 	ret = register_framebuffer(info);
 	if (ret < 0)
 		return ret;
