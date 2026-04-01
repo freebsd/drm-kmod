@@ -31,9 +31,6 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 #include <sys/reboot.h>
 #include <sys/fbio.h>
 #include <dev/vt/vt.h>
@@ -41,8 +38,6 @@ __FBSDID("$FreeBSD$");
 #include <dev/vt/colors/vt_termcolors.h>
 
 #include <linux/fb.h>
-
-#include <drm/drm_fb_helper.h>
 
 /*
  * `drm_fb_helper.h` redefines `fb_info` to be `linux_fb_info` to manage the
@@ -54,22 +49,25 @@ __FBSDID("$FreeBSD$");
  */
 #undef	fb_info
 
-#include <drm/drm_os_freebsd.h>
-
 #include "vt_drmfb.h"
 
-#define	to_drm_fb_helper(fbio) ((struct drm_fb_helper *)fbio->fb_priv)
-#define	to_linux_fb_info(fbio) (to_drm_fb_helper(fbio)->info)
+#define	to_linux_fb_info(f)	container_of(f, struct linux_fb_info, fbio);
 
-vd_init_t		vt_drmfb_init;
-vd_fini_t		vt_drmfb_fini;
-vd_blank_t		vt_drmfb_blank;
-vd_bitblt_bmp_t		vt_drmfb_bitblt_bitmap;
-vd_bitblt_argb_t	vt_drmfb_bitblt_argb;
-vd_drawrect_t		vt_drmfb_drawrect;
-vd_setpixel_t		vt_drmfb_setpixel;
-vd_invalidate_text_t	vt_drmfb_invalidate_text;
-vd_postswitch_t		vt_drmfb_postswitch;
+/*
+ * skip_ddb is controlled via sysctls in drm_os_freebsd.c in drm.ko
+ * TODO: Move these sysctl definitions here.
+ */
+int linuxkpi_skip_ddb = 0;
+
+static vd_init_t		vt_drmfb_init;
+static vd_fini_t		vt_drmfb_fini;
+static vd_blank_t		vt_drmfb_blank;
+static vd_bitblt_bmp_t		vt_drmfb_bitblt_bitmap;
+static vd_bitblt_argb_t		vt_drmfb_bitblt_argb;
+static vd_drawrect_t		vt_drmfb_drawrect;
+static vd_setpixel_t		vt_drmfb_setpixel;
+static vd_invalidate_text_t	vt_drmfb_invalidate_text;
+static vd_postswitch_t		vt_drmfb_postswitch;
 
 static struct vt_driver vt_drmfb_driver = {
 	.vd_name = "drmfb",
@@ -92,8 +90,10 @@ static struct vt_driver vt_drmfb_driver = {
 	.vd_invalidate_text = vt_drmfb_invalidate_text,
 	.vd_postswitch = vt_drmfb_postswitch,
 	.vd_priority = VD_PRIORITY_GENERIC+20,
-	.vd_suspend = vt_drmfb_suspend,
-	.vd_resume = vt_drmfb_resume,
+
+	/* Use generic implementation */
+	.vd_suspend = vt_suspend,
+	.vd_resume = vt_resume,
 
 	/* Use vt_fb implementation */
 	.vd_fb_ioctl = vt_fb_ioctl,
@@ -104,13 +104,13 @@ static struct vt_driver vt_drmfb_driver = {
 
 VT_DRIVER_DECLARE(vt_drmfb, vt_drmfb_driver);
 
-void
+static void
 vt_drmfb_setpixel(struct vt_device *vd, int x, int y, term_color_t color)
 {
 	vt_drmfb_drawrect(vd, x, y, x, y, 1, color);
 }
 
-void
+static void
 vt_drmfb_drawrect(
     struct vt_device *vd,
     int x1, int y1, int x2, int y2, int fill,
@@ -147,7 +147,7 @@ vt_drmfb_drawrect(
 	info->fbops->fb_fillrect(info, &rect);
 }
 
-void
+static void
 vt_drmfb_blank(struct vt_device *vd, term_color_t color)
 {
 	struct fb_info *fbio;
@@ -165,7 +165,7 @@ vt_drmfb_blank(struct vt_device *vd, term_color_t color)
 	vt_drmfb_drawrect(vd, x1, y1, x2, y2, 1, color);
 }
 
-void
+static void
 vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
     const uint8_t *pattern, const uint8_t *mask,
     unsigned int width, unsigned int height,
@@ -211,7 +211,7 @@ vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
 	info->fbops->fb_imageblit(info, &image);
 }
 
-int
+static int
 vt_drmfb_bitblt_argb(struct vt_device *vd, const struct vt_window *vw,
     const uint8_t *argb,
     unsigned int width, unsigned int height,
@@ -253,7 +253,7 @@ vt_drmfb_bitblt_argb(struct vt_device *vd, const struct vt_window *vw,
 	return (0);
 }
 
-void
+static void
 vt_drmfb_postswitch(struct vt_device *vd)
 {
 	struct fb_info *fbio;
@@ -274,7 +274,7 @@ vt_drmfb_postswitch(struct vt_device *vd)
 		db_trace_self_depth(10);
 		mdelay(1000);
 #endif
-		if (skip_ddb) {
+		if (linuxkpi_skip_ddb) {
 			spinlock_enter();
 			doadump(false);
 			EVENTHANDLER_INVOKE(shutdown_final, RB_NOSYNC);
@@ -290,7 +290,7 @@ vt_drmfb_postswitch(struct vt_device *vd)
 	}
 }
 
-void
+static void
 vt_drmfb_invalidate_text(struct vt_device *vd, const term_rect_t *area)
 {
 	unsigned int col, row;
@@ -338,7 +338,7 @@ vt_drmfb_init_colors(struct fb_info *info)
 	}
 }
 
-int
+static int
 vt_drmfb_init(struct vt_device *vd)
 {
 	struct fb_info *fbio;
@@ -381,14 +381,14 @@ vt_drmfb_init(struct vt_device *vd)
 	return (CN_INTERNAL);
 }
 
-void
+static void
 vt_drmfb_fini(struct vt_device *vd, void *softc)
 {
 	vd->vd_video_dev = NULL;
 }
 
 int
-vt_drmfb_attach(struct fb_info *fbio)
+lkpi_vt_drmfb_attach(struct fb_info *fbio)
 {
 	int ret;
 
@@ -398,23 +398,11 @@ vt_drmfb_attach(struct fb_info *fbio)
 }
 
 int
-vt_drmfb_detach(struct fb_info *fbio)
+lkpi_vt_drmfb_detach(struct fb_info *fbio)
 {
 	int ret;
 
 	ret = vt_deallocate(&vt_drmfb_driver, fbio);
 
 	return (ret);
-}
-
-void
-vt_drmfb_suspend(struct vt_device *vd)
-{
-	vt_suspend(vd);
-}
-
-void
-vt_drmfb_resume(struct vt_device *vd)
-{
-	vt_resume(vd);
 }

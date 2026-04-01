@@ -139,13 +139,6 @@ static void intel_fbdev_fb_destroy(struct fb_info *info)
 	struct drm_fb_helper *fb_helper = info->par;
 	struct intel_fbdev *ifbdev = container_of(fb_helper, struct intel_fbdev, helper);
 
-#ifdef __FreeBSD__
-	unregister_fictitious_range(
-		fb_helper->dev,
-		ifbdev->helper.info->fix.smem_start,
-		ifbdev->helper.info->fix.smem_len);
-#endif
-
 	drm_fb_helper_fini(&ifbdev->helper);
 
 	/*
@@ -268,11 +261,12 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	 * driver stopped setting them when it got rid of its specific
 	 * framebuffer initialization to use the generic drm_fb_helper code.
 	 *
-	 * We can't do this in register_framebuffer() anymore because the
-	 * values passed to register_fictitious_range() below are unavailable
-	 * from a generic structure set by both drivers.
+	 * To keep doing this in register_framebuffer() the values are passed
+	 * to register_fictitious_range() in additional FreeBSD-specific fields
+	 * of drm_driver structure.
 	 */
-	register_fictitious_range(dev, info->fix.smem_start, info->fix.smem_len);
+	dev->aperture_base = info->fix.smem_start;
+	dev->aperture_size = info->fix.smem_len;
 #endif
 
 	drm_fb_helper_fill_info(info, &ifbdev->helper, sizes);

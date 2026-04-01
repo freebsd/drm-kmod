@@ -24,11 +24,6 @@
  *
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
-#undef fb_info
-
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/kernel.h>
@@ -41,11 +36,12 @@ __FBSDID("$FreeBSD$");
 #include <dev/vt/vt.h>
 #include "vt_drmfb.h"
 
-#include <drm/drm_fb_helper.h>
+#include <vm/vm.h>
+#include <vm/vm_phys.h>
+
+#include <linux/aperture.h>
 #include <linux/fb.h>
 #include <video/cmdline.h>
-#undef fb_info
-#include <drm/drm_os_freebsd.h>
 
 MALLOC_DEFINE(LKPI_FB_MEM, "fb_kms", "FB KMS Data Structures");
 
@@ -56,12 +52,10 @@ extern struct vt_device *main_vd;
 
 static int __unregister_framebuffer(struct linux_fb_info *fb_info);
 
-void
-vt_freeze_main_vd(struct apertures_struct *a)
+static void
+vt_freeze_main_vd(unsigned long base, unsigned long size)
 {
 	struct fb_info *fb;
-	int i;
-	bool overlap = false;
 
 	if (main_vd && main_vd->vd_driver && main_vd->vd_softc &&
 	    /* For these, we know the softc (or its first field) is of type fb_info */
@@ -72,23 +66,13 @@ vt_freeze_main_vd(struct apertures_struct *a)
 	    || strcmp(main_vd->vd_driver->vd_name, "drmfb") == 0)) {
 		fb = main_vd->vd_softc;
 
-		for (i = 0; i < a->count; i++) {
-			if (fb->fb_pbase == a->ranges[i].base) {
-				overlap = true;
-				break;
-			}
-			if ((fb->fb_pbase > a->ranges[i].base) &&
-			    (fb->fb_pbase < (a->ranges[i].base + a->ranges[i].size))) {
-				overlap = true;
-				break;
-			}
-		}
-		if (overlap == true)
+		if (fb->fb_pbase == base ||
+		    ((fb->fb_pbase > base) && (fb->fb_pbase < (base + size))))
 			fb->fb_flags |= FB_FLAG_NOWRITE;
 	}
 }
 
-void
+static void
 vt_unfreeze_main_vd(void)
 {
 	struct fb_info *fb;
@@ -108,14 +92,14 @@ vt_restore_fbdev_mode(void *arg, int pending)
 	info->fbops->fb_set_par(info);
 }
 
-void
+static void
 fb_info_print(struct linux_fb_info *info)
 {
 	printf("start FB_INFO:\n");
 	printf("height=%d width=%d depth=%d\n",
 	       info->var.yres, info->var.xres, info->var.bits_per_pixel);
 	printf("pbase=0x%lx vbase=0x%lx\n",
-	       info->fix.smem_start, info->screen_base);
+	       info->fix.smem_start, (unsigned long)info->screen_base);
 	printf("name=%s id=%s flags=0x%x stride=%d\n",
 	       info->fbio.fb_name, info->fix.id, info->fbio.fb_flags,
 	       info->fix.line_length);
@@ -125,7 +109,7 @@ fb_info_print(struct linux_fb_info *info)
 CTASSERT((sizeof(struct linux_fb_info) % sizeof(long)) == 0);
 
 struct linux_fb_info *
-framebuffer_alloc(size_t size, struct device *dev)
+linuxkpi_framebuffer_alloc(size_t size, struct device *dev)
 {
 	struct linux_fb_info *info;
 
@@ -141,65 +125,64 @@ framebuffer_alloc(size_t size, struct device *dev)
 }
 
 void
-framebuffer_release(struct linux_fb_info *info)
+linuxkpi_framebuffer_release(struct linux_fb_info *info)
 {
 	if (info == NULL)
 		return;
-	kfree(info->apertures);
 	free(info, LKPI_FB_MEM);
 }
 
 int
-remove_conflicting_framebuffers(struct apertures_struct *a,
-				const char *name, bool primary)
+aperture_remove_conflicting_devices(resource_size_t base,
+    resource_size_t size, const char *name)
 {
 
 	sx_xlock(&linux_fb_mtx);
-	vt_freeze_main_vd(a);
+	vt_freeze_main_vd(base, size);
 	sx_xunlock(&linux_fb_mtx);
 	return (0);
 }
 
 #define	PCI_STD_NUM_BARS	6
 int
-remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
+aperture_remove_conflicting_pci_devices(struct pci_dev *pdev,
+    const char *name)
 {
-	struct apertures_struct *ap;
-	bool primary = false;
-	int err, idx, bar;
+	unsigned long base, size;
+	int bar;
 
-	for (idx = 0, bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
-		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
-			continue;
-		idx++;
-	}
-
-	ap = alloc_apertures(idx);
-	if (!ap)
-		return -ENOMEM;
-
-	for (idx = 0, bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
-		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
-			continue;
-		ap->ranges[idx].base = pci_resource_start(pdev, bar);
-		ap->ranges[idx].size = pci_resource_len(pdev, bar);
-		idx++;
-	}
 	sx_xlock(&linux_fb_mtx);
-	vt_freeze_main_vd(ap);
+	for (bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
+		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
+			continue;
+		base = pci_resource_start(pdev, bar);
+		size = pci_resource_len(pdev, bar);
+		vt_freeze_main_vd(base, size);
+	}
 	sx_xunlock(&linux_fb_mtx);
-	kfree(ap);
+
 	return (0);
 }
 
 static int
 __register_framebuffer(struct linux_fb_info *fb_info)
 {
-	int i, err;
-	struct drm_fb_helper *fb_helper;
+	int err;
 
-	fb_helper = (struct drm_fb_helper *)fb_info->fbio.fb_priv;
-	fb_info->fb_bsddev = fb_helper->dev->dev->bsddev;
+	vt_freeze_main_vd(fb_info->aperture_base, fb_info->aperture_size);
+
+	if (fb_info->aperture_base != 0 && fb_info->aperture_size != 0) {
+		err = vm_phys_fictitious_reg_range(fb_info->aperture_base,
+		    fb_info->aperture_base + fb_info->aperture_size,
+#ifdef VM_MEMATTR_WRITE_COMBINING
+		    VM_MEMATTR_WRITE_COMBINING);
+#else
+		    VM_MEMATTR_UNCACHEABLE);
+#endif
+		MPASS(err == 0);
+	} else
+		device_printf(fb_info->fb_bsddev, "Aperture undefined\n");
+
 	fb_info->fbio.fb_video_dev = device_get_parent(fb_info->fb_bsddev);
 	fb_info->fbio.fb_name = device_get_nameunit(fb_info->fb_bsddev);
 
@@ -224,7 +207,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 		    "fb_bpp not set, setting to 8\n");
 		fb_info->fbio.fb_bpp = 32;
 	}
-	if ((err = vt_drmfb_attach(&fb_info->fbio)) != 0) {
+	if ((err = lkpi_vt_drmfb_attach(&fb_info->fbio)) != 0) {
 		switch (err) {
 		case EEXIST:
 			device_printf(fb_info->fbio.fb_fbd_dev,
@@ -245,7 +228,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 }
 
 int
-linux_register_framebuffer(struct linux_fb_info *fb_info)
+linuxkpi_register_framebuffer(struct linux_fb_info *fb_info)
 {
 	int rc;
 
@@ -258,9 +241,7 @@ linux_register_framebuffer(struct linux_fb_info *fb_info)
 static int
 __unregister_framebuffer(struct linux_fb_info *fb_info)
 {
-	int ret = 0;
-
-	vt_drmfb_detach(&fb_info->fbio);
+	lkpi_vt_drmfb_detach(&fb_info->fbio);
 
 	if (fb_info->fbio.fb_fbd_dev) {
 		mtx_lock(&Giant);
@@ -269,14 +250,20 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 		fb_info->fbio.fb_fbd_dev = NULL;
 	}
 
+	if (fb_info->aperture_base != 0 && fb_info->aperture_size != 0)
+		vm_phys_fictitious_unreg_range(fb_info->aperture_base,
+		    fb_info->aperture_base + fb_info->aperture_size);
+
 	if (fb_info->fbops->fb_destroy)
 		fb_info->fbops->fb_destroy(fb_info);
+
+	vt_unfreeze_main_vd();
 
 	return 0;
 }
 
 int
-linux_unregister_framebuffer(struct linux_fb_info *fb_info)
+linuxkpi_unregister_framebuffer(struct linux_fb_info *fb_info)
 {
 	int rc;
 
@@ -287,7 +274,7 @@ linux_unregister_framebuffer(struct linux_fb_info *fb_info)
 }
 
 int
-linux_fb_get_options(const char *connector_name, char **option)
+linuxkpi_fb_get_options(const char *connector_name, char **option)
 {
 	*option = __DECONST(char *, video_get_options(connector_name));
 	return (*option != NULL ? 0 : -ENOENT);
@@ -361,7 +348,8 @@ fb_setpixel(struct linux_fb_info *info, uint32_t x, uint32_t y,
 }
 
 void
-cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
+linuxkpi_cfb_fillrect(struct linux_fb_info *info,
+    const struct fb_fillrect *rect)
 {
 	uint32_t x, y;
 
@@ -380,13 +368,15 @@ cfb_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
 }
 
 void
-cfb_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area)
+linuxkpi_cfb_copyarea(struct linux_fb_info *info,
+    const struct fb_copyarea *area)
 {
 	panic("cfb_copyarea() not implemented");
 }
 
 void
-cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
+linuxkpi_cfb_imageblit(struct linux_fb_info *info,
+    const struct fb_image *image)
 {
 	uint32_t x, y, width, height, xi, yi;
 	uint32_t bytes_per_img_line, bit, byte, color, line;
@@ -444,42 +434,8 @@ cfb_imageblit(struct linux_fb_info *info, const struct fb_image *image)
 	}
 }
 
-void
-sys_fillrect(struct linux_fb_info *info, const struct fb_fillrect *rect)
-{
-	cfb_fillrect(info, rect);
-}
-
-void
-sys_copyarea(struct linux_fb_info *info, const struct fb_copyarea *area)
-{
-	cfb_copyarea(info, area);
-}
-
-void
-sys_imageblit(struct linux_fb_info *info, const struct fb_image *image)
-{
-	cfb_imageblit(info, image);
-}
-
 ssize_t
-fb_sys_read(struct linux_fb_info *info, char __user *buf,
-    size_t count, loff_t *ppos)
-{
-	panic("fb_sys_read() not implemented");
-	return (0);
-}
-
-ssize_t
-fb_sys_write(struct linux_fb_info *info, const char __user *buf,
-    size_t count, loff_t *ppos)
-{
-	panic("fb_sys_write() not implemented");
-	return (0);
-}
-
-ssize_t
-fb_io_read(struct linux_fb_info *info, char __user *buf,
+linuxkpi_fb_io_read(struct linux_fb_info *info, char __user *buf,
     size_t count, loff_t *ppos)
 {
 	panic("fb_io_read() not implemented");
@@ -487,7 +443,7 @@ fb_io_read(struct linux_fb_info *info, char __user *buf,
 }
 
 ssize_t
-fb_io_write(struct linux_fb_info *info, const char __user *buf,
+linuxkpi_fb_io_write(struct linux_fb_info *info, const char __user *buf,
     size_t count, loff_t *ppos)
 {
 	panic("fb_io_write() not implemented");
@@ -495,7 +451,8 @@ fb_io_write(struct linux_fb_info *info, const char __user *buf,
 }
 
 int
-fb_deferred_io_mmap(struct linux_fb_info *info, struct vm_area_struct *vma)
+linuxkpi_fb_deferred_io_mmap(struct linux_fb_info *info,
+    struct vm_area_struct *vma)
 {
 	panic("fb_deferred_io_mmap() not implemented");
 	return (0);

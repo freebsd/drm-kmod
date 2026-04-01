@@ -35,10 +35,11 @@
 
 #ifndef _DEV_VT_HW_FB_VT_DRMFB_H_
 #define	_DEV_VT_HW_FB_VT_DRMFB_H_
+
+struct fb_info;
+
 /* Generic framebuffer interface call vt_drmfb_attach to init VT(9) */
-int vt_drmfb_attach(struct fb_info *info);
-void vt_drmfb_resume(struct vt_device *vd);
-void vt_drmfb_suspend(struct vt_device *vd);
-int vt_drmfb_detach(struct fb_info *info);
+int lkpi_vt_drmfb_attach(struct fb_info *info);
+int lkpi_vt_drmfb_detach(struct fb_info *info);
 
 #endif /* _DEV_VT_HW_FB_VT_DRMFB_H_ */
