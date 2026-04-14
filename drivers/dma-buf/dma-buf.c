@@ -533,7 +533,7 @@ dma_buf_fd(struct dma_buf *db, int flags)
 	flags &= O_CLOEXEC;
 	err = finstall(curthread, db->linux_file, &fd, flags, NULL);
 	if (err != 0)
-		return (err);
+		return (-err);
 
 	/* drop extra reference */
 	fdrop(db->linux_file, curthread);
