@@ -708,6 +708,7 @@ static int mes_v12_0_reset_legacy_queue(struct amdgpu_mes *mes,
 					struct mes_reset_legacy_queue_input *input)
 {
 	union MESAPI__RESET mes_reset_queue_pkt;
+	int pipe;
 
 	memset(&mes_reset_queue_pkt, 0, sizeof(mes_reset_queue_pkt));
 
@@ -731,8 +732,12 @@ static int mes_v12_0_reset_legacy_queue(struct amdgpu_mes *mes,
 		mes_reset_queue_pkt.doorbell_offset = input->doorbell_offset;
 	}
 
-	return mes_v12_0_submit_pkt_and_poll_completion(mes,
-			AMDGPU_MES_SCHED_PIPE,
+	if (mes->adev->enable_uni_mes)
+		pipe = AMDGPU_MES_KIQ_PIPE;
+	else
+		pipe = AMDGPU_MES_SCHED_PIPE;
+
+	return mes_v12_0_submit_pkt_and_poll_completion(mes, pipe,
 			&mes_reset_queue_pkt, sizeof(mes_reset_queue_pkt),
 			offsetof(union MESAPI__RESET, api_status));
 }
