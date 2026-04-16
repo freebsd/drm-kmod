@@ -307,10 +307,10 @@ static void intel_vblank_section_enter(struct drm_i915_private *i915)
 	__acquires(i915->uncore.lock)
 {
 #ifdef I915
+	spin_lock(&i915->uncore.lock);
 #ifdef __FreeBSD__
 	preempt_disable();
 #endif
-	spin_lock(&i915->uncore.lock);
 #endif
 }
 
@@ -318,10 +318,10 @@ static void intel_vblank_section_exit(struct drm_i915_private *i915)
 	__releases(i915->uncore.lock)
 {
 #ifdef I915
-	spin_unlock(&i915->uncore.lock);
 #ifdef __FreeBSD__
 	preempt_enable();
 #endif
+	spin_unlock(&i915->uncore.lock);
 #endif
 }
 
