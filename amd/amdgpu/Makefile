@@ -14,6 +14,7 @@ MK_CTF=	no
 
 .include "../../kconfig.mk"
 .include "../../linuxkpi_version.mk"
+.include "../../compiler_flags.mk"
 
 .if !empty(KCONFIG:MDRM_AMD_DC_FP)
 _dml=	${SRCDIR}/display/dc/dml \
