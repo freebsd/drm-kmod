@@ -6,6 +6,7 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
 
 KMOD=	drm
 SRCS=	drm_atomic.c \
