@@ -4,6 +4,7 @@ SRCDIR=	${.CURDIR:H}/drivers/dma-buf
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
 
 KMOD=	dmabuf
 SRCS=	dma-buf-kmod.c \
