@@ -6,6 +6,7 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/ttm
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
 
 KMOD=	ttm
 SRCS=	ttm_bo.c \

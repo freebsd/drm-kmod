@@ -13,6 +13,7 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
 
 KMOD=	i915kms
 SRCS=	\
