@@ -4,6 +4,7 @@ SRCDIR=	${.CURDIR:H}/drivers/video
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
 
 KMOD=	linuxkpi_video
 SRCS=	hdmi.c \
