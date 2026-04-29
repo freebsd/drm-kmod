@@ -63,7 +63,7 @@ SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h pci_iov_if.h device_if.h iicbus_
 .include <bsd.kmod.mk>
 
 CWARNFLAGS+=	-Wno-pointer-arith
-CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
+CWARNFLAGS+=	${CWARNFLAGS.${.IMPSRC:T}}
 
 CWARNFLAGS.kfd_chardev.c=	-Wno-format
 CWARNFLAGS.kfd_dbgdev.c=	-Wno-format

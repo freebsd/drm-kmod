@@ -159,7 +159,7 @@ SRCS+=	device_if.h \
 .if ${MACHINE_CPUARCH} == "powerpc"
 CWARNFLAGS+=-Wno-cast-qual
 .endif
-CWARNFLAGS+= -Wno-pointer-sign -Wno-format
+CWARNFLAGS+=	-Wno-format
 
 CWARNFLAGS.drm_ioc32.c+=	-Wno-address-of-packed-member
 

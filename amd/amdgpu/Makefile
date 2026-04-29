@@ -1089,7 +1089,7 @@ CFLAGS.rc_calc_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CWARNFLAGS+=	-Wno-expansion-to-defined
 .endif
 CWARNFLAGS+=	-Wno-pointer-arith -Wno-format -Wno-cast-qual
-CWARNFLAGS+=	-Wno-pointer-sign ${CWARNFLAGS.${.IMPSRC:T}}
+CWARNFLAGS+=	${CWARNFLAGS.${.IMPSRC:T}}
 
 # amdgpu/
 CWARNFLAGS.amdgpu_acpi.c=			-Wno-missing-prototypes -Wno-incompatible-pointer-types

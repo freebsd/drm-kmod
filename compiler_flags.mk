@@ -18,6 +18,8 @@ COMPILER_TYPE=	gcc
 # `include/drm/drm_atomic_uap.h` depends on this to compile.
 CFLAGS+=	-include ${SYSDIR}/compat/linuxkpi/common/include/linux/compiler_types.h
 
+CWARNFLAGS+=	-Wno-pointer-sign
+
 # Globally silence a new warning from Clang 21.
 # See https://lkml.org/lkml/2025/5/6/1681.
 .if ${COMPILER_TYPE} == clang && ${COMPILER_VERSION} >= 211
