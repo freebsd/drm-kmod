@@ -25,6 +25,7 @@
  */
 
 #include "dc_trace.h"
+#include "dc_fpu.h"
 
 #if defined(CONFIG_X86)
 #include <asm/fpu/api.h>
