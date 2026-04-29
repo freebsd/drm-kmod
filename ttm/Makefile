@@ -56,7 +56,7 @@ SRCS+=	device_if.h \
 .if ${MACHINE_CPUARCH} == "powerpc"
 CWARNFLAGS+=-Wno-cast-qual
 .endif
-CWARNFLAGS+= -Wno-pointer-arith -Wno-pointer-sign -Wno-format
+CWARNFLAGS+= -Wno-pointer-arith -Wno-format
 CWARNFLAGS+= -Wno-expansion-to-defined
 
 EXPORT_SYMS=	YES
