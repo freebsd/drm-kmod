@@ -232,9 +232,11 @@ struct syncobj_eventfd_entry {
 	u32 flags;
 };
 
+#if __FreeBSD_version >= 1600011
 static void
 syncobj_eventfd_entry_func(struct drm_syncobj *syncobj,
 			   struct syncobj_eventfd_entry *entry);
+#endif
 
 /**
  * drm_syncobj_find - lookup and reference a sync object.
