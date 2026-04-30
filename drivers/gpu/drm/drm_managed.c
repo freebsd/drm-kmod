@@ -7,6 +7,7 @@
 
 #include <drm/drm_device.h>
 #include <drm/drm_managed.h>
+#include <drm/drm_internal.h>
 
 MALLOC_DEFINE(DRM_MEM_MANAGED, "drm_managed", "DRM MANAGED Data Structures");
 
