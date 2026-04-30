@@ -108,7 +108,7 @@ vt_restore_fbdev_mode(void *arg, int pending)
 	info->fbops->fb_set_par(info);
 }
 
-void
+static void
 fb_info_print(struct linux_fb_info *info)
 {
 	printf("start FB_INFO:\n");
@@ -165,8 +165,7 @@ int
 remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 {
 	struct apertures_struct *ap;
-	bool primary = false;
-	int err, idx, bar;
+	int idx, bar;
 
 	for (idx = 0, bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
 		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
@@ -195,7 +194,7 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 static int
 __register_framebuffer(struct linux_fb_info *fb_info)
 {
-	int i, err;
+	int err;
 	struct drm_fb_helper *fb_helper;
 
 	fb_helper = (struct drm_fb_helper *)fb_info->fbio.fb_priv;
@@ -258,7 +257,6 @@ linux_register_framebuffer(struct linux_fb_info *fb_info)
 static int
 __unregister_framebuffer(struct linux_fb_info *fb_info)
 {
-	int ret = 0;
 
 	vt_drmfb_detach(&fb_info->fbio);
 
