@@ -183,5 +183,6 @@ CWARNFLAGS.drm_gem_framebuffer_helper.c+=	-Wno-missing-prototypes
 CWARNFLAGS.drm_hdcp_helper.c+=			-Wno-cast-qual
 CWARNFLAGS.drm_ioc32.c+=			-Wno-address-of-packed-member
 CWARNFLAGS.drm_mm.c+=				-Wno-cast-qual -Wno-unused-function
+CWARNFLAGS.drm_syncobj.c+=			-Wno-unused-variable
 
 EXPORT_SYMS=	YES
