@@ -54,11 +54,8 @@ static char *drm_devnode(struct device *dev, umode_t *mode)
 	return kasprintf(GFP_KERNEL, "dri/%s", dev_name(dev));
 }
 
-static CLASS_ATTR_STRING(version, S_IRUGO, "drm 1.1.0 20060810");
-
 int drm_sysfs_init(void)
 {
-	int err;
 
 	drm_class = class_create("drm");
 	if (drm_class == NULL)
