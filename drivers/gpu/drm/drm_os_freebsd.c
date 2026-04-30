@@ -121,18 +121,16 @@ unregister_fictitious_range(struct drm_device *ddev, vm_paddr_t base, size_t siz
 int
 drm_dev_alias(struct device *ldev, struct drm_minor *minor, const char *minor_str)
 {
-	struct sysctl_oid_list *oid_list, *child;
+	struct sysctl_oid_list *oid_list;
 	struct sysctl_ctx_list *ctx_list;
 	struct linux_cdev *cdevp;
 	struct sysctl_oid *node;
 	device_t dev = ldev->parent->bsddev;
 	char buf[32];
-	char *devbuf;
 	u32 tmp;
 
 	MPASS(dev != NULL);
 	ctx_list = device_get_sysctl_ctx(dev);
-	child = SYSCTL_CHILDREN(device_get_sysctl_tree(dev));
 	snprintf(buf, sizeof(buf), "%d", minor->index);
 	node = SYSCTL_ADD_NODE(ctx_list, SYSCTL_STATIC_CHILDREN(_dev_drm), OID_AUTO, buf,
 	    CTLFLAG_RD, NULL, "DRM properties");
