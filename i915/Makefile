@@ -380,10 +380,6 @@ SRCS	+=			\
 # error: cast from 'const unsigned long *' to 'volatile unsigned long *'
 CWARNFLAGS += -Wno-pointer-arith -Wno-format -Wno-cast-qual
 
-.if ${COMPILER_TYPE} == clang && ${COMPILER_VERSION} >= 211
-CWARNFLAGS +=	-Wno-address-of-packed-member
-.endif
-
 CWARNFLAGS.intel_acpi.c=	-Wno-incompatible-pointer-types
 CWARNFLAGS.intel_audio.c=	-Wno-unused-function
 CWARNFLAGS.intel_backlight.c=	-Wno-unused-but-set-variable
