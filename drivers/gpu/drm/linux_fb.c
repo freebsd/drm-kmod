@@ -98,7 +98,7 @@ vt_unfreeze_main_vd(void)
 	fb->fb_flags &= ~FB_FLAG_NOWRITE;
 }
 
-void
+static void
 fb_info_print(struct fb_info *t)
 {
 	printf("start FB_INFO:\n");
@@ -137,12 +137,8 @@ framebuffer_alloc(size_t size, struct device *dev)
 void
 framebuffer_release(struct linux_fb_info *info)
 {
-	struct vt_kms_softc *sc;
-
 	if (info == NULL)
 		return;
-	if (info->fbio.fb_priv)
-		sc = info->fbio.fb_priv;
 	kfree(info->apertures);
 	free(info->fbio.fb_priv, LKPI_FB_MEM);
 	free(info, LKPI_FB_MEM);
@@ -164,8 +160,7 @@ int
 remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 {
 	struct apertures_struct *ap;
-	bool primary = false;
-	int err, idx, bar;
+	int idx, bar;
 
 	for (idx = 0, bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
 		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
@@ -194,7 +189,7 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 static int
 __register_framebuffer(struct linux_fb_info *fb_info)
 {
-	int i, err;
+	int err;
 
 	vt_freeze_main_vd(fb_info->apertures);
 
@@ -262,7 +257,6 @@ linux_register_framebuffer(struct linux_fb_info *fb_info)
 static int
 __unregister_framebuffer(struct linux_fb_info *fb_info)
 {
-	int ret = 0;
 
 	vm_phys_fictitious_unreg_range(fb_info->apertures->ranges[0].base,
 				     fb_info->apertures->ranges[0].base +
