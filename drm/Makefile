@@ -4,10 +4,6 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
 .PATH:	${SRCDIR} ${SRCDIR}/display ${SRCDIR}/scheduler
 
-.include "../kconfig.mk"
-.include "../linuxkpi_version.mk"
-.include "../compiler_flags.mk"
-
 KMOD=	drm
 SRCS=	drm_atomic.c \
 	drm_atomic_helper.c \
@@ -135,6 +131,12 @@ SRCS+=	drm_panic.c
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
+.include <bsd.kmod.mk>
+
+.include "../kconfig.mk"
+.include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
+
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/bsd/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
@@ -166,12 +168,20 @@ SRCS+=	device_if.h \
 .if ${MACHINE_CPUARCH} == "powerpc"
 CWARNFLAGS+=-Wno-cast-qual
 .endif
-CWARNFLAGS+=	-Wno-format
+CWARNFLAGS+=	-Wno-format -Wno-gnu-pointer-arith
 
-CWARNFLAGS.drm_file.c+=		-Wno-unused-value
-CWARNFLAGS.drm_ioc32.c+=	-Wno-address-of-packed-member
-CWARNFLAGS.drm_dp_tunnel.c+=	-Wno-incompatible-pointer-types-discards-qualifiers
+CWARNFLAGS.drm_blend.c+=			-Wno-cast-qual
+CWARNFLAGS.drm_dp_helper.c+=			-Wno-unused-const-variable
+CWARNFLAGS.drm_dp_mst_topology.c+=		-Wno-missing-prototypes
+CWARNFLAGS.drm_dp_tunnel.c+=			-Wno-incompatible-pointer-types-discards-qualifiers
+CWARNFLAGS.drm_drv.c+=				-Wno-unused-variable
+CWARNFLAGS.drm_edid.c+=				-Wno-cast-qual
+CWARNFLAGS.drm_file.c+=				-Wno-unused-but-set-variable
+CWARNFLAGS.drm_file.c+=				-Wno-unused-value
+CWARNFLAGS.drm_gem_atomic_helper.c+=		-Wno-missing-prototypes
+CWARNFLAGS.drm_gem_framebuffer_helper.c+=	-Wno-missing-prototypes
+CWARNFLAGS.drm_hdcp_helper.c+=			-Wno-cast-qual
+CWARNFLAGS.drm_ioc32.c+=			-Wno-address-of-packed-member
+CWARNFLAGS.drm_mm.c+=				-Wno-cast-qual -Wno-unused-function
 
 EXPORT_SYMS=	YES
-
-.include <bsd.kmod.mk>
