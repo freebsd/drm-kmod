@@ -53,7 +53,7 @@ struct drm_syncobj {
 	 * @cb_list: List of callbacks to call when the &fence gets replaced.
 	 */
 	struct list_head cb_list;
-#if __FreeBSD_version >= 1600011
+#if (__FreeBSD_version >= 1500508 && __FreeBSD_version < 1600000) || __FreeBSD_version >= 1600011
 	/**
 	 * @ev_fd_list: List of registered eventfd.
 	 */

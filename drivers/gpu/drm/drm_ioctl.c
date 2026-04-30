@@ -667,7 +667,7 @@ static const struct drm_ioctl_desc drm_ioctls[] = {
 		      DRM_RENDER_ALLOW),
 	DRM_IOCTL_DEF(DRM_IOCTL_SYNCOBJ_TIMELINE_WAIT, drm_syncobj_timeline_wait_ioctl,
 		      DRM_RENDER_ALLOW),
-#if __FreeBSD_version >= 1600011
+#if (__FreeBSD_version >= 1500508 && __FreeBSD_version < 1600000) || __FreeBSD_version >= 1600011
 	DRM_IOCTL_DEF(DRM_IOCTL_SYNCOBJ_EVENTFD, drm_syncobj_eventfd_ioctl,
 		      DRM_RENDER_ALLOW),
 #endif
