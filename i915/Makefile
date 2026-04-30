@@ -11,10 +11,6 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 	${SRCDIR}/pxp \
 	${SRCDIR}/soc
 
-.include "../kconfig.mk"
-.include "../linuxkpi_version.mk"
-.include "../compiler_flags.mk"
-
 KMOD=	i915kms
 SRCS=	\
 	i915_active.c \
@@ -346,6 +342,14 @@ SRCS+=	i915_hwmon.c
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
+
+.include <bsd.kmod.mk>
+
+.include "../kconfig.mk"
+.include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
+
+
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/bsd/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
@@ -372,8 +376,6 @@ SRCS	+=			\
 	pci_if.h		\
 	pci_iov_if.h		\
 	vnode_if.h
-
-.include <bsd.kmod.mk>
 
 # Re-instate -Wno-cast-qual for all files
 # Reason: More or less all files need it due to use of test_bit() macro
