@@ -295,7 +295,7 @@ struct drm_plane_funcs {
 	 *
 	 * This is the legacy entry point to enable and configure the plane for
 	 * the given CRTC and framebuffer. It is never called to disable the
-	 * plane, i.e. the passed-in crtc and fb paramters are never NULL.
+	 * plane, i.e. the passed-in crtc and fb parameters are never NULL.
 	 *
 	 * The source rectangle in frame buffer memory coordinates is given by
 	 * the src_x, src_y, src_w and src_h parameters (as 16.16 fixed point
