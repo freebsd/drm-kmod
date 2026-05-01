@@ -571,7 +571,7 @@ static int cik_sdma_start(struct amdgpu_device *adev)
 	if (r)
 		return r;
 
-	/* halt the engine before programing */
+	/* halt the engine before programming */
 	cik_sdma_enable(adev, false);
 	/* enable sdma ring preemption */
 	cik_ctx_switch_enable(adev, true);

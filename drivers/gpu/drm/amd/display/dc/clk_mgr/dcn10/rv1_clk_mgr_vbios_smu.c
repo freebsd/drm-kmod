@@ -152,7 +152,7 @@ int rv1_vbios_smu_set_dprefclk(struct clk_mgr_internal *clk_mgr)
 			VBIOSSMC_MSG_SetDprefclkFreq,
 			khz_to_mhz_ceil(clk_mgr->base.dprefclk_khz));
 
-	/* TODO: add code for programing DP DTO, currently this is down by command table */
+	/* TODO: add code for programming DP DTO, currently this is down by command table */
 
 	return actual_dprefclk_set_mhz * 1000;
 }

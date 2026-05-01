@@ -476,7 +476,7 @@ static int sdma_v6_0_gfx_resume(struct amdgpu_device *adev)
 
 		ring->wptr = 0;
 
-		/* before programing wptr to a less value, need set minor_ptr_update first */
+		/* before programming wptr to a less value, need set minor_ptr_update first */
 		WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_MINOR_PTR_UPDATE), 1);
 
 		if (!amdgpu_sriov_vf(adev)) { /* only bare-metal use register write for wptr */

@@ -653,7 +653,7 @@ static void sdma_v4_4_2_gfx_resume(struct amdgpu_device *adev, unsigned int i)
 
 	ring->wptr = 0;
 
-	/* before programing wptr to a less value, need set minor_ptr_update first */
+	/* before programming wptr to a less value, need set minor_ptr_update first */
 	WREG32_SDMA(i, regSDMA_GFX_MINOR_PTR_UPDATE, 1);
 
 	/* Initialize the ring buffer's read and write pointers */
@@ -747,7 +747,7 @@ static void sdma_v4_4_2_page_resume(struct amdgpu_device *adev, unsigned int i)
 
 	ring->wptr = 0;
 
-	/* before programing wptr to a less value, need set minor_ptr_update first */
+	/* before programming wptr to a less value, need set minor_ptr_update first */
 	WREG32_SDMA(i, regSDMA_PAGE_MINOR_PTR_UPDATE, 1);
 
 	doorbell = RREG32_SDMA(i, regSDMA_PAGE_DOORBELL);

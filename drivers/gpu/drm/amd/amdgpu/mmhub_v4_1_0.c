@@ -172,7 +172,7 @@ static void mmhub_v4_1_0_init_system_aperture_regs(struct amdgpu_device *adev)
 	/*
 	 * the new L1 policy will block SRIOV guest from writing
 	 * these regs, and they will be programed at host.
-	 * so skip programing these regs.
+	 * so skip programming these regs.
 	 */
 	if (amdgpu_sriov_vf(adev))
 		return;

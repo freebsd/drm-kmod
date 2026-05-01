@@ -503,7 +503,7 @@ static int sdma_v2_4_start(struct amdgpu_device *adev)
 {
 	int r;
 
-	/* halt the engine before programing */
+	/* halt the engine before programming */
 	sdma_v2_4_enable(adev, false);
 
 	/* start the gfx rings and rlc compute queues */

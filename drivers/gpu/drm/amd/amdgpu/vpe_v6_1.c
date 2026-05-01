@@ -240,7 +240,7 @@ static int vpe_v6_1_ring_start(struct amdgpu_vpe *vpe)
 
 		ring->wptr = 0;
 
-		/* before programing wptr to a less value, need set minor_ptr_update first */
+		/* before programming wptr to a less value, need set minor_ptr_update first */
 		WREG32(vpe_get_reg_offset(vpe, i, regVPEC_QUEUE0_MINOR_PTR_UPDATE), 1);
 		WREG32(vpe_get_reg_offset(vpe, i, regVPEC_QUEUE0_RB_WPTR), lower_32_bits(ring->wptr) << 2);
 		WREG32(vpe_get_reg_offset(vpe, i, regVPEC_QUEUE0_RB_WPTR_HI), upper_32_bits(ring->wptr) << 2);
