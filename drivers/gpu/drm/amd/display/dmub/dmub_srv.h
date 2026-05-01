@@ -304,11 +304,11 @@ struct dmub_srv_hw_params {
 
 /**
  * struct dmub_srv_debug - Debug info for dmub_srv
- * @timeout_occured: Indicates a timeout occured on any message from driver to dmub
+ * @timeout_occurred: Indicates a timeout occured on any message from driver to dmub
  * @timeout_cmd: first cmd sent from driver that timed out - subsequent timeouts are not stored
  */
 struct dmub_srv_debug {
-	bool timeout_occured;
+	bool timeout_occurred;
 	union dmub_rb_cmd timeout_cmd;
 	unsigned long long timestamp;
 };

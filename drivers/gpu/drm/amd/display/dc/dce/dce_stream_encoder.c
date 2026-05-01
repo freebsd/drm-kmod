@@ -465,7 +465,7 @@ static void dce110_stream_encoder_dp_set_stream_attribute(
 		h_back_porch = h_blank - hw_crtc_timing.h_front_porch -
 				hw_crtc_timing.h_sync_width;
 
-		/* start at begining of left border */
+		/* start at beginning of left border */
 		h_active_start = hw_crtc_timing.h_sync_width + h_back_porch;
 
 
@@ -474,7 +474,7 @@ static void dce110_stream_encoder_dp_set_stream_attribute(
 				hw_crtc_timing.v_front_porch;
 
 
-		/* start at begining of left border */
+		/* start at beginning of left border */
 		if (REG(DP_MSA_TIMING_PARAM2))
 			REG_SET_2(DP_MSA_TIMING_PARAM2, 0,
 				DP_MSA_HSTART, h_active_start,

@@ -684,8 +684,8 @@ enum dmub_status dmub_srv_hw_init(struct dmub_srv *dmub,
 	cw4.region.top = cw4.region.base + mail_fb->size;
 
 	/**
-	 * Doubled the mailbox region to accomodate inbox and outbox.
-	 * Note: Currently, currently total mailbox size is 16KB. It is split
+	 * Doubled the mailbox region to accommodate inbox and outbox.
+	 * Note: Currently total mailbox size is 16KB. It is split
 	 * equally into 8KB between inbox and outbox. If this config is
 	 * changed, then uncached base address configuration of outbox1
 	 * has to be updated in funcs->setup_out_mailbox.
