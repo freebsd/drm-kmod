@@ -1648,7 +1648,7 @@ bool amdgpu_device_need_post(struct amdgpu_device *adev)
 			uint32_t fw_ver;
 
 			err = request_firmware(&adev->pm.fw, "amdgpu/fiji_smc.bin", adev->dev);
-			/* force vPost if error occured */
+			/* force vPost if error occurred */
 			if (err)
 				return true;
 

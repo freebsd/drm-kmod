@@ -441,7 +441,7 @@ static int soc15_read_register(struct amdgpu_device *adev, u32 se_num,
  * @regs: pointer to the register array
  * @array_size: size of the register array
  *
- * Programs an array or registers with and and or masks.
+ * Programs an array or registers with and/or masks.
  * This is a helper for setting golden registers.
  */
 
