@@ -914,7 +914,7 @@ int r600_parse_extended_power_table(struct radeon_device *rdev)
 		}
 	}
 
-	/* clock dependancy tables, shedding tables */
+	/* clock dependency tables, shedding tables */
 	if (le16_to_cpu(power_info->pplib.usTableSize) >=
 	    sizeof(struct _ATOM_PPLIB_POWERPLAYTABLE4)) {
 		if (power_info->pplib4.usVddcDependencyOnSCLKOffset) {

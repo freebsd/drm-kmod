@@ -196,7 +196,7 @@ static void radeon_device_handle_px_quirks(struct radeon_device *rdev)
  * @registers: pointer to the register array
  * @array_size: size of the register array
  *
- * Programs an array or registers with and and or masks.
+ * Programs an array or registers with and/or masks.
  * This is a helper for setting golden registers.
  */
 void radeon_program_register_sequence(struct radeon_device *rdev,
