@@ -239,7 +239,7 @@ static void dsi_program_swing_and_deemphasis(struct intel_encoder *encoder)
 	for_each_dsi_phy(phy, intel_dsi->phys) {
 		/*
 		 * Program voltage swing and pre-emphasis level values as per
-		 * table in BSPEC under DDI buffer programing
+		 * table in BSPEC under DDI buffer programming
 		 */
 		mask = SCALING_MODE_SEL_MASK | RTERM_SELECT_MASK;
 		val = SCALING_MODE_SEL(0x2) | TAP2_DISABLE | TAP3_DISABLE |

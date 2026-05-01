@@ -921,7 +921,7 @@ void chv_phy_pre_pll_enable(struct intel_encoder *encoder,
 	}
 
 	/*
-	 * This a a bit weird since generally CL
+	 * This is a bit weird since generally CL
 	 * matches the pipe, but here we need to
 	 * pick the CL based on the port.
 	 */
