@@ -85,7 +85,7 @@
  * With binary syncobj, all manipulation of the syncobjs's fence happens in
  * terms of the current fence at the time the ioctl is called by userspace
  * regardless of whether that operation is an immediate host-side operation
- * (signal or reset) or or an operation which is enqueued in some driver
+ * (signal or reset) or an operation which is enqueued in some driver
  * queue. &DRM_IOCTL_SYNCOBJ_RESET and &DRM_IOCTL_SYNCOBJ_SIGNAL can be used
  * to manipulate a syncobj from the host by resetting its pointer to NULL or
  * setting its pointer to a fence which is already signaled.

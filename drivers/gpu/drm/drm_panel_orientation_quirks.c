@@ -482,7 +482,7 @@ static const struct dmi_system_id orientation_data[] = {
  * resolution expected by the quirk-table entry.
  *
  * Note this function is also used outside of the drm-subsys, by for example
- * the efifb code. Because of this this function gets compiled into its own
+ * the efifb code. Because of this function gets compiled into its own
  * kernel-module when built as a module.
  *
  * Returns:
