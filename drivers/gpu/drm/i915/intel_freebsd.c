@@ -222,7 +222,7 @@ intel_gmch_gtt_flush(void)
 }
 
 void
-intel_acpi_video_register(struct drm_i915_private *i915)
+intel_acpi_video_register(struct intel_display *display)
 {
 	acpi_video_register();
 }

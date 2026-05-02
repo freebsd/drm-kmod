@@ -114,7 +114,9 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dio/dcn10 \
 	${SRCDIR}/display/dc/dio/dcn20 \
 	${SRCDIR}/display/dc/dio/dcn30 \
+	${SRCDIR}/display/dc/dio/dcn301 \
 	${SRCDIR}/display/dc/dio/dcn31 \
+	${SRCDIR}/display/dc/dio/dcn314 \
 	${SRCDIR}/display/dc/dio/dcn32 \
 	${SRCDIR}/display/dc/dio/dcn321 \
 	${SRCDIR}/display/dc/dio/dcn35 \
@@ -126,7 +128,9 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dpp/dcn32 \
 	${SRCDIR}/display/dc/dpp/dcn35 \
 	${SRCDIR}/display/dc/dpp/dcn401 \
+	${SRCDIR}/display/dc/dwb/dcn30 \
 	${SRCDIR}/display/dc/dwb/dcn35 \
+	${SRCDIR}/display/dc/hpo/dcn31 \
 	${SRCDIR}/display/dc/hpo/dcn32 \
 	${SRCDIR}/display/dc/hubp/dcn10 \
 	${SRCDIR}/display/dc/hubp/dcn20 \
@@ -222,10 +226,16 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/link/accessories \
 	${SRCDIR}/display/dc/link/hwss \
 	${SRCDIR}/display/dc/link/protocols \
+	${SRCDIR}/display/dc/mmhubbub/dcn20 \
 	${SRCDIR}/display/dc/mmhubbub/dcn32 \
 	${SRCDIR}/display/dc/mmhubbub/dcn35 \
+	${SRCDIR}/display/dc/mpc/dcn10 \
+	${SRCDIR}/display/dc/mpc/dcn20 \
+	${SRCDIR}/display/dc/mpc/dcn30 \
 	${SRCDIR}/display/dc/mpc/dcn32 \
 	${SRCDIR}/display/dc/mpc/dcn401 \
+	${SRCDIR}/display/dc/opp/dcn10 \
+	${SRCDIR}/display/dc/opp/dcn20 \
 	${SRCDIR}/display/dc/opp/dcn35 \
 	${SRCDIR}/display/dc/optc/dcn10 \
 	${SRCDIR}/display/dc/optc/dcn20 \
@@ -989,7 +999,7 @@ SRCS+=	display_mode_core.c \
 	dml2_core_dcn4.c \
 	dml2_core_factory.c \
 	dml2_core_dcn4_calcs.c \
-	dml2_core_shared.c \
+	dml2_core_utils.c \
 	dml2_dc_resource_mgmt.c \
 	dml2_debug.c \
 	dml2_dpmm_dcn4.c \
@@ -999,7 +1009,6 @@ SRCS+=	display_mode_core.c \
 	dml2_mcg_factory.c \
 	dml2_pmo_dcn3.c \
 	dml2_pmo_dcn4_fams2.c \
-	dml2_pmo_dcn4.c \
 	dml2_pmo_factory.c \
 	dml2_policy.c \
 	dml2_translation_helper.c \
@@ -1022,11 +1031,7 @@ SRCS+=	dc_vm_helper.c
 # display/dc/dsc
 SRCS+=	rc_calc.c \
 	rc_calc_dpi.c \
-	dc_dsc.c \
-	dc_spl.c \
-	dc_spl_isharp_filters.c \
-	dc_spl_scl_filters.c \
-	dc_spl_translate.c
+	dc_dsc.c
 
 # display/dc/gpio/*
 SRCS+=	gpio_base.c \
@@ -1102,6 +1107,16 @@ SRCS+=	link_ddc.c \
 	link_hwss_hpo_fixed_vs_pe_retimer_dp.c \
 	link_resource.c \
 	link_validation.c
+
+# display/dc/spl
+SRCS+=	dc_spl.c \
+	dc_spl_filters.c \
+	dc_spl_isharp_filters.c \
+	dc_spl_scl_easf_filters.c \
+	dc_spl_scl_filters.c \
+	dc_spl_translate.c \
+	spl_custom_float.c \
+	spl_fixpt31_32.c
 
 # display/dc/virtual
 SRCS+=	virtual_link_encoder.c \
@@ -1369,6 +1384,7 @@ CFLAGS.dml_top_mcache.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_core_dcn4.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_core_dcn4_calcs.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_core_shared.c = ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dml2_core_utils.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_dc_resource_mgmt.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.dml2_dpmm_dcn4.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_mall_phantom.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
@@ -1639,6 +1655,7 @@ CWARNFLAGS.dcn351_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn351_fpu.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn401_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
+CWARNFLAGS.spl_fixpt31_32.c=		-Wno-incompatible-pointer-types
 
 CWARNFLAGS.hw_ddc.c=			-Wno-unused-but-set-variable
 CWARNFLAGS.hw_factory.c=		-Wno-missing-prototypes
@@ -1709,6 +1726,7 @@ CWARNFLAGS.smu_cmn.c=			-Wno-implicit-function-declaration -Wno-sometimes-uninit
 CWARNFLAGS.smu_v13_0_0_ppt.c=		-Wno-unused-variable
 CWARNFLAGS.smu_v13_0_6_ppt.c=		-Wno-missing-prototypes -Wno-initializer-overrides
 CWARNFLAGS.smu_v13_0_7_ppt.c=		-Wno-unused-variable
+CWARNFLAGS.smu_v14_0_2_ppt.c=		-Wno-unused-variable
 CWARNFLAGS.tonga_smumgr.c=		-Wno-unused-but-set-variable
 CWARNFLAGS.vega10_hwmgr.c=		-Wno-missing-prototypes -Wno-unused-but-set-variable
 CWARNFLAGS.vega10_processpptables.c=	-Wno-missing-prototypes

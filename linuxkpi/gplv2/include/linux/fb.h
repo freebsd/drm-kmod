@@ -144,6 +144,7 @@ struct linux_fb_info {
 	} *apertures;
 
 	bool skip_vt_switch; /* no VT switch on suspend/resume required */
+	bool skip_panic; /* Do not write to the fb after a panic */
 
 #ifdef __FreeBSD__
 	struct fb_info fbio;
