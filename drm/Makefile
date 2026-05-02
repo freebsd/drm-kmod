@@ -129,6 +129,20 @@ SRCS+=	drm_exec.c
 SRCS+=	drm_panic.c
 .endif
 
+SRCS+=	device_if.h \
+	vnode_if.h \
+	bus_if.h \
+	pci_if.h \
+	pci_iov_if.h \
+	device_if.h \
+	iicbus_if.h \
+	opt_teken.h \
+	opt_splash.h \
+	opt_syscons.h \
+	opt_drm.h \
+	opt_vm.h \
+	opt_syscons.h
+
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 .include <bsd.kmod.mk>
@@ -150,20 +164,6 @@ CFLAGS+= -I${SRCDIR:H}
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_' -DDRM_SYSCTL_PARAM_PREFIX=_dri
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
-
-SRCS+=	device_if.h \
-	vnode_if.h \
-	bus_if.h \
-	pci_if.h \
-	pci_iov_if.h \
-	device_if.h \
-	iicbus_if.h \
-	opt_teken.h \
-	opt_splash.h \
-	opt_syscons.h \
-	opt_drm.h \
-	opt_vm.h \
-	opt_syscons.h
 
 .if ${MACHINE_CPUARCH} == "powerpc"
 CWARNFLAGS+=-Wno-cast-qual

@@ -340,8 +340,19 @@ SRCS+=	i915_hwmon.c
 # i915_perf.c         # This one opens a can of worms. Hold off for now.
 # intel_lpe_audio.c   # Need platform and irq_chip support
 
-CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
+SRCS	+=			\
+	opt_acpi.h		\
+	opt_drm.h		\
+	opt_syscons.h		\
+	acpi_if.h		\
+	bus_if.h		\
+	fb_if.h			\
+	device_if.h		\
+	pci_if.h		\
+	pci_iov_if.h		\
+	vnode_if.h
 
+CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 .include <bsd.kmod.mk>
 
@@ -364,18 +375,6 @@ CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=i915_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 CFLAGS+= -DI915
-
-SRCS	+=			\
-	opt_acpi.h		\
-	opt_drm.h		\
-	opt_syscons.h		\
-	acpi_if.h		\
-	bus_if.h		\
-	fb_if.h			\
-	device_if.h		\
-	pci_if.h		\
-	pci_iov_if.h		\
-	vnode_if.h
 
 # Re-instate -Wno-cast-qual for all files
 # Reason: More or less all files need it due to use of test_bit() macro
