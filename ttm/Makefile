@@ -26,6 +26,17 @@ SRCS=	ttm_bo.c \
 SRCS+=	ttm_agp_backend.c
 .endif
 
+SRCS+=	device_if.h \
+	vnode_if.h \
+	bus_if.h \
+	pci_if.h \
+	pci_iov_if.h \
+	device_if.h \
+	iicbus_if.h \
+	opt_drm.h \
+	opt_vm.h \
+	opt_syscons.h
+
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
@@ -41,17 +52,6 @@ CFLAGS+= -I${SRCDIR:H:H}
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=ttm_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
-
-SRCS+=	device_if.h \
-	vnode_if.h \
-	bus_if.h \
-	pci_if.h \
-	pci_iov_if.h \
-	device_if.h \
-	iicbus_if.h \
-	opt_drm.h \
-	opt_vm.h \
-	opt_syscons.h
 
 .if ${MACHINE_CPUARCH} == "powerpc"
 CWARNFLAGS+=-Wno-cast-qual

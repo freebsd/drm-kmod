@@ -36,6 +36,17 @@ SRCS	= \
 	kfd_queue.c #\
 #	kfd_topology.c
 
+SRCS+=	device_if.h \
+	vnode_if.h \
+	bus_if.h \
+	pci_if.h \
+	pci_iov_if.h \
+	device_if.h \
+	iicbus_if.h \
+	opt_drm.h \
+	opt_vm.h \
+	opt_syscons.h
+
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
@@ -56,9 +67,6 @@ CFLAGS+= -I${SRCDIR}/include/asic_reg
 
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=amdkfd_'
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-
-SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h pci_iov_if.h device_if.h iicbus_if.h opt_drm.h \
-	opt_vm.h opt_syscons.h
 
 .include <bsd.kmod.mk>
 
