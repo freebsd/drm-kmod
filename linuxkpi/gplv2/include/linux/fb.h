@@ -283,7 +283,11 @@ int remove_conflicting_framebuffers(struct apertures_struct *a,
 int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name);
 struct linux_fb_info *framebuffer_alloc(size_t size, struct device *dev);
 void framebuffer_release(struct linux_fb_info *info);
-#define	fb_set_suspend(x, y)	0
+
+static inline void
+fb_set_suspend(struct linux_fb_info *info, int state)
+{
+}
 
 static inline bool
 is_firmware_framebuffer(struct apertures_struct *a __unused)
