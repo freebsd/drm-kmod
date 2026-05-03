@@ -83,10 +83,14 @@ static DECLARE_RWSEM(pool_shrink_rwsem);
 static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
 					unsigned int order)
 {
+#ifdef __linux__
 	unsigned long attr = DMA_ATTR_FORCE_CONTIGUOUS;
 	struct ttm_pool_dma *dma;
+#endif
 	struct page *p;
+#ifdef __linux__
 	void *vaddr;
+#endif
 
 	/* Don't set the __GFP_COMP flag for higher order allocations.
 	 * Mapping pages directly into an userspace process and calling
@@ -130,22 +134,25 @@ static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
 	p->private = (unsigned long)dma;
 	return p;
 #elif defined(__FreeBSD__)
-	dma = NULL;
 	panic("ttm_pool.c: use_dma_alloc not implemented");
 #endif
 
+#ifdef __linux__
 error_free:
 	kfree(dma);
 	return NULL;
+#endif
 }
 
 /* Reset the caching and pages of size 1 << order */
 static void ttm_pool_free_page(struct ttm_pool *pool, enum ttm_caching caching,
 			       unsigned int order, struct page *p)
 {
+#ifdef __linux__
 	unsigned long attr = DMA_ATTR_FORCE_CONTIGUOUS;
 	struct ttm_pool_dma *dma;
 	void *vaddr;
+#endif
 
 #ifdef CONFIG_X86
 	/* We don't care that set_pages_wb is inefficient here. This is only
@@ -160,10 +167,10 @@ static void ttm_pool_free_page(struct ttm_pool *pool, enum ttm_caching caching,
 		return;
 	}
 
+#ifdef __linux__
 	if (order)
 		attr |= DMA_ATTR_NO_WARN;
 
-#ifdef __linux__
 	dma = (void *)p->private;
 	vaddr = (void *)(dma->vaddr & PAGE_MASK);
 	dma_free_attrs(pool->dev, (1UL << order) * PAGE_SIZE, vaddr, dma->addr,

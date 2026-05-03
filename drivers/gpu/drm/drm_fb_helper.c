@@ -522,7 +522,9 @@ struct fb_info *drm_fb_helper_alloc_info(struct drm_fb_helper *fb_helper)
 {
 	struct device *dev = fb_helper->dev->dev;
 	struct fb_info *info;
+#ifdef __linux__
 	int ret;
+#endif
 
 	info = framebuffer_alloc(0, dev);
 	if (!info)
@@ -541,10 +543,12 @@ struct fb_info *drm_fb_helper_alloc_info(struct drm_fb_helper *fb_helper)
 	info->skip_vt_switch = true;
 
 	return info;
+#ifdef __linux__
 
 err_release:
 	framebuffer_release(info);
 	return ERR_PTR(ret);
+#endif
 }
 EXPORT_SYMBOL(drm_fb_helper_alloc_info);
 
@@ -1353,7 +1357,9 @@ EXPORT_SYMBOL(drm_fb_helper_check_var);
 int drm_fb_helper_set_par(struct fb_info *info)
 {
 	struct drm_fb_helper *fb_helper = info->par;
+#ifdef __linux__
 	struct fb_var_screeninfo *var = &info->var;
+#endif
 	bool force;
 
 	if (oops_in_progress)
