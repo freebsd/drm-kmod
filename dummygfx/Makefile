@@ -1,4 +1,5 @@
-# $FreeBSD$
+# `kconfig.mk` defines variables used to conditionally add files to $(SRCS).
+.include "../kconfig.mk"
 
 SRCDIR=	${.CURDIR}
 
@@ -25,6 +26,13 @@ SRCS	+=			\
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
+.include <bsd.kmod.mk>
+
+# These Makefiles are included after <bsd.kmod.mk> because they expand
+# variables defined by it.
+.include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
+
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
 
@@ -38,7 +46,5 @@ CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=dummygfx_'
 CFLAGS+= -include ${SRCDIR:H}/drivers/gpu/drm/drm_os_config.h
 
 EXPORT_SYMS=	YES
-
-.include <bsd.kmod.mk>
 
 CWARNFLAGS += -Wno-cast-qual
