@@ -1,4 +1,5 @@
-# $FreeBSD$
+# `kconfig.mk` defines variables used to conditionally add files to $(SRCS).
+.include "../kconfig.mk"
 
 SRCDIR=	${.CURDIR}
 
@@ -38,8 +39,15 @@ SRCS	+=			\
 	pci_if.h		\
 	vnode_if.h
 
-EXPORT_SYMS=	YES
+CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 .include <bsd.kmod.mk>
+
+# These Makefiles are included after <bsd.kmod.mk> because they expand
+# variables defined by it.
+.include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
+
+EXPORT_SYMS=	YES
 
 CWARNFLAGS += -Wno-cast-qual

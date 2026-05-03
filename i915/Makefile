@@ -1,12 +1,9 @@
-# $FreeBSD$
+# `kconfig.mk` defines variables used to conditionally add files to $(SRCS).
+.include "../kconfig.mk"
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
 .PATH:	${SRCDIR} ${SRCDIR}/gt ${SRCDIR}/gt/uc ${SRCDIR}/gem ${SRCDIR}/display ${SRCDIR}/oa
-
-.include "../kconfig.mk"
-.include "../linuxkpi_version.mk"
-.include "../compiler_flags.mk"
 
 KMOD=	i915kms
 SRCS=	\
@@ -254,20 +251,6 @@ SRCS+=	i915_gpu_error.c
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
-CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
-CFLAGS+= -I${.CURDIR:H}/linuxkpi/bsd/include
-CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
-CFLAGS+= -I${SYSDIR}/compat/linuxkpi/dummy/include
-
-CFLAGS+= -I${.CURDIR:H}/include
-CFLAGS+= -I${.CURDIR:H}/include/drm
-CFLAGS+= -I${.CURDIR:H}/include/uapi
-CFLAGS+= -I${SRCDIR:H:H} -I${SRCDIR} -I${SRCDIR}/display
-
-CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=i915_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
-CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
-
 SRCS	+=			\
 	opt_acpi.h		\
 	opt_drm.h		\
@@ -281,6 +264,25 @@ SRCS	+=			\
 	vnode_if.h
 
 .include <bsd.kmod.mk>
+
+# These Makefiles are included after <bsd.kmod.mk> because they expand
+# variables defined by it.
+.include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
+
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/bsd/include
+CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
+CFLAGS+= -I${SYSDIR}/compat/linuxkpi/dummy/include
+
+CFLAGS+= -I${.CURDIR:H}/include
+CFLAGS+= -I${.CURDIR:H}/include/drm
+CFLAGS+= -I${.CURDIR:H}/include/uapi
+CFLAGS+= -I${SRCDIR:H:H} -I${SRCDIR} -I${SRCDIR}/display
+
+CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=i915_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
+CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 # Re-instate -Wno-cast-qual for all files
 # Reason: More or less all files need it due to use of test_bit() macro

@@ -1,12 +1,11 @@
 # $FreeBSD$
 
+# `kconfig.mk` defines variables used to conditionally add files to $(SRCS).
+.include "../kconfig.mk"
+
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
 .PATH:	${SRCDIR} ${SRCDIR}/scheduler
-
-.include "../kconfig.mk"
-.include "../linuxkpi_version.mk"
-.include "../compiler_flags.mk"
 
 KMOD=	drm
 SRCS=	drm_atomic.c \
@@ -111,23 +110,6 @@ SRCS+=	sched_main.c \
 	sched_fence.c \
 	sched_entity.c
 
-CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
-
-CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
-CFLAGS+= -I${.CURDIR:H}/linuxkpi/bsd/include
-CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
-CFLAGS+= -I${.CURDIR:H}/linuxkpi/dummy/include # fallback to dummy
-CFLAGS+= -I${SYSDIR}/compat/linuxkpi/dummy/include
-CFLAGS+= -I${SRCDIR}
-CFLAGS+= -I${.CURDIR:H}/include
-CFLAGS+= -I${.CURDIR:H}/include/drm
-CFLAGS+= -I${.CURDIR:H}/include/uapi
-CFLAGS+= -I${SRCDIR:H}
-
-CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
-CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_' -DDRM_SYSCTL_PARAM_PREFIX=_dri
-CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
-
 SRCS+=	device_if.h \
 	vnode_if.h \
 	bus_if.h \
@@ -142,13 +124,46 @@ SRCS+=	device_if.h \
 	opt_vm.h \
 	opt_syscons.h
 
+CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
+
+.include <bsd.kmod.mk>
+
+# These Makefiles are included after <bsd.kmod.mk> because they expand
+# variables defined by it.
+.include "../linuxkpi_version.mk"
+.include "../compiler_flags.mk"
+
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
+CFLAGS+= -I${.CURDIR:H}/linuxkpi/bsd/include
+CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
+CFLAGS+= -I${SYSDIR}/compat/linuxkpi/dummy/include
+CFLAGS+= -I${SRCDIR}
+CFLAGS+= -I${.CURDIR:H}/include
+CFLAGS+= -I${.CURDIR:H}/include/drm
+CFLAGS+= -I${.CURDIR:H}/include/uapi
+CFLAGS+= -I${SRCDIR:H}
+
+CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
+CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=drm_' -DDRM_SYSCTL_PARAM_PREFIX=_dri
+CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
+
 .if ${MACHINE_CPUARCH} == "powerpc"
 CWARNFLAGS+=-Wno-cast-qual
 .endif
 CWARNFLAGS+= -Wno-pointer-sign -Wno-format
 
-CWARNFLAGS.drm_ioc32.c+=	-Wno-address-of-packed-member
+CWARNFLAGS+=   -Wno-format -Wno-gnu-pointer-arith
+
+CWARNFLAGS.drm_blend.c+=			-Wno-cast-qual
+CWARNFLAGS.drm_dp_helper.c+=			-Wno-unused-const-variable
+CWARNFLAGS.drm_dp_mst_topology.c+=		-Wno-missing-prototypes -Wno-unused-but-set-variable
+CWARNFLAGS.drm_drv.c+=				-Wno-unused-variable -Wno-uninitialized
+CWARNFLAGS.drm_edid.c+=				-Wno-cast-qual
+CWARNFLAGS.drm_fb_helper.c+=			-Wno-unused-variable -Wno-unused-label -Wno-unused-but-set-variable
+CWARNFLAGS.drm_gem_framebuffer_helper.c+=	-Wno-missing-prototypes
+CWARNFLAGS.drm_mipi_dsi.c+=			-Wno-missing-prototypes
+CWARNFLAGS.drm_mm.c+=				-Wno-cast-qual -Wno-unused-function
+CWARNFLAGS.drm_panel_orientation_quirks.c+=	-Wno-cast-qual
+CWARNFLAGS.drm_sysfs.c+=			-Wno-unused-variable
 
 EXPORT_SYMS=	YES
-
-.include <bsd.kmod.mk>

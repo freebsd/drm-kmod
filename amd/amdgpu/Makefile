@@ -1,13 +1,10 @@
-# $FreeBSD$
+# `kconfig.mk` defines variables used to conditionally add files to $(SRCS).
+.include "../../kconfig.mk"
 
 SRCDIR=	${.CURDIR:H:H}/drivers/gpu/drm/amd
 DRM= ${.CURDIR:H:H}/drivers/gpu/drm
 
 KMOD=	amdgpu
-
-.include "../../kconfig.mk"
-.include "../../linuxkpi_version.mk"
-.include "../../compiler_flags.mk"
 
 .if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
 _dml=	${SRCDIR}/display/dc/dml \
@@ -744,7 +741,17 @@ SRCS+=	amd_powerplay.c \
 SRCS+=	amdgpu_pmu.c
 .endif
 
+SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h pci_iov_if.h iicbus_if.h opt_drm.h \
+        opt_vm.h opt_syscons.h opt_acpi.h
+
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
+
+.include <bsd.kmod.mk>
+
+# These Makefiles are included after <bsd.kmod.mk> because they expand
+# variables defined by it.
+.include "../../linuxkpi_version.mk"
+.include "../../compiler_flags.mk"
 
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${.CURDIR:H:H}/linuxkpi/bsd/include
@@ -785,11 +792,6 @@ CFLAGS+= -I${DRM}/scheduler
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=amdgpu_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
-
-SRCS+=	device_if.h vnode_if.h bus_if.h pci_if.h pci_iov_if.h device_if.h iicbus_if.h opt_drm.h \
-        opt_vm.h opt_syscons.h opt_acpi.h
-
-.include <bsd.kmod.mk>
 
 CFLAGS.gcc+= -Wno-redundant-decls -Wno-unused-but-set-variable
 
