@@ -163,7 +163,7 @@ CWARNFLAGS.drm_blend.c+=			-Wno-cast-qual
 CWARNFLAGS.drm_dp_helper.c+=			-Wno-unused-const-variable
 CWARNFLAGS.drm_dp_mst_topology.c+=		-Wno-missing-prototypes
 CWARNFLAGS.drm_dp_tunnel.c+=			-Wno-incompatible-pointer-types-discards-qualifiers
-CWARNFLAGS.drm_drv.c+=				-Wno-unused-variable
+CWARNFLAGS.drm_drv.c+=				-Wno-unused-variable -Wno-uninitialized
 CWARNFLAGS.drm_edid.c+=				-Wno-cast-qual
 CWARNFLAGS.drm_fb_helper.c+=			-Wno-unused-variable -Wno-unused-label
 CWARNFLAGS.drm_fbdev_ttm.c+=			-Wno-unused-variable -Wno-unused-label
@@ -176,6 +176,7 @@ CWARNFLAGS.drm_hdcp_helper.c+=			-Wno-cast-qual
 CWARNFLAGS.drm_ioc32.c+=			-Wno-address-of-packed-member
 CWARNFLAGS.drm_mipi_dsi.c+=			-Wno-missing-prototypes
 CWARNFLAGS.drm_mm.c+=				-Wno-cast-qual -Wno-unused-function
+CWARNFLAGS.drm_nomodeset.c+=			-Wno-missing-prototypes
 CWARNFLAGS.drm_panel_orientation_quirks.c+=	-Wno-cast-qual
 CWARNFLAGS.drm_syncobj.c+=			-Wno-unused-variable
 
