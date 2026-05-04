@@ -63,5 +63,6 @@ CWARNFLAGS+= -Wno-pointer-arith -Wno-format
 CWARNFLAGS+= -Wno-expansion-to-defined
 
 CWARNFLAGS.ttm_pool.c+=		-Wno-unused-variable -Wno-unused-label -Wno-unused-but-set-variable
+CWARNFLAGS.ttm_tt.c+=		-Wno-unused-variable
 
 EXPORT_SYMS=	YES
