@@ -1,5 +1,8 @@
 # $FreeBSD$
 
+.include "../kconfig.mk"
+.include "../linuxkpi_version.mk"
+
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 
 .PATH:	${SRCDIR} \
@@ -307,8 +310,6 @@ CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 .include <bsd.kmod.mk>
 
-.include "../kconfig.mk"
-.include "../linuxkpi_version.mk"
 .include "../compiler_flags.mk"
 
 
