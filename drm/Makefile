@@ -1,5 +1,8 @@
 # $FreeBSD$
 
+.include "../kconfig.mk"
+.include "../linuxkpi_version.mk"
+
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
 .PATH:	${SRCDIR} ${SRCDIR}/display ${SRCDIR}/scheduler
@@ -140,8 +143,6 @@ CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
 .include <bsd.kmod.mk>
 
-.include "../kconfig.mk"
-.include "../linuxkpi_version.mk"
 .include "../compiler_flags.mk"
 
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
@@ -169,12 +170,17 @@ CWARNFLAGS.drm_dp_mst_topology.c+=		-Wno-missing-prototypes
 CWARNFLAGS.drm_dp_tunnel.c+=			-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.drm_drv.c+=				-Wno-unused-variable
 CWARNFLAGS.drm_edid.c+=				-Wno-cast-qual
+CWARNFLAGS.drm_fb_helper.c+=			-Wno-unused-variable -Wno-unused-label
+CWARNFLAGS.drm_fbdev_ttm.c+=			-Wno-unused-variable -Wno-unused-label
 CWARNFLAGS.drm_file.c+=				-Wno-unused-but-set-variable
 CWARNFLAGS.drm_file.c+=				-Wno-unused-value
 CWARNFLAGS.drm_gem_atomic_helper.c+=		-Wno-missing-prototypes
 CWARNFLAGS.drm_gem_framebuffer_helper.c+=	-Wno-missing-prototypes
 CWARNFLAGS.drm_hdcp_helper.c+=			-Wno-cast-qual
 CWARNFLAGS.drm_ioc32.c+=			-Wno-address-of-packed-member
+CWARNFLAGS.drm_mipi_dsi.c+=			-Wno-missing-prototypes
 CWARNFLAGS.drm_mm.c+=				-Wno-cast-qual -Wno-unused-function
+CWARNFLAGS.drm_panel_orientation_quirks.c+=	-Wno-cast-qual
+CWARNFLAGS.drm_syncobj.c+=			-Wno-unused-variable
 
 EXPORT_SYMS=	YES
