@@ -6,7 +6,6 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/ttm
 
 .include "../kconfig.mk"
 .include "../linuxkpi_version.mk"
-.include "../compiler_flags.mk"
 
 KMOD=	ttm
 SRCS=	ttm_bo.c \
@@ -39,6 +38,10 @@ SRCS+=	device_if.h \
 
 CLEANFILES+= ${KMOD}.ko.full ${KMOD}.ko.debug
 
+.include <bsd.kmod.mk>
+
+.include "../compiler_flags.mk"
+
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/gplv2/include
 CFLAGS+= -I${.CURDIR:H}/linuxkpi/bsd/include
 CFLAGS+= -I${SYSDIR}/compat/linuxkpi/common/include
@@ -59,6 +62,6 @@ CWARNFLAGS+=-Wno-cast-qual
 CWARNFLAGS+= -Wno-pointer-arith -Wno-format
 CWARNFLAGS+= -Wno-expansion-to-defined
 
-EXPORT_SYMS=	YES
+CWARNFLAGS.ttm_pool.c+=		-Wno-unused-variable -Wno-unused-label -Wno-unused-but-set-variable
 
-.include <bsd.kmod.mk>
+EXPORT_SYMS=	YES
