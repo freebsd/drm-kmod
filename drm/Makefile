@@ -172,6 +172,7 @@ CWARNFLAGS.drm_file.c+=				-Wno-unused-but-set-variable
 CWARNFLAGS.drm_file.c+=				-Wno-unused-value
 CWARNFLAGS.drm_gem_atomic_helper.c+=		-Wno-missing-prototypes
 CWARNFLAGS.drm_gem_framebuffer_helper.c+=	-Wno-missing-prototypes
+CWARNFLAGS.drm_hashtab.c+=			-Wno-missing-prototypes
 CWARNFLAGS.drm_hdcp_helper.c+=			-Wno-cast-qual
 CWARNFLAGS.drm_ioc32.c+=			-Wno-address-of-packed-member
 CWARNFLAGS.drm_mipi_dsi.c+=			-Wno-missing-prototypes
