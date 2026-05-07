@@ -1,7 +1,0 @@
-freebsd_task:
-        script:
-                - make -j4
-        matrix:
-                - name: freebsd14-amd64
-                  freebsd_instance:
-                     image_family: freebsd-14-2-snap

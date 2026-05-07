@@ -1,0 +1,48 @@
+name: Build Test
+
+on:
+  - pull_request
+  - push
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: "FreeBSD ${{ matrix.freebsd_src_ref }} — ${{ matrix.arch }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        freebsd_src_ref: ['main', 'stable/15']
+        arch: ['x86_64', 'aarch64']
+
+    steps:
+      - name: Checkout drm-kmod repository
+        uses: actions/checkout@v6
+        with:
+          path: drm-kmod
+
+      - name: Cache FreeBSD source repository
+        uses: actions/cache@v5
+        with:
+          path: src/.git
+          key: freebsd-src-${{ matrix.freebsd_src_ref }}
+
+      - name: Checkout FreeBSD source repository
+        uses: actions/checkout@v6
+        with:
+          repository: freebsd/freebsd-src
+          ref: ${{ matrix.freebsd_src_ref }}
+          path: src
+
+      - name: Compile drm-kmod
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          run: |
+            export SYSDIR=$PWD/src/sys
+            test -d "$SYSDIR"
+
+            make -j$(sysctl -n hw.ncpu) -C drm-kmod
