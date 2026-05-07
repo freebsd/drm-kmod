@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        freebsd_src_ref: ['main']
+        freebsd_src_ref: ['drm-related-linuxkpi-changes']
         arch: ['x86_64']
 
     steps:
@@ -33,7 +33,7 @@ jobs:
       - name: Checkout FreeBSD source repository
         uses: actions/checkout@v6
         with:
-          repository: freebsd/freebsd-src
+          repository: dumbbell/freebsd-src
           ref: ${{ matrix.freebsd_src_ref }}
           path: src
 
