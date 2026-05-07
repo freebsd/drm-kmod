@@ -15,13 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        freebsd_src_ref: ['main', 'stable/15']
+        freebsd_src_ref: ['main']
         arch: ['x86_64']
-        # TODO: Requires FreeBSD 15.1-RELEASE.
-        # include:
-        #   - vm_release: '15.1'
-        #   - freebsd_src_ref: 'release/15.1.0'
-        #     test_kldload: true
 
     steps:
       - name: Checkout drm-kmod repository
