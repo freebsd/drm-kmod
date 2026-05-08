@@ -10,12 +10,12 @@ concurrency:
 
 jobs:
   test:
-    name: "FreeBSD ${{ matrix.freebsd_src_ref }} — ${{ matrix.arch }}"
+    name: "${{ matrix.freebsd_src_ref }} — ${{ matrix.arch }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        freebsd_src_ref: ['main', 'stable/15']
+        freebsd_src_ref: ['main', 'release/15.0.0']
         arch: ['x86_64']
 
     steps:
