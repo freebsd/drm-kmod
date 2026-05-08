@@ -130,7 +130,6 @@ SRCS+=	device_if.h \
 	bus_if.h \
 	pci_if.h \
 	pci_iov_if.h \
-	device_if.h \
 	iicbus_if.h \
 	opt_teken.h \
 	opt_splash.h \
