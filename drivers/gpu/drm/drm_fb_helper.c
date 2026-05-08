@@ -323,6 +323,7 @@ static const struct sysrq_key_op sysrq_drm_fb_helper_restore_op = { };
 #endif
 #endif
 
+#ifdef __linux__
 static void drm_fb_helper_dpms(struct fb_info *info, int dpms_mode)
 {
 	struct drm_fb_helper *fb_helper = info->par;
@@ -332,7 +333,6 @@ static void drm_fb_helper_dpms(struct fb_info *info, int dpms_mode)
 	mutex_unlock(&fb_helper->lock);
 }
 
-#ifdef __linux__
 /**
  * drm_fb_helper_blank - implementation for &fb_ops.fb_blank
  * @blank: desired blanking state
@@ -669,6 +669,7 @@ void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 }
 EXPORT_SYMBOL(drm_fb_helper_fini);
 
+#ifdef __linux__
 static bool drm_fbdev_use_shadow_fb(struct drm_fb_helper *fb_helper)
 {
 	struct drm_device *dev = fb_helper->dev;
@@ -699,7 +700,6 @@ static void drm_fb_helper_damage(struct fb_info *info, u32 x, u32 y,
 	schedule_work(&helper->damage_work);
 }
 
-#ifdef __linux__
 // ifdef CONFIG_FB_DEFERRED_IO removed upstream
 // Does not compile, FreeBSD vm_page has no field lru
 
