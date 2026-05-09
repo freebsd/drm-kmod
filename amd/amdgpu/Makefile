@@ -6,6 +6,8 @@ DRM= ${.CURDIR:H:H}/drivers/gpu/drm
 
 KMOD=	amdgpu
 
+EXPORT_SYMS=	YES
+
 .if !empty(KCONFIG:MDRM_AMD_DC_DCN*)
 _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/dml/dcn10 \
@@ -1298,5 +1300,3 @@ CWARNFLAGS.vegam_smumgr.c=		-Wno-missing-prototypes
 
 # modules/*
 CWARNFLAGS.freesync.c=			-Wno-unused-but-set-variable
-
-EXPORT_SYMS=	YES

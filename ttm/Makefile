@@ -6,6 +6,9 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/ttm
 .PATH:	${SRCDIR} ${SRCDIR}/..
 
 KMOD=	ttm
+
+EXPORT_SYMS=	YES
+
 SRCS=	ttm_bo.c \
 	ttm_bo_util.c \
 	ttm_bo_vm.c \
@@ -64,5 +67,3 @@ CWARNFLAGS+= -Wno-expansion-to-defined
 
 CWARNFLAGS.ttm_pool.c+=		-Wno-unused-variable -Wno-unused-label -Wno-unused-but-set-variable
 CWARNFLAGS.ttm_tt.c+=		-Wno-unused-variable
-
-EXPORT_SYMS=	YES

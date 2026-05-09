@@ -8,6 +8,9 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 .PATH:	${SRCDIR} ${SRCDIR}/display ${SRCDIR}/scheduler
 
 KMOD=	drm
+
+EXPORT_SYMS=	YES
+
 SRCS=	drm_atomic.c \
 	drm_atomic_helper.c \
 	drm_atomic_state_helper.c \
@@ -181,5 +184,3 @@ CWARNFLAGS.drm_mm.c+=				-Wno-cast-qual -Wno-unused-function
 CWARNFLAGS.drm_nomodeset.c+=			-Wno-missing-prototypes
 CWARNFLAGS.drm_panel_orientation_quirks.c+=	-Wno-cast-qual
 CWARNFLAGS.drm_syncobj.c+=			-Wno-unused-variable
-
-EXPORT_SYMS=	YES

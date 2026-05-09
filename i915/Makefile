@@ -12,6 +12,9 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/i915
 	${SRCDIR}/pxp
 
 KMOD=	i915kms
+
+EXPORT_SYMS=	YES
+
 SRCS=	\
 	i915_active.c \
 	i915_cmd_parser.c \
