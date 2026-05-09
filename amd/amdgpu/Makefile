@@ -6,6 +6,8 @@ DRM= ${.CURDIR:H:H}/drivers/gpu/drm
 
 KMOD=	amdgpu
 
+EXPORT_SYMS=	YES
+
 #
 # Work around ctfmerge(1) segfaults with recent amdgpu.ko
 #
@@ -1737,5 +1739,3 @@ CWARNFLAGS.vegam_smumgr.c=		-Wno-missing-prototypes
 
 # modules/*
 CWARNFLAGS.freesync.c=			-Wno-unused-but-set-variable
-
-EXPORT_SYMS=	YES

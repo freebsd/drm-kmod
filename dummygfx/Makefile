@@ -6,6 +6,9 @@ SRCDIR=	${.CURDIR}
 .PATH:	${SRCDIR}
 
 KMOD=	dummygfx
+
+EXPORT_SYMS=	YES
+
 SRCS=	\
 	dummygfx_drv.c \
 	dummygfx_debugfs.c
@@ -44,7 +47,5 @@ CFLAGS+= -I${SRCDIR:H}/drivers/gpu
 CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=dummygfx_'
 CFLAGS+= -include ${SRCDIR:H}/drivers/gpu/drm/drm_os_config.h
-
-EXPORT_SYMS=	YES
 
 CWARNFLAGS += -Wno-cast-qual

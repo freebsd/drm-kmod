@@ -6,6 +6,9 @@ SRCDIR=	${.CURDIR:H}/drivers/gpu/drm/radeon
 .PATH:	${SRCDIR}
 
 KMOD=	radeonkms
+
+EXPORT_SYMS=	YES
+
 SRCS=	atom.c \
 	atombios_crtc.c \
 	atombios_dp.c \
@@ -196,5 +199,3 @@ CWARNFLAGS.trinity_dpm.c=		-Wno-unused-const-variable
 CWARNFLAGS.vce_v1_0.c=			-Wno-missing-prototypes -Wno-cast-qual
 CWARNFLAGS.vce_v2_0.c=			-Wno-missing-prototypes
 CWARNFLAGS.radeon_atpx_handler.c=	-Wno-missing-prototypes -Wno-unused-but-set-variable
-
-EXPORT_SYMS=	YES

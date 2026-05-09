@@ -6,6 +6,9 @@ SRCDIR=	${.CURDIR:H}/drivers/video
 .PATH:	${SRCDIR}
 
 KMOD=	linuxkpi_video
+
+EXPORT_SYMS=    YES
+
 SRCS=	hdmi.c \
 	video_kmod.c
 
@@ -40,5 +43,3 @@ CFLAGS+= '-DLINUXKPI_PARAM_PREFIX=ttm_' -DDRM_SYSCTL_PARAM_PREFIX=_${KMOD}
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 CWARNFLAGS.hdmi.c=	-Wno-cast-qual
-
-EXPORT_SYMS=    YES
