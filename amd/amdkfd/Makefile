@@ -7,6 +7,8 @@ SRCDIR=	${.CURDIR:H:H}/drivers/gpu/drm/amd
 
 KMOD	= amdkfd
 
+EXPORT_SYMS=	YES
+
 # XXX NOT PORTED YET:
 #	kfd_device.c : amd_iommu 
 #	kfd_chardev.c : lots of missing stuff
@@ -84,5 +86,3 @@ CWARNFLAGS.kfd_device_queue_manager.c=	-Wno-format -Wno-strict-prototypes -Wno-i
 CWARNFLAGS.kfd_doorbell.c=	-Wno-format
 CWARNFLAGS.kfd_packet_manager.c=	-Wno-format
 CWARNFLAGS.kfd_queue.c= -Wno-format
-
-EXPORT_SYMS=	YES

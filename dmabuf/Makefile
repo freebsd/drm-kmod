@@ -6,6 +6,9 @@ SRCDIR=	${.CURDIR:H}/drivers/dma-buf
 .PATH:	${SRCDIR}
 
 KMOD=	dmabuf
+
+EXPORT_SYMS=	YES
+
 SRCS=	dma-buf-kmod.c \
 	dma-buf.c \
 	dma-fence-array.c \
@@ -38,5 +41,3 @@ CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 CWARNFLAGS.dma-buf.c+=		-Wno-pointer-arith
 CWARNFLAGS.dma-fence-unwrap.c+=	-Wno-cast-qual
-
-EXPORT_SYMS=	YES
