@@ -1,4 +1,4 @@
-name: Build Test
+name: Test build + kldload
 
 on:
   - pull_request
@@ -16,7 +16,12 @@ jobs:
       fail-fast: false
       matrix:
         freebsd_src_ref: ['main', 'stable/15']
-        arch: ['x86_64', 'aarch64']
+        arch: ['x86_64']
+        # TODO: Requires FreeBSD 15.1-RELEASE.
+        # include:
+        #   - vm_release: '15.1'
+        #   - freebsd_src_ref: 'release/15.1.0'
+        #     test_kldload: true
 
     steps:
       - name: Checkout drm-kmod repository
@@ -40,9 +45,31 @@ jobs:
       - name: Compile drm-kmod
         uses: vmactions/freebsd-vm@v1
         with:
+          release: ${{ matrix.vm_release }}
+          arch: ${{ matrix.arch }}
           usesh: true
           run: |
+            set -ex
+
             export SYSDIR=$PWD/src/sys
             test -d "$SYSDIR"
 
             make -j$(sysctl -n hw.ncpu) -C drm-kmod
+            make -C drm-kmod install
+
+      - name: Load DRM drivers
+        if: ${{ matrix.test_kldload == true }}
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: ${{ matrix.vm_release }}
+          arch: ${{ matrix.arch }}
+          usesh: true
+          run: |
+            set -ex
+
+            # The firmwares are missing, but that's ok, there are no GPU in CI
+            # anyway. The goal is just to check the modules are loadable and
+            # there are no missing symbols.
+            kldload amdgpu i915kms radeonkms
+
+            cat /var/log/messages
