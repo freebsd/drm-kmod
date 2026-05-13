@@ -297,12 +297,19 @@ linux_fb_get_options(const char *connector_name, char **option)
  *
  * Copied from `sys/dev/vt/hw/fb/vt_fb.c`.
  */
+#ifdef INVARIANTS
+static uint32_t
+fb_size(struct linux_fb_info *info)
+{
+	return (info->screen_size ? info->screen_size : info->fix.smem_len);
+}
+#endif
 
 static void
 fb_mem_wr1(struct linux_fb_info *info, uint32_t offset, uint8_t value)
 {
 	KASSERT(
-	    (offset < info->screen_size),
+	    (offset < fb_size(info)),
 	    ("Offset %#08x out of framebuffer size", offset));
 	*(uint8_t *)(info->screen_base + offset) = value;
 }
@@ -311,7 +318,7 @@ static void
 fb_mem_wr2(struct linux_fb_info *info, uint32_t offset, uint16_t value)
 {
 	KASSERT(
-	    (offset < info->screen_size),
+	    (offset < fb_size(info)),
 	    ("Offset %#08x out of framebuffer size", offset));
 	*(uint16_t *)(info->screen_base + offset) = value;
 }
@@ -320,7 +327,7 @@ static void
 fb_mem_wr4(struct linux_fb_info *info, uint32_t offset, uint32_t value)
 {
 	KASSERT(
-	    (offset < info->screen_size),
+	    (offset < fb_size(info)),
 	    ("Offset %#08x out of framebuffer size", offset));
 	*(uint32_t *)(info->screen_base + offset) = value;
 }
