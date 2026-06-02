@@ -148,4 +148,6 @@ for file in ${PATCH_DIR}/*; do
 	sed -i '' 's/\([ab]\)\/include\/linux\/dma-resv\.h/\1\/linuxkpi\/bsd\/include\/linux\/dma-resv.h/g' ${file}
 	sed -i '' 's/\([ab]\)\/include\/linux\/dma-fence-unwrap\.h/\1\/linuxkpi\/gplv2\/include\/linux\/dma-fence-unwrap.h/' ${file}
 	sed -i '' 's/\([ab]\)\/include\/linux\/hdmi\.h/\1\/linuxkpi\/bsd\/include\/linux\/hdmi.h/g' ${file}
+	sed -i '' 's|\([ab]/drivers/video\)/aperture\.c|\1/linux_aperture.c|g' ${file}
+	sed -i '' 's|\([ab]/drivers/video\)/hdmi\.c|\1/linux_hdmi.c|g' ${file}
 done

@@ -21,7 +21,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __linux__
 #include <drm/display/drm_dp.h>
+#endif
 #include <linux/bitops.h>
 #include <linux/bug.h>
 #include <linux/errno.h>
@@ -486,6 +488,7 @@ ssize_t hdmi_audio_infoframe_pack(struct hdmi_audio_infoframe *frame,
 }
 EXPORT_SYMBOL(hdmi_audio_infoframe_pack);
 
+#ifdef __linux__
 /**
  * hdmi_audio_infoframe_pack_for_dp - Pack a HDMI Audio infoframe for DisplayPort
  *
@@ -522,6 +525,7 @@ hdmi_audio_infoframe_pack_for_dp(const struct hdmi_audio_infoframe *frame,
 	return frame->length + 4;
 }
 EXPORT_SYMBOL(hdmi_audio_infoframe_pack_for_dp);
+#endif
 
 /**
  * hdmi_vendor_infoframe_init() - initialize an HDMI vendor infoframe

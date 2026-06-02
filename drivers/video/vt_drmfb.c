@@ -31,18 +31,19 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
-#include <sys/reboot.h>
+#include <sys/param.h>
+#include <sys/systm.h>
 #include <sys/fbio.h>
+#include <sys/module.h>
+#include <sys/reboot.h>
+
 #include <dev/vt/vt.h>
 #include <dev/vt/hw/fb/vt_fb.h>
 #include <dev/vt/colors/vt_termcolors.h>
 
 #include <linux/fb.h>
 
-#include <drm/drm_fb_helper.h>
+#include "fb_if.h"
 
 /*
  * `drm_fb_helper.h` redefines `fb_info` to be `linux_fb_info` to manage the
@@ -54,27 +55,17 @@ __FBSDID("$FreeBSD$");
  */
 #undef	fb_info
 
-#include <drm/drm_os_freebsd.h>
+#define	to_linux_fb_info(f)	container_of(f, struct linux_fb_info, fbio);
 
-#include "vt_drmfb.h"
-
-#define	to_drm_fb_helper(fbio) ((struct drm_fb_helper *)fbio->fb_priv)
-#define	to_linux_fb_info(fbio) (to_drm_fb_helper(fbio)->info)
-
-vd_init_t		vt_drmfb_init;
-vd_fini_t		vt_drmfb_fini;
-vd_blank_t		vt_drmfb_blank;
-vd_bitblt_bmp_t		vt_drmfb_bitblt_bitmap;
-vd_bitblt_argb_t	vt_drmfb_bitblt_argb;
-vd_drawrect_t		vt_drmfb_drawrect;
-vd_setpixel_t		vt_drmfb_setpixel;
-vd_invalidate_text_t	vt_drmfb_invalidate_text;
-vd_postswitch_t		vt_drmfb_postswitch;
+static vd_blank_t		vt_drmfb_blank;
+static vd_bitblt_bmp_t		vt_drmfb_bitblt_bitmap;
+static vd_bitblt_argb_t		vt_drmfb_bitblt_argb;
+static vd_drawrect_t		vt_drmfb_drawrect;
+static vd_setpixel_t		vt_drmfb_setpixel;
+static vd_invalidate_text_t	vt_drmfb_invalidate_text;
 
 static struct vt_driver vt_drmfb_driver = {
 	.vd_name = "drmfb",
-	.vd_init = vt_drmfb_init,
-	.vd_fini = vt_drmfb_fini,
 	.vd_blank = vt_drmfb_blank,
 	/*
 	 * .vd_bitblt_text is unset.
@@ -90,12 +81,16 @@ static struct vt_driver vt_drmfb_driver = {
 	.vd_drawrect = vt_drmfb_drawrect,
 	.vd_setpixel = vt_drmfb_setpixel,
 	.vd_invalidate_text = vt_drmfb_invalidate_text,
-	.vd_postswitch = vt_drmfb_postswitch,
 	.vd_priority = VD_PRIORITY_GENERIC+20,
-	.vd_suspend = vt_drmfb_suspend,
-	.vd_resume = vt_drmfb_resume,
+
+	/* Use generic implementation */
+	.vd_suspend = vt_suspend,
+	.vd_resume = vt_resume,
 
 	/* Use vt_fb implementation */
+	.vd_init = vt_fb_init,
+	.vd_fini = vt_fb_fini,
+	.vd_postswitch = vt_fb_postswitch,
 	.vd_fb_ioctl = vt_fb_ioctl,
 	.vd_fb_mmap = vt_fb_mmap,
 
@@ -104,13 +99,13 @@ static struct vt_driver vt_drmfb_driver = {
 
 VT_DRIVER_DECLARE(vt_drmfb, vt_drmfb_driver);
 
-void
+static void
 vt_drmfb_setpixel(struct vt_device *vd, int x, int y, term_color_t color)
 {
 	vt_drmfb_drawrect(vd, x, y, x, y, 1, color);
 }
 
-void
+static void
 vt_drmfb_drawrect(
     struct vt_device *vd,
     int x1, int y1, int x2, int y2, int fill,
@@ -147,7 +142,7 @@ vt_drmfb_drawrect(
 	info->fbops->fb_fillrect(info, &rect);
 }
 
-void
+static void
 vt_drmfb_blank(struct vt_device *vd, term_color_t color)
 {
 	struct fb_info *fbio;
@@ -165,7 +160,7 @@ vt_drmfb_blank(struct vt_device *vd, term_color_t color)
 	vt_drmfb_drawrect(vd, x1, y1, x2, y2, 1, color);
 }
 
-void
+static void
 vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
     const uint8_t *pattern, const uint8_t *mask,
     unsigned int width, unsigned int height,
@@ -174,7 +169,6 @@ vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
 	struct fb_info *fbio;
 	struct linux_fb_info *info;
 	struct fb_image image;
-	uint32_t vt_width;
 
 	fbio = vd->vd_softc;
 	info = to_linux_fb_info(fbio);
@@ -182,17 +176,10 @@ vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
 		return;
 
 	/* Bound by right and bottom edges. */
-	if (y + height > vw->vw_draw_area.tr_end.tp_row) {
-		if (y >= vw->vw_draw_area.tr_end.tp_row)
-			return;
-		height = vw->vw_draw_area.tr_end.tp_row - y;
-	}
-	vt_width = width;
-	if (x + width > vw->vw_draw_area.tr_end.tp_col) {
-		if (x >= vw->vw_draw_area.tr_end.tp_col)
-			return;
-		vt_width = vw->vw_draw_area.tr_end.tp_col - x;
-	}
+	if (y >= vw->vw_draw_area.tr_end.tp_row)
+		return;
+	if (x >= vw->vw_draw_area.tr_end.tp_col)
+		return;
 
 	image.dx = x;
 	image.dy = y;
@@ -203,7 +190,6 @@ vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
 	image.depth = 1;
 	image.data = pattern;
 	image.mask = mask; // Specific to FreeBSD to display the mouse pointer.
-	image.vt_width = vt_width; // FreeBSD. Stores truncated width.
 
 	if (!kdb_active && !KERNEL_PANICKED())
 		linux_set_current(curthread);
@@ -211,7 +197,7 @@ vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
 	info->fbops->fb_imageblit(info, &image);
 }
 
-int
+static int
 vt_drmfb_bitblt_argb(struct vt_device *vd, const struct vt_window *vw,
     const uint8_t *argb,
     unsigned int width, unsigned int height,
@@ -220,7 +206,6 @@ vt_drmfb_bitblt_argb(struct vt_device *vd, const struct vt_window *vw,
 	struct fb_info *fbio;
 	struct linux_fb_info *info;
 	struct fb_image image;
-	uint32_t vt_width;
 
 	fbio = vd->vd_softc;
 	info = to_linux_fb_info(fbio);
@@ -228,17 +213,10 @@ vt_drmfb_bitblt_argb(struct vt_device *vd, const struct vt_window *vw,
 		return (ENOTSUP);
 
 	/* Bound by right and bottom edges. */
-	if (y + height > vw->vw_draw_area.tr_end.tp_row) {
-		if (y >= vw->vw_draw_area.tr_end.tp_row)
-			return (EINVAL);
-		height = vw->vw_draw_area.tr_end.tp_row - y;
-	}
-	vt_width = width;
-	if (x + width > vw->vw_draw_area.tr_end.tp_col) {
-		if (x >= vw->vw_draw_area.tr_end.tp_col)
-			return (EINVAL);
-		vt_width = vw->vw_draw_area.tr_end.tp_col - x;
-	}
+	if (y >= vw->vw_draw_area.tr_end.tp_row)
+		return (EINVAL);
+	if (x >= vw->vw_draw_area.tr_end.tp_col)
+		return (EINVAL);
 
 	image.dx = x;
 	image.dy = y;
@@ -246,51 +224,13 @@ vt_drmfb_bitblt_argb(struct vt_device *vd, const struct vt_window *vw,
 	image.height = height;
 	image.depth = 32;
 	image.data = argb;
-	image.vt_width = vt_width; // FreeBSD. Stores truncated width.
 
 	info->fbops->fb_imageblit(info, &image);
 
 	return (0);
 }
 
-void
-vt_drmfb_postswitch(struct vt_device *vd)
-{
-	struct fb_info *fbio;
-	struct linux_fb_info *info;
-
-	fbio = vd->vd_softc;
-	info = to_linux_fb_info(fbio);
-
-	if (!kdb_active && !KERNEL_PANICKED()) {
-		taskqueue_enqueue(taskqueue_thread, &info->fb_mode_task);
-
-		/* XXX the VT_ACTIVATE IOCTL must be synchronous */
-		if (curthread->td_proc->p_pid != 0 &&
-		    taskqueue_member(taskqueue_thread, curthread) == 0)
-			taskqueue_drain(taskqueue_thread, &info->fb_mode_task);
-	} else {
-#ifdef DDB
-		db_trace_self_depth(10);
-		mdelay(1000);
-#endif
-		if (skip_ddb) {
-			spinlock_enter();
-			doadump(false);
-			EVENTHANDLER_INVOKE(shutdown_final, RB_NOSYNC);
-		}
-
-		if (vd->vd_grabwindow != NULL) {
-			if (info->fbops->fb_debug_enter)
-				info->fbops->fb_debug_enter(info);
-		} else {
-			if (info->fbops->fb_debug_leave)
-				info->fbops->fb_debug_leave(info);
-		}
-	}
-}
-
-void
+static void
 vt_drmfb_invalidate_text(struct vt_device *vd, const term_rect_t *area)
 {
 	unsigned int col, row;
@@ -315,106 +255,59 @@ vt_drmfb_invalidate_text(struct vt_device *vd, const term_rect_t *area)
 	}
 }
 
+/* Newbus methods. */
 static int
-vt_drmfb_init_colors(struct fb_info *info)
+vt_drmfb_probe(device_t dev)
 {
+	char *disabled;
 
-	switch (FBTYPE_GET_BPP(info)) {
-	case 8:
-		return (vt_config_cons_colors(info, COLOR_FORMAT_RGB,
-		    0x7, 5, 0x7, 2, 0x3, 0));
-	case 15:
-		return (vt_config_cons_colors(info, COLOR_FORMAT_RGB,
-		    0x1f, 10, 0x1f, 5, 0x1f, 0));
-	case 16:
-		return (vt_config_cons_colors(info, COLOR_FORMAT_RGB,
-		    0x1f, 11, 0x3f, 5, 0x1f, 0));
-	case 24:
-	case 32: /* Ignore alpha. */
-		return (vt_config_cons_colors(info, COLOR_FORMAT_RGB,
-		    0xff, 16, 0xff, 8, 0xff, 0));
-	default:
-		return (1);
-	}
+	disabled = kern_getenv("kern.vt.disable_drmfb");
+	if (disabled != NULL && strtoul(disabled, NULL, 10) != 0)
+		return (ENXIO);
+
+	return (BUS_PROBE_GENERIC);
 }
 
-int
-vt_drmfb_init(struct vt_device *vd)
+static int
+vt_drmfb_attach(device_t dev)
 {
 	struct fb_info *fbio;
-	u_int margin;
-	int bg, err;
-	term_color_t c;
 
-	fbio = vd->vd_softc;
-	vd->vd_height = MIN(VT_FB_MAX_HEIGHT, fbio->fb_height);
-	margin = (fbio->fb_height - vd->vd_height) >> 1;
-	vd->vd_transpose = margin * fbio->fb_stride;
-	vd->vd_width = MIN(VT_FB_MAX_WIDTH, fbio->fb_width);
-	margin = (fbio->fb_width - vd->vd_width) >> 1;
-	vd->vd_transpose += margin * (fbio->fb_bpp / NBBY);
-	vd->vd_video_dev = fbio->fb_video_dev;
+	fbio = FB_GETINFO(device_get_parent(dev));
+	if (fbio == NULL)
+		return (ENXIO);
 
-	if (fbio->fb_size == 0)
-		return (CN_DEAD);
-
-	if (fbio->fb_pbase == 0 && fbio->fb_vbase == 0)
-		fbio->fb_flags |= FB_FLAG_NOMMAP;
-
-	if (fbio->fb_cmsize <= 0) {
-		err = vt_drmfb_init_colors(fbio);
-		if (err)
-			return (CN_DEAD);
-		fbio->fb_cmsize = 16;
-	}
-
-	c = TC_BLACK;
-	if (TUNABLE_INT_FETCH("teken.bg_color", &bg) != 0) {
-		if (bg == TC_WHITE)
-			bg |= TC_LIGHT;
-		c = bg;
-	}
-
-	/* Clear the screen. */
-	vd->vd_driver->vd_blank(vd, c);
-
-	return (CN_INTERNAL);
+	return (vt_allocate(&vt_drmfb_driver, fbio));
 }
 
-void
-vt_drmfb_fini(struct vt_device *vd, void *softc)
+static int
+vt_drmfb_detach(device_t dev)
 {
-	vd->vd_video_dev = NULL;
+	struct fb_info *fbio;
+
+	fbio = FB_GETINFO(device_get_parent(dev));
+	if (fbio == NULL)
+		return (ENXIO);
+
+	return (vt_deallocate(&vt_drmfb_driver, fbio));
 }
 
-int
-vt_drmfb_attach(struct fb_info *fbio)
-{
-	int ret;
 
-	ret = vt_allocate(&vt_drmfb_driver, fbio);
+static device_method_t vt_drmfb_methods[] = {
+	/* Device interface */
+	DEVMETHOD(device_probe,		vt_drmfb_probe),
+	DEVMETHOD(device_attach,	vt_drmfb_attach),
+	DEVMETHOD(device_detach,	vt_drmfb_detach),
+	DEVMETHOD(device_shutdown,      bus_generic_shutdown),
 
-	return (ret);
-}
+	DEVMETHOD_END
+};
 
-int
-vt_drmfb_detach(struct fb_info *fbio)
-{
-	int ret;
+driver_t vt_drmfb_bus_driver = {
+	"fbd",
+	vt_drmfb_methods,
+	0
+};
 
-	ret = vt_deallocate(&vt_drmfb_driver, fbio);
-
-	return (ret);
-}
-
-void
-vt_drmfb_suspend(struct vt_device *vd)
-{
-	vt_suspend(vd);
-}
-
-void
-vt_drmfb_resume(struct vt_device *vd)
-{
-	vt_resume(vd);
-}
+DRIVER_MODULE(vt_drmfb, drmn, vt_drmfb_bus_driver, NULL, NULL);
+MODULE_VERSION(vt_drmfb, 1);

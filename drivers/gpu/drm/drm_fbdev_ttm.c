@@ -46,9 +46,7 @@ static void drm_fbdev_ttm_fb_destroy(struct fb_info *info)
 	if (!fb_helper->dev)
 		return;
 
-#ifdef __linux__
 	fb_deferred_io_cleanup(info);
-#endif
 	drm_fb_helper_fini(fb_helper);
 	vfree(shadow);
 	drm_client_framebuffer_delete(fb_helper->buffer);
