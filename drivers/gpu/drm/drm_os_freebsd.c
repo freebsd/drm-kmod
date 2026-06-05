@@ -100,11 +100,13 @@ register_fictitious_range(struct drm_device *ddev, vm_paddr_t base, size_t size)
 					   VM_MEMATTR_UNCACHEABLE
 #endif
 	    );
-	MPASS(ret == 0);
-
+	if (ret) {
+		vt_unfreeze_main_vd();
+		return (ret);
+	}
 	ddev->fictitious_range_registered = true;
 
-	return (ret);
+	return (0);
 }
 
 void
@@ -113,6 +115,7 @@ unregister_fictitious_range(struct drm_device *ddev, vm_paddr_t base, size_t siz
 	if (ddev->fictitious_range_registered) {
 		vm_phys_fictitious_unreg_range(base, base + size);
 		vt_unfreeze_main_vd();
+		ddev->fictitious_range_registered = false;
 	}
 }
 
