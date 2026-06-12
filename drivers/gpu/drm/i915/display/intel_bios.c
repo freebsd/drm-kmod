@@ -3010,7 +3010,7 @@ bool intel_bios_is_valid_vbt(const void *buf, size_t size)
 	return vbt;
 }
 
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) && !defined(pci_map_rom)
 #define	pci_map_rom(pdev, sizep)			\
 	vga_pci_map_bios(device_get_parent(pdev->dev.bsddev), sizep)
 #define	pci_unmap_rom(pdev, bios)			\
