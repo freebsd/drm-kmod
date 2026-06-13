@@ -4109,6 +4109,16 @@ static void gfx_v10_0_check_gfxoff_flag(struct amdgpu_device *adev)
 		if (!gfx_v10_0_navi10_gfxoff_should_enable(adev))
 			adev->pm.pp_feature &= ~PP_GFXOFF_MASK;
 		break;
+#ifdef __FreeBSD__
+	case IP_VERSION(10, 3, 6):
+		/* Raphael APU: GFXOFF wake via SMU is broken under LinuxKPI,
+		 * leaving the gfx ring stuck (ring gfx_0.0.0 timeout) followed
+		 * by a GPU reset loop. Disable GFXOFF until the SMU handshake
+		 * works on FreeBSD.
+		 */
+		adev->pm.pp_feature &= ~PP_GFXOFF_MASK;
+		break;
+#endif
 	default:
 		break;
 	}
