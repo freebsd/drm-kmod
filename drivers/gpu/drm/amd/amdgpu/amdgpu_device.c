@@ -4259,7 +4259,15 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 					  PCI_EXP_DEVCAP2_ATOMIC_COMP64);
 	}
 #elif defined(__FreeBSD__)
-	adev->have_atomics_support = false;
+	/* APUs w/ gfx9 onwards don't rely on PCIe atomics: the internal path
+	 * natively supports atomics, so enable it (mirrors the __linux__ case).
+	 * Without this the userspace gfx submission path stalls the gfx ring.
+	 */
+	if ((adev->flags & AMD_IS_APU) &&
+	    (amdgpu_ip_version(adev, GC_HWIP, 0) > IP_VERSION(9, 0, 0)))
+		adev->have_atomics_support = true;
+	else
+		adev->have_atomics_support = false;
 #endif
 
 	if (!adev->have_atomics_support)
