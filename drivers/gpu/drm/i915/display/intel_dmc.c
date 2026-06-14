@@ -1002,8 +1002,8 @@ static void dmc_load_work_fn(struct work_struct *work)
 		drm_notice(&i915->drm, "DMC firmware homepage: %s",
 			   INTEL_UC_FIRMWARE_URL);
 #elif defined(__FreeBSD__)
-		drm_notice(&i915->drm, "Run pkg install gpu-firmware-kmod" \
-		    " to install it\n");
+		drm_notice(&i915->drm, "Run fwget(8) to install the "
+			   "correct gpu-firmware-*kmod package.\n");
 #endif
 	}
 
