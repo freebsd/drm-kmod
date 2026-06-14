@@ -627,9 +627,15 @@ int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
 			   uc_fw->file_wanted.major_ver, uc_fw->file_wanted.minor_ver,
 			   uc_fw->file_selected.path,
 			   uc_fw->file_selected.major_ver, uc_fw->file_selected.minor_ver);
+#ifdef __linux__
 		drm_info(&i915->drm,
 			 "Consider updating your linux-firmware pkg or downloading from %s\n",
 			 INTEL_UC_FIRMWARE_URL);
+#elif defined(__FreeBSD__)
+		drm_info(&i915->drm,
+			 "Run fwget(8) to install the "
+			 "correct gpu-firmware-*kmod package.\n");
+#endif
 	}
 
 	if (HAS_LMEM(i915)) {
