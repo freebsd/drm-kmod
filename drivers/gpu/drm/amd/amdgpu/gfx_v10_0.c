@@ -7173,6 +7173,31 @@ static int gfx_v10_0_cp_resume(struct amdgpu_device *adev)
 			return r;
 	}
 
+#ifdef __FreeBSD__
+	/*
+	 * On this APU under LinuxKPI the doorbell does not wake the CP/MEC
+	 * once a queue has gone idle, so GPU-scheduler submissions issued
+	 * after the boot-time idle-poll window are never fetched (ring
+	 * gfx_0.0.0 timeout, signaled seq < emitted seq, with no VM fault).
+	 * Keep the engines polling the queue write pointer from memory rather
+	 * than relying on a doorbell wake: aim the GFX-pipe wptr poll at the
+	 * ring's wptr writeback, max out the idle poll count, and enable MEC
+	 * wptr polling (per-queue poll address comes from each MQD).
+	 */
+	if (adev->gfx.num_gfx_rings) {
+		uint64_t wptr_gpu_addr = adev->gfx.gfx_ring[0].wptr_gpu_addr;
+
+		WREG32_SOC15(GC, 0, mmCP_RB_WPTR_POLL_ADDR_LO,
+			     lower_32_bits(wptr_gpu_addr));
+		WREG32_SOC15(GC, 0, mmCP_RB_WPTR_POLL_ADDR_HI,
+			     upper_32_bits(wptr_gpu_addr));
+	}
+	WREG32_SOC15(GC, 0, mmCP_RB_WPTR_POLL_CNTL,
+		     (0x0100 << CP_RB_WPTR_POLL_CNTL__POLL_FREQUENCY__SHIFT) |
+		     (0xffff << CP_RB_WPTR_POLL_CNTL__IDLE_POLL_COUNT__SHIFT));
+	WREG32_FIELD15(GC, 0, CP_PQ_WPTR_POLL_CNTL, EN, 1);
+#endif
+
 	return 0;
 }
 
