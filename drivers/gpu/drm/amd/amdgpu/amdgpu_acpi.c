@@ -39,6 +39,16 @@
 #include "amd_acpi.h"
 #include "atom.h"
 
+#if defined(__FreeBSD__)
+#include "opt_acpi.h"
+
+#ifdef ACPI_DEBUG
+void AcpiUtStatusExit(UINT32, const char *, const char *, UINT32, ACPI_STATUS);
+ACPI_MODULE_NAME("AMDGPU")
+#define	_COMPONENT	ACPI_HARDWARE
+#endif
+#endif
+
 /* Declare GUID for AMD _DSM method for XCCs */
 static const guid_t amd_xcc_dsm_guid = GUID_INIT(0x8267f5d5, 0xa556, 0x44f2,
 						 0xb8, 0xb4, 0x45, 0x56, 0x2e,
