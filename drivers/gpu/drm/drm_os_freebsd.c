@@ -139,6 +139,9 @@ drm_dev_alias(struct device *ldev, struct drm_minor *minor, const char *minor_st
 	SYSCTL_ADD_PROC(ctx_list, oid_list, OID_AUTO, "PCI_ID",
 	    CTLTYPE_STRING | CTLFLAG_RD, NULL, tmp,
 	    sysctl_pci_id, "A", "PCI vendor and device ID");
+	SYSCTL_ADD_INT(ctx_list, oid_list, OID_AUTO, "type",
+	    CTLFLAG_RD, &minor->type, 0,
+	    "DRM minor type (0=primary, 2=render)");
 
 	/*
 	 * FreeBSD won't automaticaly create the corresponding device
