@@ -1719,16 +1719,6 @@ mst_topology_add_connector(struct drm_dp_mst_topology_mgr *mgr,
 
 	intel_dp_init_modeset_retry_work(intel_connector);
 
-	/*
-	 * TODO: The following drm_connector specific initialization belongs
-	 * to DRM core, however it happens atm too late in
-	 * drm_connector_init(). That function will also expose the connector
-	 * to in-kernel users, so it can't be called until the connector is
-	 * sufficiently initialized; init the device pointer used by the
-	 * following DSC setup, until a fix moving this to DRM core.
-	 */
-	intel_connector->base.dev = mgr->dev;
-
 	ret = drm_connector_dynamic_init(display->drm, connector, &mst_connector_funcs,
 					 DRM_MODE_CONNECTOR_DisplayPort, NULL);
 	if (ret) {

@@ -276,9 +276,9 @@ bool dml21_validate(const struct dc *in_dc, struct dc_state *context, struct dml
 	DC_FP_START();
 
 	/* Use dml_validate_only for fast_validate path */
-	if (fast_validate)
+	if (fast_validate) {
 		out = dml21_check_mode_support(in_dc, context, dml_ctx);
-	else
+	} else
 		out = dml21_mode_check_and_programming(in_dc, context, dml_ctx);
 
 	DC_FP_END();

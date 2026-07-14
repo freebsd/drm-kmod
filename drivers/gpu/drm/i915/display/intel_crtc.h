@@ -8,10 +8,6 @@
 
 #include <linux/types.h>
 
-#ifdef __FreeBSD__
-#include <linux/kconfig.h>
-#endif
-
 enum i9xx_plane_id;
 enum pipe;
 struct drm_device;

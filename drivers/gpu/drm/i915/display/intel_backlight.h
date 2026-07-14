@@ -7,9 +7,6 @@
 #define __INTEL_BACKLIGHT_H__
 
 #include <linux/types.h>
-#ifdef __FreeBSD__
-#include <linux/kconfig.h>
-#endif
 
 struct drm_connector_state;
 struct intel_atomic_state;
