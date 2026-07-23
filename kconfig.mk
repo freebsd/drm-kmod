@@ -42,6 +42,7 @@ KCONFIG+=	ARCH_HAVE_NMI_SAFE_CMPXCHG \
 		DEBUG_FS \
 		DMI \
 		FB \
+		GPU_BUDDY \
 		MTRR \
 		PCI \
 		PM \

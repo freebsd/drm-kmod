@@ -5,7 +5,7 @@
 
 SRCDIR=	${.CURDIR:H}/drivers/gpu/drm
 
-.PATH:	${SRCDIR} ${SRCDIR}/display ${SRCDIR}/scheduler
+.PATH:	${SRCDIR} ${SRCDIR}/display ${SRCDIR}/scheduler ${SRCDIR}/..
 
 KMOD=	drm
 
@@ -140,6 +140,10 @@ SRCS+=	drm_panic.c
 
 .if !empty(KCONFIG:MDRM_CLIENT_SETUP)
 SRCS+=	drm_client_setup.c
+.endif
+
+.if !empty(KCONFIG:MGPU_BUDDY)
+SRCS+=	buddy.c
 .endif
 
 SRCS+=	device_if.h \
