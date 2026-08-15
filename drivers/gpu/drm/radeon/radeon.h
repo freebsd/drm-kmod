@@ -2725,6 +2725,16 @@ static inline void radeon_ring_write(struct radeon_ring *ring, uint32_t v)
 #define radeon_get_vblank_counter(rdev, crtc) (rdev)->asic->display.get_vblank_counter((rdev), (crtc))
 #define radeon_set_backlight_level(rdev, e, l) (rdev)->asic->display.set_backlight_level((e), (l))
 #define radeon_get_backlight_level(rdev, e) (rdev)->asic->display.get_backlight_level((e))
+
+static inline bool radeon_backlight_connector_ready(struct drm_device *dev,
+						      struct drm_connector *connector)
+{
+	if (!connector->kdev) {
+		drm_info(dev, "radeon: skip DIG backlight, no connector kdev\n");
+		return false;
+	}
+	return true;
+}
 #define radeon_hdmi_enable(rdev, e, b) (rdev)->asic->display.hdmi_enable((e), (b))
 #define radeon_hdmi_setmode(rdev, e, m) (rdev)->asic->display.hdmi_setmode((e), (m))
 #define radeon_fence_ring_emit(rdev, r, fence) (rdev)->asic->ring[(r)]->emit_fence((rdev), (fence))
