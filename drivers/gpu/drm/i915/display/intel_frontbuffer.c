@@ -260,14 +260,15 @@ static void frontbuffer_release(struct kref *ref)
 	struct intel_frontbuffer *ret, *front =
 		container_of(ref, typeof(*front), ref);
 	struct drm_i915_gem_object *obj = front->obj;
+	struct drm_i915_private *i915 = intel_bo_to_i915(obj);
 
-	drm_WARN_ON(&intel_bo_to_i915(obj)->drm, atomic_read(&front->bits));
+	drm_WARN_ON(&i915->drm, atomic_read(&front->bits));
 
 	i915_ggtt_clear_scanout(obj);
 
 	ret = i915_gem_object_set_frontbuffer(obj, NULL);
-	drm_WARN_ON(&intel_bo_to_i915(obj)->drm, ret);
-	spin_unlock(&intel_bo_to_i915(obj)->display.fb_tracking.lock);
+	drm_WARN_ON(&i915->drm, ret);
+	spin_unlock(&i915->display.fb_tracking.lock);
 
 	i915_active_fini(&front->write);
 	kfree_rcu(front, rcu);
