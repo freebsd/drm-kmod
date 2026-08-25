@@ -139,6 +139,12 @@ dma_fence_is_container(struct dma_fence *fence)
 	return (dma_fence_is_array(fence) || dma_fence_is_chain(fence));
 }
 
+static inline bool
+dma_fence_match_context(struct dma_fence *fence, u64 context)
+{
+	return (fence->context == context);
+}
+
 #define	dma_fence_begin_signalling() true
 #define	dma_fence_end_signalling(cookie) do { (void)cookie; } while (0)
 

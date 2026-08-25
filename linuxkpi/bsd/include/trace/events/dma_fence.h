@@ -49,6 +49,12 @@ trace_dma_fence_destroy(void *fence)
 }
 
 static inline void
+trace_dma_fence_emit(void *fence)
+{
+	CTR1(KTR_DRM, "dma_fence_emit dma_fence %p", fence);
+}
+
+static inline void
 trace_dma_fence_enable_signal(void *fence)
 {
 	CTR1(KTR_DRM, "dma_fence_enable_signal dma_fence %p", fence);
