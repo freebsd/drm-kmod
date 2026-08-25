@@ -40,6 +40,12 @@
 
 #include "virtgpu_drv.h"
 
+#ifdef __FreeBSD__
+SYSCTL_NODE(_hw, OID_AUTO, virtio_gpu,
+    CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
+    "VirtIO GPU DRM parameters");
+#endif
+
 static const struct drm_driver driver;
 
 static int virtio_gpu_modeset = -1;
@@ -161,6 +167,21 @@ static struct virtio_driver virtio_gpu_driver = {
 };
 
 module_virtio_driver(virtio_gpu_driver);
+
+#ifdef __FreeBSD__
+/*
+ * FreeBSD: registration happens via newbus (virtgpu_freebsd.c); the glue
+ * reaches probe/remove/config_changed through this accessor instead of
+ * the Linux virtio bus.
+ */
+const struct virtio_driver *virtio_gpu_freebsd_driver(void);
+
+const struct virtio_driver *
+virtio_gpu_freebsd_driver(void)
+{
+	return (&virtio_gpu_driver);
+}
+#endif
 
 MODULE_DEVICE_TABLE(virtio, id_table);
 MODULE_DESCRIPTION("Virtio GPU driver");
