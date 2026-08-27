@@ -5,11 +5,11 @@ into the drm-kmod framework, for FreeBSD 15.1 guests under QEMU/UTM
 with a `virtio-gpu-pci` device.  Developed and tested on aarch64
 (Apple-silicon UTM, QEMU/hvf); the code is arch-neutral.
 
-**Scope: 2D only.**  KMS atomic modesetting, dumb buffers, fbdev
-console, PRIME self-import — enough for a wlroots compositor with
-`WLR_RENDERER=pixman` (sway, confirmed) and for `vt(4)` console on the
-DRM framebuffer.  Out of scope: virgl/3D, Vulkan, blob resources,
-multi-head.
+**Scope: 2D KMS, plus classic virgl 3D when the host offers it.**
+KMS atomic modesetting, dumb buffers, fbdev console, PRIME
+self-import, and - with a virtio-gpu-gl host device - GPU-accelerated
+GLES via Mesa virgl (see the virgl section).  Out of scope: blob
+resources, host-visible memory, venus/Vulkan, multi-head.
 
 Upstream base: Linux v6.12 driver sources against drm-kmod
 `drm_v6.12.85_2` (DRM core 6.12.85).  The upstream `virtgpu_*.c` files
@@ -95,6 +95,12 @@ mkdir -p /tmp/xdg && chmod 700 /tmp/xdg
 env XDG_RUNTIME_DIR=/tmp/xdg WLR_RENDERER=pixman LIBSEAT_BACKEND=seatd sway
 ```
 
+`WLR_RENDERER=pixman` is required only on a plain (non-GL) host
+device, where the render node has no accelerated driver behind it and
+wlroots' default EGL path cannot allocate buffers.  With a virgl
+host device (see below) sway runs on its default GLES2 renderer and
+the variable can be dropped.
+
 Confirmed working: sway + swaybar + swaybg render, foot opens, keyboard
 input works, `grim` screencopy works, live mode switching and custom
 modes work.
@@ -113,6 +119,30 @@ when running fullscreen.  UTM does not push window-size changes to
 plain virtio-gpu-pci, so the resolution is chosen guest-side.  Also
 raise the default fonts, which read tiny at this density: foot.ini
 `font=monospace:size=12` and sway `font pango:DejaVu Sans 11`.)
+
+## 3D acceleration (classic virgl, experimental)
+
+If the host display device offers `VIRTIO_GPU_F_VIRGL`, the driver
+negotiates it and the full 3D path unlocks: Mesa's virgl driver
+(`virtio_gpu_dri.so`, in `graphics/mesa-dri`) renders through the
+host GPU, and sway runs on its default GLES2 renderer with no
+environment overrides.
+
+Host side: UTM — enable the GPU-accelerated display device
+(`virtio-gpu-gl-pci`); plain QEMU — `-device virtio-gpu-gl-pci` (or
+`-vga none -device virtio-vga-gl`) with virglrenderer support built
+in.  On a host without virgl the feature simply does not negotiate
+and the driver behaves exactly as the 2D configuration.
+
+Verified under UTM on Apple silicon (virglrenderer over ANGLE/Metal):
+`eglinfo` reports `virgl (ANGLE (Apple, ... Metal))`, `kmscube` runs
+at several hundred fps, and the 2D paths (console, kmstest, dumb
+buffers) are unaffected with 3D active.  Note the GL device model
+shows up with a larger control ring (256 vs 64 slots).
+
+Still out of scope: blob resources (`VIRTGPU_BLOB`), host-visible
+memory, venus/Vulkan — the corresponding features are rejected at
+negotiation.
 
 ## Architecture
 
