@@ -61,8 +61,10 @@ claims the device at boot.  Disable it and let this driver take over:
    seatd_enable="YES"
    ```
 
-   Absolute paths keep dependency loading in order without touching
-   `kern.module_path`.  Load via `kld_list`, not `_load` entries in
+   With the modules in /boot/modules, `kld_list="virtio_gpu_drm"`
+   alone suffices - dmabuf.ko and drm.ko load automatically via
+   MODULE_DEPEND.  From any other directory, list all three as
+   absolute paths in the order above.  Load via `kld_list`, not `_load` entries in
    loader.conf: at loader time DRM core has not initialized yet and
    the probe fails with -19.
 
