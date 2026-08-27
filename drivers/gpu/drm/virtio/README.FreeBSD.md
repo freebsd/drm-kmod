@@ -62,7 +62,9 @@ claims the device at boot.  Disable it and let this driver take over:
    ```
 
    Absolute paths keep dependency loading in order without touching
-   `kern.module_path`.
+   `kern.module_path`.  Load via `kld_list`, not `_load` entries in
+   loader.conf: at loader time DRM core has not initialized yet and
+   the probe fails with -19.
 
 4. `/etc/rc.local` — the vtgpu hint also disables the newbus child
    device, so re-enable it after the module is in:
@@ -74,6 +76,11 @@ claims the device at boot.  Disable it and let this driver take over:
 
 After reboot: `/dev/dri/card0` exists, the console is on the DRM
 framebuffer, and `drm_info` enumerates the connector/modes.
+
+On plain QEMU (non-UTM), configure the display as `-vga virtio`
+rather than a bare `-device virtio-gpu-pci`: with the latter, QEMU
+also instantiates its default std-VGA device and X picks the wrong
+one as primary.
 
 Manual load (same order, then `devctl enable vtgpu0`) works too.
 DRM device-node teardown is not survivable on drm-kmod, so the driver
