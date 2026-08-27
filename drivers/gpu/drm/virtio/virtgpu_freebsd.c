@@ -36,8 +36,9 @@
 
 #include "freebsd/virtgpu_freebsd.h"
 
-/* 2D only: EDID, plus indirect descriptors (see VIRTGPU_MAX_INDIRECT). */
+/* EDID, classic virgl 3D, and indirect descriptors (VIRTGPU_MAX_INDIRECT). */
 #define	VGD_FEATURES	((1ULL << VIRTIO_GPU_F_EDID) | \
+			    (1ULL << VIRTIO_GPU_F_VIRGL) | \
 			    VIRTIO_RING_F_INDIRECT_DESC)
 
 /* gates MOD_QUIESCE */
@@ -266,13 +267,16 @@ virtio_gpu_drm_attach(device_t dev)
 		sc->vgd_features |= VIRTIO_F_VERSION_1;
 	if (virtio_with_feature(dev, 1ULL << VIRTIO_GPU_F_EDID))
 		sc->vgd_features |= 1ULL << VIRTIO_GPU_F_EDID;
+	if (virtio_with_feature(dev, 1ULL << VIRTIO_GPU_F_VIRGL))
+		sc->vgd_features |= 1ULL << VIRTIO_GPU_F_VIRGL;
 	if (virtio_with_feature(dev, VIRTIO_F_IOMMU_PLATFORM))
 		sc->vgd_features |= VIRTIO_F_IOMMU_PLATFORM;
 	if (virtio_with_feature(dev, VIRTIO_RING_F_INDIRECT_DESC))
 		sc->vgd_features |= VIRTIO_RING_F_INDIRECT_DESC;
-	device_printf(dev, "negotiated features 0x%016jx%s%s%s\n",
+	device_printf(dev, "negotiated features 0x%016jx%s%s%s%s\n",
 	    (uintmax_t)sc->vgd_features,
 	    (sc->vgd_features & (1ULL << VIRTIO_GPU_F_EDID)) ? " EDID" : "",
+	    (sc->vgd_features & (1ULL << VIRTIO_GPU_F_VIRGL)) ? " VIRGL" : "",
 	    (sc->vgd_features & VIRTIO_F_IOMMU_PLATFORM) ?
 	    " ACCESS_PLATFORM" : "",
 	    (sc->vgd_features & VIRTIO_RING_F_INDIRECT_DESC) ?
