@@ -40,12 +40,7 @@ struct file *shmem_create_from_object(struct drm_i915_gem_object *obj)
 
 	if (i915_gem_object_is_shmem(obj)) {
 		file = obj->base.filp;
-#ifdef __linux__
-		atomic_long_inc(&file->f_count);
-#elif defined(__FreeBSD__)
-		MPASS(file->_file == NULL);
-		refcount_acquire(&file->f_count);
-#endif
+		get_file(file);
 		return file;
 	}
 

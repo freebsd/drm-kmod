@@ -55,6 +55,7 @@ SRCS=	\
 	intel_atomic.c \
 	intel_atomic_plane.c \
 	intel_audio.c \
+	intel_bo.c \
 	intel_bw.c \
 	intel_bios.c \
 	intel_cdclk.c \
@@ -67,6 +68,7 @@ SRCS=	\
 	intel_device_info.c \
 	intel_display.c \
 	intel_display_power.c \
+	intel_display_snapshot.c \
 	intel_dmc.c \
 	intel_dmc_wl.c \
 	intel_dpio_phy.c \
@@ -133,6 +135,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_dp_hdcp.c \
 	intel_dp_link_training.c \
 	intel_dp_mst.c \
+	intel_dp_test.c \
 	intel_dpt.c \
 	intel_dpt_common.c \
 	intel_drrs.c \
@@ -160,6 +163,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_modeset_lock.c \
 	intel_modeset_setup.c \
 	intel_modeset_verify.c \
+	intel_pfit.c \
 	intel_panel.c \
 	intel_pch_display.c \
 	intel_pch_refclk.c \
@@ -167,6 +171,7 @@ SRCS+=	dvo_ch7017.c \
 	intel_pmdemand.c \
 	intel_pps.c \
 	intel_qp_tables.c \
+	intel_rom.c \
 	intel_sdvo.c \
 	intel_sprite_uapi.c \
 	intel_tc.c \

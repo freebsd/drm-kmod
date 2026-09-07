@@ -4,6 +4,6 @@
 # the source tree and external components such as
 # nvidia-drm
 
-LINUXKPI_VERSION_NUMBER=	61200
+LINUXKPI_VERSION_NUMBER=	61300
 
 CFLAGS+=	-DLINUXKPI_VERSION=${LINUXKPI_VERSION_NUMBER}
