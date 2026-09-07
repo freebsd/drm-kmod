@@ -60,6 +60,7 @@ struct intel_fbdev {
 	struct i915_vma *vma;
 	unsigned long vma_flags;
 	int preferred_bpp;
+	struct drm_i915_gem_object *screen_base_object;
 
 	/* Whether or not fbdev hpd processing is temporarily suspended */
 	bool hpd_suspended: 1;
@@ -135,6 +136,19 @@ static int intel_fbdev_mmap(struct fb_info *info, struct vm_area_struct *vma)
 	return i915_gem_fb_mmap(obj, vma);
 }
 
+#ifdef __FreeBSD__
+static void intel_fbdev_unpin_screen_base(struct intel_fbdev *ifbdev)
+{
+	struct drm_i915_gem_object *obj = ifbdev->screen_base_object;
+
+	if (obj == NULL)
+		return;
+
+	ifbdev->screen_base_object = NULL;
+	i915_gem_object_unpin_map(obj);
+}
+#endif
+
 static void intel_fbdev_fb_destroy(struct fb_info *info)
 {
 	struct drm_fb_helper *fb_helper = info->par;
@@ -149,10 +163,14 @@ static void intel_fbdev_fb_destroy(struct fb_info *info)
 
 	drm_fb_helper_fini(&ifbdev->helper);
 
+#ifdef __FreeBSD__
+	intel_fbdev_unpin_screen_base(ifbdev);
+#endif
+
 	/*
-	 * We rely on the object-free to release the VMA pinning for
-	 * the info->screen_base mmaping. Leaking the VMA is simpler than
-	 * trying to rectify all the possible error paths leading here.
+	 * The GGTT iomap path relies on object-free to release the extra VMA
+	 * pin associated with info->screen_base. Leaking the VMA is simpler
+	 * than trying to rectify all the possible error paths leading here.
 	 */
 	intel_fb_unpin_vma(ifbdev->vma, ifbdev->vma_flags);
 	drm_framebuffer_remove(&ifbdev->fb->base);
@@ -256,7 +274,8 @@ static int intelfb_create(struct drm_fb_helper *helper,
 
 	obj = intel_fb_obj(&fb->base);
 
-	ret = intel_fbdev_fb_fill_info(dev_priv, info, obj, vma);
+	ret = intel_fbdev_fb_fill_info(dev_priv, info, obj, vma,
+				       &ifbdev->screen_base_object);
 	if (ret)
 		goto out_unpin;
 
@@ -306,10 +325,58 @@ out_unlock:
 	return ret;
 }
 
+#ifdef __FreeBSD__
+static void intel_fbdev_flush_object_map(struct drm_fb_helper *helper,
+					 struct drm_clip_rect *clip)
+{
+	struct intel_fbdev *ifbdev = to_intel_fbdev(helper);
+	struct drm_framebuffer *fb = helper->fb;
+	struct drm_i915_gem_object *obj;
+	u64 offset, end;
+	u32 cpp, pitch, x1, x2, y1, y2;
+
+	if (ifbdev->screen_base_object == NULL || fb == NULL)
+		return;
+
+	x1 = min_t(u32, clip->x1, fb->width);
+	x2 = min_t(u32, clip->x2, fb->width);
+	y1 = min_t(u32, clip->y1, fb->height);
+	y2 = min_t(u32, clip->y2, fb->height);
+	if (x1 >= x2 || y1 >= y2)
+		return;
+
+	cpp = fb->format->cpp[0];
+	pitch = fb->pitches[0];
+	offset = mul_u32_u32(y1, pitch);
+	if (check_add_overflow(offset, mul_u32_u32(x1, cpp), &offset) ||
+	    check_add_overflow(offset, (u64)fb->offsets[0], &offset))
+		return;
+
+	end = mul_u32_u32(y2 - 1, pitch);
+	if (check_add_overflow(end, mul_u32_u32(x2, cpp), &end) ||
+	    check_add_overflow(end, (u64)fb->offsets[0], &end))
+		return;
+
+	obj = ifbdev->screen_base_object;
+	if (offset >= obj->base.size)
+		return;
+
+	end = min_t(u64, end, obj->base.size);
+	if (offset < end) {
+		/* Make WB console writes visible to the display engine. */
+		__i915_gem_object_flush_map(obj, offset, end - offset);
+	}
+}
+#endif
+
 static int intelfb_dirty(struct drm_fb_helper *helper, struct drm_clip_rect *clip)
 {
 	if (!(clip->x1 < clip->x2 && clip->y1 < clip->y2))
 		return 0;
+
+#ifdef __FreeBSD__
+	intel_fbdev_flush_object_map(helper, clip);
+#endif
 
 	if (helper->fb->funcs->dirty)
 		return helper->fb->funcs->dirty(helper->fb, NULL, 0, 0, clip, 1);
@@ -664,6 +731,9 @@ static int intel_fbdev_client_hotplug(struct drm_client_dev *client)
 
 err_drm_fb_helper_fini:
 	drm_fb_helper_fini(fb_helper);
+#ifdef __FreeBSD__
+	intel_fbdev_unpin_screen_base(to_intel_fbdev(fb_helper));
+#endif
 err_drm_err:
 	drm_err(dev, "Failed to setup i915 fbdev emulation (ret=%d)\n", ret);
 	return ret;
