@@ -42,18 +42,25 @@ static void uc_expand_default_options(struct intel_uc *uc)
 		return;
 	}
 
-#ifndef __FreeBSD__
-	/* FreeBSD FIXME */
-	/* GuC is known to be broken so disable it for GEN12 for now */
-
 	/* Intermediate platforms are HuC authentication only */
 	if (IS_ALDERLAKE_S(i915) && !IS_RAPTORLAKE_S(i915)) {
 		i915->params.enable_guc = ENABLE_GUC_LOAD_HUC;
 		return;
 	}
 
+#ifdef __linux__
 	/* Default: enable HuC authentication and GuC submission */
 	i915->params.enable_guc = ENABLE_GUC_LOAD_HUC | ENABLE_GUC_SUBMISSION;
+#elif defined(__FreeBSD__)
+	/*
+	 * FIXME:
+	 * On FreeBSD, when GUC submission is enabled, there is a great chance
+	 * that the computer refuses to power off when asked to do so. Like
+	 * after a `shutdown -p now`, the kernel stops everything, the display
+	 * is turned off, but the power LED is still on and the fans are
+	 * running. The computer is obviously unreachable.
+	 */
+	i915->params.enable_guc = ENABLE_GUC_LOAD_HUC;
 #endif
 }
 
