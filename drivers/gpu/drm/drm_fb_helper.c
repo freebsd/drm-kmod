@@ -1658,6 +1658,42 @@ static int __drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 	return 0;
 }
 
+#ifdef __FreeBSD__
+static void
+drm_fb_helper_reserve_cmdline_modes(struct drm_fb_helper *fb_helper,
+				    struct drm_fb_helper_surface_size *sizes)
+{
+	struct drm_device *dev = fb_helper->dev;
+	struct drm_mode_config *config = &dev->mode_config;
+	struct drm_connector_list_iter conn_iter;
+	struct drm_connector *connector;
+
+	/*
+	 * Hotplug reuses the existing framebuffer and therefore cannot enable a
+	 * mode larger than the initial scanout surface.  Firmware may leave a
+	 * connector out of its active configuration even when the loader has a
+	 * mode for it, so reserve that mode's dimensions during initial setup.
+	 */
+	drm_connector_list_iter_begin(dev, &conn_iter);
+	drm_client_for_each_connector_iter(connector, &conn_iter) {
+		const struct drm_cmdline_mode *mode = &connector->cmdline_mode;
+
+		if (!mode->specified || mode->force == DRM_FORCE_OFF ||
+		    mode->xres <= 0 || mode->yres <= 0)
+			continue;
+		if ((config->max_width > 0 && mode->xres > config->max_width) ||
+		    (config->max_height > 0 && mode->yres > config->max_height))
+			continue;
+
+		sizes->surface_width = max_t(u32, sizes->surface_width,
+		    (u32)mode->xres);
+		sizes->surface_height = max_t(u32, sizes->surface_height,
+		    (u32)mode->yres);
+	}
+	drm_connector_list_iter_end(&conn_iter);
+}
+#endif
+
 static int drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 				    struct drm_fb_helper_surface_size *sizes)
 {
@@ -1672,6 +1708,10 @@ static int drm_fb_helper_find_sizes(struct drm_fb_helper *fb_helper,
 
 	if (ret)
 		return ret;
+
+#ifdef __FreeBSD__
+	drm_fb_helper_reserve_cmdline_modes(fb_helper, sizes);
+#endif
 
 	/* Handle our overallocation */
 	sizes->surface_height *= drm_fbdev_overalloc;
