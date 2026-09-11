@@ -77,3 +77,9 @@ vmwgfx/i386
 vmwgfx/x86
 vmwgfx/machine
 vmwgfx/export_syms
+virtio/*.h
+virtio/i386
+virtio/x86
+virtio/machine
+virtio/export_syms
+*.kld

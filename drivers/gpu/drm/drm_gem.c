@@ -711,6 +711,74 @@ void drm_gem_put_pages(struct drm_gem_object *obj, struct page **pages,
 	kvfree(pages);
 }
 EXPORT_SYMBOL(drm_gem_put_pages);
+#elif defined(__FreeBSD__)
+/*
+ * FreeBSD versions of the shmem page helpers: the Linux 6.x originals
+ * above walk folio batches and the unevictable LRU, neither of which
+ * LinuxKPI models.  This is the pre-folio shape (page-at-a-time via
+ * shmem_read_mapping_page on the linux_file's shmem vm_object), which
+ * is exactly what LinuxKPI's shmem layer implements.
+ */
+struct page **drm_gem_get_pages(struct drm_gem_object *obj)
+{
+	vm_object_t mapping;
+	struct page *p, **pages;
+	int i, npages;
+
+	if (WARN_ON(!obj->filp))
+		return ERR_PTR(-EINVAL);
+
+	mapping = obj->filp->f_shmem;
+
+	/* We already BUG_ON() for non-page-aligned sizes in
+	 * drm_gem_object_init(), so we should never hit this unless
+	 * driver author is doing something really wrong:
+	 */
+	WARN_ON((obj->size & (PAGE_SIZE - 1)) != 0);
+
+	npages = obj->size >> PAGE_SHIFT;
+
+	pages = kvmalloc_array(npages, sizeof(struct page *), GFP_KERNEL);
+	if (pages == NULL)
+		return ERR_PTR(-ENOMEM);
+
+	for (i = 0; i < npages; i++) {
+		p = shmem_read_mapping_page(mapping, i);
+		if (IS_ERR(p))
+			goto fail;
+		pages[i] = p;
+	}
+
+	return pages;
+
+fail:
+	while (i--)
+		put_page(pages[i]);
+	kvfree(pages);
+	return ERR_CAST(p);
+}
+EXPORT_SYMBOL(drm_gem_get_pages);
+
+void drm_gem_put_pages(struct drm_gem_object *obj, struct page **pages,
+		bool dirty, bool accessed)
+{
+	int i, npages;
+
+	npages = obj->size >> PAGE_SHIFT;
+
+	for (i = 0; i < npages; i++) {
+		if (pages[i] == NULL)
+			continue;
+		if (dirty)
+			set_page_dirty(pages[i]);
+		if (accessed)
+			mark_page_accessed(pages[i]);
+		put_page(pages[i]);
+	}
+
+	kvfree(pages);
+}
+EXPORT_SYMBOL(drm_gem_put_pages);
 #endif
 
 static int objects_lookup(struct drm_file *filp, u32 *handle, int count,

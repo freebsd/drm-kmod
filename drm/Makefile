@@ -40,9 +40,11 @@ SRCS=	drm_atomic.c \
 	drm_flip_work.c \
 	drm_fourcc.c \
 	drm_framebuffer.c \
+	drm_format_helper.c \
 	drm_gem.c \
 	drm_gem_atomic_helper.c \
 	drm_gem_framebuffer_helper.c \
+	drm_gem_shmem_helper.c \
 	drm_gpuvm.c \
 	drm_hdmi_state_helper.c \
 	drm_ioctl.c \
@@ -81,6 +83,7 @@ SRCS+=	drm_writeback.c
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
 SRCS+=	drm_fb_helper.c \
+	drm_fbdev_shmem.c \
 	drm_fbdev_ttm.c
 .endif
 
