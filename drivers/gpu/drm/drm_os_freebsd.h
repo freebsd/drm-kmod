@@ -35,7 +35,7 @@ struct drm_minor;
 int drm_dev_alias(struct device *dev, struct drm_minor *minor, const char *minor_str);
 void cancel_reset_debug_log(void);
 
-void vt_freeze_main_vd(struct apertures_struct *a);
+void vt_freeze_main_vd(unsigned long base, unsigned long size);
 void vt_unfreeze_main_vd(void);
 
 struct drm_device;

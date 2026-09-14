@@ -132,17 +132,6 @@ struct linux_fb_info {
 	u32 state;			/* Hardware state i.e suspend */
 	/* From here on everything is device dependent */
 	void *par;
-	/* we need the PCI or similar aperture base/size not
-	   smem_start/size as smem_start may just be an object
-	   allocated inside the aperture so may not actually overlap */
-	struct apertures_struct {
-		unsigned int count;
-		struct aperture {
-			resource_size_t base;
-			resource_size_t size;
-		} ranges[0];
-	} *apertures;
-
 	bool skip_vt_switch; /* no VT switch on suspend/resume required */
 	bool skip_panic; /* Do not write to the fb after a panic */
 
@@ -152,15 +141,6 @@ struct linux_fb_info {
 	struct task fb_mode_task;
 #endif
 } __aligned(sizeof(long));
-
-static inline struct apertures_struct *alloc_apertures(unsigned int max_num) {
-	struct apertures_struct *a = kzalloc(sizeof(struct apertures_struct)
-			+ max_num * sizeof(struct aperture), GFP_KERNEL);
-	if (!a)
-		return NULL;
-	a->count = max_num;
-	return a;
-}
 
     /*
      *  `Generic' versions of the frame buffer device operations
@@ -279,7 +259,7 @@ extern int fb_deferred_io_mmap(struct linux_fb_info *info, struct vm_area_struct
 
 int linux_register_framebuffer(struct linux_fb_info *fb_info);
 int linux_unregister_framebuffer(struct linux_fb_info *fb_info);
-int remove_conflicting_framebuffers(struct apertures_struct *a,
+int remove_conflicting_framebuffers(resource_size_t base, resource_size_t size,
 	const char *name, bool primary);
 int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name);
 struct linux_fb_info *framebuffer_alloc(size_t size, struct device *dev);
