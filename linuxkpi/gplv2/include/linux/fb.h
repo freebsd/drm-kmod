@@ -290,12 +290,6 @@ fb_set_suspend(struct linux_fb_info *info, int state)
 {
 }
 
-static inline bool
-is_firmware_framebuffer(struct apertures_struct *a __unused)
-{
-	return false;
-}
-
 static inline void
 fb_deferred_io_cleanup(struct linux_fb_info *info)
 {
