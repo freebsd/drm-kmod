@@ -31,8 +31,4 @@ int drm_dev_alias(struct device *dev, struct drm_minor *minor, const char *minor
 void drm_dev_alias_free(struct drm_minor *minor);
 void cancel_reset_debug_log(void);
 
-struct drm_device;
-int register_fictitious_range(struct drm_device *ddev, vm_paddr_t start, vm_paddr_t end);
-void unregister_fictitious_range(struct drm_device *ddev, vm_paddr_t start, vm_paddr_t end);
-
 #endif /* _DRM_OS_FREEBSD_H_ */

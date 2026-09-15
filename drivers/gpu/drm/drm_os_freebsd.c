@@ -14,8 +14,6 @@
 #include <drm/drm_print.h>
 #include <drm/drm_os_freebsd.h>
 
-#include <vm/vm_phys.h>
-
 MALLOC_DEFINE(DRM_MEM_DRIVER, "drm_driver", "DRM DRIVER Data Structures");
 
 SYSCTL_NODE(_dev, OID_AUTO, drm, CTLFLAG_RW, 0, "DRM args (compat)");
@@ -65,39 +63,6 @@ sysctl_pci_id(SYSCTL_HANDLER_ARGS)
 
 	snprintf(buf, sizeof(buf), "%x:%x", vid, pid);
 	return (sysctl_handle_string(oidp, buf, sizeof(buf), req));
-}
-
-int
-register_fictitious_range(struct drm_device *ddev, vm_paddr_t base, size_t size)
-{
-	int ret;
-
-	MPASS(base != 0);
-	MPASS(size != 0);
-
-	vt_freeze_main_vd(base, size);
-
-	ret = vm_phys_fictitious_reg_range(base, base + size,
-#ifdef VM_MEMATTR_WRITE_COMBINING
-					   VM_MEMATTR_WRITE_COMBINING
-#else
-					   VM_MEMATTR_UNCACHEABLE
-#endif
-	    );
-	MPASS(ret == 0);
-
-	ddev->fictitious_range_registered = true;
-
-	return (ret);
-}
-
-void
-unregister_fictitious_range(struct drm_device *ddev, vm_paddr_t base, size_t size)
-{
-	if (ddev->fictitious_range_registered) {
-		vm_phys_fictitious_unreg_range(base, base + size);
-		vt_unfreeze_main_vd();
-	}
 }
 
 /* Framebuffer related code */

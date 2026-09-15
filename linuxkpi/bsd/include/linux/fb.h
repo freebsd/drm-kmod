@@ -70,9 +70,6 @@ struct vm_area_struct;
 
 #ifdef __FreeBSD__
 extern int linuxkpi_skip_ddb;
-
-void vt_freeze_main_vd(unsigned long base, unsigned long size);
-void vt_unfreeze_main_vd(void);
 #endif
 
 struct fb_fix_screeninfo {
