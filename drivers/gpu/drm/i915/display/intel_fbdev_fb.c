@@ -67,11 +67,14 @@ struct intel_framebuffer *intel_fbdev_fb_alloc(struct drm_fb_helper *helper,
 }
 
 int intel_fbdev_fb_fill_info(struct drm_i915_private *i915, struct fb_info *info,
-			     struct drm_i915_gem_object *obj, struct i915_vma *vma)
+			     struct drm_i915_gem_object *obj, struct i915_vma *vma,
+			     struct drm_i915_gem_object **screen_base_object)
 {
 	struct i915_gem_ww_ctx ww;
 	void __iomem *vaddr;
 	int ret;
+
+	*screen_base_object = NULL;
 
 	if (i915_gem_object_is_lmem(obj)) {
 		struct intel_memory_region *mem = obj->mm.region;
@@ -97,7 +100,22 @@ int intel_fbdev_fb_fill_info(struct drm_i915_private *i915, struct fb_info *info
 		if (ret)
 			continue;
 
-		vaddr = i915_vma_pin_iomap(vma);
+#ifdef __FreeBSD__
+		/*
+		 * MTL fbdev uses shmem because Wa_22018444074 excludes stolen
+		 * memory.  Map those backing pages directly: on FreeBSD, CPU
+		 * writes through MTL's GMADR aperture can miss the pages scanned
+		 * out by the display engine after the EFI framebuffer handoff.
+		 * Use WB for VT performance; the damage callback flushes writes.
+		 */
+		if (IS_METEORLAKE(i915) && i915_gem_object_is_shmem(obj)) {
+			vaddr = (void __iomem *)i915_gem_object_pin_map(obj,
+								 I915_MAP_WB);
+			if (!IS_ERR(vaddr))
+				*screen_base_object = obj;
+		} else
+#endif
+			vaddr = i915_vma_pin_iomap(vma);
 		if (IS_ERR(vaddr)) {
 			drm_err(&i915->drm,
 				"Failed to remap framebuffer into virtual memory (%pe)\n", vaddr);

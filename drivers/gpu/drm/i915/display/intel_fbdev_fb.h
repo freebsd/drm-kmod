@@ -16,6 +16,7 @@ struct i915_vma;
 struct intel_framebuffer *intel_fbdev_fb_alloc(struct drm_fb_helper *helper,
 					       struct drm_fb_helper_surface_size *sizes);
 int intel_fbdev_fb_fill_info(struct drm_i915_private *i915, struct fb_info *info,
-			     struct drm_i915_gem_object *obj, struct i915_vma *vma);
+			     struct drm_i915_gem_object *obj, struct i915_vma *vma,
+			     struct drm_i915_gem_object **screen_base_object);
 
 #endif
