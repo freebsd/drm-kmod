@@ -54,6 +54,11 @@
 
 #define FB_ACCEL_NONE		0
 
+#ifdef __FreeBSD__
+void vt_freeze_main_vd(unsigned long base, unsigned long size);
+void vt_unfreeze_main_vd(void);
+#endif
+
 struct fb_fix_screeninfo {
 	char id[16];
 	unsigned long smem_start;

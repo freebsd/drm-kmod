@@ -38,7 +38,6 @@
 
 #include <linux/fb.h>
 #include <video/cmdline.h>
-#include <drm/drm_os_freebsd.h>
 
 MALLOC_DEFINE(LKPI_FB_MEM, "fb_kms", "FB KMS Data Structures");
 
