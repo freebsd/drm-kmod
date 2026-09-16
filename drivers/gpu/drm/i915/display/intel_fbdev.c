@@ -61,6 +61,11 @@ struct intel_fbdev {
 	unsigned long vma_flags;
 	int preferred_bpp;
 
+#ifdef __FreeBSD__
+	/* Track whether fictitious range is owned by fbdev */
+	bool fictitious_range_registered;
+#endif
+
 	/* Whether or not fbdev hpd processing is temporarily suspended */
 	bool hpd_suspended: 1;
 	/* Set when a hotplug was received while HPD processing was suspended */
@@ -141,10 +146,13 @@ static void intel_fbdev_fb_destroy(struct fb_info *info)
 	struct intel_fbdev *ifbdev = container_of(fb_helper, struct intel_fbdev, helper);
 
 #ifdef __FreeBSD__
-	unregister_fictitious_range(
-		fb_helper->dev,
-		ifbdev->helper.info->fix.smem_start,
-		ifbdev->helper.info->fix.smem_len);
+	if (ifbdev->fictitious_range_registered) {
+		unregister_fictitious_range(
+			fb_helper->dev,
+			ifbdev->helper.info->fix.smem_start,
+			ifbdev->helper.info->fix.smem_len);
+		ifbdev->fictitious_range_registered = false;
+	}
 #endif
 
 	drm_fb_helper_fini(&ifbdev->helper);
@@ -274,7 +282,12 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	 * values passed to register_fictitious_range() below are unavailable
 	 * from a generic structure set by both drivers.
 	 */
-	register_fictitious_range(dev, info->fix.smem_start, info->fix.smem_len);
+	if (!dev->fictitious_range_registered) {
+		ret = register_fictitious_range(dev, info->fix.smem_start, info->fix.smem_len);
+		if (ret)
+			goto out_unpin;
+		ifbdev->fictitious_range_registered = true;
+	}
 #endif
 
 	drm_fb_helper_fill_info(info, &ifbdev->helper, sizes);
