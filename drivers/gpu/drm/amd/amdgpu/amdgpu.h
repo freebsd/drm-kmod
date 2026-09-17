@@ -116,6 +116,13 @@
 #include "amdgpu_isp.h"
 #endif
 
+#if __FreeBSD_version < 1501503 || (__FreeBSD_version >= 1600000 && __FreeBSD_version < 1600027)
+#include <dev/pci/pcireg.h>
+#define	PCI_EXP_TYPE_UPSTREAM   PCIEM_TYPE_UPSTREAM_PORT
+#define	PCI_VENDOR_ID_AMD       0x1022
+#define	vmemdup_array_user(...) memdup_array_user(__VA_ARGS__)
+#endif
+
 #define MAX_GPU_INSTANCE		64
 
 #define GFX_SLICE_PERIOD		msecs_to_jiffies(250)

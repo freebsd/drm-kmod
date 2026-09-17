@@ -9,6 +9,13 @@
 #define DRM_EXEC_INTERRUPTIBLE_WAIT	BIT(0)
 #define DRM_EXEC_IGNORE_DUPLICATES	BIT(1)
 
+#ifndef __UNIQUE_ID
+/* FreeBSD 15.1 compat */
+#define	____UNIQUE_ID(name, num)	__UNIQUE_ID_##name##_##num
+#define	___UNIQUE_ID(name, num)		____UNIQUE_ID(name, num)
+#define	__UNIQUE_ID(name)		___UNIQUE_ID(name, __COUNTER__)
+#endif
+
 struct drm_gem_object;
 
 /**
