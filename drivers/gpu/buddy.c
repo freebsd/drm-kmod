@@ -398,7 +398,11 @@ void gpu_buddy_fini(struct gpu_buddy *mm)
 		__force_merge(mm, start, start + size, order);
 
 		if (WARN_ON(!gpu_buddy_block_is_free(mm->roots[i])))
+#ifdef __FreeBSD__
+			{}
+#else
 			kunit_fail_current_test("buddy_fini() root");
+#endif
 
 		gpu_block_free(mm, mm->roots[i]);
 

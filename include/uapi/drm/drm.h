@@ -69,6 +69,34 @@ typedef unsigned long drm_handle_t;
 #include <drm/drm_os_freebsd.h>
 #endif
 
+#if __FreeBSD_version < 1501503
+#include <linux/file.h>
+#ifndef LINUXKPI_DEFINE_CLASS
+#define	LINUXKPI_DEFINE_CLASS(_name, _type, _exit, _init, _init_args...)\
+    typedef _type class_##_name##_t;					\
+									\
+    static inline _type class_##_name##_constructor(_init_args)		\
+    {									\
+	_type v = _init;						\
+	return (v);							\
+    }									\
+									\
+    static inline void class_##_name##_destructor(_type *p)		\
+    {									\
+	_type _T = *p;							\
+	_exit;								\
+    }
+
+#define	CLASS(_name, _var)						\
+    class_##_name##_t _var __cleanup(class_##_name##_destructor) =	\
+	class_##_name##_constructor
+
+LINUXKPI_DEFINE_CLASS(fd, struct fd, fdput(_T), fdget(fd), int fd)
+#endif
+
+#define	fd_empty(fd)	(fd_file(fd) == NULL)
+#endif
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
