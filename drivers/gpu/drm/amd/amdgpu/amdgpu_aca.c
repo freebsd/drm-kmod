@@ -660,9 +660,7 @@ static void remove_aca_sysfs(struct aca_handle *handle)
 	struct amdgpu_device *adev = handle->adev;
 	struct device_attribute *aca_attr = &handle->aca_attr;
 
-#ifdef __linux__
 	if (adev->dev->kobj.sd)
-#endif
 		sysfs_remove_file_from_group(&adev->dev->kobj,
 					     &aca_attr->attr,
 					     "ras");
