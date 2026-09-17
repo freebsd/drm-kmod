@@ -233,72 +233,6 @@ static void drm_minor_unregister(struct drm_device *dev, enum drm_minor_type typ
 }
 
 /*
- * Available recovery methods for wedged device. To be sent along with device
- * wedged uevent.
- */
-static const char *drm_get_wedge_recovery(unsigned int opt)
-{
-	switch (BIT(opt)) {
-	case DRM_WEDGE_RECOVERY_NONE:
-		return "none";
-	case DRM_WEDGE_RECOVERY_REBIND:
-		return "rebind";
-	case DRM_WEDGE_RECOVERY_BUS_RESET:
-		return "bus-reset";
-	default:
-		return NULL;
-	}
-}
-
-/**
- * drm_dev_wedged_event - generate a device wedged uevent
- * @dev: DRM device
- * @method: method(s) to be used for recovery
- *
- * This generates a device wedged uevent for the DRM device specified by @dev.
- * Recovery @method\(s) of choice will be sent in the uevent environment as
- * ``WEDGED=<method1>[,..,<methodN>]`` in order of less to more side-effects.
- * If caller is unsure about recovery or @method is unknown (0),
- * ``WEDGED=unknown`` will be sent instead.
- *
- * Refer to "Device Wedging" chapter in Documentation/gpu/drm-uapi.rst for more
- * details.
- *
- * Returns: 0 on success, negative error code otherwise.
- */
-int drm_dev_wedged_event(struct drm_device *dev, unsigned long method)
-{
-	const char *recovery = NULL;
-	unsigned int len, opt;
-	/* Event string length up to 28+ characters with available methods */
-	char event_string[32];
-	char *envp[] = { event_string, NULL };
-
-	len = scnprintf(event_string, sizeof(event_string), "%s", "WEDGED=");
-
-	for_each_set_bit(opt, &method, BITS_PER_TYPE(method)) {
-		recovery = drm_get_wedge_recovery(opt);
-		if (drm_WARN_ONCE(dev, !recovery, "invalid recovery method %u\n", opt))
-			break;
-
-		len += scnprintf(event_string + len, sizeof(event_string) - len, "%s,", recovery);
-	}
-
-	if (recovery)
-		/* Get rid of trailing comma */
-		event_string[len - 1] = '\0';
-	else
-		/* Caller is unsure about recovery, do the best we can at this point. */
-		snprintf(event_string, sizeof(event_string), "%s", "WEDGED=unknown");
-
-	drm_info(dev, "device wedged, %s\n", method == DRM_WEDGE_RECOVERY_NONE ?
-		 "but recovered through reset" : "needs recovery");
-
-	return kobject_uevent_env(&dev->primary->kdev->kobj, KOBJ_CHANGE, envp);
-}
-EXPORT_SYMBOL(drm_dev_wedged_event);
-
-/*
  * Looks up the given minor-ID and returns the respective DRM-minor object. The
  * refence-count of the underlying device is increased so you must release this
  * object with drm_minor_release().
@@ -574,6 +508,72 @@ void drm_dev_unplug(struct drm_device *dev)
 #endif
 }
 EXPORT_SYMBOL(drm_dev_unplug);
+
+/*
+ * Available recovery methods for wedged device. To be sent along with device
+ * wedged uevent.
+ */
+static const char *drm_get_wedge_recovery(unsigned int opt)
+{
+	switch (BIT(opt)) {
+	case DRM_WEDGE_RECOVERY_NONE:
+		return "none";
+	case DRM_WEDGE_RECOVERY_REBIND:
+		return "rebind";
+	case DRM_WEDGE_RECOVERY_BUS_RESET:
+		return "bus-reset";
+	default:
+		return NULL;
+	}
+}
+
+/**
+ * drm_dev_wedged_event - generate a device wedged uevent
+ * @dev: DRM device
+ * @method: method(s) to be used for recovery
+ *
+ * This generates a device wedged uevent for the DRM device specified by @dev.
+ * Recovery @method\(s) of choice will be sent in the uevent environment as
+ * ``WEDGED=<method1>[,..,<methodN>]`` in order of less to more side-effects.
+ * If caller is unsure about recovery or @method is unknown (0),
+ * ``WEDGED=unknown`` will be sent instead.
+ *
+ * Refer to "Device Wedging" chapter in Documentation/gpu/drm-uapi.rst for more
+ * details.
+ *
+ * Returns: 0 on success, negative error code otherwise.
+ */
+int drm_dev_wedged_event(struct drm_device *dev, unsigned long method)
+{
+	const char *recovery = NULL;
+	unsigned int len, opt;
+	/* Event string length up to 28+ characters with available methods */
+	char event_string[32];
+	char *envp[] = { event_string, NULL };
+
+	len = scnprintf(event_string, sizeof(event_string), "%s", "WEDGED=");
+
+	for_each_set_bit(opt, &method, BITS_PER_TYPE(method)) {
+		recovery = drm_get_wedge_recovery(opt);
+		if (drm_WARN_ONCE(dev, !recovery, "invalid recovery method %u\n", opt))
+			break;
+
+		len += scnprintf(event_string + len, sizeof(event_string) - len, "%s,", recovery);
+	}
+
+	if (recovery)
+		/* Get rid of trailing comma */
+		event_string[len - 1] = '\0';
+	else
+		/* Caller is unsure about recovery, do the best we can at this point. */
+		snprintf(event_string, sizeof(event_string), "%s", "WEDGED=unknown");
+
+	drm_info(dev, "device wedged, %s\n", method == DRM_WEDGE_RECOVERY_NONE ?
+		 "but recovered through reset" : "needs recovery");
+
+	return kobject_uevent_env(&dev->primary->kdev->kobj, KOBJ_CHANGE, envp);
+}
+EXPORT_SYMBOL(drm_dev_wedged_event);
 
 #ifdef __linux__
 /*
