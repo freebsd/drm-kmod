@@ -37,6 +37,7 @@ __FBSDID("$FreeBSD$");
 #include <sys/sleepqueue.h>
 #include <sys/lock.h>
 #include <sys/mutex.h>
+#include <sys/mman.h>
 #include <sys/bus.h>
 #include <sys/fcntl.h>
 #include <sys/file.h>
@@ -153,12 +154,109 @@ dma_buf_fill_kinfo(struct file *fp, struct kinfo_file *kif,
 }
 
 static int
+dma_buf_mmap_single(struct file* fp, vm_ooffset_t *off, vm_size_t size,
+    struct vm_object **obj, int prot, struct thread *td)
+{
+	struct task_struct *task;
+	struct mm_struct *mm;
+	struct dma_buf *db;
+	struct vm_area_struct *vma;
+	vm_memattr_t attr;
+	int ret = 0;
+
+	db = fp->f_data;
+
+	linux_set_current(td);
+
+	/*
+	 * The same VM object might be shared by multiple processes
+	 * and the mm_struct is usually freed when a process exits.
+	 *
+	 * The atomic reference below makes sure the mm_struct is
+	 * available as long as the vmap is in the linux_vma_head.
+	 */
+	task = current;
+	mm = task->mm;
+	if (atomic_inc_not_zero(&mm->mm_users) == 0)
+		return (EINVAL);
+
+	vma = malloc(sizeof(struct vm_area_struct), M_DMABUF, M_ZERO|M_NOWAIT);
+	if (vma == NULL){
+		ret = ENOMEM;
+		goto out;
+	}
+
+	vma->vm_start = 0;
+	vma->vm_end = size;
+	vma->vm_pgoff = *off / PAGE_SIZE;
+	vma->vm_mm = mm;
+	vma->vm_flags = vma->vm_page_prot = (prot & VM_PROT_ALL);
+	vma->vm_flags |= VM_SHARED;
+	vma->vm_ops = NULL;
+	vma->vm_pfn = 0;
+	/* XXX: No linux file available to assign to vma->vm_file. */
+
+	if (unlikely(down_write_killable(&vma->vm_mm->mmap_sem))){
+		ret = EINTR;
+		goto out;
+	}
+
+	ret = -db->ops->mmap(db, vma);
+	up_write(&vma->vm_mm->mmap_sem);
+	if (ret != 0)
+		goto out;
+
+	attr = pgprot2cachemode(vma->vm_page_prot);
+
+	/* Reuse the vm_obj field to allow the driver to create its own object. */
+	if (vma->vm_obj != NULL) {
+		*obj = vma->vm_obj;
+		mmput(mm);
+		free(vma, M_DMABUF);
+	} else if (vma->vm_ops != NULL) {
+		/*
+		 * Linux drivers set the vm_ops and vm_private_data fields
+		 * during a mmap() call to indicate that the driver wants to use
+		 * the LinuxKPI VM operations.  Therefore, we must store the vma
+		 * and create an OBJT_DEVICE or OBJT_MGTDEVICE for it.
+		 *
+		 * See sys/compat/linuxkpi/common/src/linux_compat.c
+		 */
+		panic("TODO:implement this when we need it");
+	} else {
+		/*
+		 * If the Linux driver sets neither vm_obj nor vm_ops, we assume
+		 * it sets vma->vm_pfn and that the memory region is contiguous.
+		 * Consequently, we create an OBJT_SGT for it.
+		 *
+		 * See sys/compat/linuxkpi/common/src/linux_compat.c
+		 */
+		panic("TODO:implement this when we need it");
+	}
+
+	if (attr != VM_MEMATTR_DEFAULT) {
+		VM_OBJECT_WLOCK(*obj);
+		vm_object_set_memattr(*obj, attr);
+		VM_OBJECT_WUNLOCK(*obj);
+	}
+	*off = 0;
+	return (ret);
+
+out:
+	mmput(mm);
+	free(vma, M_DMABUF);
+	return (ret);
+}
+
+static int
 dma_buf_mmap_fileops(struct file *fp, vm_map_t map, vm_offset_t *addr,
 	     vm_size_t size, vm_prot_t prot, vm_prot_t cap_maxprot,
 	     int flags, vm_ooffset_t foff, struct thread *td)
 {
 	struct dma_buf *db;
-	struct vm_area_struct vma;
+	vm_object_t object;
+	int maxprot;
+	int ret = 0;
 
 	if (!fp_is_db(fp))
 		return (EINVAL);
@@ -167,12 +265,40 @@ dma_buf_mmap_fileops(struct file *fp, vm_map_t map, vm_offset_t *addr,
 	if (foff + size > db->size)
 		return (EINVAL);
 
-	vma.vm_start = *addr;
-	vma.vm_end = *addr + size;
-	vma.vm_pgoff = foff;
-	/* XXX do we need to fill in / propagate other flags? */
-	
-	return (-db->ops->mmap(db, &vma));
+	if (db->ops->mmap == NULL)
+		return (EINVAL);
+
+	maxprot = VM_PROT_NONE;
+
+	/* dma_buf do not provide private mapping */
+	if ((flags & MAP_PRIVATE) != 0)
+		return (EACCES);
+
+	/*
+	 * Ensure that file and memory protections are
+	 * compatible.
+	 */
+	if ((fp->f_flag & FREAD) != 0)
+		maxprot |= VM_PROT_READ;
+	else if ((prot & VM_PROT_READ) != 0)
+		return (EACCES);
+	if ((fp->f_flag & FWRITE) != 0)
+		maxprot |= VM_PROT_WRITE;
+	else if ((prot & VM_PROT_WRITE) != 0)
+		return (EACCES);
+
+	maxprot &= cap_maxprot;
+
+	ret = dma_buf_mmap_single(fp, &foff, size, &object, prot, td);
+	if (ret != 0)
+		return (ret);
+
+	ret = vm_mmap_object(map, addr, size, prot, maxprot, flags, object,
+	    foff, FALSE, td);
+	if (ret != 0)
+		vm_object_deallocate(object);
+
+	return (ret);
 }
 
 static int
