@@ -861,6 +861,7 @@ SRCS+=	dcn321_dio_link_encoder.c \
 
 # display/dc/dcn35
 SRCS+=	dcn35_clk_mgr.c \
+	dcn351_clk_mgr.c \
 	dcn35_dccg.c \
 	dcn35_dio_link_encoder.c \
 	dcn35_dio_stream_encoder.c \
