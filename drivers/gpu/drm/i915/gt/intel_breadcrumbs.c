@@ -244,7 +244,9 @@ static void signal_irq_work(struct irq_work *work)
 		}
 	}
 	atomic_dec(&b->signaler_active);
+#ifdef __linux__
 	rcu_read_unlock();
+#endif
 
 	llist_for_each_safe(signal, sn, signal) {
 		struct i915_request *rq =
@@ -262,6 +264,10 @@ static void signal_irq_work(struct irq_work *work)
 
 		i915_request_put(rq);
 	}
+#ifdef __FreeBSD__
+	/* FreeBSD irq_work taskqueues do not provide implicit RCU protection. */
+	rcu_read_unlock();
+#endif
 
 	/* Lazy irq enabling after HW submission */
 	if (!READ_ONCE(b->irq_armed) && !list_empty(&b->signalers))
