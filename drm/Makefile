@@ -49,6 +49,7 @@ SRCS=	drm_atomic.c \
 	drm_mode_config.c \
 	drm_mode_object.c \
 	drm_modeset_lock.c \
+	drm_panel_backlight_quirks.c \
 	drm_modeset_helper.c \
 	drm_os_freebsd.c \
 	drm_panel.c \
