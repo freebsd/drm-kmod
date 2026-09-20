@@ -111,6 +111,7 @@ drm_dev_alias(struct device *ldev, struct drm_minor *minor, const char *minor_st
 	device_t dev = ldev->parent->bsddev;
 	char buf[32];
 	u32 tmp;
+	int error;
 
 	MPASS(dev != NULL);
 	ctx_list = device_get_sysctl_ctx(dev);
@@ -137,9 +138,40 @@ drm_dev_alias(struct device *ldev, struct drm_minor *minor, const char *minor_st
 	if (cdevp == NULL)
 		return (-ENXIO);
 	minor->bsd_device = cdevp->cdev;
-	make_dev_alias(cdevp->cdev, buf, minor->index);
+
+	/*
+	 * MAKEDEV_CHECKNAME: make_dev_alias() panics on an existing name.
+	 * Keep the alias so drm_dev_alias_free() can destroy it. buf is a
+	 * format ("dri/renderD%d"); the index is substituted here.
+	 */
+	error = make_dev_alias_p(MAKEDEV_CHECKNAME, &minor->bsd_alias,
+	    cdevp->cdev, buf, minor->index);
+	if (error != 0) {
+		minor->bsd_alias = NULL;
+		minor->bsd_device = NULL;
+		return (-error);
+	}
+
 	reset_debug_log();
 	return (0);
+}
+
+/*
+ * Destroy the alias created by drm_dev_alias(), if any. Idempotent. Called
+ * from drm_minor_alloc_release() when the drm_device is released.
+ */
+void
+drm_dev_alias_free(struct drm_minor *minor)
+{
+	struct cdev *alias;
+
+	if (minor == NULL)
+		return;
+	alias = minor->bsd_alias;
+	if (alias == NULL)
+		return;
+	minor->bsd_alias = NULL;
+	destroy_dev(alias);
 }
 
 static int

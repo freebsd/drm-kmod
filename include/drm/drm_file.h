@@ -83,6 +83,7 @@ struct drm_minor {
 
 #ifdef __FreeBSD__
 	struct cdev *bsd_device; 	/* Device number for mknod */
+	struct cdev *bsd_alias;		/* /dev/dri alias, destroyed on release */
 #endif
 	struct dentry *debugfs_symlink;
 	struct dentry *debugfs_root;
