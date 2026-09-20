@@ -28,6 +28,7 @@ struct device;
 MALLOC_DECLARE(DRM_MEM_DRIVER);
 
 int drm_dev_alias(struct device *dev, struct drm_minor *minor, const char *minor_str);
+void drm_dev_alias_free(struct drm_minor *minor);
 void cancel_reset_debug_log(void);
 
 struct drm_device;
