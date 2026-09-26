@@ -43,11 +43,22 @@ static int drm_add_busid_modesetting(struct drm_device *dev, struct sysctl_ctx_l
 	   struct sysctl_oid *top);
 
 SYSCTL_DECL(_hw_drm);
+SYSCTL_DECL(_hw_dri);
 
 #define DRM_SYSCTL_HANDLER_ARGS	(SYSCTL_HANDLER_ARGS)
 
 extern int drm_vblank_offdelay;
 extern unsigned int drm_timestamp_precision;
+
+/*
+ * hw.dri itself is a static node of this module (drm_os_freebsd.c), and so
+ * are these two leaves: they describe drm.ko, not any one device, and must
+ * live exactly as long as drm.ko does.
+ */
+SYSCTL_INT(_hw_dri, OID_AUTO, vblank_offdelay, CTLFLAG_RW,
+    &drm_vblank_offdelay, 0, "");
+SYSCTL_UINT(_hw_dri, OID_AUTO, timestamp_precision, CTLFLAG_RW,
+    &drm_timestamp_precision, 0, "");
 
 static int	   drm_name_info DRM_SYSCTL_HANDLER_ARGS;
 static int	   drm_clients_info DRM_SYSCTL_HANDLER_ARGS;
@@ -73,27 +84,27 @@ drm_sysctl_init(struct drm_device *dev)
 {
 	struct drm_sysctl_info *info;
 	struct sysctl_oid *oid;
-	struct sysctl_oid *top, *drioid;
+	struct sysctl_oid *top;
 	int		  i;
 
 	info = malloc(sizeof *info, DRM_MEM_DRIVER, M_WAITOK | M_ZERO);
+	sysctl_ctx_init(&info->ctx);
 	dev->sysctl = info;
 
-	/* Add the sysctl node for DRI if it doesn't already exist */
-	drioid = SYSCTL_ADD_NODE(&info->ctx, SYSCTL_CHILDREN(&sysctl___hw), OID_AUTO,
-	    "dri", CTLFLAG_RW, NULL, "DRI Graphics");
-	if (!drioid) {
-		free(dev->sysctl, DRM_MEM_DRIVER);
-		dev->sysctl = NULL;
-		return (-ENOMEM);
-	}
+	/*
+	 * Only this device's own hw.dri.<N> subtree goes into its context.
+	 * hw.dri is static; claiming it here (as SYSCTL_ADD_NODE on an existing
+	 * node does) made sysctl_ctx_free() fail with EBUSY on every unload --
+	 * a static OID cannot be removed -- having removed nothing, after which
+	 * the hw.dri.<N> OIDs pointed into freed memory.
+	 */
 
 	/* Find the next free slot under hw.dri */
 	i = 0;
 #ifdef SYSCTL_FOREACH
-	SYSCTL_FOREACH(oid, SYSCTL_CHILDREN(drioid))
+	SYSCTL_FOREACH(oid, SYSCTL_STATIC_CHILDREN(_hw_dri))
 #else
-	SLIST_FOREACH(oid, SYSCTL_CHILDREN(drioid), oid_link)
+	SLIST_FOREACH(oid, SYSCTL_STATIC_CHILDREN(_hw_dri), oid_link)
 #endif
 	{
 		if (i == oid->oid_name[0] - '0' && oid->oid_name[1] == 0)
@@ -108,7 +119,7 @@ drm_sysctl_init(struct drm_device *dev)
 	/* Add the hw.dri.x for our device */
 	info->name[0] = '0' + i;
 	info->name[1] = 0;
-	top = SYSCTL_ADD_NODE(&info->ctx, SYSCTL_CHILDREN(drioid),
+	top = SYSCTL_ADD_NODE(&info->ctx, SYSCTL_STATIC_CHILDREN(_hw_dri),
 	    OID_AUTO, info->name, CTLFLAG_RW, NULL, NULL);
 	if (!top) {
 		drm_sysctl_cleanup(dev);
@@ -131,23 +142,12 @@ drm_sysctl_init(struct drm_device *dev)
 			return (-ENOMEM);
 		}
 	}
-	SYSCTL_ADD_LONG(&info->ctx, SYSCTL_CHILDREN(drioid), OID_AUTO, "debug",
-	    CTLFLAG_RW, &__drm_debug, "Enable debugging output");
 #ifdef notyet
 	if (dev->driver->sysctl_init != NULL)
 		dev->driver->sysctl_init(dev, &info->ctx, top);
 #endif
 
 	drm_add_busid_modesetting(dev, &info->ctx, top);
-
-	SYSCTL_ADD_INT(&info->ctx, SYSCTL_CHILDREN(drioid), OID_AUTO,
-	    "vblank_offdelay", CTLFLAG_RW, &drm_vblank_offdelay,
-	    sizeof(drm_vblank_offdelay),
-	    "");
-	SYSCTL_ADD_INT(&info->ctx, SYSCTL_CHILDREN(drioid), OID_AUTO,
-	    "timestamp_precision", CTLFLAG_RW, &drm_timestamp_precision,
-	    sizeof(drm_timestamp_precision),
-	    "");
 
 	return (0);
 }
