@@ -158,7 +158,7 @@ static int aca_smu_get_valid_aca_banks(struct amdgpu_device *adev, enum aca_smu_
 		return -EINVAL;
 	}
 
-	if (start + count >= max_count)
+	if (start + count > max_count)
 		return -EINVAL;
 
 	count = min_t(int, count, max_count);
@@ -660,9 +660,7 @@ static void remove_aca_sysfs(struct aca_handle *handle)
 	struct amdgpu_device *adev = handle->adev;
 	struct device_attribute *aca_attr = &handle->aca_attr;
 
-#ifdef __linux__
 	if (adev->dev->kobj.sd)
-#endif
 		sysfs_remove_file_from_group(&adev->dev->kobj,
 					     &aca_attr->attr,
 					     "ras");

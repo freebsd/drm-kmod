@@ -21,8 +21,6 @@ SRCS=	drm_atomic.c \
 	drm_blend.c \
 	drm_bridge.c \
 	drm_cache.c \
-	drm_client.c \
-	drm_client_modeset.c \
 	drm_color_mgmt.c \
 	drm_connector.c \
 	drm_crtc.c \
@@ -78,6 +76,7 @@ SRCS+=	drm_writeback.c
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
 SRCS+=	drm_fb_helper.c \
+	drm_fbdev_client.c \
 	drm_fbdev_ttm.c
 .endif
 
@@ -135,6 +134,15 @@ SRCS+=	drm_exec.c
 SRCS+=	drm_panic.c
 .endif
 
+.if !empty(KCONFIG:MDRM_CLIENT)
+SRCS+= 	drm_client.c \
+	drm_client_event.c \
+	drm_client_modeset.c
+.endif
+.if !empty(KCONFIG:MDRM_CLIENT_SETUP)
+SRCS+= 	drm_client_setup.c
+.endif
+
 SRCS+=	device_if.h \
 	vnode_if.h \
 	bus_if.h \
@@ -182,6 +190,7 @@ CWARNFLAGS.drm_dp_mst_topology.c+=		-Wno-missing-prototypes
 CWARNFLAGS.drm_dp_tunnel.c+=			-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.drm_drv.c+=				-Wno-unused-variable
 CWARNFLAGS.drm_edid.c+=				-Wno-cast-qual
+CWARNFLAGS.drm_fb_helper.c+=			-Wno-unused-variable
 CWARNFLAGS.drm_file.c+=				-Wno-unused-but-set-variable
 CWARNFLAGS.drm_file.c+=				-Wno-unused-value
 CWARNFLAGS.drm_gem_atomic_helper.c+=		-Wno-missing-prototypes

@@ -35,6 +35,11 @@
 
 #ifndef _DEV_VT_HW_FB_VT_DRMFB_H_
 #define	_DEV_VT_HW_FB_VT_DRMFB_H_
+
+struct fb_info;
+
+extern int skip_ddb;
+
 /* Generic framebuffer interface call vt_drmfb_attach to init VT(9) */
 int vt_drmfb_attach(struct fb_info *info);
 int vt_drmfb_detach(struct fb_info *info);

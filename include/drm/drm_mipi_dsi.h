@@ -96,6 +96,8 @@ int mipi_dsi_picture_parameter_set(struct mipi_dsi_device *,
 
 void mipi_dsi_compression_mode_ext_multi(struct mipi_dsi_multi_context *,
     bool, enum mipi_dsi_compression_algo, unsigned int);
+void mipi_dsi_compression_mode_multi(struct mipi_dsi_multi_context *ctx,
+    bool enable);
 void mipi_dsi_picture_parameter_set_multi(struct mipi_dsi_multi_context *,
     const struct drm_dsc_picture_parameter_set *);
 

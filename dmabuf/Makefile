@@ -40,3 +40,4 @@ CFLAGS+= '-DKBUILD_MODNAME="${KMOD}"'
 CFLAGS+= ${KCONFIG:C/(.*)/-DCONFIG_\1/}
 
 CWARNFLAGS.dma-buf.c+=	-Wno-pointer-arith
+CWARNFLAGS.dma-fence-unwrap.c+=	-Wno-cast-qual
