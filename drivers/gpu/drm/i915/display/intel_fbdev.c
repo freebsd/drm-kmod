@@ -153,10 +153,9 @@ static void intel_fbdev_fb_destroy(struct fb_info *info)
 	struct intel_fbdev *ifbdev = container_of(fb_helper, struct intel_fbdev, helper);
 
 #ifdef __FreeBSD__
-	unregister_fictitious_range(
-		fb_helper->dev,
-		ifbdev->helper.info->fix.smem_start,
-		ifbdev->helper.info->fix.smem_len);
+	if (!(info->flags & FBINFO_VIRTFB))
+		unregister_fictitious_range(fb_helper->dev,
+		    info->fix.smem_start, info->fix.smem_len);
 #endif
 
 	drm_fb_helper_fini(&ifbdev->helper);
@@ -291,7 +290,10 @@ static int intelfb_create(struct drm_fb_helper *helper,
 	 * values passed to register_fictitious_range() below are unavailable
 	 * from a generic structure set by both drivers.
 	 */
-	register_fictitious_range(dev, info->fix.smem_start, info->fix.smem_len);
+	/* System RAM already has real vm_page structures. */
+	if (!(info->flags & FBINFO_VIRTFB))
+		register_fictitious_range(dev, info->fix.smem_start,
+		    info->fix.smem_len);
 #endif
 
 	drm_fb_helper_fill_info(info, &ifbdev->helper, sizes);

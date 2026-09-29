@@ -87,6 +87,14 @@ int intel_fbdev_fb_fill_info(struct drm_i915_private *i915, struct fb_info *info
 					i915_gem_object_get_dma_address(obj, 0) -
 					mem->region.start);
 		info->fix.smem_len = obj->base.size;
+#ifdef __FreeBSD__
+	} else if (!i915_ggtt_has_aperture(to_gt(i915)->ggtt) &&
+		   i915_gem_object_is_shmem(obj)) {
+		/* vt_fb_mmap() resolves each page through screen_base. */
+		info->fix.smem_start = 0;
+		info->fix.smem_len = obj->base.size;
+		info->flags |= FBINFO_VIRTFB;
+#endif
 	} else {
 		struct i915_ggtt *ggtt = to_gt(i915)->ggtt;
 
@@ -110,7 +118,8 @@ int intel_fbdev_fb_fill_info(struct drm_i915_private *i915, struct fb_info *info
 		 * out by the display engine after the EFI framebuffer handoff.
 		 * Use WB for VT performance; the damage callback flushes writes.
 		 */
-		if (IS_METEORLAKE(i915) && i915_gem_object_is_shmem(obj)) {
+		if (!i915_ggtt_has_aperture(to_gt(i915)->ggtt) &&
+		    i915_gem_object_is_shmem(obj)) {
 			vaddr = (void __iomem *)i915_gem_object_pin_map(obj,
 								 I915_MAP_WB);
 			if (!IS_ERR(vaddr))

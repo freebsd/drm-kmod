@@ -10,6 +10,7 @@ struct drm_fb_helper;
 struct drm_fb_helper_surface_size;
 struct drm_gem_object;
 struct drm_i915_private;
+struct drm_i915_gem_object;
 struct fb_info;
 struct i915_vma;
 
