@@ -387,9 +387,5 @@ static const struct file_operations sync_file_fops = {
 	.release = sync_file_release,
 	.poll = sync_file_poll,
 	.unlocked_ioctl = sync_file_ioctl,
-#ifdef __linux__
 	.compat_ioctl = compat_ptr_ioctl,
-#elif defined(__FreeBSD__)
-	.compat_ioctl = sync_file_ioctl,
-#endif
 };
