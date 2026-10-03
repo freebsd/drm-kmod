@@ -260,9 +260,7 @@ int radeon_fbdev_driver_fbdev_probe(struct drm_fb_helper *fb_helper,
 	info->fbops = &radeon_fbdev_fb_ops;
 
 	/* radeon resume is fragile and needs a vt switch to help it along */
-#ifdef __linux__
 	info->skip_vt_switch = false;
-#endif
 
 	drm_fb_helper_fill_info(info, fb_helper, sizes);
 
