@@ -765,6 +765,37 @@ void dma_buf_vunmap(struct dma_buf *dmabuf, struct iosys_map *map)
 	mutex_unlock(&dmabuf->lock);
 }
 
+/*
+ * From Linux drivers/dma-buf/dma-buf.c, without vma_set_file(): here
+ * dmabuf->file is a native struct file, not the struct linux_file that
+ * vma->vm_file is, so the vma does not hold its own reference on the
+ * dma-buf. The importing GEM object's reference, taken by drm_gem_mmap_obj(),
+ * keeps it alive for the mapping in the usual map/use/unmap case.
+ */
+int
+dma_buf_mmap(struct dma_buf *dmabuf, struct vm_area_struct *vma,
+    unsigned long pgoff)
+{
+
+	if (WARN_ON(!dmabuf || !vma))
+		return (-EINVAL);
+
+	if (!dmabuf->ops->mmap)
+		return (-EINVAL);
+
+	/* Check for offset overflow. */
+	if (pgoff + vma_pages(vma) < pgoff)
+		return (-EOVERFLOW);
+
+	/* Check for overflowing the buffer's size. */
+	if (pgoff + vma_pages(vma) > dmabuf->size >> PAGE_SHIFT)
+		return (-EINVAL);
+
+	vma->vm_pgoff = pgoff;
+
+	return (dmabuf->ops->mmap(dmabuf, vma));
+}
+
 static void
 dma_buf_init(void *arg __unused)
 {
