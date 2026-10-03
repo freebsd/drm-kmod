@@ -55,9 +55,9 @@ extern unsigned int drm_timestamp_precision;
  * are these two leaves: they describe drm.ko, not any one device, and must
  * live exactly as long as drm.ko does.
  */
-SYSCTL_INT(_hw_dri, OID_AUTO, vblank_offdelay, CTLFLAG_RW,
+SYSCTL_INT(_hw_dri, OID_AUTO, vblank_offdelay, CTLFLAG_RWTUN,
     &drm_vblank_offdelay, 0, "");
-SYSCTL_UINT(_hw_dri, OID_AUTO, timestamp_precision, CTLFLAG_RW,
+SYSCTL_UINT(_hw_dri, OID_AUTO, timestamp_precision, CTLFLAG_RWTUN,
     &drm_timestamp_precision, 0, "");
 
 static int	   drm_name_info DRM_SYSCTL_HANDLER_ARGS;
