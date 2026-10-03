@@ -1867,10 +1867,6 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper)
 	info = fb_helper->info;
 	info->var.pixclock = 0;
 
-#ifdef __FreeBSD__
-	info->fb_bsddev = dev->dev->bsddev;
-#endif
-
 	/* Need to drop locks to avoid recursive deadlock in
 	 * register_framebuffer. This is ok because the only thing left to do is
 	 * register the fbdev emulation instance in kernel_fb_helper_list. */

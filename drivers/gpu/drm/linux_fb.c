@@ -161,10 +161,11 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 static int
 __register_framebuffer(struct linux_fb_info *fb_info)
 {
+	device_t fb_bsddev = fb_info->device->bsddev;
 	int err;
 
-	fb_info->fbio.fb_video_dev = device_get_parent(fb_info->fb_bsddev);
-	fb_info->fbio.fb_name = device_get_nameunit(fb_info->fb_bsddev);
+	fb_info->fbio.fb_video_dev = device_get_parent(fb_bsddev);
+	fb_info->fbio.fb_name = device_get_nameunit(fb_bsddev);
 
 	fb_info->fbio.fb_type = FBTYPE_PCIMISC;
 	fb_info->fbio.fb_height = fb_info->var.yres;
@@ -177,8 +178,8 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	fb_info->fbio.fb_size = fb_info->fix.smem_len;
 	fb_info->fbio.fb_vbase = (uintptr_t)fb_info->screen_base;
 
-	fb_info->fbio.fb_fbd_dev = device_add_child(fb_info->fb_bsddev, "fbd",
-				device_get_unit(fb_info->fb_bsddev));
+	fb_info->fbio.fb_fbd_dev = device_add_child(fb_bsddev, "fbd",
+				device_get_unit(fb_bsddev));
 
 	/* tell vt_drmfb to initialize color map */
 	fb_info->fbio.fb_cmsize = 0;
@@ -221,12 +222,13 @@ linux_register_framebuffer(struct linux_fb_info *fb_info)
 static int
 __unregister_framebuffer(struct linux_fb_info *fb_info)
 {
+	device_t fb_bsddev = fb_info->device->bsddev;
 
 	vt_drmfb_detach(&fb_info->fbio);
 
 	if (fb_info->fbio.fb_fbd_dev) {
 		mtx_lock(&Giant);
-		device_delete_child(fb_info->fb_bsddev, fb_info->fbio.fb_fbd_dev);
+		device_delete_child(fb_bsddev, fb_info->fbio.fb_fbd_dev);
 		mtx_unlock(&Giant);
 		fb_info->fbio.fb_fbd_dev = NULL;
 	}
