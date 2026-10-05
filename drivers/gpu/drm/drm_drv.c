@@ -117,7 +117,7 @@ static void drm_minor_alloc_release(struct drm_device *dev, void *data)
 	WARN_ON(dev != minor->dev);
 
 #ifdef __FreeBSD__
-	/* Destroy the /dev/dri alias, also on a failed probe's drm_dev_put(). */
+	/* Undo drm_dev_alias(), also on a failed probe's drm_dev_put(). */
 	drm_dev_alias_free(minor);
 #endif
 
