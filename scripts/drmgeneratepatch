@@ -29,7 +29,6 @@ mkdir -p ${PATCH_DIR}
 
 cd ${LINUX_DIR}
 git format-patch -o ${PATCH_DIR} ${REV} \
-    drivers/gpu/buddy.c \
     drivers/gpu/drm/*.c \
     drivers/gpu/drm/*.h \
     drivers/gpu/drm/amd/ \
@@ -58,7 +57,6 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     include/linux/dma-fence-chain.h \
     include/linux/dma-fence-unwrap.h \
     include/linux/dma-resv.h \
-    include/linux/gpu_buddy.h \
     include/linux/sync_file.h \
     ':!drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_*' \
     ':!drivers/gpu/drm/amd/amdgpu/amdgpu_atpx_handler*' \
