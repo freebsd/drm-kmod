@@ -176,6 +176,7 @@ int virtio_gpu_init(struct virtio_device *vdev, struct drm_device *dev)
 	}
 	if (virtio_get_shm_region(vgdev->vdev, &vgdev->host_visible_region,
 				  VIRTIO_GPU_SHM_ID_HOST_VISIBLE)) {
+#ifdef __linux__
 		if (!devm_request_mem_region(&vgdev->vdev->dev,
 					     vgdev->host_visible_region.addr,
 					     vgdev->host_visible_region.len,
@@ -184,6 +185,7 @@ int virtio_gpu_init(struct virtio_device *vdev, struct drm_device *dev)
 			ret = -EBUSY;
 			goto err_vqs;
 		}
+#endif
 
 		DRM_INFO("Host memory window: 0x%lx +0x%lx\n",
 			 (unsigned long)vgdev->host_visible_region.addr,

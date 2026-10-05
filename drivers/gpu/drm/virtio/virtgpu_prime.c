@@ -311,6 +311,11 @@ struct drm_gem_object *virtgpu_gem_prime_import(struct drm_device *dev,
 		}
 	}
 
+#ifdef __FreeBSD__
+	/* The exporter would DMA-map for our parent, which has no DMA tag. */
+	return ERR_PTR(-ENODEV);
+#endif
+
 	if (!vgdev->has_resource_blob || vgdev->has_virgl_3d)
 		return drm_gem_prime_import(dev, buf);
 

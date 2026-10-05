@@ -86,3 +86,7 @@ selftests
 selftest_*.c
 selftest_*.h
 st_shmem_utils.c
+
+virtgpu_freebsd.c
+virtgpu_trace.h
+virtgpu_trace_points.c

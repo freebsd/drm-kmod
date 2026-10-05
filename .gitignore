@@ -77,6 +77,11 @@ vboxvideo/export_syms
 drivers/staging/vboxvideo/Kconfig
 drivers/staging/vboxvideo/Makefile
 drivers/staging/vboxvideo/TODO
+virtio/*.h
+virtio/i386
+virtio/x86
+virtio/machine
+virtio/export_syms
 vmwgfx/*.h
 vmwgfx/i386
 vmwgfx/x86

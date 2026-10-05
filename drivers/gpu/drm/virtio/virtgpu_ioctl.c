@@ -517,8 +517,13 @@ static int virtio_gpu_resource_create_blob_ioctl(struct drm_device *dev,
 	if (rc_blob->cmd_size) {
 		void *buf;
 
+#ifdef __linux__
 		buf = memdup_user(u64_to_user_ptr(rc_blob->cmd),
 				  rc_blob->cmd_size);
+#elif defined(__FreeBSD__)
+		buf = lkpi_virtqueue_memdup_user(u64_to_user_ptr(rc_blob->cmd),
+		    rc_blob->cmd_size);
+#endif
 
 		if (IS_ERR(buf))
 			return PTR_ERR(buf);

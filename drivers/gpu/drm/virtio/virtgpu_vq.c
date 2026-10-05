@@ -279,14 +279,25 @@ static struct sg_table *vmalloc_to_sgt(char *data, uint32_t size, int *sg_ents)
 	struct scatterlist *sg;
 	struct page *pg;
 
+#ifdef __linux__
 	if (WARN_ON(!PAGE_ALIGNED(data)))
 		return NULL;
+#elif defined(__FreeBSD__)
+	/*
+	 * LinuxKPI's is_vmalloc_addr() also matches malloc(9) memory, which
+	 * need not be page-aligned.
+	 */
+#endif
 
 	sgt = kmalloc(sizeof(*sgt), GFP_KERNEL);
 	if (!sgt)
 		return NULL;
 
+#ifdef __linux__
 	*sg_ents = DIV_ROUND_UP(size, PAGE_SIZE);
+#elif defined(__FreeBSD__)
+	*sg_ents = DIV_ROUND_UP(offset_in_page(data) + size, PAGE_SIZE);
+#endif
 	ret = sg_alloc_table(sgt, *sg_ents, GFP_KERNEL);
 	if (ret) {
 		kfree(sgt);
@@ -301,8 +312,13 @@ static struct sg_table *vmalloc_to_sgt(char *data, uint32_t size, int *sg_ents)
 			return NULL;
 		}
 
+#ifdef __linux__
 		s = min_t(int, PAGE_SIZE, size);
 		sg_set_page(sg, pg, s, 0);
+#elif defined(__FreeBSD__)
+		s = min_t(int, PAGE_SIZE - offset_in_page(data), size);
+		sg_set_page(sg, pg, s, offset_in_page(data));
+#endif
 
 		size -= s;
 		data += s;
