@@ -76,12 +76,21 @@ SRCS=	drm_atomic.c \
 	vt_drmfb.c
 
 # GPL-2.0.
-SRCS+=	drm_writeback.c
+SRCS+=	drm_simple_kms_helper.c \
+	drm_writeback.c
+
+.if !empty(KCONFIG:MDRM_GEM_SHMEM_HELPER)
+# GPL-2.0.
+SRCS+=	drm_gem_shmem_helper.c
+.endif
 
 .if !empty(KCONFIG:MDRM_FBDEV_EMULATION)
 SRCS+=	drm_fb_helper.c \
 	drm_fbdev_client.c \
 	drm_fbdev_ttm.c
+.if !empty(KCONFIG:MDRM_GEM_SHMEM_HELPER)
+SRCS+=	drm_fbdev_shmem.c
+.endif
 .endif
 
 .if !empty(KCONFIG:MCOMPAT)
