@@ -30,6 +30,10 @@
 
 static int virtio_gpu_virglrenderer_workaround = 1;
 module_param_named(virglhack, virtio_gpu_virglrenderer_workaround, int, 0400);
+#ifdef __FreeBSD__
+/* LinuxKPI's module_param_named() requires the description symbol. */
+MODULE_PARM_DESC(virglhack, "virglrenderer resource-id workaround");
+#endif
 
 int virtio_gpu_resource_id_get(struct virtio_gpu_device *vgdev, uint32_t *resid)
 {
@@ -151,9 +155,14 @@ static int virtio_gpu_object_shmem_init(struct virtio_gpu_device *vgdev,
 	else
 		*nents = pages->orig_nents;
 
+#ifdef __linux__
 	*ents = kvmalloc_array(*nents,
 			       sizeof(struct virtio_gpu_mem_entry),
 			       GFP_KERNEL);
+#elif defined(__FreeBSD__)
+	*ents = lkpi_virtqueue_kvmalloc(array_size(*nents,
+	    sizeof(struct virtio_gpu_mem_entry)), GFP_KERNEL);
+#endif
 	if (!(*ents)) {
 		DRM_ERROR("failed to allocate ent list\n");
 		return -ENOMEM;

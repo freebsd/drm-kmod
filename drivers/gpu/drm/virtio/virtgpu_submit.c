@@ -413,7 +413,12 @@ static int virtio_gpu_init_submit(struct virtio_gpu_submit *submit,
 	if (err)
 		return err;
 
+#ifdef __linux__
 	submit->buf = vmemdup_user(u64_to_user_ptr(exbuf->command), exbuf->size);
+#elif defined(__FreeBSD__)
+	submit->buf = lkpi_virtqueue_memdup_user(u64_to_user_ptr(exbuf->command),
+	    exbuf->size);
+#endif
 	if (IS_ERR(submit->buf))
 		return PTR_ERR(submit->buf);
 

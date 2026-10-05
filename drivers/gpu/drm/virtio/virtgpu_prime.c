@@ -159,7 +159,15 @@ struct drm_gem_object *virtgpu_gem_prime_import(struct drm_device *dev,
 		}
 	}
 
+#ifdef __linux__
 	return drm_gem_prime_import(dev, buf);
+#elif defined(__FreeBSD__)
+	/*
+	 * The exporter would DMA-map for our parent, which has no DMA tag;
+	 * Linux fails the import later anyway (import_sg_table).
+	 */
+	return ERR_PTR(-ENODEV);
+#endif
 }
 
 struct drm_gem_object *virtgpu_gem_prime_import_sg_table(

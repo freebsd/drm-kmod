@@ -38,6 +38,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     drivers/gpu/drm/radeon/ \
     drivers/gpu/drm/scheduler/ \
     drivers/gpu/drm/ttm/ \
+    drivers/gpu/drm/virtio/ \
     drivers/dma-buf/dma-fence.c \
     drivers/dma-buf/dma-fence-array.c \
     drivers/dma-buf/dma-fence-chain.c \
@@ -51,6 +52,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     include/drm/intel/ \
     include/drm/ttm/ \
     include/uapi/drm/*.h \
+    include/uapi/linux/virtio_gpu.h \
     include/linux/aperture.h \
     include/linux/hdmi.h \
     include/linux/dma-fence.h \
@@ -76,6 +78,7 @@ git format-patch -o ${PATCH_DIR} ${REV} \
     ':!drivers/gpu/drm/i915/intel_gvt_mmio_table.c' \
     ':!drivers/gpu/drm/i915/intel_gvt.c' \
     ':!drivers/gpu/drm/selftests/*' \
+    ':!drivers/gpu/drm/virtio/virtgpu_trace*' \
     ':!drivers/gpu/drm/display/drm_dp_aux_bus*' \
     ':!drivers/gpu/drm/display/drm_dp_cec*' \
     ':!drivers/gpu/drm/display/drm_dp_mst_topology_internal*' \

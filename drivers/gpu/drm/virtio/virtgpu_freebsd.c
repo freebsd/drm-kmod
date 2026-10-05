@@ -25,34 +25,20 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _VIRTGPU_TRACE_FREEBSD_H_
-#define	_VIRTGPU_TRACE_FREEBSD_H_
-
 #include <sys/param.h>
-#include <sys/ktr.h>
+#include <sys/module.h>
+#include <sys/sysctl.h>
 
-#include "virtgpu_drv.h"
+SYSCTL_DECL(_hw_virtio);
 
-/* DEFINE_EVENT(virtio_gpu_cmd, virtio_gpu_cmd_queue) */
-static inline void
-trace_virtio_gpu_cmd_queue(struct linux_virtqueue *vq,
-    struct virtio_gpu_ctrl_hdr *hdr, uint32_t seqno)
-{
-	CTR6(KTR_DRM, "virtio_gpu_cmd_queue type %#x flags %#x fence_id %ju "
-	    "ctx_id %u num_free %u seqno %u", le32_to_cpu(hdr->type),
-	    le32_to_cpu(hdr->flags), (uintmax_t)le64_to_cpu(hdr->fence_id),
-	    le32_to_cpu(hdr->ctx_id), vq->num_free, seqno);
-}
+/* Node for the driver's LinuxKPI module parameters. */
+SYSCTL_NODE(_hw_virtio, OID_AUTO, gpu, CTLFLAG_RW | CTLFLAG_MPSAFE, 0,
+    "VirtIO GPU DRM parameters");
 
-/* DEFINE_EVENT(virtio_gpu_cmd, virtio_gpu_cmd_response) */
-static inline void
-trace_virtio_gpu_cmd_response(struct linux_virtqueue *vq,
-    struct virtio_gpu_ctrl_hdr *hdr, uint32_t seqno)
-{
-	CTR6(KTR_DRM, "virtio_gpu_cmd_response type %#x flags %#x fence_id %ju "
-	    "ctx_id %u num_free %u seqno %u", le32_to_cpu(hdr->type),
-	    le32_to_cpu(hdr->flags), (uintmax_t)le64_to_cpu(hdr->fence_id),
-	    le32_to_cpu(hdr->ctx_id), vq->num_free, seqno);
-}
-
-#endif /* _VIRTGPU_TRACE_FREEBSD_H_ */
+MODULE_VERSION(virtio_gpu_drm, 1);
+MODULE_DEPEND(virtio_gpu_drm, linuxkpi, 1, 1, 1);
+MODULE_DEPEND(virtio_gpu_drm, linuxkpi_virtio, 1, 1, 1);
+MODULE_DEPEND(virtio_gpu_drm, virtio, 1, 1, 1);
+MODULE_DEPEND(virtio_gpu_drm, linuxkpi_video, 1, 1, 1);
+MODULE_DEPEND(virtio_gpu_drm, drmn, 2, 2, 2);
+MODULE_DEPEND(virtio_gpu_drm, dmabuf, 1, 1, 1);
