@@ -90,6 +90,7 @@ __drm_gem_shmem_create(struct drm_device *dev, size_t size, bool private,
 
 	INIT_LIST_HEAD(&shmem->madv_list);
 
+#ifdef __linux__
 	if (!private) {
 		/*
 		 * Our buffers are kept pinned, so allocating them
@@ -101,6 +102,7 @@ __drm_gem_shmem_create(struct drm_device *dev, size_t size, bool private,
 		mapping_set_gfp_mask(obj->filp->f_mapping, GFP_HIGHUSER |
 				     __GFP_RETRY_MAYFAIL | __GFP_NOWARN);
 	}
+#endif
 
 	return shmem;
 
@@ -168,8 +170,10 @@ void drm_gem_shmem_free(struct drm_gem_shmem_object *shmem)
 		drm_WARN_ON(obj->dev, shmem->vmap_use_count);
 
 		if (shmem->sgt) {
+#ifdef __linux__
 			dma_unmap_sgtable(obj->dev->dev, shmem->sgt,
 					  DMA_BIDIRECTIONAL, 0);
+#endif
 			sg_free_table(shmem->sgt);
 			kfree(shmem->sgt);
 		}
@@ -471,7 +475,9 @@ void drm_gem_shmem_purge(struct drm_gem_shmem_object *shmem)
 
 	drm_WARN_ON(obj->dev, !drm_gem_shmem_is_purgeable(shmem));
 
+#ifdef __linux__
 	dma_unmap_sgtable(dev->dev, shmem->sgt, DMA_BIDIRECTIONAL, 0);
+#endif
 	sg_free_table(shmem->sgt);
 	kfree(shmem->sgt);
 	shmem->sgt = NULL;
@@ -480,7 +486,12 @@ void drm_gem_shmem_purge(struct drm_gem_shmem_object *shmem)
 
 	shmem->madv = -1;
 
+#ifdef __linux__
 	drm_vma_node_unmap(&obj->vma_node, dev->anon_inode->i_mapping);
+#elif defined(__FreeBSD__)
+	(void)dev;
+	drm_vma_node_unmap(&obj->vma_node, obj);
+#endif
 	drm_gem_free_mmap_offset(obj);
 
 	/* Our goal here is to return as much of the memory as
@@ -488,9 +499,15 @@ void drm_gem_shmem_purge(struct drm_gem_shmem_object *shmem)
 	 * To do this we must instruct the shmfs to drop all of its
 	 * backing pages, *now*.
 	 */
+#ifdef __linux__
 	shmem_truncate_range(file_inode(obj->filp), 0, (loff_t)-1);
 
 	invalidate_mapping_pages(file_inode(obj->filp)->i_mapping, 0, (loff_t)-1);
+#elif defined(__FreeBSD__)
+	shmem_truncate_range(obj->filp->f_shmem, 0, (loff_t)-1);
+
+	invalidate_mapping_pages(obj->filp->f_shmem, 0, (loff_t)-1);
+#endif
 }
 EXPORT_SYMBOL(drm_gem_shmem_purge);
 
@@ -553,7 +570,14 @@ static vm_fault_t drm_gem_shmem_fault(struct vm_fault *vmf)
 	} else {
 		page = shmem->pages[page_offset];
 
+#ifdef __linux__
 		ret = vmf_insert_pfn(vma, vmf->address, page_to_pfn(page));
+#elif defined(__FreeBSD__)
+		VM_OBJECT_WLOCK(vma->vm_obj);
+		ret = lkpi_vmf_insert_pfn_prot_locked(vma, vmf->address,
+		    page_to_pfn(page), vma->vm_page_prot);
+		VM_OBJECT_WUNLOCK(vma->vm_obj);
+#endif
 	}
 
 	dma_resv_unlock(shmem->base.resv);
@@ -626,7 +650,11 @@ int drm_gem_shmem_mmap(struct drm_gem_shmem_object *shmem, struct vm_area_struct
 		vma->vm_private_data = NULL;
 		vma->vm_ops = NULL;
 
+#ifdef __linux__
 		ret = dma_buf_mmap(obj->dma_buf, vma, 0);
+#elif defined(__FreeBSD__)
+		ret = -ENOSYS;	/* No dma_buf_mmap() */
+#endif
 
 		/* Drop the reference drm_gem_mmap_obj() acquired.*/
 		if (!ret)
@@ -717,17 +745,27 @@ static struct sg_table *drm_gem_shmem_get_pages_sgt_locked(struct drm_gem_shmem_
 		goto err_put_pages;
 	}
 	/* Map the pages for use by the h/w. */
+#ifdef __linux__
 	ret = dma_map_sgtable(obj->dev->dev, sgt, DMA_BIDIRECTIONAL, 0);
 	if (ret)
 		goto err_free_sgt;
+#elif defined(__FreeBSD__)
+	/*
+	 * BSDFIXME: Not DMA-mapped, sg_dma_address() is unset.  The parent
+	 * device of virtio-gpu, the only user, has no DMA tag; it uses
+	 * sg_phys().
+	 */
+#endif
 
 	shmem->sgt = sgt;
 
 	return sgt;
 
+#ifdef __linux__
 err_free_sgt:
 	sg_free_table(sgt);
 	kfree(sgt);
+#endif
 err_put_pages:
 	drm_gem_shmem_put_pages(shmem);
 	return ERR_PTR(ret);

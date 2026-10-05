@@ -9,13 +9,6 @@
 #include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_gem_shmem_helper.h>
 
-#ifdef __FreeBSD__
-/*
- * TODO: Not connected to the build because it depends on
- * `drm_gem_shmem_helper` which is GPL-2.
- */
-#endif
-
 /*
  * struct fb_ops
  */
@@ -86,6 +79,7 @@ static const struct fb_ops drm_fbdev_shmem_fb_ops = {
 	.fb_destroy = drm_fbdev_shmem_fb_destroy,
 };
 
+#ifdef __linux__
 static struct page *drm_fbdev_shmem_get_page(struct fb_info *info, unsigned long offset)
 {
 	struct drm_fb_helper *fb_helper = info->par;
@@ -105,6 +99,7 @@ static struct page *drm_fbdev_shmem_get_page(struct fb_info *info, unsigned long
 
 	return page;
 }
+#endif
 
 /*
  * struct drm_fb_helper
@@ -193,6 +188,7 @@ int drm_fbdev_shmem_driver_fbdev_probe(struct drm_fb_helper *fb_helper,
 	info->screen_buffer = map.vaddr;
 	info->fix.smem_len = info->screen_size;
 
+#ifdef __linux__
 	/* deferred I/O */
 	fb_helper->fbdefio.delay = HZ / 20;
 	fb_helper->fbdefio.get_page = drm_fbdev_shmem_get_page;
@@ -202,11 +198,14 @@ int drm_fbdev_shmem_driver_fbdev_probe(struct drm_fb_helper *fb_helper,
 	ret = fb_deferred_io_init(info);
 	if (ret)
 		goto err_drm_fb_helper_release_info;
+#endif
 
 	return 0;
 
+#ifdef __linux__
 err_drm_fb_helper_release_info:
 	drm_fb_helper_release_info(fb_helper);
+#endif
 err_drm_client_buffer_vunmap:
 	fb_helper->fb = NULL;
 	fb_helper->buffer = NULL;
