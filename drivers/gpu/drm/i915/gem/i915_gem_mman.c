@@ -266,7 +266,7 @@ static unsigned int tile_row_pages(const struct drm_i915_gem_object *obj)
  */
 int i915_gem_mmap_gtt_version(void)
 {
-#if __FreeBSD_version < 1500508 || (__FreeBSD_version >= 1600000 && __FreeBSD_version < 1600015)
+#if __FreeBSD_version < 1500508 || (__FreeBSD_version >= 1501000 && __FreeBSD_version < 1600015)
 	return 3;
 #else
 	return 5;
