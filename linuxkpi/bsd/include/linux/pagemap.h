@@ -1,8 +1,7 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2018 Johannes Lundberg <johalun0@gmail.com>
- * Copyright (c) 2021 Vladimir Kondratyev <wulf@FreeBSD.org>
+ * Copyright (c) 2026 Denis Borovikov <denis.borovikov@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,56 +25,36 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _TRACE_DMA_FENCE_H_
-#define _TRACE_DMA_FENCE_H_
+#ifndef _BSD_LKPI_LINUX_PAGEMAP_H_
+#define	_BSD_LKPI_LINUX_PAGEMAP_H_
 
-#include <sys/param.h>
-#include <sys/ktr.h>
+#include_next <linux/pagemap.h>
 
-#ifndef KTR_DRM
-#define	KTR_DRM	KTR_DEV
-#endif
-
-static inline void
-trace_dma_fence_emit(void *fence)
+/*
+ * Missing from the base system's LinuxKPI.  Its shmem objects take no
+ * allocation flags and keep their pages wired, and a folio is one page.
+ */
+static inline gfp_t
+mapping_gfp_mask(vm_object_t mapping)
 {
-	CTR1(KTR_DRM, "dma_fence_emit dma_fence %p", fence);
+	return (0);
+}
+
+static inline gfp_t
+mapping_gfp_constraint(vm_object_t mapping, gfp_t gfp_mask)
+{
+	return (mapping_gfp_mask(mapping) & gfp_mask);
 }
 
 static inline void
-trace_dma_fence_init(void *fence)
+mapping_set_unevictable(vm_object_t mapping)
 {
-	CTR1(KTR_DRM, "dma_fence_init dma_fence %p", fence);
 }
 
-static inline void
-trace_dma_fence_destroy(void *fence)
+static inline struct page *
+folio_file_page(struct folio *folio, pgoff_t index)
 {
-	CTR1(KTR_DRM, "dma_fence_destroy dma_fence %p", fence);
+	return (&folio->page);
 }
 
-static inline void
-trace_dma_fence_enable_signal(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_enable_signal dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_signaled(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_signaled dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_wait_start(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_wait_start dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_wait_end(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_wait_end dma_fence %p", fence);
-}
-
-#endif
+#endif /* _BSD_LKPI_LINUX_PAGEMAP_H_ */

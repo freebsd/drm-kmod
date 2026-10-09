@@ -1,8 +1,7 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2018 Johannes Lundberg <johalun0@gmail.com>
- * Copyright (c) 2021 Vladimir Kondratyev <wulf@FreeBSD.org>
+ * Copyright (c) 2026 Denis Borovikov <denis.borovikov@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,56 +25,44 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _TRACE_DMA_FENCE_H_
-#define _TRACE_DMA_FENCE_H_
+/*
+ * Interim: uuid_t and its helpers are under review for base LinuxKPI, see
+ * https://reviews.freebsd.org/D60199; drop this file once it lands.
+ */
 
-#include <sys/param.h>
-#include <sys/ktr.h>
+#ifndef _BSD_LKPI_LINUX_UUID_H_
+#define	_BSD_LKPI_LINUX_UUID_H_
 
-#ifndef KTR_DRM
-#define	KTR_DRM	KTR_DEV
-#endif
+#include_next <linux/uuid.h>
 
-static inline void
-trace_dma_fence_emit(void *fence)
+/* Renamed to stay clear of the other uuid_t types in the tree. */
+typedef struct {
+	uint8_t	b[UUID_SIZE];
+} linux_uuid_t;
+#define	uuid_t	linux_uuid_t
+
+static inline bool
+uuid_equal(const uuid_t *u1, const uuid_t *u2)
 {
-	CTR1(KTR_DRM, "dma_fence_emit dma_fence %p", fence);
+	return (memcmp(u1, u2, sizeof(uuid_t)) == 0);
 }
 
 static inline void
-trace_dma_fence_init(void *fence)
+uuid_copy(uuid_t *dst, const uuid_t *src)
 {
-	CTR1(KTR_DRM, "dma_fence_init dma_fence %p", fence);
+	memcpy(dst, src, sizeof(uuid_t));
 }
 
 static inline void
-trace_dma_fence_destroy(void *fence)
+import_uuid(uuid_t *dst, const uint8_t *src)
 {
-	CTR1(KTR_DRM, "dma_fence_destroy dma_fence %p", fence);
+	memcpy(dst, src, sizeof(uuid_t));
 }
 
 static inline void
-trace_dma_fence_enable_signal(void *fence)
+export_uuid(uint8_t *dst, const uuid_t *src)
 {
-	CTR1(KTR_DRM, "dma_fence_enable_signal dma_fence %p", fence);
+	memcpy(dst, src, sizeof(uuid_t));
 }
 
-static inline void
-trace_dma_fence_signaled(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_signaled dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_wait_start(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_wait_start dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_wait_end(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_wait_end dma_fence %p", fence);
-}
-
-#endif
+#endif /* _BSD_LKPI_LINUX_UUID_H_ */

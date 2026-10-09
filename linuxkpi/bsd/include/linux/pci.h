@@ -1,8 +1,7 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2018 Johannes Lundberg <johalun0@gmail.com>
- * Copyright (c) 2021 Vladimir Kondratyev <wulf@FreeBSD.org>
+ * Copyright (c) 2026 Denis Borovikov <denis.borovikov@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,56 +25,25 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _TRACE_DMA_FENCE_H_
-#define _TRACE_DMA_FENCE_H_
+/*
+ * Interim: pci_is_vga() is under review for base LinuxKPI, see
+ * https://reviews.freebsd.org/D60200; drop this file once it lands.
+ */
 
-#include <sys/param.h>
-#include <sys/ktr.h>
+#ifndef _BSD_LKPI_LINUX_PCI_H_
+#define	_BSD_LKPI_LINUX_PCI_H_
 
-#ifndef KTR_DRM
-#define	KTR_DRM	KTR_DEV
-#endif
+#include_next <linux/pci.h>
 
-static inline void
-trace_dma_fence_emit(void *fence)
+static inline bool
+pci_is_vga(struct pci_dev *pdev)
 {
-	CTR1(KTR_DRM, "dma_fence_emit dma_fence %p", fence);
+	uint8_t subclass;
+
+	/* pdev->class holds only the base class. */
+	subclass = pci_get_subclass(pdev->dev.bsddev);
+	return ((pdev->class == PCIC_DISPLAY && subclass == PCIS_DISPLAY_VGA) ||
+	    (pdev->class == PCIC_OLD && subclass == PCIS_OLD_VGA));
 }
 
-static inline void
-trace_dma_fence_init(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_init dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_destroy(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_destroy dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_enable_signal(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_enable_signal dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_signaled(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_signaled dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_wait_start(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_wait_start dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_wait_end(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_wait_end dma_fence %p", fence);
-}
-
-#endif
+#endif /* _BSD_LKPI_LINUX_PCI_H_ */

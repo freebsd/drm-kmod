@@ -1,8 +1,7 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2018 Johannes Lundberg <johalun0@gmail.com>
- * Copyright (c) 2021 Vladimir Kondratyev <wulf@FreeBSD.org>
+ * Copyright (c) 2026 Denis Borovikov <denis.borovikov@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,56 +25,12 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _TRACE_DMA_FENCE_H_
-#define _TRACE_DMA_FENCE_H_
+#ifndef _BSD_LKPI_LINUX_VIRTIO_RING_H_
+#define	_BSD_LKPI_LINUX_VIRTIO_RING_H_
 
-#include <sys/param.h>
-#include <sys/ktr.h>
+#include <linux/virtio.h>
 
-#ifndef KTR_DRM
-#define	KTR_DRM	KTR_DEV
-#endif
+/* Feature bit number, Linux-style (dev/virtio uses a mask). */
+#define	VIRTIO_RING_F_INDIRECT_DESC	28
 
-static inline void
-trace_dma_fence_emit(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_emit dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_init(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_init dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_destroy(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_destroy dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_enable_signal(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_enable_signal dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_signaled(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_signaled dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_wait_start(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_wait_start dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_wait_end(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_wait_end dma_fence %p", fence);
-}
-
-#endif
+#endif /* _BSD_LKPI_LINUX_VIRTIO_RING_H_ */

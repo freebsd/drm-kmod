@@ -169,6 +169,23 @@ dma_fence_array_next(struct dma_fence *head, unsigned int index)
 	return (NULL);
 }
 
+bool
+dma_fence_match_context(struct dma_fence *fence, uint64_t context)
+{
+	struct dma_fence_array *array;
+	unsigned int i;
+
+	if ((array = to_dma_fence_array(fence)) == NULL)
+		return (fence->context == context);
+
+	for (i = 0; i < array->num_fences; i++) {
+		if (array->fences[i]->context != context)
+			return (false);
+	}
+
+	return (true);
+}
+
 static void
 dma_fence_array_set_deadline(struct dma_fence *fence, ktime_t deadline)
 {

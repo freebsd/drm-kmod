@@ -162,9 +162,18 @@ static int
 __register_framebuffer(struct linux_fb_info *fb_info)
 {
 	device_t fb_bsddev = fb_info->device->bsddev;
+	device_t parent;
 	int err;
 
-	fb_info->fbio.fb_video_dev = device_get_parent(fb_bsddev);
+	/*
+	 * vt(4) reposts the video device when it falls back to vt_vga, so
+	 * it must be a vgapci(4) one.  For virtio-gpu, fb_bsddev is the
+	 * virtio PCI transport and its parent the PCI bus.
+	 */
+	parent = device_get_parent(fb_bsddev);
+	fb_info->fbio.fb_video_dev =
+	    device_get_devclass(parent) == devclass_find("vgapci") ?
+	    parent : NULL;
 	fb_info->fbio.fb_name = device_get_nameunit(fb_bsddev);
 
 	fb_info->fbio.fb_type = FBTYPE_PCIMISC;

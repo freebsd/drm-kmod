@@ -59,6 +59,7 @@ void dma_fence_array_init(struct dma_fence_array *array,
 struct dma_fence_array *dma_fence_array_create(int num_fences,
     struct dma_fence **fences, u64 context, unsigned seqno,
     bool signal_on_any);
+bool dma_fence_match_context(struct dma_fence *fence, uint64_t context);
 struct dma_fence *dma_fence_array_first(struct dma_fence *head);
 struct dma_fence *dma_fence_array_next(struct dma_fence *head,
     unsigned int index);

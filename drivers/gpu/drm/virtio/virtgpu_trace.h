@@ -1,8 +1,7 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2018 Johannes Lundberg <johalun0@gmail.com>
- * Copyright (c) 2021 Vladimir Kondratyev <wulf@FreeBSD.org>
+ * Copyright (c) 2026 Denis Borovikov <denis.borovikov@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,56 +25,34 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _TRACE_DMA_FENCE_H_
-#define _TRACE_DMA_FENCE_H_
+#ifndef _VIRTGPU_TRACE_FREEBSD_H_
+#define	_VIRTGPU_TRACE_FREEBSD_H_
 
 #include <sys/param.h>
 #include <sys/ktr.h>
 
-#ifndef KTR_DRM
-#define	KTR_DRM	KTR_DEV
-#endif
+#include "virtgpu_drv.h"
 
+/* DEFINE_EVENT(virtio_gpu_cmd, virtio_gpu_cmd_queue) */
 static inline void
-trace_dma_fence_emit(void *fence)
+trace_virtio_gpu_cmd_queue(struct linux_virtqueue *vq,
+    struct virtio_gpu_ctrl_hdr *hdr, uint32_t seqno)
 {
-	CTR1(KTR_DRM, "dma_fence_emit dma_fence %p", fence);
+	CTR6(KTR_DRM, "virtio_gpu_cmd_queue type %#x flags %#x fence_id %ju "
+	    "ctx_id %u num_free %u seqno %u", le32_to_cpu(hdr->type),
+	    le32_to_cpu(hdr->flags), (uintmax_t)le64_to_cpu(hdr->fence_id),
+	    le32_to_cpu(hdr->ctx_id), vq->num_free, seqno);
 }
 
+/* DEFINE_EVENT(virtio_gpu_cmd, virtio_gpu_cmd_response) */
 static inline void
-trace_dma_fence_init(void *fence)
+trace_virtio_gpu_cmd_response(struct linux_virtqueue *vq,
+    struct virtio_gpu_ctrl_hdr *hdr, uint32_t seqno)
 {
-	CTR1(KTR_DRM, "dma_fence_init dma_fence %p", fence);
+	CTR6(KTR_DRM, "virtio_gpu_cmd_response type %#x flags %#x fence_id %ju "
+	    "ctx_id %u num_free %u seqno %u", le32_to_cpu(hdr->type),
+	    le32_to_cpu(hdr->flags), (uintmax_t)le64_to_cpu(hdr->fence_id),
+	    le32_to_cpu(hdr->ctx_id), vq->num_free, seqno);
 }
 
-static inline void
-trace_dma_fence_destroy(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_destroy dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_enable_signal(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_enable_signal dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_signaled(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_signaled dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_wait_start(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_wait_start dma_fence %p", fence);
-}
-
-static inline void
-trace_dma_fence_wait_end(void *fence)
-{
-	CTR1(KTR_DRM, "dma_fence_wait_end dma_fence %p", fence);
-}
-
-#endif
+#endif /* _VIRTGPU_TRACE_FREEBSD_H_ */

@@ -105,7 +105,6 @@ int
 drm_dev_alias(struct device *ldev, struct drm_minor *minor, const char *minor_str)
 {
 	struct sysctl_oid_list *oid_list;
-	struct sysctl_ctx_list *ctx_list;
 	struct linux_cdev *cdevp;
 	struct sysctl_oid *node;
 	device_t dev = ldev->parent->bsddev;
@@ -114,16 +113,17 @@ drm_dev_alias(struct device *ldev, struct drm_minor *minor, const char *minor_st
 	int error;
 
 	MPASS(dev != NULL);
-	ctx_list = device_get_sysctl_ctx(dev);
 	snprintf(buf, sizeof(buf), "%d", minor->index);
-	node = SYSCTL_ADD_NODE(ctx_list, SYSCTL_STATIC_CHILDREN(_dev_drm), OID_AUTO, buf,
+	/* Removed with the minor: the parent device can outlive it. */
+	node = SYSCTL_ADD_NODE(NULL, SYSCTL_STATIC_CHILDREN(_dev_drm), OID_AUTO, buf,
 	    CTLFLAG_RD, NULL, "DRM properties");
+	minor->bsd_sysctl = node;
 	oid_list = SYSCTL_CHILDREN(node);
 	tmp = pci_get_vendor(dev) + ((u32)pci_get_device(dev) << 16);
-	SYSCTL_ADD_PROC(ctx_list, oid_list, OID_AUTO, "PCI_ID",
+	SYSCTL_ADD_PROC(NULL, oid_list, OID_AUTO, "PCI_ID",
 	    CTLTYPE_STRING | CTLFLAG_RD, NULL, tmp,
 	    sysctl_pci_id, "A", "PCI vendor and device ID");
-	SYSCTL_ADD_INT(ctx_list, oid_list, OID_AUTO, "type",
+	SYSCTL_ADD_INT(NULL, oid_list, OID_AUTO, "type",
 	    CTLFLAG_RD, &minor->type, 0,
 	    "DRM minor type (0=primary, 2=render)");
 
@@ -157,8 +157,9 @@ drm_dev_alias(struct device *ldev, struct drm_minor *minor, const char *minor_st
 }
 
 /*
- * Destroy the alias created by drm_dev_alias(), if any. Idempotent. Called
- * from drm_minor_alloc_release() when the drm_device is released.
+ * Undo drm_dev_alias(): remove its sysctls and destroy its alias, if any.
+ * Idempotent. Called from drm_minor_alloc_release() when the drm_device is
+ * released.
  */
 void
 drm_dev_alias_free(struct drm_minor *minor)
@@ -167,6 +168,10 @@ drm_dev_alias_free(struct drm_minor *minor)
 
 	if (minor == NULL)
 		return;
+	if (minor->bsd_sysctl != NULL) {
+		sysctl_remove_oid(minor->bsd_sysctl, 1, 1);
+		minor->bsd_sysctl = NULL;
+	}
 	alias = minor->bsd_alias;
 	if (alias == NULL)
 		return;
