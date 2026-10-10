@@ -13,6 +13,8 @@
 #include <sys/param.h>
 #include <sys/ktr.h>
 
+#include <drm/drm_os_freebsd.h> /* KTR_DRM */
+
 #include "i915_reg_defs.h"
 
 static inline void
