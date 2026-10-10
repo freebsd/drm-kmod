@@ -221,6 +221,7 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/irq/dcn32 \
 	${SRCDIR}/display/dc/irq/dcn35 \
 	${SRCDIR}/display/dc/irq/dcn351 \
+	${SRCDIR}/display/dc/irq/dcn36 \
 	${SRCDIR}/display/dc/irq/dcn401 \
 	${SRCDIR}/display/dc/link \
 	${SRCDIR}/display/dc/link/accessories \
@@ -270,8 +271,9 @@ _dml=	${SRCDIR}/display/dc/dml \
 	${SRCDIR}/display/dc/resource/dcn321 \
 	${SRCDIR}/display/dc/resource/dcn35 \
 	${SRCDIR}/display/dc/resource/dcn351 \
+	${SRCDIR}/display/dc/resource/dcn36 \
 	${SRCDIR}/display/dc/resource/dcn401 \
-	${SRCDIR}/display/dc/spl \
+	${SRCDIR}/display/dc/sspl \
 	${SRCDIR}/display/dc/virtual \
 	${SRCDIR}/display/dmub/src \
 	${SRCDIR}/display/modules \
@@ -315,6 +317,7 @@ SRCS+=	amdgpu_aca.c \
 	amdgpu_bo_list.c \
 	amdgpu_cgs.c \
 	amdgpu_connectors.c \
+	amdgpu_cper.c \
 	amdgpu_cs.c \
 	amdgpu_csa.c \
 	amdgpu_ctx.c \
@@ -892,6 +895,10 @@ SRCS+=	dcn351_clk_mgr.c \
 	dcn351_resource.c \
 	irq_service_dcn351.c
 
+# display/dc/dcn36
+SRCS+=	dcn36_resource.c \
+	irq_service_dcn36.c
+
 # display/dc/dcn401
 SRCS+=	dcn401_clk_mgr.c \
 	dcn401_clk_mgr_smu_msg.c \
@@ -1110,7 +1117,7 @@ SRCS+=	link_ddc.c \
 	link_resource.c \
 	link_validation.c
 
-# display/dc/spl
+# display/dc/sspl
 SRCS+=	dc_spl.c \
 	dc_spl_filters.c \
 	dc_spl_isharp_filters.c \
@@ -1159,6 +1166,7 @@ SRCS+=	dmub_dcn20.c \
 	dmub_dcn315.c \
 	dmub_dcn316.c \
 	dmub_dcn351.c \
+	dmub_dcn36.c \
 	dmub_dcn401.c \
 	dmub_reg.c \
 	dmub_srv.c \
@@ -1230,6 +1238,7 @@ SRCS+=	amd_powerplay.c \
 	smu_v13_0_6_ppt.c \
 	smu_v13_0_7_ppt.c \
 	smu_v13_0_10.c \
+	smu_v13_0_12_ppt.c \
 	smu_v14_0.c \
 	smu_v14_0_0_ppt.c \
 	smu_v14_0_2_ppt.c \
@@ -1325,7 +1334,7 @@ CFLAGS+= -I${SRCDIR}/display/dc/opp
 CFLAGS+= -I${SRCDIR}/display/dc/optc
 CFLAGS+= -I${SRCDIR}/display/dc/pg
 CFLAGS+= -I${SRCDIR}/display/dc/resource
-CFLAGS+= -I${SRCDIR}/display/dc/spl
+CFLAGS+= -I${SRCDIR}/display/dc/sspl
 CFLAGS+= -I${SRCDIR}/display/dmub/inc
 CFLAGS+= -I${SRCDIR}/display/include
 CFLAGS+= -I${SRCDIR}/display/modules/hdcp
@@ -1659,6 +1668,7 @@ CWARNFLAGS.dcn35_clk_mgr.c=		-Wno-incompatible-pointer-types
 CWARNFLAGS.dcn35_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn351_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn351_fpu.c=		-Wno-initializer-overrides
+CWARNFLAGS.dcn36_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.dcn401_resource.c=		-Wno-initializer-overrides
 CWARNFLAGS.fixpt31_32.c=		-Wno-unused-but-set-variable -Wno-incompatible-pointer-types -Wno-unused-const-variable
 CWARNFLAGS.spl_fixpt31_32.c=		-Wno-incompatible-pointer-types

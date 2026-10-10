@@ -32,9 +32,7 @@ int intel_pxp_get_backend_timeout_ms(struct intel_pxp *pxp);
 int intel_pxp_start(struct intel_pxp *pxp);
 void intel_pxp_end(struct intel_pxp *pxp);
 
-int intel_pxp_key_check(struct intel_pxp *pxp,
-			struct drm_gem_object *obj,
-			bool assign);
+int intel_pxp_key_check(struct drm_gem_object *obj, bool assign);
 
 void intel_pxp_invalidate(struct intel_pxp *pxp);
 #else
@@ -73,8 +71,7 @@ static inline int intel_pxp_get_readiness_status(struct intel_pxp *pxp,
 	return -ENODEV;
 }
 
-static inline int intel_pxp_key_check(struct intel_pxp *pxp,
-				      struct drm_gem_object *obj,
+static inline int intel_pxp_key_check(struct drm_gem_object *obj,
 				      bool assign)
 {
 	return -ENODEV;

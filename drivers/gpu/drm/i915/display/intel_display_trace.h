@@ -13,6 +13,7 @@
 #include "intel_vblank.h"
 
 #define __dev_name_display(display) dev_name((display)->drm->dev)
+#define __dev_name_drm(obj) dev_name((obj)->dev->dev)
 #define __dev_name_kms(obj) dev_name((obj)->base.dev->dev)
 
 /*
@@ -238,7 +239,7 @@ static inline void
 trace_intel_plane_async_flip(struct intel_plane *plane, struct intel_crtc *crtc, bool async_flip)
 {
 	CTR6(KTR_DRM,
-	    "intel_plane_async_flip: dev %s, pipe %c, plane %s, frame=%u, scanline=%u, async_flip=%s",
+	    "intel_plane_async_flip: dev %s, pipe %c, %s, frame=%u, scanline=%u, async_flip=%s",
 	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc),
 	    intel_get_crtc_scanline(crtc),
@@ -246,45 +247,83 @@ trace_intel_plane_async_flip(struct intel_plane *plane, struct intel_crtc *crtc,
 }
 
 static inline void
-trace_intel_plane_update_noarm(struct intel_plane *plane, struct intel_crtc *crtc)
+trace_intel_plane_update_noarm(const struct intel_plane_state *plane_state, struct intel_crtc *crtc)
 {
-	CTR5(KTR_DRM,
-	    "intel_plane_update_noarm[1/3]: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
-	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
-	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR6(KTR_DRM,
+	    "intel_plane_update_noarm[1/3]: dev %s, pipe %c, %s, frame=%u, scanline=%u, format=%p4cc",
+	    __dev_name_drm(plane_state->uapi.plane), pipe_name(crtc->pipe), plane_state->uapi.plane->name,
+	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc), plane_state->hw.fb->format->format);
 	/* FIXME FreeBSD
 	CTR8(KTR_DRM,
 	    "intel_plane_update_noarm[2/3]: " DRM_RECT_FP_FMT " ->",
-	    DRM_RECT_FP_ARG(&plane->state->src));
+	    DRM_RECT_FP_ARG(&plane_state->uapi.src));
 	CTR4(KTR_DRM,
 	    "intel_plane_update_noarm[3/3]: " DRM_RECT_FMT,
-	    DRM_RECT_ARG(&plane->state->dst)); */
+	    DRM_RECT_ARG(&plane_state->uapi.dst)); */
 }
 
 static inline void
-trace_intel_plane_update_arm(struct intel_plane *plane, struct intel_crtc *crtc)
+trace_intel_plane_update_arm(const struct intel_plane_state *plane_state, struct intel_crtc *crtc)
 {
-	CTR5(KTR_DRM,
-	    "intel_plane_update_arm[1/3]: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
-	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
-	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR6(KTR_DRM,
+	    "intel_plane_update_arm[1/3]: dev %s, pipe %c, %s, frame=%u, scanline=%u, format=%p4cc",
+	    __dev_name_drm(plane_state->uapi.plane), pipe_name(crtc->pipe), plane_state->uapi.plane->name,
+	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc), plane_state->hw.fb->format->format);
 	/* FIXME FreeBSD
 	CTR8(KTR_DRM,
 	    "intel_plane_update_arm[2/3]: " DRM_RECT_FP_FMT " ->",
-	    DRM_RECT_FP_ARG(&plane->state->src));
+	    DRM_RECT_FP_ARG(&plane_state->uapi.src));
 	CTR4(KTR_DRM,
 	    "intel_plane_update_arm[3/3]: " DRM_RECT_FMT,
-	    DRM_RECT_ARG(&plane->state->dst)); */
+	    DRM_RECT_ARG(&plane_state->uapi.dst)); */
 }
 
 static inline void
 trace_intel_plane_disable_arm(struct intel_plane *plane, struct intel_crtc *crtc)
 {
 	CTR5(KTR_DRM,
-	    "intel_plane_disable_arm: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
+	    "intel_plane_disable_arm: dev %s, pipe %c, %s, frame=%u, scanline=%u",
 	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc),
 	    intel_get_crtc_scanline(crtc));
+}
+
+static inline void
+trace_intel_plane_scaler_update_arm(struct intel_plane *plane, int scaler_id, int x, int y, int w, int h)
+{
+#ifdef KTR
+	struct intel_display *display = to_intel_display(plane);
+	struct intel_crtc *crtc = intel_crtc_for_pipe(display, plane->pipe);
+#endif
+
+	CTR6(KTR_DRM,
+	    "intel_plane_scaler_update_arm[1/2]: dev %s, pipe %c, scaler %d, plane %s, frame=%u, scanline=%u",
+	    __dev_name_kms(plane), pipe_name(crtc->pipe), scaler_id,
+	    plane->base.name, intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR4(KTR_DRM,
+	    "intel_plane_scaler_update_arm[2/2]: " DRM_RECT_FMT,
+	    w, h, x, y);
+}
+
+static inline void
+trace_intel_pipe_scaler_update_arm(struct intel_crtc *crtc, int scaler_id, int x, int y, int w, int h)
+{
+	CTR5(KTR_DRM,
+	    "intel_pipe_scaler_update_arm[1/2]: dev %s, pipe %c, scaler %d frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe), scaler_id,
+	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
+	CTR4(KTR_DRM,
+	    "intel_pipe_scaler_update_arm[2/2]: " DRM_RECT_FMT,
+	    w, h, x, y);
+}
+
+static inline void
+trace_intel_scaler_disable_arm(struct intel_crtc *crtc, int scaler_id)
+{
+	CTR5(KTR_DRM,
+	    "intel_scaler_disable_arm: dev %s, pipe %c, scaler %d, frame=%u, scanline=%u",
+	    __dev_name_kms(crtc), pipe_name(crtc->pipe), scaler_id,
+	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
 
 static inline void
@@ -297,7 +336,7 @@ trace_intel_fbc_activate(struct intel_plane *plane)
 #endif
 
 	CTR5(KTR_DRM,
-	    "intel_fbc_activate: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
+	    "intel_fbc_activate: dev %s, pipe %c, %s, frame=%u, scanline=%u",
 	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
@@ -312,7 +351,7 @@ trace_intel_fbc_deactivate(struct intel_plane *plane)
 #endif
 
 	CTR5(KTR_DRM,
-	    "intel_fbc_deactivate: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
+	    "intel_fbc_deactivate: dev %s, pipe %c, %s, frame=%u, scanline=%u",
 	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }
@@ -327,7 +366,7 @@ trace_intel_fbc_nuke(struct intel_plane *plane)
 #endif
 
 	CTR5(KTR_DRM,
-	    "intel_fbc_nuke: dev %s, pipe %c, plane %s, frame=%u, scanline=%u",
+	    "intel_fbc_nuke: dev %s, pipe %c, %s, frame=%u, scanline=%u",
 	    __dev_name_kms(plane), pipe_name(crtc->pipe), plane->base.name,
 	    intel_crtc_get_vblank_counter(crtc), intel_get_crtc_scanline(crtc));
 }

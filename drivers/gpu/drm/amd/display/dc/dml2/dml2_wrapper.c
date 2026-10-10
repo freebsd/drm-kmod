@@ -24,6 +24,8 @@
  *
  */
 
+#include <linux/vmalloc.h>
+
 #include "display_mode_core.h"
 #include "dml2_internal_types.h"
 #include "dml2_utils.h"
@@ -32,7 +34,6 @@
 #include "dml2_mall_phantom.h"
 #include "dml2_dc_resource_mgmt.h"
 #include "dml21_wrapper.h"
-
 
 static void initialize_dml2_ip_params(struct dml2_context *dml2, const struct dc *in_dc, struct ip_params_st *out)
 {
@@ -72,6 +73,7 @@ static void map_hw_resources(struct dml2_context *dml2,
 		in_out_display_cfg->hw.NumberOfDSCSlices[i] = mode_support_info->NumberOfDSCSlices[i];
 		in_out_display_cfg->hw.DLGRefClkFreqMHz = 24;
 		if (dml2->v20.dml_core_ctx.project != dml_project_dcn35 &&
+			dml2->v20.dml_core_ctx.project != dml_project_dcn36 &&
 			dml2->v20.dml_core_ctx.project != dml_project_dcn351) {
 			/*dGPU default as 50Mhz*/
 			in_out_display_cfg->hw.DLGRefClkFreqMHz = 50;
@@ -747,7 +749,7 @@ bool dml2_validate(const struct dc *in_dc, struct dc_state *context, struct dml2
 
 static inline struct dml2_context *dml2_allocate_memory(void)
 {
-	return (struct dml2_context *) kzalloc(sizeof(struct dml2_context), GFP_KERNEL);
+	return (struct dml2_context *) vzalloc(sizeof(struct dml2_context));
 }
 
 static void dml2_init(const struct dc *in_dc, const struct dml2_configuration_options *config, struct dml2_context **dml2)
@@ -766,6 +768,9 @@ static void dml2_init(const struct dc *in_dc, const struct dml2_configuration_op
 		break;
 	case DCN_VERSION_3_51:
 		(*dml2)->v20.dml_core_ctx.project = dml_project_dcn351;
+		break;
+	case DCN_VERSION_3_6:
+		(*dml2)->v20.dml_core_ctx.project = dml_project_dcn36;
 		break;
 	case DCN_VERSION_3_2:
 		(*dml2)->v20.dml_core_ctx.project = dml_project_dcn32;
@@ -794,7 +799,10 @@ static void dml2_init(const struct dc *in_dc, const struct dml2_configuration_op
 
 bool dml2_create(const struct dc *in_dc, const struct dml2_configuration_options *config, struct dml2_context **dml2)
 {
-	if ((in_dc->debug.using_dml21) && (in_dc->ctx->dce_version == DCN_VERSION_4_01))
+	// TODO : Temporarily add DCN_VERSION_3_2 for N-1 validation. Remove DCN_VERSION_3_2 after N-1 validation phase is complete.
+	if ((in_dc->debug.using_dml21)
+			&& (in_dc->ctx->dce_version == DCN_VERSION_4_01
+		))
 		return dml21_create(in_dc, dml2, config);
 
 	// Allocate Mode Lib Ctx
@@ -815,7 +823,7 @@ void dml2_destroy(struct dml2_context *dml2)
 
 	if (dml2->architecture == dml2_architecture_21)
 		dml21_destroy(dml2);
-	kfree(dml2);
+	vfree(dml2);
 }
 
 void dml2_extract_dram_and_fclk_change_support(struct dml2_context *dml2,

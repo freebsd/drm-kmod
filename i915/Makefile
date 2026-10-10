@@ -60,6 +60,7 @@ SRCS=	\
 	intel_bios.c \
 	intel_cdclk.c \
 	intel_clock_gating.c \
+	intel_cmtg.c \
 	intel_color.c \
 	intel_combo_phy.c \
 	intel_connector.c \
@@ -91,6 +92,7 @@ SRCS=	\
 	intel_region_ttm.c \
 	intel_runtime_pm.c \
 	intel_sbi.c \
+	intel_snps_hdmi_pll.c \
 	intel_snps_phy.c \
 	intel_step.c \
 	intel_sprite.c \
@@ -394,7 +396,7 @@ CFLAGS+= -DI915
 CWARNFLAGS += -Wno-pointer-arith -Wno-format -Wno-cast-qual
 
 CWARNFLAGS.intel_acpi.c=	-Wno-incompatible-pointer-types
-CWARNFLAGS.intel_audio.c=	-Wno-unused-function
+CWARNFLAGS.intel_audio.c=	-Wno-unused-function -Wno-unused-variable
 CWARNFLAGS.intel_backlight.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.intel_bios.c=	-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.intel_combo_phy.c=	-Wno-uninitialized
@@ -425,7 +427,7 @@ CWARNFLAGS.intel_sseu.c=	-Wno-incompatible-pointer-types-discards-qualifiers
 CWARNFLAGS.intel_workarounds.c=	-Wno-unused-variable
 CWARNFLAGS.i915_debugfs.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.i915_driver.c=	-Wno-unused-but-set-variable
-CWARNFLAGS.i915_irq.c=		-Wno-unused-but-set-variable
+CWARNFLAGS.i915_irq.c=		-Wno-unused-but-set-variable -Wno-unused-variable
 CWARNFLAGS.i915_gem_execbuffer.c=	-Wno-unused-but-set-variable -Wno-sometimes-uninitialized
 CWARNFLAGS.i915_gem_mman.c=	-Wno-unused-but-set-variable
 CWARNFLAGS.i915_gem_shmem.c=	-Wno-unused-but-set-variable

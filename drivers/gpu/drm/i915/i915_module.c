@@ -33,7 +33,7 @@ static int i915_check_nomodeset(void)
 	bool use_kms = true;
 
 	/*
-	 * Enable KMS by default, unless explicitly overriden by
+	 * Enable KMS by default, unless explicitly overridden by
 	 * either the i915.modeset parameter or by the
 	 * nomodeset boot option.
 	 */
@@ -80,8 +80,6 @@ static const struct {
 	{ .init = i915_vma_resource_module_init,
 	  .exit = i915_vma_resource_module_exit },
 	{ .init = i915_mock_selftests },
-	{ .init = i915_pmu_init,
-	  .exit = i915_pmu_exit },
 	{ .init = i915_pci_register_driver,
 	  .exit = i915_pci_unregister_driver },
 #ifdef __linux__
