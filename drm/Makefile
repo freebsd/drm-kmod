@@ -155,7 +155,8 @@ SRCS+= 	drm_client.c \
 SRCS+= 	drm_client_setup.c
 .endif
 
-SRCS+=	device_if.h \
+SRCS+=	${LINUXKPI_GENSRCS} \
+	device_if.h \
 	vnode_if.h \
 	bus_if.h \
 	pci_if.h \
