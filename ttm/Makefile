@@ -26,7 +26,8 @@ SRCS=	ttm_bo.c \
 SRCS+=	ttm_agp_backend.c
 .endif
 
-SRCS+=	device_if.h \
+SRCS+=	${LINUXKPI_GENSRCS} \
+	device_if.h \
 	vnode_if.h \
 	bus_if.h \
 	pci_if.h \

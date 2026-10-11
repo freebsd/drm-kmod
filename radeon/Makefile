@@ -115,7 +115,8 @@ SRCS+=  opt_acpi.h \
 	radeon_acpi.c
 .endif
 
-SRCS+=	device_if.h \
+SRCS+=	${LINUXKPI_GENSRCS} \
+	device_if.h \
 	vnode_if.h \
 	bus_if.h \
 	pci_if.h \
