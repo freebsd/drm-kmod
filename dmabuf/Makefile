@@ -18,7 +18,8 @@ SRCS=	dma-buf-kmod.c \
 	dma-resv.c \
 	sync_file.c
 
-SRCS+=	device_if.h \
+SRCS+=	${LINUXKPI_GENSRCS} \
+	device_if.h \
 	bus_if.h \
 	vnode_if.h
 
