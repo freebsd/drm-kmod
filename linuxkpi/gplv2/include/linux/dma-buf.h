@@ -188,5 +188,7 @@ void dma_buf_unmap_attachment_unlocked(struct dma_buf_attachment *,
 void dma_buf_move_notify(struct dma_buf *);
 int dma_buf_vmap(struct dma_buf *dmabuf, struct iosys_map *map);
 void dma_buf_vunmap(struct dma_buf *dmabuf, struct iosys_map *map);
+int dma_buf_mmap(struct dma_buf *dmabuf, struct vm_area_struct *vma,
+    unsigned long pgoff);
 
 #endif /* _LINUX_GPLV2_DMA_BUF_H_ */
