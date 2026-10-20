@@ -27,13 +27,17 @@
 
 /*
  * Interim copy of uuid_t and its helpers, in base LinuxKPI since
- * fce354b0e9eb (D60199); drop this file once drm-kmod requires it.
+ * fce354b0e9eb (D60199), which landed without a __FreeBSD_version bump,
+ * at 1600028; drop this file once drm-kmod requires it.
  */
 
 #ifndef _BSD_LKPI_LINUX_UUID_H_
 #define	_BSD_LKPI_LINUX_UUID_H_
 
+#include <sys/param.h>
 #include_next <linux/uuid.h>
+
+#if __FreeBSD_version < 1600028
 
 /* Renamed to stay clear of the other uuid_t types in the tree. */
 typedef struct {
@@ -64,5 +68,7 @@ export_uuid(uint8_t *dst, const linux_uuid_t *src)
 {
 	memcpy(dst, src, sizeof(linux_uuid_t));
 }
+
+#endif /* __FreeBSD_version < 1600028 */
 
 #endif /* _BSD_LKPI_LINUX_UUID_H_ */

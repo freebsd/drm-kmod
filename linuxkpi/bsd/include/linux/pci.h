@@ -26,14 +26,18 @@
  */
 
 /*
- * Interim copy of pci_is_vga(), in base LinuxKPI since 8558dd61e674
- * (D60200); drop this file once drm-kmod requires it.
+ * Interim copy of pci_is_vga(), in base LinuxKPI since
+ * 8558dd61e674 (D60200), which landed without a __FreeBSD_version bump,
+ * at 1600028; drop this file once drm-kmod requires it.
  */
 
 #ifndef _BSD_LKPI_LINUX_PCI_H_
 #define	_BSD_LKPI_LINUX_PCI_H_
 
+#include <sys/param.h>
 #include_next <linux/pci.h>
+
+#if __FreeBSD_version < 1600028
 
 static inline bool
 pci_is_vga(struct pci_dev *pdev)
@@ -45,5 +49,7 @@ pci_is_vga(struct pci_dev *pdev)
 	return ((class == PCIC_DISPLAY && subclass == PCIS_DISPLAY_VGA) ||
 	    (class == PCIC_OLD && subclass == PCIS_OLD_VGA));
 }
+
+#endif /* __FreeBSD_version < 1600028 */
 
 #endif /* _BSD_LKPI_LINUX_PCI_H_ */

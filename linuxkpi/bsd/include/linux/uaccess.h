@@ -27,13 +27,17 @@
 
 /*
  * Interim copy of strncpy_from_user(), in base LinuxKPI since
- * 59642e07f427 (D60198); drop this file once drm-kmod requires it.
+ * 59642e07f427 (D60198), which landed without a __FreeBSD_version bump,
+ * at 1600028; drop this file once drm-kmod requires it.
  */
 
 #ifndef _BSD_LKPI_LINUX_UACCESS_H_
 #define	_BSD_LKPI_LINUX_UACCESS_H_
 
+#include <sys/param.h>
 #include_next <linux/uaccess.h>
+
+#if __FreeBSD_version < 1600028
 
 #include <sys/systm.h>
 
@@ -52,5 +56,7 @@ strncpy_from_user(char *dst, const char __user *src, long count)
 		return (count);			/* truncated, as Linux */
 	return (-EFAULT);
 }
+
+#endif /* __FreeBSD_version < 1600028 */
 
 #endif /* _BSD_LKPI_LINUX_UACCESS_H_ */
