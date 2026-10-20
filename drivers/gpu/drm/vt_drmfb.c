@@ -340,7 +340,12 @@ vt_drmfb_init(struct vt_device *vd)
 	if (fbio->fb_size == 0)
 		return (CN_DEAD);
 
-	if (fbio->fb_pbase == 0 && fbio->fb_vbase == 0)
+	/*
+	 * A framebuffer in system memory has no physical base, and
+	 * vt_fb_mmap() would map its pages by vtophys() without holding
+	 * them: they would stay mapped after the fbdev frees them.
+	 */
+	if (fbio->fb_pbase == 0)
 		fbio->fb_flags |= FB_FLAG_NOMMAP;
 
 	if (fbio->fb_cmsize <= 0) {
