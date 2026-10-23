@@ -911,7 +911,16 @@ static int
 dm_helpers_probe_acpi_edid(void *data, u8 *buf, unsigned int block, size_t len)
 {
 	struct drm_connector *connector = data;
+#ifdef __FreeBSD__
+	/* LinuxKPI has no ACPI_COMPANION() stub for !CONFIG_ACPI */
+#ifdef CONFIG_ACPI
 	struct acpi_device *acpidev = ACPI_COMPANION(connector->dev->dev);
+#else
+	struct acpi_device *acpidev = NULL;
+#endif
+#else
+	struct acpi_device *acpidev = ACPI_COMPANION(connector->dev->dev);
+#endif
 	unsigned char start = block * EDID_LENGTH;
 	struct edid *edid;
 	int r;
