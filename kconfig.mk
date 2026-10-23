@@ -90,8 +90,7 @@ KCONFIG+=	64BIT \
 		PPC64
 		
 # DCN is only compile-tested.
-KCONFIG+=	DRM_AMD_DC_DCN \
-		DRM_AMD_DC_DCN3_0
+KCONFIG+=	DRM_AMD_DC_FP
 .endif
 
 .if ${MACHINE_CPUARCH} == "riscv"

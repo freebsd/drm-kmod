@@ -1357,6 +1357,11 @@ CFLAGS.gcc+= -Wno-redundant-decls -Wno-unused-but-set-variable
 
 .if ${MACHINE_CPUARCH} == "i386" || ${MACHINE_CPUARCH} == "amd64"
 FPUFLAGS= -msse
+.elif ${MACHINE_CPUARCH} == "powerpc"
+# The kernel is built with -msoft-float; the DCN floating-point code must use
+# the FPU that kernel_fpu_begin() enables instead of soft-float libcalls the
+# kernel does not provide.
+FPUFLAGS= -mhard-float
 .endif
 
 CFLAGS.dc.c = -Wno-typedef-redefinition
@@ -1371,6 +1376,7 @@ CFLAGS.dcn30_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn30_resource.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn301_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn301_resource.c= ${FPUFLAGS} -mstack-alignment=4
+CFLAGS.dcn302_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn303_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_fpu.c= ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dcn31_resource.c= ${FPUFLAGS} -mstack-alignment=4
@@ -1391,6 +1397,7 @@ CFLAGS.dml2_core_dcn4_calcs.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_dc_resource_mgmt.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
 CFLAGS.dml2_dpmm_dcn4.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_mall_phantom.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
+CFLAGS.dml2_mcg_dcn4.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_pmo_dcn3.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_pmo_dcn4_fams2.c = ${FPUFLAGS} -mstack-alignment=4
 CFLAGS.dml2_policy.c = ${FPUFLAGS} -mstack-alignment=4 -Wno-typedef-redefinition
