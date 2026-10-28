@@ -4768,9 +4768,20 @@ void amdgpu_device_fini_hw(struct amdgpu_device *adev)
 
 	amdgpu_gart_dummy_page_fini(adev);
 
+#ifdef __FreeBSD__
+	/*
+	 * On FreeBSD the driver is detached while the hardware is still there
+	 * (e.g. kldunload), and amdgpu_device_fini_sw() still has to access
+	 * registers (e.g. audio, display); unmap in amdgpu_device_fini_sw().
+	 * The doorbell buffer is a TTM object though, so it has to be freed
+	 * now, while TTM is still alive, as on Linux.
+	 */
+	if (drm_dev_is_unplugged(adev_to_drm(adev)))
+		amdgpu_doorbell_fini(adev);
+#else
 	if (drm_dev_is_unplugged(adev_to_drm(adev)))
 		amdgpu_device_unmap_mmio(adev);
-
+#endif
 }
 
 void amdgpu_device_fini_sw(struct amdgpu_device *adev)
@@ -4811,6 +4822,11 @@ void amdgpu_device_fini_sw(struct amdgpu_device *adev)
 	if ((adev->pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA)
 		vga_client_unregister(adev->pdev);
 
+#ifdef __FreeBSD__
+	if (adev->rmmio != NULL && drm_dev_is_unplugged(adev_to_drm(adev)))
+		amdgpu_device_unmap_mmio(adev);
+	else
+#endif
 	if (drm_dev_enter(adev_to_drm(adev), &idx)) {
 
 		iounmap(adev->rmmio);
