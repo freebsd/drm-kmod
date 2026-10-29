@@ -1044,6 +1044,38 @@ int i915_init_ggtt(struct drm_i915_private *i915)
 	return 0;
 }
 
+#ifdef __FreeBSD__
+/*
+ * The VMAs are unbound at teardown without rewriting the PTEs (see
+ * skip_pte_rewrite) and clear_range() is a nop on gen8+, so every GGTT entry
+ * still points to pages that are freed with the driver, including the
+ * scratch pages.  This is not an issue on Linux where the device is gone,
+ * but here the module can be unloaded while the GPU is still reachable and
+ * any access through the GGTT would hit memory reused by something else.
+ * Invalidate all the entries so that the GPU faults instead.
+ */
+static void ggtt_zap_ptes(struct i915_ggtt *ggtt)
+{
+	unsigned int i, n = ggtt_total_entries(ggtt);
+
+	if (!ggtt->gsm)
+		return;
+
+	if (GRAPHICS_VER(ggtt->vm.i915) >= 8) {
+		gen8_pte_t __iomem *pte = (gen8_pte_t __iomem *)ggtt->gsm;
+
+		for (i = 0; i < n; i++)
+			gen8_set_pte(&pte[i], 0);
+	} else {
+		gen6_pte_t __iomem *pte = (gen6_pte_t __iomem *)ggtt->gsm;
+
+		for (i = 0; i < n; i++)
+			iowrite32(0, &pte[i]);
+	}
+	ggtt->invalidate(ggtt);
+}
+#endif
+
 static void ggtt_cleanup_hw(struct i915_ggtt *ggtt)
 {
 	struct i915_vma *vma, *vn;
@@ -1074,6 +1106,9 @@ static void ggtt_cleanup_hw(struct i915_ggtt *ggtt)
 	ggtt_release_guc_top(ggtt);
 	intel_vgt_deballoon(ggtt);
 
+#ifdef __FreeBSD__
+	ggtt_zap_ptes(ggtt);
+#endif
 	ggtt->vm.cleanup(&ggtt->vm);
 
 	mutex_unlock(&ggtt->vm.mutex);
