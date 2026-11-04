@@ -40,6 +40,15 @@
 #include <linux/fb.h>
 #include <video/cmdline.h>
 
+/*
+ * `linux/fb.h` redefines `fb_info` to be `linux_fb_info` to manage the
+ * name conflict between the Linux and FreeBSD structures, while avoiding a
+ * extensive rewrite and use of macros in the drm-kmod.
+ *
+ * We need to undo this here because we use both structures.
+ */
+#undef  fb_info
+
 MALLOC_DEFINE(LKPI_FB_MEM, "fb_kms", "FB KMS Data Structures");
 
 static struct sx linux_fb_mtx;

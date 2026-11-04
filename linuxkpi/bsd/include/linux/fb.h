@@ -287,6 +287,7 @@ struct linux_fb_info {
 	void (*fb_set_current)(void);
 #endif
 } __aligned(sizeof(long));
+#define fb_info	linux_fb_info
 
 #define __FB_DEFAULT_IOMEM_OPS_RDWR \
 	.fb_read	= fb_io_read, \

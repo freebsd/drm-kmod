@@ -34,9 +34,6 @@ struct drm_clip_rect;
 struct drm_fb_helper;
 
 #include <linux/fb.h>
-#ifdef __FreeBSD__
-#define fb_info linux_fb_info
-#endif
 
 #include <drm/drm_client.h>
 

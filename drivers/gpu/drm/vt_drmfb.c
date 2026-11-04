@@ -46,10 +46,9 @@
 #include <linux/fb.h>
 
 /*
- * `drm_fb_helper.h` redefines `fb_info` to be `linux_fb_info` to manage the
+ * `linux/fb.h` redefines `fb_info` to be `linux_fb_info` to manage the
  * name conflict between the Linux and FreeBSD structures, while avoiding a
- * extensive rewrite and use of macros in the original drm_fb_helper.[ch]
- * files.
+ * extensive rewrite and use of macros in the drm_kmod.
  *
  * We need to undo this here because we use both structures.
  */
