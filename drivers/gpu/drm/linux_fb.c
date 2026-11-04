@@ -29,6 +29,7 @@
 #include <sys/kernel.h>
 #include <sys/lock.h>
 #include <sys/malloc.h>
+#include <sys/reboot.h>
 #include <sys/systm.h>
 #include <sys/sx.h>
 #include <sys/fbio.h>
@@ -47,6 +48,12 @@ SX_SYSINIT(linux_fb_mtx, &linux_fb_mtx, "linux fb");
 extern struct vt_device *main_vd;
 
 static int __unregister_framebuffer(struct linux_fb_info *fb_info);
+
+/*
+ * linuxkpi_skip_ddb is controlled via sysctls in drm_os_freebsd.c in drm.ko
+ * TODO: Move these sysctl definitions here.
+ */
+int linuxkpi_skip_ddb = 0;
 
 void
 vt_freeze_main_vd(unsigned long base, unsigned long size)
@@ -88,6 +95,41 @@ vt_restore_fbdev_mode(void *arg, int pending)
 	info->fbops->fb_set_par(info);
 }
 
+static int
+vt_kms_postswitch(void *arg)
+{
+	struct linux_fb_info *info = arg;
+
+	if (!kdb_active && !KERNEL_PANICKED()) {
+		taskqueue_enqueue(taskqueue_thread, &info->fb_mode_task);
+
+		/* XXX the VT_ACTIVATE IOCTL must be synchronous */
+		if (curthread->td_proc->p_pid != 0 &&
+		    taskqueue_member(taskqueue_thread, curthread) == 0)
+			taskqueue_drain(taskqueue_thread, &info->fb_mode_task);
+	} else {
+#ifdef DDB
+		db_trace_self_depth(10);
+		mdelay(1000);
+#endif
+		if (linuxkpi_skip_ddb) {
+			spinlock_enter();
+			doadump(false);
+			EVENTHANDLER_INVOKE(shutdown_final, RB_NOSYNC);
+		}
+
+		if (main_vd->vd_grabwindow != NULL) {
+			if (info->fbops->fb_debug_enter)
+				info->fbops->fb_debug_enter(info);
+		} else {
+			if (info->fbops->fb_debug_leave)
+				info->fbops->fb_debug_leave(info);
+		}
+	}
+
+	return (0);
+}
+
 static void
 fb_info_print(struct linux_fb_info *info)
 {
@@ -111,6 +153,9 @@ framebuffer_alloc(size_t size, struct device *dev)
 
 	info = malloc(sizeof(*info) + size, LKPI_FB_MEM, M_WAITOK | M_ZERO);
 	TASK_INIT(&info->fb_mode_task, 0, vt_restore_fbdev_mode, info);
+
+	info->fbio.fb_priv = info;
+	info->fbio.enter = &vt_kms_postswitch;
 
 	if (size)
 		info->par = info + 1;

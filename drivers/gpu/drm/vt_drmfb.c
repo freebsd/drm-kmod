@@ -31,7 +31,6 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/reboot.h>
 #include <sys/fbio.h>
 #include <dev/vt/vt.h>
 #include <dev/vt/hw/fb/vt_fb.h>
@@ -53,12 +52,6 @@
 
 #define	to_linux_fb_info(f)	container_of(f, struct linux_fb_info, fbio);
 
-/*
- * linuxkpi_skip_ddb is controlled via sysctls in drm_os_freebsd.c in drm.ko
- * TODO: Move these sysctl definitions here.
- */
-int linuxkpi_skip_ddb = 0;
-
 static vd_init_t		vt_drmfb_init;
 static vd_fini_t		vt_drmfb_fini;
 static vd_blank_t		vt_drmfb_blank;
@@ -67,7 +60,6 @@ static vd_bitblt_argb_t		vt_drmfb_bitblt_argb;
 static vd_drawrect_t		vt_drmfb_drawrect;
 static vd_setpixel_t		vt_drmfb_setpixel;
 static vd_invalidate_text_t	vt_drmfb_invalidate_text;
-static vd_postswitch_t		vt_drmfb_postswitch;
 
 static struct vt_driver vt_drmfb_driver = {
 	.vd_name = "drmfb",
@@ -88,7 +80,6 @@ static struct vt_driver vt_drmfb_driver = {
 	.vd_drawrect = vt_drmfb_drawrect,
 	.vd_setpixel = vt_drmfb_setpixel,
 	.vd_invalidate_text = vt_drmfb_invalidate_text,
-	.vd_postswitch = vt_drmfb_postswitch,
 	.vd_priority = VD_PRIORITY_GENERIC+20,
 
 	/* Use generic implementation */
@@ -96,6 +87,7 @@ static struct vt_driver vt_drmfb_driver = {
 	.vd_resume = vt_resume,
 
 	/* Use vt_fb implementation */
+	.vd_postswitch = vt_fb_postswitch,
 	.vd_fb_ioctl = vt_fb_ioctl,
 	.vd_fb_mmap = vt_fb_mmap,
 
@@ -233,43 +225,6 @@ vt_drmfb_bitblt_argb(struct vt_device *vd, const struct vt_window *vw,
 	info->fbops->fb_imageblit(info, &image);
 
 	return (0);
-}
-
-static void
-vt_drmfb_postswitch(struct vt_device *vd)
-{
-	struct fb_info *fbio;
-	struct linux_fb_info *info;
-
-	fbio = vd->vd_softc;
-	info = to_linux_fb_info(fbio);
-
-	if (!kdb_active && !KERNEL_PANICKED()) {
-		taskqueue_enqueue(taskqueue_thread, &info->fb_mode_task);
-
-		/* XXX the VT_ACTIVATE IOCTL must be synchronous */
-		if (curthread->td_proc->p_pid != 0 &&
-		    taskqueue_member(taskqueue_thread, curthread) == 0)
-			taskqueue_drain(taskqueue_thread, &info->fb_mode_task);
-	} else {
-#ifdef DDB
-		db_trace_self_depth(10);
-		mdelay(1000);
-#endif
-		if (linuxkpi_skip_ddb) {
-			spinlock_enter();
-			doadump(false);
-			EVENTHANDLER_INVOKE(shutdown_final, RB_NOSYNC);
-		}
-
-		if (vd->vd_grabwindow != NULL) {
-			if (info->fbops->fb_debug_enter)
-				info->fbops->fb_debug_enter(info);
-		} else {
-			if (info->fbops->fb_debug_leave)
-				info->fbops->fb_debug_leave(info);
-		}
-	}
 }
 
 static void
