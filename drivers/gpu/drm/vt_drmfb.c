@@ -54,10 +54,10 @@
 #define	to_linux_fb_info(f)	container_of(f, struct linux_fb_info, fbio);
 
 /*
- * skip_ddb is controlled via sysctls in drm_os_freebsd.c in drm.ko
+ * linuxkpi_skip_ddb is controlled via sysctls in drm_os_freebsd.c in drm.ko
  * TODO: Move these sysctl definitions here.
  */
-int skip_ddb = 0;
+int linuxkpi_skip_ddb = 0;
 
 static vd_init_t		vt_drmfb_init;
 static vd_fini_t		vt_drmfb_fini;
@@ -256,7 +256,7 @@ vt_drmfb_postswitch(struct vt_device *vd)
 		db_trace_self_depth(10);
 		mdelay(1000);
 #endif
-		if (skip_ddb) {
+		if (linuxkpi_skip_ddb) {
 			spinlock_enter();
 			doadump(false);
 			EVENTHANDLER_INVOKE(shutdown_final, RB_NOSYNC);
