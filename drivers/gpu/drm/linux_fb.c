@@ -224,7 +224,7 @@ __register_framebuffer(struct linux_fb_info *fb_info)
 	fb_info->fbio.fb_vbase = (uintptr_t)fb_info->screen_base;
 
 	fb_info->fbio.fb_fbd_dev = device_add_child(fb_bsddev, "fbd",
-				device_get_unit(fb_bsddev));
+	    DEVICE_UNIT_ANY);
 
 	/* tell vt_drmfb to initialize color map */
 	fb_info->fbio.fb_cmsize = 0;
