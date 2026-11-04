@@ -144,6 +144,12 @@ fb_info_print(struct linux_fb_info *info)
 	printf("end FB_INFO\n");
 }
 
+static void
+vt_set_current(void)
+{
+	linux_set_current(curthread);
+}
+
 CTASSERT((sizeof(struct linux_fb_info) % sizeof(long)) == 0);
 
 struct linux_fb_info *
@@ -156,6 +162,7 @@ framebuffer_alloc(size_t size, struct device *dev)
 
 	info->fbio.fb_priv = info;
 	info->fbio.enter = &vt_kms_postswitch;
+	info->fb_set_current = &vt_set_current;
 
 	if (size)
 		info->par = info + 1;

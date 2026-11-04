@@ -31,7 +31,14 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/param.h>
+#include <sys/systm.h>
+#include <sys/cdefs.h>
 #include <sys/fbio.h>
+#include <sys/kdb.h>
+#include <sys/kernel.h>
+#include <sys/reboot.h>
+
 #include <dev/vt/vt.h>
 #include <dev/vt/hw/fb/vt_fb.h>
 #include <dev/vt/colors/vt_termcolors.h>
@@ -50,7 +57,7 @@
 
 #include "vt_drmfb.h"
 
-#define	to_linux_fb_info(f)	container_of(f, struct linux_fb_info, fbio);
+#define	to_linux_fb_info(f)	__containerof(f, struct linux_fb_info, fbio)
 
 static vd_init_t		vt_drmfb_init;
 static vd_fini_t		vt_drmfb_fini;
@@ -189,7 +196,7 @@ vt_drmfb_bitblt_bitmap(struct vt_device *vd, const struct vt_window *vw,
 	image.mask = mask; // Specific to FreeBSD to display the mouse pointer.
 
 	if (!kdb_active && !KERNEL_PANICKED())
-		linux_set_current(curthread);
+		info->fb_set_current();
 
 	info->fbops->fb_imageblit(info, &image);
 }
