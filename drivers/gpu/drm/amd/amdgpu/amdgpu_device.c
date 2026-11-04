@@ -4433,6 +4433,25 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	if (adev->bios)
 		amdgpu_device_detect_sriov_bios(adev);
 
+#ifdef __FreeBSD__
+	/*
+	 * Do not touch a GPU that was used since boot if nothing resets it: the
+	 * initialization would fail, and could hang the machine.  A reboot is
+	 * required (or hw.amdgpu.allow_reload=1 in the kernel environment to
+	 * try anyway).
+	 */
+	if (!amdgpu_sriov_vf(adev)) {
+		if (amdgpu_fbsd_used_before(adev) &&
+		    !amdgpu_asic_need_reset_on_init(adev)) {
+			dev_err(adev->dev,
+			    "this GPU can not be loaded again after it was used (it is not reset on init), reboot to use it\n");
+			r = -EBUSY;
+			goto failed;
+		}
+		amdgpu_fbsd_mark_used(adev);
+	}
+#endif
+
 	/* check if we need to reset the asic
 	 *  E.g., driver was not cleanly unloaded previously, etc.
 	 */
