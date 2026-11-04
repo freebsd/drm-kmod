@@ -37,6 +37,7 @@
 #include <dev/vt/vt.h>
 #include "vt_drmfb.h"
 
+#include <linux/device.h>
 #include <linux/fb.h>
 #include <video/cmdline.h>
 
@@ -189,6 +190,7 @@ framebuffer_release(struct linux_fb_info *info)
 	free(info, LKPI_FB_MEM);
 }
 
+#ifdef not_yet	/* To be reenabled after moving to linuxkpi video driver */
 int
 remove_conflicting_framebuffers(resource_size_t base, resource_size_t size,
 				const char *name, bool primary)
@@ -218,6 +220,7 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 
 	return (0);
 }
+#endif
 
 static int
 __register_framebuffer(struct linux_fb_info *fb_info)

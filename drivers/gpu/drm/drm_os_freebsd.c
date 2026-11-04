@@ -2,6 +2,8 @@
 #include <sys/bus.h>
 #include <sys/reboot.h>
 
+#include <dev/pci/pcivar.h>
+
 #include <linux/cdev.h>
 #undef cdev
 #include <linux/fb.h>	/* linuxkpi_skip_ddb */

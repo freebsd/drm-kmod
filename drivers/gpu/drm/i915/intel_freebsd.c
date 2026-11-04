@@ -15,6 +15,7 @@ __FBSDID("$FreeBSD$");
 #include "intel_acpi.h"
 #include <linux/console.h>
 #include <linux/module.h>
+#include <linux/scatterlist.h>
 #include <linux/pm_runtime.h>
 #include <linux/vgaarb.h>
 #include <linux/vga_switcheroo.h>

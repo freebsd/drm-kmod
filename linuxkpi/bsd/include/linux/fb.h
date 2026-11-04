@@ -31,7 +31,6 @@
 
 #include <linux/types.h>
 #include <linux/fs.h>
-#include <linux/pci.h>
 
 #define	FB_ROTATE_UR	0
 #define	FB_ROTATE_CW	1
@@ -390,9 +389,6 @@ fb_sys_write(struct linux_fb_info *info, const char __user *buf, size_t count,
 
 int linux_register_framebuffer(struct linux_fb_info *fb_info);
 int linux_unregister_framebuffer(struct linux_fb_info *fb_info);
-int remove_conflicting_framebuffers(resource_size_t base, resource_size_t size,
-	const char *name, bool primary);
-int remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name);
 struct linux_fb_info *framebuffer_alloc(size_t size, struct device *dev);
 void framebuffer_release(struct linux_fb_info *info);
 
