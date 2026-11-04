@@ -327,6 +327,11 @@ struct drm_i915_private {
 	struct intel_gt *gt[I915_MAX_GT];
 
 	struct kobject *sysfs_gt;
+#ifdef __FreeBSD__
+	/* sysfs objects of the engines, released by i915_teardown_sysfs() */
+	struct kobject *sysfs_engine_dir;
+	struct list_head sysfs_engine_kobjs;
+#endif
 
 	/* Quick lookup of media GT (current platforms only have one) */
 	struct intel_gt *media_gt;
