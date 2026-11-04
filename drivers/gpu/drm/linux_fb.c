@@ -137,7 +137,7 @@ fb_info_print(struct linux_fb_info *info)
 	printf("height=%d width=%d depth=%d\n",
 	       info->var.yres, info->var.xres, info->var.bits_per_pixel);
 	printf("pbase=0x%lx vbase=0x%lx\n",
-	       info->fix.smem_start, info->screen_base);
+	       info->fix.smem_start, (unsigned long)info->screen_base);
 	printf("name=%s id=%s flags=0x%x stride=%d\n",
 	       info->fbio.fb_name, info->fix.id, info->fbio.fb_flags,
 	       info->fix.line_length);
