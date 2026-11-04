@@ -14,6 +14,9 @@
 struct kobj_engine {
 	struct kobject base;
 	struct intel_engine_cs *engine;
+#ifdef __FreeBSD__
+	struct list_head link;
+#endif
 };
 
 static struct intel_engine_cs *kobj_to_engine(struct kobject *kobj)
@@ -468,6 +471,9 @@ static void add_defaults(struct kobj_engine *parent)
 		kobject_put(&ke->base);
 		return;
 	}
+#ifdef __FreeBSD__
+	list_add_tail(&ke->link, &ke->engine->i915->sysfs_engine_kobjs);
+#endif
 
 	if (sysfs_create_files(&ke->base, files))
 		return;
@@ -505,6 +511,10 @@ void intel_engines_add_sysfs(struct drm_i915_private *i915)
 	dir = kobject_create_and_add("engine", &kdev->kobj);
 	if (!dir)
 		return;
+#ifdef __FreeBSD__
+	i915->sysfs_engine_dir = dir;
+	INIT_LIST_HEAD(&i915->sysfs_engine_kobjs);
+#endif
 
 	for_each_uabi_engine(engine, i915) {
 		struct kobject *kobj;
@@ -512,6 +522,10 @@ void intel_engines_add_sysfs(struct drm_i915_private *i915)
 		kobj = kobj_engine(dir, engine);
 		if (!kobj)
 			goto err_engine;
+#ifdef __FreeBSD__
+		list_add_tail(&container_of(kobj, struct kobj_engine, base)->link,
+		    &i915->sysfs_engine_kobjs);
+#endif
 
 		if (sysfs_create_files(kobj, files))
 			goto err_object;
@@ -528,6 +542,9 @@ void intel_engines_add_sysfs(struct drm_i915_private *i915)
 
 		if (0) {
 err_object:
+#ifdef __FreeBSD__
+			list_del(&container_of(kobj, struct kobj_engine, base)->link);
+#endif
 			kobject_put(kobj);
 err_engine:
 			dev_warn(kdev, "Failed to add sysfs engine '%s'\n",
@@ -535,3 +552,26 @@ err_engine:
 		}
 	}
 }
+
+#ifdef __FreeBSD__
+/*
+ * On Linux the objects are owned by the sysfs tree.  Here nothing else
+ * releases them, so drop the references taken when they were created, the
+ * .defaults and engine objects first and the "engine" directory last.
+ */
+void intel_engines_remove_sysfs(struct drm_i915_private *i915)
+{
+	struct kobj_engine *ke, *tmp;
+
+	if (!i915->sysfs_engine_dir)
+		return;
+
+	list_for_each_entry_safe_reverse(ke, tmp, &i915->sysfs_engine_kobjs,
+	    link) {
+		list_del(&ke->link);
+		kobject_put(&ke->base);
+	}
+	kobject_put(i915->sysfs_engine_dir);
+	i915->sysfs_engine_dir = NULL;
+}
+#endif
