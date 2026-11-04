@@ -100,7 +100,8 @@ drmm_kfree(struct drm_device *dev, void *p)
 	spin_unlock(&dev->managed.lock);
 	
 	if (m != NULL) {
-		free(m->p, DRM_MEM_MANAGED);
+		/* Allocated with kzalloc(), kcalloc() or kstrdup(). */
+		kfree(m->p);
 		free(m, DRM_MEM_MANAGED);
 	}
 }
@@ -148,7 +149,7 @@ drm_managed_release(struct drm_device *dev)
 		if (n->func)
 			n->func(dev, n->p);
 		else
-			free(n->p, DRM_MEM_MANAGED);
+			kfree(n->p);	/* see drmm_kzalloc() */
 		free(n, DRM_MEM_MANAGED);
 	}
 }
