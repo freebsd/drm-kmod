@@ -25,14 +25,14 @@
  */
 
 #include <sys/param.h>
-#include <sys/types.h>
+#include <sys/systm.h>
+#include <sys/bus.h>
+#include <sys/fbio.h>
 #include <sys/kernel.h>
 #include <sys/lock.h>
 #include <sys/malloc.h>
 #include <sys/reboot.h>
-#include <sys/systm.h>
 #include <sys/sx.h>
-#include <sys/fbio.h>
 
 #include <dev/vt/vt.h>
 #include "vt_drmfb.h"
