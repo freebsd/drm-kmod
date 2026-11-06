@@ -47,7 +47,12 @@ __FBSDID("$FreeBSD$");
 #include <vm/vm.h>
 #include <vm/pmap.h>
 
+#if __FreeBSD_version < 1403503 || \
+    (__FreeBSD_version >= 1500000 && __FreeBSD_version < 1500047)
 #include <machine/stdarg.h>
+#else
+#include <sys/stdarg.h>
+#endif
 
 #include <linux/list.h>
 #include <linux/dma-buf.h>
