@@ -115,7 +115,6 @@ drm_sysctl_init(struct drm_device *dev)
 		return (-ENOSPC);
 	}
 
-	dev->sysctl_node_idx = i;
 	/* Add the hw.dri.x for our device */
 	info->name[0] = '0' + i;
 	info->name[1] = 0;

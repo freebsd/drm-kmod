@@ -142,7 +142,7 @@ struct drm_device {
 	bool unplugged;
 
 	/** @anon_inode: inode for private address-space */
-#ifdef __linux__	
+#ifdef __linux__
 	struct inode *anon_inode;
 #endif
 
@@ -307,14 +307,9 @@ struct drm_device {
 
 #ifdef __FreeBSD__
 	struct drm_sysctl_info *sysctl;
-	int  sysctl_node_idx;
-	void *sysctl_private;
 	char busid_str[128];
 	int modesetting;
 	bool fictitious_range_registered;
-/* FIXME: Should be defined in linux/mmzone.h and include linux/mmzone.h in the
- * correct headers, such as gfp.h. */
-#define	MAX_ORDER 11
 #endif
 	/**
 	 * @fb_helper:
