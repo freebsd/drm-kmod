@@ -4517,24 +4517,6 @@ fence_driver_init:
 		goto release_ras_con;
 	}
 
-#ifdef __FreeBSD__
-	/*
-	 * After amdgpu_device_ip_init(), gmc.aper_base and gmc.aper_size are
-	 * set, and mode_config.fb_base was initialized from gmc.aper_base.
-	 * Therefore, we can register the fictitious memory range.
-	 *
-	 * This was handled in register_framebuffer() in the past, based on the
-	 * values of info->apertures->ranges[0]. However, the `amdgpu` driver
-	 * stopped setting them when it got rid of its specific framebuffer
-	 * initialization to use the generic drm_fb_helper code.
-	 *
-	 * We can't do this in register_framebuffer() anymore because the
-	 * values passed to register_fictitious_range() below are unavailable
-	 * from a generic structure set by both drivers.
-	 */
-	register_fictitious_range(ddev, adev->gmc.aper_base, adev->gmc.aper_size);
-#endif
-
 	amdgpu_fence_driver_hw_init(adev);
 
 	dev_info(adev->dev,
@@ -4752,10 +4734,6 @@ void amdgpu_device_fini_hw(struct amdgpu_device *adev)
 
 	/* disable ras feature must before hw fini */
 	amdgpu_ras_pre_fini(adev);
-
-#ifdef __FreeBSD__
-	unregister_fictitious_range(adev_to_drm(adev), adev->gmc.aper_base, adev->gmc.aper_size);
-#endif
 
 	amdgpu_ttm_set_buffer_funcs_status(adev, false);
 
