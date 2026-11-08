@@ -236,6 +236,60 @@ __i915_gem_object_unset_pages(struct drm_i915_gem_object *obj)
 	return pages;
 }
 
+#ifdef __FreeBSD__
+/* Reattach still-needed shmem pages after device-pager PTE revocation. */
+static int
+restore_shmem_page_ownership(struct drm_i915_gem_object *obj)
+{
+	struct drm_i915_private *i915 = to_i915(obj->base.dev);
+	struct sgt_iter iter;
+	struct page *page;
+	vm_object_t mapping;
+	vm_pindex_t index = 0;
+	int ret = 0;
+
+	assert_object_held_shared(obj);
+	if (!IS_COFFEELAKE(i915) || !i915_gem_object_is_shmem(obj) ||
+	    !i915_gem_object_has_struct_page(obj) ||
+	    obj->mm.madv != I915_MADV_WILLNEED ||
+	    kref_read(&obj->base.refcount) == 0 ||
+	    IS_ERR_OR_NULL(obj->mm.pages))
+		return 0;
+
+	mapping = obj->base.filp->f_shmem;
+	VM_OBJECT_WLOCK(mapping);
+	for_each_sgt_page(page, iter, obj->mm.pages) {
+		struct page *resident = vm_page_lookup(mapping, index);
+
+		if (resident == page) {
+			index++;
+			continue;
+		}
+		/* Never replace an existing legacy alias or wait on a busy page. */
+		if (resident || !vm_page_tryxbusy(page)) {
+			ret = -EBUSY;
+			break;
+		}
+		if (page->object != NULL) {
+			vm_page_xunbusy(page);
+			ret = -EBUSY;
+			break;
+		}
+		if (vm_page_insert(page, mapping, index)) {
+			vm_page_xunbusy(page);
+			ret = -ENOMEM;
+			break;
+		}
+		/* Offset CPU writes must survive later paging of this object. */
+		vm_page_dirty(page);
+		vm_page_xunbusy(page);
+		index++;
+	}
+	VM_OBJECT_WUNLOCK(mapping);
+	return ret;
+}
+#endif
+
 int __i915_gem_object_put_pages(struct drm_i915_gem_object *obj)
 {
 	struct sg_table *pages;
@@ -247,6 +301,11 @@ int __i915_gem_object_put_pages(struct drm_i915_gem_object *obj)
 	assert_object_held_shared(obj);
 
 	i915_gem_object_release_mmap_offset(obj);
+#ifdef __FreeBSD__
+	int restore_ret = restore_shmem_page_ownership(obj);
+	if (restore_ret)
+		return restore_ret;
+#endif
 
 	/*
 	 * ->put_pages might need to allocate memory for the bit17 swizzle
