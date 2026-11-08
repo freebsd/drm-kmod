@@ -212,5 +212,9 @@ void i915_teardown_sysfs(struct drm_i915_private *dev_priv)
 	device_remove_bin_file(kdev, &dpf_attrs);
 
 	kobject_put(dev_priv->sysfs_gt);
+#else
+	intel_engines_remove_sysfs(dev_priv);
+	kobject_put(dev_priv->sysfs_gt);
+	dev_priv->sysfs_gt = NULL;
 #endif
 }

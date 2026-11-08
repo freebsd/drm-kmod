@@ -4433,6 +4433,25 @@ int amdgpu_device_init(struct amdgpu_device *adev,
 	if (adev->bios)
 		amdgpu_device_detect_sriov_bios(adev);
 
+#ifdef __FreeBSD__
+	/*
+	 * Do not touch a GPU that was used since boot if nothing resets it: the
+	 * initialization would fail, and could hang the machine.  A reboot is
+	 * required (or hw.amdgpu.allow_reload=1 in the kernel environment to
+	 * try anyway).
+	 */
+	if (!amdgpu_sriov_vf(adev)) {
+		if (amdgpu_fbsd_used_before(adev) &&
+		    !amdgpu_asic_need_reset_on_init(adev)) {
+			dev_err(adev->dev,
+			    "this GPU can not be loaded again after it was used (it is not reset on init), reboot to use it\n");
+			r = -EBUSY;
+			goto failed;
+		}
+		amdgpu_fbsd_mark_used(adev);
+	}
+#endif
+
 	/* check if we need to reset the asic
 	 *  E.g., driver was not cleanly unloaded previously, etc.
 	 */
@@ -4768,9 +4787,20 @@ void amdgpu_device_fini_hw(struct amdgpu_device *adev)
 
 	amdgpu_gart_dummy_page_fini(adev);
 
+#ifdef __FreeBSD__
+	/*
+	 * On FreeBSD the driver is detached while the hardware is still there
+	 * (e.g. kldunload), and amdgpu_device_fini_sw() still has to access
+	 * registers (e.g. audio, display); unmap in amdgpu_device_fini_sw().
+	 * The doorbell buffer is a TTM object though, so it has to be freed
+	 * now, while TTM is still alive, as on Linux.
+	 */
+	if (drm_dev_is_unplugged(adev_to_drm(adev)))
+		amdgpu_doorbell_fini(adev);
+#else
 	if (drm_dev_is_unplugged(adev_to_drm(adev)))
 		amdgpu_device_unmap_mmio(adev);
-
+#endif
 }
 
 void amdgpu_device_fini_sw(struct amdgpu_device *adev)
@@ -4811,6 +4841,11 @@ void amdgpu_device_fini_sw(struct amdgpu_device *adev)
 	if ((adev->pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA)
 		vga_client_unregister(adev->pdev);
 
+#ifdef __FreeBSD__
+	if (adev->rmmio != NULL && drm_dev_is_unplugged(adev_to_drm(adev)))
+		amdgpu_device_unmap_mmio(adev);
+	else
+#endif
 	if (drm_dev_enter(adev_to_drm(adev), &idx)) {
 
 		iounmap(adev->rmmio);

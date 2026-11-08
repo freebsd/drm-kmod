@@ -59,6 +59,43 @@ SYSCTL_NODE(_hw, OID_AUTO, amdgpu,
     DRIVER_DESC " parameters");
 #endif
 
+#ifdef __FreeBSD__
+/*
+ * Some GPUs can not be loaded a second time after the driver was unloaded:
+ * the hardware is left in the state the driver left it, nothing resets it
+ * (amdgpu_asic_need_reset_on_init() is false) and the next initialization
+ * fails, e.g. the UVD firmware validation on SI, and can hang the machine.
+ * Remember in the kernel environment, i.e. until the next boot, that the
+ * driver was used on a device so that the attach can be refused cleanly.
+ */
+static void
+amdgpu_fbsd_used_name(struct amdgpu_device *adev, char *buf, size_t len)
+{
+	snprintf(buf, len, "hw.amdgpu.used.%s", pci_name(adev->pdev));
+}
+
+bool
+amdgpu_fbsd_used_before(struct amdgpu_device *adev)
+{
+	char name[64];
+
+	/* Allows to test the reload on hardware which is not known to work. */
+	if (testenv("hw.amdgpu.allow_reload"))
+		return (false);
+	amdgpu_fbsd_used_name(adev, name, sizeof(name));
+	return (testenv(name));
+}
+
+void
+amdgpu_fbsd_mark_used(struct amdgpu_device *adev)
+{
+	char name[64];
+
+	amdgpu_fbsd_used_name(adev, name, sizeof(name));
+	kern_setenv(name, "1");
+}
+#endif
+
 /*
  * KMS wrapper.
  * - 3.0.0 - initial driver
