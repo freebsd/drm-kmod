@@ -17,6 +17,10 @@
 #include "gt/intel_gt_mcr.h"
 #include "gt/intel_gt_regs.h"
 
+#ifdef __FreeBSD__
+#include <drm/drm_os_freebsd.h>
+#endif
+
 #ifdef CONFIG_64BIT
 #ifdef __linux__
 static void _release_bars(struct pci_dev *pdev)
@@ -137,6 +141,16 @@ region_lmem_release(struct intel_memory_region *mem)
 	int ret;
 
 	ret = intel_region_ttm_fini(mem);
+
+#ifdef __FreeBSD__
+	if (mem->fictitious_range_registered) {
+		unregister_fictitious_range(&mem->i915->drm,
+									mem->io.start,
+									resource_size(&mem->io));
+		mem->fictitious_range_registered = false;
+	}
+#endif
+
 	io_mapping_fini(&mem->iomap);
 
 	return ret;
@@ -145,6 +159,9 @@ region_lmem_release(struct intel_memory_region *mem)
 static int
 region_lmem_init(struct intel_memory_region *mem)
 {
+#ifdef __FreeBSD__
+	struct drm_device *ddev = &mem->i915->drm;
+#endif
 	int ret;
 
 	if (!io_mapping_init_wc(&mem->iomap,
@@ -156,8 +173,22 @@ region_lmem_init(struct intel_memory_region *mem)
 	if (ret)
 		goto out_no_buddy;
 
-	return 0;
+#ifdef __FreeBSD__
+	if (!ddev->fictitious_range_registered) {
+		ret = register_fictitious_range(ddev,
+										mem->io.start,
+										resource_size(&mem->io));
+		if (ret)
+			goto out_ttm_fini;
+		mem->fictitious_range_registered = true;
+	}
+#endif
 
+	return 0;
+#ifdef __FreeBSD__
+out_ttm_fini:
+	intel_region_ttm_fini(mem);
+#endif
 out_no_buddy:
 	io_mapping_fini(&mem->iomap);
 
