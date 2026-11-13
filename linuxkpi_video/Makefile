@@ -20,7 +20,8 @@ SRCS+= aperture.c
 SRCS+=	cmdline.c
 .endif
 
-SRCS+=	bus_if.h \
+SRCS+=	${LINUXKPI_GENSRCS} \
+	bus_if.h \
 	device_if.h \
 	pci_if.h \
 	vnode_if.h \

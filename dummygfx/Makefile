@@ -14,6 +14,7 @@ SRCS=	\
 	dummygfx_debugfs.c
 
 SRCS	+=			\
+	${LINUXKPI_GENSRCS}	\
 	opt_acpi.h		\
 	opt_drm.h		\
 	opt_platform.h		\

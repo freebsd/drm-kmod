@@ -353,6 +353,7 @@ SRCS+=	i915_hwmon.c
 # intel_lpe_audio.c   # Need platform and irq_chip support
 
 SRCS	+=			\
+	${LINUXKPI_GENSRCS}	\
 	opt_acpi.h		\
 	opt_drm.h		\
 	opt_syscons.h		\

@@ -1261,7 +1261,8 @@ SRCS+=	amd_powerplay.c \
 SRCS+=	amdgpu_pmu.c
 .endif
 
-SRCS+=	device_if.h \
+SRCS+=	${LINUXKPI_GENSRCS} \
+	device_if.h \
 	vnode_if.h \
 	bus_if.h \
 	pci_if.h \
