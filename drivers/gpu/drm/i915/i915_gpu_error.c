@@ -1141,7 +1141,9 @@ i915_vma_coredump_create(const struct intel_gt *gt,
 	dst->unused = 0;
 
 	ret = -EINVAL;
-	if (drm_mm_node_allocated(&ggtt->error_capture)) {
+	/* MTL BAR2 maps stolen memory, not a CPU GGTT aperture. */
+	if (drm_mm_node_allocated(&ggtt->error_capture) &&
+	    !HAS_LMEMBAR_SMEM_STOLEN(gt->i915)) {
 		void __iomem *s;
 		dma_addr_t dma;
 
