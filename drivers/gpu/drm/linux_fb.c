@@ -37,8 +37,12 @@
 #include <dev/vt/vt.h>
 #include "vt_drmfb.h"
 
+#include <vm/vm.h>
+#include <vm/vm_phys.h>
+
 #include <linux/device.h>
 #include <linux/fb.h>
+#include <linux/pci.h>
 #include <video/cmdline.h>
 
 /*
@@ -65,7 +69,7 @@ static int __unregister_framebuffer(struct linux_fb_info *fb_info);
  */
 int linuxkpi_skip_ddb = 0;
 
-void
+static void
 vt_freeze_main_vd(unsigned long base, unsigned long size)
 {
 	struct fb_info *fb;
@@ -85,7 +89,7 @@ vt_freeze_main_vd(unsigned long base, unsigned long size)
 	}
 }
 
-void
+static void
 vt_unfreeze_main_vd(void)
 {
 	struct fb_info *fb;
@@ -222,11 +226,75 @@ remove_conflicting_pci_framebuffers(struct pci_dev *pdev, const char *name)
 }
 #endif
 
+static void
+fb_set_fake_pages(struct linux_fb_info *fb_info, bool enable)
+{
+	struct pci_dev *pdev = to_pci_dev(fb_info->device);
+	unsigned long base, size, new_size, smem_start;
+	struct pci_map *pm;
+	int bar, ret __unused;
+
+	/* Start with trying to find PCI BAR frame buffer belongs to */
+	smem_start = fb_info->fix.smem_start;
+	for (bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
+		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
+			continue;
+		base = pci_resource_start(pdev, bar);
+		size = pci_resource_len(pdev, bar);
+		if (smem_start >= base && smem_start < base + size)
+			goto found;
+	}
+
+	/* Then search for largest prefetchable memory BAR */
+	size = 0;
+	for (bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
+		if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM))
+			continue;
+		/* TODO: Implement IORESOURCE_PREFETCH flag in LinuxKPI */
+		pm = pci_find_bar(pdev->dev.bsddev, PCIR_BAR(bar));
+		if (pm->pm_value & PCIM_BAR_MEM_PREFETCH) {
+			new_size = pci_resource_len(pdev, bar);
+			if (new_size > size) {
+				base = pci_resource_start(pdev, bar);
+				size = new_size;
+			}
+		}
+	}
+	if (size == 0) {
+		device_printf(pdev->dev.bsddev,
+		   "Graphical aperture PCI BAR not found\n");
+		return;
+	}
+found:
+	MPASS(base != 0);
+	MPASS(size != 0);
+
+	if (enable) {
+		device_printf(pdev->dev.bsddev, "Graphical aperture: "
+		    "PCI_BAR=%i base=0x%lx size=0x%lx\n", bar, base, size);
+		vt_freeze_main_vd(base, size);
+		ret = vm_phys_fictitious_reg_range(base, base + size,
+#ifdef VM_MEMATTR_WRITE_COMBINING
+						   VM_MEMATTR_WRITE_COMBINING
+#else
+						   VM_MEMATTR_UNCACHEABLE
+#endif
+		    );
+		MPASS(ret == 0);
+	} else {
+		vm_phys_fictitious_unreg_range(base, base + size);
+		vt_unfreeze_main_vd();
+	}
+}
+
 static int
 __register_framebuffer(struct linux_fb_info *fb_info)
 {
 	device_t fb_bsddev = fb_info->device->bsddev;
 	int err;
+
+	if (dev_is_pci(fb_info->device))
+		fb_set_fake_pages(fb_info, true);
 
 	fb_info->fbio.fb_video_dev = device_get_parent(fb_bsddev);
 	fb_info->fbio.fb_name = device_get_nameunit(fb_bsddev);
@@ -296,6 +364,9 @@ __unregister_framebuffer(struct linux_fb_info *fb_info)
 		mtx_unlock(&Giant);
 		fb_info->fbio.fb_fbd_dev = NULL;
 	}
+
+	if (dev_is_pci(fb_info->device))
+		fb_set_fake_pages(fb_info, false);
 
 	if (fb_info->fbops->fb_destroy)
 		fb_info->fbops->fb_destroy(fb_info);

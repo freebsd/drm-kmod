@@ -309,7 +309,6 @@ struct drm_device {
 	struct drm_sysctl_info *sysctl;
 	char busid_str[128];
 	int modesetting;
-	bool fictitious_range_registered;
 #endif
 	/**
 	 * @fb_helper:

@@ -177,11 +177,6 @@ static void radeon_fbdev_fb_destroy(struct fb_info *info)
 	struct drm_framebuffer *fb = fb_helper->fb;
 	struct drm_gem_object *gobj = drm_gem_fb_get_obj(fb, 0);
 
-#ifdef __FreeBSD__
-	struct radeon_device *rdev = fb_helper->dev->dev_private;
-	unregister_fictitious_range(fb_helper->dev, rdev->mc.aper_base, rdev->mc.aper_size);
-#endif
-
 	drm_fb_helper_fini(fb_helper);
 
 	drm_framebuffer_unregister_private(fb);
@@ -271,23 +266,6 @@ int radeon_fbdev_driver_fbdev_probe(struct drm_fb_helper *fb_helper,
 	info->screen_size = radeon_bo_size(rbo);
 
 	memset_io(info->screen_base, 0, info->screen_size);
-
-#ifdef __FreeBSD__
-	/*
-	 * We can register the fictitious memory range based on the
-	 * info->apertures->ranges[0] values.
-	 *
-	 * This was handled in register_framebuffer() in the past, also based
-	 * on the values of info->apertures->ranges[0]. However, the `amdgpu`
-	 * driver stopped setting them when it got rid of its specific
-	 * framebuffer initialization to use the generic drm_fb_helper code.
-	 *
-	 * We can't do this in register_framebuffer() anymore because the
-	 * values passed to register_fictitious_range() below are unavailable
-	 * from a generic structure set by both drivers.
-	 */
-	register_fictitious_range(fb_helper->dev, rdev->mc.aper_base, rdev->mc.aper_size);
-#endif
 
 	/* Use default scratch pixmap (info->pixmap.flags = FB_PIXMAP_SYSTEM) */
 
