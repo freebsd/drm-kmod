@@ -11,7 +11,8 @@ EXPORT_SYMS=	YES
 
 SRCS=	linuxkpi_virtio.c
 
-SRCS+=	bus_if.h \
+SRCS+=	${LINUXKPI_GENSRCS} \
+	bus_if.h \
 	device_if.h \
 	pci_if.h \
 	vnode_if.h \

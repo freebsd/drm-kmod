@@ -26,7 +26,8 @@ SRCS=	virtgpu_debugfs.c \
 # GPL-2.0.
 SRCS+=	virtgpu_vram.c
 
-SRCS+=	bus_if.h \
+SRCS+=	${LINUXKPI_GENSRCS} \
+	bus_if.h \
 	device_if.h \
 	opt_drm.h \
 	pci_if.h \
