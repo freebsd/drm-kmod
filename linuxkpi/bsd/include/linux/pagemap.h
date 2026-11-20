@@ -28,10 +28,15 @@
 #ifndef _BSD_LKPI_LINUX_PAGEMAP_H_
 #define	_BSD_LKPI_LINUX_PAGEMAP_H_
 
+#include <sys/param.h>
 #include_next <linux/pagemap.h>
 
+#if __FreeBSD_version < 1600031
+
 /*
- * Missing from the base system's LinuxKPI.  Its shmem objects take no
+ * Interim copies of helpers in base LinuxKPI since 40e726479d73 (D61217),
+ * which landed without a __FreeBSD_version bump, at 1600031; drop this
+ * file once drm-kmod requires it.  LinuxKPI shmem objects take no
  * allocation flags and keep their pages wired, and a folio is one page.
  */
 static inline gfp_t
@@ -56,5 +61,7 @@ folio_file_page(struct folio *folio, pgoff_t index)
 {
 	return (&folio->page);
 }
+
+#endif /* __FreeBSD_version < 1600031 */
 
 #endif /* _BSD_LKPI_LINUX_PAGEMAP_H_ */
