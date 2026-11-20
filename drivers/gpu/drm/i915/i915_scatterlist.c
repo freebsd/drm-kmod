@@ -131,8 +131,17 @@ struct i915_refct_sgt *i915_rsgt_from_mm_node(const struct drm_mm_node *node,
 		}
 
 		len = min_t(u64, block_size, max_segment - sg->length);
+
+		#ifdef __linux__
 		sg->length += len;
 		sg_dma_len(sg) += len;
+		#elif defined(__FreeBSD__)
+		/* In linuxkpi/common/include/linux/scatterlist.h, there's a
+		 * "#define sg_dma_len(sg)          (sg)->length"
+		 * which causes this increment to double count when both variables are incremented
+		 */
+		sg_dma_len(sg) += len;
+		#endif
 
 		offset += len;
 		block_size -= len;
@@ -221,8 +230,17 @@ struct i915_refct_sgt *i915_rsgt_from_buddy_resource(struct ttm_resource *res,
 			}
 
 			len = min_t(u64, block_size, max_segment - sg->length);
+
+			#ifdef __linux__
 			sg->length += len;
 			sg_dma_len(sg) += len;
+			#elif defined(__FreeBSD__)
+			/* In linuxkpi/common/include/linux/scatterlist.h, there's a
+			 * "#define sg_dma_len(sg)          (sg)->length"
+			 * which causes this increment to double count when both variables are incremented
+			 */
+			sg_dma_len(sg) += len;
+			#endif
 
 			offset += len;
 			block_size -= len;

@@ -64,6 +64,11 @@ struct intel_memory_region {
 	struct io_mapping iomap;
 	struct resource region;
 
+#ifdef __FreeBSD__
+	/* FreeBSD-only flag for whether a fictitious range was registered by this memory region */
+	bool fictitious_range_registered;
+#endif
+
 	struct resource io;
 	resource_size_t min_page_size;
 	resource_size_t total;
