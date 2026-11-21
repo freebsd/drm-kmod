@@ -528,7 +528,6 @@ int drm_gem_create_mmap_offset(struct drm_gem_object *obj)
 }
 EXPORT_SYMBOL(drm_gem_create_mmap_offset);
 
-#ifdef __linux__
 /*
  * Move folios to appropriate lru and release the folios, decrementing the
  * ref count of those folios.
@@ -567,7 +566,11 @@ static void drm_gem_check_release_batch(struct folio_batch *fbatch)
  */
 struct page **drm_gem_get_pages(struct drm_gem_object *obj)
 {
+#ifdef __linux__
 	struct address_space *mapping;
+#elif defined(__FreeBSD__)
+	vm_object_t mapping;
+#endif
 	struct page **pages;
 	struct folio *folio;
 	struct folio_batch fbatch;
@@ -577,7 +580,11 @@ struct page **drm_gem_get_pages(struct drm_gem_object *obj)
 		return ERR_PTR(-EINVAL);
 
 	/* This is the shared memory object that backs the GEM resource */
+#ifdef __linux__
 	mapping = obj->filp->f_mapping;
+#elif defined(__FreeBSD__)
+	mapping = obj->filp->f_shmem;
+#endif
 
 	/* We already BUG_ON() for non-page-aligned sizes in
 	 * drm_gem_object_init(), so we should never hit this unless
@@ -644,10 +651,18 @@ void drm_gem_put_pages(struct drm_gem_object *obj, struct page **pages,
 		bool dirty, bool accessed)
 {
 	int i, npages;
+#ifdef __linux__
 	struct address_space *mapping;
+#elif defined(__FreeBSD__)
+	vm_object_t mapping;
+#endif
 	struct folio_batch fbatch;
 
+#ifdef __linux__
 	mapping = file_inode(obj->filp)->i_mapping;
+#elif defined(__FreeBSD__)
+	mapping = obj->filp->f_shmem;
+#endif
 	mapping_clear_unevictable(mapping);
 
 	/* We already BUG_ON() for non-page-aligned sizes in
@@ -683,7 +698,6 @@ void drm_gem_put_pages(struct drm_gem_object *obj, struct page **pages,
 	kvfree(pages);
 }
 EXPORT_SYMBOL(drm_gem_put_pages);
-#endif
 
 static int objects_lookup(struct drm_file *filp, u32 *handle, int count,
 			  struct drm_gem_object **objs)
